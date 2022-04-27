@@ -82,7 +82,7 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t status;
+                uint8_t status;
                 ReturnErrorOnFailure(reader.Get(status));
                 PRETTY_PRINT("\tstatus = " ChipLogFormatIMStatus ",", ChipLogValueIMStatus(static_cast<Status>(status)));
             }

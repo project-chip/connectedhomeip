@@ -611,7 +611,10 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
         g_variant_get(scan_result.get(), "a(tstayqqyyyybb)", &MakeUniquePointerReceiver(iter).Get());
         if (!iter)
+        {
+            delete scanResult;
             return;
+        }
 
         guint64 ext_address;
         const gchar * network_name;
@@ -630,7 +633,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
                                    &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
         {
             ChipLogProgress(DeviceLayer,
-                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %u"
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %u LQI %u"
                             " Version %u",
                             network_name, ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;

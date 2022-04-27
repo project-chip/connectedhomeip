@@ -95,6 +95,8 @@ public:
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }
     SwitchDeviceControlDelegate * GetSwitchDelegate() const { return mSwitchDelegate; }
     FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+    CHIP_ERROR SetBreadcrumb(uint64_t breadcrumb);
+    uint64_t GetBreadcrumb();
 
     static DeviceControlServer & DeviceControlSvr();
 

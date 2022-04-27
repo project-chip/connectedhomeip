@@ -135,7 +135,6 @@ public:
      *
      *  @param[in]    messageCounter  The message counter of the packet.
      *  @param[in]    payloadHeader   A reference to the PayloadHeader object.
-     *  @param[in]    peerAddress     The address of the sender
      *  @param[in]    msgFlags        The message flags corresponding to the received message
      *  @param[in]    msgBuf          A handle to the packet buffer holding the CHIP message.
      *
@@ -144,8 +143,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                              System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }

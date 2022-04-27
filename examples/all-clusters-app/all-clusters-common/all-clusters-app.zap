@@ -10774,7 +10774,47 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "UnlockWithTimeout",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "SetWeekDaySchedule",
+              "code": 11,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetWeekDaySchedule",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "SetYearDaySchedule",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+             {
+              "name": "GetYearDaySchedule",
+              "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             },
             {
               "name": "SetUser",
@@ -11036,7 +11076,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "10",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -11051,7 +11091,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "10",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -11561,7 +11601,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x103",
+              "defaultValue": "0x113",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -17573,7 +17613,7 @@
             },
             {
               "name": "nullable_boolean",
-              "code": 32768,
+              "code": 16384,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17588,7 +17628,7 @@
             },
             {
               "name": "nullable_bitmap8",
-              "code": 32769,
+              "code": 16385,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17603,7 +17643,7 @@
             },
             {
               "name": "nullable_bitmap16",
-              "code": 32770,
+              "code": 16386,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17618,7 +17658,7 @@
             },
             {
               "name": "nullable_bitmap32",
-              "code": 32771,
+              "code": 16387,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17633,7 +17673,7 @@
             },
             {
               "name": "nullable_bitmap64",
-              "code": 32772,
+              "code": 16388,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17648,7 +17688,7 @@
             },
             {
               "name": "nullable_int8u",
-              "code": 32773,
+              "code": 16389,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17663,7 +17703,7 @@
             },
             {
               "name": "nullable_int16u",
-              "code": 32774,
+              "code": 16390,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17678,7 +17718,7 @@
             },
             {
               "name": "nullable_int24u",
-              "code": 32775,
+              "code": 16391,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17693,7 +17733,7 @@
             },
             {
               "name": "nullable_int32u",
-              "code": 32776,
+              "code": 16392,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17708,7 +17748,7 @@
             },
             {
               "name": "nullable_int40u",
-              "code": 32777,
+              "code": 16393,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17723,7 +17763,7 @@
             },
             {
               "name": "nullable_int48u",
-              "code": 32778,
+              "code": 16394,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17738,7 +17778,7 @@
             },
             {
               "name": "nullable_int56u",
-              "code": 32779,
+              "code": 16395,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17753,7 +17793,7 @@
             },
             {
               "name": "nullable_int64u",
-              "code": 32780,
+              "code": 16396,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17768,7 +17808,7 @@
             },
             {
               "name": "nullable_int8s",
-              "code": 32781,
+              "code": 16397,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17783,7 +17823,7 @@
             },
             {
               "name": "nullable_int16s",
-              "code": 32782,
+              "code": 16398,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17798,7 +17838,7 @@
             },
             {
               "name": "nullable_int24s",
-              "code": 32783,
+              "code": 16399,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17813,7 +17853,7 @@
             },
             {
               "name": "nullable_int32s",
-              "code": 32784,
+              "code": 16400,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17828,7 +17868,7 @@
             },
             {
               "name": "nullable_int40s",
-              "code": 32785,
+              "code": 16401,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17843,7 +17883,7 @@
             },
             {
               "name": "nullable_int48s",
-              "code": 32786,
+              "code": 16402,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17858,7 +17898,7 @@
             },
             {
               "name": "nullable_int56s",
-              "code": 32787,
+              "code": 16403,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17873,7 +17913,7 @@
             },
             {
               "name": "nullable_int64s",
-              "code": 32788,
+              "code": 16404,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17888,7 +17928,7 @@
             },
             {
               "name": "nullable_enum8",
-              "code": 32789,
+              "code": 16405,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17903,7 +17943,7 @@
             },
             {
               "name": "nullable_enum16",
-              "code": 32790,
+              "code": 16406,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17918,7 +17958,7 @@
             },
             {
               "name": "nullable_float_single",
-              "code": 32791,
+              "code": 16407,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17933,7 +17973,7 @@
             },
             {
               "name": "nullable_float_double",
-              "code": 32792,
+              "code": 16408,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17948,7 +17988,7 @@
             },
             {
               "name": "nullable_octet_string",
-              "code": 32793,
+              "code": 16409,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17963,7 +18003,7 @@
             },
             {
               "name": "nullable_char_string",
-              "code": 32798,
+              "code": 16414,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17978,7 +18018,7 @@
             },
             {
               "name": "nullable_enum_attr",
-              "code": 32804,
+              "code": 16420,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -17993,7 +18033,7 @@
             },
             {
               "name": "nullable_struct",
-              "code": 32805,
+              "code": 16421,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -18008,7 +18048,7 @@
             },
             {
               "name": "nullable_range_restricted_int8u",
-              "code": 32806,
+              "code": 16422,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -18023,7 +18063,7 @@
             },
             {
               "name": "nullable_range_restricted_int8s",
-              "code": 32807,
+              "code": 16423,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -18038,7 +18078,7 @@
             },
             {
               "name": "nullable_range_restricted_int16u",
-              "code": 32808,
+              "code": 16424,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -18053,7 +18093,7 @@
             },
             {
               "name": "nullable_range_restricted_int16s",
-              "code": 32809,
+              "code": 16425,
               "mfgCode": null,
               "side": "server",
               "included": 1,

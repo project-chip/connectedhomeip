@@ -31,19 +31,76 @@ tests:
     - label: "Stop the accessory"
       command: "Stop"
 
-    - label: "Start the accessory with a given discriminator"
+    - label: "Start the accessory with no command line options"
+      command: "Start"
+
+    - label: "Stop the accessory"
+      command: "Stop"
+
+    - label: "Start the accessory with only discriminator command line option"
       command: "Start"
       arguments:
           values:
               - name: "discriminator"
                 value: 1111
 
-    - label: "Reboot the accessory with an other given discriminator"
+    - label: "Stop the accessory"
+      command: "Stop"
+
+    - label:
+          "Start the accessory with discriminator and port command line option"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 1111
+              - name: "port"
+                value: 5560
+
+    - label: "Stop the accessory"
+      command: "Stop"
+
+    - label: "Start the accessory with all command line options"
+      command: "Start"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 1111
+              - name: "port"
+                value: 5560
+              - name: "kvs"
+                value: "/tmp/chip_kvs_test"
+
+    - label: "Reboot the accessory with no command line options"
+      command: "Reboot"
+
+    - label: "Reboot the accessory with only discriminator command line option"
       command: "Reboot"
       arguments:
           values:
               - name: "discriminator"
                 value: 2222
+
+    - label:
+          "Reboot the accessory with discriminator and port command line option"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 2222
+              - name: "port"
+                value: 5565
+
+    - label: "Reboot the accessory with all command line options"
+      command: "Reboot"
+      arguments:
+          values:
+              - name: "discriminator"
+                value: 2222
+              - name: "port"
+                value: 5565
+              - name: "kvs"
+                value: "/tmp/chip_kvs_test"
 
     - label: "Factory Reset the accessory"
       command: "FactoryReset"

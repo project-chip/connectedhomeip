@@ -102,6 +102,12 @@ CHIP_ERROR P6Utils::IsAPEnabled(bool & apEnabled)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR P6Utils::IsStationEnabled(bool & staEnabled)
+{
+    staEnabled = (WiFiMode == WIFI_MODE_STA || WiFiMode == WIFI_MODE_APSTA);
+    return CHIP_NO_ERROR;
+}
+
 bool P6Utils::IsStationProvisioned(void)
 {
     wifi_config_t stationConfig;

@@ -12,6 +12,7 @@ FROM connectedhomeip/chip-build-ameba:${VERSION} AS ameba
 FROM connectedhomeip/chip-build-k32w:${VERSION} AS k32w
 FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
 FROM connectedhomeip/chip-build-ti:${VERSION} AS ti
+FROM connectedhomeip/chip-build-zap:${VERSION} AS zap
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -34,7 +35,7 @@ COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/zephyr-sdk-0.13.2 /opt/telink/zephyr-sdk-0.13.2
 
-COPY --from=tizen /opt/tizen_sdk /opt/tizen_sdk
+COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
 COPY --from=crosscompile /opt/ubuntu-21.04-aarch64-sysroot /opt/ubuntu-21.04-aarch64-sysroot
 
@@ -45,6 +46,8 @@ COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
+
+COPY --from=zap /opt/zap /opt/zap
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -69,7 +72,7 @@ ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
-ENV TIZEN_HOME /opt/tizen_sdk
+ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks

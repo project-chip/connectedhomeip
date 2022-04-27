@@ -22,6 +22,7 @@ from .gn import GnBuilder
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     CHIP_TOOL = auto()
+    CHIP_TOOL_DARWIN = auto()
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
@@ -41,6 +42,8 @@ class HostApp(Enum):
             return 'all-clusters-app/linux'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
+        elif self == HostApp.CHIP_TOOL_DARWIN:
+            return 'chip-tool-darwin'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
@@ -50,7 +53,7 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
         elif self == HostApp.LOCK:
-            return 'door-lock-app/linux'
+            return 'lock-app/linux'
         elif self == HostApp.SHELL:
             return 'shell/standalone'
         elif self == HostApp.OTA_PROVIDER:
@@ -71,6 +74,9 @@ class HostApp(Enum):
         elif self == HostApp.CHIP_TOOL:
             yield 'chip-tool'
             yield 'chip-tool.map'
+        elif self == HostApp.CHIP_TOOL_DARWIN:
+            yield 'chip-tool-darwin'
+            yield 'chip-tool-darwin.map'
         elif self == HostApp.THERMOSTAT:
             yield 'thermostat-app'
             yield 'thermostat-app.map'
@@ -90,8 +96,8 @@ class HostApp(Enum):
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
         elif self == HostApp.LOCK:
-            yield 'chip-door-lock-app'
-            yield 'chip-door-lock-app.map'
+            yield 'chip-lock-app'
+            yield 'chip-lock-app.map'
         elif self == HostApp.TESTS:
             pass
         elif self == HostApp.SHELL:
@@ -158,7 +164,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False, interactive_mode=True,
+                 test_group=False, use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -201,6 +207,11 @@ class HostBuilder(GnBuilder):
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
+
+        if extra_tests:
+            # Flag for testing purpose
+            self.extra_gn_options.append(
+                'chip_im_force_fabric_quota_check=true')
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')

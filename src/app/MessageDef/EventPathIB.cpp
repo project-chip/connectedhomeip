@@ -69,7 +69,7 @@ CHIP_ERROR EventPathIB::Parser::CheckSchemaValidity() const
             {
                 EndpointId endpoint;
                 reader.Get(endpoint);
-                PRETTY_PRINT("\tEndpoint = 0x%" PRIx16 ",", endpoint);
+                PRETTY_PRINT("\tEndpoint = 0x%x,", endpoint);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -97,7 +97,7 @@ CHIP_ERROR EventPathIB::Parser::CheckSchemaValidity() const
             {
                 EventId event;
                 reader.Get(event);
-                PRETTY_PRINT("\tEvent = 0x%" PRIx16 ",", event);
+                PRETTY_PRINT("\tEvent = 0x%x,", event);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

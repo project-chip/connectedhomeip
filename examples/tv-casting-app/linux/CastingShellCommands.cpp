@@ -38,10 +38,13 @@ static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
+    streamer_printf(sout,
+                    "  init <nodeid> <fabric-index>  Initialize casting app using given nodeid and index from previous "
+                    "commissioning. Usage: init 18446744004990074879 2\r\n");
     streamer_printf(sout, "  discover             Discover commissioners. Usage: cast discover\r\n");
     streamer_printf(
         sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
-    streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launc https://www.yahoo.com Hello\r\n");
+    streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launch https://www.yahoo.com Hello\r\n");
     streamer_printf(
         sout,
         "  access <node>        Read and display clusters on each endpoint for <node>. Usage: cast access 0xFFFFFFEFFFFFFFFF\r\n");
@@ -56,6 +59,15 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
+    }
+    if (strcmp(argv[0], "init") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "init");
+
+        char * eptr;
+        chip::NodeId nodeId           = (chip::NodeId) strtoull(argv[1], &eptr, 10);
+        chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[2], &eptr, 10);
+        return TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "discover") == 0)
     {

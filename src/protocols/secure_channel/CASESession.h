@@ -60,11 +60,11 @@ class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
                                public PairingSession
 {
 public:
-    CASESession();
-    CASESession(CASESession &&)      = default;
-    CASESession(const CASESession &) = default;
-
     ~CASESession() override;
+
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+    CATValues GetPeerCATs() const override { return mPeerCATs; };
 
     /**
      * @brief
@@ -86,7 +86,6 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param peerAddress                   Address of peer with which to establish a session.
      * @param fabric                        The fabric that should be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -95,9 +94,9 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, FabricInfo * fabric,
-                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt,
-                     SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
+    EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
+                     Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
+                     SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -135,15 +134,12 @@ public:
 
     /**
      * @brief
-     *   Derive a secure session from the established session. The API will return error
-     *   if called before session is established.
+     *   Derive a secure session from the established session. The API will return error if called before session is established.
      *
-     * @param session     Reference to the secure session that will be
-     *                    initialized once session establishment is complete
-     * @param role        Role of the new session (initiator or responder)
+     * @param session     Reference to the secure session that will be initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
@@ -166,7 +162,7 @@ public:
     void Clear();
 
 private:
-    enum State : uint8_t
+    enum class State : uint8_t
     {
         kInitialized      = 0,
         kSentSigma1       = 1,
@@ -217,6 +213,9 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
+    // TODO: pull up Finish to PairingSession class
+    void Finish();
+
     void AbortExchange();
 
     /**
@@ -253,6 +252,8 @@ private:
 
     FabricTable * mFabricsTable    = nullptr;
     const FabricInfo * mFabricInfo = nullptr;
+    NodeId mPeerNodeId             = kUndefinedNodeId;
+    CATValues mPeerCATs;
 
     // This field is only used for CASE responder, when during sending sigma2 and waiting for sigma3
     SessionResumptionStorage::ResumptionIdStorage mResumptionId;
@@ -260,8 +261,6 @@ private:
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;
-
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
 protected:
     bool mCASESessionEstablished = false;

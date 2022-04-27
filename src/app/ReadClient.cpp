@@ -234,16 +234,13 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         ReturnErrorOnFailure(GenerateEventPaths(eventPathListBuilder, eventPaths));
 
-        if (aReadPrepareParams.mEventNumber != 0)
+        Optional<EventNumber> eventMin;
+        ReturnErrorOnFailure(GetMinEventNumber(aReadPrepareParams, eventMin));
+        if (eventMin.HasValue())
         {
-            // EventFilter is optional
             EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
-            ReturnErrorOnFailure(request.GetError());
-
-            EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
-            ReturnErrorOnFailure(eventFilters.GetError());
-            ReturnErrorOnFailure(eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB().GetError());
-            ReturnErrorOnFailure(eventFilters.EndOfEventFilters().GetError());
+            ReturnErrorOnFailure(err = request.GetError());
+            ReturnErrorOnFailure(eventFilters.GenerateEventFilter(eventMin.Value()));
         }
     }
 
@@ -695,8 +692,13 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
             header.mTimestamp = mEventTimestamp;
             ReturnErrorOnFailure(data.DecodeEventHeader(header));
             mEventTimestamp = header.mTimestamp;
-            mEventMin       = header.mEventNumber + 1;
+
             ReturnErrorOnFailure(data.GetData(&dataReader));
+
+            if (mReadPrepareParams.mResubscribePolicy != nullptr)
+            {
+                mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
+            }
 
             mpCallback.OnEventData(header, &dataReader, nullptr);
         }
@@ -799,8 +801,8 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeResponse.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
 
     ChipLogProgress(DataManagement,
-                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %" PRIu16
-                    "s MaxInterval = %" PRIu16 "s Peer = %02x:" ChipLogFormatX64,
+                    "Subscription established with SubscriptionID = 0x" ChipLogFormatX64 " MinInterval = %u"
+                    "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
                     ChipLogValueX64(mSubscriptionId), mMinIntervalFloorSeconds, mMaxIntervalCeilingSeconds, mFabricIndex,
                     ChipLogValueX64(mPeerNodeId));
 
@@ -876,19 +878,14 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         ReturnErrorOnFailure(err = eventPathListBuilder.GetError());
         ReturnErrorOnFailure(GenerateEventPaths(eventPathListBuilder, eventPaths));
 
-        if (aReadPrepareParams.mEventNumber != 0)
+        Optional<EventNumber> eventMin;
+        ReturnErrorOnFailure(GetMinEventNumber(aReadPrepareParams, eventMin));
+        if (eventMin.HasValue())
         {
-            mEventMin = aReadPrepareParams.mEventNumber;
+            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
+            ReturnErrorOnFailure(err = request.GetError());
+            ReturnErrorOnFailure(eventFilters.GenerateEventFilter(eventMin.Value()));
         }
-
-        EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
-        ReturnErrorOnFailure(err = request.GetError());
-        EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
-        ReturnErrorOnFailure(err = eventFilters.GetError());
-        eventFilter.EventMin(mEventMin).EndOfEventFilterIB();
-        ReturnErrorOnFailure(err = eventFilter.GetError());
-        eventFilters.EndOfEventFilters();
-        ReturnErrorOnFailure(err = eventFilters.GetError());
     }
 
     ReturnErrorOnFailure(err = request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).GetError());
@@ -980,6 +977,19 @@ void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPat
             mReadPrepareParams.mpDataVersionFilterList[index].mDataVersion = aPath.mDataVersion;
         }
     }
+}
+
+CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin)
+{
+    if (aReadPrepareParams.mEventNumber.HasValue())
+    {
+        aEventMin = aReadPrepareParams.mEventNumber;
+    }
+    else
+    {
+        return mpCallback.GetHighestReceivedEventNumber(aEventMin);
+    }
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

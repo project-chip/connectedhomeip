@@ -52,7 +52,7 @@ struct ResolvedNodeData
         for (unsigned i = 0; i < mNumIPs; ++i)
         {
             mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(Discovery, "    Addr %u: [%s]:%" PRIu16, i, addrBuffer, mPort);
+            ChipLogProgress(Discovery, "    Addr %u: [%s]:%u", i, addrBuffer, mPort);
         }
 #endif // CHIP_PROGRESS_LOGGING
     }

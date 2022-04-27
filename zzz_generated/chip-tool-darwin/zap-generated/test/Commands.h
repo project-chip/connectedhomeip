@@ -19,6 +19,8 @@
 
 #pragma once
 
+#if CONFIG_ENABLE_YAML_TESTS
+
 #include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommandBridge.h>
 #include <lib/core/Optional.h>
@@ -165,6 +167,7 @@ public:
         printf("Test_TC_WNCV_1_1\n");
         printf("Test_TC_WNCV_2_1\n");
         printf("Test_TC_WNCV_2_2\n");
+        printf("Test_TC_WNCV_2_3\n");
         printf("Test_TC_WNCV_2_4\n");
         printf("Test_TC_WNCV_2_5\n");
         printf("Test_TC_WNCV_3_4\n");
@@ -202,6 +205,7 @@ public:
 
 class TestAccessControlCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestAccessControlCluster()
         : TestCommandBridge("TestAccessControlCluster")
         , mTestIndex(0)
@@ -211,6 +215,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestAccessControlCluster() {}
 
@@ -1505,6 +1510,7 @@ private:
 
 class Test_TC_BI_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BI_1_1()
         : TestCommandBridge("Test_TC_BI_1_1")
         , mTestIndex(0)
@@ -1514,6 +1520,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BI_1_1() {}
 
@@ -1564,6 +1571,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
             err = TestReadTheGlobalAttributeAttributeList_5();
             break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_7();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -1579,7 +1594,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -1702,10 +1717,51 @@ private:
 
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBinaryInputBasic * cluster = [[CHIPTestBinaryInputBasic alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestBinaryInputBasic * cluster = [[CHIPTestBinaryInputBasic alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class Test_TC_BI_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BI_2_1()
         : TestCommandBridge("Test_TC_BI_2_1")
         , mTestIndex(0)
@@ -1715,6 +1771,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BI_2_1() {}
 
@@ -2077,6 +2134,7 @@ private:
 
 class Test_TC_BI_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BI_2_2()
         : TestCommandBridge("Test_TC_BI_2_2")
         , mTestIndex(0)
@@ -2086,6 +2144,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BI_2_2() {}
 
@@ -2402,6 +2461,7 @@ private:
 
 class Test_TC_BOOL_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BOOL_1_1()
         : TestCommandBridge("Test_TC_BOOL_1_1")
         , mTestIndex(0)
@@ -2411,6 +2471,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BOOL_1_1() {}
 
@@ -2585,6 +2646,7 @@ private:
 
 class Test_TC_BOOL_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BOOL_2_1()
         : TestCommandBridge("Test_TC_BOOL_2_1")
         , mTestIndex(0)
@@ -2594,6 +2656,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BOOL_2_1() {}
 
@@ -2702,6 +2765,7 @@ private:
 
 class Test_TC_BRAC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_BRAC_1_1()
         : TestCommandBridge("Test_TC_BRAC_1_1")
         , mTestIndex(0)
@@ -2711,6 +2775,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_BRAC_1_1() {}
 
@@ -2885,6 +2950,7 @@ private:
 
 class Test_TC_CC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_1_1()
         : TestCommandBridge("Test_TC_CC_1_1")
         , mTestIndex(0)
@@ -2894,6 +2960,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_1_1() {}
 
@@ -3024,6 +3091,7 @@ private:
 
 class Test_TC_CC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_2_1()
         : TestCommandBridge("Test_TC_CC_2_1")
         , mTestIndex(0)
@@ -3033,6 +3101,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_2_1() {}
 
@@ -6886,6 +6955,7 @@ private:
 
 class Test_TC_CC_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_3_1()
         : TestCommandBridge("Test_TC_CC_3_1")
         , mTestIndex(0)
@@ -6895,6 +6965,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_3_1() {}
 
@@ -7190,6 +7261,7 @@ private:
 
 class Test_TC_CC_3_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_3_2()
         : TestCommandBridge("Test_TC_CC_3_2")
         , mTestIndex(0)
@@ -7199,6 +7271,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_3_2() {}
 
@@ -7461,6 +7534,7 @@ private:
 
 class Test_TC_CC_3_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_3_3()
         : TestCommandBridge("Test_TC_CC_3_3")
         , mTestIndex(0)
@@ -7470,6 +7544,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_3_3() {}
 
@@ -7680,6 +7755,7 @@ private:
 
 class Test_TC_CC_4_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_1()
         : TestCommandBridge("Test_TC_CC_4_1")
         , mTestIndex(0)
@@ -7689,6 +7765,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_1() {}
 
@@ -7870,6 +7947,7 @@ private:
 
 class Test_TC_CC_4_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_2()
         : TestCommandBridge("Test_TC_CC_4_2")
         , mTestIndex(0)
@@ -7879,6 +7957,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_2() {}
 
@@ -8195,6 +8274,7 @@ private:
 
 class Test_TC_CC_4_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_3()
         : TestCommandBridge("Test_TC_CC_4_3")
         , mTestIndex(0)
@@ -8204,6 +8284,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_3() {}
 
@@ -8414,6 +8495,7 @@ private:
 
 class Test_TC_CC_4_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_4_4()
         : TestCommandBridge("Test_TC_CC_4_4")
         , mTestIndex(0)
@@ -8423,6 +8505,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_4_4() {}
 
@@ -8605,6 +8688,7 @@ private:
 
 class Test_TC_CC_5_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_5_1()
         : TestCommandBridge("Test_TC_CC_5_1")
         , mTestIndex(0)
@@ -8614,6 +8698,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_5_1() {}
 
@@ -8796,6 +8881,7 @@ private:
 
 class Test_TC_CC_5_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_5_2()
         : TestCommandBridge("Test_TC_CC_5_2")
         , mTestIndex(0)
@@ -8805,6 +8891,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_5_2() {}
 
@@ -9011,6 +9098,7 @@ private:
 
 class Test_TC_CC_5_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_5_3()
         : TestCommandBridge("Test_TC_CC_5_3")
         , mTestIndex(0)
@@ -9020,6 +9108,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_5_3() {}
 
@@ -9202,6 +9291,7 @@ private:
 
 class Test_TC_CC_6_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_6_1()
         : TestCommandBridge("Test_TC_CC_6_1")
         , mTestIndex(0)
@@ -9211,6 +9301,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_6_1() {}
 
@@ -9392,6 +9483,7 @@ private:
 
 class Test_TC_CC_6_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_6_2()
         : TestCommandBridge("Test_TC_CC_6_2")
         , mTestIndex(0)
@@ -9401,6 +9493,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_6_2() {}
 
@@ -9758,6 +9851,7 @@ private:
 
 class Test_TC_CC_6_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_6_3()
         : TestCommandBridge("Test_TC_CC_6_3")
         , mTestIndex(0)
@@ -9767,6 +9861,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_6_3() {}
 
@@ -9981,6 +10076,7 @@ private:
 
 class Test_TC_CC_7_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_1()
         : TestCommandBridge("Test_TC_CC_7_1")
         , mTestIndex(0)
@@ -9990,6 +10086,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_1() {}
 
@@ -10284,6 +10381,7 @@ private:
 
 class Test_TC_CC_7_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_2()
         : TestCommandBridge("Test_TC_CC_7_2")
         , mTestIndex(0)
@@ -10293,6 +10391,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_2() {}
 
@@ -10584,6 +10683,7 @@ private:
 
 class Test_TC_CC_7_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_3()
         : TestCommandBridge("Test_TC_CC_7_3")
         , mTestIndex(0)
@@ -10593,6 +10693,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_3() {}
 
@@ -10803,6 +10904,7 @@ private:
 
 class Test_TC_CC_7_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_7_4()
         : TestCommandBridge("Test_TC_CC_7_4")
         , mTestIndex(0)
@@ -10812,6 +10914,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_7_4() {}
 
@@ -10994,6 +11097,7 @@ private:
 
 class Test_TC_CC_8_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_8_1()
         : TestCommandBridge("Test_TC_CC_8_1")
         , mTestIndex(0)
@@ -11003,6 +11107,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_8_1() {}
 
@@ -11486,6 +11591,7 @@ private:
 
 class Test_TC_CC_9_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_9_1()
         : TestCommandBridge("Test_TC_CC_9_1")
         , mTestIndex(0)
@@ -11495,6 +11601,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_9_1() {}
 
@@ -13178,6 +13285,7 @@ private:
 
 class Test_TC_CC_9_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_9_2()
         : TestCommandBridge("Test_TC_CC_9_2")
         , mTestIndex(0)
@@ -13187,6 +13295,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_9_2() {}
 
@@ -13812,6 +13921,7 @@ private:
 
 class Test_TC_CC_9_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_CC_9_3()
         : TestCommandBridge("Test_TC_CC_9_3")
         , mTestIndex(0)
@@ -13821,6 +13931,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_CC_9_3() {}
 
@@ -14446,6 +14557,7 @@ private:
 
 class Test_TC_DD_1_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_5()
         : TestCommandBridge("Test_TC_DD_1_5")
         , mTestIndex(0)
@@ -14455,6 +14567,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_5() {}
 
@@ -14516,6 +14629,7 @@ private:
 
 class Test_TC_DD_1_6 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_6()
         : TestCommandBridge("Test_TC_DD_1_6")
         , mTestIndex(0)
@@ -14525,6 +14639,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_6() {}
 
@@ -14606,6 +14721,7 @@ private:
 
 class Test_TC_DD_1_7 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_7()
         : TestCommandBridge("Test_TC_DD_1_7")
         , mTestIndex(0)
@@ -14615,6 +14731,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_7() {}
 
@@ -14686,6 +14803,7 @@ private:
 
 class Test_TC_DD_1_8 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_8()
         : TestCommandBridge("Test_TC_DD_1_8")
         , mTestIndex(0)
@@ -14695,6 +14813,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_8() {}
 
@@ -14765,6 +14884,7 @@ private:
 
 class Test_TC_DD_1_9 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DD_1_9()
         : TestCommandBridge("Test_TC_DD_1_9")
         , mTestIndex(0)
@@ -14774,6 +14894,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DD_1_9() {}
 
@@ -14854,6 +14975,7 @@ private:
 
 class Test_TC_DM_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_1_1()
         : TestCommandBridge("Test_TC_DM_1_1")
         , mTestIndex(0)
@@ -14863,6 +14985,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_1_1() {}
 
@@ -15408,6 +15531,7 @@ private:
 
 class Test_TC_DM_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DM_3_1()
         : TestCommandBridge("Test_TC_DM_3_1")
         , mTestIndex(0)
@@ -15417,6 +15541,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DM_3_1() {}
 
@@ -15535,6 +15660,7 @@ private:
 
 class Test_TC_DL_1_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DL_1_3()
         : TestCommandBridge("Test_TC_DL_1_3")
         , mTestIndex(0)
@@ -15544,6 +15670,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DL_1_3() {}
 
@@ -15816,6 +15943,7 @@ private:
 
 class Test_TC_EMR_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_EMR_1_1()
         : TestCommandBridge("Test_TC_EMR_1_1")
         , mTestIndex(0)
@@ -15825,6 +15953,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_EMR_1_1() {}
 
@@ -16017,6 +16146,7 @@ private:
 
 class Test_TC_ETHDIAG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ETHDIAG_1_1()
         : TestCommandBridge("Test_TC_ETHDIAG_1_1")
         , mTestIndex(0)
@@ -16026,6 +16156,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ETHDIAG_1_1() {}
 
@@ -16055,6 +16186,42 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read PHYRate attribute constraints\n");
+            err = TestReadPHYRateAttributeConstraints_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read FullDuplex attribute constraints\n");
+            err = TestReadFullDuplexAttributeConstraints_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read PacketRxCount attribute constraints\n");
+            err = TestReadPacketRxCountAttributeConstraints_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read PacketTxCount attribute constraints\n");
+            err = TestReadPacketTxCountAttributeConstraints_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read TxErrCount attribute constraints\n");
+            err = TestReadTxErrCountAttributeConstraints_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read CollisionCount attribute constraints\n");
+            err = TestReadCollisionCountAttributeConstraints_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read OverrunCount attribute constraints\n");
+            err = TestReadOverrunCountAttributeConstraints_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read CarrierDetect attribute constraints\n");
+            err = TestReadCarrierDetectAttributeConstraints_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read TimeSinceReset attribute constraints\n");
+            err = TestReadTimeSinceResetAttributeConstraints_9();
+            break;
         }
 
         if (CHIP_NO_ERROR != err) {
@@ -16070,7 +16237,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -16082,10 +16249,198 @@ private:
         WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR TestReadPHYRateAttributeConstraints_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePHYRateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read PHYRate attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("PHYRate", "", "enum8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("PHYRate", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("PHYRate", [value unsignedCharValue], 9));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFullDuplexAttributeConstraints_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeFullDuplexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read FullDuplex attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("fullDuplex", "", "bool"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadPacketRxCountAttributeConstraints_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePacketRxCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read PacketRxCount attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("packetRxCount", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadPacketTxCountAttributeConstraints_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributePacketTxCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read PacketTxCount attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("packetTxCount", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTxErrCountAttributeConstraints_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTxErrCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read TxErrCount attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("txErrCount", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCollisionCountAttributeConstraints_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCollisionCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read CollisionCount attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("collisionCount", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadOverrunCountAttributeConstraints_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeOverrunCountWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read OverrunCount attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("overrunCount", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCarrierDetectAttributeConstraints_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCarrierDetectWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read CarrierDetect attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("carrierDetect", "", "bool"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTimeSinceResetAttributeConstraints_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestEthernetNetworkDiagnostics * cluster = [[CHIPTestEthernetNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeTimeSinceResetWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read TimeSinceReset attribute constraints Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("timeSinceReset", "", "uint64"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class Test_TC_ETHDIAG_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ETHDIAG_2_1()
         : TestCommandBridge("Test_TC_ETHDIAG_2_1")
         , mTestIndex(0)
@@ -16095,6 +16450,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ETHDIAG_2_1() {}
 
@@ -16155,6 +16511,7 @@ private:
 
 class Test_TC_FLW_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_FLW_1_1()
         : TestCommandBridge("Test_TC_FLW_1_1")
         , mTestIndex(0)
@@ -16164,6 +16521,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_FLW_1_1() {}
 
@@ -16294,6 +16652,7 @@ private:
 
 class Test_TC_FLW_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_FLW_2_1()
         : TestCommandBridge("Test_TC_FLW_2_1")
         , mTestIndex(0)
@@ -16303,6 +16662,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_FLW_2_1() {}
 
@@ -16688,6 +17048,7 @@ private:
 
 class Test_TC_FLW_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_FLW_2_2()
         : TestCommandBridge("Test_TC_FLW_2_2")
         , mTestIndex(0)
@@ -16697,6 +17058,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_FLW_2_2() {}
 
@@ -16801,6 +17163,7 @@ private:
 
 class Test_TC_GC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_GC_1_1()
         : TestCommandBridge("Test_TC_GC_1_1")
         , mTestIndex(0)
@@ -16810,6 +17173,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_GC_1_1() {}
 
@@ -17012,6 +17376,7 @@ private:
 
 class Test_TC_ILL_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ILL_1_1()
         : TestCommandBridge("Test_TC_ILL_1_1")
         , mTestIndex(0)
@@ -17021,6 +17386,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ILL_1_1() {}
 
@@ -17177,6 +17543,7 @@ private:
 
 class Test_TC_ILL_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_ILL_2_1()
         : TestCommandBridge("Test_TC_ILL_2_1")
         , mTestIndex(0)
@@ -17186,6 +17553,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_ILL_2_1() {}
 
@@ -17363,6 +17731,7 @@ private:
 
 class Test_TC_I_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_I_1_1()
         : TestCommandBridge("Test_TC_I_1_1")
         , mTestIndex(0)
@@ -17372,6 +17741,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_I_1_1() {}
 
@@ -17520,6 +17890,7 @@ private:
 
 class Test_TC_I_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_I_2_1()
         : TestCommandBridge("Test_TC_I_2_1")
         , mTestIndex(0)
@@ -17529,6 +17900,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_I_2_1() {}
 
@@ -17640,6 +18012,7 @@ private:
 
 class Test_TC_I_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_I_2_3()
         : TestCommandBridge("Test_TC_I_2_3")
         , mTestIndex(0)
@@ -17649,6 +18022,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_I_2_3() {}
 
@@ -18111,6 +18485,7 @@ private:
 
 class Test_TC_LVL_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_1_1()
         : TestCommandBridge("Test_TC_LVL_1_1")
         , mTestIndex(0)
@@ -18120,6 +18495,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_1_1() {}
 
@@ -18439,6 +18815,7 @@ private:
 
 class Test_TC_LVL_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_2_1()
         : TestCommandBridge("Test_TC_LVL_2_1")
         , mTestIndex(0)
@@ -18448,6 +18825,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_2_1() {}
 
@@ -18871,6 +19249,7 @@ private:
 
 class Test_TC_LVL_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_2_2()
         : TestCommandBridge("Test_TC_LVL_2_2")
         , mTestIndex(0)
@@ -18880,6 +19259,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_2_2() {}
 
@@ -19330,6 +19710,7 @@ private:
 
 class Test_TC_LVL_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_3_1()
         : TestCommandBridge("Test_TC_LVL_3_1")
         , mTestIndex(0)
@@ -19339,6 +19720,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_3_1() {}
 
@@ -19713,6 +20095,7 @@ private:
 
 class Test_TC_LVL_4_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_4_1()
         : TestCommandBridge("Test_TC_LVL_4_1")
         , mTestIndex(0)
@@ -19722,6 +20105,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_4_1() {}
 
@@ -20128,6 +20512,7 @@ private:
 
 class Test_TC_LVL_5_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_5_1()
         : TestCommandBridge("Test_TC_LVL_5_1")
         , mTestIndex(0)
@@ -20137,6 +20522,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_5_1() {}
 
@@ -20468,6 +20854,7 @@ private:
 
 class Test_TC_LVL_6_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LVL_6_1()
         : TestCommandBridge("Test_TC_LVL_6_1")
         , mTestIndex(0)
@@ -20477,6 +20864,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LVL_6_1() {}
 
@@ -20772,6 +21160,7 @@ private:
 
 class Test_TC_MC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_1()
         : TestCommandBridge("Test_TC_MC_1_1")
         , mTestIndex(0)
@@ -20781,6 +21170,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_1() {}
 
@@ -20911,6 +21301,7 @@ private:
 
 class Test_TC_MC_1_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_2()
         : TestCommandBridge("Test_TC_MC_1_2")
         , mTestIndex(0)
@@ -20920,6 +21311,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_2() {}
 
@@ -21050,6 +21442,7 @@ private:
 
 class Test_TC_MC_1_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_3()
         : TestCommandBridge("Test_TC_MC_1_3")
         , mTestIndex(0)
@@ -21059,6 +21452,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_3() {}
 
@@ -21195,6 +21589,7 @@ private:
 
 class Test_TC_MC_1_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_4()
         : TestCommandBridge("Test_TC_MC_1_4")
         , mTestIndex(0)
@@ -21204,6 +21599,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_4() {}
 
@@ -21334,6 +21730,7 @@ private:
 
 class Test_TC_MC_1_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_5()
         : TestCommandBridge("Test_TC_MC_1_5")
         , mTestIndex(0)
@@ -21343,6 +21740,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_5() {}
 
@@ -21473,6 +21871,7 @@ private:
 
 class Test_TC_MC_1_6 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_6()
         : TestCommandBridge("Test_TC_MC_1_6")
         , mTestIndex(0)
@@ -21482,6 +21881,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_6() {}
 
@@ -21612,6 +22012,7 @@ private:
 
 class Test_TC_MC_1_7 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_7()
         : TestCommandBridge("Test_TC_MC_1_7")
         , mTestIndex(0)
@@ -21621,6 +22022,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_7() {}
 
@@ -21751,6 +22153,7 @@ private:
 
 class Test_TC_MC_1_8 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_8()
         : TestCommandBridge("Test_TC_MC_1_8")
         , mTestIndex(0)
@@ -21760,6 +22163,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_8() {}
 
@@ -21890,6 +22294,7 @@ private:
 
 class Test_TC_MC_1_9 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_9()
         : TestCommandBridge("Test_TC_MC_1_9")
         , mTestIndex(0)
@@ -21899,6 +22304,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_9() {}
 
@@ -22029,6 +22435,7 @@ private:
 
 class Test_TC_MC_1_10 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_10()
         : TestCommandBridge("Test_TC_MC_1_10")
         , mTestIndex(0)
@@ -22038,6 +22445,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_10() {}
 
@@ -22174,6 +22582,7 @@ private:
 
 class Test_TC_MC_1_11 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_11()
         : TestCommandBridge("Test_TC_MC_1_11")
         , mTestIndex(0)
@@ -22183,6 +22592,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_11() {}
 
@@ -22313,6 +22723,7 @@ private:
 
 class Test_TC_MC_1_12 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_1_12()
         : TestCommandBridge("Test_TC_MC_1_12")
         , mTestIndex(0)
@@ -22322,6 +22733,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_1_12() {}
 
@@ -22452,6 +22864,7 @@ private:
 
 class Test_TC_MC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_2_1()
         : TestCommandBridge("Test_TC_MC_2_1")
         , mTestIndex(0)
@@ -22461,6 +22874,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_2_1() {}
 
@@ -22542,6 +22956,7 @@ private:
 
 class Test_TC_MC_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_1()
         : TestCommandBridge("Test_TC_MC_3_1")
         , mTestIndex(0)
@@ -22551,6 +22966,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_1() {}
 
@@ -22611,6 +23027,7 @@ private:
 
 class Test_TC_MC_3_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_2()
         : TestCommandBridge("Test_TC_MC_3_2")
         , mTestIndex(0)
@@ -22620,6 +23037,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_2() {}
 
@@ -22680,6 +23098,7 @@ private:
 
 class Test_TC_MC_3_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_3()
         : TestCommandBridge("Test_TC_MC_3_3")
         , mTestIndex(0)
@@ -22689,6 +23108,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_3() {}
 
@@ -22749,6 +23169,7 @@ private:
 
 class Test_TC_MC_3_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_4()
         : TestCommandBridge("Test_TC_MC_3_4")
         , mTestIndex(0)
@@ -22758,6 +23179,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_4() {}
 
@@ -22818,6 +23240,7 @@ private:
 
 class Test_TC_MC_3_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_5()
         : TestCommandBridge("Test_TC_MC_3_5")
         , mTestIndex(0)
@@ -22827,6 +23250,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_5() {}
 
@@ -22887,6 +23311,7 @@ private:
 
 class Test_TC_MC_3_6 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_6()
         : TestCommandBridge("Test_TC_MC_3_6")
         , mTestIndex(0)
@@ -22896,6 +23321,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_6() {}
 
@@ -22956,6 +23382,7 @@ private:
 
 class Test_TC_MC_3_7 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_7()
         : TestCommandBridge("Test_TC_MC_3_7")
         , mTestIndex(0)
@@ -22965,6 +23392,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_7() {}
 
@@ -23025,6 +23453,7 @@ private:
 
 class Test_TC_MC_3_8 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_8()
         : TestCommandBridge("Test_TC_MC_3_8")
         , mTestIndex(0)
@@ -23034,6 +23463,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_8() {}
 
@@ -23094,6 +23524,7 @@ private:
 
 class Test_TC_MC_3_9 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_9()
         : TestCommandBridge("Test_TC_MC_3_9")
         , mTestIndex(0)
@@ -23103,6 +23534,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_9() {}
 
@@ -23163,6 +23595,7 @@ private:
 
 class Test_TC_MC_3_10 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_10()
         : TestCommandBridge("Test_TC_MC_3_10")
         , mTestIndex(0)
@@ -23172,6 +23605,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_10() {}
 
@@ -23232,6 +23666,7 @@ private:
 
 class Test_TC_MC_3_11 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_3_11()
         : TestCommandBridge("Test_TC_MC_3_11")
         , mTestIndex(0)
@@ -23241,6 +23676,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_3_11() {}
 
@@ -23301,6 +23737,7 @@ private:
 
 class Test_TC_MC_5_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_5_1()
         : TestCommandBridge("Test_TC_MC_5_1")
         , mTestIndex(0)
@@ -23310,6 +23747,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_5_1() {}
 
@@ -23392,6 +23830,7 @@ private:
 
 class Test_TC_MC_5_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_5_2()
         : TestCommandBridge("Test_TC_MC_5_2")
         , mTestIndex(0)
@@ -23401,6 +23840,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_5_2() {}
 
@@ -23471,6 +23911,7 @@ private:
 
 class Test_TC_MC_5_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_5_3()
         : TestCommandBridge("Test_TC_MC_5_3")
         , mTestIndex(0)
@@ -23480,6 +23921,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_5_3() {}
 
@@ -23550,6 +23992,7 @@ private:
 
 class Test_TC_MC_6_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_1()
         : TestCommandBridge("Test_TC_MC_6_1")
         , mTestIndex(0)
@@ -23559,6 +24002,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_1() {}
 
@@ -23685,6 +24129,7 @@ private:
 
 class Test_TC_MC_6_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_2()
         : TestCommandBridge("Test_TC_MC_6_2")
         , mTestIndex(0)
@@ -23694,6 +24139,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_2() {}
 
@@ -23850,6 +24296,7 @@ private:
 
 class Test_TC_MC_6_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_3()
         : TestCommandBridge("Test_TC_MC_6_3")
         , mTestIndex(0)
@@ -23859,6 +24306,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_3() {}
 
@@ -23949,6 +24397,7 @@ private:
 
 class Test_TC_MC_6_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_6_4()
         : TestCommandBridge("Test_TC_MC_6_4")
         , mTestIndex(0)
@@ -23958,6 +24407,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_6_4() {}
 
@@ -24156,6 +24606,7 @@ private:
 
 class Test_TC_MC_7_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_7_1()
         : TestCommandBridge("Test_TC_MC_7_1")
         , mTestIndex(0)
@@ -24165,6 +24616,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_7_1() {}
 
@@ -24225,6 +24677,7 @@ private:
 
 class Test_TC_MC_7_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_7_2()
         : TestCommandBridge("Test_TC_MC_7_2")
         , mTestIndex(0)
@@ -24234,6 +24687,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_7_2() {}
 
@@ -24294,6 +24748,7 @@ private:
 
 class Test_TC_MC_8_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_8_1()
         : TestCommandBridge("Test_TC_MC_8_1")
         , mTestIndex(0)
@@ -24303,6 +24758,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_8_1() {}
 
@@ -24407,6 +24863,7 @@ private:
 
 class Test_TC_MC_9_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_9_1()
         : TestCommandBridge("Test_TC_MC_9_1")
         , mTestIndex(0)
@@ -24416,6 +24873,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_9_1() {}
 
@@ -24637,6 +25095,7 @@ private:
 
 class Test_TC_MC_10_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MC_10_1()
         : TestCommandBridge("Test_TC_MC_10_1")
         , mTestIndex(0)
@@ -24646,6 +25105,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MC_10_1() {}
 
@@ -24751,6 +25211,7 @@ private:
 
 class Test_TC_MOD_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_MOD_1_1()
         : TestCommandBridge("Test_TC_MOD_1_1")
         , mTestIndex(0)
@@ -24760,6 +25221,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_MOD_1_1() {}
 
@@ -24913,6 +25375,7 @@ private:
 
 class Test_TC_OCC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OCC_1_1()
         : TestCommandBridge("Test_TC_OCC_1_1")
         , mTestIndex(0)
@@ -24922,6 +25385,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OCC_1_1() {}
 
@@ -25058,6 +25522,7 @@ private:
 
 class Test_TC_OCC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OCC_2_1()
         : TestCommandBridge("Test_TC_OCC_2_1")
         , mTestIndex(0)
@@ -25067,6 +25532,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OCC_2_1() {}
 
@@ -25388,6 +25854,7 @@ private:
 
 class Test_TC_OCC_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OCC_2_2()
         : TestCommandBridge("Test_TC_OCC_2_2")
         , mTestIndex(0)
@@ -25397,6 +25864,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OCC_2_2() {}
 
@@ -25520,6 +25988,7 @@ private:
 
 class Test_TC_OO_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_1_1()
         : TestCommandBridge("Test_TC_OO_1_1")
         , mTestIndex(0)
@@ -25529,6 +25998,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_1_1() {}
 
@@ -25808,6 +26278,7 @@ private:
 
 class Test_TC_OO_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_2_1()
         : TestCommandBridge("Test_TC_OO_2_1")
         , mTestIndex(0)
@@ -25817,6 +26288,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_2_1() {}
 
@@ -25921,6 +26393,11 @@ private:
         [cluster readAttributeGlobalSceneControlWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read LT attribute: GlobalSceneControl Error: %@", err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("globalSceneControl", "", "bool"));
@@ -25938,6 +26415,11 @@ private:
 
         [cluster readAttributeOnTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read LT attribute: OnTime Error: %@", err);
+
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -25957,6 +26439,11 @@ private:
         [cluster readAttributeOffWaitTimeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read LT attribute: OffWaitTime Error: %@", err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("offWaitTime", "", "uint16"));
@@ -25975,6 +26462,11 @@ private:
         [cluster readAttributeStartUpOnOffWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
             NSLog(@"read LT attribute: StartUpOnOff Error: %@", err);
 
+            if (err.code == MatterInteractionErrorCodeUnsupportedAttribute) {
+                NextTest();
+                return;
+            }
+
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("startUpOnOff", "", "enum8"));
@@ -25987,6 +26479,7 @@ private:
 
 class Test_TC_OO_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_2_2()
         : TestCommandBridge("Test_TC_OO_2_2")
         , mTestIndex(0)
@@ -25996,6 +26489,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_2_2() {}
 
@@ -26472,6 +26966,7 @@ private:
 
 class Test_TC_OO_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_OO_2_3()
         : TestCommandBridge("Test_TC_OO_2_3")
         , mTestIndex(0)
@@ -26481,6 +26976,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_OO_2_3() {}
 
@@ -27811,6 +28307,7 @@ private:
 
 class Test_TC_PS_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PS_1_1()
         : TestCommandBridge("Test_TC_PS_1_1")
         , mTestIndex(0)
@@ -27820,6 +28317,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PS_1_1() {}
 
@@ -27972,6 +28470,7 @@ private:
 
 class Test_TC_PS_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PS_2_1()
         : TestCommandBridge("Test_TC_PS_2_1")
         , mTestIndex(0)
@@ -27981,6 +28480,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PS_2_1() {}
 
@@ -28267,6 +28767,7 @@ private:
 
 class Test_TC_PRS_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PRS_1_1()
         : TestCommandBridge("Test_TC_PRS_1_1")
         , mTestIndex(0)
@@ -28276,6 +28777,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PRS_1_1() {}
 
@@ -28412,6 +28914,7 @@ private:
 
 class Test_TC_PRS_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PRS_2_1()
         : TestCommandBridge("Test_TC_PRS_2_1")
         , mTestIndex(0)
@@ -28421,6 +28924,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PRS_2_1() {}
 
@@ -28717,6 +29221,7 @@ private:
 
 class Test_TC_PCC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_1_1()
         : TestCommandBridge("Test_TC_PCC_1_1")
         , mTestIndex(0)
@@ -28726,6 +29231,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_1_1() {}
 
@@ -29016,6 +29522,7 @@ private:
 
 class Test_TC_PCC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_1()
         : TestCommandBridge("Test_TC_PCC_2_1")
         , mTestIndex(0)
@@ -29025,6 +29532,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_1() {}
 
@@ -30493,6 +31001,7 @@ private:
 
 class Test_TC_PCC_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_2()
         : TestCommandBridge("Test_TC_PCC_2_2")
         , mTestIndex(0)
@@ -30502,6 +31011,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_2() {}
 
@@ -30540,20 +31050,44 @@ public:
             err = TestWrite1ToTheOperationModeAttributeToDutOperationMode_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Write 2 to the OperationMode attribute to DUT: OperationMode\n");
-            if (ShouldSkip("A_OPERATIONMODE")) {
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the attribute: EffectiveOperationMode\n");
+            if (ShouldSkip("A_EFFECTIVEOPERATIONMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite2ToTheOperationModeAttributeToDutOperationMode_2();
+            err = TestReadsTheAttributeEffectiveOperationMode_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Write 3 to the OperationMode attribute to DUT: OperationMode\n");
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write 2 to the OperationMode attribute to DUT: OperationMode\n");
             if (ShouldSkip("A_OPERATIONMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite3ToTheOperationModeAttributeToDutOperationMode_3();
+            err = TestWrite2ToTheOperationModeAttributeToDutOperationMode_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the attribute: EffectiveOperationMode\n");
+            if (ShouldSkip("A_EFFECTIVEOPERATIONMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveOperationMode_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write 3 to the OperationMode attribute to DUT: OperationMode\n");
+            if (ShouldSkip("A_OPERATIONMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestWrite3ToTheOperationModeAttributeToDutOperationMode_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the attribute: EffectiveOperationMode\n");
+            if (ShouldSkip("A_EFFECTIVEOPERATIONMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveOperationMode_6();
             break;
         }
 
@@ -30570,7 +31104,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -30605,7 +31139,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite2ToTheOperationModeAttributeToDutOperationMode_2()
+    CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveOperationModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveOperationMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveOperationMode", actualValue, 1));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite2ToTheOperationModeAttributeToDutOperationMode_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30627,7 +31185,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite3ToTheOperationModeAttributeToDutOperationMode_3()
+    CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveOperationModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveOperationMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveOperationMode", actualValue, 2));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite3ToTheOperationModeAttributeToDutOperationMode_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30648,10 +31230,35 @@ private:
 
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveOperationModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveOperationMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveOperationMode", actualValue, 3));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class Test_TC_PCC_2_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_3()
         : TestCommandBridge("Test_TC_PCC_2_3")
         , mTestIndex(0)
@@ -30661,6 +31268,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_3() {}
 
@@ -30731,36 +31339,76 @@ public:
             err = TestWrite1ToTheControlModeAttributeToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Write 2 to the ControlMode attribute to DUT\n");
-            if (ShouldSkip("A_CONTROLMODE")) {
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite2ToTheControlModeAttributeToDut_6();
+            err = TestReadsTheAttributeEffectiveControlMode_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 3 to the ControlMode attribute to DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 2 to the ControlMode attribute to DUT\n");
             if (ShouldSkip("A_CONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite3ToTheControlModeAttributeToDut_7();
+            err = TestWrite2ToTheControlModeAttributeToDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Write 5 to the ControlMode attribute to DUT\n");
-            if (ShouldSkip("A_CONTROLMODE")) {
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite5ToTheControlModeAttributeToDut_8();
+            err = TestReadsTheAttributeEffectiveControlMode_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 7 to the ControlMode attribute to DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 3 to the ControlMode attribute to DUT\n");
             if (ShouldSkip("A_CONTROLMODE")) {
                 NextTest();
                 return;
             }
-            err = TestWrite7ToTheControlModeAttributeToDut_9();
+            err = TestWrite3ToTheControlModeAttributeToDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Write 5 to the ControlMode attribute to DUT\n");
+            if (ShouldSkip("A_CONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestWrite5ToTheControlModeAttributeToDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Write 7 to the ControlMode attribute to DUT\n");
+            if (ShouldSkip("A_CONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestWrite7ToTheControlModeAttributeToDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Reads the attribute: EffectiveControlMode\n");
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE")) {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_14();
             break;
         }
 
@@ -30777,7 +31425,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 15;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -30904,7 +31552,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_6()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 1));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_7()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30926,7 +31598,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_7()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 2));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30948,7 +31644,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_8()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 3));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30970,7 +31690,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_9()
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 5));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_13()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -30991,10 +31735,35 @@ private:
 
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEffectiveControlModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: EffectiveControlMode Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("EffectiveControlMode", actualValue, 7));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 class Test_TC_PCC_2_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PCC_2_4()
         : TestCommandBridge("Test_TC_PCC_2_4")
         , mTestIndex(0)
@@ -31004,6 +31773,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PCC_2_4() {}
 
@@ -31062,20 +31832,24 @@ public:
             err = TestWrite1ToTheLifetimeEnergyConsumedAttributeToDut_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Write 2 to the LifetimeEnergyConsumed attribute to DUT\n");
-            err = TestWrite2ToTheLifetimeEnergyConsumedAttributeToDut_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads the attribute: LifetimeEnergyConsumed\n");
+            err = TestReadsTheAttributeLifetimeEnergyConsumed_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Reads the attribute: LifetimeEnergyConsumed\n");
-            err = TestReadsTheAttributeLifetimeEnergyConsumed_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 2 to the LifetimeEnergyConsumed attribute to DUT\n");
+            err = TestWrite2ToTheLifetimeEnergyConsumedAttributeToDut_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Write 3 to the LifetimeEnergyConsumed attribute to DUT\n");
-            err = TestWrite3ToTheLifetimeEnergyConsumedAttributeToDut_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Reads the attribute: LifetimeEnergyConsumed\n");
+            err = TestReadsTheAttributeLifetimeEnergyConsumed_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Reads the attribute: LifetimeEnergyConsumed\n");
-            err = TestReadsTheAttributeLifetimeEnergyConsumed_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Write 3 to the LifetimeEnergyConsumed attribute to DUT\n");
+            err = TestWrite3ToTheLifetimeEnergyConsumedAttributeToDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Reads the attribute: LifetimeEnergyConsumed\n");
+            err = TestReadsTheAttributeLifetimeEnergyConsumed_12();
             break;
         }
 
@@ -31092,7 +31866,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 12;
+    const uint16_t mTestCount = 13;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -31268,7 +32042,32 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite2ToTheLifetimeEnergyConsumedAttributeToDut_8()
+    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                           endpoint:1
+                                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeLifetimeEnergyConsumedWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads the attribute: LifetimeEnergyConsumed Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNonNull("LifetimeEnergyConsumed", actualValue));
+                VerifyOrReturn(CheckValue("LifetimeEnergyConsumed", actualValue, 1UL));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWrite2ToTheLifetimeEnergyConsumedAttributeToDut_9()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -31290,7 +32089,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_9()
+    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_10()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -31315,7 +32114,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWrite3ToTheLifetimeEnergyConsumedAttributeToDut_10()
+    CHIP_ERROR TestWrite3ToTheLifetimeEnergyConsumedAttributeToDut_11()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -31337,7 +32136,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_11()
+    CHIP_ERROR TestReadsTheAttributeLifetimeEnergyConsumed_12()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
@@ -31365,6 +32164,7 @@ private:
 
 class Test_TC_PSCFG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_PSCFG_1_1()
         : TestCommandBridge("Test_TC_PSCFG_1_1")
         , mTestIndex(0)
@@ -31374,6 +32174,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_PSCFG_1_1() {}
 
@@ -31534,6 +32335,7 @@ private:
 
 class Test_TC_RH_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_RH_1_1()
         : TestCommandBridge("Test_TC_RH_1_1")
         , mTestIndex(0)
@@ -31543,6 +32345,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_RH_1_1() {}
 
@@ -31699,6 +32502,7 @@ private:
 
 class Test_TC_RH_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_RH_2_1()
         : TestCommandBridge("Test_TC_RH_2_1")
         , mTestIndex(0)
@@ -31708,6 +32512,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_RH_2_1() {}
 
@@ -31866,6 +32671,7 @@ private:
 
 class Test_TC_RH_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_RH_2_2()
         : TestCommandBridge("Test_TC_RH_2_2")
         , mTestIndex(0)
@@ -31875,6 +32681,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_RH_2_2() {}
 
@@ -32029,6 +32836,7 @@ private:
 
 class Test_TC_SWTCH_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWTCH_2_1()
         : TestCommandBridge("Test_TC_SWTCH_2_1")
         , mTestIndex(0)
@@ -32038,6 +32846,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWTCH_2_1() {}
 
@@ -32254,6 +33063,7 @@ private:
 
 class Test_TC_SWTCH_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWTCH_2_2()
         : TestCommandBridge("Test_TC_SWTCH_2_2")
         , mTestIndex(0)
@@ -32263,6 +33073,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWTCH_2_2() {}
 
@@ -32725,6 +33536,7 @@ private:
 
 class Test_TC_TM_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TM_1_1()
         : TestCommandBridge("Test_TC_TM_1_1")
         , mTestIndex(0)
@@ -32734,6 +33546,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TM_1_1() {}
 
@@ -32842,6 +33655,7 @@ private:
 
 class Test_TC_TM_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TM_2_1()
         : TestCommandBridge("Test_TC_TM_2_1")
         , mTestIndex(0)
@@ -32851,6 +33665,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TM_2_1() {}
 
@@ -33033,6 +33848,7 @@ private:
 
 class Test_TC_TM_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TM_2_2()
         : TestCommandBridge("Test_TC_TM_2_2")
         , mTestIndex(0)
@@ -33042,6 +33858,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TM_2_2() {}
 
@@ -33220,6 +34037,7 @@ private:
 
 class Test_TC_TSTAT_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSTAT_1_1()
         : TestCommandBridge("Test_TC_TSTAT_1_1")
         , mTestIndex(0)
@@ -33229,6 +34047,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSTAT_1_1() {}
 
@@ -33355,6 +34174,7 @@ private:
 
 class Test_TC_TSTAT_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSTAT_2_1()
         : TestCommandBridge("Test_TC_TSTAT_2_1")
         , mTestIndex(0)
@@ -33364,6 +34184,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSTAT_2_1() {}
 
@@ -33958,6 +34779,7 @@ private:
 
 class Test_TC_TSTAT_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSTAT_2_2()
         : TestCommandBridge("Test_TC_TSTAT_2_2")
         , mTestIndex(0)
@@ -33967,6 +34789,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSTAT_2_2() {}
 
@@ -35706,6 +36529,7 @@ private:
 
 class Test_TC_TSUIC_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSUIC_1_1()
         : TestCommandBridge("Test_TC_TSUIC_1_1")
         , mTestIndex(0)
@@ -35715,6 +36539,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSUIC_1_1() {}
 
@@ -35867,6 +36692,7 @@ private:
 
 class Test_TC_TSUIC_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSUIC_2_1()
         : TestCommandBridge("Test_TC_TSUIC_2_1")
         , mTestIndex(0)
@@ -35876,6 +36702,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSUIC_2_1() {}
 
@@ -36109,6 +36936,7 @@ private:
 
 class Test_TC_TSUIC_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_TSUIC_2_2()
         : TestCommandBridge("Test_TC_TSUIC_2_2")
         , mTestIndex(0)
@@ -36118,6 +36946,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_TSUIC_2_2() {}
 
@@ -36567,6 +37396,7 @@ private:
 
 class Test_TC_DIAG_TH_NW_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DIAG_TH_NW_1_1()
         : TestCommandBridge("Test_TC_DIAG_TH_NW_1_1")
         , mTestIndex(0)
@@ -36576,6 +37406,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DIAG_TH_NW_1_1() {}
 
@@ -36687,6 +37518,7 @@ private:
 
 class Test_TC_DIAG_TH_NW_1_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_DIAG_TH_NW_1_2()
         : TestCommandBridge("Test_TC_DIAG_TH_NW_1_2")
         , mTestIndex(0)
@@ -36696,6 +37528,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_DIAG_TH_NW_1_2() {}
 
@@ -39382,6 +40215,7 @@ private:
 
 class Test_TC_LC_1_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_LC_1_2()
         : TestCommandBridge("Test_TC_LC_1_2")
         , mTestIndex(0)
@@ -39391,6 +40225,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_LC_1_2() {}
 
@@ -39472,6 +40307,7 @@ private:
 
 class Test_TC_WIFIDIAG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WIFIDIAG_1_1()
         : TestCommandBridge("Test_TC_WIFIDIAG_1_1")
         , mTestIndex(0)
@@ -39481,6 +40317,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WIFIDIAG_1_1() {}
 
@@ -39515,20 +40352,24 @@ public:
             err = TestReadsNetworkInterfaceStructureAttributeFromDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads SecurityType attribute constraints\n");
-            err = TestReadsSecurityTypeAttributeConstraints_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads SecurityType attribute from DUT\n");
+            err = TestReadsSecurityTypeAttributeFromDut_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads WiFiVersion attribute constraints\n");
-            err = TestReadsWiFiVersionAttributeConstraints_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads SecurityType attribute constraints\n");
+            err = TestReadsSecurityTypeAttributeConstraints_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads ChannelNumber attribute constraints\n");
-            err = TestReadsChannelNumberAttributeConstraints_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads WiFiVersion attribute constraints\n");
+            err = TestReadsWiFiVersionAttributeConstraints_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads RSSI attribute constraints\n");
-            err = TestReadsRssiAttributeConstraints_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads ChannelNumber attribute constraints\n");
+            err = TestReadsChannelNumberAttributeConstraints_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads RSSI attribute constraints\n");
+            err = TestReadsRssiAttributeConstraints_6();
             break;
         }
 
@@ -39545,7 +40386,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -39578,7 +40419,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsSecurityTypeAttributeConstraints_2()
+    CHIP_ERROR TestReadsSecurityTypeAttributeFromDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeSecurityTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads SecurityType attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValueNull("SecurityType", actualValue));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadsSecurityTypeAttributeConstraints_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
@@ -39598,7 +40463,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsWiFiVersionAttributeConstraints_3()
+    CHIP_ERROR TestReadsWiFiVersionAttributeConstraints_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
@@ -39612,13 +40477,20 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("wiFiVersion", "", "enum"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("wiFiVersion", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("wiFiVersion", [value unsignedCharValue], 5));
+            }
+
             NextTest();
         }];
 
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsChannelNumberAttributeConstraints_4()
+    CHIP_ERROR TestReadsChannelNumberAttributeConstraints_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
@@ -39638,7 +40510,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsRssiAttributeConstraints_5()
+    CHIP_ERROR TestReadsRssiAttributeConstraints_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestWiFiNetworkDiagnostics * cluster = [[CHIPTestWiFiNetworkDiagnostics alloc] initWithDevice:device
@@ -39668,6 +40540,7 @@ private:
 
 class Test_TC_WIFIDIAG_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WIFIDIAG_3_1()
         : TestCommandBridge("Test_TC_WIFIDIAG_3_1")
         , mTestIndex(0)
@@ -39677,6 +40550,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WIFIDIAG_3_1() {}
 
@@ -39737,6 +40611,7 @@ private:
 
 class Test_TC_WNCV_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_1_1()
         : TestCommandBridge("Test_TC_WNCV_1_1")
         , mTestIndex(0)
@@ -39746,6 +40621,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_1_1() {}
 
@@ -39988,6 +40864,7 @@ private:
 
 class Test_TC_WNCV_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_1()
         : TestCommandBridge("Test_TC_WNCV_2_1")
         , mTestIndex(0)
@@ -39997,6 +40874,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_1() {}
 
@@ -41562,6 +42440,7 @@ private:
 
 class Test_TC_WNCV_2_2 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_2()
         : TestCommandBridge("Test_TC_WNCV_2_2")
         , mTestIndex(0)
@@ -41571,6 +42450,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_2() {}
 
@@ -41629,8 +42509,611 @@ private:
     }
 };
 
+class Test_TC_WNCV_2_3 : public TestCommandBridge {
+public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
+    Test_TC_WNCV_2_3()
+        : TestCommandBridge("Test_TC_WNCV_2_3")
+        , mTestIndex(0)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
+
+    ~Test_TC_WNCV_2_3() {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_WNCV_2_3\n");
+        }
+
+        if (mTestCount == mTestIndex) {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_WNCV_2_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++) {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : 1a: TH set the Mode Attribute bit0 of the DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1aThSetTheModeAttributeBit0OfTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : 1b: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1bThReadsConfigStatusAttributeFromDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : 1c: TH clear the Mode Attribute bit0 of the DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1cThClearTheModeAttributeBit0OfTheDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : 1d: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_REVERSAL")) {
+                NextTest();
+                return;
+            }
+            err = Test1dThReadsConfigStatusAttributeFromDut_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : 2a: TH set the Mode Attribute bit1 of the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2aThSetTheModeAttributeBit1OfTheDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : 2b: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2bThReadsConfigStatusAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 7 : 2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2cIfConfigStatusBit00ThSendDownOrCloseCommandToTheDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : 2d: TH clear the Mode Attribute bit1 of the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2dThClearTheModeAttributeBit1OfTheDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : 2e: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2eThReadsConfigStatusAttributeFromDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : 2f: TH reads the Mode Attribute from the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2fThReadsTheModeAttributeFromTheDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : 2g: TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_CALIBRATION")) {
+                NextTest();
+                return;
+            }
+            err = Test2gThSendDownOrCloseCommandToTheDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : 3a: TH set the Mode Attribute bit2 of the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3aThSetTheModeAttributeBit2OfTheDut_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : 3c: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3cThReadsConfigStatusAttributeFromDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : 3c: TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3cThSendDownOrCloseCommandToTheDut_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : 3d: TH clear the Mode Attribute bit2 of the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3dThClearTheModeAttributeBit2OfTheDut_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : 3e: TH reads ConfigStatus attribute from DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3eThReadsConfigStatusAttributeFromDut_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : 3f: TH reads the Mode Attribute from the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3fThReadsTheModeAttributeFromTheDut_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : 3g: TH send DownOrClose command to the DUT\n");
+            if (ShouldSkip("WNCV_MAINTENANCE")) {
+                NextTest();
+                return;
+            }
+            err = Test3gThSendDownOrCloseCommandToTheDut_18();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err) {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 19;
+
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1aThSetTheModeAttributeBit0OfTheDut_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:1];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"1a: TH set the Mode Attribute bit0 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1bThReadsConfigStatusAttributeFromDut_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1b: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 4));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1cThClearTheModeAttributeBit0OfTheDut_3()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"1c: TH clear the Mode Attribute bit0 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test1dThReadsConfigStatusAttributeFromDut_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"1d: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2aThSetTheModeAttributeBit1OfTheDut_5()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:2];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"2a: TH set the Mode Attribute bit1 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nonnull configStatusValA;
+
+    CHIP_ERROR Test2bThReadsConfigStatusAttributeFromDut_6()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2b: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+            {
+                configStatusValA = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2cIfConfigStatusBit00ThSendDownOrCloseCommandToTheDut_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_FAILURE));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2dThClearTheModeAttributeBit1OfTheDut_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"2d: TH clear the Mode Attribute bit1 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2eThReadsConfigStatusAttributeFromDut_9()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2e: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 1));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2fThReadsTheModeAttributeFromTheDut_10()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"2f: TH reads the Mode Attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test2gThSendDownOrCloseCommandToTheDut_11()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"2g: TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3aThSetTheModeAttributeBit2OfTheDut_12()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:4];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"3a: TH set the Mode Attribute bit2 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+    NSNumber * _Nonnull configStatusValB;
+
+    CHIP_ERROR Test3cThReadsConfigStatusAttributeFromDut_13()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3c: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+            {
+                configStatusValB = value;
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3cThSendDownOrCloseCommandToTheDut_14()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"3c: TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_BUSY));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3dThClearTheModeAttributeBit2OfTheDut_15()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        id modeArgument;
+        modeArgument = [NSNumber numberWithUnsignedChar:0];
+        [cluster writeAttributeModeWithValue:modeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"3d: TH clear the Mode Attribute bit2 of the DUT Error: %@", err);
+
+                               VerifyOrReturn(CheckValue("status", err, 0));
+
+                               NextTest();
+                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3eThReadsConfigStatusAttributeFromDut_16()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeConfigStatusWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3e: TH reads ConfigStatus attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", [value unsignedCharValue], 1));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3fThReadsTheModeAttributeFromTheDut_17()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeModeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"3f: TH reads the Mode Attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", [value unsignedCharValue], 127));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Test3gThSendDownOrCloseCommandToTheDut_18()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestWindowCovering * cluster = [[CHIPTestWindowCovering alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster downOrCloseWithCompletionHandler:^(NSError * _Nullable err) {
+            NSLog(@"3g: TH send DownOrClose command to the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_WNCV_2_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_4()
         : TestCommandBridge("Test_TC_WNCV_2_4")
         , mTestIndex(0)
@@ -41640,6 +43123,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_4() {}
 
@@ -41763,6 +43247,7 @@ private:
 
 class Test_TC_WNCV_2_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_2_5()
         : TestCommandBridge("Test_TC_WNCV_2_5")
         , mTestIndex(0)
@@ -41772,6 +43257,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_2_5() {}
 
@@ -41895,6 +43381,7 @@ private:
 
 class Test_TC_WNCV_3_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_3_4()
         : TestCommandBridge("Test_TC_WNCV_3_4")
         , mTestIndex(0)
@@ -41906,6 +43393,7 @@ public:
         AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_3_4() {}
 
@@ -42165,6 +43653,7 @@ private:
 
 class Test_TC_WNCV_3_5 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_3_5()
         : TestCommandBridge("Test_TC_WNCV_3_5")
         , mTestIndex(0)
@@ -42176,6 +43665,7 @@ public:
         AddArgument("fullMotionDuration", 0, UINT16_MAX, &mFullMotionDuration);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_3_5() {}
 
@@ -42435,6 +43925,7 @@ private:
 
 class Test_TC_WNCV_4_3 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_4_3()
         : TestCommandBridge("Test_TC_WNCV_4_3")
         , mTestIndex(0)
@@ -42444,6 +43935,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_4_3() {}
 
@@ -42492,7 +43984,7 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : 2b: TH sends GoToLiftPercentage command with BadParam to DUT\n");
-            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE")) {
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE")) {
                 NextTest();
                 return;
             }
@@ -42500,7 +43992,7 @@ public:
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : 3a: TH sends GoToLiftPercentage command with 10001 to DUT\n");
-            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE")) {
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE")) {
                 NextTest();
                 return;
             }
@@ -42508,7 +44000,7 @@ public:
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : 4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT\n");
-            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE")) {
+            if (ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE")) {
                 NextTest();
                 return;
             }
@@ -42667,6 +44159,7 @@ private:
 
 class Test_TC_WNCV_4_4 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_WNCV_4_4()
         : TestCommandBridge("Test_TC_WNCV_4_4")
         , mTestIndex(0)
@@ -42676,6 +44169,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_WNCV_4_4() {}
 
@@ -42724,7 +44218,7 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : 2b: TH sends GoToTiltPercentage command with BadParam to DUT\n");
-            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE")) {
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE")) {
                 NextTest();
                 return;
             }
@@ -42732,7 +44226,7 @@ public:
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : 3a: TH sends GoToTiltPercentage command with 10001 to DUT\n");
-            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE")) {
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE")) {
                 NextTest();
                 return;
             }
@@ -42740,7 +44234,7 @@ public:
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : 4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT\n");
-            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && PICS_CR_GOTOTILTPERCENTAGE")) {
+            if (ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE")) {
                 NextTest();
                 return;
             }
@@ -42899,6 +44393,7 @@ private:
 
 class TestCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestCluster()
         : TestCommandBridge("TestCluster")
         , mTestIndex(0)
@@ -42908,6 +44403,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestCluster() {}
 
@@ -56177,6 +57673,7 @@ private:
 
 class TestSaveAs : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestSaveAs()
         : TestCommandBridge("TestSaveAs")
         , mTestIndex(0)
@@ -56186,6 +57683,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestSaveAs() {}
 
@@ -59109,6 +60607,7 @@ private:
 
 class TestConstraints : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestConstraints()
         : TestCommandBridge("TestConstraints")
         , mTestIndex(0)
@@ -59118,6 +60617,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestConstraints() {}
 
@@ -59673,6 +61173,7 @@ private:
 
 class TestDelayCommands : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestDelayCommands()
         : TestCommandBridge("TestDelayCommands")
         , mTestIndex(0)
@@ -59682,6 +61183,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestDelayCommands() {}
 
@@ -59752,6 +61254,7 @@ private:
 
 class TestDescriptorCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestDescriptorCluster()
         : TestCommandBridge("TestDescriptorCluster")
         , mTestIndex(0)
@@ -59761,6 +61264,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestDescriptorCluster() {}
 
@@ -59955,6 +61459,7 @@ private:
 
 class TestBasicInformation : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestBasicInformation()
         : TestCommandBridge("TestBasicInformation")
         , mTestIndex(0)
@@ -59964,6 +61469,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestBasicInformation() {}
 
@@ -60174,6 +61680,7 @@ private:
 
 class TestGeneralCommissioning : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestGeneralCommissioning()
         : TestCommandBridge("TestGeneralCommissioning")
         , mTestIndex(0)
@@ -60183,6 +61690,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestGeneralCommissioning() {}
 
@@ -60376,6 +61884,7 @@ private:
 
 class TestGroupsCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestGroupsCluster()
         : TestCommandBridge("TestGroupsCluster")
         , mTestIndex(0)
@@ -60385,6 +61894,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestGroupsCluster() {}
 
@@ -61083,6 +62593,7 @@ private:
 
 class TestGroupKeyManagementCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestGroupKeyManagementCluster()
         : TestCommandBridge("TestGroupKeyManagementCluster")
         , mTestIndex(0)
@@ -61092,6 +62603,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestGroupKeyManagementCluster() {}
 
@@ -61757,6 +63269,7 @@ private:
 
 class TestIdentifyCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestIdentifyCluster()
         : TestCommandBridge("TestIdentifyCluster")
         , mTestIndex(0)
@@ -61766,6 +63279,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestIdentifyCluster() {}
 
@@ -61850,6 +63364,7 @@ private:
 
 class TestLogCommands : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestLogCommands()
         : TestCommandBridge("TestLogCommands")
         , mTestIndex(0)
@@ -61859,6 +63374,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestLogCommands() {}
 
@@ -61939,6 +63455,7 @@ private:
 
 class TestOperationalCredentialsCluster : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestOperationalCredentialsCluster()
         : TestCommandBridge("TestOperationalCredentialsCluster")
         , mTestIndex(0)
@@ -61948,6 +63465,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestOperationalCredentialsCluster() {}
 
@@ -62238,6 +63756,7 @@ private:
 
 class TestBinding : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestBinding()
         : TestCommandBridge("TestBinding")
         , mTestIndex(0)
@@ -62247,6 +63766,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestBinding() {}
 
@@ -62598,6 +64118,7 @@ private:
 
 class Test_TC_SWDIAG_1_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWDIAG_1_1()
         : TestCommandBridge("Test_TC_SWDIAG_1_1")
         , mTestIndex(0)
@@ -62607,6 +64128,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWDIAG_1_1() {}
 
@@ -62790,6 +64312,7 @@ private:
 
 class Test_TC_SWDIAG_2_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWDIAG_2_1()
         : TestCommandBridge("Test_TC_SWDIAG_2_1")
         , mTestIndex(0)
@@ -62799,6 +64322,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWDIAG_2_1() {}
 
@@ -62849,6 +64373,7 @@ private:
 
 class Test_TC_SWDIAG_3_1 : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     Test_TC_SWDIAG_3_1()
         : TestCommandBridge("Test_TC_SWDIAG_3_1")
         , mTestIndex(0)
@@ -62858,6 +64383,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~Test_TC_SWDIAG_3_1() {}
 
@@ -63011,6 +64537,7 @@ private:
 
 class TestSubscribe_OnOff : public TestCommandBridge {
 public:
+    // NOLINTBEGIN(clang-analyzer-nullability.NullPassedToNonnull): Test constructor nullability not enforced
     TestSubscribe_OnOff()
         : TestCommandBridge("TestSubscribe_OnOff")
         , mTestIndex(0)
@@ -63020,6 +64547,7 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
+    // NOLINTEND(clang-analyzer-nullability.NullPassedToNonnull)
 
     ~TestSubscribe_OnOff() {}
 
@@ -63257,11 +64785,14 @@ private:
     }
 };
 
+#endif // CONFIG_ENABLE_YAML_TESTS
+
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
+#if CONFIG_ENABLE_YAML_TESTS
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
         make_unique<TestAccessControlCluster>(),
@@ -63397,6 +64928,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_WNCV_1_1>(),
         make_unique<Test_TC_WNCV_2_1>(),
         make_unique<Test_TC_WNCV_2_2>(),
+        make_unique<Test_TC_WNCV_2_3>(),
         make_unique<Test_TC_WNCV_2_4>(),
         make_unique<Test_TC_WNCV_2_5>(),
         make_unique<Test_TC_WNCV_3_4>(),
@@ -63420,6 +64952,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_SWDIAG_2_1>(),
         make_unique<Test_TC_SWDIAG_3_1>(),
         make_unique<TestSubscribe_OnOff>(),
+#endif // CONFIG_ENABLE_YAML_TESTS
     };
 
     commands.Register(clusterName, clusterCommands);

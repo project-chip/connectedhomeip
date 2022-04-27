@@ -179,7 +179,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         if (status == CHIP_NO_ERROR)
         {
             // Format is YYYYMMDD
-            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "%02u%02u", manufacturingYear,
+            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear,
                      manufacturingMonth, manufacturingDayOfMonth);
             status = aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
         }
@@ -270,11 +270,10 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         Basic::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
         // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
-        constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec  = 3;
-        constexpr uint16_t kMinSubscriptionsPerFabricMandatedBySpec = 3;
+        constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
         capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
-        capabilityMinima.subscriptionsPerFabric = kMinSubscriptionsPerFabricMandatedBySpec;
+        capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinSubscriptionsPerFabric();
 
         status = aEncoder.Encode(capabilityMinima);
         break;
@@ -406,13 +405,6 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
-    }
-
-    bool reachable;
-    if (ConfigurationMgr().GetReachable(reachable) == CHIP_NO_ERROR)
-    {
-        status = Attributes::Reachable::Set(endpoint, reachable);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Reachable: 0x%02x", status));
     }
 }
 

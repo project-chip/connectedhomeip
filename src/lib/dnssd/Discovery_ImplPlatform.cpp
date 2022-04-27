@@ -344,8 +344,7 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
     ReturnErrorCodeIf(mDnssdInitialized, CHIP_NO_ERROR);
     ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this));
 
-    uint64_t random_instance_name = chip::Crypto::GetRandU64();
-    memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
+    UpdateCommissionableInstanceName();
 
     return CHIP_NO_ERROR;
 }
@@ -425,7 +424,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
     }
 }
 
-CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
+CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength) const
 {
     if (maxLength < (chip::Dnssd::Commission::kInstanceNameMaxLength + 1))
     {
@@ -434,6 +433,14 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
 
     return chip::Encoding::BytesToUppercaseHexString(&mCommissionableInstanceName[0], sizeof(mCommissionableInstanceName),
                                                      instanceName, maxLength);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::UpdateCommissionableInstanceName()
+{
+    uint64_t random_instance_name = chip::Crypto::GetRandU64();
+    static_assert(sizeof(mCommissionableInstanceName) == sizeof(random_instance_name), "Not copying the right amount of data");
+    memcpy(&mCommissionableInstanceName[0], &random_instance_name, sizeof(mCommissionableInstanceName));
+    return CHIP_NO_ERROR;
 }
 
 void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type, CHIP_ERROR error)
@@ -489,16 +496,17 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
     ReturnErrorOnFailure(ChipDnssdPublishService(&service, HandleDnssdPublish, this));
 
 #ifdef DETAIL_LOGGING
-    printf("printEntries port=%u, mTextEntrySize=%zu, mSubTypeSize=%zu\n", port, textEntrySize, subTypeSize);
+    printf("printEntries port=%u, mTextEntrySize=%u, mSubTypeSize=%u\n", port, static_cast<unsigned int>(textEntrySize),
+           static_cast<unsigned int>(subTypeSize));
 
     for (size_t i = 0; i < textEntrySize; i++)
     {
-        printf(" entry [%zu] : %s %s\n", i, textEntries[i].mKey, (char *) (textEntries[i].mData));
+        printf(" entry [%u] : %s %s\n", static_cast<unsigned int>(i), textEntries[i].mKey, (char *) (textEntries[i].mData));
     }
 
     for (size_t i = 0; i < subTypeSize; i++)
     {
-        printf(" type [%zu] : %s\n", i, subTypes[i]);
+        printf(" type [%u] : %s\n", static_cast<unsigned int>(i), subTypes[i]);
     }
 #endif
 

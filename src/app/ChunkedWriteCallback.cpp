@@ -69,6 +69,9 @@ void ChunkedWriteCallback::OnDone(WriteClient * apWriteClient)
         callback->OnResponse(apWriteClient, mProcessingAttributePath.Value(), mAttributeStatus);
     }
 
+    mProcessingAttributePath = NullOptional;
+    mAttributeStatus         = StatusIB();
+
     callback->OnDone(apWriteClient);
 }
 

@@ -269,7 +269,8 @@ tests:
       response:
           values:
               - name: "pairingHint"
-                notValue: 0
+                constraints:
+                    notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
       PICS: PI_KEY

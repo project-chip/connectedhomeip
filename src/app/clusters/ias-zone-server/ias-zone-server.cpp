@@ -628,13 +628,12 @@ static void unenrollSecurityDevice(EndpointId endpoint)
 void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
 {
     EndpointId endpoint;
-    uint8_t i;
 
     // If the device has left the network, unenroll all endpoints on the device
     // that are servers of the IAS Zone Cluster
     if (status == EMBER_NETWORK_DOWN && emberAfNetworkState() == EMBER_NO_NETWORK)
     {
-        for (i = 0; i < emberAfEndpointCount(); i++)
+        for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
         {
             endpoint = emberAfEndpointFromIndex(i);
             if (emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))

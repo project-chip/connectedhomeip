@@ -279,8 +279,6 @@ CHIP_ERROR AppTask::Init()
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
-
     ConfigurationMgr().LogDeviceConfig();
 
 // Print setup info on LCD if available

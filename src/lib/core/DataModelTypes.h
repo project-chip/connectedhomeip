@@ -57,14 +57,47 @@ static constexpr CommandId kInvalidCommandId     = 0xFFFF'FFFF;
 static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
 static constexpr FieldId kInvalidFieldId         = 0xFFFF'FFFF;
 
+static constexpr uint16_t ExtractIdFromMEI(uint32_t aMEI)
+{
+    constexpr uint32_t kIdMask = 0x0000'FFFF;
+    return static_cast<uint16_t>(aMEI & kIdMask);
+}
+
+static constexpr uint16_t ExtractVendorFromMEI(uint32_t aMEI)
+{
+    constexpr uint32_t kVendorMask  = 0xFFFF'0000;
+    constexpr uint32_t kVendorShift = 16;
+    return static_cast<uint16_t>((aMEI & kVendorMask) >> kVendorShift);
+}
+
 constexpr bool IsValidClusterId(ClusterId aClusterId)
 {
-    const ClusterId kIdMask     = 0x0000'FFFF;
-    const ClusterId kVendorMask = 0xFFFF'0000;
-    const auto id               = aClusterId & kIdMask;
-    const auto vendor           = aClusterId & kVendorMask;
-    return (vendor == 0x0000'0000 && id <= 0x7FFF) ||
-        (vendor >= 0x0001'0000 && vendor <= 0xFFFE'0000 && id >= 0xFC00 && id <= 0xFFFE);
+    const auto id     = ExtractIdFromMEI(aClusterId);
+    const auto vendor = ExtractVendorFromMEI(aClusterId);
+    // Cluster id suffixes in the range 0x0000 to 0x7FFF indicate a standard
+    // cluster.
+    //
+    // Cluster id suffixes in the range 0xFC00 to 0xFFFE indicate an MS cluster.
+    return (vendor == 0x0000 && id <= 0x7FFF) || (vendor >= 0x0001 && vendor <= 0xFFFE && id >= 0xFC00 && id <= 0xFFFE);
+}
+
+constexpr bool IsGlobalAttribute(AttributeId aAttributeId)
+{
+    const auto id     = ExtractIdFromMEI(aAttributeId);
+    const auto vendor = ExtractVendorFromMEI(aAttributeId);
+    // Attribute id suffixes in the range 0xF000 to 0xFFFE indicate a standard
+    // global attribute.
+    return (vendor == 0x0000 && id >= 0xF000 && id <= 0xFFFE);
+}
+
+constexpr bool IsValidAttributeId(AttributeId aAttributeId)
+{
+    const auto id     = ExtractIdFromMEI(aAttributeId);
+    const auto vendor = ExtractVendorFromMEI(aAttributeId);
+    // Attribute id suffixes in the range 0x0000 to 0x4FFF indicate a non-global
+    // attribute (standard or MS).  The vendor id must not be wildcard in this
+    // case.
+    return (id <= 0x4FFF && vendor != 0xFFFF) || IsGlobalAttribute(aAttributeId);
 }
 
 constexpr bool IsValidDeviceTypeId(DeviceTypeId aDeviceTypeId)

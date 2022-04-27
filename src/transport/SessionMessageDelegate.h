@@ -46,13 +46,12 @@ public:
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
-     * @param source        The sender's address
      * @param isDuplicate   The message is a duplicate of previously received message
      * @param msgBuf        The received message
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   const SessionHandle & session, const Transport::PeerAddress & source,
-                                   DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) = 0;
+                                   const SessionHandle & session, DuplicateMessage isDuplicate,
+                                   System::PacketBufferHandle && msgBuf) = 0;
 };
 
 } // namespace chip

@@ -89,16 +89,8 @@ CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
-#if !CONFIG_USE_SEPARATE_EVENTLOOP
-static void OnResponseTimeout(chip::System::Layer *, void * appState)
-{
-    (reinterpret_cast<CHIPCommandBridge *>(appState))->SetCommandExitStatus(CHIP_ERROR_TIMEOUT);
-}
-#endif // !CONFIG_USE_SEPARATE_EVENTLOOP
-
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
 {
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
     {
@@ -108,23 +100,15 @@ CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration
         }
     }
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-#else
-    ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
     return mCommandExitStatus;
 }
 
 void CHIPCommandBridge::StopWaiting()
 {
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     {
         std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
         mWaitingForResponse = false;
     }
     cvWaitingForResponse.notify_all();
-#else // CONFIG_USE_SEPARATE_EVENTLOOP
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 }

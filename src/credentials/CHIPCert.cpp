@@ -44,6 +44,9 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 namespace chip {
 namespace Credentials {
@@ -283,7 +286,11 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
+#ifdef ENABLE_HSM_ECDSA_VERIFY
+    P256PublicKeyHSM caPublicKey;
+#else
     P256PublicKey caPublicKey;
+#endif
     P256ECDSASignature signature;
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1226,7 +1233,7 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
             cats.values[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
         }
     }
-    for (uint8_t i = catCount; i < cats.size(); ++i)
+    for (size_t i = catCount; i < cats.size(); ++i)
     {
         cats.values[i] = kUndefinedCAT;
     }

@@ -68,7 +68,7 @@ CHIP_ERROR ClusterPathIB::Parser::CheckSchemaValidity() const
             {
                 EndpointId endpoint;
                 reader.Get(endpoint);
-                PRETTY_PRINT("\tEndpoint = 0x%" PRIx16 ",", endpoint);
+                PRETTY_PRINT("\tEndpoint = 0x%x,", endpoint);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

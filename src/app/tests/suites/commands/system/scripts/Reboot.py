@@ -23,5 +23,7 @@ PORT = 9000
 if sys.platform == 'linux':
     IP = '10.10.10.5'
 
+# Passing in sys.argv[1:] gets rid of the script name with the remaining values in the list as
+# key-value pairs, e.g. [option1, value1, option2, value2, ...]
 with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
-    proxy.reboot('default', sys.argv[1])
+    proxy.reboot('default', sys.argv[1:])

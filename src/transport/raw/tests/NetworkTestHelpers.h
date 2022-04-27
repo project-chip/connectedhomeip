@@ -36,8 +36,6 @@ namespace Test {
 class IOContext
 {
 public:
-    IOContext() {}
-
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init();
 
@@ -61,34 +59,33 @@ private:
     Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 };
 
+class LoopbackTransportDelegate
+{
+public:
+    virtual ~LoopbackTransportDelegate() {}
+
+    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop.
+    virtual void OnMessageDropped() {}
+};
+
 class LoopbackTransport : public Transport::Base
 {
 public:
+    void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
+    void ShutdownLoopbackTransport()
+    {
+        // TODO: remove these after #17624 (Ensure tests drain all message in loopback transport) being fixed
+        // Packets are allocated from platform memory, we should release them before Platform::MemoryShutdown
+        while (!mPendingMessageQueue.empty())
+            mPendingMessageQueue.pop();
+    }
+
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char *) { return CHIP_NO_ERROR; }
 
-    /*
-     * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
-     * this mode better replicates a real-functioning stack that correctly handles the processing
-     * of a transmitted message as an asynchronous, bottom half handler dispatched after the current execution context has
-     * completed. This is achieved using SystemLayer::ScheduleWork.
-     */
-    void EnableAsyncDispatch(System::Layer * aSystemLayer)
-    {
-        mSystemLayer          = aSystemLayer;
-        mAsyncMessageDispatch = true;
-    }
-
-    /*
-     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
-     *
-     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
-     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
-     * use this sparingly!
-     */
-    void DisableAsyncDispatch() { mAsyncMessageDispatch = false; }
-
     bool HasPendingMessages() { return !mPendingMessageQueue.empty(); }
+
+    void SetLoopbackTransportDelegate(LoopbackTransportDelegate * delegate) { mDelegate = delegate; }
 
     static void OnMessageReceived(System::Layer * aSystemLayer, void * aAppState)
     {
@@ -110,22 +107,15 @@ public:
         if (mNumMessagesToDrop == 0)
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-
-            if (mAsyncMessageDispatch)
-            {
-                mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
-                mSystemLayer->ScheduleWork(OnMessageReceived, this);
-            }
-            else
-            {
-                HandleMessageReceived(address, std::move(receivedMessage));
-            }
+            mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+            mSystemLayer->ScheduleWork(OnMessageReceived, this);
         }
         else
         {
             mNumMessagesToDrop--;
             mDroppedMessageCount++;
-            MessageDropped();
+            if (mDelegate != nullptr)
+                mDelegate->OnMessageDropped();
         }
 
         return CHIP_NO_ERROR;
@@ -151,17 +141,14 @@ public:
         System::PacketBufferHandle mPendingMessage;
     };
 
-    // Hook for subclasses to perform custom logic on message drops.
-    virtual void MessageDropped() {}
-
     System::Layer * mSystemLayer = nullptr;
-    bool mAsyncMessageDispatch   = false;
     std::queue<PendingMessageItem> mPendingMessageQueue;
     Transport::PeerAddress mTxAddress;
-    uint32_t mNumMessagesToDrop   = 0;
-    uint32_t mDroppedMessageCount = 0;
-    uint32_t mSentMessageCount    = 0;
-    CHIP_ERROR mMessageSendError  = CHIP_NO_ERROR;
+    uint32_t mNumMessagesToDrop           = 0;
+    uint32_t mDroppedMessageCount         = 0;
+    uint32_t mSentMessageCount            = 0;
+    CHIP_ERROR mMessageSendError          = CHIP_NO_ERROR;
+    LoopbackTransportDelegate * mDelegate = nullptr;
 };
 
 } // namespace Test

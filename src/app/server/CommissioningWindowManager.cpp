@@ -56,6 +56,9 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mCommissioningTimeoutTimerArmed = false;
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASEPairings();
+#if CONFIG_NETWORK_LAYER_BLE
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+#endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
@@ -144,19 +147,9 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
 }
 
-void CommissioningWindowManager::OnSessionEstablished()
+void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & session)
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
-    SessionHolder sessionHolder;
-    CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
-        sessionHolder, Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
-        &mPairingSession, CryptoContext::SessionRole::kResponder, 0);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Commissioning failed while setting up secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-        return;
-    }
 
     ChipLogProgress(AppServer, "Commissioning completed session establishment step");
     if (mAppDelegate != nullptr)
@@ -177,7 +170,7 @@ void CommissioningWindowManager::OnSessionEstablished()
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
+        CHIP_ERROR err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
@@ -194,6 +187,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
                         CHIP_ERROR_INVALID_ARGUMENT);
     DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Dnssd::ServiceAdvertiser::Instance().UpdateCommissionableInstanceName());
 
     ReturnErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(commissioningTimeout, HandleCommissioningWindowTimeout, this));
 

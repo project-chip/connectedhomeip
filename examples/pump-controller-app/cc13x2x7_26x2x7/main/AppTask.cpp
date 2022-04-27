@@ -37,6 +37,7 @@
 #include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -86,6 +87,12 @@ void InitializeOTARequestor(void)
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
 }
 #endif
+
+static const chip::EndpointId sIdentifyEndpointId = 0;
+static const uint32_t sIdentifyBlinkRateMs        = 500;
+
+::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
+                          EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::TriggerIdentifyEffectHandler };
 
 int AppTask::StartAppTask()
 {
@@ -370,6 +377,26 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         break;
 
+    case AppEvent::kEventType_IdentifyStart:
+        LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+        LED_startBlinking(sAppGreenHandle, sIdentifyBlinkRateMs, LED_BLINK_FOREVER);
+        PLAT_LOG("Identify started");
+        break;
+
+    case AppEvent::kEventType_IdentifyStop:
+        LED_stopBlinking(sAppGreenHandle);
+
+        if (!PumpMgr().IsStopped())
+        {
+            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+        }
+        else
+        {
+            LED_setOff(sAppGreenHandle);
+        }
+        PLAT_LOG("Identify stopped");
+        break;
+
     case AppEvent::kEventType_AppEvent:
         if (NULL != aEvent->Handler)
         {
@@ -384,3 +411,46 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 void AppTask::UpdateClusterState() {}
+
+void AppTask::IdentifyStartHandler(::Identify *)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_IdentifyStart;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::IdentifyStopHandler(::Identify *)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_IdentifyStop;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        PLAT_LOG("Starting blink identifier effect");
+        IdentifyStartHandler(identify);
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        PLAT_LOG("Breathe identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        PLAT_LOG("Okay identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        PLAT_LOG("Channel Change identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+        PLAT_LOG("Finish identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+        PLAT_LOG("Stop identifier effect");
+        IdentifyStopHandler(identify);
+        break;
+    default:
+        PLAT_LOG("No identifier effect");
+    }
+}

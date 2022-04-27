@@ -65,7 +65,8 @@ server cluster AccessControl = 31 {
   }
 
   // Response structures are used for command outputs
-  response struct ConnectNetworkResponse {
+  // Responses are encoded as a command and use a unique ID for encoding
+  response struct ConnectNetworkResponse = 123 {
     CHAR_STRING debugText = 1;
     INT32S errorValue = 2;
   }
@@ -115,6 +116,9 @@ server cluster AccessControl = 31 {
   // command invocation default to "operate" privilege, however these
   // can be modified as well
   command access(invoke: administer) Off(): DefaultSuccess = 4;
+
+  // command invocation can require timed invoke usage
+  timed command RequiresTimedInvok(): DefaultSuccess = 4;
 }
 
 // A client cluster represents something that is used by an app

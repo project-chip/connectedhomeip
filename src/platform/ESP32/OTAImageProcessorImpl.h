@@ -35,8 +35,8 @@ public:
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
-    bool IsFirstImageRun() override { return false; }
-    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
 
 private:
     static void HandlePrepareDownload(intptr_t context);

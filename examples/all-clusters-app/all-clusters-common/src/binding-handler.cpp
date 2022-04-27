@@ -103,12 +103,18 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry & binding, ch
     }
 }
 
+static void BoundDeviceContextReleaseHandler(void * context)
+{
+    (void) context;
+}
+
 static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler);
 }
 
 CHIP_ERROR InitBindingHandlers()

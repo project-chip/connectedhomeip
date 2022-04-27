@@ -1,0 +1,13 @@
+{
+  "clusters": [
+    {
+      "identifier": "0x050a",
+      "features": "CS"
+    },
+    {
+      "identifier": "0x0506",
+      "features": "AS",
+      "optionalCommands" : [4, 5]
+    }
+  ]
+}

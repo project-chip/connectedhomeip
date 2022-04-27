@@ -95,6 +95,10 @@ if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
 endif()
 
+if (CONFIG_CHIP_ENABLE_SCHEMA_CHECK)
+    chip_gn_arg_bool("chip_enable_schema_check"	"true")
+endif()
+
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
 endif()
@@ -127,6 +131,10 @@ endif()
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
     chip_gn_arg_append("chip_platform_target"   "\"${CONFIG_CHIP_EXTERNAL_PLATFORM_TARGET}\"")
+endif()
+
+if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
+    chip_gn_arg_append("chip_use_transitional_commissionable_data_provider" "false")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
