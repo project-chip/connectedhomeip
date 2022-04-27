@@ -15,13 +15,11 @@
  *    limitations under the License.
  */
 
-function getManualTests()
-{
+function getManualTests() {
   return [];
 }
 
-function getTests()
-{
+function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
   ];
@@ -278,6 +276,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
+    // 'TestSelfFabricRemoval',  --> TODO: Integrate here when Darwin can live with current fabric going away
     'TestBinding',
     'TestUserLabelCluster',
   ];
@@ -335,5 +334,5 @@ function getTests()
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;

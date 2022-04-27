@@ -15,15 +15,13 @@
  *    limitations under the License.
  */
 
-function getManualTests()
-{
+function getManualTests() {
   return [];
 }
 
 // clang-format off
 
-function getTests()
-{
+function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
   ];
@@ -282,6 +280,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
+    'TestSelfFabricRemoval',
     'TestBinding',
   ];
 
@@ -340,5 +339,5 @@ function getTests()
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;
