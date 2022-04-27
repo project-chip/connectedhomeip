@@ -30,7 +30,7 @@ constexpr System::Clock::Seconds32 kUserConsentPollInterval = System::Clock::Sec
 
 bool ExtendedOTARequestorDriver::CanConsent()
 {
-    return false;
+    return mUserConsentDelegate != nullptr;
 }
 
 void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
