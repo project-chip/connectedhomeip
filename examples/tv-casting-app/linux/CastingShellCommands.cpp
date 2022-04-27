@@ -20,7 +20,8 @@
  */
 
 #include "CastingShellCommands.h"
-#include "Casting.h"
+#include "CastingUtils.h"
+#include "CastingServer.h"
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -67,7 +68,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         chip::NodeId nodeId           = (chip::NodeId) strtoull(argv[1], &eptr, 10);
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[2], &eptr, 10);
-        return TargetVideoPlayerInfoInit(nodeId, fabricIndex);
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "discover") == 0)
     {
@@ -95,7 +96,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         char * url     = argv[1];
         char * display = argv[2];
-        return ContentLauncherLaunchURL(url, display);
+        return CastingServer::GetInstance()->ContentLauncherLaunchURL(url, display);
     }
     if (strcmp(argv[0], "access") == 0)
     {
@@ -106,7 +107,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         char * eptr;
         chip::NodeId node = (chip::NodeId) strtoull(argv[1], &eptr, 0);
-        ReadServerClustersForNode(node);
+        CastingServer::GetInstance()->ReadServerClustersForNode(node);
         return CHIP_NO_ERROR;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

@@ -18,41 +18,11 @@
 
 #pragma once
 
-#include "TargetEndpointInfo.h"
-#include "LinuxCommissionableDataProvider.h"
-#include "Options.h"
-#include "app/clusters/bindings/BindingManager.h"
-#include <app/OperationalDeviceProxy.h>
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
-#include <controller/CHIPCommissionableNodeController.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
-#include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/CommissionableDataProvider.h>
-#include <platform/ConfigurationManager.h>
-#include <platform/DeviceControlServer.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
-#include <system/SystemClock.h>
-#include <system/SystemLayer.h>
-#include <transport/raw/PeerAddress.h>
-#include <zap-generated/CHIPClusters.h>
-
-#include <list>
-#include <string>
+#include "app/clusters/bindings/BindingManager.h"
+#include "TargetEndpointInfo.h"
 
 using namespace chip;
-using namespace chip::Controller;
-using namespace chip::Credentials;
-using chip::ArgParser::HelpOptions;
-using chip::ArgParser::OptionDef;
-using chip::ArgParser::OptionSet;
-using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 class TargetVideoPlayerInfo
 {

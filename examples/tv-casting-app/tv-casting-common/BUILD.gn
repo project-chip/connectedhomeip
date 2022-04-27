@@ -23,8 +23,10 @@ chip_data_model("tv-casting-common") {
       "${chip_root}/zzz_generated/tv-casting-app/zap-generated"
 
   sources = [
+    "include/CastingServer.h",
     "include/TargetEndpointInfo.h",
     "include/TargetVideoPlayerInfo.h",
+    "src/CastingServer.cpp",
     "src/TargetEndpointInfo.cpp",
     "src/TargetVideoPlayerInfo.cpp",
   ]

@@ -41,6 +41,8 @@
 #include <zap-generated/CHIPClusters.h>
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
+#include "CastingServer.h"
+#include "CastingUtils.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include "CastingShellCommands.h"
@@ -62,27 +64,23 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
 #endif
-
 struct TVExampleDeviceType
 {
     const char * name;
     uint16_t id;
 };
 
+Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
 constexpr TVExampleDeviceType kKnownDeviceTypes[]              = { { "video-player", 35 }, { "dimmable-light", 257 } };
 constexpr int kKnownDeviceTypesCount                           = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
 constexpr uint16_t kOptionDeviceType                           = 't';
-constexpr System::Clock::Seconds16 kCommissioningWindowTimeout = System::Clock::Seconds16(3 * 60);
-constexpr uint32_t kCommissionerDiscoveryTimeoutInMs           = 5 * 1000;
 
 // TODO: Accept these values over CLI
 const char * kContentUrl         = "https://www.test.com/videoid";
 const char * kContentDisplayStr  = "Test video";
-constexpr EndpointId kTvEndpoint = 1;
 
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
-Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
 bool gInited                            = false;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -131,273 +129,22 @@ HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-void ReadServerClusters(EndpointId endpointId);
-CHIP_ERROR InitBindingHandlers()
-{
-    auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
-        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    return CHIP_NO_ERROR;
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
-{
-    Dnssd::DiscoveredNodeData * selectedCommissioner = (Dnssd::DiscoveredNodeData *) context;
-
-    // Send User Directed commissioning request
-    ReturnOnFailure(Server::GetInstance().SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-void InitServer()
-{
-    if (gInited)
-    {
-        return;
-    }
-    // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
-    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
-
-    // Enter commissioning mode, open commissioning window
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize binding handlers
-    ReturnOnFailure(InitBindingHandlers());
-
-    gInited = true;
-}
-
-/**
- * Enters commissioning mode, opens commissioning window, logs onboarding payload.
- * If non-null selectedCommissioner is provided, sends user directed commissioning
- * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
- */
-void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr)
-{
-    InitServer();
-
-    Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-    ReturnOnFailure(
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout));
-
-    // Display onboarding payload
-    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    if (selectedCommissioner != nullptr)
-    {
-        // Send User Directed commissioning request
-        // Wait 1 second to allow our commissionee DNS records to publish (needed on Mac)
-        int32_t expiration = 1;
-        ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(expiration), HandleUDCSendExpiration,
-                                                              (void *) selectedCommissioner));
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "To run discovery again, enter: cast discover");
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-CHIP_ERROR SendUDC(chip::Transport::PeerAddress commissioner)
-{
-    PrepareForCommissioning();
-    return Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-void InitCommissioningFlow(intptr_t commandArg)
-{
-    int commissionerCount = 0;
-
-    // Display discovered commissioner TVs to ask user to select one
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
-    {
-        const Dnssd::DiscoveredNodeData * commissioner = gCommissionableNodeController.GetDiscoveredCommissioner(i);
-        if (commissioner != nullptr)
-        {
-            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount++);
-            commissioner->LogDetail();
-        }
-    }
-
-    if (commissionerCount > 0)
-    {
-        ChipLogProgress(AppServer, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ",
-                        commissionerCount);
-
-        ChipLogProgress(AppServer, "Example: cast request 0");
-    }
-    else
-    {
-        ChipLogError(AppServer, "No commissioner discovered, commissioning must be initiated manually!");
-        PrepareForCommissioning();
-    }
-}
-
-CHIP_ERROR DiscoverCommissioners()
-{
-    // Send discover commissioners request
-    ReturnErrorOnFailure(gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
-
-    // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
-    return DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
-        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
-}
-
-CHIP_ERROR RequestCommissioning(int index)
-{
-    const Dnssd::DiscoveredNodeData * selectedCommissioner = gCommissionableNodeController.GetDiscoveredCommissioner(index);
-    if (selectedCommissioner == nullptr)
-    {
-        ChipLogError(AppServer, "No such commissioner with index %d exists", index);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    PrepareForCommissioning(selectedCommissioner);
-    return CHIP_NO_ERROR;
-}
-
-void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
-{
-    ChipLogProgress(AppServer, "ContentLauncher: Default Success Response");
-}
-
-void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
-{
-    ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
-}
-
-TargetVideoPlayerInfo gTargetVideoPlayerInfo;
-
-void OnDescriptorReadSuccessResponse(void * context, const app::DataModel::DecodableList<ClusterId> & responseList)
-{
-    TargetEndpointInfo * endpointInfo = static_cast<TargetEndpointInfo *>(context);
-
-    ChipLogProgress(AppServer, "Descriptor: Default Success Response endpoint=%d", endpointInfo->GetEndpointId());
-
-    auto iter = responseList.begin();
-    while (iter.Next())
-    {
-        auto & clusterId = iter.GetValue();
-        endpointInfo->AddCluster(clusterId);
-    }
-    // Always print the target info after handling descriptor read response
-    // Even when we get nothing back for any reasons
-    gTargetVideoPlayerInfo.PrintInfo();
-}
-
-void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error)
-{
-    ChipLogError(AppServer, "Descriptor: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
-}
-
-void ReadServerClusters(EndpointId endpointId)
-{
-    OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
-    {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-        return;
-    }
-
-    chip::Controller::DescriptorCluster cluster;
-    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, endpointId);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-
-    TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
-
-    if (cluster.ReadAttribute<app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
-            endpointInfo, OnDescriptorReadSuccessResponse, OnDescriptorReadFailureResponse) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Could not read Descriptor cluster ServerList");
-    }
-
-    ChipLogProgress(Controller, "Sent descriptor read for remote endpoint=%d", endpointId);
-}
-
-void ReadServerClustersForNode(NodeId nodeId)
-{
-    ChipLogProgress(NotSpecified, "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-    for (const auto & binding : BindingTable::GetInstance())
-    {
-        ChipLogProgress(NotSpecified,
-                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
-                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
-                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
-                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
-        if (binding.type == EMBER_UNICAST_BINDING && nodeId == binding.nodeId)
-        {
-            if (!gTargetVideoPlayerInfo.HasEndpoint(binding.remote))
-            {
-                ReadServerClusters(binding.remote);
-            }
-            else
-            {
-                TargetEndpointInfo * endpointInfo = gTargetVideoPlayerInfo.GetEndpoint(binding.remote);
-                if (endpointInfo != nullptr && endpointInfo->IsInitialized())
-                {
-                    endpointInfo->PrintInfo();
-                }
-            }
-        }
-    }
-}
-
-CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr)
-{
-    OperationalDeviceProxy * operationalDeviceProxy = gTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
-    {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-        return CHIP_ERROR_PEER_NODE_NOT_FOUND;
-    }
-
-    ContentLauncherCluster cluster;
-    CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    LaunchURL::Type request;
-    request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
-    request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
-    request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
-    cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex)
-{
-    InitServer();
-    return gTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex);
-}
 
 void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
     {
-        if (gTargetVideoPlayerInfo.IsInitialized())
+        if (CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
         {
-            ReadServerClustersForNode(gTargetVideoPlayerInfo.GetNodeId());
+            CastingServer::GetInstance()->ReadServerClustersForNode(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        ReturnOnFailure(gTargetVideoPlayerInfo.Initialize(event->CommissioningComplete.PeerNodeId,
+        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(event->CommissioningComplete.PeerNodeId,
                                                           event->CommissioningComplete.PeerFabricIndex));
 
-        ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
+        CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
     }
 }
 
@@ -480,7 +227,7 @@ int main(int argc, char * argv[])
     }
 
     // Send discover commissioners request
-    SuccessOrExit(err = gCommissionableNodeController.DiscoverCommissioners(gDiscoveryFilter));
+    SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     DeviceLayer::SystemLayer().StartTimer(
