@@ -389,24 +389,22 @@ PlatformMgrDelegate gPlatformMgrDelegate;
 
 } // anonymous namespace
 
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Basic {
+bool IsLocalConfigDisabled()
 {
-    EmberAfStatus status;
-
-    char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
-    if (ConfigurationMgr().GetNodeLabel(nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan::fromCharString(nodeLabel));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
-    }
-
-    bool localConfigDisabled;
-    if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
-    {
-        status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
-    }
+    bool disabled        = false;
+    EmberAfStatus status = LocalConfigDisabled::Get(0, &disabled);
+    return status == EMBER_ZCL_STATUS_SUCCESS && disabled;
 }
+} // namespace Basic
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint) {}
 
 void MatterBasicPluginServerInitCallback()
 {

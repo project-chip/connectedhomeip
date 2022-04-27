@@ -79,11 +79,9 @@ public:
     static const Key kConfigKey_ProductName;
     static const Key kConfigKey_SoftwareVersion;
     static const Key kConfigKey_SoftwareVersionString;
-    static const Key kConfigKey_NodeLabel;
     static const Key kConfigKey_PartNumber;
     static const Key kConfigKey_ProductURL;
     static const Key kConfigKey_ProductLabel;
-    static const Key kConfigKey_LocalConfigDisabled;
     static const Key kConfigKey_UniqueId;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;

@@ -82,3 +82,75 @@ tests:
                   0xFFFB, # AttributeList
                   0xFFFD, # ClusterRevision
               ]
+
+    - label: "Read NodeLabel"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: ""
+
+    - label: "Write NodeLabel"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "My node"
+
+    - label: "Read back NodeLabel"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "My node"
+
+    - label: "Read LocalConfigDisabled"
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      response:
+          value: false
+
+    - label: "Write LocalConfigDisabled"
+      command: "writeAttribute"
+      attribute: "LocalConfigDisabled"
+      arguments:
+          value: true
+
+    - label: "Read back LocalConfigDisabled"
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      response:
+          value: true
+
+    - label: "Reboot the device"
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Connect to the device again"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read back NodeLabel after reboot"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "My node"
+
+    - label: "Restore initial NodeLabel value"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: ""
+
+    - label: "Read back LocalConfigDisabled after reboot"
+      command: "readAttribute"
+      attribute: "LocalConfigDisabled"
+      response:
+          value: true
+
+    - label: "Restore initial LocalConfigDisabled value"
+      command: "writeAttribute"
+      attribute: "LocalConfigDisabled"
+      arguments:
+          value: false
