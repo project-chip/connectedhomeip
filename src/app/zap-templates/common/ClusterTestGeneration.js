@@ -173,8 +173,12 @@ function setDefaultTypeForCommand(test)
     break;
 
   case 'waitForReport':
-    test.commandName     = 'WaitForReport';
-    test.isAttribute     = true;
+    test.commandName = 'WaitForReport';
+    if ('attribute' in test) {
+      test.isAttribute = true;
+    } else if ('event' in test) {
+      test.isEvent = true;
+    }
     test.isWaitForReport = true;
     break;
 
