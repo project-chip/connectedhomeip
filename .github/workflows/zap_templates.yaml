@@ -36,15 +36,28 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: actions/checkout@v3 #Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.11
               name: Checkout
               with:
+                  action: actions/checkout@v3
                   with: |
                       token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Setup ZAP
+              timeout-minutes: 10
               run: |
                   rm -R ./third_party/zap/repo/
                   mv /opt/zap ./third_party/zap/repo/
             - name: Generate all
+              timeout-minutes: 30
               run: scripts/tools/zap_regen_all.py
-
+            - name: Check for uncommited changes
+              run: |
+                  git add .
+                  # Show the full diff
+                  git diff-index -p HEAD --
+                  # Also show just the files that are different, to make it easy
+                  # to tell at a glance what might be going on.  And throw in
+                  # --exit-code to make this job fail if there is a difference.
+                  git diff-index --exit-code HEAD --
