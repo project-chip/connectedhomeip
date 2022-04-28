@@ -272,8 +272,7 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(EndpointId endpoint, Cluste
     return UINT16_MAX;
 }
 
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                     bool asServer)
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer)
 {
     return false;
 }
