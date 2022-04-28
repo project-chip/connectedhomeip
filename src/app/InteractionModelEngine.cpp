@@ -29,10 +29,8 @@
 
 #include <lib/core/CHIPTLVUtilities.hpp>
 
-#include <app-common/zap-generated/att-storage.h>
-
-extern uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                            chip::AttributeId attributeId);
+extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                     bool asServer);
 
 namespace chip {
 namespace app {
@@ -868,8 +866,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
         bool duplicate = false;
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.HasAttributeWildcard() ||
-            emberAfGetServerAttributeIndexByAttributeId(path1->mValue.mEndpointId, path1->mValue.mClusterId,
-                                                        path1->mValue.mAttributeId) == UINT16_MAX)
+            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId, true))
         {
             prev  = path1;
             path1 = path1->mpNext;
@@ -909,7 +906,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
         {
             prev->mpNext = path1->mpNext;
             mAttributePathPool.ReleaseObject(path1);
-            path1 = path1->mpNext;
+            path1 = prev->mpNext;
         }
     }
 }
