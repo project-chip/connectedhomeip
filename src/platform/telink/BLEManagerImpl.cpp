@@ -169,6 +169,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ThreadConnectivityReady = false;
+
     /* Initialize the CHIP BleLayer. */
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
@@ -968,6 +970,9 @@ CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event
         error = PlatformMgr().PostEvent(&attachEvent);
         VerifyOrExit(error == CHIP_NO_ERROR,
                      ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
+
+        ChipLogDetail(DeviceLayer, "Thread Connectivity Ready");
+        ThreadConnectivityReady = true;
     }
 
 exit:
@@ -977,7 +982,7 @@ exit:
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
     /* It is time to swich to IEEE802154 radio if it is provisioned */
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (ThreadConnectivityReady)
     {
         SwitchToIeee802154();
     }
