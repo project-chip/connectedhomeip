@@ -1,0 +1,7 @@
+{
+   "platforms":[
+      "linux",
+      "esp32",
+      "nrfconnect"
+   ]
+}

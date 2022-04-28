@@ -32,6 +32,7 @@ from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 from builders.imx import IMXApp, IMXBuilder
+from builders.chef import ChefApp, ChefBuilder
 
 
 class Target:
@@ -554,6 +555,10 @@ def IMXTargets():
     yield target.Extend('all-clusters-app-release', app=IMXApp.ALL_CLUSTERS, release=True)
     yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
 
+def ChefTargets():
+    target = Target('chef', ChefBuilder)
+
+    yield target.Extend('all', app=ChefApp.ALL_DEVICES)
 
 ALL = []
 
@@ -573,6 +578,7 @@ target_generators = [
     TizenTargets(),
     Bl602Targets(),
     IMXTargets(),
+    ChefTargets(),
 ]
 
 for generator in target_generators:

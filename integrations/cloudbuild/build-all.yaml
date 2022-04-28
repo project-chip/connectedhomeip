@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.64"
+    - name: "connectedhomeip/chip-build-vscode:0.5.65"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -12,14 +12,16 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.64"
+    - name: "connectedhomeip/chip-build-vscode:0.5.65"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              rm -R /workspace/third_party/zap/repo;
+              cp -r /opt/zap /workspace/third_party/zap/repo;
               ./scripts/build/build_examples.py --enable-flashbundle
               --target-glob '*' --skip-target-glob '*-tests' build
-              --create-archives /workspace/artifacts/
+              --create-archives /workspace/artifacts/;
       id: CompileAll
       waitFor:
           - Bootstrap
