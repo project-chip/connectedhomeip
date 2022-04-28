@@ -340,9 +340,15 @@ void LayerImplSelect::PrepareEvents()
     Clock::ToTimeval(sleepTime, mNextTimeout);
 
     mMaxFd = -1;
+
+    // NOLINTBEGIN(clang-analyzer-security.insecureAPI.bzero)
+    //
+    // NOTE: darwin uses bzero to clear out FD sets. This is not a security concern.
     FD_ZERO(&mSelected.mReadSet);
     FD_ZERO(&mSelected.mWriteSet);
     FD_ZERO(&mSelected.mErrorSet);
+    // NOLINTEND(clang-analyzer-security.insecureAPI.bzero)
+
     for (auto & w : mSocketWatchPool)
     {
         if (w.mFD != kInvalidFd)

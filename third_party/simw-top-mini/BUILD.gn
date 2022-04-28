@@ -31,7 +31,6 @@ config("se05x_config") {
       "AX_EMBEDDED",
       "LPC_K32W",
       "SDK_OS_FREE_RTOS=1",
-      "USE_RTOS=0",
     ]
   }
 

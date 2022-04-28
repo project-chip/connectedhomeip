@@ -37,7 +37,6 @@
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <stdarg.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 
@@ -51,7 +50,7 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = Test::LoopbackMessagingContext<>;
+using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
 TestContext sContext;
@@ -654,7 +653,6 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 
     ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
-    ctx.EnableAsyncDispatch();
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);

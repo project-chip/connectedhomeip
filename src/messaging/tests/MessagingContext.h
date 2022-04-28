@@ -24,7 +24,7 @@
 #include <system/SystemClock.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
+#include <transport/tests/LoopbackTransportManager.h>
 
 #include <nlunit-test.h>
 
@@ -108,6 +108,7 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessionManager; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
+    FabricTable & GetFabricTable() { return mFabricTable; }
 
     FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
@@ -158,8 +159,8 @@ private:
     Optional<Transport::OutgoingGroupSession> mSessionBobToFriends;
 };
 
-template <typename Transport = LoopbackTransport>
-class LoopbackMessagingContext : public MessagingContext
+// LoopbackMessagingContext enriches MessagingContext with an async loopback transport
+class LoopbackMessagingContext : public LoopbackTransportManager, public MessagingContext
 {
 public:
     virtual ~LoopbackMessagingContext() {}
@@ -168,9 +169,8 @@ public:
     virtual CHIP_ERROR Init()
     {
         ReturnErrorOnFailure(chip::Platform::MemoryInit());
-        ReturnErrorOnFailure(mIOContext.Init());
-        ReturnErrorOnFailure(mTransportManager.Init("LOOPBACK"));
-        ReturnErrorOnFailure(MessagingContext::Init(&mTransportManager, &mIOContext));
+        ReturnErrorOnFailure(LoopbackTransportManager::Init());
+        ReturnErrorOnFailure(MessagingContext::Init(&GetTransportMgr(), &GetIOContext()));
         return CHIP_NO_ERROR;
     }
 
@@ -178,7 +178,7 @@ public:
     virtual CHIP_ERROR Shutdown()
     {
         ReturnErrorOnFailure(MessagingContext::Shutdown());
-        ReturnErrorOnFailure(mIOContext.Shutdown());
+        ReturnErrorOnFailure(LoopbackTransportManager::Shutdown());
         chip::Platform::MemoryShutdown();
         return CHIP_NO_ERROR;
     }
@@ -191,111 +191,13 @@ public:
         return ctx->Init() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
     }
 
-    static int InitializeAsync(void * context)
-    {
-        auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-
-        VerifyOrReturnError(ctx->Init() == CHIP_NO_ERROR, FAILURE);
-        ctx->EnableAsyncDispatch();
-
-        return SUCCESS;
-    }
-
     static int Finalize(void * context)
     {
         auto * ctx = static_cast<LoopbackMessagingContext *>(context);
         return ctx->Shutdown() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
     }
 
-    Transport & GetLoopback() { return mTransportManager.GetTransport().template GetImplAtIndex<0>(); }
-
-    TransportMgrBase & GetTransportMgr() { return mTransportManager; }
-
-    IOContext & GetIOContext() { return mIOContext; }
-
-    /*
-     * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
-     * this mode better replicates a real-functioning stack that correctly handles the processing
-     * of a transmitted message as an asynchronous, bottom half handler dispatched after the current execution context has
-     completed.
-     * This is achieved using SystemLayer::ScheduleWork.
-
-     * This should be used in conjunction with the DrainAndServiceIO function below to correctly service and drain the event queue.
-     *
-     */
-    void EnableAsyncDispatch()
-    {
-        auto & impl = GetLoopback();
-        impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
-    }
-
-    /*
-     * Reset the dispatch back to a model that synchronously dispatches received messages up the stack.
-     *
-     * NOTE: This results in highly atypical/complex call stacks that are not representative of what happens on real
-     * devices and can cause subtle and complex bugs to either appear or get masked in the system. Where possible, please
-     * use this sparingly!
-     *
-     */
-    void DisableAsyncDispatch()
-    {
-        auto & impl = GetLoopback();
-        impl.DisableAsyncDispatch();
-    }
-
-    /*
-     * This drives the servicing of events using the embedded IOContext while there are pending
-     * messages in the loopback transport's pending message queue. This should run to completion
-     * in well-behaved logic (i.e there isn't an indefinite ping-pong of messages transmitted back
-     * and forth).
-     *
-     * Consequently, this is guarded with a user-provided timeout to ensure we don't have unit-tests that stall
-     * in CI due to bugs in the code that is being tested.
-     *
-     * This DOES NOT ensure that all pending events are serviced to completion
-     * (i.e timers, any ScheduleWork calls), but does:
-     *
-     * 1) Guarantee that every call will make some progress on ready-to-run
-     *    things, by calling DriveIO at least once.
-     * 2) Try to ensure that any ScheduleWork calls that happend directly as a
-     *    result of message reception, and any messages those async tasks send,
-     *    get handled before DrainAndServiceIO returns.
-     */
-    void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
-    {
-        auto & impl                        = GetLoopback();
-        System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
-
-        while (true)
-        {
-            bool hadPendingMessages = impl.HasPendingMessages();
-            while (impl.HasPendingMessages())
-            {
-                mIOContext.DriveIO();
-                if ((System::SystemClock().GetMonotonicTimestamp() - startTime) >= maxWait)
-                {
-                    return;
-                }
-            }
-            // Processing those messages might have queued some run-ASAP async
-            // work.  Make sure to process that too, in case it generates
-            // response messages.
-            mIOContext.DriveIO();
-            if (!hadPendingMessages && !impl.HasPendingMessages())
-            {
-                // We're not making any progress on messages.  Just stop.
-                break;
-            }
-            // No need to check our timer here: either impl.HasPendingMessages()
-            // is true and we will check it next iteration, or it's false and we
-            // will either stop on the next iteration or it will become true and
-            // we will check the timer then.
-        }
-    }
-
-private:
-    TransportMgr<Transport> mTransportManager;
-    Test::IOContext mIOContext;
+    using LoopbackTransportManager::GetSystemLayer;
 };
 
 } // namespace Test

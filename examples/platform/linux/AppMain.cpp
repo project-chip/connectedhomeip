@@ -27,10 +27,10 @@
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ScopedBuffer.h>
@@ -389,7 +389,7 @@ exit:
     return 0;
 }
 
-void ChipLinuxAppMainLoop(DeviceAttestationCredentialsProvider * dacProvider)
+void ChipLinuxAppMainLoop()
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
@@ -422,7 +422,7 @@ void ChipLinuxAppMainLoop(DeviceAttestationCredentialsProvider * dacProvider)
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(dacProvider == nullptr ? Examples::GetExampleDACProvider() : dacProvider);
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");

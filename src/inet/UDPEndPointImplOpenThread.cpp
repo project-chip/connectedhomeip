@@ -30,6 +30,8 @@
 namespace chip {
 namespace Inet {
 
+otInstance * globalOtInstance;
+
 void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo)
 {
     UDPEndPointImplOT * ep = static_cast<UDPEndPointImplOT *>(aContext);
@@ -167,6 +169,12 @@ void UDPEndPointImplOT::HandleDataReceived(System::PacketBufferHandle && msg)
             }
         }
     }
+}
+
+void UDPEndPointImplOT::SetNativeParams(void * params)
+{
+    mOTInstance      = static_cast<otInstance *>(params);
+    globalOtInstance = mOTInstance;
 }
 
 CHIP_ERROR UDPEndPointImplOT::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)

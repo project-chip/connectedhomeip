@@ -35,6 +35,9 @@ declare_args() {
   }
 
   chip_enable_session_resumption = true
+
+  # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
+  chip_im_force_fabric_quota_check = false
 }
 
 buildconfig_header("app_buildconfig") {
@@ -43,6 +46,7 @@ buildconfig_header("app_buildconfig") {
 
   defines = [
     "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
+    "CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK=${chip_im_force_fabric_quota_check}",
     "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
   ]
