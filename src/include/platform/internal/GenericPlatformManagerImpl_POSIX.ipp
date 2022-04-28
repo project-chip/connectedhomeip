@@ -311,6 +311,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
 template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 
 } // namespace Internal

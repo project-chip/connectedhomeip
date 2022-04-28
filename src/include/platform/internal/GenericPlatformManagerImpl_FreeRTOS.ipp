@@ -39,9 +39,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
-
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
 {
@@ -287,6 +284,10 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_StopEventLoopTask(vo
     mShouldRunEventLoop.store(false);
     return CHIP_NO_ERROR;
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

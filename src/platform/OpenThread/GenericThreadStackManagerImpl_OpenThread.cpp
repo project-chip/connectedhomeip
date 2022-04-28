@@ -102,8 +102,6 @@ void initNetworkCommissioningThreadDriver(void)
 NetworkCommissioning::ThreadScanResponse * sScanResult;
 otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
 } // namespace
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
 
 /**
  * Called by OpenThread to alert the ThreadStackManager of a change in the state of the Thread stack.
@@ -2583,6 +2581,10 @@ exit:
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer
