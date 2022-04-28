@@ -17,8 +17,6 @@
 
 #include <app/server/AclStorage.h>
 
-#include <app/server/Server.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Access;
