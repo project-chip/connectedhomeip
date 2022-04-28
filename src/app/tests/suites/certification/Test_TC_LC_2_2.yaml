@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    94.4. [TC-LC-1.4]User Label cluster constraint_error verification [DUT -
-    Commissionee]
+name: 92.3. [TC-LC-2.2] User label cluster [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -36,4 +34,4 @@ tests:
       response:
           constraints:
               - type: list
-              - minLength: 3
+              - minLength: 4
