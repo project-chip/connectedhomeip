@@ -21,5 +21,25 @@ chip_data_model("tv-casting-common") {
 
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/tv-casting-app/zap-generated"
+
+  sources = [
+    "include/CastingServer.h",
+    "include/TargetEndpointInfo.h",
+    "include/TargetVideoPlayerInfo.h",
+    "src/CastingServer.cpp",
+    "src/TargetEndpointInfo.cpp",
+    "src/TargetVideoPlayerInfo.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/credentials:default_attestation_verifier",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  include_dirs =
+      [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
+
   is_server = true
 }
