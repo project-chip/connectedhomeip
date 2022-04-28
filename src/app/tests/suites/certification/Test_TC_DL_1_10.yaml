@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name:
+    107.10. [TC-DL-1.10] Verification for the following Commands - Set User
+    Type, Get User Type ,Get User Type Response [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -21,37 +23,50 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
+    - label:
+          "TH sends Set User Type Command to DUT with the following values: User
+          ID as 6 User Type as 0"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15776
+      disabled: true
+
+    - label: "TH sends Get User Type Command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Request to TH"
+    - label:
+          "TH sends Set User Type Command to DUT with the following values: User
+          ID as 6 User Type as 0"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Certificate Chain Request to TH"
+    - label: "TH sends Get User Type Command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends CSR Request to TH"
+    - label:
+          "TH sends Set User Type Command to DUT with the following values: User
+          ID as 6 User Type as 8"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Trusted Root Certificate Request to TH"
+    - label: "TH sends Get User Type Command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Op Cert Request to TH"
+    - label:
+          "TH sends Set User Type Command to DUT with the following values: User
+          ID as 6 User Type as 10"
       verification: |
 
       disabled: true
 
-    - label: "Verify DUT and TH are on the same Fabric"
+    - label: "TH sends Get User Type Command to DUT"
       verification: |
 
       disabled: true

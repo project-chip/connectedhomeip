@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.2.2. [TC-DD-2.2] Discovery by commissioner verification [DUT -
+    3.2.2. [TC-DD-2.2] Discovery by commissioner verification [DUT -
     Commissioner]
 
 config:

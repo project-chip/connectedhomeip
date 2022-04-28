@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name: 13.4.10. [TC-SC-4.10] Operational Discovery - Sleepy Node
 
 config:
     nodeId: 0x12344321
@@ -21,37 +21,18 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
+    - label: "DUT is instructed to advertise its service"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Request to TH"
+    - label: "TH scans for DNS-SD advertising"
       verification: |
-
-      disabled: true
-
-    - label: "DUT Sends Attestation Certificate Chain Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT Sends CSR Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT Sends Add Trusted Root Certificate Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "DUT Sends Add Op Cert Request to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "Verify DUT and TH are on the same Fabric"
-      verification: |
-
+          avahi-browse -rt _matter._tcp
+          + veth5329b41 IPv6 68F6D747B9CD3DCD-0000000000000001             _matter._tcp         local
+          = veth5329b41 IPv6 68F6D747B9CD3DCD-0000000000000001             _matter._tcp         local
+             hostname = [EEAABADABAD0DDCA.local]
+             address = [fe80::acec:27ff:fe14:515d]
+             port = [5540]
+             txt = ["T=1" "CRA=300" "CRI=5000"]
       disabled: true

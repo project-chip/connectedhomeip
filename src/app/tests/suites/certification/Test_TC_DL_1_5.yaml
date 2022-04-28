@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name:
+    107.5. [TC-DL-1.5] Verification for Get Log Record, Get Log Record Response
+    Command [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -21,37 +23,52 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
+    - label:
+          "TH saves the NumberOfLogRecordsSupported attribute value as logcount
+          for the future use"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15776
+      disabled: true
+
+    - label:
+          "TH sends Door lock command to the DUT with PINCode argument value as
+          'xxxxxxxx' for 5 times"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Request to TH"
+    - label: "Increment the logcount by 5."
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Certificate Chain Request to TH"
+    - label: "TH reads NumberOfLogRecordsSupported attribute from the DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends CSR Request to TH"
+    - label:
+          "TH sends Get Log Record Command to the DUT with argument Log Index
+          value as 2"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Trusted Root Certificate Request to TH"
+    - label:
+          "TH sends Door lock command to the DUT with PINCode argument value as
+          'xxxxxxxx'"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Op Cert Request to TH"
+    - label: "TH reads NumberOfLogRecordsSupported attribute from the DUT"
       verification: |
 
       disabled: true
 
-    - label: "Verify DUT and TH are on the same Fabric"
+    - label:
+          "TH sends Get Log Record Command to the DUT with argument Log Index
+          value as 0"
       verification: |
 
       disabled: true

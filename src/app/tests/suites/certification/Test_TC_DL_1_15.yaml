@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 10.2.3. [TC-DM-2.3] Operational Credential Commands [DUT - Commissioner]
+name:
+    107.15. [TC-DL-1.15] Verification for the Operation Event Notification
+    Command [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -21,37 +23,46 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission TH to DUT"
+    - label: "TH sends Get User Status Command to DUT"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15776
+      disabled: true
+
+    - label:
+          "From the Get User Status Response extract UserID and save for future
+          use"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Request to TH"
+    - label: "TH sends Get PIN Code Command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Attestation Certificate Chain Request to TH"
+    - label:
+          "From the Get PIN Code Response extract PIN Code for the above User ID
+          and save for future use"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends CSR Request to TH"
+    - label: "TH reads KeypadOperationEventMask Attribute from DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Trusted Root Certificate Request to TH"
+    - label: "TH reads Remote Operation Event Mask attribute from DUT"
       verification: |
 
       disabled: true
 
-    - label: "DUT Sends Add Op Cert Request to TH"
+    - label: "TH reads Manual Operation Event Mask attribute from DUT"
       verification: |
 
       disabled: true
 
-    - label: "Verify DUT and TH are on the same Fabric"
+    - label: "TH reads RFID Operation Event Mask attribute from DUT"
       verification: |
 
       disabled: true
