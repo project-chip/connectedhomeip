@@ -194,7 +194,7 @@ function chip_endpoint_generated_functions()
 
 function chip_endpoint_generated_commands_list(options)
 {
-  let ret = [];
+  let ret   = [];
   let index = 0;
   this.clusterList.forEach((c) => {
     let acceptedCommands  = [];
@@ -215,7 +215,7 @@ function chip_endpoint_generated_commands_list(options)
       }
     });
 
-    generatedCommands = [...new Set(generatedCommands)].sort();
+    generatedCommands = [...new Set(generatedCommands) ].sort();
 
     if (acceptedCommands.length > 0 || generatedCommands.length > 0) {
       ret.push({ text : `  /* ${c.comment} */\\` });
@@ -281,8 +281,9 @@ function chip_endpoint_cluster_list()
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
 
-    let acceptedCommands  = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
-    let generatedCommands = c.commands.reduce(((acc, cmd) => (acc + (c.commands.find(req => req.responseName == cmd.name) ? 1 : 0))), 0);
+    let acceptedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
+    let generatedCommands
+        = c.commands.reduce(((acc, cmd) => (acc + (c.commands.find(req => req.responseName == cmd.name) ? 1 : 0))), 0);
 
     let acceptedCommandsListVal  = "nullptr";
     let generatedCommandsListVal = "nullptr";
