@@ -74,13 +74,6 @@ extern "C" void otSysProcessDrivers(otInstance * aInstance);
 extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::DataModel;
-using namespace chip::DeviceLayer::NetworkCommissioning;
-
-using chip::Inet::IPPrefix;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -89,7 +82,7 @@ namespace Internal {
 namespace {
 #ifndef _NO_NETWORK_COMMISSIONING_DRIVER_
 NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
+app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sGenericThreadDriver);
 #endif
 
 void initNetworkCommissioningThreadDriver(void)
@@ -100,7 +93,7 @@ void initNetworkCommissioningThreadDriver(void)
 }
 
 NetworkCommissioning::ThreadScanResponse * sScanResult;
-otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
+NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter(sScanResult);
 } // namespace
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
@@ -174,7 +167,7 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveRouteToAddress(co
 
             while ((otErr = otNetDataGetNextRoute(Impl()->OTInstance(), &routeIter, &routeConfig)) == OT_ERROR_NONE)
             {
-                const IPPrefix prefix = ToIPPrefix(routeConfig.mPrefix);
+                const Inet::IPPrefix prefix = ToIPPrefix(routeConfig.mPrefix);
                 char addrStr[64];
                 prefix.IPAddr.ToString(addrStr);
                 if (!routeConfig.mNextHopIsThisDevice && (!destIsULA || routeConfig.mPrefix.mLength > 0) &&
@@ -394,7 +387,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinishe
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(ThreadDriver::ScanCallback * callback)
+CHIP_ERROR
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1008,6 +1002,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
     CHIP_ERROR err;
+
+    namespace ThreadNetworkDiagnostics = app::Clusters::ThreadNetworkDiagnostics;
 
     switch (attributeId)
     {
@@ -1925,11 +1921,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
     // We have already connected to the network, thus return success.
     if (ThreadStackMgrImpl().IsThreadAttached())
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(extpanid), NullOptional);
+        mpStatusChangeCallback->OnNetworkingStatusChange(NetworkCommissioning::Status::kSuccess, MakeOptional(extpanid),
+                                                         NullOptional);
     }
     else
     {
-        mpStatusChangeCallback->OnNetworkingStatusChange(Status::kNetworkNotFound, MakeOptional(extpanid),
+        mpStatusChangeCallback->OnNetworkingStatusChange(NetworkCommissioning::Status::kNetworkNotFound, MakeOptional(extpanid),
                                                          MakeOptional(static_cast<int32_t>(OT_ERROR_DETACHED)));
     }
 }
