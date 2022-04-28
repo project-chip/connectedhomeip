@@ -28,8 +28,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue 17510
     - label: "Send Select"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -37,7 +38,7 @@ tests:
                 value: 0x00
 
     - label: "Send Up"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -45,7 +46,7 @@ tests:
                 value: 0x01
 
     - label: "Send Down"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -53,14 +54,14 @@ tests:
                 value: 0x02
 
     - label: "Send Left"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x03
     - label: "Send Right"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -68,7 +69,7 @@ tests:
                 value: 0x04
 
     - label: "Send RightUp"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -76,7 +77,7 @@ tests:
                 value: 0x05
 
     - label: "Send RightDown"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -84,7 +85,7 @@ tests:
                 value: 0x06
 
     - label: "Send LeftUp"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -92,7 +93,7 @@ tests:
                 value: 0x07
 
     - label: "Send LeftDown"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -100,7 +101,7 @@ tests:
                 value: 0x08
 
     - label: "Send RootMenu"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -108,7 +109,7 @@ tests:
                 value: 0x09
 
     - label: "Send SetupMenu"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -116,7 +117,7 @@ tests:
                 value: 0x0A
 
     - label: "Send ContentsMenu"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -124,7 +125,7 @@ tests:
                 value: 0x0B
 
     - label: "Send FavoriteMenu"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -132,7 +133,7 @@ tests:
                 value: 0x0C
 
     - label: "Send Exit"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -140,7 +141,7 @@ tests:
                 value: 0x0D
 
     - label: "Send Invalid"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:

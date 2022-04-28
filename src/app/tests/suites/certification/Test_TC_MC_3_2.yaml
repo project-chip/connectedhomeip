@@ -28,8 +28,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue 17510
     - label: "Send RootMenu"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:
@@ -37,7 +38,7 @@ tests:
                 value: 0x09
 
     - label: "Send SetupMenu"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SendKey"
       arguments:
           values:

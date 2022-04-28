@@ -315,3 +315,6 @@ PICS:
 
     - label: "Skip sample app"
       id: PICS_SKIP_SAMPLE_APP
+
+    - label: "Level Control for Lighting"
+      id: OO_LT
