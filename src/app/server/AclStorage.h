@@ -44,6 +44,11 @@ class AclStorage
 public:
     /**
      * Used for decoding access control entries.
+     *
+     * Typically used temporarily on the stack to decode:
+     * - source: TLV
+     * - staging: generated cluster level code
+     * - destination: system level access control entry
      */
     class DecodableEntry
     {
@@ -55,7 +60,7 @@ public:
 
         /**
          * Reader decodes into a staging entry, which is then unstaged
-         * into a constructor-provided entry.
+         * into a member entry.
          */
         CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -79,6 +84,11 @@ public:
 
     /**
      * Used for encoding access control entries.
+     *
+     * Typically used temporarily on the stack to encode:
+     * - source: system level access control entry
+     * - staging: generated cluster level code
+     * - destination: TLV
      */
     class EncodableEntry
     {

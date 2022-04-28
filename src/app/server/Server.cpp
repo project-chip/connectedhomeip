@@ -148,6 +148,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
+    // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler(&mExchangeMgr);
 
     // Init transport before operations with secure session mgr.
