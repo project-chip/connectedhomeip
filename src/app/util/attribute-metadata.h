@@ -136,10 +136,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define ATTRIBUTE_MASK_EXTERNAL_STORAGE (0x10)
 // Attribute is singleton
 #define ATTRIBUTE_MASK_SINGLETON (0x20)
-// Attribute is a client attribute
-#define ATTRIBUTE_MASK_CLIENT (0x40)
 // Attribute is nullable
-#define ATTRIBUTE_MASK_NULLABLE (0x80)
+#define ATTRIBUTE_MASK_NULLABLE (0x40)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.

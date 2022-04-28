@@ -312,8 +312,8 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
             if (err == CHIP_NO_ERROR)
             {
                 TLV::TLVReader pathReader;
-                attributePathListParser.GetReader(&pathReader);
-                TLV::Utilities::Count(pathReader, requestedAttributePathCount, false);
+                eventpathListParser.GetReader(&pathReader);
+                TLV::Utilities::Count(pathReader, requestedEventPathCount, false);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {

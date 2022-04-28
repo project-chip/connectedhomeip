@@ -244,12 +244,18 @@ public:
         printf("Test_TC_DD_1_8\n");
         printf("Test_TC_DD_1_9\n");
         printf("Test_TC_DD_1_10\n");
+        printf("Test_TC_DD_1_11\n");
+        printf("Test_TC_DD_1_12\n");
         printf("Test_TC_DD_2_1\n");
         printf("Test_TC_DD_2_2\n");
         printf("Test_TC_DD_3_1\n");
         printf("Test_TC_DD_3_2\n");
+        printf("Test_TC_DD_3_3\n");
+        printf("Test_TC_DD_3_4\n");
         printf("Test_TC_DD_3_5\n");
         printf("Test_TC_DD_3_6\n");
+        printf("Test_TC_DD_3_7\n");
+        printf("Test_TC_DD_3_8\n");
         printf("Test_TC_DD_3_9\n");
         printf("Test_TC_DD_3_10\n");
         printf("Test_TC_DD_3_11\n");
@@ -262,6 +268,7 @@ public:
         printf("Test_TC_BDX_1_1\n");
         printf("Test_TC_BDX_1_2\n");
         printf("Test_TC_BDX_1_3\n");
+        printf("Test_TC_BDX_1_4\n");
         printf("Test_TC_BDX_1_5\n");
         printf("Test_TC_BDX_1_6\n");
         printf("Test_TC_BDX_2_1\n");
@@ -274,8 +281,10 @@ public:
         printf("Test_TC_BR_3\n");
         printf("Test_TC_BRAC_2_1\n");
         printf("Test_TC_BRAC_2_2\n");
+        printf("Test_TC_BRAC_3_1\n");
         printf("Test_TC_DM_1_2\n");
         printf("Test_TC_DM_1_4\n");
+        printf("Test_TC_DM_2_1\n");
         printf("Test_TC_DM_2_3\n");
         printf("Test_TC_DM_2_4\n");
         printf("Test_TC_DM_3_2\n");
@@ -287,11 +296,15 @@ public:
         printf("Test_TC_ETHDIAG_1_2\n");
         printf("Test_TC_GC_1_2\n");
         printf("Test_TC_GC_1_3\n");
+        printf("Test_TC_GC_1_4\n");
         printf("Test_TC_GENDIAG_1_1\n");
         printf("Test_TC_GENDIAG_1_2\n");
         printf("Test_TC_GENDIAG_2_1\n");
         printf("Test_TC_I_2_2\n");
+        printf("Test_TC_I_3_1\n");
+        printf("Test_TC_I_3_2\n");
         printf("Test_TC_ILL_2_2\n");
+        printf("Test_TC_ILL_3_1\n");
         printf("Test_TC_IDM_1_1\n");
         printf("Test_TC_IDM_1_2\n");
         printf("Test_TC_IDM_2_1\n");
@@ -306,6 +319,8 @@ public:
         printf("Test_TC_IDM_6_2\n");
         printf("Test_TC_IDM_6_3\n");
         printf("Test_TC_IDM_6_4\n");
+        printf("Test_TC_IDM_7_1\n");
+        printf("Test_TC_MC_2_2\n");
         printf("Test_TC_MC_3_12\n");
         printf("Test_TC_MC_3_13\n");
         printf("Test_TC_MC_4_1\n");
@@ -316,6 +331,7 @@ public:
         printf("Test_TC_MC_10_4\n");
         printf("Test_TC_MC_10_5\n");
         printf("Test_TC_MC_10_6\n");
+        printf("Test_TC_MC_10_7\n");
         printf("Test_TC_MF_1_1\n");
         printf("Test_TC_MF_1_2\n");
         printf("Test_TC_MF_1_7\n");
@@ -340,6 +356,7 @@ public:
         printf("Test_TC_MF_1_27\n");
         printf("Test_TC_MF_1_28\n");
         printf("Test_TC_MOD_1_2\n");
+        printf("Test_TC_MOD_1_3\n");
         printf("Test_TC_MOD_2_1\n");
         printf("Test_TC_MOD_2_2\n");
         printf("Test_TC_MOD_3_1\n");
@@ -360,23 +377,88 @@ public:
         printf("Test_TC_SU_4_1\n");
         printf("Test_TC_SU_4_2\n");
         printf("Test_TC_PSCFG_2_1\n");
+        printf("Test_TC_PSCFG_2_2\n");
         printf("Test_TC_PSCFG_3_1\n");
+        printf("Test_TC_SC_4_1\n");
+        printf("Test_TC_SC_4_3\n");
+        printf("Test_TC_SC_4_4\n");
         printf("Test_TC_SC_4_5\n");
         printf("Test_TC_SC_4_6\n");
         printf("Test_TC_SC_4_7\n");
         printf("Test_TC_SC_4_8\n");
         printf("Test_TC_SC_4_9\n");
+        printf("Test_TC_SC_4_10\n");
         printf("Test_TC_SWDIAG_1_2\n");
         printf("Test_TC_WIFIDIAG_1_2\n");
         printf("Test_TC_WIFIDIAG_2_1\n");
         printf("Test_TC_WNCV_6_1\n");
+        printf("Test_TC_WNCV_7_1\n");
         printf("Test_TC_FLW_3_1\n");
         printf("Test_TC_OCC_2_3\n");
         printf("Test_TC_OCC_2_4\n");
         printf("Test_TC_OCC_3_1\n");
+        printf("Test_TC_OCC_3_2\n");
         printf("Test_TC_PRS_2_2\n");
         printf("Test_TC_PRS_2_3\n");
+        printf("Test_TC_PRS_3_1\n");
         printf("Test_TC_PS_2_2\n");
+        printf("Test_TC_PS_3_1\n");
+        printf("Test_TC_BOOL_2_2\n");
+        printf("Test_TC_BOOL_3_1\n");
+        printf("Test_TC_CC_2_2\n");
+        printf("Test_TC_CC_3_4\n");
+        printf("Test_TC_CC_4_5\n");
+        printf("Test_TC_CC_5_4\n");
+        printf("Test_TC_CC_6_4\n");
+        printf("Test_TC_CC_7_5\n");
+        printf("Test_TC_CC_9_4\n");
+        printf("Test_TC_DL_1_1\n");
+        printf("Test_TC_DL_1_2\n");
+        printf("Test_TC_DL_1_4\n");
+        printf("Test_TC_DL_1_5\n");
+        printf("Test_TC_DL_1_6\n");
+        printf("Test_TC_DL_1_7\n");
+        printf("Test_TC_DL_1_8\n");
+        printf("Test_TC_DL_1_10\n");
+        printf("Test_TC_DL_1_11\n");
+        printf("Test_TC_DL_1_13\n");
+        printf("Test_TC_DL_1_14\n");
+        printf("Test_TC_DL_1_15\n");
+        printf("Test_TC_DL_1_16\n");
+        printf("Test_TC_DL_1_17\n");
+        printf("Test_TC_LC_1_1\n");
+        printf("Test_TC_LC_1_3\n");
+        printf("Test_TC_LC_1_4\n");
+        printf("Test_TC_LC_1_5\n");
+        printf("Test_TC_LO_1_1\n");
+        printf("Test_TC_LVL_2_3\n");
+        printf("Test_TC_NC_1_1\n");
+        printf("Test_TC_NC_1_2\n");
+        printf("Test_TC_NC_1_3\n");
+        printf("Test_TC_NC_1_4\n");
+        printf("Test_TC_NC_1_5\n");
+        printf("Test_TC_NC_1_6\n");
+        printf("Test_TC_NC_1_7\n");
+        printf("Test_TC_NC_1_8\n");
+        printf("Test_TC_NC_1_9\n");
+        printf("Test_TC_NC_1_10\n");
+        printf("Test_TC_NC_1_11\n");
+        printf("Test_TC_NC_1_12\n");
+        printf("Test_TC_NC_1_13\n");
+        printf("Test_TC_NC_1_14\n");
+        printf("Test_TC_NC_1_15\n");
+        printf("Test_TC_NC_1_16\n");
+        printf("Test_TC_NC_1_17\n");
+        printf("Test_TC_NC_1_18\n");
+        printf("Test_TC_OO_3_1\n");
+        printf("Test_TC_OO_3_2\n");
+        printf("Test_TC_RH_3_1\n");
+        printf("Test_TC_SWTCH_1_1\n");
+        printf("Test_TC_SWTCH_3_1\n");
+        printf("Test_TC_TM_3_1\n");
+        printf("Test_TC_TSTAT_3_1\n");
+        printf("Test_TC_TSTAT_3_2\n");
+        printf("Test_TC_TSUIC_3_1\n");
 
         return CHIP_NO_ERROR;
     }
@@ -12535,7 +12617,7 @@ private:
 class Test_TC_MC_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", 4, credsIssuerConfig)
+    Test_TC_MC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -12578,23 +12660,62 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("clusterRevision", value, 1U));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 4));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 1));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -12621,12 +12742,31 @@ private:
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::ClusterRevision::Id);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::ClusterRevision::Id);
+            LogStep(2, "Read the global attribute: AttributeList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::AttributeList::Id);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AttributeList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::AttributeList::Id);
+            LogStep(3,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 4: {
+            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::AcceptedCommandList::Id);
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: GeneratedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::GeneratedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6,
+                    "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates either value 0 or throws a "
+                    "general error if the attribute is not supported");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -12636,7 +12776,7 @@ private:
 class Test_TC_MC_1_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_2", 4, credsIssuerConfig)
+    Test_TC_MC_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_2", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -12694,8 +12834,58 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 5));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -12727,7 +12917,31 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id,
+                                 KeypadInput::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -12737,7 +12951,7 @@ private:
 class Test_TC_MC_1_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_3", 4, credsIssuerConfig)
+    Test_TC_MC_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_3", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -12795,8 +13009,66 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 3));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -12830,8 +13102,36 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
+                                 ApplicationLauncher::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
+                                 ApplicationLauncher::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read attribute Feature map and verify that DUT response indicates that the FeatureMap attribute has bit 0 set "
+                    "to 1 if the DUT supports the Application Platform feature (PICS_AP_S is true).");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -12841,7 +13141,7 @@ private:
 class Test_TC_MC_1_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_4", 4, credsIssuerConfig)
+    Test_TC_MC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_4", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -12899,8 +13199,66 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[3]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 4));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -12932,7 +13290,31 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read attribute Feature map and Verify that the DUT response indicates that the FeatureMap attribute has bit 0 "
+                    "set to 1 if the DUT supports the Name Updates feature PICS_NU_S is true");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -12942,7 +13324,7 @@ private:
 class Test_TC_MC_1_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_5", 4, credsIssuerConfig)
+    Test_TC_MC_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_5", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13000,8 +13382,56 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13033,7 +13463,29 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WakeOnLan::Id, WakeOnLan::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WakeOnLan::Id, WakeOnLan::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WakeOnLan::Id, WakeOnLan::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13043,7 +13495,7 @@ private:
 class Test_TC_MC_1_6Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_6", 4, credsIssuerConfig)
+    Test_TC_MC_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_6", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13101,8 +13553,52 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 7));
+                    VerifyOrReturn(CheckValue("attributeList[7]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 8));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13134,7 +13630,34 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read FeatureMap attribute from the DUT and Verify that the DUT response values based on feature/PICS support "
+                    "Bit 0 - Set to 1 if the DUT supports Channel Lists (PICS_CL_S is true) Bit 1 - Set to 1 if the DUT supports "
+                    "Lineup Info (PICS_LI_S is true)");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13144,7 +13667,7 @@ private:
 class Test_TC_MC_1_7Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_7", 4, credsIssuerConfig)
+    Test_TC_MC_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_7", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13202,8 +13725,88 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 4UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 5UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 6UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 7));
+                    VerifyOrReturn(CheckValue("attributeList[7]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 8));
+                    VerifyOrReturn(CheckValue("attributeList[8]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 9));
+                    VerifyOrReturn(CheckValue("attributeList[9]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 10));
+                    VerifyOrReturn(CheckValue("attributeList[10]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 11));
+                    VerifyOrReturn(CheckValue("attributeList[11]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 12));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[3]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[4]", iter_0.GetValue(), 4UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[5]", iter_0.GetValue(), 5UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[6]", iter_0.GetValue(), 6UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 7));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[7]", iter_0.GetValue(), 7UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 8));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[8]", iter_0.GetValue(), 8UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 9));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[9]", iter_0.GetValue(), 9UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 10));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[10]", iter_0.GetValue(), 11UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 11));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 10UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13235,7 +13838,29 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id,
+                                 MediaPlayback::Attributes::AcceptedCommandList::Id);
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id,
+                                 MediaPlayback::Attributes::GeneratedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6,
+                    "Read FeatureMap attribute from the DUT and Verify that the DUT values based on feature/PICS support:Bit 0 - "
+                    "Set to 1 if the DUT supports Advanced Seek (PICS_ADVANCEDSEEK is true) Bit 1 - Set to 1 if the DUT supports "
+                    "Variable Speed (PICS_VARIABLESPEED is true)");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13245,7 +13870,7 @@ private:
 class Test_TC_MC_1_8Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_8", 4, credsIssuerConfig)
+    Test_TC_MC_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_8", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13303,8 +13928,62 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65532UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 7));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13336,7 +14015,34 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id,
+                                 AudioOutput::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read FeatureMap attribute from the DUT and Verify that the DUT has bit 1 set to 1 if the device supports Name "
+                    "Updates PICS_NAMEUPDATES is true");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13346,7 +14052,7 @@ private:
 class Test_TC_MC_1_9Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_9", 4, credsIssuerConfig)
+    Test_TC_MC_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_9", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13404,8 +14110,60 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13439,8 +14197,35 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
+                                 TargetNavigator::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
+                                 TargetNavigator::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read FeatureMap attribute from the DUT and verify response has the value 0 or throws a general error if the "
+                    "attribute is not supported..");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13450,7 +14235,7 @@ private:
 class Test_TC_MC_1_10Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_10", 4, credsIssuerConfig)
+    Test_TC_MC_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_10", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13508,8 +14293,74 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 4UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 5UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 6));
+                    VerifyOrReturn(CheckValue("attributeList[6]", iter_0.GetValue(), 6UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 7));
+                    VerifyOrReturn(CheckValue("attributeList[7]", iter_0.GetValue(), 7UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 8));
+                    VerifyOrReturn(CheckValue("attributeList[8]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 9));
+                    VerifyOrReturn(CheckValue("attributeList[9]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 10));
+                    VerifyOrReturn(CheckValue("attributeList[10]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 11));
+                    VerifyOrReturn(CheckValue("attributeList[11]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 12));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 2));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13543,8 +14394,36 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+                                 ApplicationBasic::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationBasic::Id,
+                                 ApplicationBasic::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read FeatureMap attribute from the DUT and verify response has the value 0 or throws a general error if the "
+                    "attribute is not supported..");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13554,7 +14433,7 @@ private:
 class Test_TC_MC_1_11Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_11", 4, credsIssuerConfig)
+    Test_TC_MC_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_11", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13612,8 +14491,60 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("attributeList[5]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 6));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13647,8 +14578,37 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
+                                 ContentLauncher::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
+                                 ContentLauncher::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7,
+                    "Read FeatureMap attribute from the DUT values based on feature/PICS support: Bit 0 - Set to 1 if the DUT "
+                    "supports Content Search (PICS_CONTENTSEARCH is true) Bit 1 - Set to 1 if the DUT supports URL Playback "
+                    "(PICS_URLPLAYBACK is true)");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13658,7 +14618,7 @@ private:
 class Test_TC_MC_1_12Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_12", 4, credsIssuerConfig)
+    Test_TC_MC_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_12", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13716,8 +14676,60 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 65528UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 65529UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 65531UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 65533UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 4));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[1]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[2]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 3));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -13750,6 +14762,31 @@ private:
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id, AccountLogin::Attributes::AttributeList::Id);
+        }
+        case 4: {
+            LogStep(4,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id,
+                                 AccountLogin::Attributes::AcceptedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AccountLogin::Id,
+                                 AccountLogin::Attributes::GeneratedCommandList::Id);
+        }
+        case 7: {
+            LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -13832,7 +14869,7 @@ private:
 class Test_TC_MC_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_1", 1, credsIssuerConfig)
+    Test_TC_MC_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_1", 16, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13869,6 +14906,107 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -13889,6 +15027,111 @@ private:
             SetIdentity(kIdentityAlpha);
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
+        case 1: {
+            LogStep(1, "Send Select");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 2: {
+            LogStep(2, "Send Up");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(1);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 3: {
+            LogStep(3, "Send Down");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(2);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 4: {
+            LogStep(4, "Send Left");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(3);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 5: {
+            LogStep(5, "Send Right");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(4);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 6: {
+            LogStep(6, "Send RightUp");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(5);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 7: {
+            LogStep(7, "Send RightDown");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(6);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 8: {
+            LogStep(8, "Send LeftUp");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(7);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 9: {
+            LogStep(9, "Send LeftDown");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 10: {
+            LogStep(10, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 11: {
+            LogStep(11, "Send SetupMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(10);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 12: {
+            LogStep(12, "Send ContentsMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(11);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 13: {
+            LogStep(13, "Send FavoriteMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(12);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 14: {
+            LogStep(14, "Send Exit");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(13);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 15: {
+            LogStep(15, "Send Invalid");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(255);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -13897,7 +15140,7 @@ private:
 class Test_TC_MC_3_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", 1, credsIssuerConfig)
+    Test_TC_MC_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13934,6 +15177,20 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -13954,6 +15211,20 @@ private:
             SetIdentity(kIdentityAlpha);
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
+        case 1: {
+            LogStep(1, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 2: {
+            LogStep(2, "Send SetupMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(10);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -13962,7 +15233,7 @@ private:
 class Test_TC_MC_3_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", 1, credsIssuerConfig)
+    Test_TC_MC_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13999,6 +15270,69 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -14019,6 +15353,69 @@ private:
             SetIdentity(kIdentityAlpha);
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
+        case 1: {
+            LogStep(1, "Send Numbers1");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(33);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 2: {
+            LogStep(2, "Send Numbers2");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(34);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 3: {
+            LogStep(3, "Send Numbers3");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(35);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 4: {
+            LogStep(4, "Send Numbers4");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(36);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 5: {
+            LogStep(5, "Send Numbers5");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(37);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 6: {
+            LogStep(6, "Send Numbers6");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(38);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 7: {
+            LogStep(7, "Send Numbers7");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(39);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 8: {
+            LogStep(8, "Send Numbers8");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(40);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 9: {
+            LogStep(9, "Send Numbers9");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(41);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -14027,7 +15424,7 @@ private:
 class Test_TC_MC_3_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_4", 1, credsIssuerConfig)
+    Test_TC_MC_3_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_4", 11, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -14064,6 +15461,76 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -14084,6 +15551,76 @@ private:
             SetIdentity(kIdentityAlpha);
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
+        case 1: {
+            LogStep(1, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 2: {
+            LogStep(2, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 3: {
+            LogStep(3, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 4: {
+            LogStep(4, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 5: {
+            LogStep(5, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 6: {
+            LogStep(6, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 7: {
+            LogStep(7, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 8: {
+            LogStep(8, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 9: {
+            LogStep(9, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
+        case 10: {
+            LogStep(10, "Send RootMenu");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
+            value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value);
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -14092,7 +15629,7 @@ private:
 class Test_TC_MC_3_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", 1, credsIssuerConfig)
+    Test_TC_MC_3_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", 2, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -14129,6 +15666,14 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<uint16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -14148,6 +15693,11 @@ private:
             LogStep(0, "Wait for the commissioned device to be retrieved");
             SetIdentity(kIdentityAlpha);
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+        }
+        case 1: {
+            LogStep(1, "Read CatalogList attribute.");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
+                                 ApplicationLauncher::Attributes::CatalogList::Id);
         }
         }
         return CHIP_NO_ERROR;
@@ -17607,7 +19157,7 @@ private:
 class Test_TC_OO_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_OO_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", 10, credsIssuerConfig)
+    Test_TC_OO_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17650,32 +19200,68 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("clusterRevision", value, 4U));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 16384UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 16385UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 16386UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("attributeList[4]", iter_0.GetValue(), 16387UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 5));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("clusterRevision", value, 4U));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[3]", iter_0.GetValue(), 64UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 4));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[4]", iter_0.GetValue(), 65UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acceptedCommandList", iter_0, 5));
+                    VerifyOrReturn(CheckValue("acceptedCommandList[5]", iter_0.GetValue(), 66UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 6));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
@@ -17685,25 +19271,7 @@ private:
                 uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("featureMap", value, 1UL));
-            }
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map32"));
-            }
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("featureMap", value, 1UL));
             }
             break;
         default:
@@ -17731,39 +19299,29 @@ private:
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::ClusterRevision::Id);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::ClusterRevision::Id);
+            LogStep(2, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AttributeList::Id);
         }
         case 3: {
-            LogStep(3, "write the default values to mandatory global attribute: ClusterRevision");
-            uint16_t value;
-            value = 3U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::ClusterRevision::Id, value);
+            LogStep(3,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         case 4: {
-            LogStep(4, "reads back global attribute: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::ClusterRevision::Id);
+            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            VerifyOrdo(!ShouldSkip("OO_LT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AcceptedCommandList::Id);
         }
         case 5: {
-            LogStep(5, "Read the global attribute: AttributeList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AttributeList::Id);
+            LogStep(5, "Read the global attribute: GeneratedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GeneratedCommandList::Id);
         }
         case 6: {
             LogStep(6, "read the optional global attribute: FeatureMap");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::FeatureMap::Id);
-        }
-        case 7: {
-            LogStep(7, "Read the optional global attribute : FeatureMap");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::FeatureMap::Id);
-        }
-        case 8: {
-            LogStep(8, "write the default values to optional global attribute: FeatureMap");
-            uint32_t value;
-            value = 0UL;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::FeatureMap::Id, value);
-        }
-        case 9: {
-            LogStep(9, "reads back optional global attribute: FeatureMap");
+            VerifyOrdo(!ShouldSkip("OO_LT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::FeatureMap::Id);
         }
         }
@@ -21565,7 +23123,7 @@ private:
 class Test_TC_RH_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_RH_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_1_1", 5, credsIssuerConfig)
+    Test_TC_RH_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_1_1", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -21604,35 +23162,57 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-            }
+            shouldContinue = true;
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 3));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::DecodableList<chip::CommandId> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "list"));
-            }
+            shouldContinue = true;
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 0));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -21655,24 +23235,41 @@ private:
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
         case 1: {
-            LogStep(1, "Read the global attribute constraints: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
-                                 RelativeHumidityMeasurement::Attributes::ClusterRevision::Id);
+            LogStep(1,
+                    "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
+                    "attribute has the value 3");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Enter the Value", "3");
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::AttributeList::Id);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AcceptedCommandList");
+            LogStep(3,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 4: {
+            LogStep(4, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::AcceptedCommandList::Id);
         }
-        case 4: {
-            LogStep(4, "Read the global attribute: GeneratedCommandList");
+        case 5: {
+            LogStep(5, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::GeneratedCommandList::Id);
+        }
+        case 6: {
+            LogStep(6, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter FeatureMap attribute value", "0");
         }
         }
         return CHIP_NO_ERROR;
@@ -21682,7 +23279,7 @@ private:
 class Test_TC_RH_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_RH_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_1", 4, credsIssuerConfig)
+    Test_TC_RH_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_2_1", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -21740,6 +23337,16 @@ private:
             }
             break;
         case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "int16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
+            }
+            break;
+        case 4:
             if (IsUnsupported(status.mStatus))
             {
                 return;
@@ -21784,7 +23391,13 @@ private:
                                  RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id);
         }
         case 3: {
-            LogStep(3, "Reads constraints of attribute: Tolerance");
+            LogStep(3, "Reads constraints of attribute: MaxMeasuredValue");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id);
+        }
+        case 4: {
+            LogStep(4, "Reads constraints of attribute: Tolerance");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::Tolerance::Id);
         }
@@ -22827,7 +24440,7 @@ private:
 class Test_TC_TM_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_TM_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", 3, credsIssuerConfig)
+    Test_TC_TM_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", 6, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -22866,19 +24479,39 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-            }
+            shouldContinue = true;
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 3));
+                    VerifyOrReturn(CheckValue("attributeList[3]", iter_0.GetValue(), 3UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 4));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -22901,14 +24534,41 @@ private:
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
         case 1: {
-            LogStep(1, "Read the global attribute constraints: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
-                                 TemperatureMeasurement::Attributes::ClusterRevision::Id);
+            LogStep(1,
+                    "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
+                    "attribute has the value 4");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter ClusterRevision attribute value", "4");
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::AttributeList::Id);
+        }
+        case 3: {
+            LogStep(3,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 4: {
+            LogStep(4,
+                    "Read AcceptedCommandList attribute from the DUT and Verify that the DUT response provides a list of supported "
+                    "commands,This list SHALL include all the mandatory commands.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 5: {
+            LogStep(5,
+                    "Read GeneratedCommandList attribute from the DUT and Verify that the DUT response provides a list of "
+                    "supported commands.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
         }
         }
         return CHIP_NO_ERROR;
@@ -24362,7 +26022,7 @@ private:
 class Test_TC_TSUIC_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_TSUIC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSUIC_1_1", 5, credsIssuerConfig)
+    Test_TC_TSUIC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSUIC_1_1", 6, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -24401,33 +26061,51 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-            }
+            shouldContinue = true;
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("attributeList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 1));
+                    VerifyOrReturn(CheckValue("attributeList[1]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("attributeList", iter_0, 2));
+                    VerifyOrReturn(CheckValue("attributeList[2]", iter_0.GetValue(), 2UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("attributeList", iter_0, 3));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::DecodableList<chip::CommandId> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "list"));
-            }
+            shouldContinue = true;
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
@@ -24452,22 +26130,33 @@ private:
             return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
         }
         case 1: {
-            LogStep(1, "Read the global attribute constraints: ClusterRevision");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
-                                 ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::Id);
+            LogStep(1,
+                    "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
+                    "attribute has the value 2");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter ClusterRevision attribute value", "2");
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                  ThermostatUserInterfaceConfiguration::Attributes::AttributeList::Id);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AcceptedCommandList");
+            LogStep(3,
+                    "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            SetIdentity(kIdentityAlpha);
+            return UserPrompt("Please enter 'y' for success", "y");
+        }
+        case 4: {
+            LogStep(4, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                  ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::Id);
         }
-        case 4: {
-            LogStep(4, "Read the global attribute: GeneratedCommandList");
+        case 5: {
+            LogStep(5, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                  ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::Id);
         }
@@ -39456,7 +41145,7 @@ private:
 class TestEventsSuite : public TestCommand
 {
 public:
-    TestEventsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestEvents", 7, credsIssuerConfig)
+    TestEventsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestEvents", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -39566,6 +41255,55 @@ private:
                 break;
             }
             break;
+        case 7:
+            switch (mTestSubStepIndex)
+            {
+            case 0:
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+                {
+                    chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                    VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
+                }
+                mTestSubStepIndex++;
+                break;
+            case 1:
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+                {
+                    chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                    VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4));
+                    VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, false));
+                }
+                mTestSubStepIndex++;
+                break;
+            default:
+                LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+                break;
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("value", value.value, eventNumber + 2));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 4));
+                VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 5));
+                VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
+            }
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -39628,6 +41366,24 @@ private:
             return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
 
             );
+        }
+        case 7: {
+            LogStep(7, "Subscribe to the event");
+            mTestSubStepCount = 2;
+            return SubscribeEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, 3, 5, false);
+        }
+        case 8: {
+            LogStep(8, "Generate a third event on the accessory");
+            chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
+            value.arg1 = 4;
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(5);
+            value.arg3 = true;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
+                               value);
+        }
+        case 9: {
+            LogStep(9, "Check for event report");
+            return WaitForReport();
         }
         }
         return CHIP_NO_ERROR;
@@ -50786,6 +52542,118 @@ private:
     }
 };
 
+class Test_TC_DD_1_11Suite : public TestCommand
+{
+public:
+    Test_TC_DD_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_11", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_1_11Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_1_12Suite : public TestCommand
+{
+public:
+    Test_TC_DD_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_12", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_1_12Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_DD_2_1Suite : public TestCommand
 {
 public:
@@ -51010,6 +52878,118 @@ private:
     }
 };
 
+class Test_TC_DD_3_3Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_4Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_DD_3_5Suite : public TestCommand
 {
 public:
@@ -51078,6 +53058,118 @@ public:
     }
 
     ~Test_TC_DD_3_6Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_7Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_7Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_8Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_8", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_8Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -52094,6 +54186,62 @@ private:
     }
 };
 
+class Test_TC_BDX_1_4Suite : public TestCommand
+{
+public:
+    Test_TC_BDX_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BDX_1_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_BDX_1_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_BDX_1_5Suite : public TestCommand
 {
 public:
@@ -52766,6 +54914,62 @@ private:
     }
 };
 
+class Test_TC_BRAC_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_BRAC_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BRAC_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_BRAC_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_DM_1_2Suite : public TestCommand
 {
 public:
@@ -52834,6 +55038,62 @@ public:
     }
 
     ~Test_TC_DM_1_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DM_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_DM_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DM_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -53498,6 +55758,62 @@ private:
     }
 };
 
+class Test_TC_GC_1_4Suite : public TestCommand
+{
+public:
+    Test_TC_GC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GC_1_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GC_1_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_GENDIAG_1_1Suite : public TestCommand
 {
 public:
@@ -53725,6 +56041,118 @@ private:
     }
 };
 
+class Test_TC_I_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_I_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_I_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_I_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_I_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_I_3_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_ILL_2_2Suite : public TestCommand
 {
 public:
@@ -53737,6 +56165,62 @@ public:
     }
 
     ~Test_TC_ILL_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ILL_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_ILL_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ILL_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -54565,6 +57049,118 @@ private:
     }
 };
 
+class Test_TC_IDM_7_1Suite : public TestCommand
+{
+public:
+    Test_TC_IDM_7_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_IDM_7_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_IDM_7_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_MC_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_MC_3_12Suite : public TestCommand
 {
 public:
@@ -55081,6 +57677,62 @@ public:
     }
 
     ~Test_TC_MC_10_6Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_MC_10_7Suite : public TestCommand
+{
+public:
+    Test_TC_MC_10_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MC_10_7Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -56469,6 +59121,62 @@ private:
     }
 };
 
+class Test_TC_MOD_1_3Suite : public TestCommand
+{
+public:
+    Test_TC_MOD_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MOD_1_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_MOD_1_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_MOD_2_1Suite : public TestCommand
 {
 public:
@@ -57589,6 +60297,62 @@ private:
     }
 };
 
+class Test_TC_PSCFG_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_PSCFG_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PSCFG_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PSCFG_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_PSCFG_3_1Suite : public TestCommand
 {
 public:
@@ -57601,6 +60365,174 @@ public:
     }
 
     ~Test_TC_PSCFG_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_SC_4_1Suite : public TestCommand
+{
+public:
+    Test_TC_SC_4_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SC_4_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_SC_4_3Suite : public TestCommand
+{
+public:
+    Test_TC_SC_4_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SC_4_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_SC_4_4Suite : public TestCommand
+{
+public:
+    Test_TC_SC_4_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SC_4_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -57925,6 +60857,62 @@ private:
     }
 };
 
+class Test_TC_SC_4_10Suite : public TestCommand
+{
+public:
+    Test_TC_SC_4_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_10", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SC_4_10Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_SWDIAG_1_2Suite : public TestCommand
 {
 public:
@@ -58107,6 +61095,62 @@ public:
     }
 
     ~Test_TC_WNCV_6_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_WNCV_7_1Suite : public TestCommand
+{
+public:
+    Test_TC_WNCV_7_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_WNCV_7_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_WNCV_7_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -58375,6 +61419,62 @@ private:
     }
 };
 
+class Test_TC_OCC_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_OCC_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OCC_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OCC_3_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_PRS_2_2Suite : public TestCommand
 {
 public:
@@ -58487,6 +61587,62 @@ private:
     }
 };
 
+class Test_TC_PRS_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_PRS_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PRS_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_PS_2_2Suite : public TestCommand
 {
 public:
@@ -58499,6 +61655,3198 @@ public:
     }
 
     ~Test_TC_PS_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_PS_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_PS_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PS_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_BOOL_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_BOOL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BOOL_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_BOOL_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_BOOL_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_BOOL_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BOOL_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_BOOL_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_CC_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_3_4Suite : public TestCommand
+{
+public:
+    Test_TC_CC_3_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_3_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_3_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_4_5Suite : public TestCommand
+{
+public:
+    Test_TC_CC_4_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_4_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_4_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_5_4Suite : public TestCommand
+{
+public:
+    Test_TC_CC_5_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_5_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_5_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_6_4Suite : public TestCommand
+{
+public:
+    Test_TC_CC_6_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_6_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_6_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_7_5Suite : public TestCommand
+{
+public:
+    Test_TC_CC_7_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_7_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_7_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_9_4Suite : public TestCommand
+{
+public:
+    Test_TC_CC_9_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_9_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_9_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_2Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_4Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_5Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_6Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_6", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_6Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_7Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_7Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_8Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_8", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_8Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_10Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_10", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_10Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_11Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_11", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_11Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_13Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_13", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_13Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_14Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_14", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_14Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_15Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_15", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_15Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_16Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_16Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_16", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_16Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DL_1_17Suite : public TestCommand
+{
+public:
+    Test_TC_DL_1_17Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DL_1_17", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DL_1_17Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LC_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_LC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LC_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LC_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LC_1_3Suite : public TestCommand
+{
+public:
+    Test_TC_LC_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LC_1_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LC_1_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LC_1_4Suite : public TestCommand
+{
+public:
+    Test_TC_LC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LC_1_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LC_1_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LC_1_5Suite : public TestCommand
+{
+public:
+    Test_TC_LC_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LC_1_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LC_1_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LO_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_LO_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LO_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LO_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_LVL_2_3Suite : public TestCommand
+{
+public:
+    Test_TC_LVL_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_2_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_LVL_2_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_2Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_3Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_4Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_5Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_6Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_6", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_6Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_7Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_7Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_8Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_8", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_8Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_9Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_9", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_9Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_10Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_10", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_10Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_11Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_11", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_11Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_12Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_12", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_12Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_13Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_13", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_13Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_14Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_14", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_14Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_15Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_15", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_15Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_16Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_16Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_16", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_16Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_17Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_17Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_17", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_17Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_NC_1_18Suite : public TestCommand
+{
+public:
+    Test_TC_NC_1_18Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_18", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_NC_1_18Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OO_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_OO_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OO_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OO_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_OO_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OO_3_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_RH_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_RH_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_RH_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_RH_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_SWTCH_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_SWTCH_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SWTCH_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SWTCH_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_SWTCH_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_SWTCH_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SWTCH_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SWTCH_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TM_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_TM_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TM_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TSTAT_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_TSTAT_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSTAT_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TSTAT_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TSTAT_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_TSTAT_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSTAT_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TSTAT_3_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TSUIC_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_TSUIC_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSUIC_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TSUIC_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -58751,12 +65099,18 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DD_1_8Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_9Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_10Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_11Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_12Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_8Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_9Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_10Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_11Suite>(credsIssuerConfig),
@@ -58769,6 +65123,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_BDX_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_BDX_1_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_6Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_2_1Suite>(credsIssuerConfig),
@@ -58781,8 +65136,10 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_BR_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_BRAC_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_BRAC_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_BRAC_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_1_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DM_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_2_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_DM_3_2Suite>(credsIssuerConfig),
@@ -58794,11 +65151,15 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_ETHDIAG_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_GC_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_GC_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_GC_1_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_GENDIAG_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_GENDIAG_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_GENDIAG_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_I_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_I_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_I_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_ILL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ILL_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_2_1Suite>(credsIssuerConfig),
@@ -58813,6 +65174,8 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_IDM_6_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_6_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_6_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_IDM_7_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MC_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_3_12Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_3_13Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_4_1Suite>(credsIssuerConfig),
@@ -58823,6 +65186,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_MC_10_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_10_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_10_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MC_10_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_MF_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_MF_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_MF_1_7Suite>(credsIssuerConfig),
@@ -58847,6 +65211,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_MF_1_27Suite>(credsIssuerConfig),
         make_unique<Test_TC_MF_1_28Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MOD_1_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_3_1Suite>(credsIssuerConfig),
@@ -58867,23 +65232,88 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_SU_4_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_SU_4_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_PSCFG_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_PSCFG_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_PSCFG_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_6Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_8Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_SC_4_10Suite>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_WIFIDIAG_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_WIFIDIAG_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_WNCV_6_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_WNCV_7_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLW_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OCC_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_OCC_2_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_OCC_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_OCC_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_PRS_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_PRS_2_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_PRS_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_PS_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_PS_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_BOOL_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_3_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_4_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_5_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_6_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_7_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CC_9_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_10Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_11Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_13Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_14Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_15Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_16Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DL_1_17Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LC_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LC_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LC_1_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LC_1_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LO_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LVL_2_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_10Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_11Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_12Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_13Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_14Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_15Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_16Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_17Suite>(credsIssuerConfig),
+        make_unique<Test_TC_NC_1_18Suite>(credsIssuerConfig),
+        make_unique<Test_TC_OO_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_OO_3_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_RH_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_SWTCH_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TM_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TSTAT_3_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TSUIC_3_1Suite>(credsIssuerConfig),
 #endif // CONFIG_ENABLE_YAML_TESTS
     };
 

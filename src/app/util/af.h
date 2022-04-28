@@ -90,12 +90,11 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
  * @param endpoint Zigbee endpoint number.
  * @param clusterId Cluster ID of the sought cluster.
  * @param attributeId Attribute ID of the sought attribute.
- * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
  *
  * @return Returns pointer to the attribute metadata location.
  */
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                chip::AttributeId attributeId, uint8_t mask);
+                                                                chip::AttributeId attributeId);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
@@ -248,13 +247,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
  * @param cluster EmberAfCluster* to consider
  */
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
-
-/**
- * @brief macro that returns true if client attribute, and false if server.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
 
 /**
  * @brief macro that returns true if attribute is saved in external storage.
