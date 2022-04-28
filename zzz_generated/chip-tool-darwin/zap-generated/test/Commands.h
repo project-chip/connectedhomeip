@@ -2505,7 +2505,7 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints : ClusterRevision\n");
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
@@ -2513,12 +2513,32 @@ public:
             err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: AcceptedCommandList\n");
-            err = TestReadTheGlobalAttributeAcceptedCommandList_4();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 4 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: GeneratedCommandList\n");
-            err = TestReadTheGlobalAttributeGeneratedCommandList_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 7 : Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap "
+                "attribute has the value 0\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_7();
             break;
         }
 
@@ -2535,7 +2555,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -2577,7 +2597,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+            NSLog(@"Read the global attribute constraints : ClusterRevision Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -2599,6 +2619,16 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(5)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 65533UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -2606,7 +2636,13 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_4()
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -2617,6 +2653,11 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
+
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();
         }];
@@ -2624,7 +2665,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_5()
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -2635,10 +2676,21 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
+
             VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_7()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
@@ -2990,17 +3042,53 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints : ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints : ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 9 : Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap "
+                "attribute has the value 0\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_9();
             break;
         }
 
@@ -3017,7 +3105,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -3030,7 +3118,29 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 5U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -3048,14 +3158,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
+        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:5U];
         [cluster
             writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                                  completionHandler:^(NSError * _Nullable err) {
@@ -3069,7 +3179,29 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 5U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -3084,6 +3216,54 @@ private:
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_9()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
@@ -16551,17 +16731,53 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 9 : Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap "
+                "attribute has the value 0\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_9();
             break;
         }
 
@@ -16578,7 +16794,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -16591,7 +16807,29 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -16609,14 +16847,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
+        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
         [cluster
             writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                                  completionHandler:^(NSError * _Nullable err) {
@@ -16630,7 +16868,29 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -16645,6 +16905,54 @@ private:
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_9()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
@@ -17416,20 +17724,44 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints : ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
-            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
-            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 4 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 7 : Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap "
+                "attribute has the value 0\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_7();
             break;
         }
 
@@ -17446,7 +17778,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -17459,7 +17791,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -17468,7 +17800,31 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                                 endpoint:1
+                                                                                                    queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints : ClusterRevision Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -17479,7 +17835,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -17492,6 +17848,20 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(9)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 3UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 65533UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -17499,7 +17869,13 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -17512,6 +17888,11 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
+
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();
         }];
@@ -17519,7 +17900,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
@@ -17532,10 +17913,21 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
+
             VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_7()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
@@ -17771,20 +18163,44 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads constraints of ClusterRevision attribute\n");
-            err = TestReadsConstraintsOfClusterRevisionAttribute_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : TH reads the ClusterRevision attribute from the DUT\n");
+            err = TestThReadsTheClusterRevisionAttributeFromTheDut_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints : ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
-            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
-            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 7 : Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap "
+                "attribute has the value 0\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_7();
             break;
         }
 
@@ -17801,7 +18217,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -17814,14 +18230,36 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadsConstraintsOfClusterRevisionAttribute_1()
+    CHIP_ERROR TestThReadsTheClusterRevisionAttributeFromTheDut_1()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads constraints of ClusterRevision attribute Error: %@", err);
+            NSLog(@"TH reads the ClusterRevision attribute from the DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 4U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints : ClusterRevision Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -17832,7 +18270,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -17843,6 +18281,17 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(6)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 65528UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 65529UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 65531UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 65533UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -17850,7 +18299,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_4()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -17861,6 +18310,14 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(3)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 64UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();
         }];
@@ -17868,7 +18325,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestIdentify * cluster = [[CHIPTestIdentify alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -17879,10 +18336,28 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(1)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponseIndicatesFeatureMapAttributeHasTheValue0_7()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
@@ -18529,45 +19004,34 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints : ClusterRevision\n");
             err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            if (ShouldSkip("PICS_SKIP_SAMPLE_APP")) {
+                NextTest();
+                return;
+            }
+            err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 4 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: AcceptedCommandList\n");
-            err = TestReadTheGlobalAttributeAcceptedCommandList_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the global attribute: GeneratedCommandList\n");
-            err = TestReadTheGlobalAttributeGeneratedCommandList_7();
-            break;
-        case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : read the optional global attribute: FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeFeatureMap_8();
-            break;
-        case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Read the optional global attribute : FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeFeatureMap_9();
-            break;
-        case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : write the default values to optional global attribute: FeatureMap\n");
-            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_10();
-            break;
-        case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : reads back optional global attribute: FeatureMap\n");
-            err = TestReadsBackOptionalGlobalAttributeFeatureMap_11();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_6();
             break;
         }
 
@@ -18584,7 +19048,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 12;
+    const uint16_t mTestCount = 7;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -18626,7 +19090,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+            NSLog(@"Read the global attribute constraints : ClusterRevision Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -18637,50 +19101,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id clusterRevisionArgument;
-        clusterRevisionArgument = [NSNumber numberWithUnsignedShort:4U];
-        [cluster
-            writeAttributeClusterRevisionWithValue:clusterRevisionArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(
-                                         @"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            {
-                id actualValue = value;
-                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 5U));
-            }
-
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18691,6 +19112,25 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(14)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 3UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 5UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 6UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 10UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 11UL));
+                VerifyOrReturn(CheckValue("", actualValue[9], 12UL));
+                VerifyOrReturn(CheckValue("", actualValue[10], 13UL));
+                VerifyOrReturn(CheckValue("", actualValue[11], 14UL));
+                VerifyOrReturn(CheckValue("", actualValue[12], 15UL));
+                VerifyOrReturn(CheckValue("", actualValue[13], 16384UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -18698,7 +19138,13 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_6()
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18709,6 +19155,19 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(8)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 3UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 4UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 5UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 6UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 7UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();
         }];
@@ -18716,25 +19175,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_7()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_8()
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -18750,61 +19191,6 @@ private:
                 VerifyOrReturn(CheckValue("FeatureMap", actualValue, 3UL));
             }
 
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_9()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the optional global attribute : FeatureMap Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
-            NextTest();
-        }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_10()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        id featureMapArgument;
-        featureMapArgument = [NSNumber numberWithUnsignedInt:0UL];
-        [cluster writeAttributeFeatureMapWithValue:featureMapArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"write the default values to optional global attribute: FeatureMap Error: %@", err);
-
-                                     VerifyOrReturn(CheckValue("status", err, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-                                     NextTest();
-                                 }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_11()
-    {
-        CHIPDevice * device = GetConnectedDevice();
-        CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
-        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
-
-        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"reads back optional global attribute: FeatureMap Error: %@", err);
-
-            VerifyOrReturn(CheckValue("status", err, 0));
-
-            VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
             NextTest();
         }];
 
@@ -25415,17 +25801,52 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_3();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AttributeList\n");
+            err = TestReadTheGlobalAttributeAttributeList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_8();
+            break;
+        case 9:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 9 : Read FeatureMap attribute from the DUT and Verify that the DUT response\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponse_9();
             break;
         }
 
@@ -25442,7 +25863,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -25455,7 +25876,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
@@ -25475,7 +25920,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
@@ -25498,7 +25943,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
@@ -25515,6 +25984,58 @@ private:
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeAcceptedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: AcceptedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_8()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device
+                                                                                     endpoint:1
+                                                                                        queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeGeneratedCommandListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: GeneratedCommandList Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponse_9()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
@@ -28351,16 +28872,38 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute: AttributeList\n");
-            err = TestReadTheGlobalAttributeAttributeList_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AcceptedCommandList\n");
-            err = TestReadTheGlobalAttributeAcceptedCommandList_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute: AttributeList\n");
+            if (ShouldSkip("PICS_SKIP_SAMPLE_APP")) {
+                NextTest();
+                return;
+            }
+            err = TestReadTheGlobalAttributeAttributeList_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read the global attribute: GeneratedCommandList\n");
-            err = TestReadTheGlobalAttributeGeneratedCommandList_4();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 4 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global attribute: AcceptedCommandList\n");
+            err = TestReadTheGlobalAttributeAcceptedCommandList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read the global attribute: GeneratedCommandList\n");
+            err = TestReadTheGlobalAttributeGeneratedCommandList_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_7();
             break;
         }
 
@@ -28377,7 +28920,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 8;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28412,7 +28955,25 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAttributeList_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28423,6 +28984,25 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AttributeList", [actualValue count], static_cast<uint32_t>(14)));
+                VerifyOrReturn(CheckValue("", actualValue[0], 0UL));
+                VerifyOrReturn(CheckValue("", actualValue[1], 1UL));
+                VerifyOrReturn(CheckValue("", actualValue[2], 2UL));
+                VerifyOrReturn(CheckValue("", actualValue[3], 5UL));
+                VerifyOrReturn(CheckValue("", actualValue[4], 11UL));
+                VerifyOrReturn(CheckValue("", actualValue[5], 12UL));
+                VerifyOrReturn(CheckValue("", actualValue[6], 13UL));
+                VerifyOrReturn(CheckValue("", actualValue[7], 14UL));
+                VerifyOrReturn(CheckValue("", actualValue[8], 15UL));
+                VerifyOrReturn(CheckValue("", actualValue[9], 16UL));
+                VerifyOrReturn(CheckValue("", actualValue[10], 19UL));
+                VerifyOrReturn(CheckValue("", actualValue[11], 26UL));
+                VerifyOrReturn(CheckValue("", actualValue[12], 28UL));
+                VerifyOrReturn(CheckValue("", actualValue[13], 25UL));
+            }
+
             VerifyOrReturn(CheckConstraintType("attributeList", "", "list"));
             NextTest();
         }];
@@ -28430,7 +29010,13 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_3()
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_4()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeAcceptedCommandList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28441,6 +29027,11 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("AcceptedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
+
             VerifyOrReturn(CheckConstraintType("acceptedCommandList", "", "list"));
             NextTest();
         }];
@@ -28448,7 +29039,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_4()
+    CHIP_ERROR TestReadTheGlobalAttributeGeneratedCommandList_6()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
@@ -28459,7 +29050,34 @@ private:
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("GeneratedCommandList", [actualValue count], static_cast<uint32_t>(0)));
+            }
+
             VerifyOrReturn(CheckConstraintType("generatedCommandList", "", "list"));
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_7()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPowerSource * cluster = [[CHIPTestPowerSource alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("FeatureMap", actualValue, 0UL));
+            }
+
             NextTest();
         }];
 
@@ -28807,17 +29425,62 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(
-                chipTool, " ***** Test Step 2 : Write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute constraints: AttributeList\n");
-            err = TestReadTheGlobalAttributeConstraintsAttributeList_3();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : Write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read the global mandatory attribute constraints: AttributeList\n");
+            err = TestReadTheGlobalMandatoryAttributeConstraintsAttributeList_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Read EventList attribute from the DUT and Verify that the DUT response provides a list of "
+                "supported events.\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 7 : Read AcceptedCommandList attribute from the DUT and Verify that the DUT response\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadAcceptedCommandListAttributeFromTheDutAndVerifyThatTheDutResponse_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 8 : Read GeneratedCommandList attribute from the DUT and Verify that the DUT response\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadGeneratedCommandListAttributeFromTheDutAndVerifyThatTheDutResponse_8();
+            break;
+        case 9:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 9 : Read FeatureMap attribute from the DUT and Verify that the DUT response\n");
+            if (ShouldSkip("PICS_USER_PROMPT")) {
+                NextTest();
+                return;
+            }
+            err = TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponse_9();
             break;
         }
 
@@ -28834,7 +29497,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -28847,7 +29510,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device
+                                                                                           endpoint:1
+                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device
@@ -28867,7 +29554,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device
@@ -28890,7 +29577,31 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsAttributeList_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
+    {
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device
+                                                                                           endpoint:1
+                                                                                              queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            {
+                id actualValue = value;
+                VerifyOrReturn(CheckValue("ClusterRevision", actualValue, 3U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadTheGlobalMandatoryAttributeConstraintsAttributeList_5()
     {
         CHIPDevice * device = GetConnectedDevice();
         CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device
@@ -28899,7 +29610,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Read the global attribute constraints: AttributeList Error: %@", err);
+            NSLog(@"Read the global mandatory attribute constraints: AttributeList Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -28907,6 +29618,30 @@ private:
             NextTest();
         }];
 
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadEventListAttributeFromTheDutAndVerifyThatTheDutResponseProvidesAListOfSupportedEvents_6()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadAcceptedCommandListAttributeFromTheDutAndVerifyThatTheDutResponse_7()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadGeneratedCommandListAttributeFromTheDutAndVerifyThatTheDutResponse_8()
+    {
+        UserPrompt(@"Please enter 'y' for success", @"y");
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadFeatureMapAttributeFromTheDutAndVerifyThatTheDutResponse_9()
+    {
+        UserPrompt(@"Please enter '0' for success", @"0");
         return CHIP_NO_ERROR;
     }
 };
