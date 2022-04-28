@@ -79,10 +79,7 @@ function getTests() {
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
-  ];
-
-  const DoorLock = [
-    'Test_TC_DL_1_3',
+    'Test_TC_DM_2_2',
   ];
 
   const ElectricalMeasurement = [
@@ -104,15 +101,15 @@ function getTests() {
     'Test_TC_GC_1_1',
   ];
 
-  const IlluminanceMeasurement = [
-    'Test_TC_ILL_1_1',
-    'Test_TC_ILL_2_1',
-  ];
-
   const Identify = [
     'Test_TC_I_1_1',
     'Test_TC_I_2_1',
     'Test_TC_I_2_3',
+  ];
+
+  const IlluminanceMeasurement = [
+    'Test_TC_ILL_1_1',
+    'Test_TC_ILL_2_1',
   ];
 
   const OccupancySensing = [
@@ -129,6 +126,10 @@ function getTests() {
     'Test_TC_LVL_4_1',
     'Test_TC_LVL_5_1',
     'Test_TC_LVL_6_1',
+  ];
+
+  const UserLabel = [
+    'Test_TC_LC_1_2',
   ];
 
   const MediaControl = [
@@ -174,12 +175,21 @@ function getTests() {
     'Test_TC_MOD_1_1',
   ];
 
+  const MultipleFabrics = [
+    // These tests all need PairWithQRCode
+    //'Test_TC_MF_1_3',
+    //'Test_TC_MF_1_4',
+    //'Test_TC_MF_1_5',
+    //'Test_TC_MF_1_6',
+    //'Test_TC_MF_1_15',
+  ];
+
   const OnOff = [
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
     'Test_TC_OO_2_3',
-    // 'Test_TC_OO_2_4', Disable this Test for now as Darwin does not support reboot commands currently
+    'Test_TC_OO_2_4',
   ];
 
   const PowerSource = [
@@ -210,6 +220,11 @@ function getTests() {
     'Test_TC_RH_2_2',
   ];
 
+  const SecureChannel = [
+    // This test needs FindCommissionable
+    //'Test_TC_SC_4_2',
+  ];
+
   const Switch = [
     'Test_TC_SWTCH_2_1',
     'Test_TC_SWTCH_2_2',
@@ -238,53 +253,79 @@ function getTests() {
     'Test_TC_DIAG_TH_NW_1_2',
   ];
 
-  const UserLabel = [
-    'Test_TC_LC_1_2',
-  ];
-
   const WiFiNetworkDiagnostics = [
     'Test_TC_WIFIDIAG_1_1',
     'Test_TC_WIFIDIAG_3_1',
   ];
 
   const WindowCovering = [
-    // WindowCovering is make uses of multiples "subscribeAttribute", but it triggers
-    // some failures on darwin supposely because the ReadClient stays open for the
-    // whole duration of the tests and that goes past some internal limits.
-    // Because of this, some of the tests are disabled on darwin.
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
     'Test_TC_WNCV_2_2',
     'Test_TC_WNCV_2_3',
     'Test_TC_WNCV_2_4',
     'Test_TC_WNCV_2_5',
-    //'Test_TC_WNCV_3_1',
-    //'Test_TC_WNCV_3_2',
-    //'Test_TC_WNCV_3_3',
+    'Test_TC_WNCV_3_1',
+    'Test_TC_WNCV_3_2',
+    'Test_TC_WNCV_3_3',
     'Test_TC_WNCV_3_4',
     'Test_TC_WNCV_3_5',
+    'Test_TC_WNCV_4_1',
+    'Test_TC_WNCV_4_2',
     'Test_TC_WNCV_4_3',
     'Test_TC_WNCV_4_4',
-    //'Test_TC_WNCV_4_5', Disable this Test for now as Darwin does not support reboot commands currently
+    'Test_TC_WNCV_4_5',
+  ];
+
+  const TV = [
+    'TV_TargetNavigatorCluster',
+    'TV_AudioOutputCluster',
+    'TV_ApplicationLauncherCluster',
+    'TV_KeypadInputCluster',
+    'TV_AccountLoginCluster',
+    'TV_WakeOnLanCluster',
+    'TV_ApplicationBasicCluster',
+    'TV_MediaPlaybackCluster',
+    'TV_ChannelCluster',
+    'TV_LowPowerCluster',
+    'TV_ContentLauncherCluster',
+    'TV_MediaInputCluster',
   ];
 
   const Others = [
     'TestCluster',
-    'TestSaveAs',
+    // TestClusterComplexTypes requires representing nullable optionals in ways
+    // that can differentiate missing and null, which Darwin can't right now.
+    //'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
-    'TestDescriptorCluster',
-    // TestBasicInformation needs Reboot
-    //'TestBasicInformation',
-    // TestGeneralCommissioning needs Reboot
-    //'TestGeneralCommissioning',
-    'TestGroupsCluster',
-    'TestGroupKeyManagementCluster',
-    'TestIdentifyCluster',
+    // TestEvents not supported in the codegen yet.
+    //'TestEvents',
+    // TestDiscovery needs FindCommissionable
+    //'TestDiscovery',
     'TestLogCommands',
+    'TestSaveAs',
+    // TestConfigVariables not supported properly in codegen yet.
+    //'TestConfigVariables',
+    'TestDescriptorCluster',
+    'TestBasicInformation',
+    // TestGeneralCommissioning needs PairWithQRCode
+    //'TestGeneralCommissioning',
+    'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
+    'TestModeSelectCluster',
     'TestSelfFabricRemoval',
+    // TestSystemCommands needs codegen changes or changes to the system
+    // command implementation.
+    //'TestSystemCommands',
     'TestBinding',
+    'TestUserLabelCluster',
+    'TestArmFailSafe',
+  ];
+
+  const MultiAdmin = [
+    // TestMultiAdmin needs PairWithQRCode
+    //'TestMultiAdmin',
   ];
 
   const SoftwareDiagnostics = [
@@ -297,6 +338,22 @@ function getTests() {
     'TestSubscribe_OnOff',
   ];
 
+  const DoorLock = [
+    // DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
+    //'DL_UsersAndCredentials',
+    'DL_LockUnlock',
+    // DL_Schedules needs some sort of codegen fixes to produce compiling code.
+    //'DL_Schedules',
+    'Test_TC_DL_1_3',
+  ];
+
+  const Groups = [
+    // TestGroupMessaging does not work on Darwin for now.
+    //'TestGroupMessaging',
+    'TestGroupsCluster',
+    'TestGroupKeyManagementCluster',
+  ];
+
   const tests = [
     AccessControl, //
     BinaryInput, //
@@ -305,16 +362,16 @@ function getTests() {
     ColorControl, //
     DeviceDiscovery, //
     DeviceManagement, //
-    DoorLock, //
     ElectricalMeasurement, //
     EthernetNetworkDiagnostics, //
     FlowMeasurement, //
     GeneralCommissioning, //
-    IlluminanceMeasurement, //
     Identify, //
+    IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
     ModeSelect, //
+    MultipleFabrics, //
     OccupancySensing, //
     OnOff, //
     PowerSource, //
@@ -322,6 +379,7 @@ function getTests() {
     PumpConfigurationControl, //
     PowerSourceConfiguration, //
     RelativeHumidityMeasurement, //
+    SecureChannel, //
     Switch, //
     TemperatureMeasurement, //
     Thermostat, //
@@ -330,9 +388,13 @@ function getTests() {
     UserLabel, //
     WiFiNetworkDiagnostics, //
     WindowCovering, //
+    TV, //
     Others, //
+    MultiAdmin, //
     SoftwareDiagnostics, //
     Subscriptions, //
+    DoorLock, //
+    Groups, //
   ];
   return tests.flat(1);
 }
