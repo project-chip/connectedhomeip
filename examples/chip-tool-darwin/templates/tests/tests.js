@@ -22,8 +22,7 @@ function getManualTests()
 
 // clang-format off
 
-function getTests()
-{
+function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
   ];
@@ -284,6 +283,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
+    'TestSelfFabricRemoval',
     'TestBinding',
   ];
 

@@ -126,23 +126,23 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
+ * CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
  *
- * The default amount of time in milliseconds that the sleepy end device will use as a slow-polling interval.
+ * The default amount of time in milliseconds that the sleepy end device will use as an idle interval.
  * This interval is used by the device to periodically wake up and poll the data in the idle mode.
  */
-#ifndef CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000_ms32
+#ifndef CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL 5000_ms32
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
+ * CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
  *
- * The default amount of time in milliseconds that the sleepy end device will use as a fast-polling interval.
+ * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
  * This interval is used by the device to periodically wake up and poll the data in the active mode.
  */
-#ifndef CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 200_ms32
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32
 #endif
 
 // -------------------- Device Identification Configuration --------------------
@@ -689,6 +689,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SSED
+ *
+ * Enable support for Thread Synchronized Sleepy End Device behavior.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SSED
+#define CHIP_DEVICE_CONFIG_THREAD_SSED 0
 #endif
 
 /**

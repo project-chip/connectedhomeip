@@ -480,27 +480,27 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-CHIP_ERROR ThreadStackManagerImpl::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
+CHIP_ERROR ThreadStackManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    (void) pollingConfig;
+    (void) intervalsConfig;
 
-    ChipLogError(DeviceLayer, "Polling config is not supported on linux");
+    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
+CHIP_ERROR ThreadStackManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    (void) pollingConfig;
+    (void) intervalsConfig;
 
-    ChipLogError(DeviceLayer, "Polling config is not supported on linux");
+    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_RequestSEDFastPollingMode(bool onOff)
+CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff)
 {
     (void) onOff;
 
-    ChipLogError(DeviceLayer, "Polling config is not supported on linux");
+    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif

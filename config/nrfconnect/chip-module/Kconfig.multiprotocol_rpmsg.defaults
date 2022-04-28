@@ -97,3 +97,7 @@ config NRF_802154_SER_RADIO
 config NRF_RTC_TIMER_USER_CHAN_COUNT
     int
     default 2
+
+config NRF_802154_ENCRYPTION
+    bool
+    default y
