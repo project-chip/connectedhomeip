@@ -163,24 +163,24 @@ private:
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
 
     /**
-     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * Sets Sleepy End Device intervals configuration and posts kSEDIntervalChange event to inform other software
      * modules about the change.
      *
-     * @param[in]  pollingConfig  polling intervals configuration to be set
+     * @param[in]  intervalsConfig  intervals configuration to be set
      */
-    CHIP_ERROR SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
 
     /**
-     * Requests setting Sleepy End Device fast polling interval on or off.
-     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
-     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     * Requests setting Sleepy End Device active interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the active mode
+     * consumers counter. Active mode is set if the consumers counter is bigger than 0.
      *
-     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     * @param[in]  onOff  true if active mode should be enabled and false otherwise.
      */
-    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR RequestSEDActiveMode(bool onOff);
 #endif
 
     bool HaveMeshConnectivity();
@@ -390,19 +390,19 @@ inline CHIP_ERROR ThreadStackManager::SetThreadDeviceType(ConnectivityManager::T
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-inline CHIP_ERROR ThreadStackManager::GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR ThreadStackManager::GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_GetSEDIntervalsConfig(intervalsConfig);
 }
 
-inline CHIP_ERROR ThreadStackManager::SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR ThreadStackManager::SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetSEDIntervalsConfig(intervalsConfig);
 }
 
-inline CHIP_ERROR ThreadStackManager::RequestSEDFastPollingMode(bool onOff)
+inline CHIP_ERROR ThreadStackManager::RequestSEDActiveMode(bool onOff)
 {
-    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
+    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff);
 }
 #endif
 
