@@ -43,13 +43,13 @@ class ChefBuilderUtil():
 
     def build(self):
         for device in self.load_devices():
-            for platform in filter(lambda x: x == 'linux', self.load_platforms()): # TODO: support all plats
+            for platform in [p for p in self.load_platforms() if p == "linux"]:
                 command = self.create_build_command(device, platform)
                 subprocess.check_call(command, cwd=self.chef_builder.root, shell=True)
 
     def create_manifest(self):
         manifest = {}
-        for platform in filter(lambda x: x == 'linux', self.load_platforms()): # TODO: support all plats
+        for platform in [p for p in self.load_platforms() if p == "linux"]:
             manifest[platform] = '{}/{}/out/'.format(self.chef_builder.root, platform)
         return manifest
 
