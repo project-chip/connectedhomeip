@@ -281,6 +281,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
+    // 'TestSelfFabricRemoval',  --> TODO: Integrate here when Darwin can live with current fabric going away
     'TestBinding',
     'TestUserLabelCluster',
   ];
