@@ -450,6 +450,7 @@ typedef struct _ProviderLocation
 typedef struct _ReadAttributeStatusRecord
 {
     chip::AttributeId attributeId;
+    uint8_t status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } ReadAttributeStatusRecord;
@@ -608,6 +609,7 @@ typedef struct _WriteAttributeRecord
 // Struct for WriteAttributeStatusRecord
 typedef struct _WriteAttributeStatusRecord
 {
+    uint8_t status;
     chip::AttributeId attributeId;
 } WriteAttributeStatusRecord;
 
@@ -624,6 +626,7 @@ typedef struct _WriteStructuredAttributeRecord
 // Struct for WriteStructuredAttributeStatusRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
+    uint8_t status;
     chip::AttributeId attributeId;
     uint8_t indicator;
     /* TYPE WARNING: array array defaults to */ uint8_t * indicies;
