@@ -242,7 +242,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     paths[1].mValue.mClusterId  = kLivenessClusterId;
     paths[1].mValue.mEventId    = kLivenessChangeEvent;
 
-    //interested paths are path list, expect to retrieve all events for each particular interested path
+    // interested paths are path list, expect to retrieve all events for each particular interested path
     CheckLogReadOut(apSuite, logMgmt, 0, 3, &paths[0]);
     CheckLogReadOut(apSuite, logMgmt, 1, 2, &paths[0]);
     CheckLogReadOut(apSuite, logMgmt, 2, 1, &paths[0]);
@@ -251,18 +251,18 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     CheckLogReadOut(apSuite, logMgmt, 5, 1, &paths[1]);
 
     paths[0].mpNext = &paths[1];
-    //interested paths are path list, expect to retrieve all events for those interested paths
+    // interested paths are path list, expect to retrieve all events for those interested paths
     CheckLogReadOut(apSuite, logMgmt, 0, 6, paths);
 
     chip::app::ObjectList<chip::app::EventPathParams> pathsWithWildcard[2];
     paths[0].mValue.mEndpointId = kTestEndpointId1;
     paths[0].mValue.mClusterId  = kLivenessClusterId;
 
-    //second path is wildcard path at default, expect to retrieve all events
+    // second path is wildcard path at default, expect to retrieve all events
     CheckLogReadOut(apSuite, logMgmt, 0, 6, &pathsWithWildcard[1]);
 
     paths[0].mpNext = &paths[1];
-    //first path is not wildcard, second path is wildcard path at default, expect to retrieve all events
+    // first path is not wildcard, second path is wildcard path at default, expect to retrieve all events
     CheckLogReadOut(apSuite, logMgmt, 0, 6, pathsWithWildcard);
 }
 
