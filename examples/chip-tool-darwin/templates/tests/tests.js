@@ -176,7 +176,7 @@ function getTests() {
   ];
 
   const MultipleFabrics = [
-    // These tests all need PairWithQRCode
+    // TODO: These tests all need PairWithQRCode
     //'Test_TC_MF_1_3',
     //'Test_TC_MF_1_4',
     //'Test_TC_MF_1_5',
@@ -221,7 +221,7 @@ function getTests() {
   ];
 
   const SecureChannel = [
-    // This test needs FindCommissionable
+    // TODO: This test needs FindCommissionable
     //'Test_TC_SC_4_2',
   ];
 
@@ -299,23 +299,23 @@ function getTests() {
     //'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
-    // TestEvents not supported in the codegen yet.
+    // TODO: TestEvents not supported in the codegen yet.
     //'TestEvents',
-    // TestDiscovery needs FindCommissionable
+    // TODO: TestDiscovery needs FindCommissionable
     //'TestDiscovery',
     'TestLogCommands',
     'TestSaveAs',
-    // TestConfigVariables not supported properly in codegen yet.
+    // TODO: TestConfigVariables not supported properly in codegen yet.
     //'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
-    // TestGeneralCommissioning needs PairWithQRCode
+    // TODO: TestGeneralCommissioning needs PairWithQRCode
     //'TestGeneralCommissioning',
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestSelfFabricRemoval',
-    // TestSystemCommands needs codegen changes or changes to the system
+    // TODO: TestSystemCommands needs codegen changes or changes to the system
     // command implementation.
     //'TestSystemCommands',
     'TestBinding',
@@ -324,7 +324,7 @@ function getTests() {
   ];
 
   const MultiAdmin = [
-    // TestMultiAdmin needs PairWithQRCode
+    // TODO: TestMultiAdmin needs PairWithQRCode
     //'TestMultiAdmin',
   ];
 
@@ -339,10 +339,10 @@ function getTests() {
   ];
 
   const DoorLock = [
-    // DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
+    // TODO: DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
     //'DL_UsersAndCredentials',
     'DL_LockUnlock',
-    // DL_Schedules needs some sort of codegen fixes to produce compiling code.
+    // TODO: DL_Schedules needs some sort of codegen fixes to produce compiling code.
     //'DL_Schedules',
     'Test_TC_DL_1_3',
   ];
