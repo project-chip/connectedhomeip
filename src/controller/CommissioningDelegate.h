@@ -449,9 +449,9 @@ struct ReadCommissioningInfo
     GeneralCommissioningInfo general;
 };
 
-struct AdditionalErrorInfo
+struct AttestationErrorInfo
 {
-    AdditionalErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
+    AttestationErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
     Credentials::AttestationVerificationResult attestationResult;
 };
 
@@ -480,7 +480,7 @@ public:
      * kSendPAICertificateRequest: RequestedCertificate
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
-     * kAttestationVerification: AdditionalErrorInfo if there is an error
+     * kAttestationVerification: AttestationErrorInfo if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
@@ -495,7 +495,7 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AdditionalErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo>
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

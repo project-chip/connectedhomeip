@@ -363,20 +363,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         completionStatus.failedStage = MakeOptional(report.stageCompleted);
         ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
-        if (report.Is<AdditionalErrorInfo>())
+        if (report.Is<AttestationErrorInfo>())
         {
-            if (report.stageCompleted == CommissioningStage::kAttestationVerification)
+            completionStatus.attestationResult = MakeOptional(report.Get<AttestationErrorInfo>().attestationResult);
+            if ((report.Get<AttestationErrorInfo>().attestationResult ==
+                 Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
+                (report.Get<AttestationErrorInfo>().attestationResult ==
+                 Credentials::AttestationVerificationResult::kDacVendorIdMismatch))
             {
-                completionStatus.attestationResult = MakeOptional(report.Get<AdditionalErrorInfo>().attestationResult);
-                if ((report.Get<AdditionalErrorInfo>().attestationResult ==
-                     Credentials::AttestationVerificationResult::kDacProductIdMismatch) ||
-                    (report.Get<AdditionalErrorInfo>().attestationResult ==
-                     Credentials::AttestationVerificationResult::kDacVendorIdMismatch))
-                {
-                    ChipLogError(Controller,
-                                 "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
-                                 "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
-                }
+                ChipLogError(Controller,
+                             "Failed device attestation. Device vendor and/or product ID do not match the IDs expected. "
+                             "Verify DAC certificate chain and certification declaration to ensure spec rules followed.");
             }
         }
         else if (report.Is<CommissioningErrorInfo>())

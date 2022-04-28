@@ -753,7 +753,7 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestationFailure(DevicePro
                      to_underlying(attestationResult));
 
         CommissioningDelegate::CommissioningReport report;
-        report.Set<AdditionalErrorInfo>(attestationResult);
+        report.Set<AttestationErrorInfo>(attestationResult);
         CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
     else
@@ -931,7 +931,7 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
     if (result != AttestationVerificationResult::kSuccess)
     {
         CommissioningDelegate::CommissioningReport report;
-        report.Set<AdditionalErrorInfo>(result);
+        report.Set<AttestationErrorInfo>(result);
         if (result == AttestationVerificationResult::kNotImplemented)
         {
             ChipLogError(Controller,
@@ -992,7 +992,7 @@ void DeviceCommissioner::OnArmFailSafeExtendedForFailedDeviceAttestation(
     {
         ChipLogProgress(Controller, "Device attestation failed and no delegate set, failing commissioning");
         CommissioningDelegate::CommissioningReport report;
-        report.Set<AdditionalErrorInfo>(commissioner->mAttestationResult);
+        report.Set<AttestationErrorInfo>(commissioner->mAttestationResult);
         commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
     }
 }
@@ -1003,7 +1003,7 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeFailedDeviceAttestation(vo
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CommissioningDelegate::CommissioningReport report;
-    report.Set<AdditionalErrorInfo>(commissioner->mAttestationResult);
+    report.Set<AttestationErrorInfo>(commissioner->mAttestationResult);
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
@@ -1472,6 +1472,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
     else
     {
+        // TODO: We should propogate errors commissioningError networkCommissioningStatus errors from completionStatus.
         mPairingDelegate->OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(kError),
                                                  completionStatus.attestationResult);
     }
