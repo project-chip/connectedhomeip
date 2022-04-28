@@ -33,7 +33,6 @@ function getTests()
   ];
 
   const BooleanState = [
-    'Test_TC_BOOL_1_1',
     'Test_TC_BOOL_2_1',
   ];
 
@@ -42,7 +41,6 @@ function getTests()
   ];
 
   const ColorControl = [
-    'Test_TC_CC_1_1',
     'Test_TC_CC_2_1',
     'Test_TC_CC_3_1',
     'Test_TC_CC_3_2',
@@ -94,7 +92,6 @@ function getTests()
   ];
 
   const FlowMeasurement = [
-    'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
     'Test_TC_FLW_2_2',
   ];
@@ -104,24 +101,20 @@ function getTests()
   ];
 
   const Identify = [
-    'Test_TC_I_1_1',
     'Test_TC_I_2_1',
     'Test_TC_I_2_3',
   ];
 
   const IlluminanceMeasurement = [
-    'Test_TC_ILL_1_1',
     'Test_TC_ILL_2_1',
   ];
 
   const OccupancySensing = [
-    'Test_TC_OCC_1_1',
     'Test_TC_OCC_2_1',
     'Test_TC_OCC_2_2',
   ];
 
   const LevelControl = [
-    'Test_TC_LVL_1_1',
     'Test_TC_LVL_2_1',
     'Test_TC_LVL_2_2',
     'Test_TC_LVL_3_1',
@@ -179,12 +172,10 @@ function getTests()
   ];
 
   const PowerSource = [
-    'Test_TC_PS_1_1',
     'Test_TC_PS_2_1',
   ];
 
   const PressureMeasurement = [
-    'Test_TC_PRS_1_1',
     'Test_TC_PRS_2_1',
   ];
 
@@ -281,6 +272,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',
+    // 'TestSelfFabricRemoval',  --> TODO: Integrate here when Darwin can live with current fabric going away
     'TestBinding',
     'TestUserLabelCluster',
   ];

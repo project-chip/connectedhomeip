@@ -85,13 +85,13 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 }
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-void ExchangeContext::UpdateSEDPollingMode()
+void ExchangeContext::UpdateSEDIntervalMode()
 {
     if (!HasSessionHandle())
     {
         // After the session has been deleted, no further communication can occur on the exchange,
-        // so withdraw a SED fast-polling mode request.
-        UpdateSEDPollingMode(false);
+        // so withdraw a SED active mode request.
+        UpdateSEDIntervalMode(false);
         return;
     }
 
@@ -110,15 +110,15 @@ void ExchangeContext::UpdateSEDPollingMode()
     }
 
     VerifyOrReturn(address.GetTransportType() != Transport::Type::kBle);
-    UpdateSEDPollingMode(IsResponseExpected() || IsSendExpected() || IsMessageNotAcked());
+    UpdateSEDIntervalMode(IsResponseExpected() || IsSendExpected() || IsMessageNotAcked());
 }
 
-void ExchangeContext::UpdateSEDPollingMode(bool fastPollingMode)
+void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
 {
-    if (fastPollingMode != IsRequestingFastPollingMode())
+    if (activeMode != IsRequestingActiveMode())
     {
-        SetRequestingFastPollingMode(fastPollingMode);
-        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(fastPollingMode);
+        SetRequestingActiveMode(activeMode);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode);
     }
 }
 #endif
@@ -301,8 +301,8 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(!IsAckPending());
 
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    // Make sure that the exchange withdraws the request for Sleepy End Device fast-polling mode.
-    UpdateSEDPollingMode(false);
+    // Make sure that the exchange withdraws the request for Sleepy End Device active mode.
+    UpdateSEDIntervalMode(false);
 #endif
 
     // Ideally, in this scenario, the retransmit table should
@@ -482,7 +482,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 void ExchangeContext::MessageHandled()
 {
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
-    UpdateSEDPollingMode();
+    UpdateSEDIntervalMode();
 #endif
 
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())

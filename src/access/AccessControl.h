@@ -310,10 +310,14 @@ public:
         /**
          * Notifies of a change in the access control list.
          *
-         * @param [in] subjectDescriptor Optional subject descriptor for this operation.
+         * The fabric is indicated by its own parameter. If available, a subject descriptor will
+         * have more detail (and its fabric index will match). A best effort is made to provide
+         * the latest value of the changed entry.
+         *
+         * @param [in] subjectDescriptor Optional (if available) subject descriptor for this operation.
          * @param [in] fabric            Index of fabric in which entry has changed.
          * @param [in] index             Index of entry to which has changed (relative to fabric).
-         * @param [in] entry             Optional latest value of entry which has changed.
+         * @param [in] entry             Optional (best effort) latest value of entry which has changed.
          * @param [in] changeType        Type of change.
          */
         virtual void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,

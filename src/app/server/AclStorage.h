@@ -18,6 +18,8 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <credentials/FabricTable.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -27,11 +29,6 @@ namespace app {
 /**
  * Storage specifically for access control entries, which correspond to the
  * ACL attribute of the access control cluster.
- *
- * This class is loosely coupled to the access control module (via
- * Access::GetAccessControl()), and to the server's persistent storage (via
- * Server::GetInstance().GetPersistentStorage()) as well as the server's
- * fabric table (via Server::GetInstance().GetFabricTable()).
  *
  * An object of this class should be initialized directly after the access
  * control module is initialized, as it will populate entries in the system
@@ -47,6 +44,11 @@ class AclStorage
 public:
     /**
      * Used for decoding access control entries.
+     *
+     * Typically used temporarily on the stack to decode:
+     * - source: TLV
+     * - staging: generated cluster level code
+     * - destination: system level access control entry
      */
     class DecodableEntry
     {
@@ -58,7 +60,7 @@ public:
 
         /**
          * Reader decodes into a staging entry, which is then unstaged
-         * into a constructor-provided entry.
+         * into a member entry.
          */
         CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -82,6 +84,11 @@ public:
 
     /**
      * Used for encoding access control entries.
+     *
+     * Typically used temporarily on the stack to encode:
+     * - source: system level access control entry
+     * - staging: generated cluster level code
+     * - destination: TLV
      */
     class EncodableEntry
     {
@@ -132,12 +139,11 @@ public:
     };
 
     /**
-     * Loads access control entries for all fabrics (Server::GetInstance().GetFabricTable())
-     * from persistent storage (Server::GetInstance().GetPersistentStorage())
-     * into access control (Access::GetAccessControl())
-     * and then installs a listener to keep persisted entries in sync.
+     * Initialize must be called. It loads ACL entries for all fabrics from persistent storage,
+     * then installs a listener for the access control system module to maintain ACL entries in
+     * persistent storage so they remain in sync with entries in the access control system module.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(PersistentStorageDelegate & persistentStorage, const FabricTable & fabricTable);
 };
 
 } // namespace app

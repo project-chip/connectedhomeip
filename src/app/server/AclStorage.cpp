@@ -261,10 +261,11 @@ public:
     {
         CHIP_ERROR err;
 
-        auto & storage = Server::GetInstance().GetPersistentStorage();
         DefaultStorageKeyAllocator key;
 
         uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
+
+        VerifyOrExit(mPersistentStorage != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
         if (changeType == ChangeType::kRemoved)
         {
@@ -272,16 +273,16 @@ public:
             while (true)
             {
                 uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-                err           = storage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index + 1), buffer, size);
+                err           = mPersistentStorage->SyncGetKeyValue(key.AccessControlAclEntry(fabric, index + 1), buffer, size);
                 if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
                 {
                     break;
                 }
                 SuccessOrExit(err);
-                SuccessOrExit(err = storage.SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size));
+                SuccessOrExit(err = mPersistentStorage->SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size));
                 index++;
             }
-            SuccessOrExit(err = storage.SyncDeleteKeyValue(key.AccessControlAclEntry(fabric, index)));
+            SuccessOrExit(err = mPersistentStorage->SyncDeleteKeyValue(key.AccessControlAclEntry(fabric, index)));
         }
         else
         {
@@ -291,8 +292,8 @@ public:
             writer.Init(buffer);
             EncodableEntry encodableEntry(*entry);
             SuccessOrExit(err = encodableEntry.EncodeForWrite(writer, TLV::AnonymousTag()));
-            SuccessOrExit(err = storage.SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer,
-                                                        static_cast<uint16_t>(writer.GetLengthWritten())));
+            SuccessOrExit(err = mPersistentStorage->SyncSetKeyValue(key.AccessControlAclEntry(fabric, index), buffer,
+                                                                    static_cast<uint16_t>(writer.GetLengthWritten())));
         }
 
         return;
@@ -300,6 +301,13 @@ public:
     exit:
         ChipLogError(DataManagement, "AclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
     }
+
+    // Must initialize before use.
+    void Init(PersistentStorageDelegate & persistentStorage) { mPersistentStorage = &persistentStorage; }
+
+private:
+    PersistentStorageDelegate * mPersistentStorage = nullptr;
+
 } sEntryListener;
 
 } // namespace
@@ -433,25 +441,24 @@ CHIP_ERROR AclStorage::EncodableEntry::Stage() const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AclStorage::Init()
+CHIP_ERROR AclStorage::Init(PersistentStorageDelegate & persistentStorage, const FabricTable & fabricTable)
 {
     ChipLogProgress(DataManagement, "AclStorage: initializing");
 
     CHIP_ERROR err;
 
-    auto & storage = Server::GetInstance().GetPersistentStorage();
     DefaultStorageKeyAllocator key;
 
     size_t count = 0;
 
-    for (auto & info : Server::GetInstance().GetFabricTable())
+    for (auto & info : fabricTable)
     {
         auto fabric = info.GetFabricIndex();
         for (size_t index = 0; /**/; ++index)
         {
             uint8_t buffer[kEncodedEntryTotalBytes] = { 0 };
             uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
-            err = storage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size);
+            err = persistentStorage.SyncGetKeyValue(key.AccessControlAclEntry(fabric, index), buffer, size);
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 break;
@@ -475,6 +482,7 @@ CHIP_ERROR AclStorage::Init()
 
     ChipLogProgress(DataManagement, "AclStorage: %u entries loaded", (unsigned) count);
 
+    sEntryListener.Init(persistentStorage);
     GetAccessControl().AddEntryListener(sEntryListener);
 
     return CHIP_NO_ERROR;

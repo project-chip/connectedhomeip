@@ -134,7 +134,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
-    SuccessOrExit(err = mAclStorage.Init());
+    SuccessOrExit(err = mAclStorage.Init(*mDeviceStorage, mFabrics));
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
@@ -148,6 +148,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
+    // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler(&mExchangeMgr);
 
     // Init transport before operations with secure session mgr.
@@ -284,6 +285,7 @@ exit:
     }
     else
     {
+        // NOTE: this log is scraped by the test harness.
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
