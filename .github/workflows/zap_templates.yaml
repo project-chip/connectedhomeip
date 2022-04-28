@@ -43,8 +43,6 @@ jobs:
                       token: ${{ github.token }}
             - name: Setup ZAP
               run: |
-                  # mkdir ./third_party/zap
-                  # mkdir ./third_party/zap/repo
                   rm -R ./third_party/zap/repo/
                   mv /opt/zap ./third_party/zap/repo/
             - name: Generate all
