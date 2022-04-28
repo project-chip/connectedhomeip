@@ -40,8 +40,7 @@ class PowerSourceConfigurationAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register on all endpoints.
-    PowerSourceConfigurationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), PowerSourceConfiguration::Id)
-    {}
+    PowerSourceConfigurationAttrAccess() : AttributeAccessInterface(Optional<EndpointId>(0), PowerSourceConfiguration::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
@@ -52,7 +51,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aPath.mClusterId != PowerSourceConfiguration::Id || aPath.mEndpointId != 0x00)
+    if (aPath.mClusterId != PowerSourceConfiguration::Id)
     {
         return CHIP_ERROR_INVALID_PATH_LIST;
     }
