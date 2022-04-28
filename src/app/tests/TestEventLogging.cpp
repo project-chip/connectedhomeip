@@ -233,20 +233,37 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     NL_TEST_ASSERT(apSuite, (eid4 + 1) == eid5);
     NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
-    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams1;
-    testEventPathParams1.mValue.mEndpointId = kTestEndpointId1;
-    testEventPathParams1.mValue.mClusterId  = kLivenessClusterId;
-    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams2;
-    testEventPathParams2.mValue.mEndpointId = kTestEndpointId2;
-    testEventPathParams2.mValue.mClusterId  = kLivenessClusterId;
-    testEventPathParams2.mValue.mEventId    = kLivenessChangeEvent;
+    chip::app::ObjectList<chip::app::EventPathParams> paths[2];
 
-    CheckLogReadOut(apSuite, logMgmt, 0, 3, &testEventPathParams1);
-    CheckLogReadOut(apSuite, logMgmt, 1, 2, &testEventPathParams1);
-    CheckLogReadOut(apSuite, logMgmt, 2, 1, &testEventPathParams1);
-    CheckLogReadOut(apSuite, logMgmt, 3, 3, &testEventPathParams2);
-    CheckLogReadOut(apSuite, logMgmt, 4, 2, &testEventPathParams2);
-    CheckLogReadOut(apSuite, logMgmt, 5, 1, &testEventPathParams2);
+    paths[0].mValue.mEndpointId = kTestEndpointId1;
+    paths[0].mValue.mClusterId  = kLivenessClusterId;
+
+    paths[1].mValue.mEndpointId = kTestEndpointId2;
+    paths[1].mValue.mClusterId  = kLivenessClusterId;
+    paths[1].mValue.mEventId    = kLivenessChangeEvent;
+
+    // interested paths are path list, expect to retrieve all events for each particular interested path
+    CheckLogReadOut(apSuite, logMgmt, 0, 3, &paths[0]);
+    CheckLogReadOut(apSuite, logMgmt, 1, 2, &paths[0]);
+    CheckLogReadOut(apSuite, logMgmt, 2, 1, &paths[0]);
+    CheckLogReadOut(apSuite, logMgmt, 3, 3, &paths[1]);
+    CheckLogReadOut(apSuite, logMgmt, 4, 2, &paths[1]);
+    CheckLogReadOut(apSuite, logMgmt, 5, 1, &paths[1]);
+
+    paths[0].mpNext = &paths[1];
+    // interested paths are path list, expect to retrieve all events for those interested paths
+    CheckLogReadOut(apSuite, logMgmt, 0, 6, paths);
+
+    chip::app::ObjectList<chip::app::EventPathParams> pathsWithWildcard[2];
+    paths[0].mValue.mEndpointId = kTestEndpointId1;
+    paths[0].mValue.mClusterId  = kLivenessClusterId;
+
+    // second path is wildcard path at default, expect to retrieve all events
+    CheckLogReadOut(apSuite, logMgmt, 0, 6, &pathsWithWildcard[1]);
+
+    paths[0].mpNext = &paths[1];
+    // first path is not wildcard, second path is wildcard path at default, expect to retrieve all events
+    CheckLogReadOut(apSuite, logMgmt, 0, 6, pathsWithWildcard);
 }
 
 static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apContext)
