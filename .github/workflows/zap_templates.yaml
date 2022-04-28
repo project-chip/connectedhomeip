@@ -29,40 +29,24 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-zap:0.5.64
+            image: connectedhomeip/chip-build-zap:0.5.65
         defaults:
             run:
                 shell: sh
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: actions/checkout@v3 #Wandalen/wretry.action@v1.0.11
               name: Checkout
               with:
-                  action: actions/checkout@v3
                   with: |
                       token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Setup ZAP
-              timeout-minutes: 10
               run: |
-                  cd third_party/zap/repo/
-                  npm ci
-                  npm run version-stamp
-                  npm rebuild canvas --update-binary
-                  npm run build-spa
+                  # mkdir ./third_party/zap
+                  # mkdir ./third_party/zap/repo
+                  rm -R ./third_party/zap/repo/
+                  mv /opt/zap ./third_party/zap/repo/
             - name: Generate all
-              timeout-minutes: 30
               run: scripts/tools/zap_regen_all.py
-            - name: Check for uncommited changes
-              run: |
-                  git add .
-                  # Show the full diff
-                  git diff-index -p HEAD --
-                  # Also show just the files that are different, to make it easy
-                  # to tell at a glance what might be going on.  And throw in
-                  # --exit-code to make this job fail if there is a difference.
-                  git diff-index --exit-code HEAD --
+
