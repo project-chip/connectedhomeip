@@ -39456,7 +39456,7 @@ private:
 class TestEventsSuite : public TestCommand
 {
 public:
-    TestEventsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestEvents", 7, credsIssuerConfig)
+    TestEventsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestEvents", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -39566,6 +39566,55 @@ private:
                 break;
             }
             break;
+        case 7:
+            switch (mTestSubStepIndex)
+            {
+            case 0:
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+                {
+                    chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                    VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 1));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 2));
+                    VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
+                }
+                mTestSubStepIndex++;
+                break;
+            case 1:
+                VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+                {
+                    chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                    VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                    VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 3));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 4));
+                    VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, false));
+                }
+                mTestSubStepIndex++;
+                break;
+            default:
+                LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+                break;
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("value", value.value, eventNumber + 2));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 4));
+                VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 5));
+                VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
+            }
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -39628,6 +39677,24 @@ private:
             return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
 
             );
+        }
+        case 7: {
+            LogStep(7, "Subscribe to the event");
+            mTestSubStepCount = 2;
+            return SubscribeEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, 3, 5, false);
+        }
+        case 8: {
+            LogStep(8, "Generate a third event on the accessory");
+            chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
+            value.arg1 = 4;
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(5);
+            value.arg3 = true;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
+                               value);
+        }
+        case 9: {
+            LogStep(9, "Check for event report");
+            return WaitForReport();
         }
         }
         return CHIP_NO_ERROR;
