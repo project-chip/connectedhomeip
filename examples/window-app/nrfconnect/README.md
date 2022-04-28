@@ -190,8 +190,8 @@ switched off LED with brightness level 0 indicates a fully opened shutter
 
 -   _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
     Releasing the button within the 6-second window cancels the factory reset
-    procedure. **LED 1** and **LED 4** blink in unison when the factory reset procedure is
-    initiated.
+    procedure. **LED 1** and **LED 4** blink in unison when the factory reset
+    procedure is initiated.
 
 -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
     process. This feature is disabled by default, but can be enabled by
