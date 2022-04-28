@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -28,11 +29,13 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <map>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PowerSourceConfiguration::Attributes;
+using namespace chip::app::Clusters::PowerSource;
 
 namespace {
 
@@ -60,9 +63,16 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
     {
     case Sources::Id:
         err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+            std::multimap<uint8_t, uint16_t> orderEpMap;
+            uint8_t order;
             for (auto endpoint : EnabledEndpointsWithServerCluster(PowerSource::Id))
             {
-                ReturnErrorOnFailure(encoder.Encode(endpoint));
+                PowerSource::Attributes::Order::Get(endpoint, &order);
+                orderEpMap.insert(std::pair<uint8_t, uint16_t>(order, endpoint));
+            }
+            for (auto orderPair : orderEpMap)
+            {
+                ReturnErrorOnFailure(encoder.Encode(orderPair.second));
             }
             return CHIP_NO_ERROR;
         });
