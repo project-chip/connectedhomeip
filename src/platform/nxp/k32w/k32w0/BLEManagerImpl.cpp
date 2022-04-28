@@ -786,8 +786,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint16_t discriminator;
     uint16_t advInterval                                  = 0;
     gapAdvertisingData_t adv                              = { 0 };
-    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { 0 };
-    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { 0 };
+    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { { 0 } };
+    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { { 0 } };
     uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN]            = { 0 };
     gapScanResponseData_t scanRsp                         = { 0 };
     gapAdvertisingParameters_t adv_params                 = { 0 };
