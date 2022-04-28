@@ -653,6 +653,10 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
             // Dynamic endpoints are external and don't factor into storage size
             if (!isDynamicEndpoint)
             {
+                if (emAfEndpoints[ep].endpointType == nullptr)
+                {
+                    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+                }
                 attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
             }
         }
