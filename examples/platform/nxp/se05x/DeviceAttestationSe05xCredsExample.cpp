@@ -33,7 +33,7 @@
 #define DEV_ATTESTATION_KEY_ID 0xDADADADA
 #define DEV_ATTESTATION_CERT_ID 0xDADADADB
 
-extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t* buf, size_t *buflen);
+extern CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
 namespace chip {
 namespace Credentials {

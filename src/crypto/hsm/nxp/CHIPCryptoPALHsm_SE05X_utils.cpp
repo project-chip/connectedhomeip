@@ -190,11 +190,11 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t* buf, size_t *buflen)
+CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 {
     sss_object_t keyObject = { 0 };
-    sss_status_t status = kStatus_SSS_Fail;
-    size_t certBitLen = 0;
+    sss_status_t status    = kStatus_SSS_Fail;
+    size_t certBitLen      = 0;
 
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(buflen != nullptr, CHIP_ERROR_INTERNAL);
