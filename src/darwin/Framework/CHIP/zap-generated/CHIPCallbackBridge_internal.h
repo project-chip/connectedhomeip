@@ -643,6 +643,7 @@ typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
     void *,
     const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> &);
 <<<<<<< HEAD
+<<<<<<< HEAD
 typedef void (*ApplicationLauncherGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
@@ -725,10 +726,18 @@ typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
 typedef void (*BinaryInputBasicStatusFlagsAttributeCallback)(void *,
                                                              chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8>);
 >>>>>>> Changes for cleaner regen
+=======
+typedef void (*BarrierControlBarrierSafetyStatusAttributeCallback)(void *, uint16_t);
+typedef void (*BarrierControlBarrierCapabilitiesAttributeCallback)(void *, uint8_t);
+typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
+    void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
+typedef void (*BinaryInputBasicStatusFlagsAttributeCallback)(void *, uint8_t);
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 typedef void (*ChannelLineupStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType> &);
 typedef void (*ChannelCurrentChannelStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &);
+<<<<<<< HEAD
 <<<<<<< HEAD
 typedef void (*ChannelGeneratedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -1093,13 +1102,27 @@ typedef void (*FanControlRockSettingAttributeCallback)(void *, chip::BitFlags<ch
 typedef void (*FanControlWindSupportAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>);
 typedef void (*FanControlWindSettingAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8>);
 typedef void (*FanControlFeatureMapAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::FanControl::bitmap32>);
+=======
+typedef void (*ColorControlColorControlOptionsAttributeCallback)(void *, uint8_t);
+typedef void (*ColorControlColorCapabilitiesAttributeCallback)(void *, uint16_t);
+typedef void (*ContentLauncherSupportedStreamingProtocolsAttributeCallback)(void *, uint32_t);
+typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(void *, uint16_t);
+typedef void (*ElectricalMeasurementMeasurementTypeAttributeCallback)(void *, uint32_t);
+typedef void (*EthernetNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*FanControlRockSupportAttributeCallback)(void *, uint8_t);
+typedef void (*FanControlRockSettingAttributeCallback)(void *, uint8_t);
+typedef void (*FanControlWindSupportAttributeCallback)(void *, uint8_t);
+typedef void (*FanControlWindSettingAttributeCallback)(void *, uint8_t);
+typedef void (*FanControlFeatureMapAttributeCallback)(void *, uint32_t);
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 typedef void (*GeneralCommissioningBasicCommissioningInfoStructAttributeCallback)(
     void *, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &);
-typedef void (*GroupsNameSupportAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::Groups::bitmap8>);
-typedef void (*LevelControlOptionsAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8>);
-typedef void (*LevelControlFeatureMapAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32>);
+typedef void (*GroupsNameSupportAttributeCallback)(void *, uint8_t);
+typedef void (*LevelControlOptionsAttributeCallback)(void *, uint8_t);
+typedef void (*LevelControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*MediaPlaybackSampledPositionStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &);
+<<<<<<< HEAD
 typedef void (*ModeSelectFeatureMapAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32>);
 typedef void (*NetworkCommissioningFeatureMapAttributeCallback)(
     void *, chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32>);
@@ -1255,6 +1278,41 @@ typedef void (*WindowCoveringAttributeListListAttributeCallback)(
 typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16>);
 typedef void (*WindowCoveringFeatureMapAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32>);
 >>>>>>> Changes for cleaner regen
+=======
+typedef void (*ModeSelectFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*NetworkCommissioningFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*OccupancySensingOccupancyAttributeCallback)(void *, uint8_t);
+typedef void (*OccupancySensingOccupancySensorTypeBitmapAttributeCallback)(void *, uint8_t);
+typedef void (*OnOffFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*PowerSourceFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*PumpConfigurationAndControlPumpStatusAttributeCallback)(void *, uint16_t);
+typedef void (*PumpConfigurationAndControlAlarmMaskAttributeCallback)(void *, uint16_t);
+typedef void (*PumpConfigurationAndControlFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*ScenesNameSupportAttributeCallback)(void *, uint8_t);
+typedef void (*SoftwareDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*SwitchFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*TestClusterBitmap8AttributeCallback)(void *, uint8_t);
+typedef void (*TestClusterBitmap16AttributeCallback)(void *, uint16_t);
+typedef void (*TestClusterBitmap32AttributeCallback)(void *, uint32_t);
+typedef void (*TestClusterBitmap64AttributeCallback)(void *, uint64_t);
+typedef void (*TestClusterStructAttrStructAttributeCallback)(
+    void *, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType &);
+typedef void (*TestClusterNullableBitmap8AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint8_t> &);
+typedef void (*TestClusterNullableBitmap16AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint16_t> &);
+typedef void (*TestClusterNullableBitmap32AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint32_t> &);
+typedef void (*TestClusterNullableBitmap64AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint64_t> &);
+typedef void (*TestClusterNullableStructStructAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &);
+typedef void (*ThermostatFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*ThreadNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*UnitLocalizationFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*WiFiNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
+typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *, uint8_t);
+typedef void (*WindowCoveringOperationalStatusAttributeCallback)(void *, uint8_t);
+typedef void (*WindowCoveringModeAttributeCallback)(void *, uint8_t);
+typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *, uint16_t);
+typedef void (*WindowCoveringFeatureMapAttributeCallback)(void *, uint32_t);
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 
 class CHIPDefaultSuccessCallbackBridge : public CHIPCallbackBridge<DefaultSuccessCallback>
 {
@@ -2703,7 +2761,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BarrierControlBarrierSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPBarrierControlBarrierSafetyStatusAttributeCallbackSubscriptionBridge
@@ -2731,7 +2789,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BarrierControlBarrierCapabilitiesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPBarrierControlBarrierCapabilitiesAttributeCallbackSubscriptionBridge
@@ -2956,7 +3014,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<BinaryInputBasicStatusFlagsAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPBinaryInputBasicStatusFlagsAttributeCallbackSubscriptionBridge
@@ -3666,7 +3724,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlColorControlOptionsAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlColorControlOptionsAttributeCallbackSubscriptionBridge
@@ -3694,7 +3752,7 @@ public:
                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlColorCapabilitiesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPColorControlColorCapabilitiesAttributeCallbackSubscriptionBridge
@@ -3835,7 +3893,7 @@ public:
         CHIPCallbackBridge<ContentLauncherSupportedStreamingProtocolsAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackSubscriptionBridge
@@ -4253,7 +4311,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge
@@ -4367,7 +4425,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ElectricalMeasurementMeasurementTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPElectricalMeasurementMeasurementTypeAttributeCallbackSubscriptionBridge
@@ -4568,7 +4626,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<EthernetNetworkDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
@@ -4595,7 +4653,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<FanControlRockSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPFanControlRockSupportAttributeCallbackSubscriptionBridge : public CHIPFanControlRockSupportAttributeCallbackBridge
@@ -4621,7 +4679,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<FanControlRockSettingAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPFanControlRockSettingAttributeCallbackSubscriptionBridge : public CHIPFanControlRockSettingAttributeCallbackBridge
@@ -4647,7 +4705,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<FanControlWindSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPFanControlWindSupportAttributeCallbackSubscriptionBridge : public CHIPFanControlWindSupportAttributeCallbackBridge
@@ -4673,7 +4731,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<FanControlWindSettingAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPFanControlWindSettingAttributeCallbackSubscriptionBridge : public CHIPFanControlWindSettingAttributeCallbackBridge
@@ -5068,7 +5126,7 @@ public:
                                                     bool keepAlive = false) :
         CHIPCallbackBridge<FanControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPFanControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPFanControlFeatureMapAttributeCallbackBridge
@@ -5760,7 +5818,7 @@ public:
                                                  bool keepAlive = false) :
         CHIPCallbackBridge<GroupsNameSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::Groups::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGroupsNameSupportAttributeCallbackSubscriptionBridge : public CHIPGroupsNameSupportAttributeCallbackBridge
@@ -6121,7 +6179,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<LevelControlOptionsAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPLevelControlOptionsAttributeCallbackSubscriptionBridge : public CHIPLevelControlOptionsAttributeCallbackBridge
@@ -6231,7 +6289,7 @@ public:
                                                       bool keepAlive = false) :
         CHIPCallbackBridge<LevelControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPLevelControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPLevelControlFeatureMapAttributeCallbackBridge
@@ -6850,7 +6908,7 @@ public:
                                                     bool keepAlive = false) :
         CHIPCallbackBridge<ModeSelectFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPModeSelectFeatureMapAttributeCallbackSubscriptionBridge : public CHIPModeSelectFeatureMapAttributeCallbackBridge
@@ -6999,7 +7057,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NetworkCommissioningFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPNetworkCommissioningFeatureMapAttributeCallbackSubscriptionBridge
@@ -7173,7 +7231,7 @@ public:
                                                          bool keepAlive = false) :
         CHIPCallbackBridge<OccupancySensingOccupancyAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOccupancySensingOccupancyAttributeCallbackSubscriptionBridge : public CHIPOccupancySensingOccupancyAttributeCallbackBridge
@@ -7201,7 +7259,7 @@ public:
         CHIPCallbackBridge<OccupancySensingOccupancySensorTypeBitmapAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBridge
@@ -7396,7 +7454,7 @@ public:
                                                bool keepAlive = false) :
         CHIPCallbackBridge<OnOffFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::OnOff::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPOnOffFeatureMapAttributeCallbackSubscriptionBridge : public CHIPOnOffFeatureMapAttributeCallbackBridge
@@ -7854,7 +7912,7 @@ public:
                                                      bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPPowerSourceFeatureMapAttributeCallbackSubscriptionBridge : public CHIPPowerSourceFeatureMapAttributeCallbackBridge
@@ -8083,7 +8141,7 @@ public:
         CHIPCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
@@ -8111,7 +8169,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PumpConfigurationAndControlAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackSubscriptionBridge
@@ -8227,7 +8285,7 @@ public:
         CHIPCallbackBridge<PumpConfigurationAndControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackSubscriptionBridge
@@ -8341,7 +8399,7 @@ public:
                                                  bool keepAlive = false) :
         CHIPCallbackBridge<ScenesNameSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::Scenes::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPScenesNameSupportAttributeCallbackSubscriptionBridge : public CHIPScenesNameSupportAttributeCallbackBridge
@@ -8567,7 +8625,7 @@ public:
                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<SoftwareDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
@@ -8676,7 +8734,7 @@ public:
                                                 bool keepAlive = false) :
         CHIPCallbackBridge<SwitchFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::Switch::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPSwitchFeatureMapAttributeCallbackSubscriptionBridge : public CHIPSwitchFeatureMapAttributeCallbackBridge
@@ -8905,7 +8963,7 @@ public:
                                                   bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap8AttributeCallbackBridge
@@ -8931,7 +8989,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap16AttributeCallbackBridge
@@ -8957,7 +9015,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap32AttributeCallbackBridge
@@ -8983,7 +9041,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value);
+    static void OnSuccessFn(void * context, uint64_t value);
 };
 
 class CHIPTestClusterBitmap64AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap64AttributeCallbackBridge
@@ -9212,9 +9270,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge
@@ -9242,9 +9298,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
 };
 
 class CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge
@@ -9272,9 +9326,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
 };
 
 class CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge
@@ -9302,9 +9354,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
 };
 
 class CHIPTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge
@@ -9529,7 +9579,7 @@ public:
                                                     bool keepAlive = false) :
         CHIPCallbackBridge<ThermostatFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPThermostatFeatureMapAttributeCallbackSubscriptionBridge : public CHIPThermostatFeatureMapAttributeCallbackBridge
@@ -9777,9 +9827,7 @@ public:
         CHIPCallbackBridge<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge
@@ -9894,7 +9942,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ThreadNetworkDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
@@ -9923,9 +9971,7 @@ public:
         CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                               keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscriptionBridge
@@ -10125,7 +10171,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<UnitLocalizationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPUnitLocalizationFeatureMapAttributeCallbackSubscriptionBridge
@@ -10434,7 +10480,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<WiFiNetworkDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
@@ -10461,7 +10507,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
@@ -10489,7 +10535,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge
@@ -10516,7 +10562,7 @@ public:
                                                   bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge
@@ -10542,7 +10588,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16> value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge
@@ -10655,7 +10701,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32> value);
+    static void OnSuccessFn(void * context, uint32_t value);
 };
 
 class CHIPWindowCoveringFeatureMapAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringFeatureMapAttributeCallbackBridge
@@ -11446,7 +11492,7 @@ public:
         CHIPCallbackBridge<IdentifyClusterIdentifyEffectIdentifierAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge
@@ -11475,8 +11521,7 @@ public:
         CHIPCallbackBridge<NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge
@@ -11504,7 +11549,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IdentifyClusterIdentifyEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyEffectVariant value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge
@@ -11533,8 +11578,7 @@ public:
         CHIPCallbackBridge<NullableIdentifyClusterIdentifyEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge
@@ -11562,7 +11606,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IdentifyClusterIdentifyIdentifyTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyIdentifyType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge
@@ -11591,8 +11635,7 @@ public:
         CHIPCallbackBridge<NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge
@@ -11621,7 +11664,7 @@ public:
         CHIPCallbackBridge<OnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge
@@ -11650,9 +11693,7 @@ public:
         CHIPCallbackBridge<NullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge
@@ -11681,7 +11722,7 @@ public:
         CHIPCallbackBridge<OnOffClusterOnOffDyingLightEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge
@@ -11710,8 +11751,7 @@ public:
         CHIPCallbackBridge<NullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                               keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge
@@ -11739,7 +11779,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<OnOffClusterOnOffEffectIdentifierAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OnOff::OnOffEffectIdentifier value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge
@@ -11768,8 +11808,7 @@ public:
         CHIPCallbackBridge<NullableOnOffClusterOnOffEffectIdentifierAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge
@@ -11797,7 +11836,7 @@ public:
                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<OnOffClusterOnOffStartUpOnOffAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OnOff::OnOffStartUpOnOff value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge
@@ -11826,8 +11865,7 @@ public:
         CHIPCallbackBridge<NullableOnOffClusterOnOffStartUpOnOffAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge
@@ -11855,7 +11893,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<LevelControlClusterMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::LevelControl::MoveMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge
@@ -11883,8 +11921,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableLevelControlClusterMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge
@@ -11912,7 +11949,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<LevelControlClusterStepModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::LevelControl::StepMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPLevelControlClusterStepModeAttributeCallbackSubscriptionBridge
@@ -11940,8 +11977,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableLevelControlClusterStepModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge
@@ -11970,7 +12006,7 @@ public:
         CHIPCallbackBridge<ApplianceControlClusterApplianceStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceControl::ApplianceStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge
@@ -11999,8 +12035,7 @@ public:
         CHIPCallbackBridge<NullableApplianceControlClusterApplianceStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge
@@ -12029,7 +12064,7 @@ public:
         CHIPCallbackBridge<ApplianceControlClusterCommandIdentificationAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceControl::CommandIdentification value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge
@@ -12059,9 +12094,7 @@ public:
         CHIPCallbackBridge<NullableApplianceControlClusterCommandIdentificationAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge
@@ -12089,7 +12122,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ApplianceControlClusterWarningEventAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceControl::WarningEvent value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge
@@ -12118,8 +12151,7 @@ public:
         CHIPCallbackBridge<NullableApplianceControlClusterWarningEventAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge
@@ -12147,7 +12179,7 @@ public:
                                                             bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlClusterAuthModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::AuthMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
@@ -12175,8 +12207,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableAccessControlClusterAuthModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
@@ -12204,7 +12235,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlClusterChangeTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge
@@ -12233,8 +12264,7 @@ public:
         CHIPCallbackBridge<NullableAccessControlClusterChangeTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge
@@ -12262,7 +12292,7 @@ public:
                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlClusterPrivilegeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::Privilege value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge
@@ -12291,8 +12321,7 @@ public:
         CHIPCallbackBridge<NullableAccessControlClusterPrivilegeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge
@@ -12320,7 +12349,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedActionsClusterActionErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::ActionErrorEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
@@ -12349,8 +12378,7 @@ public:
         CHIPCallbackBridge<NullableBridgedActionsClusterActionErrorEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
@@ -12378,7 +12406,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedActionsClusterActionStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::ActionStateEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
@@ -12407,8 +12435,7 @@ public:
         CHIPCallbackBridge<NullableBridgedActionsClusterActionStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
@@ -12436,7 +12463,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<BridgedActionsClusterActionTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::ActionTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
@@ -12465,8 +12492,7 @@ public:
         CHIPCallbackBridge<NullableBridgedActionsClusterActionTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge
@@ -12495,7 +12521,7 @@ public:
         CHIPCallbackBridge<BridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::BridgedActions::EndpointListTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge
@@ -12524,9 +12550,7 @@ public:
         CHIPCallbackBridge<NullableBridgedActionsClusterEndpointListTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge
@@ -12556,7 +12580,7 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge
@@ -12587,9 +12611,7 @@ public:
         CHIPCallbackBridge<NullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, action,
                                                                                                           OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge
@@ -12618,7 +12640,7 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge
@@ -12649,9 +12671,7 @@ public:
         CHIPCallbackBridge<NullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, action,
                                                                                                          OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge
@@ -12680,7 +12700,7 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge
@@ -12711,9 +12731,7 @@ public:
         CHIPCallbackBridge<NullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, action,
                                                                                                     OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge
@@ -12744,7 +12762,7 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, action,
                                                                                                     OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge
@@ -12775,9 +12793,7 @@ public:
         CHIPCallbackBridge<NullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(
             queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge
@@ -12807,7 +12823,7 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge
@@ -12838,9 +12854,7 @@ public:
         CHIPCallbackBridge<NullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, action,
                                                                                                           OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge
@@ -12869,7 +12883,7 @@ public:
         CHIPCallbackBridge<OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge
@@ -12900,9 +12914,7 @@ public:
         CHIPCallbackBridge<NullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, action,
                                                                                                          OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge
@@ -12931,7 +12943,7 @@ public:
         CHIPCallbackBridge<TimeFormatLocalizationClusterCalendarTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge
@@ -12960,9 +12972,7 @@ public:
         CHIPCallbackBridge<NullableTimeFormatLocalizationClusterCalendarTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge
@@ -12991,7 +13001,7 @@ public:
         CHIPCallbackBridge<TimeFormatLocalizationClusterHourFormatAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge
@@ -13020,8 +13030,7 @@ public:
         CHIPCallbackBridge<NullableTimeFormatLocalizationClusterHourFormatAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge
@@ -13049,7 +13058,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::UnitLocalization::TempUnit value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
@@ -13078,8 +13087,7 @@ public:
         CHIPCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
@@ -13107,7 +13115,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterBatChargeFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeFaultType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge
@@ -13136,8 +13144,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterBatChargeFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge
@@ -13165,7 +13172,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterBatChargeLevelAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeLevel value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge
@@ -13194,8 +13201,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterBatChargeLevelAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge
@@ -13223,7 +13229,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterBatChargeStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeState value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge
@@ -13252,8 +13258,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterBatChargeStateAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge
@@ -13281,7 +13286,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterBatFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatFaultType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge
@@ -13310,8 +13315,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterBatFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge
@@ -13339,7 +13343,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterBatReplaceabilityAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatReplaceability value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge
@@ -13368,8 +13372,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterBatReplaceabilityAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge
@@ -13397,7 +13400,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterPowerSourceStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge
@@ -13426,8 +13429,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterPowerSourceStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge
@@ -13455,7 +13457,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterWiredCurrentTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::WiredCurrentType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge
@@ -13484,8 +13486,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterWiredCurrentTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge
@@ -13513,7 +13514,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceClusterWiredFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PowerSource::WiredFaultType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge
@@ -13542,8 +13543,7 @@ public:
         CHIPCallbackBridge<NullablePowerSourceClusterWiredFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge
@@ -13572,7 +13572,7 @@ public:
         CHIPCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge
@@ -13603,9 +13603,7 @@ public:
         CHIPCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, action,
                                                                                                    OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge
@@ -13634,7 +13632,7 @@ public:
         CHIPCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge
@@ -13665,9 +13663,7 @@ public:
         CHIPCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>(queue, handler, action,
                                                                                                        OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge
@@ -13698,7 +13694,7 @@ public:
         CHIPCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(queue, handler, action,
                                                                                                    OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge
@@ -13729,9 +13725,7 @@ public:
         CHIPCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(
             queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge
@@ -13759,7 +13753,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NetworkCommissioningClusterWiFiBandAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge
@@ -13788,8 +13782,7 @@ public:
         CHIPCallbackBridge<NullableNetworkCommissioningClusterWiFiBandAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge
@@ -13817,7 +13810,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DiagnosticLogsClusterLogsIntentAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DiagnosticLogs::LogsIntent value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge
@@ -13846,8 +13839,7 @@ public:
         CHIPCallbackBridge<NullableDiagnosticLogsClusterLogsIntentAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge
@@ -13875,7 +13867,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DiagnosticLogsClusterLogsStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DiagnosticLogs::LogsStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge
@@ -13904,8 +13896,7 @@ public:
         CHIPCallbackBridge<NullableDiagnosticLogsClusterLogsStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge
@@ -13934,7 +13925,7 @@ public:
         CHIPCallbackBridge<DiagnosticLogsClusterLogsTransferProtocolAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge
@@ -13963,9 +13954,7 @@ public:
         CHIPCallbackBridge<NullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge
@@ -13994,7 +13983,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsClusterBootReasonTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::BootReasonType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge
@@ -14023,8 +14012,7 @@ public:
         CHIPCallbackBridge<NullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge
@@ -14053,7 +14041,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge
@@ -14082,9 +14070,7 @@ public:
         CHIPCallbackBridge<NullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                 keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge
@@ -14113,7 +14099,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsClusterInterfaceTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge
@@ -14142,8 +14128,7 @@ public:
         CHIPCallbackBridge<NullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge
@@ -14172,7 +14157,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge
@@ -14201,9 +14186,7 @@ public:
         CHIPCallbackBridge<NullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge
@@ -14232,7 +14215,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsClusterRadioFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge
@@ -14261,8 +14244,7 @@ public:
         CHIPCallbackBridge<NullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge
@@ -14291,7 +14273,7 @@ public:
         CHIPCallbackBridge<ThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge
@@ -14320,9 +14302,7 @@ public:
         CHIPCallbackBridge<NullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge
@@ -14351,7 +14331,7 @@ public:
         CHIPCallbackBridge<ThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge
@@ -14380,9 +14360,7 @@ public:
         CHIPCallbackBridge<NullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                 keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge
@@ -14413,7 +14391,7 @@ public:
         CHIPCallbackBridge<ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>(queue, handler, action,
                                                                                                    OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge
@@ -14444,9 +14422,7 @@ public:
         CHIPCallbackBridge<NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>(
             queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge
@@ -14476,7 +14452,7 @@ public:
         CHIPCallbackBridge<WiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge
@@ -14507,9 +14483,7 @@ public:
         CHIPCallbackBridge<NullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback>(queue, handler, action,
                                                                                                           OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge
@@ -14538,7 +14512,7 @@ public:
         CHIPCallbackBridge<WiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge
@@ -14567,9 +14541,7 @@ public:
         CHIPCallbackBridge<NullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge
@@ -14598,7 +14570,7 @@ public:
         CHIPCallbackBridge<WiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge
@@ -14629,9 +14601,7 @@ public:
         CHIPCallbackBridge<NullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallback>(queue, handler, action,
                                                                                                        OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge
@@ -14660,7 +14630,7 @@ public:
         CHIPCallbackBridge<WiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge
@@ -14690,9 +14660,7 @@ public:
         CHIPCallbackBridge<NullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge
@@ -14721,7 +14689,7 @@ public:
         CHIPCallbackBridge<EthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge
@@ -14751,9 +14719,7 @@ public:
         CHIPCallbackBridge<NullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge
@@ -14784,7 +14750,7 @@ public:
         CHIPCallbackBridge<AdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>(queue, handler, action,
                                                                                                         OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge
@@ -14815,9 +14781,7 @@ public:
         CHIPCallbackBridge<NullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallback>(
             queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge
@@ -14846,7 +14810,7 @@ public:
         CHIPCallbackBridge<AdministratorCommissioningClusterStatusCodeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AdministratorCommissioning::StatusCode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge
@@ -14875,9 +14839,7 @@ public:
         CHIPCallbackBridge<NullableAdministratorCommissioningClusterStatusCodeAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge
@@ -14906,7 +14868,7 @@ public:
         CHIPCallbackBridge<OperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                 keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
@@ -14937,9 +14899,7 @@ public:
         CHIPCallbackBridge<NullableOperationalCredentialsClusterOperationalCertStatusAttributeCallback>(queue, handler, action,
                                                                                                         OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubscriptionBridge
@@ -14968,7 +14928,7 @@ public:
         CHIPCallbackBridge<GroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge
@@ -14999,9 +14959,7 @@ public:
         CHIPCallbackBridge<NullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback>(queue, handler, action,
                                                                                                      OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge
@@ -15028,7 +14986,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlAlarmCodeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlAlarmCode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge
@@ -15056,8 +15014,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlAlarmCodeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge
@@ -15085,7 +15042,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlCredentialRuleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlCredentialRule value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge
@@ -15114,8 +15071,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlCredentialRuleAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge
@@ -15143,7 +15099,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlCredentialTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlCredentialType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge
@@ -15172,8 +15128,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlCredentialTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge
@@ -15201,7 +15156,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlDataOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlDataOperationType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge
@@ -15230,8 +15185,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlDataOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge
@@ -15258,7 +15212,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlDoorStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlDoorState value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge
@@ -15286,8 +15240,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlDoorStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge
@@ -15315,7 +15268,7 @@ public:
                                                              CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlLockDataTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockDataType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge
@@ -15344,8 +15297,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlLockDataTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge
@@ -15373,7 +15325,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlLockOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockOperationType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge
@@ -15402,8 +15354,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlLockOperationTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge
@@ -15430,7 +15381,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlLockStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockState value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge
@@ -15458,8 +15409,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlLockStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge
@@ -15486,7 +15436,7 @@ public:
                                                          bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlLockTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge : public CHIPDoorLockClusterDlLockTypeAttributeCallbackBridge
@@ -15513,8 +15463,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlLockTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge
@@ -15542,7 +15491,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlOperatingModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge
@@ -15571,8 +15520,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlOperatingModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge
@@ -15600,7 +15548,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlOperationErrorAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlOperationError value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge
@@ -15629,8 +15577,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlOperationErrorAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge
@@ -15658,7 +15605,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlOperationSourceAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlOperationSource value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge
@@ -15687,8 +15634,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDlOperationSourceAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge
@@ -15715,7 +15661,7 @@ public:
                                                        bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge : public CHIPDoorLockClusterDlStatusAttributeCallbackBridge
@@ -15742,7 +15688,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge
@@ -15770,7 +15716,7 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlUserStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge
@@ -15798,8 +15744,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge
@@ -15826,7 +15771,7 @@ public:
                                                          bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDlUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlUserType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge : public CHIPDoorLockClusterDlUserTypeAttributeCallbackBridge
@@ -15853,8 +15798,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableDoorLockClusterDlUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge
@@ -15883,7 +15827,7 @@ public:
         CHIPCallbackBridge<DoorLockClusterDoorLockOperationEventCodeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockOperationEventCode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge
@@ -15912,9 +15856,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDoorLockOperationEventCodeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockOperationEventCode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge
@@ -15943,7 +15885,7 @@ public:
         CHIPCallbackBridge<DoorLockClusterDoorLockProgrammingEventCodeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge
@@ -15972,9 +15914,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge
@@ -16003,7 +15943,7 @@ public:
         CHIPCallbackBridge<DoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge
@@ -16032,8 +15972,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge
@@ -16061,7 +16000,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDoorLockUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockUserStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge
@@ -16090,8 +16029,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDoorLockUserStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge
@@ -16119,7 +16057,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockClusterDoorLockUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockUserType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge
@@ -16148,8 +16086,7 @@ public:
         CHIPCallbackBridge<NullableDoorLockClusterDoorLockUserTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge
@@ -16177,7 +16114,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringClusterEndProductTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::EndProductType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge
@@ -16206,8 +16143,7 @@ public:
         CHIPCallbackBridge<NullableWindowCoveringClusterEndProductTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge
@@ -16234,7 +16170,7 @@ public:
                                                          bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringClusterTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::Type value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringClusterTypeAttributeCallbackBridge
@@ -16261,8 +16197,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableWindowCoveringClusterTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge
@@ -16291,7 +16226,7 @@ public:
         CHIPCallbackBridge<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge
@@ -16322,9 +16257,7 @@ public:
         CHIPCallbackBridge<NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback>(queue, handler, action,
                                                                                                        OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge
@@ -16353,7 +16286,7 @@ public:
         CHIPCallbackBridge<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge
@@ -16384,9 +16317,7 @@ public:
         CHIPCallbackBridge<NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>(queue, handler, action,
                                                                                                          OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge
@@ -16414,7 +16345,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ThermostatClusterSetpointAdjustModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::SetpointAdjustMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge
@@ -16443,8 +16374,7 @@ public:
         CHIPCallbackBridge<NullableThermostatClusterSetpointAdjustModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge
@@ -16473,7 +16403,7 @@ public:
         CHIPCallbackBridge<ThermostatClusterThermostatControlSequenceAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatControlSequence value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge
@@ -16502,9 +16432,7 @@ public:
         CHIPCallbackBridge<NullableThermostatClusterThermostatControlSequenceAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                 keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionBridge
@@ -16533,7 +16461,7 @@ public:
         CHIPCallbackBridge<ThermostatClusterThermostatRunningModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatRunningMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge
@@ -16562,8 +16490,7 @@ public:
         CHIPCallbackBridge<NullableThermostatClusterThermostatRunningModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridge
@@ -16592,7 +16519,7 @@ public:
         CHIPCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
@@ -16621,8 +16548,7 @@ public:
         CHIPCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
@@ -16650,7 +16576,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<FanControlClusterFanModeSequenceTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanModeSequenceType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge
@@ -16679,8 +16605,7 @@ public:
         CHIPCallbackBridge<NullableFanControlClusterFanModeSequenceTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge
@@ -16708,7 +16633,7 @@ public:
                                                             bool keepAlive = false) :
         CHIPCallbackBridge<FanControlClusterFanModeTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanModeType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge
@@ -16736,8 +16661,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableFanControlClusterFanModeTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge
@@ -16765,7 +16689,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlClusterColorLoopActionAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::ColorLoopAction value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge
@@ -16794,8 +16718,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterColorLoopActionAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge
@@ -16824,7 +16747,7 @@ public:
         CHIPCallbackBridge<ColorControlClusterColorLoopDirectionAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::ColorLoopDirection value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge
@@ -16853,8 +16776,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterColorLoopDirectionAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopDirection> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge
@@ -16882,7 +16804,7 @@ public:
                                                             bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlClusterColorModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::ColorMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterColorModeAttributeCallbackSubscriptionBridge
@@ -16910,8 +16832,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableColorControlClusterColorModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge
@@ -16939,7 +16860,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlClusterHueDirectionAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueDirection value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge
@@ -16968,8 +16889,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterHueDirectionAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge
@@ -16997,7 +16917,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlClusterHueMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueMoveMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge
@@ -17026,8 +16946,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterHueMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueMoveMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge
@@ -17055,7 +16974,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ColorControlClusterHueStepModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueStepMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge
@@ -17084,8 +17003,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterHueStepModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueStepMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge
@@ -17114,7 +17032,7 @@ public:
         CHIPCallbackBridge<ColorControlClusterSaturationMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::SaturationMoveMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge
@@ -17143,8 +17061,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterSaturationMoveModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationMoveMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge
@@ -17173,7 +17090,7 @@ public:
         CHIPCallbackBridge<ColorControlClusterSaturationStepModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::SaturationStepMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge
@@ -17202,8 +17119,7 @@ public:
         CHIPCallbackBridge<NullableColorControlClusterSaturationStepModeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge
@@ -17232,7 +17148,7 @@ public:
         CHIPCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorType value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge
@@ -17262,9 +17178,7 @@ public:
         CHIPCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge
@@ -17292,7 +17206,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IasZoneClusterIasEnrollResponseCodeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasZone::IasEnrollResponseCode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge
@@ -17321,8 +17235,7 @@ public:
         CHIPCallbackBridge<NullableIasZoneClusterIasEnrollResponseCodeAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasEnrollResponseCode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge
@@ -17349,7 +17262,7 @@ public:
                                                          bool keepAlive = false) :
         CHIPCallbackBridge<IasZoneClusterIasZoneTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasZone::IasZoneType value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge : public CHIPIasZoneClusterIasZoneTypeAttributeCallbackBridge
@@ -17376,8 +17289,7 @@ public:
                                                                  CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableIasZoneClusterIasZoneTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasZoneType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
 };
 
 class CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge
@@ -17405,7 +17317,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IasAceClusterIasAceAlarmStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasAceAlarmStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge
@@ -17434,8 +17346,7 @@ public:
         CHIPCallbackBridge<NullableIasAceClusterIasAceAlarmStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAlarmStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge
@@ -17462,7 +17373,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<IasAceClusterIasAceArmModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasAceArmMode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge
@@ -17490,8 +17401,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableIasAceClusterIasAceArmModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmMode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge
@@ -17519,7 +17429,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IasAceClusterIasAceArmNotificationAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasAceArmNotification value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge
@@ -17548,8 +17458,7 @@ public:
         CHIPCallbackBridge<NullableIasAceClusterIasAceArmNotificationAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmNotification> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge
@@ -17578,7 +17487,7 @@ public:
         CHIPCallbackBridge<IasAceClusterIasAceAudibleNotificationAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasAceAudibleNotification value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge
@@ -17607,8 +17516,7 @@ public:
         CHIPCallbackBridge<NullableIasAceClusterIasAceAudibleNotificationAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAudibleNotification> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge
@@ -17636,7 +17544,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IasAceClusterIasAceBypassResultAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasAceBypassResult value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge
@@ -17665,8 +17573,7 @@ public:
         CHIPCallbackBridge<NullableIasAceClusterIasAceBypassResultAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceBypassResult> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge
@@ -17694,7 +17601,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<IasAceClusterIasAcePanelStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasAcePanelStatus value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge
@@ -17723,8 +17630,7 @@ public:
         CHIPCallbackBridge<NullableIasAceClusterIasAcePanelStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAcePanelStatus> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge
@@ -17751,7 +17657,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<IasAceClusterIasZoneTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IasAce::IasZoneType value);
+    static void OnSuccessFn(void * context, uint16_t value);
 };
 
 class CHIPIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge : public CHIPIasAceClusterIasZoneTypeAttributeCallbackBridge
@@ -17778,7 +17684,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableIasAceClusterIasZoneTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasZoneType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
 };
 
 class CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge
@@ -17806,7 +17712,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ChannelClusterChannelStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Channel::ChannelStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge
@@ -17835,8 +17741,7 @@ public:
         CHIPCallbackBridge<NullableChannelClusterChannelStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge
@@ -17864,7 +17769,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ChannelClusterLineupInfoTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Channel::LineupInfoTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge
@@ -17893,8 +17798,7 @@ public:
         CHIPCallbackBridge<NullableChannelClusterLineupInfoTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge
@@ -17923,7 +17827,7 @@ public:
         CHIPCallbackBridge<TargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge
@@ -17954,9 +17858,7 @@ public:
         CHIPCallbackBridge<NullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                      OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscriptionBridge
@@ -17985,7 +17887,7 @@ public:
         CHIPCallbackBridge<MediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge
@@ -18014,9 +17916,7 @@ public:
         CHIPCallbackBridge<NullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptionBridge
@@ -18045,7 +17945,7 @@ public:
         CHIPCallbackBridge<MediaPlaybackClusterPlaybackStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge
@@ -18074,8 +17974,7 @@ public:
         CHIPCallbackBridge<NullableMediaPlaybackClusterPlaybackStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge
@@ -18103,7 +18002,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<MediaInputClusterInputTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::MediaInput::InputTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge
@@ -18132,8 +18031,7 @@ public:
         CHIPCallbackBridge<NullableMediaInputClusterInputTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge
@@ -18161,7 +18059,7 @@ public:
                                                             bool keepAlive = false) :
         CHIPCallbackBridge<KeypadInputClusterCecKeyCodeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::KeypadInput::CecKeyCode value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge
@@ -18189,8 +18087,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableKeypadInputClusterCecKeyCodeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge
@@ -18219,7 +18116,7 @@ public:
         CHIPCallbackBridge<KeypadInputClusterKeypadInputStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge
@@ -18248,8 +18145,7 @@ public:
         CHIPCallbackBridge<NullableKeypadInputClusterKeypadInputStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBridge
@@ -18278,7 +18174,7 @@ public:
         CHIPCallbackBridge<ContentLauncherClusterContentLaunchStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge
@@ -18309,9 +18205,7 @@ public:
         CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                    OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscriptionBridge
@@ -18339,7 +18233,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherClusterMetricTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::MetricTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge
@@ -18368,8 +18262,7 @@ public:
         CHIPCallbackBridge<NullableContentLauncherClusterMetricTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge
@@ -18397,7 +18290,7 @@ public:
                                                                    CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherClusterParameterEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge
@@ -18426,8 +18319,7 @@ public:
         CHIPCallbackBridge<NullableContentLauncherClusterParameterEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge
@@ -18455,7 +18347,7 @@ public:
                                                                 CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<AudioOutputClusterOutputTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AudioOutput::OutputTypeEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge
@@ -18484,8 +18376,7 @@ public:
         CHIPCallbackBridge<NullableAudioOutputClusterOutputTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge
@@ -18516,7 +18407,7 @@ public:
         CHIPCallbackBridge<ApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                      OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge
@@ -18547,9 +18438,7 @@ public:
         CHIPCallbackBridge<NullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback>(
             queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge
@@ -18578,7 +18467,7 @@ public:
         CHIPCallbackBridge<ApplicationBasicClusterApplicationStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge
@@ -18608,9 +18497,7 @@ public:
         CHIPCallbackBridge<NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge
@@ -18638,7 +18525,7 @@ public:
                                                             bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TestCluster::SimpleEnum value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
@@ -18666,8 +18553,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableTestClusterClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
@@ -18694,7 +18580,7 @@ public:
                                                        bool keepAlive = false) :
         CHIPCallbackBridge<MessagingClusterEventIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::EventId value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMessagingClusterEventIdAttributeCallbackSubscriptionBridge : public CHIPMessagingClusterEventIdAttributeCallbackBridge
@@ -18721,7 +18607,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<NullableMessagingClusterEventIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::EventId> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMessagingClusterEventIdAttributeCallbackSubscriptionBridge
@@ -18750,7 +18636,7 @@ public:
         CHIPCallbackBridge<MessagingClusterMessagingControlConfirmationAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlConfirmation value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge
@@ -18780,9 +18666,7 @@ public:
         CHIPCallbackBridge<NullableMessagingClusterMessagingControlConfirmationAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlConfirmation> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge
@@ -18812,7 +18696,7 @@ public:
         CHIPCallbackBridge<MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge
@@ -18843,9 +18727,7 @@ public:
         CHIPCallbackBridge<NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>(queue, handler, action,
                                                                                                           OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge
@@ -18874,7 +18756,7 @@ public:
         CHIPCallbackBridge<MessagingClusterMessagingControlImportanceAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlImportance value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge
@@ -18903,9 +18785,7 @@ public:
         CHIPCallbackBridge<NullableMessagingClusterMessagingControlImportanceAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                 keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlImportance> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge
@@ -18934,7 +18814,7 @@ public:
         CHIPCallbackBridge<MessagingClusterMessagingControlTransmissionAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlTransmission value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge
@@ -18964,9 +18844,7 @@ public:
         CHIPCallbackBridge<NullableMessagingClusterMessagingControlTransmissionAttributeCallback>(queue, handler, action,
                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlTransmission> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge
@@ -18995,7 +18873,7 @@ public:
         CHIPCallbackBridge<ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification value);
+    static void OnSuccessFn(void * context, uint8_t value);
 };
 
 class CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge
@@ -19026,9 +18904,7 @@ public:
         CHIPCallbackBridge<NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>(queue, handler, action,
                                                                                                        OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge

@@ -6129,8 +6129,7 @@ CHIPDoorLockLockStateAttributeCallback::~CHIPDoorLockLockStateAttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPDoorLockLockStateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
+void CHIPDoorLockLockStateAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6194,8 +6193,7 @@ CHIPDoorLockDoorStateAttributeCallback::~CHIPDoorLockDoorStateAttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6685,8 +6683,8 @@ CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::~CHIPEthernetNetworkDiag
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value)
+void CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback::CallbackFn(void * context,
+                                                                        const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9901,8 +9899,8 @@ CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::~CHIPIlluminanceMeas
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::enum8> & value)
+void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void * context,
+                                                                            const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12146,8 +12144,8 @@ CHIPModeSelectStandardNamespaceAttributeCallback::~CHIPModeSelectStandardNamespa
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPModeSelectStandardNamespaceAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::enum16> & value)
+void CHIPModeSelectStandardNamespaceAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12749,8 +12747,7 @@ CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback::~CHIPNetworkCommi
 }
 
 void CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback::CallbackFn(
-    void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13621,8 +13618,7 @@ CHIPOnOffStartUpOnOffAttributeCallback::~CHIPOnOffStartUpOnOffAttributeCallback(
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOnOffStartUpOnOffAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+void CHIPOnOffStartUpOnOffAttributeCallback::CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20254,8 +20250,8 @@ CHIPTestClusterNullableBitmap8AttributeCallback::~CHIPTestClusterNullableBitmap8
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap8AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+void CHIPTestClusterNullableBitmap8AttributeCallback::CallbackFn(void * context,
+                                                                 const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20321,8 +20317,8 @@ CHIPTestClusterNullableBitmap16AttributeCallback::~CHIPTestClusterNullableBitmap
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap16AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+void CHIPTestClusterNullableBitmap16AttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20388,8 +20384,8 @@ CHIPTestClusterNullableBitmap32AttributeCallback::~CHIPTestClusterNullableBitmap
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap32AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+void CHIPTestClusterNullableBitmap32AttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20455,8 +20451,8 @@ CHIPTestClusterNullableBitmap64AttributeCallback::~CHIPTestClusterNullableBitmap
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap64AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+void CHIPTestClusterNullableBitmap64AttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::Nullable<uint64_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21587,8 +21583,8 @@ CHIPTestClusterNullableEnum8AttributeCallback::~CHIPTestClusterNullableEnum8Attr
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableEnum8AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8> & value)
+void CHIPTestClusterNullableEnum8AttributeCallback::CallbackFn(void * context,
+                                                               const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21654,8 +21650,8 @@ CHIPTestClusterNullableEnum16AttributeCallback::~CHIPTestClusterNullableEnum16At
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableEnum16AttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16> & value)
+void CHIPTestClusterNullableEnum16AttributeCallback::CallbackFn(void * context,
+                                                                const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21986,8 +21982,8 @@ CHIPTestClusterNullableEnumAttrAttributeCallback::~CHIPTestClusterNullableEnumAt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableEnumAttrAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+void CHIPTestClusterNullableEnumAttrAttributeCallback::CallbackFn(void * context,
+                                                                  const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -23414,7 +23410,7 @@ CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::
 }
 
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -23701,7 +23697,7 @@ CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::
 }
 
 void CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & list)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24492,8 +24488,8 @@ CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback::~CHIPWiFiNetworkDiagnos
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value)
+void CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback::CallbackFn(void * context,
+                                                                         const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24559,8 +24555,8 @@ CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback::~CHIPWiFiNetworkDiagnost
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value)
+void CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback::CallbackFn(void * context,
+                                                                        const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -1764,8 +1764,7 @@ void CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap16> value)
+void CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -1788,8 +1787,7 @@ void CHIPBarrierControlBarrierSafetyStatusAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::BarrierControl::bitmap8> value)
+void CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -2072,8 +2070,7 @@ void CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::BinaryInputBasic::bitmap8> value)
+void CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3125,8 +3122,7 @@ void CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void CHIPColorControlColorControlOptionsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8> value)
+void CHIPColorControlColorControlOptionsAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -3149,8 +3145,7 @@ void CHIPColorControlColorControlOptionsAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPColorControlColorCapabilitiesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::ColorControl::bitmap16> value)
+void CHIPColorControlColorCapabilitiesAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -3329,8 +3324,7 @@ void CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32> value)
+void CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -3862,6 +3856,7 @@ void CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
+<<<<<<< HEAD
 void CHIPDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
@@ -3888,6 +3883,9 @@ void CHIPDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSu
 
 void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
+=======
+void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -4267,8 +4265,7 @@ void CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap32> value)
+void CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -4527,8 +4524,7 @@ void CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::EthernetNetworkDiagnostics::bitmap32> value)
+void CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -4551,8 +4547,7 @@ void CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value)
+void CHIPFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -4575,8 +4570,7 @@ void CHIPFanControlRockSupportAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void CHIPFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value)
+void CHIPFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -4599,8 +4593,7 @@ void CHIPFanControlRockSettingAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void CHIPFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value)
+void CHIPFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -4623,8 +4616,7 @@ void CHIPFanControlWindSupportAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void CHIPFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> value)
+void CHIPFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -4764,8 +4756,7 @@ void CHIPFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void CHIPFanControlFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::FanControl::bitmap32> value)
+void CHIPFanControlFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -5760,8 +5751,7 @@ void CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPGroupsNameSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::Groups::bitmap8> value)
+void CHIPGroupsNameSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -6253,8 +6243,7 @@ void CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void CHIPLevelControlOptionsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8> value)
+void CHIPLevelControlOptionsAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -6394,8 +6383,7 @@ void CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void CHIPLevelControlFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::LevelControl::bitmap32> value)
+void CHIPLevelControlFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -7169,8 +7157,7 @@ void CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void CHIPModeSelectFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::ModeSelect::bitmap32> value)
+void CHIPModeSelectFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -7314,6 +7301,7 @@ void CHIPNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscriptio
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 void CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -7423,6 +7411,9 @@ void CHIPOtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscr
 =======
 void CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitFlags<chip::app::Clusters::NetworkCommissioning::bitmap32> value)
+=======
+void CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -7648,8 +7639,7 @@ void CHIPOtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void CHIPOccupancySensingOccupancyAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8> value)
+void CHIPOccupancySensingOccupancyAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -7672,8 +7662,7 @@ void CHIPOccupancySensingOccupancyAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::OccupancySensing::bitmap8> value)
+void CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -7930,8 +7919,7 @@ void CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void CHIPOnOffFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::OnOff::bitmap32> value)
+void CHIPOnOffFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -8560,8 +8548,7 @@ void CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void CHIPPowerSourceFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::PowerSource::bitmap32> value)
+void CHIPPowerSourceFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -8781,8 +8768,12 @@ void CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
+<<<<<<< HEAD
 void CHIPPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+=======
+void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8883,8 +8874,7 @@ void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridg
     }
 }
 
-void CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap16> value)
+void CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9027,8 +9017,7 @@ void CHIPPumpConfigurationAndControlAttributeListListAttributeCallbackSubscripti
     }
 }
 
-void CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::bitmap32> value)
+void CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9171,8 +9160,7 @@ void CHIPRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscripti
     }
 }
 
-void CHIPScenesNameSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::Scenes::bitmap8> value)
+void CHIPScenesNameSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -9476,8 +9464,7 @@ void CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::SoftwareDiagnostics::bitmap32> value)
+void CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9617,8 +9604,7 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void CHIPSwitchFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::Switch::bitmap32> value)
+void CHIPSwitchFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9919,8 +9905,7 @@ void CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -9943,8 +9928,7 @@ void CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9967,8 +9951,7 @@ void CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9991,8 +9974,7 @@ void CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
@@ -10516,7 +10498,7 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10544,7 +10526,7 @@ void CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10572,7 +10554,7 @@ void CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10600,7 +10582,7 @@ void CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+    void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10899,8 +10881,7 @@ void CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void CHIPThermostatFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32> value)
+void CHIPThermostatFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -11248,7 +11229,7 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
 }
 
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11407,8 +11388,7 @@ void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::ThreadNetworkDiagnostics::bitmap32> value)
+void CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -11432,7 +11412,7 @@ void CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11590,11 +11570,15 @@ void CHIPTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBri
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 void CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 =======
 void CHIPUnitLocalizationFeatureMapAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitFlags<chip::app::Clusters::UnitLocalization::bitmap32> value)
+=======
+void CHIPUnitLocalizationFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -12132,8 +12116,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WiFiNetworkDiagnostics::bitmap32> value)
+void CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -12156,8 +12139,7 @@ void CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12180,8 +12162,7 @@ void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void CHIPWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap8> value)
+void CHIPWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12204,8 +12185,7 @@ void CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
+void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12228,8 +12208,7 @@ void CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void CHIPWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap16> value)
+void CHIPWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -12369,8 +12348,7 @@ void CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPWindowCoveringFeatureMapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::bitmap32> value)
+void CHIPWindowCoveringFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -14197,6 +14175,7 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+<<<<<<< HEAD
 void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
 {
@@ -14224,6 +14203,9 @@ void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
 
 void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value)
+=======
+void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
+>>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14247,7 +14229,7 @@ void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBri
 }
 
 void CHIPNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14275,8 +14257,7 @@ void CHIPNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscri
     }
 }
 
-void CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::IdentifyEffectVariant value)
+void CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14300,7 +14281,7 @@ void CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge
 }
 
 void CHIPNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14327,8 +14308,7 @@ void CHIPNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscripti
     }
 }
 
-void CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::IdentifyIdentifyType value)
+void CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14352,7 +14332,7 @@ void CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14379,8 +14359,7 @@ void CHIPNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptio
     }
 }
 
-void CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant value)
+void CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14404,7 +14383,7 @@ void CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptio
 }
 
 void CHIPNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14433,8 +14412,7 @@ void CHIPNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSub
     }
 }
 
-void CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant value)
+void CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14458,7 +14436,7 @@ void CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBr
 }
 
 void CHIPNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14486,8 +14464,7 @@ void CHIPNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscr
     }
 }
 
-void CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffEffectIdentifier value)
+void CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14511,7 +14488,7 @@ void CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::O
 }
 
 void CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14538,8 +14515,7 @@ void CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionB
     }
 }
 
-void CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffStartUpOnOff value)
+void CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14563,7 +14539,7 @@ void CHIPOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14590,8 +14566,7 @@ void CHIPNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridg
     }
 }
 
-void CHIPLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LevelControl::MoveMode value)
+void CHIPLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14615,7 +14590,7 @@ void CHIPLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14642,8 +14617,7 @@ void CHIPNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LevelControl::StepMode value)
+void CHIPLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14667,7 +14641,7 @@ void CHIPLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPNullableLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14694,8 +14668,7 @@ void CHIPNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceControl::ApplianceStatus value)
+void CHIPApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14719,7 +14692,7 @@ void CHIPApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBrid
 }
 
 void CHIPNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14747,8 +14720,7 @@ void CHIPNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscrip
     }
 }
 
-void CHIPApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceControl::CommandIdentification value)
+void CHIPApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14772,7 +14744,7 @@ void CHIPApplianceControlClusterCommandIdentificationAttributeCallbackSubscripti
 }
 
 void CHIPNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14801,8 +14773,7 @@ void CHIPNullableApplianceControlClusterCommandIdentificationAttributeCallbackSu
     }
 }
 
-void CHIPApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceControl::WarningEvent value)
+void CHIPApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14826,7 +14797,7 @@ void CHIPApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14853,8 +14824,7 @@ void CHIPNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptio
     }
 }
 
-void CHIPAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::AuthMode value)
+void CHIPAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14878,7 +14848,7 @@ void CHIPAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubs
 }
 
 void CHIPNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14905,8 +14875,7 @@ void CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value)
+void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14930,7 +14899,7 @@ void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14957,8 +14926,7 @@ void CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscription
     }
 }
 
-void CHIPAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::Privilege value)
+void CHIPAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -14982,7 +14950,7 @@ void CHIPAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void CHIPNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15009,8 +14977,7 @@ void CHIPNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridg
     }
 }
 
-void CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::ActionErrorEnum value)
+void CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15034,7 +15001,7 @@ void CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
 }
 
 void CHIPNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15061,8 +15028,7 @@ void CHIPNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscripti
     }
 }
 
-void CHIPBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::ActionStateEnum value)
+void CHIPBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15086,7 +15052,7 @@ void CHIPBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
 }
 
 void CHIPNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15113,8 +15079,7 @@ void CHIPNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscripti
     }
 }
 
-void CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::ActionTypeEnum value)
+void CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15138,7 +15103,7 @@ void CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15165,8 +15130,7 @@ void CHIPNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptio
     }
 }
 
-void CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedActions::EndpointListTypeEnum value)
+void CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15190,7 +15154,7 @@ void CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionB
 }
 
 void CHIPNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15218,8 +15182,7 @@ void CHIPNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubsc
     }
 }
 
-void CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
+void CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15244,8 +15207,8 @@ void CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSu
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15275,8 +15238,7 @@ void CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCa
     }
 }
 
-void CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
+void CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15301,8 +15263,8 @@ void CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSub
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15331,8 +15293,7 @@ void CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCal
     }
 }
 
-void CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
+void CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15357,7 +15318,7 @@ void CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscrip
 }
 
 void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15386,8 +15347,7 @@ void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
+void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15412,8 +15372,8 @@ void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15443,8 +15403,7 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttribute
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15469,8 +15428,8 @@ void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSu
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15500,8 +15459,7 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCa
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15526,8 +15484,8 @@ void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSub
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15556,8 +15514,7 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCal
     }
 }
 
-void CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+void CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15581,7 +15538,7 @@ void CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionB
 }
 
 void CHIPNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15609,8 +15566,7 @@ void CHIPNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubsc
     }
 }
 
-void CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+void CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15634,7 +15590,7 @@ void CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBri
 }
 
 void CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15662,8 +15618,7 @@ void CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscri
     }
 }
 
-void CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
+void CHIPUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15687,7 +15642,7 @@ void CHIPUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15714,8 +15669,7 @@ void CHIPNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeFaultType value)
+void CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15739,7 +15693,7 @@ void CHIPPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge
 }
 
 void CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15766,8 +15720,7 @@ void CHIPNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscripti
     }
 }
 
-void CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeLevel value)
+void CHIPPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15791,7 +15744,7 @@ void CHIPPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15818,8 +15771,7 @@ void CHIPNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBr
     }
 }
 
-void CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeState value)
+void CHIPPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15843,7 +15795,7 @@ void CHIPPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15870,8 +15822,7 @@ void CHIPNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBr
     }
 }
 
-void CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatFaultType value)
+void CHIPPowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15895,7 +15846,7 @@ void CHIPPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15922,8 +15873,7 @@ void CHIPNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatReplaceability value)
+void CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15947,7 +15897,7 @@ void CHIPPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15974,8 +15924,7 @@ void CHIPNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptio
     }
 }
 
-void CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value)
+void CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -15999,7 +15948,7 @@ void CHIPPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16026,8 +15975,7 @@ void CHIPNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptio
     }
 }
 
-void CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredCurrentType value)
+void CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16051,7 +15999,7 @@ void CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16078,8 +16026,7 @@ void CHIPNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscription
     }
 }
 
-void CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredFaultType value)
+void CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16103,7 +16050,7 @@ void CHIPPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16130,8 +16077,7 @@ void CHIPNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value)
+void CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16155,7 +16101,7 @@ void CHIPGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscript
 }
 
 void CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16184,8 +16130,7 @@ void CHIPNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackS
     }
 }
 
-void CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value)
+void CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16210,7 +16155,7 @@ void CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubsc
 }
 
 void CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16239,8 +16184,7 @@ void CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallb
     }
 }
 
-void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
+void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16265,8 +16209,8 @@ void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackS
     }
 }
 
-void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16296,8 +16240,7 @@ void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeC
     }
 }
 
-void CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value)
+void CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16321,7 +16264,7 @@ void CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16348,8 +16291,7 @@ void CHIPNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptio
     }
 }
 
-void CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsIntent value)
+void CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16373,7 +16315,7 @@ void CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16400,8 +16342,7 @@ void CHIPNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsStatus value)
+void CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16425,7 +16366,7 @@ void CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16452,8 +16393,7 @@ void CHIPNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol value)
+void CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16477,7 +16417,7 @@ void CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionB
 }
 
 void CHIPNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16505,8 +16445,7 @@ void CHIPNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubsc
     }
 }
 
-void CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::BootReasonType value)
+void CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16530,7 +16469,7 @@ void CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBri
 }
 
 void CHIPNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16558,8 +16497,7 @@ void CHIPNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscri
     }
 }
 
-void CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultType value)
+void CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16583,7 +16521,7 @@ void CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscription
 }
 
 void CHIPNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16611,8 +16549,7 @@ void CHIPNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubs
     }
 }
 
-void CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceType value)
+void CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16636,7 +16573,7 @@ void CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBrid
 }
 
 void CHIPNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16664,8 +16601,7 @@ void CHIPNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscrip
     }
 }
 
-void CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType value)
+void CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16689,7 +16625,7 @@ void CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionB
 }
 
 void CHIPNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16717,8 +16653,7 @@ void CHIPNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubsc
     }
 }
 
-void CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultType value)
+void CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16742,7 +16677,7 @@ void CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBri
 }
 
 void CHIPNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16770,8 +16705,7 @@ void CHIPNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscri
     }
 }
 
-void CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value)
+void CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16795,7 +16729,7 @@ void CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptio
 }
 
 void CHIPNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16824,8 +16758,7 @@ void CHIPNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSub
     }
 }
 
-void CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole value)
+void CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16849,7 +16782,7 @@ void CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscription
 }
 
 void CHIPNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16877,8 +16810,7 @@ void CHIPNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubs
     }
 }
 
-void CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus value)
+void CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16903,8 +16835,8 @@ void CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackS
     }
 }
 
-void CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value)
+void CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16934,8 +16866,7 @@ void CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeC
     }
 }
 
-void CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause value)
+void CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -16960,8 +16891,8 @@ void CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSu
     }
 }
 
-void CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> & value)
+void CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16991,8 +16922,7 @@ void CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCa
     }
 }
 
-void CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType value)
+void CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17016,7 +16946,7 @@ void CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionB
 }
 
 void CHIPNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17044,8 +16974,7 @@ void CHIPNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubsc
     }
 }
 
-void CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus value)
+void CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17070,7 +16999,7 @@ void CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubsc
 }
 
 void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17099,8 +17028,7 @@ void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallb
     }
 }
 
-void CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType value)
+void CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17124,7 +17052,7 @@ void CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscripti
 }
 
 void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17153,8 +17081,7 @@ void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSu
     }
 }
 
-void CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType value)
+void CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17178,7 +17105,7 @@ void CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscripti
 }
 
 void CHIPNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17208,7 +17135,7 @@ void CHIPNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSu
 }
 
 void CHIPAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value)
+    void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17233,8 +17160,8 @@ void CHIPAdministratorCommissioningClusterCommissioningWindowStatusAttributeCall
     }
 }
 
-void CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value)
+void CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17264,8 +17191,7 @@ void CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttri
     }
 }
 
-void CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AdministratorCommissioning::StatusCode value)
+void CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17289,7 +17215,7 @@ void CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptio
 }
 
 void CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17318,8 +17244,7 @@ void CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSub
     }
 }
 
-void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalCredentials::OperationalCertStatus value)
+void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17343,8 +17268,8 @@ void CHIPOperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubs
     }
 }
 
-void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value)
+void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17373,8 +17298,7 @@ void CHIPNullableOperationalCredentialsClusterOperationalCertStatusAttributeCall
     }
 }
 
-void CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy value)
+void CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17399,7 +17323,7 @@ void CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscri
 }
 
 void CHIPNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17428,8 +17352,7 @@ void CHIPNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbac
     }
 }
 
-void CHIPDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlAlarmCode value)
+void CHIPDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17453,7 +17376,7 @@ void CHIPDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17480,8 +17403,7 @@ void CHIPNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void CHIPDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlCredentialRule value)
+void CHIPDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17505,7 +17427,7 @@ void CHIPDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17532,8 +17454,7 @@ void CHIPNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlCredentialType value)
+void CHIPDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17557,7 +17478,7 @@ void CHIPDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17584,8 +17505,7 @@ void CHIPNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlDataOperationType value)
+void CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17609,7 +17529,7 @@ void CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17636,8 +17556,7 @@ void CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscription
     }
 }
 
-void CHIPDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlDoorState value)
+void CHIPDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17661,7 +17580,7 @@ void CHIPDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17688,8 +17607,7 @@ void CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::
     }
 }
 
-void CHIPDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockDataType value)
+void CHIPDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17713,7 +17631,7 @@ void CHIPDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void CHIPNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17740,8 +17658,7 @@ void CHIPNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridg
     }
 }
 
-void CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockOperationType value)
+void CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17765,7 +17682,7 @@ void CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17792,8 +17709,7 @@ void CHIPNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscription
     }
 }
 
-void CHIPDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockState value)
+void CHIPDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17817,7 +17733,7 @@ void CHIPDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17844,8 +17760,7 @@ void CHIPNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::
     }
 }
 
-void CHIPDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockType value)
+void CHIPDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17869,7 +17784,7 @@ void CHIPDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void CHIPNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17896,8 +17811,7 @@ void CHIPNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
+void CHIPDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17921,7 +17835,7 @@ void CHIPDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17948,8 +17862,7 @@ void CHIPNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlOperationError value)
+void CHIPDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -17973,7 +17886,7 @@ void CHIPDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18000,8 +17913,7 @@ void CHIPNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlOperationSource value)
+void CHIPDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18025,7 +17937,7 @@ void CHIPDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18052,7 +17964,7 @@ void CHIPNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBr
     }
 }
 
-void CHIPDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlStatus value)
+void CHIPDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18076,7 +17988,7 @@ void CHIPDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void CHIPNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18103,8 +18015,7 @@ void CHIPNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlUserStatus value)
+void CHIPDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18128,7 +18039,7 @@ void CHIPDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18155,8 +18066,7 @@ void CHIPNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlUserType value)
+void CHIPDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18180,7 +18090,7 @@ void CHIPDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void CHIPNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18207,8 +18117,7 @@ void CHIPNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockOperationEventCode value)
+void CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18232,7 +18141,7 @@ void CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionB
 }
 
 void CHIPNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockOperationEventCode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18260,8 +18169,7 @@ void CHIPNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubsc
     }
 }
 
-void CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode value)
+void CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18285,7 +18193,7 @@ void CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptio
 }
 
 void CHIPNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18314,8 +18222,7 @@ void CHIPNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSub
     }
 }
 
-void CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus value)
+void CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18339,7 +18246,7 @@ void CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBri
 }
 
 void CHIPNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18367,8 +18274,7 @@ void CHIPNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscri
     }
 }
 
-void CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockUserStatus value)
+void CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18392,7 +18298,7 @@ void CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::O
 }
 
 void CHIPNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18419,8 +18325,7 @@ void CHIPNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionB
     }
 }
 
-void CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockUserType value)
+void CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18444,7 +18349,7 @@ void CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18471,8 +18376,7 @@ void CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WindowCovering::EndProductType value)
+void CHIPWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18496,7 +18400,7 @@ void CHIPWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18523,8 +18427,7 @@ void CHIPNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptio
     }
 }
 
-void CHIPWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WindowCovering::Type value)
+void CHIPWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18548,7 +18451,7 @@ void CHIPWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void CHIPNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18575,8 +18478,7 @@ void CHIPNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
+void CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18601,7 +18503,7 @@ void CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubsc
 }
 
 void CHIPNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18630,8 +18532,7 @@ void CHIPNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallb
     }
 }
 
-void CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
+void CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18656,8 +18557,8 @@ void CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSub
     }
 }
 
-void CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value)
+void CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18686,8 +18587,7 @@ void CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCal
     }
 }
 
-void CHIPThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::SetpointAdjustMode value)
+void CHIPThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18711,7 +18611,7 @@ void CHIPThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18738,8 +18638,7 @@ void CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptio
     }
 }
 
-void CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatControlSequence value)
+void CHIPThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18763,7 +18662,7 @@ void CHIPThermostatClusterThermostatControlSequenceAttributeCallbackSubscription
 }
 
 void CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18791,8 +18690,7 @@ void CHIPNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubs
     }
 }
 
-void CHIPThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatRunningMode value)
+void CHIPThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18816,7 +18714,7 @@ void CHIPThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBrid
 }
 
 void CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18844,8 +18742,7 @@ void CHIPNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscrip
     }
 }
 
-void CHIPThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value)
+void CHIPThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18869,7 +18766,7 @@ void CHIPThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridg
 }
 
 void CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18896,8 +18793,7 @@ void CHIPNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscript
     }
 }
 
-void CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeSequenceType value)
+void CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18921,7 +18817,7 @@ void CHIPFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge
 }
 
 void CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18948,8 +18844,7 @@ void CHIPNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscripti
     }
 }
 
-void CHIPFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeType value)
+void CHIPFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -18973,7 +18868,7 @@ void CHIPFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubs
 }
 
 void CHIPNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19000,8 +18895,7 @@ void CHIPNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::ColorLoopAction value)
+void CHIPColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19025,7 +18919,7 @@ void CHIPColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19052,8 +18946,7 @@ void CHIPNullableColorControlClusterColorLoopActionAttributeCallbackSubscription
     }
 }
 
-void CHIPColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::ColorLoopDirection value)
+void CHIPColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19077,7 +18970,7 @@ void CHIPColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridg
 }
 
 void CHIPNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopDirection> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19104,8 +18997,7 @@ void CHIPNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscript
     }
 }
 
-void CHIPColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::ColorMode value)
+void CHIPColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19129,7 +19021,7 @@ void CHIPColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubs
 }
 
 void CHIPNullableColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19156,8 +19048,7 @@ void CHIPNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::HueDirection value)
+void CHIPColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19181,7 +19072,7 @@ void CHIPColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19208,8 +19099,7 @@ void CHIPNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::HueMoveMode value)
+void CHIPColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19233,7 +19123,7 @@ void CHIPColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueMoveMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19260,8 +19150,7 @@ void CHIPNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::HueStepMode value)
+void CHIPColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19285,7 +19174,7 @@ void CHIPColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueStepMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19312,8 +19201,7 @@ void CHIPNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::SaturationMoveMode value)
+void CHIPColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19337,7 +19225,7 @@ void CHIPColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridg
 }
 
 void CHIPNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationMoveMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19364,8 +19252,7 @@ void CHIPNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscript
     }
 }
 
-void CHIPColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::SaturationStepMode value)
+void CHIPColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19389,7 +19276,7 @@ void CHIPColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridg
 }
 
 void CHIPNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19416,8 +19303,7 @@ void CHIPNullableColorControlClusterSaturationStepModeAttributeCallbackSubscript
     }
 }
 
-void CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorType value)
+void CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19441,7 +19327,7 @@ void CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscripti
 }
 
 void CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19470,8 +19356,7 @@ void CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSu
     }
 }
 
-void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasZone::IasEnrollResponseCode value)
+void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19495,7 +19380,7 @@ void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasEnrollResponseCode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19522,8 +19407,7 @@ void CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptio
     }
 }
 
-void CHIPIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasZone::IasZoneType value)
+void CHIPIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -19547,7 +19431,7 @@ void CHIPIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasZoneType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19574,8 +19458,7 @@ void CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceAlarmStatus value)
+void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19599,7 +19482,7 @@ void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAlarmStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19626,8 +19509,7 @@ void CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceArmMode value)
+void CHIPIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19651,7 +19533,7 @@ void CHIPIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmMode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19678,8 +19560,7 @@ void CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceArmNotification value)
+void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19703,7 +19584,7 @@ void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge::
 }
 
 void CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmNotification> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19730,8 +19611,7 @@ void CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackSubscription
     }
 }
 
-void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceAudibleNotification value)
+void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19755,7 +19635,7 @@ void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBrid
 }
 
 void CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAudibleNotification> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19783,8 +19663,7 @@ void CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscrip
     }
 }
 
-void CHIPIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAceBypassResult value)
+void CHIPIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19808,7 +19687,7 @@ void CHIPIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceBypassResult> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19835,8 +19714,7 @@ void CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasAcePanelStatus value)
+void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19860,7 +19738,7 @@ void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAcePanelStatus> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19887,8 +19765,7 @@ void CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IasAce::IasZoneType value)
+void CHIPIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -19912,7 +19789,7 @@ void CHIPIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscrip
 }
 
 void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasZoneType> & value)
+    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19939,8 +19816,7 @@ void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void CHIPChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Channel::ChannelStatusEnum value)
+void CHIPChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -19964,7 +19840,7 @@ void CHIPChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19991,8 +19867,7 @@ void CHIPNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Channel::LineupInfoTypeEnum value)
+void CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20016,7 +19891,7 @@ void CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20043,8 +19918,7 @@ void CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value)
+void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20069,7 +19943,7 @@ void CHIPTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscri
 }
 
 void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20098,8 +19972,7 @@ void CHIPNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbac
     }
 }
 
-void CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum value)
+void CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20123,7 +19996,7 @@ void CHIPMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscriptio
 }
 
 void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20152,8 +20025,7 @@ void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSub
     }
 }
 
-void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
+void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20177,7 +20049,7 @@ void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridg
 }
 
 void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20204,8 +20076,7 @@ void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscript
     }
 }
 
-void CHIPMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaInput::InputTypeEnum value)
+void CHIPMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20229,7 +20100,7 @@ void CHIPMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void CHIPNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20256,8 +20127,7 @@ void CHIPNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::CecKeyCode value)
+void CHIPKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20281,7 +20151,7 @@ void CHIPKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubs
 }
 
 void CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20308,8 +20178,7 @@ void CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value)
+void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20333,7 +20202,7 @@ void CHIPKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBri
 }
 
 void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20361,8 +20230,7 @@ void CHIPNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscri
     }
 }
 
-void CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value)
+void CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20386,7 +20254,7 @@ void CHIPContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscript
 }
 
 void CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20415,8 +20283,7 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackS
     }
 }
 
-void CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::MetricTypeEnum value)
+void CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20440,7 +20307,7 @@ void CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge
 }
 
 void CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20467,8 +20334,7 @@ void CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscripti
     }
 }
 
-void CHIPContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
+void CHIPContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20492,7 +20358,7 @@ void CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge:
 }
 
 void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20519,8 +20385,7 @@ void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptio
     }
 }
 
-void CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AudioOutput::OutputTypeEnum value)
+void CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20544,7 +20409,7 @@ void CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20571,8 +20436,7 @@ void CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value)
+void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20597,8 +20461,8 @@ void CHIPApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbac
     }
 }
 
-void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
+void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20628,8 +20492,7 @@ void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribut
     }
 }
 
-void CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
+void CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20653,7 +20516,7 @@ void CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscripti
 }
 
 void CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20682,8 +20545,7 @@ void CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSu
     }
 }
 
-void CHIPTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
+void CHIPTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20707,7 +20569,7 @@ void CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubs
 }
 
 void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20734,7 +20596,7 @@ void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPMessagingClusterEventIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Messaging::EventId value)
+void CHIPMessagingClusterEventIdAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20758,7 +20620,7 @@ void CHIPMessagingClusterEventIdAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void CHIPNullableMessagingClusterEventIdAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::EventId> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20785,8 +20647,7 @@ void CHIPNullableMessagingClusterEventIdAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Messaging::MessagingControlConfirmation value)
+void CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20810,7 +20671,7 @@ void CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackSubscripti
 }
 
 void CHIPNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlConfirmation> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20839,8 +20700,7 @@ void CHIPNullableMessagingClusterMessagingControlConfirmationAttributeCallbackSu
     }
 }
 
-void CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation value)
+void CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20865,8 +20725,8 @@ void CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSu
     }
 }
 
-void CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> & value)
+void CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20896,8 +20756,7 @@ void CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCa
     }
 }
 
-void CHIPMessagingClusterMessagingControlImportanceAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Messaging::MessagingControlImportance value)
+void CHIPMessagingClusterMessagingControlImportanceAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20921,7 +20780,7 @@ void CHIPMessagingClusterMessagingControlImportanceAttributeCallbackSubscription
 }
 
 void CHIPNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlImportance> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20949,8 +20808,7 @@ void CHIPNullableMessagingClusterMessagingControlImportanceAttributeCallbackSubs
     }
 }
 
-void CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Messaging::MessagingControlTransmission value)
+void CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20974,7 +20832,7 @@ void CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackSubscripti
 }
 
 void CHIPNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlTransmission> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21003,8 +20861,7 @@ void CHIPNullableMessagingClusterMessagingControlTransmissionAttributeCallbackSu
     }
 }
 
-void CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification value)
+void CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21029,7 +20886,7 @@ void CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubsc
 }
 
 void CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> & value)
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {

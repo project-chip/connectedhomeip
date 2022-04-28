@@ -248,7 +248,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationMainsVoltageMinThreshold : public WriteAttribute
@@ -383,7 +383,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PowerConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationBatteryAhrRating : public WriteAttribute
@@ -491,7 +491,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationBatteryVoltageMinThreshold : public WriteAttribute
@@ -761,7 +761,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PowerConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationBattery2AhrRating : public WriteAttribute
@@ -869,7 +869,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationBattery2VoltageMinThreshold : public WriteAttribute
@@ -1139,7 +1139,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PowerConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationBattery3AhrRating : public WriteAttribute
@@ -1247,7 +1247,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::PowerConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WritePowerConfigurationBattery3VoltageMinThreshold : public WriteAttribute
@@ -1514,7 +1514,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DeviceTemperatureConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteDeviceTemperatureConfigurationLowTempThreshold : public WriteAttribute
@@ -2604,7 +2604,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -2648,7 +2648,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::OnOffSwitchConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -2966,7 +2966,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::LevelControl::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteLevelControlOnOffTransitionTime : public WriteAttribute
@@ -3342,7 +3342,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::Time::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteTimeTimeZone : public WriteAttribute
@@ -3657,7 +3657,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::BinaryInputBasic::enum8 mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4007,7 +4007,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::PowerProfile::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5196,8 +5196,7 @@ public:
 
 private:
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol>>
-        mComplex_ProtocolsSupported;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_ProtocolsSupported;
 };
 
 /*
@@ -5438,7 +5437,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TimeFormatLocalization::HourFormat mValue;
+    uint8_t mValue;
 };
 
 class WriteTimeFormatLocalizationActiveCalendarType : public WriteAttribute
@@ -5465,7 +5464,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TimeFormatLocalization::CalendarType mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5508,7 +5507,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::UnitLocalization::TempUnit mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -7297,7 +7296,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::ShadeConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteShadeConfigurationClosedLimit : public WriteAttribute
@@ -7350,7 +7349,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ShadeConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -8663,7 +8662,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlOperatingMode mValue;
+    uint8_t mValue;
 };
 
 class WriteDoorLockEnableLocalProgramming : public WriteAttribute
@@ -8798,7 +8797,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
+    uint8_t mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8959,7 +8958,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
@@ -8986,7 +8985,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
@@ -9013,7 +9012,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockManualOperationEventMask : public WriteAttribute
@@ -9040,7 +9039,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
@@ -9067,7 +9066,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
@@ -9094,7 +9093,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
@@ -9121,7 +9120,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
+    uint16_t mValue;
 };
 
 class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
@@ -9148,7 +9147,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
+    uint16_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9431,7 +9430,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9818,7 +9817,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode mValue;
+    uint8_t mValue;
 };
 
 class WritePumpConfigurationAndControlControlMode : public WriteAttribute
@@ -9845,7 +9844,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10094,7 +10093,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatLocalTemperatureCalibration : public WriteAttribute
@@ -10390,7 +10389,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatControlSequenceOfOperation : public WriteAttribute
@@ -10417,7 +10416,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::ThermostatControlSequence mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatSystemMode : public WriteAttribute
@@ -10443,7 +10442,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatTemperatureSetpointHold : public WriteAttribute
@@ -10470,7 +10469,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatTemperatureSetpointHoldDuration : public WriteAttribute
@@ -10524,7 +10523,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatAcType : public WriteAttribute
@@ -10550,7 +10549,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatAcCapacity : public WriteAttribute
@@ -10603,7 +10602,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatAcCompressorType : public WriteAttribute
@@ -10630,7 +10629,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatAcErrorCode : public WriteAttribute
@@ -10656,7 +10655,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::Thermostat::bitmap32> mValue;
+    uint32_t mValue;
 };
 
 class WriteThermostatAcLouverPosition : public WriteAttribute
@@ -10683,7 +10682,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatAcCapacityFormat : public WriteAttribute
@@ -10710,7 +10709,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Thermostat::enum8 mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10762,7 +10761,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::FanControl::FanModeType mValue;
+    uint8_t mValue;
 };
 
 class WriteFanControlFanModeSequence : public WriteAttribute
@@ -10789,7 +10788,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::FanControl::FanModeSequenceType mValue;
+    uint8_t mValue;
 };
 
 class WriteFanControlPercentSetting : public WriteAttribute
@@ -10868,7 +10867,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteFanControlWindSetting : public WriteAttribute
@@ -10894,7 +10893,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::FanControl::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10971,7 +10970,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DehumidificationControl::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteDehumidificationControlDehumidificationLockout : public WriteAttribute
@@ -10998,7 +10997,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DehumidificationControl::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteDehumidificationControlDehumidificationHysteresis : public WriteAttribute
@@ -11079,7 +11078,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DehumidificationControl::enum8 mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11124,7 +11123,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatUserInterfaceConfigurationKeypadLockout : public WriteAttribute
@@ -11151,7 +11150,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : public WriteAttribute
@@ -11178,7 +11177,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::ThermostatUserInterfaceConfiguration::enum8 mValue;
+    uint8_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -11942,7 +11941,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::ColorControl::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteColorControlWhitePointX : public WriteAttribute
@@ -12583,7 +12582,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::BallastConfiguration::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteBallastConfigurationLampBurnHoursTripPoint : public WriteAttribute
@@ -15039,7 +15038,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::ContentLauncher::bitmap32> mValue;
+    uint32_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -15738,7 +15737,7 @@ private:
         mComplex_Arg1;
     TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
         mComplex_Arg2;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>> mComplex_Arg3;
+    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg3;
     TypedComplexArgument<chip::app::DataModel::List<const bool>> mComplex_Arg4;
 };
 
@@ -16080,13 +16079,9 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>>
         mComplex_NullableOptionalStruct;
-    TypedComplexArgument<
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
-        mComplex_NullableList;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
-        mComplex_OptionalList;
-    TypedComplexArgument<chip::Optional<
-        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>>
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>> mComplex_NullableList;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint8_t>>> mComplex_OptionalList;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>>>
         mComplex_NullableOptionalList;
 };
 
@@ -16296,7 +16291,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> mValue;
+    uint8_t mValue;
 };
 
 class WriteTestClusterBitmap16 : public WriteAttribute
@@ -16322,7 +16317,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> mValue;
+    uint16_t mValue;
 };
 
 class WriteTestClusterBitmap32 : public WriteAttribute
@@ -16348,7 +16343,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> mValue;
+    uint32_t mValue;
 };
 
 class WriteTestClusterBitmap64 : public WriteAttribute
@@ -16374,7 +16369,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> mValue;
+    uint64_t mValue;
 };
 
 class WriteTestClusterInt8u : public WriteAttribute
@@ -16816,7 +16811,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::enum8 mValue;
+    uint8_t mValue;
 };
 
 class WriteTestClusterEnum16 : public WriteAttribute
@@ -16842,7 +16837,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::enum16 mValue;
+    uint16_t mValue;
 };
 
 class WriteTestClusterFloatSingle : public WriteAttribute
@@ -17219,7 +17214,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::TestCluster::SimpleEnum mValue;
+    uint8_t mValue;
 };
 
 class WriteTestClusterStructAttr : public WriteAttribute
@@ -17573,7 +17568,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteTestClusterNullableBitmap16 : public WriteAttribute
@@ -17600,7 +17595,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> mValue;
+    chip::app::DataModel::Nullable<uint16_t> mValue;
 };
 
 class WriteTestClusterNullableBitmap32 : public WriteAttribute
@@ -17627,7 +17622,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> mValue;
+    chip::app::DataModel::Nullable<uint32_t> mValue;
 };
 
 class WriteTestClusterNullableBitmap64 : public WriteAttribute
@@ -17654,7 +17649,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> mValue;
+    chip::app::DataModel::Nullable<uint64_t> mValue;
 };
 
 class WriteTestClusterNullableInt8u : public WriteAttribute
@@ -18110,7 +18105,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum8> mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteTestClusterNullableEnum16 : public WriteAttribute
@@ -18137,7 +18132,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::enum16> mValue;
+    chip::app::DataModel::Nullable<uint16_t> mValue;
 };
 
 class WriteTestClusterNullableFloatSingle : public WriteAttribute
@@ -18272,7 +18267,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteTestClusterNullableStruct : public WriteAttribute
@@ -19122,7 +19117,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap8> mValue;
+    uint8_t mValue;
 };
 
 class WriteElectricalMeasurementAcOverloadAlarmsMask : public WriteAttribute
@@ -19149,7 +19144,7 @@ public:
     }
 
 private:
-    chip::BitFlags<chip::app::Clusters::ElectricalMeasurement::bitmap16> mValue;
+    uint16_t mValue;
 };
 
 /*----------------------------------------------------------------------------*\
