@@ -88,7 +88,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 30
+              timeout-minutes: 40
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
