@@ -36,7 +36,7 @@ tests:
     - label: "1a.1: read the RO mandatory attribute default: Type"
       command: "readAttribute"
       attribute: "Type"
-      PICS: PICS_A_TYPE
+      PICS: A_TYPE
       response:
           constraints:
               type: enum8
@@ -46,7 +46,7 @@ tests:
     - label: "1a.2: write a value into the RO mandatory attribute: Type"
       command: "writeAttribute"
       attribute: "Type"
-      PICS: PICS_A_TYPE
+      PICS: A_TYPE
       arguments:
           value: 250
       response:
@@ -55,7 +55,7 @@ tests:
     - label: "1a.3: reads back the RO mandatory attribute: Type"
       command: "readAttribute"
       attribute: "Type"
-      PICS: PICS_A_TYPE
+      PICS: A_TYPE
       response:
           constraints:
               type: enum8
@@ -65,7 +65,7 @@ tests:
     - label: "1b.1: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: PICS_A_CONFIGSTATUS
+      PICS: A_CONFIGSTATUS
       response:
           constraints:
               type: map8
@@ -75,7 +75,7 @@ tests:
     - label: "1b.2: write a value into the RO mandatory attribute: ConfigStatus"
       command: "writeAttribute"
       attribute: "ConfigStatus"
-      PICS: PICS_A_CONFIGSTATUS
+      PICS: A_CONFIGSTATUS
       arguments:
           value: 128
       response:
@@ -84,7 +84,7 @@ tests:
     - label: "1b.3: reads back the RO mandatory attribute: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: PICS_A_CONFIGSTATUS
+      PICS: A_CONFIGSTATUS
       response:
           constraints:
               type: map8
@@ -94,7 +94,7 @@ tests:
     - label: "1c.1: read the RO mandatory attribute default: OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: PICS_A_OPERATIONALSTATUS
+      PICS: A_OPERATIONALSTATUS
       response:
           constraints:
               type: map8
@@ -105,7 +105,7 @@ tests:
           "1c.2: write a value into the RO mandatory attribute: OperationalStatus"
       command: "writeAttribute"
       attribute: "OperationalStatus"
-      PICS: PICS_A_OPERATIONALSTATUS
+      PICS: A_OPERATIONALSTATUS
       arguments:
           value: 128
       response:
@@ -114,7 +114,7 @@ tests:
     - label: "1c.3: reads back the RO mandatory attribute: OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: PICS_A_OPERATIONALSTATUS
+      PICS: A_OPERATIONALSTATUS
       response:
           constraints:
               type: map8
@@ -124,7 +124,7 @@ tests:
     - label: "1d.1: read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
       attribute: "EndProductType"
-      PICS: PICS_A_ENDPRODUCTTYPE
+      PICS: A_ENDPRODUCTTYPE
       response:
           constraints:
               type: enum8
@@ -134,7 +134,7 @@ tests:
     - label: "1d.2: write a value into the RO mandatory attribute: EndProductType"
       command: "writeAttribute"
       attribute: "EndProductType"
-      PICS: PICS_A_ENDPRODUCTTYPE
+      PICS: A_ENDPRODUCTTYPE
       arguments:
           value: 250
       response:
@@ -143,7 +143,7 @@ tests:
     - label: "1d.3: reads back the RO mandatory attribute: EndProductType"
       command: "readAttribute"
       attribute: "EndProductType"
-      PICS: PICS_A_ENDPRODUCTTYPE
+      PICS: A_ENDPRODUCTTYPE
       response:
           constraints:
               type: enum8
@@ -153,7 +153,7 @@ tests:
     - label: "1f.1: read the RW mandatory attribute default: Mode"
       command: "readAttribute"
       attribute: "Mode"
-      PICS: PICS_A_MODE
+      PICS: A_MODE
       response:
           constraints:
               type: map8
@@ -163,14 +163,14 @@ tests:
     - label: "1f.2: write a value into the RW mandatory attribute:: Mode"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: PICS_A_MODE
+      PICS: A_MODE
       arguments:
           value: 8
 
     - label: "1f.3: reads back the RW mandatory attribute: Mode"
       command: "readAttribute"
       attribute: "Mode"
-      PICS: PICS_A_MODE
+      PICS: A_MODE
       response:
           value: 8
 
@@ -181,7 +181,7 @@ tests:
           TargetPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: PICS_A_TARGETPOSITIONLIFTPERCENT100THS
+      PICS: A_TARGETPOSITIONLIFTPERCENT100THS
 
       response:
           constraints:
@@ -194,7 +194,7 @@ tests:
           TargetPositionLiftPercent100ths"
       command: "writeAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: PICS_A_TARGETPOSITIONLIFTPERCENT100THS
+      PICS: A_TARGETPOSITIONLIFTPERCENT100THS
       arguments:
           value: 20000
       response:
@@ -205,7 +205,7 @@ tests:
           TargetPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: PICS_A_TARGETPOSITIONLIFTPERCENT100THS
+      PICS: A_TARGETPOSITIONLIFTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -217,7 +217,7 @@ tests:
           TargetPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: PICS_A_TARGETPOSITIONTILTPERCENT100THS
+      PICS: A_TARGETPOSITIONTILTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -229,7 +229,7 @@ tests:
           TargetPositionTiltPercent100ths"
       command: "writeAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: PICS_A_TARGETPOSITIONTILTPERCENT100THS
+      PICS: A_TARGETPOSITIONTILTPERCENT100THS
       arguments:
           value: 20000
       response:
@@ -240,7 +240,7 @@ tests:
           TargetPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: PICS_A_TARGETPOSITIONTILTPERCENT100THS
+      PICS: A_TARGETPOSITIONTILTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -252,7 +252,7 @@ tests:
           CurrentPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENT100THS
+      PICS: A_CURRENTPOSITIONLIFTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -264,7 +264,7 @@ tests:
           CurrentPositionLiftPercent100ths"
       command: "writeAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENT100THS
+      PICS: A_CURRENTPOSITIONLIFTPERCENT100THS
       arguments:
           value: 20000
       response:
@@ -275,7 +275,7 @@ tests:
           CurrentPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENT100THS
+      PICS: A_CURRENTPOSITIONLIFTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -287,7 +287,7 @@ tests:
           CurrentPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: PICS_A_CURRENTPOSITIONTILTPERCENT100THS
+      PICS: A_CURRENTPOSITIONTILTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -299,7 +299,7 @@ tests:
           CurrentPositionTiltPercent100ths"
       command: "writeAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: PICS_A_CURRENTPOSITIONTILTPERCENT100THS
+      PICS: A_CURRENTPOSITIONTILTPERCENT100THS
       arguments:
           value: 20000
       response:
@@ -310,7 +310,7 @@ tests:
           CurrentPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: PICS_A_CURRENTPOSITIONTILTPERCENT100THS
+      PICS: A_CURRENTPOSITIONTILTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -320,7 +320,7 @@ tests:
     - label: "2e.1: read the RO optional attribute default: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
-      PICS: PICS_A_INSTALLEDOPENLIMITLIFT
+      PICS: A_INSTALLEDOPENLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -332,7 +332,7 @@ tests:
           InstalledOpenLimitLift"
       command: "writeAttribute"
       attribute: "InstalledOpenLimitLift"
-      PICS: PICS_A_INSTALLEDOPENLIMITLIFT
+      PICS: A_INSTALLEDOPENLIMITLIFT
       arguments:
           value: 255
       response:
@@ -341,7 +341,7 @@ tests:
     - label: "2e.3: reads back the RO optional attribute: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
-      PICS: PICS_A_INSTALLEDOPENLIMITLIFT
+      PICS: A_INSTALLEDOPENLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -353,7 +353,7 @@ tests:
           "2f.1: read the RO optional attribute default: InstalledClosedLimitLift"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
-      PICS: PICS_A_INSTALLEDCLOSEDLIMITLIFT
+      PICS: A_INSTALLEDCLOSEDLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -365,7 +365,7 @@ tests:
           InstalledClosedLimitLift"
       command: "writeAttribute"
       attribute: "InstalledClosedLimitLift"
-      PICS: PICS_A_INSTALLEDCLOSEDLIMITLIFT
+      PICS: A_INSTALLEDCLOSEDLIMITLIFT
       arguments:
           value: 255
       response:
@@ -375,7 +375,7 @@ tests:
           "2f.3: reads back the RO optional attribute: InstalledClosedLimitLift"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
-      PICS: PICS_A_INSTALLEDCLOSEDLIMITLIFT
+      PICS: A_INSTALLEDCLOSEDLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -386,7 +386,7 @@ tests:
     - label: "2g.1: read the RO optional attribute default: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
-      PICS: PICS_A_INSTALLEDOPENLIMITTILT
+      PICS: A_INSTALLEDOPENLIMITTILT
       response:
           constraints:
               type: uint16
@@ -398,7 +398,7 @@ tests:
           InstalledOpenLimitTilt"
       command: "writeAttribute"
       attribute: "InstalledOpenLimitTilt"
-      PICS: PICS_A_INSTALLEDOPENLIMITTILT
+      PICS: A_INSTALLEDOPENLIMITTILT
       arguments:
           value: 255
       response:
@@ -407,7 +407,7 @@ tests:
     - label: "2g.3: reads back the RO optional attribute: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
-      PICS: PICS_A_INSTALLEDOPENLIMITTILT
+      PICS: A_INSTALLEDOPENLIMITTILT
       response:
           constraints:
               type: uint16
@@ -419,7 +419,7 @@ tests:
           "2h.1: read the RO optional attribute default: InstalledClosedLimitTilt"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
-      PICS: PICS_A_INSTALLEDCLOSEDLIMITTILT
+      PICS: A_INSTALLEDCLOSEDLIMITTILT
       response:
           constraints:
               type: uint16
@@ -431,7 +431,7 @@ tests:
           InstalledClosedLimitTilt"
       command: "writeAttribute"
       attribute: "InstalledClosedLimitTilt"
-      PICS: PICS_A_INSTALLEDCLOSEDLIMITTILT
+      PICS: A_INSTALLEDCLOSEDLIMITTILT
       arguments:
           value: 255
       response:
@@ -441,7 +441,7 @@ tests:
           "2h.3: reads back the RO optional attribute: InstalledClosedLimitTilt"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
-      PICS: PICS_A_INSTALLEDCLOSEDLIMITTILT
+      PICS: A_INSTALLEDCLOSEDLIMITTILT
       response:
           constraints:
               type: uint16
@@ -453,7 +453,7 @@ tests:
     - label: "3a.1: read the RO mandatory attribute default: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
-      PICS: PICS_A_SAFETYSTATUS
+      PICS: A_SAFETYSTATUS
       response:
           constraints:
               type: map16
@@ -463,7 +463,7 @@ tests:
     - label: "3a.2: write a value into the RO mandatory attribute: SafetyStatus"
       command: "writeAttribute"
       attribute: "SafetyStatus"
-      PICS: PICS_A_SAFETYSTATUS
+      PICS: A_SAFETYSTATUS
       arguments:
           value: 4096
       response:
@@ -472,7 +472,7 @@ tests:
     - label: "3a.3: reads back the RO mandatory attribute: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
-      PICS: PICS_A_SAFETYSTATUS
+      PICS: A_SAFETYSTATUS
       response:
           constraints:
               type: map16
@@ -483,7 +483,7 @@ tests:
           "3b.1: read the RO optional attribute default: PhysicalClosedLimitLift"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
-      PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
+      PICS: A_PHYSICALCLOSEDLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -495,7 +495,7 @@ tests:
           PhysicalClosedLimitLift"
       command: "writeAttribute"
       attribute: "PhysicalClosedLimitLift"
-      PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
+      PICS: A_PHYSICALCLOSEDLIMITLIFT
       arguments:
           value: 255
       response:
@@ -504,7 +504,7 @@ tests:
     - label: "3b.3: reads back the RO optional attribute: PhysicalClosedLimitLift"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
-      PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
+      PICS: A_PHYSICALCLOSEDLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -515,7 +515,7 @@ tests:
     - label: "3c.1: read the RO optional attribute default: PhysicalClosedLimitTilt"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
-      PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
+      PICS: A_PHYSICALCLOSEDLIMITTILT
       response:
           constraints:
               type: uint16
@@ -526,7 +526,7 @@ tests:
           PhysicalClosedLimitTilt"
       command: "writeAttribute"
       attribute: "PhysicalClosedLimitTilt"
-      PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
+      PICS: A_PHYSICALCLOSEDLIMITTILT
       arguments:
           value: 255
       response:
@@ -535,7 +535,7 @@ tests:
     - label: "3c.3: reads back the RO optional attribute: PhysicalClosedLimitTilt"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
-      PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
+      PICS: A_PHYSICALCLOSEDLIMITTILT
       response:
           constraints:
               type: uint16
@@ -546,7 +546,7 @@ tests:
     - label: "3d.1: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
-      PICS: PICS_A_CURRENTPOSITIONLIFT
+      PICS: A_CURRENTPOSITIONLIFT
       response:
           constraints:
               type: uint16
@@ -557,7 +557,7 @@ tests:
           "3d.2: write a value into the RO optional attribute: CurrentPositionLift"
       command: "writeAttribute"
       attribute: "CurrentPositionLift"
-      PICS: PICS_A_CURRENTPOSITIONLIFT
+      PICS: A_CURRENTPOSITIONLIFT
       arguments:
           value: 255
       response:
@@ -566,7 +566,7 @@ tests:
     - label: "3d.3: reads back the RO optional attribute: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
-      PICS: PICS_A_CURRENTPOSITIONLIFT
+      PICS: A_CURRENTPOSITIONLIFT
       response:
           constraints:
               type: uint16
@@ -577,7 +577,7 @@ tests:
     - label: "3e.1: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
-      PICS: PICS_A_CURRENTPOSITIONTILT
+      PICS: A_CURRENTPOSITIONTILT
       response:
           constraints:
               type: uint16
@@ -587,7 +587,7 @@ tests:
     - label: "3e.2: write a value into the RO optional attribute: CurrentPositionTilt"
       command: "writeAttribute"
       attribute: "CurrentPositionTilt"
-      PICS: PICS_A_CURRENTPOSITIONTILT
+      PICS: A_CURRENTPOSITIONTILT
       arguments:
           value: 255
       response:
@@ -596,7 +596,7 @@ tests:
     - label: "3e.3: reads back the RO optional attribute: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
-      PICS: PICS_A_CURRENTPOSITIONTILT
+      PICS: A_CURRENTPOSITIONTILT
       response:
           constraints:
               type: uint16
@@ -607,7 +607,7 @@ tests:
     - label: "3f.1: read the RO optional attribute default: NumberOfActuationsLift"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
-      PICS: PICS_A_NUMBEROFACTUATIONSLIFT
+      PICS: A_NUMBEROFACTUATIONSLIFT
       response:
           constraints:
               type: uint16
@@ -617,7 +617,7 @@ tests:
     - label: "3f.2: write a value into the RO optional attribute: NumberOfActuationsLift"
       command: "writeAttribute"
       attribute: "NumberOfActuationsLift"
-      PICS: PICS_A_NUMBEROFACTUATIONSLIFT
+      PICS: A_NUMBEROFACTUATIONSLIFT
       arguments:
           value: 255
       response:
@@ -626,7 +626,7 @@ tests:
     - label: "3f.3: reads back the RO optional attribute: NumberOfActuationsLift"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
-      PICS: PICS_A_NUMBEROFACTUATIONSLIFT
+      PICS: A_NUMBEROFACTUATIONSLIFT
       response:
           constraints:
               type: uint16
@@ -637,7 +637,7 @@ tests:
     - label: "3g.1: read the RO optional attribute default: NumberOfActuationsTilt"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
-      PICS: PICS_A_NUMBEROFACTUATIONSTILT
+      PICS: A_NUMBEROFACTUATIONSTILT
       response:
           constraints:
               type: uint16
@@ -647,7 +647,7 @@ tests:
     - label: "3g.2: write a value into the RO optional attribute: NumberOfActuationsTilt"
       command: "writeAttribute"
       attribute: "NumberOfActuationsTilt"
-      PICS: PICS_A_NUMBEROFACTUATIONSTILT
+      PICS: A_NUMBEROFACTUATIONSTILT
       arguments:
           value: 255
       response:
@@ -656,7 +656,7 @@ tests:
     - label: "3g.3: reads back the RO optional attribute: NumberOfActuationsTilt"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
-      PICS: PICS_A_NUMBEROFACTUATIONSTILT
+      PICS: A_NUMBEROFACTUATIONSTILT
       response:
           constraints:
               type: uint16
@@ -668,7 +668,7 @@ tests:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: A_CURRENTPOSITIONLIFTPERCENTAGE
       response:
           constraints:
               type: Percent
@@ -679,7 +679,7 @@ tests:
           CurrentPositionLiftPercentage"
       command: "writeAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: A_CURRENTPOSITIONLIFTPERCENTAGE
       arguments:
           value: 200
       response:
@@ -689,7 +689,7 @@ tests:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: A_CURRENTPOSITIONLIFTPERCENTAGE
       response:
           constraints:
               type: Percent
@@ -699,7 +699,7 @@ tests:
     - label: "3i.1:read the RO optional attribute default: CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: PICS_A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: A_CURRENTPOSITIONTILTPERCENTAGE
       response:
           constraints:
               type: Percent
@@ -709,7 +709,7 @@ tests:
     - label: "3i.2::write a value into the RO optional attribute: CurrentPositionTiltPercentage"
       command: "writeAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: PICS_A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: A_CURRENTPOSITIONTILTPERCENTAGE
       arguments:
           value: 200
       response:
@@ -718,7 +718,7 @@ tests:
     - label: "3i.3:reads back the RO optional attribute: CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: PICS_A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: A_CURRENTPOSITIONTILTPERCENTAGE
       response:
           constraints:
               type: Percent
