@@ -687,6 +687,17 @@ EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
+EmberAfStatus ExtractPercent100thsFromCommand(OPercent oPercent, OPercent100ths oPercent100ths, Percent100ths & percent100ths)
+{
+    if (oPercent.HasValue() || oPercent100ths.HasValue())
+    {
+        percent100ths = oPercent100ths.ValueOr(static_cast<Percent100ths>(oPercent.Value() * WC_PERCENT100THS_COEF));
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+}
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
@@ -844,16 +855,20 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::GoToLiftPercentage::DecodableType & commandData)
 {
-    auto & liftPercentageValue    = commandData.liftPercentageValue;
-    auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
-    Percent100ths liftPercent100ths =
-        liftPercent100thsValue.ValueOr(static_cast<Percent100ths>(liftPercentageValue * WC_PERCENT100THS_COEF));
-
+    Percent100ths percent100ths;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100ths);
+    EmberAfStatus status = ExtractPercent100thsFromCommand(commandData.liftPercentageValue, commandData.liftPercent100thsValue, percent100ths);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("GoToLiftPercentage error no param");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
 
-    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u command received", percent100ths);
+
+    status = GetMotionLockStatus(endpoint);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         emberAfWindowCoveringClusterPrint("Err device locked");
@@ -863,9 +878,9 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 
     if (HasFeaturePaLift(endpoint))
     {
-        if (IsPercent100thsValid(liftPercent100ths))
+        if (IsPercent100thsValid(percent100ths))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100ths);
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, percent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -922,16 +937,20 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::GoToTiltPercentage::DecodableType & commandData)
 {
-    auto & tiltPercentageValue    = commandData.tiltPercentageValue;
-    auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
-    Percent100ths tiltPercent100ths =
-        tiltPercent100thsValue.ValueOr(static_cast<Percent100ths>(tiltPercentageValue * WC_PERCENT100THS_COEF));
-
+    Percent100ths percent100ths;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100ths);
+    EmberAfStatus status = ExtractPercent100thsFromCommand(commandData.tiltPercentageValue, commandData.tiltPercent100thsValue, percent100ths);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfWindowCoveringClusterPrint("GoToTiltPercentage error no param");
+        emberAfSendImmediateDefaultResponse(status);
+        return true;
+    }
 
-    EmberAfStatus status = GetMotionLockStatus(endpoint);
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u command received", percent100ths);
+
+    status = GetMotionLockStatus(endpoint);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         emberAfWindowCoveringClusterPrint("Err device locked");
@@ -941,9 +960,9 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 
     if (HasFeaturePaTilt(endpoint))
     {
-        if (IsPercent100thsValid(tiltPercent100ths))
+        if (IsPercent100thsValid(percent100ths))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100ths);
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, percent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
