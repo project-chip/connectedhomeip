@@ -87,9 +87,9 @@ function getManualTests()
   ];
 
   const DiagnosticsLogs = [
-    'Test_TC_DIAG_LOG_1_1',
-    'Test_TC_DIAG_LOG_1_2',
-    'Test_TC_DIAG_LOG_1_3',
+    'Test_TC_Diag_Log_2_1',
+    'Test_TC_Diag_Log_2_2',
+    'Test_TC_Diag_Log_2_3',
   ];
 
   const Descriptor = [
@@ -101,9 +101,9 @@ function getManualTests()
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_1_2',
-    'Test_TC_GC_1_3',
-    'Test_TC_GC_1_4',
+    'Test_TC_GC_2_2',
+    'Test_TC_GC_2_3',
+    'Test_TC_GC_2_4',
   ];
 
   const GeneralDiagnostics = [
@@ -279,27 +279,27 @@ function getManualTests()
   ];
 
   const DoorLock = [
-    'Test_TC_DL_1_1',
-    'Test_TC_DL_1_2',
-    'Test_TC_DL_1_4',
-    'Test_TC_DL_1_5',
-    'Test_TC_DL_1_6',
-    'Test_TC_DL_1_7',
-    'Test_TC_DL_1_8',
-    'Test_TC_DL_1_10',
-    'Test_TC_DL_1_11',
-    'Test_TC_DL_1_13',
-    'Test_TC_DL_1_14',
-    'Test_TC_DL_1_15',
-    'Test_TC_DL_1_16',
-    'Test_TC_DL_1_17',
+    'Test_TC_DL_2_1',
+    'Test_TC_DL_2_2',
+    'Test_TC_DL_2_4',
+    'Test_TC_DL_2_5',
+    'Test_TC_DL_2_6',
+    'Test_TC_DL_2_7',
+    'Test_TC_DL_2_8',
+    'Test_TC_DL_2_10',
+    'Test_TC_DL_2_11',
+    'Test_TC_DL_2_13',
+    'Test_TC_DL_2_14',
+    'Test_TC_DL_2_15',
+    'Test_TC_DL_2_16',
+    'Test_TC_DL_2_17',
   ];
 
   const UserLabel = [
     'Test_TC_LC_1_1',
-    'Test_TC_LC_1_3',
-    'Test_TC_LC_1_4',
-    'Test_TC_LC_1_5',
+    'Test_TC_LC_2_3',
+    'Test_TC_LC_2_4',
+    'Test_TC_LC_2_5',
   ];
 
   const LocalizationConfiguration = [

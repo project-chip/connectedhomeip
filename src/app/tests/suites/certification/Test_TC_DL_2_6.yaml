@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    107.6. [TC-DL-1.6] Verification for the following Commands - Set PIN Code,
+    100.2.6. [TC-DL-2.6] Verification for the following Commands - Set PIN Code,
     Get PIN Code, Get PIN Code Response, Clear PIN Code, Clear All PIN Codes
     [DUT-Server]
 

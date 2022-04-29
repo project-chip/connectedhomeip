@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    107.11. [TC-DL-1.11] Verification for the following Commands - Set Year
+    100.2.11. [TC-DL-2.11] Verification for the following Commands - Set Year
     Schedule, Get Year Schedule, Get Year Day Schedule Response and Clear Year
     Day Schedule[DUT-Server]
 
