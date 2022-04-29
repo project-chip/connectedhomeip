@@ -42,11 +42,17 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPWriteParams : NSObject
 
 /**
- * Whether a Timed Write Request is sent. Default is nil and is treated as if
- * a write is sent.
+ * Controls whether the write is a timed write.
+ * 
+ * If nil (the default value), a regular write is done for attributes that do
+ * not require a timed write and a timed write with some default timed request
+ * timeout is done for attributes that require a timed write.
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If not nil, a timed write is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual write
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedWriteTimeoutMs;
