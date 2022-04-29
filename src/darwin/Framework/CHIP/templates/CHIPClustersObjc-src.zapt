@@ -127,12 +127,12 @@ using namespace chip::app::Clusters;
     // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     if (params!=nil) {
       if (params.timedWriteTimeoutMs!=nil){
-        timedWriteTimeoutMsOptional.SetValue(params.timedWriteTimeoutMs.unsignedShortValue);
+        timedWriteTimeoutMs.SetValue(params.timedWriteTimeoutMs.unsignedShortValue);
       }
     }
     {{#if mustUseTimedInvoke}}
-    if (!timedWriteTimeoutMsOptional.HasValue()) {
-      timedWriteTimeoutMsOptional.SetValue(10000);
+    if (!timedWriteTimeoutMs.HasValue()) {
+      timedWriteTimeoutMs.SetValue(10000);
     }
     {{/if}}
     
@@ -150,7 +150,7 @@ using namespace chip::app::Clusters;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeoutMsOptional);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeoutMs);
     });
     // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
