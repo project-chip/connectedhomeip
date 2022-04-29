@@ -391,6 +391,30 @@ $ ./chip-tool basic
 This section contains a general list of various CHIP Tool commands and options,
 not limited to commissioning procedure and cluster interaction.
 
+### Interactive mode versus single command mode
+
+By default, chip-tool runs in single command mode where if any single command
+does not complete within a certain timeout period, chip-tool will exit with a
+timeout error.
+
+Example of error:
+
+```
+[1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
+```
+
+For commands such as event subscriptions that need to run for longer periods of
+time, chip-tool can be started in interactive mode first before running the
+command. In interactive mode, there will be no timeout and multiple commands can
+be issued.
+
+Example of command:
+
+```
+$ ./chip-tool interactive start
+otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0
+```
+
 ### Printing all supported clusters
 
 To print all clusters supported by the CHIP Tool, run the following command:
