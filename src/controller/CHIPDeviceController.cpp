@@ -554,7 +554,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     Messaging::ExchangeContext * exchangeCtxt = nullptr;
     Optional<SessionHandle> session;
-    SessionHolder secureSessionHolder;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
