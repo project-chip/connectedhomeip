@@ -24,9 +24,13 @@
  */
 
 #include "InteractionModelEngine.h"
+
 #include <cinttypes>
 
 #include <lib/core/CHIPTLVUtilities.hpp>
+
+extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                     bool asServer);
 
 namespace chip {
 namespace app {
@@ -850,6 +854,61 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(ObjectList<Attribu
         return CHIP_IM_GLOBAL_STATUS(PathsExhausted);
     }
     return err;
+}
+
+void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths)
+{
+    ObjectList<AttributePathParams> * prev = nullptr;
+    auto * path1                           = aAttributePaths;
+
+    while (path1 != nullptr)
+    {
+        bool duplicate = false;
+        // skip all wildcard paths and invalid concrete attribute
+        if (path1->mValue.HasAttributeWildcard() ||
+            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId, true))
+        {
+            prev  = path1;
+            path1 = path1->mpNext;
+            continue;
+        }
+
+        // Check whether a wildcard path expands to something that includes this concrete path.
+        for (auto * path2 = aAttributePaths; path2 != nullptr; path2 = path2->mpNext)
+        {
+            if (path2 == path1)
+            {
+                continue;
+            }
+
+            if (path2->mValue.HasAttributeWildcard() && path2->mValue.IsAttributePathSupersetOf(path1->mValue))
+            {
+                duplicate = true;
+                break;
+            }
+        }
+
+        // if path1 duplicates something from wildcard expansion, discard path1
+        if (!duplicate)
+        {
+            prev  = path1;
+            path1 = path1->mpNext;
+            continue;
+        }
+
+        if (path1 == aAttributePaths)
+        {
+            aAttributePaths = path1->mpNext;
+            mAttributePathPool.ReleaseObject(path1);
+            path1 = aAttributePaths;
+        }
+        else
+        {
+            prev->mpNext = path1->mpNext;
+            mAttributePathPool.ReleaseObject(path1);
+            path1 = prev->mpNext;
+        }
+    }
 }
 
 void InteractionModelEngine::ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList)
