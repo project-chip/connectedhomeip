@@ -93,7 +93,16 @@ public:
         ReturnErrorOnFailure(ReadStartValue(startValue));
 
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%x startValue 0x%x", aEpoch, startValue);
+        // Compiler should optimize these branches.
+        if (is_same_v<decltype(T), uint64_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx64 " startValue 0x%" PRIx64, aEpoch, startValue);
+        }
+        else if (is_same_v<decltype(T), uint32_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx32 " startValue 0x%" PRIx32,
+                          static_cast<uint32_t>(aEpoch), static_cast<uint32_t>(startValue));
+        }
 #endif
 
         ReturnErrorOnFailure(PersistNextEpochStart(startValue + aEpoch));
@@ -142,7 +151,16 @@ private:
     {
         mNextEpoch = aStartValue;
 #if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%" PRIx64, aStartValue);
+        // Compiler should optimize these branches.
+        if (is_same_v<decltype(T), uint64_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%" PRIx64, aStartValue);
+        }
+        else
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%" PRIx32,
+                          static_cast<uint32_t>(aStartValue));
+        }
 #endif
 
         T valueLE = Encoding::LittleEndian::HostSwap<T>(aStartValue);

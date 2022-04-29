@@ -78,7 +78,7 @@ public:
         ReturnErrorOnFailure(ReadStartValue(startValue));
 
         // This will set the starting value, after which we're ready.
-        return MonotonicallyIncreasingCounter::Init(startValue);
+        return MonotonicallyIncreasingCounter<T>::Init(startValue);
     }
 
     /**
@@ -92,33 +92,12 @@ public:
     {
         VerifyOrReturnError(mId != chip::Platform::PersistedStorage::kEmptyKey, CHIP_ERROR_INCORRECT_STATE);
 
-        ReturnErrorOnFailure(MonotonicallyIncreasingCounter::Advance());
+        ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::Advance());
 
-        return chip::Platform::PersistedStorage::Write(mId, GetValue());
+        return chip::Platform::PersistedStorage::Write(mId, MonotonicallyIncreasingCounter<T>::GetValue());
     }
 
 private:
-    /**
-     *  @brief
-     *    Write out the counter value to persistent storage.
-     *
-     *  @param[in] aStartValue  The counter value to write out.
-     *
-     *  @return Any error returned by a write to persistent storage.
-     */
-    CHIP_ERROR PersistNextEpochStart(T aStartValue)
-    {
-        mNextEpoch = aStartValue;
-#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
-        ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%x", aStartValue);
-#endif
-
-        uint32_t valueLE = Encoding::LittleEndian::HostSwap(aStartValue);
-
-        DefaultStorageKeyAllocator keyAlloc;
-        return mStorage->SyncSetKeyValue((keyAlloc.*mKey)(), &valueLE, sizeof(valueLE));
-    }
-
     /**
      *  @brief
      *    Read our starting counter value (if we have one) in from persistent storage.
