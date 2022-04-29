@@ -68,7 +68,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
         app::DnssdServer::Instance().AdvertiseOperational();
-        ChipLogError(AppServer, "Operational advertising enabled");
+        ChipLogProgress(AppServer, "Operational advertising enabled");
     }
 }
 
