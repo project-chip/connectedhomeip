@@ -481,7 +481,6 @@ tests:
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
           "3b.1: read the RO optional attribute default: PhysicalClosedLimitLift"
-      disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
       PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
@@ -494,7 +493,6 @@ tests:
     - label:
           "3b.2: write a value into the RO optional attribute:
           PhysicalClosedLimitLift"
-      disabled: true
       command: "writeAttribute"
       attribute: "PhysicalClosedLimitLift"
       PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
@@ -504,7 +502,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "3b.3: reads back the RO optional attribute: PhysicalClosedLimitLift"
-      disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
       PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
@@ -516,7 +513,6 @@ tests:
 
     ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
     - label: "3c.1: read the RO optional attribute default: PhysicalClosedLimitTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
       PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
@@ -528,7 +524,6 @@ tests:
 
     - label: "3c.2: write a value into the RO optional attribute:
           PhysicalClosedLimitTilt"
-      disabled: true
       command: "writeAttribute"
       attribute: "PhysicalClosedLimitTilt"
       PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
@@ -610,7 +605,6 @@ tests:
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label: "3f.1: read the RO optional attribute default: NumberOfActuationsLift"
-      disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
       PICS: PICS_A_NUMBEROFACTUATIONSLIFT
@@ -621,7 +615,6 @@ tests:
               maxValue: 65535
 
     - label: "3f.2: write a value into the RO optional attribute: NumberOfActuationsLift"
-      disabled: true
       command: "writeAttribute"
       attribute: "NumberOfActuationsLift"
       PICS: PICS_A_NUMBEROFACTUATIONSLIFT
@@ -631,7 +624,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "3f.3: reads back the RO optional attribute: NumberOfActuationsLift"
-      disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
       PICS: PICS_A_NUMBEROFACTUATIONSLIFT
@@ -643,7 +635,6 @@ tests:
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
     - label: "3g.1: read the RO optional attribute default: NumberOfActuationsTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
       PICS: PICS_A_NUMBEROFACTUATIONSTILT
@@ -654,7 +645,6 @@ tests:
               maxValue: 65535
 
     - label: "3g.2: write a value into the RO optional attribute: NumberOfActuationsTilt"
-      disabled: true
       command: "writeAttribute"
       attribute: "NumberOfActuationsTilt"
       PICS: PICS_A_NUMBEROFACTUATIONSTILT
@@ -664,7 +654,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "3g.3: reads back the RO optional attribute: NumberOfActuationsTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
       PICS: PICS_A_NUMBEROFACTUATIONSTILT
