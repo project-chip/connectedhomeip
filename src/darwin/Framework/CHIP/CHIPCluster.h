@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * CHIPWriteParams
  *    This is used to control the behavior of cluster writes.
  *    If not provided (i.e. nil passed for the CHIPWriteParams argument), will be
- *    treated as as if no arguments were passed in.
+ *    treated as if a default-initialized object was passed in.
  */
 @interface CHIPWriteParams : NSObject
 
