@@ -47355,7 +47355,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
-    bool testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled = false;
+    bool testSendClusterTest_TC_WNCV_3_1_7_WaitForReport_Fulfilled = false;
     ResponseHandler _Nullable test_Test_TC_WNCV_3_1_OperationalStatus_Reported = nil;
 
     CHIP_ERROR TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_7()
@@ -47370,7 +47370,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-            testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled = true;
+            testSendClusterTest_TC_WNCV_3_1_7_WaitForReport_Fulfilled = true;
         };
 
         NextTest();
@@ -47390,8 +47390,8 @@ private:
             maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
             params:params
             subscriptionEstablished:^{
-                VerifyOrReturn(testSendClusterTest_TC_WNCV_3_1_000007_WaitForReport_Fulfilled,
-                    SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+                VerifyOrReturn(
+                    testSendClusterTest_TC_WNCV_3_1_7_WaitForReport_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
                 NextTest();
             }
             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -48071,7 +48071,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
-    bool testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled = false;
+    bool testSendClusterTest_TC_WNCV_3_2_7_WaitForReport_Fulfilled = false;
     ResponseHandler _Nullable test_Test_TC_WNCV_3_2_OperationalStatus_Reported = nil;
 
     CHIP_ERROR TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_7()
@@ -48086,7 +48086,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-            testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled = true;
+            testSendClusterTest_TC_WNCV_3_2_7_WaitForReport_Fulfilled = true;
         };
 
         NextTest();
@@ -48106,8 +48106,8 @@ private:
             maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
             params:params
             subscriptionEstablished:^{
-                VerifyOrReturn(testSendClusterTest_TC_WNCV_3_2_000007_WaitForReport_Fulfilled,
-                    SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+                VerifyOrReturn(
+                    testSendClusterTest_TC_WNCV_3_2_7_WaitForReport_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
                 NextTest();
             }
             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -48629,7 +48629,7 @@ private:
         WaitForMs(2000);
         return CHIP_NO_ERROR;
     }
-    bool testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled = false;
+    bool testSendClusterTest_TC_WNCV_3_3_5_WaitForReport_Fulfilled = false;
     ResponseHandler _Nullable test_Test_TC_WNCV_3_3_OperationalStatus_Reported = nil;
 
     CHIP_ERROR TestReport2SubscribeToDutReportsOnOperationalStatusAttribute_5()
@@ -48644,7 +48644,7 @@ private:
             VerifyOrReturn(CheckValue("status", err, 0));
 
             VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
-            testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled = true;
+            testSendClusterTest_TC_WNCV_3_3_5_WaitForReport_Fulfilled = true;
         };
 
         NextTest();
@@ -48664,8 +48664,8 @@ private:
             maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
             params:params
             subscriptionEstablished:^{
-                VerifyOrReturn(testSendClusterTest_TC_WNCV_3_3_000005_WaitForReport_Fulfilled,
-                    SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+                VerifyOrReturn(
+                    testSendClusterTest_TC_WNCV_3_3_5_WaitForReport_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
                 NextTest();
             }
             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
@@ -64617,7 +64617,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
-    bool testSendClusterTestCluster_000366_WaitForReport_Fulfilled = false;
+    bool testSendClusterTestCluster_366_WaitForReport_Fulfilled = false;
     ResponseHandler _Nullable test_TestCluster_list_int8u_Reported = nil;
 
     CHIP_ERROR TestReportSubscribeToListAttribute_366()
@@ -64640,7 +64640,7 @@ private:
                 VerifyOrReturn(CheckValue("", actualValue[3], 4));
             }
 
-            testSendClusterTestCluster_000366_WaitForReport_Fulfilled = true;
+            testSendClusterTestCluster_366_WaitForReport_Fulfilled = true;
         };
 
         NextTest();
@@ -64661,7 +64661,7 @@ private:
             params:params
             subscriptionEstablished:^{
                 VerifyOrReturn(
-                    testSendClusterTestCluster_000366_WaitForReport_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+                    testSendClusterTestCluster_366_WaitForReport_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
                 NextTest();
             }
             reportHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
@@ -74254,7 +74254,7 @@ private:
 
         return CHIP_NO_ERROR;
     }
-    bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
+    bool testSendClusterTestSubscribe_OnOff_2_WaitForReport_Fulfilled = false;
     ResponseHandler _Nullable test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     CHIP_ERROR TestReportSubscribeOnOffAttribute_2()
@@ -74273,7 +74273,7 @@ private:
                 VerifyOrReturn(CheckValue("OnOff", actualValue, false));
             }
 
-            testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = true;
+            testSendClusterTestSubscribe_OnOff_2_WaitForReport_Fulfilled = true;
         };
 
         NextTest();
@@ -74293,8 +74293,8 @@ private:
             maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
             params:params
             subscriptionEstablished:^{
-                VerifyOrReturn(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled,
-                    SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+                VerifyOrReturn(
+                    testSendClusterTestSubscribe_OnOff_2_WaitForReport_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
                 NextTest();
             }
             reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {

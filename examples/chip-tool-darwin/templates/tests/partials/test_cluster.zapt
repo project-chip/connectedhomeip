@@ -82,7 +82,7 @@ class {{filename}}: public TestCommandBridge
 
     {{#chip_tests_items}}
     {{#if async}}
-    bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = false;
+    bool testSendCluster{{parent.filename}}_{{index}}_{{asUpperCamelCase command}}_Fulfilled = false;
     {{/if}}
     {{#chip_tests_item_responses}}
     {{#chip_tests_item_response_parameters}}
@@ -140,7 +140,7 @@ class {{filename}}: public TestCommandBridge
                                                                    maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument] 
                                                                    params:params
                                                                    subscriptionEstablished:^{
-              VerifyOrReturn(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+              VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
               NextTest();
           }
           reportHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
@@ -235,7 +235,7 @@ class {{filename}}: public TestCommandBridge
         {{#unless async}}
         NextTest();
         {{else}}
-        testSendCluster{{parent.filename}}_{{asTestIndex ../index}}_{{asUpperCamelCase command}}_Fulfilled = true;
+        testSendCluster{{parent.filename}}_{{../index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
         {{else}}
           {{! We're a subscription }}
