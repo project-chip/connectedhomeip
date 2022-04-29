@@ -444,8 +444,9 @@ public:
         else if (i == 2)
         {
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-            chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                CommissioningWindowManager::MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly);
+            auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+            commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                       CommissioningWindowAdvertisement::kDnssdOnly);
         }
     }
 
