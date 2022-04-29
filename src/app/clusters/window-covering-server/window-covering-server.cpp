@@ -858,7 +858,8 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     Percent100ths percent100ths;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    EmberAfStatus status = ExtractPercent100thsFromCommand(commandData.liftPercentageValue, commandData.liftPercent100thsValue, percent100ths);
+    EmberAfStatus status =
+        ExtractPercent100thsFromCommand(commandData.liftPercentageValue, commandData.liftPercent100thsValue, percent100ths);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         emberAfWindowCoveringClusterPrint("GoToLiftPercentage error no param");
@@ -940,7 +941,8 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     Percent100ths percent100ths;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    EmberAfStatus status = ExtractPercent100thsFromCommand(commandData.tiltPercentageValue, commandData.tiltPercent100thsValue, percent100ths);
+    EmberAfStatus status =
+        ExtractPercent100thsFromCommand(commandData.tiltPercentageValue, commandData.tiltPercent100thsValue, percent100ths);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         emberAfWindowCoveringClusterPrint("GoToTiltPercentage error no param");
