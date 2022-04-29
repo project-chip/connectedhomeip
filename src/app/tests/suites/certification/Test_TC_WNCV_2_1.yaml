@@ -31,6 +31,7 @@ tests:
                 value: nodeId
 
     ### MANDATORY Attributes
+    ### 1 MANDATORY Attributes
     ### Attribute[  0]: Type  =======================================
     - label: "2: read the RO mandatory attribute default: Type"
       command: "readAttribute"
@@ -158,7 +159,7 @@ tests:
       response:
           value: 8
 
-    ### CONDITIONALLY MANDATORY Attributes
+    ### 2 CONDITIONALLY MANDATORY Attributes
     ### Attribute[ 11]: TargetPositionLiftPercent100ths  ====================
     - label:
           "2: read the RO optional attribute default:
@@ -407,7 +408,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    ### CONDITIONALLY and PURELY OPTIONAL Attributes
+    ### 3 CONDITIONALLY and PURELY OPTIONAL Attributes
     ### Attribute[ 26]: SafetyStatus  ==========================
     - label: "4: read the RO mandatory attribute default: SafetyStatus"
       command: "readAttribute"
