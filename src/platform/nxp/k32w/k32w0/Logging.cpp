@@ -2,6 +2,7 @@
 
 #include <platform/logging/LogV.h>
 
+#include <inttypes.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
@@ -45,7 +46,7 @@ void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t c
      */
     assert(bufLen >= (timestamp_max_len_bytes + category_max_len_bytes + (strlen(module) + 2) + 1));
 
-    writtenLen = snprintf(buf, bufLen, "[%lu]", otPlatAlarmMilliGetNow());
+    writtenLen = snprintf(buf, bufLen, "[%" PRIu32, otPlatAlarmMilliGetNow());
     bufLen -= writtenLen;
     buf += writtenLen;
 
