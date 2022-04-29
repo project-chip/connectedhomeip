@@ -12,20 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/jsoncpp.gni")
-
-config("jsontlv_config") {
-  cflags = [ "-Wno-implicit-fallthrough" ]
-}
-
-static_library("jsontlv") {
-  sources = [ "TlvJson.cpp" ]
-
-  public_configs = [ ":jsontlv_config" ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    jsoncpp_root,
-  ]
+declare_args() {
+  jsoncpp_root = "//third_party/jsoncpp"
 }
