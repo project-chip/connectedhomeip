@@ -11,10 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w0_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
@@ -268,11 +272,19 @@ template("k32w0_sdk") {
       "-Wno-sign-compare",
       "-Wno-clobbered",
       "-Wno-implicit-fallthrough",
-      "-fno-optimize-strlen",
       "-mthumb",
       "-MMD",
       "-MP",
     ]
+
+    if (is_clang) {
+      cflags += [
+        "-Wno-self-assign",
+        "-Wno-parentheses-equality",
+      ]
+    } else {
+      cflags += [ "-fno-optimize-strlen" ]
+    }
 
     # Now add our "system-header" include dirs
     foreach(include_dir, _sdk_include_dirs) {
