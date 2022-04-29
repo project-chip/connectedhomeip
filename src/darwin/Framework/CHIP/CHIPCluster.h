@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Controls whether the write is a timed write.
- * 
+ *
  * If nil (the default value), a regular write is done for attributes that do
  * not require a timed write and a timed write with some default timed request
  * timeout is done for attributes that require a timed write.
