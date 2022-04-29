@@ -40,7 +40,7 @@ tests:
     - label: "TH reads TxUnicastCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-unicast-count 476 0
-           
+
 
           [1649826032.959906][3511:3516] CHIP:DMG:        SuppressResponse = true,
           [1649826032.959968][3511:3516] CHIP:DMG:        InteractionModelRevision = 1
@@ -63,7 +63,7 @@ tests:
     - label: "TH reads TxAckRequestedCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 476 0
-           
+
 
           [1649826091.335485][3525:3530] CHIP:DMG:        SuppressResponse = true,
           [1649826091.335549][3525:3530] CHIP:DMG:        InteractionModelRevision = 1
@@ -75,7 +75,7 @@ tests:
     - label: "TH reads TxAckedCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-acked-count 476 0
-           
+
 
           [1649826121.430757][3534:3539] CHIP:DMG:        SuppressResponse = true,
           [1649826121.430799][3534:3539] CHIP:DMG:        InteractionModelRevision = 1
@@ -87,7 +87,7 @@ tests:
     - label: "TH reads TxNoAckRequestedCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 476 0
-           
+
 
           [1649826152.539898][3540:3545] CHIP:DMG:        SuppressResponse = true,
           [1649826152.539960][3540:3545] CHIP:DMG:        InteractionModelRevision = 1
@@ -99,7 +99,7 @@ tests:
     - label: "TH reads TxDataCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-data-count 476 0
-           
+
           [1649826184.869528][3547:3552] CHIP:DMG:        SuppressResponse = true,
           [1649826184.869589][3547:3552] CHIP:DMG:        InteractionModelRevision = 1
           [1649826184.869646][3547:3552] CHIP:DMG: }
@@ -110,7 +110,7 @@ tests:
     - label: "TH reads TxDataPollCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 476 0
-           
+
           [1649826215.573121][3553:3558] CHIP:DMG:        SuppressResponse = true,
           [1649826215.573185][3553:3558] CHIP:DMG:        InteractionModelRevision = 1
           [1649826215.573242][3553:3558] CHIP:DMG: }
@@ -121,7 +121,7 @@ tests:
     - label: "TH reads TxBeaconCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-beacon-count 476 0
-           
+
 
           [1649826252.581671][3561:3566] CHIP:DMG:        SuppressResponse = true,
           [1649826252.581733][3561:3566] CHIP:DMG:        InteractionModelRevision = 1
@@ -133,7 +133,7 @@ tests:
     - label: "TH reads TxBeaconRequestCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 476 0
-           
+
           [1649826283.345936][3568:3573] CHIP:DMG:        SuppressResponse = true,
           [1649826283.345998][3568:3573] CHIP:DMG:        InteractionModelRevision = 1
           [1649826283.346055][3568:3573] CHIP:DMG: }
@@ -155,7 +155,7 @@ tests:
     - label: "TH reads TxRetryCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-retry-count 476 0
-           
+
           [1649826365.526774][3584:3589] CHIP:DMG:        SuppressResponse = true,
           [1649826365.526838][3584:3589] CHIP:DMG:        InteractionModelRevision = 1
           [1649826365.526915][3584:3589] CHIP:DMG: }
@@ -166,7 +166,7 @@ tests:
     - label: "TH reads TxDirectMaxRetryExpiryCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-direct-max-retry-expiry-count 476 0
-           
+
 
           [1649826396.738205][3590:3595] CHIP:DMG:        SuppressResponse = true,
           [1649826396.738269][3590:3595] CHIP:DMG:        InteractionModelRevision = 1
@@ -200,7 +200,7 @@ tests:
     - label: "TH reads TxErrAbortCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-abort-count 476 0
-           
+
 
           [1649826488.510290][3614:3619] CHIP:DMG:        SuppressResponse = true,
           [1649826488.510353][3614:3619] CHIP:DMG:        InteractionModelRevision = 1
@@ -212,7 +212,7 @@ tests:
     - label: "TH reads TxErrBusyChannelCount attribute value from DUT"
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 476 0
-           
+
           [1649826519.384125][3621:3626] CHIP:DMG:        SuppressResponse = true,
           [1649826519.384189][3621:3626] CHIP:DMG:        InteractionModelRevision = 1
           [1649826519.384269][3621:3626] CHIP:DMG: }
