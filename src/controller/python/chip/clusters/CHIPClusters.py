@@ -7197,6 +7197,18 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000001: {
+                    "attributeName": "PhysicalClosedLimitLift",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000002: {
+                    "attributeName": "PhysicalClosedLimitTilt",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000003: {
                     "attributeName": "CurrentPositionLift",
                     "attributeId": 0x00000003,
@@ -7206,6 +7218,18 @@ class ChipClusters:
                 0x00000004: {
                     "attributeName": "CurrentPositionTilt",
                     "attributeId": 0x00000004,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000005: {
+                    "attributeName": "NumberOfActuationsLift",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000006: {
+                    "attributeName": "NumberOfActuationsTilt",
+                    "attributeId": 0x00000006,
                     "type": "int",
                     "reportable": True,
                 },

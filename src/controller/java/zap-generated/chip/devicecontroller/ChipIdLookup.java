@@ -2941,11 +2941,23 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "Type";
       }
+      if (attributeId == 1L) {
+        return "PhysicalClosedLimitLift";
+      }
+      if (attributeId == 2L) {
+        return "PhysicalClosedLimitTilt";
+      }
       if (attributeId == 3L) {
         return "CurrentPositionLift";
       }
       if (attributeId == 4L) {
         return "CurrentPositionTilt";
+      }
+      if (attributeId == 5L) {
+        return "NumberOfActuationsLift";
+      }
+      if (attributeId == 6L) {
+        return "NumberOfActuationsTilt";
       }
       if (attributeId == 7L) {
         return "ConfigStatus";
