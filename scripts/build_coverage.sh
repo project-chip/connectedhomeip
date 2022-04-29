@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+#
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+set -e
+
+_normpath() {
+    python -c "import os.path; print(os.path.normpath('$@'))"
+}
+
+CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
+OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
+COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
+
+help() {
+
+    echo "Usage: $file_name [ options ... ]"
+
+    echo "General Options:
+  -h, --help                Display this information.
+Input Options:
+  -o, --output_root         Set the build output directory"
+}
+
+file_name=${0##*/}
+
+while (($#)); do
+    case $1 in
+        --help | -h)
+            help
+            exit 1
+            ;;
+        --output_root | -o)
+            OUTPUT_ROOT=$2
+            shift
+            ;;
+        -*)
+            help
+            echo "Unknown Option \"$1\""
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# Print input values
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\""
+
+# Ensure we have a compilation environment
+source "$CHIP_ROOT/scripts/activate.sh"
+
+# Generates ninja files
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true'
+ninja -C "$OUTPUT_ROOT" check
+
+mkdir -p "$COVERAGE_ROOT"
+lcov --initial --capture --directory "$OUTPUT_ROOT/obj" --output-file "$COVERAGE_ROOT/lcov_base.info"
+lcov --capture --directory "$OUTPUT_ROOT"/obj --output-file "$COVERAGE_ROOT/lcov_test.info"
+lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
+genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"
