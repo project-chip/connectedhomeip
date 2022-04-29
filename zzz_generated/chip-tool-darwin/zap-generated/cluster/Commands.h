@@ -46778,7 +46778,6 @@ private:
 | * LifetimeEnergyConsumed                                            | 0x0017 |
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
-| * AlarmMask                                                         | 0x0022 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -48822,87 +48821,6 @@ public:
                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                }
                                            }];
-
-        return CHIP_NO_ERROR;
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute AlarmMask
- */
-class ReadPumpConfigurationAndControlAlarmMask : public ModelCommand {
-public:
-    ReadPumpConfigurationAndControlAlarmMask()
-        : ModelCommand("read")
-    {
-        AddArgument("attr-name", "alarm-mask");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadPumpConfigurationAndControlAlarmMask() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReadAttribute (0x00000022) on endpoint %u", endpointId);
-
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
-                                                                                                   endpoint:endpointId
-                                                                                                      queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
-        [cluster readAttributeAlarmMaskWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-            NSLog(@"PumpConfigurationAndControl.AlarmMask response %@", [value description]);
-            err = [CHIPError errorToCHIPErrorCode:error];
-
-            ChipLogError(chipTool, "PumpConfigurationAndControl AlarmMask Error: %s", chip::ErrorStr(err));
-            SetCommandExitStatus(err);
-        }];
-        return err;
-    }
-};
-
-class SubscribeAttributePumpConfigurationAndControlAlarmMask : public ModelCommand {
-public:
-    SubscribeAttributePumpConfigurationAndControlAlarmMask()
-        : ModelCommand("subscribe")
-    {
-        AddArgument("attr-name", "alarm-mask");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~SubscribeAttributePumpConfigurationAndControlAlarmMask() {}
-
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000200) ReportAttribute (0x00000022) on endpoint %u", endpointId);
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
-                                                                                                   endpoint:endpointId
-                                                                                                      queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
-        [cluster subscribeAttributeAlarmMaskWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
-                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
-                                                     params:params
-                                    subscriptionEstablished:nullptr
-                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                                                  NSLog(@"PumpConfigurationAndControl.AlarmMask response %@", [value description]);
-                                                  if (error || !mWait) {
-                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
-                                                  }
-                                              }];
 
         return CHIP_NO_ERROR;
     }
@@ -79692,8 +79610,6 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<ReadPumpConfigurationAndControlControlMode>(), //
         make_unique<WritePumpConfigurationAndControlControlMode>(), //
         make_unique<SubscribeAttributePumpConfigurationAndControlControlMode>(), //
-        make_unique<ReadPumpConfigurationAndControlAlarmMask>(), //
-        make_unique<SubscribeAttributePumpConfigurationAndControlAlarmMask>(), //
         make_unique<ReadPumpConfigurationAndControlGeneratedCommandList>(), //
         make_unique<SubscribeAttributePumpConfigurationAndControlGeneratedCommandList>(), //
         make_unique<ReadPumpConfigurationAndControlAcceptedCommandList>(), //

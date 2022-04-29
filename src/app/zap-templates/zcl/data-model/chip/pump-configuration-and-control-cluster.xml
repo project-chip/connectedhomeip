@@ -64,7 +64,6 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" default="0x0000" optional="true">AlarmMask</attribute>
 
     <event side="server" code="0x00" priority="info" name="SupplyVoltageLow">
       <description>SupplyVoltageLow</description>

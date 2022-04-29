@@ -20,15 +20,33 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/AttributeAccessInterface.h>
+//#include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PumpConfigurationAndControl;
 
 namespace {
+
+class PumpConfigurationAndControlAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the Pump Configuration And Control cluster on all endpoints.
+    PumpConfigurationAndControlAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), PumpConfigurationAndControl::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+private:
+};
+
+PumpConfigurationAndControlAttrAccess gAttrAccess;
 
 // Enum for RemoteSensorType
 enum class RemoteSensorType : uint8_t
@@ -79,9 +97,15 @@ static void updateAttributeLinks(EndpointId endpoint)
             break;
         case RemoteSensorType::kPressureSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
+            pumpStatus.Clear(PumpStatus::kRemoteFlow);
+            pumpStatus.Set(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
             break;
         case RemoteSensorType::kTemperatureSensor:
             Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
+            pumpStatus.Clear(PumpStatus::kRemoteFlow);
+            pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Set(PumpStatus::kRemoteTemperature);
             break;
         case RemoteSensorType::kNoSensor:
             // The pump is controlled by a setpoint, as defined by
@@ -89,11 +113,27 @@ static void updateAttributeLinks(EndpointId endpoint)
             // controlled between 0% and 100%, e.g., by means of the Level Control cluster)
             // The ControlMode can be any of the following:
             // ConstantSpeed, ConstantPressure, ProportionalPressure,
-            // ConstantFlow, ConstantTemperature or Automatic
+            // ConstantFlow, ConstantTemperature or Automatic. The actual ControlMode
+            // which would be the EffectiveControlMode is dependant on the actual
+            // physical pump application running "on-top" of this cluster server.
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
             pumpStatus.Clear(PumpStatus::kRemoteFlow);
             pumpStatus.Clear(PumpStatus::kRemotePressure);
+            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            switch (controlMode) {
+            case PumpControlMode::kConstantFlow:
+                pumpStatus.Set(PumpStatus::kRemoteFlow);
+            break;
+            case PumpControlMode::kConstantPressure:
+                pumpStatus.Set(PumpStatus::kRemotePressure);
+            break;
+            case PumpControlMode::kConstantTemperature:
+                pumpStatus.Set(PumpStatus::kRemoteTemperature);
+            break;
+            default:
+                // Intentionally left out
+            break;
+            }
             break;
         }
         // Set the overall effective operation mode to Normal
@@ -108,8 +148,13 @@ static void updateAttributeLinks(EndpointId endpoint)
         uint8_t maxLevel;
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMaximum);
         Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
         LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
+#endif
+        pumpStatus.Clear(PumpStatus::kRemoteFlow);
+        pumpStatus.Clear(PumpStatus::kRemotePressure);
+        pumpStatus.Clear(PumpStatus::kRemoteTemperature);
     }
     break;
 
@@ -117,25 +162,175 @@ static void updateAttributeLinks(EndpointId endpoint)
         uint8_t minLevel;
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMinimum);
         Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
         LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel);
+#endif
+        pumpStatus.Clear(PumpStatus::kRemoteFlow);
+        pumpStatus.Clear(PumpStatus::kRemotePressure);
+        pumpStatus.Clear(PumpStatus::kRemoteTemperature);
     }
     break;
 
     case PumpOperationMode::kLocal: {
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
         Attributes::EffectiveControlMode::Set(endpoint, controlMode);
-        pumpStatus.Set(PumpStatus::kLocalOverride);
+        pumpStatus.Clear(PumpStatus::kRemoteFlow);
+        pumpStatus.Clear(PumpStatus::kRemotePressure);
+        pumpStatus.Clear(PumpStatus::kRemoteTemperature);
     }
     break;
     }
     Attributes::PumpStatus::Set(endpoint, pumpStatus);
 }
+
+CHIP_ERROR PumpConfigurationAndControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    emberAfDebugPrintln("Reading from PCC");
+
+    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PumpConfigurationAndControlAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    emberAfDebugPrintln("Writing to PCC");
+
+    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
 } // namespace
+
+// SDK Callbacks
+
+template <typename T1, typename T2>
+bool IsFeatureSupported(EndpointId endpoint, EmberAfStatus (*getFn1)(chip::EndpointId endpointId, T1 & value), EmberAfStatus (*getFn2)(chip::EndpointId endpointId, T2 & value))
+{
+    EmberAfStatus status;
+
+    T1 value1;
+    T2 value2;
+
+    status = getFn1(endpoint, value1);
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        if (!value1.IsNull())
+        {
+            status = getFn2(endpoint, value2);
+            if (status == EMBER_ZCL_STATUS_SUCCESS)
+            {
+                if (!value2.IsNull())
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
+    bool constPressureSupported = false;
+    bool constPropPressureSupported = false;
+    bool constFlowSupported = false;
+    bool constTemperatureSupported = false;
+    bool constSpeedSupported = false;
+
     emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
+
+    // Determine the internal feature set of the pump, depending on the pump
+    // specific attributes available, and their values. If an attribute is
+    // present/available, then there is a possibility for the associated
+    // feature being present as well. But we will have to distinguis between
+    // the attributes being available and null also. At this point (init)
+    // we can only examine the list of attributes available, and then detect
+    // if they each have a NonNull value. Later on, when the pump application
+    // has finished its init process, it might setup these attributevalues
+    // to something NonNull, and then we must re-calcualte the feature set.
+
+    Attributes::MaxConstPressure::SetNull(endpoint);
+    Attributes::MinConstTemp::SetNull(endpoint);
+
+    constPressureSupported = IsFeatureSupported(endpoint, Attributes::MinConstPressure::Get, Attributes::MaxConstPressure::Get);
+    emberAfDebugPrintln("Constant Pressure %s", constPressureSupported ? "Supported" : "Not Supported");
+    constPropPressureSupported = IsFeatureSupported(endpoint, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get);
+    emberAfDebugPrintln("Constant Proportional Pressure %s", constPropPressureSupported ? "Supported" : "Not Supported");
+    constFlowSupported = IsFeatureSupported(endpoint, Attributes::MinConstFlow::Get, Attributes::MaxConstFlow::Get);
+    emberAfDebugPrintln("Constant Flow %s", constFlowSupported ? "Supported" : "Not Supported");
+    constTemperatureSupported = IsFeatureSupported(endpoint, Attributes::MinConstTemp::Get, Attributes::MaxConstTemp::Get);
+    emberAfDebugPrintln("Constant Temperature %s", constTemperatureSupported ? "Supported" : "Not Supported");
+    constSpeedSupported = IsFeatureSupported(endpoint, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get);
+    emberAfDebugPrintln("Constant Speed %s", constSpeedSupported ? "Supported" : "Not Supported");
+}
+
+chip::Protocols::InteractionModel::Status
+MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+{
+    emberAfDebugPrintln("PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                        (unsigned int) attributePath.mAttributeId);
+
+    Protocols::InteractionModel::Status status;
+
+    switch (attributePath.mAttributeId)
+    {
+    case Attributes::ControlMode::Id: {
+        PumpControlMode controlMode;
+        NumericAttributeTraits<PumpControlMode>::StorageType storage;
+        memcpy(&storage, value, size);
+        controlMode = NumericAttributeTraits<PumpControlMode>::StorageToWorking(storage);
+        switch (controlMode)
+        {
+        case PumpControlMode::kConstantFlow:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstFlow::Get, Attributes::MaxConstFlow::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpControlMode::kConstantPressure:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstPressure::Get, Attributes::MaxConstPressure::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpControlMode::kConstantSpeed:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpControlMode::kConstantTemperature:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstTemp::Get, Attributes::MaxConstTemp::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        default:
+            status = Protocols::InteractionModel::Status::Success;
+        }
+    } break;
+    case Attributes::OperationMode::Id:
+        // TODO: Implement checks on the Operation Mode values
+        break;
+    default:
+        status = Protocols::InteractionModel::Status::Success;
+    }
+
+    return status;
 }
 
 void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
@@ -158,4 +353,9 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
     }
 }
 
-void MatterPumpConfigurationAndControlPluginServerInitCallback() {}
+void MatterPumpConfigurationAndControlPluginServerInitCallback(void)
+{
+    emberAfDebugPrintln("Initialize PCC Plugin Server Cluster.");
+
+    registerAttributeAccessOverride(&gAttrAccess);
+}

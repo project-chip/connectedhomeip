@@ -104,6 +104,31 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     }
 }
 
+chip::Protocols::InteractionModel::Status DeviceCallbacks::PreAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+{
+    PLAT_LOG("PreAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
+             endpointId, attributeId);
+
+    switch (clusterId)
+    {
+    case PumpConfigurationAndControl::Id:
+        break;
+
+    case OnOff::Id:
+        break;
+
+    case LevelControl::Id:
+        break;
+
+    default:
+        PLAT_LOG("Unhandled cluster ID: %d", clusterId);
+        break;
+    }
+
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                                   uint8_t type, uint16_t size, uint8_t * value)
 {
@@ -112,6 +137,9 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 
     switch (clusterId)
     {
+    case PumpConfigurationAndControl::Id:
+        break;
+
     case OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;

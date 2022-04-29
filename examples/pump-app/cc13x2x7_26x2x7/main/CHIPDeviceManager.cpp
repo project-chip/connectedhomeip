@@ -75,3 +75,18 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                         size, value);
     }
 }
+
+chip::Protocols::InteractionModel::Status
+MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+                                 uint8_t * value)
+{
+    chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
+        chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
+    if (cb != nullptr)
+    {
+        return cb->PreAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, mask, type,
+                                        size, value);
+    }
+
+    return chip::Protocols::InteractionModel::Status::Success;
+}

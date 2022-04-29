@@ -123,6 +123,17 @@ int AppTask::StartAppTask()
     return ret;
 }
 
+void AppTask::InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+}
+
 int AppTask::Init()
 {
     LED_Params ledParams;
@@ -179,13 +190,7 @@ int AppTask::Init()
 #endif
 
     // Init ZCL Data Model and start server
-    PLAT_LOG("Initialize Server");
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -321,29 +326,23 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     // Turn off the pump state LED if in an STOPPED state.
     if (aAction == PumpManager::START_ACTION)
     {
-        BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
         PLAT_LOG("Pump start completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
         // Signal to the PCC cluster, that the pump is running
-        PumpConfigurationAndControl::Attributes::PumpStatus::Get(1, &pumpStatus);
-        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
-        PumpConfigurationAndControl::Attributes::PumpStatus::Set(1, pumpStatus);
+        sAppTask.UpdateClusterState();
     }
     else if (aAction == PumpManager::STOP_ACTION)
     {
-        BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
         PLAT_LOG("Pump stop completed");
         LED_stopBlinking(sAppGreenHandle);
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
         // Signal to the PCC cluster, that the pump is NOT running
-        PumpConfigurationAndControl::Attributes::PumpStatus::Get(1, &pumpStatus);
-        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
-        PumpConfigurationAndControl::Attributes::PumpStatus::Set(1, pumpStatus);
+        sAppTask.UpdateClusterState();
     }
     if (aActor == AppEvent::kEventType_ButtonLeft)
     {
@@ -431,11 +430,52 @@ void AppTask::InitOnOffClusterState()
 
 void AppTask::InitPCCClusterState() {}
 
-void AppTask::UpdateClusterState()
+void AppTask::UpdateClusterState(void)
+{
+    // We must ensure that the Cluster accessors gets called in the right context
+    // which is the Matter mainloop thru ScheduleWork()
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
+}
+
+void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
+    BitFlags<PumpConfigurationAndControl::PumpStatus> pumpStatus;
 
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
+    ChipLogProgress(NotSpecified, "Update Cluster State");
+
+    // Update the PumpStatus
+    PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
+    if (PumpMgr().IsStopped())
+    {
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+    }
+    else
+    {
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+    }
+    PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
+
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantFlow);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Flow error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantPressure);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Pressure error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Speed error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantTemperature);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Temperature error  %x", status);
+    }
 
     // Write the new values
     bool onOffState = !PumpMgr().IsStopped();

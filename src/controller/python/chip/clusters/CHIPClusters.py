@@ -4565,12 +4565,6 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
-                0x00000022: {
-                    "attributeName": "AlarmMask",
-                    "attributeId": 0x00000022,
-                    "type": "int",
-                    "reportable": True,
-                },
                 0x0000FFF8: {
                     "attributeName": "GeneratedCommandList",
                     "attributeId": 0x0000FFF8,

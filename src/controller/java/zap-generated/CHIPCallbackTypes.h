@@ -1122,8 +1122,6 @@ typedef void (*CHIPPumpConfigurationAndControlClusterOperationModeAttributeCallb
     void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPPumpConfigurationAndControlClusterControlModeAttributeCallbackType)(
     void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo::DecodableArgType);
-typedef void (*CHIPPumpConfigurationAndControlClusterAlarmMaskAttributeCallbackType)(
-    void *, chip::app::Clusters::PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo::DecodableArgType);
 typedef void (*CHIPPumpConfigurationAndControlClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::PumpConfigurationAndControl::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPumpConfigurationAndControlClusterAcceptedCommandListAttributeCallbackType)(

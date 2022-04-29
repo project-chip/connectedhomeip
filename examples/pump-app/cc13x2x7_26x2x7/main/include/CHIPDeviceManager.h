@@ -74,6 +74,24 @@ public:
     virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
     {}
+    /**
+     * @brief
+     *   Called just before an attribute will be changed
+     *
+     * @param endpoint           endpoint id
+     * @param clusterID          cluster id
+     * @param attributeId        attribute id that was changed
+     * @param mask               mask of the attribute
+     * @param manufacturerCode   manufacturer code
+     * @param type               attribute type
+     * @param size               size of the attribute
+     * @param value              pointer to the new value
+     * 
+     * @return Success if the attribute can be changed, otherwise Failed.
+     */
+    virtual chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+    { return chip::Protocols::InteractionModel::Status::Success; }
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
 

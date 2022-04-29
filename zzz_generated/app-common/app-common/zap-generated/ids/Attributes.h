@@ -3250,10 +3250,6 @@ namespace ControlMode {
 static constexpr AttributeId Id = 0x00000021;
 } // namespace ControlMode
 
-namespace AlarmMask {
-static constexpr AttributeId Id = 0x00000022;
-} // namespace AlarmMask
-
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

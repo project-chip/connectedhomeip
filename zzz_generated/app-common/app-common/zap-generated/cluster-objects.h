@@ -21377,18 +21377,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ControlMode
-namespace AlarmMask {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AlarmMask
 namespace GeneratedCommandList {
 struct TypeInfo
 {
@@ -21486,7 +21474,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
         Attributes::ControlMode::TypeInfo::DecodableType controlMode =
             static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(0);
-        Attributes::AlarmMask::TypeInfo::DecodableType alarmMask = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
