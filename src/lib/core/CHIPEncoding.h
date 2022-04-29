@@ -209,6 +209,15 @@ namespace LittleEndian {
 
 /**
  * This conditionally performs, as necessary for the target system, a
+ * byte order swap by value of the specified value, presumed to be in
+ * little endian byte ordering to the target system (i.e. host)
+ * byte ordering.
+ */
+template <typename T>
+inline T HostSwap(T v);
+
+/**
+ * This conditionally performs, as necessary for the target system, a
  * byte order swap by value of the specified 16-bit value, presumed to
  * be in little endian byte ordering to the target system (i.e. host)
  * byte ordering.
@@ -223,6 +232,12 @@ namespace LittleEndian {
 inline uint16_t HostSwap16(uint16_t v)
 {
     return nl::ByteOrder::Swap16LittleToHost(v);
+}
+
+template <>
+inline uint16_t HostSwap<uint16_t>(uint16_t v)
+{
+    return HostSwap16(v);
 }
 
 /**
@@ -243,6 +258,12 @@ inline uint32_t HostSwap32(uint32_t v)
     return nl::ByteOrder::Swap32LittleToHost(v);
 }
 
+template <>
+inline uint32_t HostSwap<uint32_t>(uint32_t v)
+{
+    return HostSwap32(v);
+}
+
 /**
  * This conditionally performs, as necessary for the target system, a
  * byte order swap by value of the specified 64-bit value, presumed to
@@ -259,6 +280,12 @@ inline uint32_t HostSwap32(uint32_t v)
 inline uint64_t HostSwap64(uint64_t v)
 {
     return nl::ByteOrder::Swap64LittleToHost(v);
+}
+
+template <>
+inline uint64_t HostSwap<uint64_t>(uint64_t v)
+{
+    return HostSwap64(v);
 }
 
 /**
