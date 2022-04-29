@@ -86,7 +86,7 @@ public:
      * @param type               attribute type
      * @param size               size of the attribute
      * @param value              pointer to the new value
-     * 
+     *
      * @return Success if the attribute can be changed, otherwise Failed.
      */
     virtual chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
