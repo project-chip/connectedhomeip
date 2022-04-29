@@ -82,6 +82,7 @@ chip::BitFlags<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint);
 void ConfigStatusUpdateFeatures(chip::EndpointId endpoint);
 
 void OperationalStatusPrint(const chip::BitFlags<OperationalStatus> & opStatus);
+void OperationalStatusSet(chip::EndpointId endpoint, chip::BitFlags<OperationalStatus> newStatus);
 chip::BitFlags<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint);
 void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field, OperationalState state);
 OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field);
