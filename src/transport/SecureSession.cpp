@@ -36,7 +36,6 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
         // Initiator (aka commissioner) leaves subject descriptor unfilled.
         if (GetCryptoContext().IsResponder())
         {
-            // Commissionee role gets subject descriptor filled in.
             subjectDescriptor.authMode    = Access::AuthMode::kPase;
             subjectDescriptor.subject     = mPeerNodeId;
             subjectDescriptor.fabricIndex = GetFabricIndex();
