@@ -4295,8 +4295,12 @@ client cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
+  readonly attribute int16u physicalClosedLimitLift = 1;
+  readonly attribute int16u physicalClosedLimitTilt = 2;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
+  readonly attribute int16u numberOfActuationsLift = 5;
+  readonly attribute int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
