@@ -40,7 +40,6 @@
 #include <protocols/secure_channel/Constants.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
-#include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 

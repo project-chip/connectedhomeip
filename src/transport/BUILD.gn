@@ -30,7 +30,6 @@ static_library("transport") {
     "MessageCounter.cpp",
     "MessageCounter.h",
     "MessageCounterManagerInterface.h",
-    "PairingSession.cpp",
     "PeerMessageCounter.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",

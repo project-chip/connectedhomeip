@@ -15,6 +15,7 @@ chip_test_suite("tests") {
     #    "TestMessageCounterManager.cpp",
     "TestDefaultSessionResumptionStorage.cpp",
     "TestPASESession.cpp",
+    "TestPairingSession.cpp",
     "TestSimpleSessionResumptionStorage.cpp",
     "TestStatusReport.cpp",
   ]

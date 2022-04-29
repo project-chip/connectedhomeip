@@ -26,11 +26,9 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
-
-#include <messaging/ReliableMessageProtocolConfig.h>
-#include <transport/PairingSession.h>
-
 #include <lib/support/UnitTestRegistration.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
+#include <protocols/secure_channel/PairingSession.h>
 #include <stdarg.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
