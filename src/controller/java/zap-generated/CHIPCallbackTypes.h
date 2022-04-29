@@ -1873,10 +1873,18 @@ typedef void (*CHIPWiFiNetworkDiagnosticsClusterClusterRevisionAttributeCallback
 
 typedef void (*CHIPWindowCoveringClusterTypeAttributeCallbackType)(
     void *, chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo::DecodableArgType);
+typedef void (*CHIPWindowCoveringClusterPhysicalClosedLimitLiftAttributeCallbackType)(
+    void *, chip::app::Clusters::WindowCovering::Attributes::PhysicalClosedLimitLift::TypeInfo::DecodableArgType);
+typedef void (*CHIPWindowCoveringClusterPhysicalClosedLimitTiltAttributeCallbackType)(
+    void *, chip::app::Clusters::WindowCovering::Attributes::PhysicalClosedLimitTilt::TypeInfo::DecodableArgType);
 typedef void (*CHIPWindowCoveringClusterCurrentPositionLiftAttributeCallbackType)(
     void *, chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo::DecodableArgType);
 typedef void (*CHIPWindowCoveringClusterCurrentPositionTiltAttributeCallbackType)(
     void *, chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo::DecodableArgType);
+typedef void (*CHIPWindowCoveringClusterNumberOfActuationsLiftAttributeCallbackType)(
+    void *, chip::app::Clusters::WindowCovering::Attributes::NumberOfActuationsLift::TypeInfo::DecodableArgType);
+typedef void (*CHIPWindowCoveringClusterNumberOfActuationsTiltAttributeCallbackType)(
+    void *, chip::app::Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::TypeInfo::DecodableArgType);
 typedef void (*CHIPWindowCoveringClusterConfigStatusAttributeCallbackType)(
     void *, chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo::DecodableArgType);
 typedef void (*CHIPWindowCoveringClusterCurrentPositionLiftPercentageAttributeCallbackType)(
