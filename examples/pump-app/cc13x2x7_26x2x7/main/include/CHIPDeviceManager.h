@@ -89,9 +89,13 @@ public:
      *
      * @return Success if the attribute can be changed, otherwise Failed.
      */
-    virtual chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
-    { return chip::Protocols::InteractionModel::Status::Success; }
+    virtual chip::Protocols::InteractionModel::Status PreAttributeChangeCallback(chip::EndpointId endpoint,
+                                                                                 chip::ClusterId clusterId,
+                                                                                 chip::AttributeId attributeId, uint8_t mask,
+                                                                                 uint8_t type, uint16_t size, uint8_t * value)
+    {
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
     virtual ~CHIPDeviceManagerCallbacks() {}
 };
 
