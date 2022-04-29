@@ -154,7 +154,7 @@ template("k32w0_sdk") {
       "USE_SDK_OSA=0",
       "gSerialManagerMaxInterfaces_c=2",
       "FSL_RTOS_FREE_RTOS=1",
-      "gTotalHeapSize_c=0xF000",
+      "gTotalHeapSize_c=0xDC00",
       "gUartDebugConsole_d=1",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
@@ -185,7 +185,7 @@ template("k32w0_sdk") {
       "gEnableBleInactivityTimeNotify=1",
       "DUAL_MODE_APP=1",
       "gMainThreadStackSize_c=5096",
-      "HEAP_SIZE=0xF000",
+      "HEAP_SIZE=gTotalHeapSize_c",
       "gLoggingActive_d=0",
       "gLogRingPlacementOffset_c=0xF000",
     ]
