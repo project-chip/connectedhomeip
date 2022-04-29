@@ -36,6 +36,7 @@ tests:
     - label: "1a: read the RO mandatory attribute default: Type"
       command: "readAttribute"
       attribute: "Type"
+      PICS: PICS_A_TYPE
       response:
           constraints:
               type: enum8
@@ -46,6 +47,7 @@ tests:
     - label: "1b: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
+      PICS: PICS_A_CONFIGSTATUS
       response:
           constraints:
               type: map8
@@ -56,6 +58,7 @@ tests:
     - label: "1c: read the RO mandatory attribute default: OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: PICS_A_OPERATIONALSTATUS
       response:
           constraints:
               type: map8
@@ -66,6 +69,7 @@ tests:
     - label: "1d: read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
       attribute: "EndProductType"
+      PICS: PICS_A_ENDPRODUCTTYPE
       response:
           constraints:
               type: enum8
@@ -76,6 +80,7 @@ tests:
     - label: "1e: read the RW mandatory attribute default: Mode"
       command: "readAttribute"
       attribute: "Mode"
+      PICS: PICS_A_MODE
       response:
           constraints:
               type: map8
@@ -85,6 +90,7 @@ tests:
     - label: "1f: write a value into the RW mandatory attribute:: Mode"
       command: "writeAttribute"
       attribute: "Mode"
+      PICS: PICS_A_MODE
       arguments:
           value: 0
 
@@ -95,6 +101,7 @@ tests:
           TargetPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
+      PICS: PICS_A_TARGETPOSITIONLIFTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -107,6 +114,7 @@ tests:
           TargetPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
+      PICS: PICS_A_TARGETPOSITIONTILTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -119,6 +127,7 @@ tests:
           CurrentPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
+      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -131,6 +140,7 @@ tests:
           CurrentPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
+      PICS: PICS_A_CURRENTPOSITIONTILTPERCENT100THS
       response:
           constraints:
               type: Percent100ths
@@ -141,6 +151,7 @@ tests:
     - label: "2e: read the RO optional attribute default: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
+      PICS: PICS_A_INSTALLEDOPENLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -152,6 +163,7 @@ tests:
           "2f: read the RO optional attribute default: InstalledClosedLimitLift"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
+      PICS: PICS_A_INSTALLEDCLOSEDLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -162,6 +174,7 @@ tests:
     - label: "2g: read the RO optional attribute default: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
+      PICS: PICS_A_INSTALLEDOPENLIMITTILT
       response:
           constraints:
               type: uint16
@@ -173,6 +186,7 @@ tests:
           "2h: read the RO optional attribute default: InstalledClosedLimitTilt"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
+      PICS: PICS_A_INSTALLEDCLOSEDLIMITTILT
       response:
           constraints:
               type: uint16
@@ -184,6 +198,7 @@ tests:
     - label: "3a: read the RO mandatory attribute default: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
+      PICS: PICS_A_SAFETYSTATUS
       response:
           constraints:
               type: map16
@@ -196,6 +211,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
+      PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
       response:
           constraints:
               type: uint16
@@ -208,6 +224,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
+      PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
       response:
           constraints:
               type: uint16
@@ -218,6 +235,7 @@ tests:
     - label: "3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
+      PICS: PICS_A_CURRENTPOSITIONLIFT
       response:
           constraints:
               type: uint16
@@ -228,6 +246,7 @@ tests:
     - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
+      PICS: PICS_A_CURRENTPOSITIONTILT
       response:
           constraints:
               type: uint16
@@ -239,6 +258,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
+      PICS: PICS_A_NUMBEROFACTUATIONSLIFT
       response:
           constraints:
               type: uint16
@@ -250,6 +270,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
+      PICS: PICS_A_NUMBEROFACTUATIONSTILT
       response:
           constraints:
               type: uint16
@@ -261,6 +282,7 @@ tests:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
+      PICS: PICS_A_CURRENTPOSITIONLIFTPERCENTAGE
       response:
           constraints:
               type: Percent
@@ -271,6 +293,7 @@ tests:
     - label: "3i:read the RO optional attribute default: CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
+      PICS: PICS_A_CURRENTPOSITIONTILTPERCENTAGE
       response:
           constraints:
               type: Percent
