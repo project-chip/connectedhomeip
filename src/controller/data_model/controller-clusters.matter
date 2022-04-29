@@ -4238,7 +4238,7 @@ client cluster WindowCovering = 258 {
   }
 
   request struct GoToLiftPercentageRequest {
-    Percent liftPercentageValue = 0;
+    optional Percent liftPercentageValue = 0;
     optional Percent100ths liftPercent100thsValue = 1;
   }
 
@@ -4247,7 +4247,7 @@ client cluster WindowCovering = 258 {
   }
 
   request struct GoToTiltPercentageRequest {
-    Percent tiltPercentageValue = 0;
+    optional Percent tiltPercentageValue = 0;
     optional Percent100ths tiltPercent100thsValue = 1;
   }
 

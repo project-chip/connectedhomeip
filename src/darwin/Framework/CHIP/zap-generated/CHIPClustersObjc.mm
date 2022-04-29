@@ -55964,15 +55964,20 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)goToLiftPercentageWithParams:(CHIPWindowCoveringClusterGoToLiftPercentageParams *)params
+- (void)goToLiftPercentageWithParams:(CHIPWindowCoveringClusterGoToLiftPercentageParams * _Nullable)params
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
     WindowCovering::Commands::GoToLiftPercentage::Type request;
-    request.liftPercentageValue = params.liftPercentageValue.unsignedCharValue;
-    if (params.liftPercent100thsValue != nil) {
-        auto & definedValue_0 = request.liftPercent100thsValue.Emplace();
-        definedValue_0 = params.liftPercent100thsValue.unsignedShortValue;
+    if (params != nil) {
+        if (params.liftPercentageValue != nil) {
+            auto & definedValue_0 = request.liftPercentageValue.Emplace();
+            definedValue_0 = params.liftPercentageValue.unsignedCharValue;
+        }
+        if (params.liftPercent100thsValue != nil) {
+            auto & definedValue_0 = request.liftPercent100thsValue.Emplace();
+            definedValue_0 = params.liftPercent100thsValue.unsignedShortValue;
+        }
     }
 
     new CHIPCommandSuccessCallbackBridge(
@@ -56006,15 +56011,20 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)goToTiltPercentageWithParams:(CHIPWindowCoveringClusterGoToTiltPercentageParams *)params
+- (void)goToTiltPercentageWithParams:(CHIPWindowCoveringClusterGoToTiltPercentageParams * _Nullable)params
                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
     WindowCovering::Commands::GoToTiltPercentage::Type request;
-    request.tiltPercentageValue = params.tiltPercentageValue.unsignedCharValue;
-    if (params.tiltPercent100thsValue != nil) {
-        auto & definedValue_0 = request.tiltPercent100thsValue.Emplace();
-        definedValue_0 = params.tiltPercent100thsValue.unsignedShortValue;
+    if (params != nil) {
+        if (params.tiltPercentageValue != nil) {
+            auto & definedValue_0 = request.tiltPercentageValue.Emplace();
+            definedValue_0 = params.tiltPercentageValue.unsignedCharValue;
+        }
+        if (params.tiltPercent100thsValue != nil) {
+            auto & definedValue_0 = request.tiltPercent100thsValue.Emplace();
+            definedValue_0 = params.tiltPercent100thsValue.unsignedShortValue;
+        }
     }
 
     new CHIPCommandSuccessCallbackBridge(

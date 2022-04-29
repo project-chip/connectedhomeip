@@ -2441,7 +2441,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _liftPercentageValue = @(0);
+        _liftPercentageValue = nil;
 
         _liftPercent100thsValue = nil;
     }
@@ -2465,7 +2465,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _tiltPercentageValue = @(0);
+        _tiltPercentageValue = nil;
 
         _tiltPercent100thsValue = nil;
     }
