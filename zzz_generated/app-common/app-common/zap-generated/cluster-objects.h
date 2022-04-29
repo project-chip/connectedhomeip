@@ -20369,7 +20369,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent liftPercentageValue = static_cast<chip::Percent>(0);
+    Optional<chip::Percent> liftPercentageValue;
     Optional<chip::Percent100ths> liftPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20385,7 +20385,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent liftPercentageValue = static_cast<chip::Percent>(0);
+    Optional<chip::Percent> liftPercentageValue;
     Optional<chip::Percent100ths> liftPercent100thsValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20436,7 +20436,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent tiltPercentageValue = static_cast<chip::Percent>(0);
+    Optional<chip::Percent> tiltPercentageValue;
     Optional<chip::Percent100ths> tiltPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -20452,7 +20452,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent tiltPercentageValue = static_cast<chip::Percent>(0);
+    Optional<chip::Percent> tiltPercentageValue;
     Optional<chip::Percent100ths> tiltPercent100thsValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

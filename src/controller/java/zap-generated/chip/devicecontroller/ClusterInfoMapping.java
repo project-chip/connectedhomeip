@@ -11933,7 +11933,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> windowCoveringgoToLiftPercentageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo windowCoveringgoToLiftPercentageliftPercentageValueCommandParameterInfo =
-        new CommandParameterInfo("liftPercentageValue", Integer.class);
+        new CommandParameterInfo("liftPercentageValue", Optional.class);
     windowCoveringgoToLiftPercentageCommandParams.put(
         "liftPercentageValue",
         windowCoveringgoToLiftPercentageliftPercentageValueCommandParameterInfo);
@@ -11951,7 +11951,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .goToLiftPercentage(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("liftPercentageValue"),
+                      (Optional<Integer>) commandArguments.get("liftPercentageValue"),
                       (Optional<Integer>) commandArguments.get("liftPercent100thsValue"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -11980,7 +11980,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> windowCoveringgoToTiltPercentageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameterInfo =
-        new CommandParameterInfo("tiltPercentageValue", Integer.class);
+        new CommandParameterInfo("tiltPercentageValue", Optional.class);
     windowCoveringgoToTiltPercentageCommandParams.put(
         "tiltPercentageValue",
         windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameterInfo);
@@ -11998,7 +11998,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .goToTiltPercentage(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("tiltPercentageValue"),
+                      (Optional<Integer>) commandArguments.get("tiltPercentageValue"),
                       (Optional<Integer>) commandArguments.get("tiltPercent100thsValue"));
             },
             () -> new DelegatedDefaultClusterCallback(),

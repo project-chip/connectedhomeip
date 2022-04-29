@@ -22752,7 +22752,7 @@ public class ChipClusters {
 
     public void goToLiftPercentage(
         DefaultClusterCallback callback,
-        Integer liftPercentageValue,
+        Optional<Integer> liftPercentageValue,
         Optional<Integer> liftPercent100thsValue) {
       goToLiftPercentage(
           chipClusterPtr, callback, liftPercentageValue, liftPercent100thsValue, null);
@@ -22760,7 +22760,7 @@ public class ChipClusters {
 
     public void goToLiftPercentage(
         DefaultClusterCallback callback,
-        Integer liftPercentageValue,
+        Optional<Integer> liftPercentageValue,
         Optional<Integer> liftPercent100thsValue,
         int timedInvokeTimeoutMs) {
       goToLiftPercentage(
@@ -22782,7 +22782,7 @@ public class ChipClusters {
 
     public void goToTiltPercentage(
         DefaultClusterCallback callback,
-        Integer tiltPercentageValue,
+        Optional<Integer> tiltPercentageValue,
         Optional<Integer> tiltPercent100thsValue) {
       goToTiltPercentage(
           chipClusterPtr, callback, tiltPercentageValue, tiltPercent100thsValue, null);
@@ -22790,7 +22790,7 @@ public class ChipClusters {
 
     public void goToTiltPercentage(
         DefaultClusterCallback callback,
-        Integer tiltPercentageValue,
+        Optional<Integer> tiltPercentageValue,
         Optional<Integer> tiltPercent100thsValue,
         int timedInvokeTimeoutMs) {
       goToTiltPercentage(
@@ -22836,7 +22836,7 @@ public class ChipClusters {
     private native void goToLiftPercentage(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer liftPercentageValue,
+        Optional<Integer> liftPercentageValue,
         Optional<Integer> liftPercent100thsValue,
         @Nullable Integer timedInvokeTimeoutMs);
 
@@ -22849,7 +22849,7 @@ public class ChipClusters {
     private native void goToTiltPercentage(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer tiltPercentageValue,
+        Optional<Integer> tiltPercentageValue,
         Optional<Integer> tiltPercent100thsValue,
         @Nullable Integer timedInvokeTimeoutMs);
 
