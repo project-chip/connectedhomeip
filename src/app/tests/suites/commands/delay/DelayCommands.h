@@ -33,7 +33,7 @@ public:
 
     virtual CHIP_ERROR WaitForCommissionee(chip::NodeId nodeId) { return CHIP_ERROR_NOT_IMPLEMENTED; };
     virtual CHIP_ERROR WaitForCommissioning() { return CHIP_ERROR_NOT_IMPLEMENTED; };
-    CHIP_ERROR WaitForMs(uint16_t ms);
+    CHIP_ERROR WaitForMs(uint32_t ms);
     CHIP_ERROR WaitForCommissionableAdvertisement();
     CHIP_ERROR WaitForOperationalAdvertisement();
 
