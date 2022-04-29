@@ -247,24 +247,22 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-        if (!req.ssid.HasValue())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-        const auto nullableSSID = req.ssid.Value();
         ByteSpan ssid;
-        if (!nullableSSID.IsNull())
+        if (req.ssid.HasValue())
         {
-            ssid = nullableSSID.Value();
-            if (ssid.empty())
+            const auto & nullableSSID = req.ssid.Value();
+            if (!nullableSSID.IsNull())
             {
-                // Normalize the zero value to null ByteSpan.
-                // Spec 7.17.1. Empty string is an equivalent of null.
-                ssid = ByteSpan();
+                ssid = nullableSSID.Value();
+                if (ssid.empty())
+                {
+                    // Normalize empty span value to null ByteSpan.
+                    // Spec 7.17.1. Empty string is an equivalent of null.
+                    ssid = ByteSpan();
+                }
             }
         }
-        if (!(ssid.size() <= DeviceLayer::Internal::kMaxWiFiSSIDLength))
+        if (ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
             return;
