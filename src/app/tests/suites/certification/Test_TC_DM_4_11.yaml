@@ -1,0 +1,109 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    10.4.11. [TC-DM-4.11][WiFi] Verification for ConnectNetwork Command
+    [DUT-Commissionee]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH1 sends ArmFailSafe command to the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+
+          [1650376197.742950][42857:42862] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1650376197.743013][42857:42862] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1650376197.743113][42857:42862] CHIP:TOO:   ArmFailSafeResponse: {
+          [1650376197.743172][42857:42862] CHIP:TOO:     errorCode: 0
+          [1650376197.743208][42857:42862] CHIP:TOO:     debugText:
+          [1650376197.743242][42857:42862] CHIP:TOO:    }
+          [1650376197.743296][42857:42862] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650376197.743367][42857:42862] CHIP:EM: Sending Standalone Ack for MessageCounter:11807454 on exchange 55345i
+      disabled: true
+
+    - label:
+          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          argument value as 'Userwifi_ssid', Credentials argument value as
+          'xxxxx' and Breadcrumb argument value as 0"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+
+          [1650376203.648598][42863:42868] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650376203.648659][42863:42868] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650376203.648761][42863:42868] CHIP:TOO:   NetworkConfigResponse: {
+          [1650376203.648822][42863:42868] CHIP:TOO:     networkingStatus: 0
+          [1650376203.648860][42863:42868] CHIP:TOO:     networkIndex: 0
+          [1650376203.648894][42863:42868] CHIP:TOO:    }
+          [1650376203.648948][42863:42868] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650376203.649015][42863:42868] CHIP:EM: Sending Standalone Ack for MessageCounter:1508553 on exchange 44250i
+      disabled: true
+
+    - label: "TH1 reads Networks attribute from the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+
+          [1650376210.400416][42869:42874] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3182776035
+          [1650376210.400521][42869:42874] CHIP:TOO:   Networks: 1 entries
+          [1650376210.400580][42869:42874] CHIP:TOO:     [1]: {
+          [1650376210.400615][42869:42874] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1650376210.400646][42869:42874] CHIP:TOO:       Connected: FALSE
+          [1650376210.400677][42869:42874] CHIP:TOO:      }
+          [1650376210.400786][42869:42874] CHIP:EM: Sending Standalone Ack for MessageCounter:3301439 on exchange 38417i
+      disabled: true
+
+    - label: "TH1 saves the timestamp as CT1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 sends ConnectNetwork command to the DUT with NetworkID argument
+          value as 'Userwifi_ssid1' and Breadcrumb argument value as 0"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+
+          [1650376217.124606][42876:42881] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1650376217.124707][42876:42881] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1650376217.124870][42876:42881] CHIP:TOO:   ConnectNetworkResponse: {
+          [1650376217.124968][42876:42881] CHIP:TOO:     networkingStatus: 0
+          [1650376217.125030][42876:42881] CHIP:TOO:     errorValue: null
+          [1650376217.125087][42876:42881] CHIP:TOO:    }
+          [1650376217.125179][42876:42881] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650376217.125282][42876:42881] CHIP:EM: Sending Standalone Ack for MessageCounter:7901929 on exchange 1050i
+      disabled: true
+
+    - label: "TH1 saves the timestamp as CT2"
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 reads Networks attribute from the DUT"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/17106
+
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+
+          [1650376224.551341][42882:42887] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3182776035
+          [1650376224.551440][42882:42887] CHIP:TOO:   Networks: 1 entries
+          [1650376224.551501][42882:42887] CHIP:TOO:     [1]: {
+          [1650376224.551535][42882:42887] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1650376224.551565][42882:42887] CHIP:TOO:       Connected: FALSE
+          [1650376224.551596][42882:42887] CHIP:TOO:      }
+          [1650376224.551703][42882:42887] CHIP:EM: Sending Standalone Ack for MessageCounter:16427109 on exchange 14955i
+      disabled: true
