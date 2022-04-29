@@ -97,7 +97,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/darwin-x64-chip-tool-darwin-${BUILD_VARIANT}/chip-tool-darwin \
-                     --target-skip-glob '{TestGroupMessaging,TV_*}' \
+                     --target-skip-glob '{TestGroupMessaging,TV_*,DL_*}' \
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
