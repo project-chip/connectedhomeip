@@ -29,11 +29,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull identifyTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -44,11 +50,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull timeout;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -57,11 +69,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIdentifyClusterIdentifyQueryParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -74,11 +92,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull effectVariant;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -91,11 +115,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull groupName;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -108,11 +138,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -123,11 +159,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -142,11 +184,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull groupName;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -157,11 +205,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -174,11 +228,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull groupList;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -189,11 +249,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -206,11 +272,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -219,11 +291,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPGroupsClusterRemoveAllGroupsParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -236,11 +314,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull groupName;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -259,11 +343,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -278,11 +368,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -295,11 +391,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -320,11 +422,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -337,11 +445,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -356,11 +470,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -371,11 +491,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -388,11 +514,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -405,11 +537,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -424,11 +562,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -443,11 +587,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -458,11 +608,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -481,11 +637,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull sceneList;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -504,11 +666,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -523,11 +691,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -540,11 +714,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -565,11 +745,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull extensionFieldSets;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -588,11 +774,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneIdTo;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -607,11 +799,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull sceneIdFrom;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -620,11 +818,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPOnOffClusterOffParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -633,11 +837,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPOnOffClusterOnParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -646,11 +856,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPOnOffClusterToggleParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -663,11 +879,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull effectVariant;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -676,11 +898,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPOnOffClusterOnWithRecallGlobalSceneParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -695,11 +923,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull offWaitTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -716,11 +950,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -737,11 +977,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -760,11 +1006,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -777,11 +1029,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -794,11 +1052,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -811,11 +1075,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull rate;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -830,11 +1100,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -843,11 +1119,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPLevelControlClusterStopWithOnOffParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -860,11 +1142,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -877,11 +1165,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -890,11 +1184,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPAlarmsClusterResetAllAlarmsParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -911,11 +1211,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -924,11 +1230,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPAlarmsClusterGetAlarmParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -937,11 +1249,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPAlarmsClusterResetAlarmLogParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -952,11 +1270,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -973,11 +1297,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull transferredPhases;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -986,11 +1316,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPPowerProfileClusterPowerProfileStateRequestParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1007,11 +1343,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull transferredPhases;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1028,11 +1370,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull priceTrailingDigit;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1045,11 +1393,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull powerProfileRecords;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1064,11 +1418,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull priceTrailingDigit;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1079,11 +1439,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1098,11 +1464,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1115,11 +1487,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull powerProfileRecords;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1134,11 +1512,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1147,11 +1531,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPPowerProfileClusterGetOverallSchedulePriceParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1162,11 +1552,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1177,11 +1573,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1192,11 +1594,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1211,11 +1619,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1232,11 +1646,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull priceTrailingDigit;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1251,11 +1671,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull scheduledPhases;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1270,11 +1696,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull stopBefore;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1289,11 +1721,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull stopBefore;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1308,11 +1746,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull powerProfileStartTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1323,11 +1767,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull commandId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1342,11 +1792,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull applianceStatus2;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1355,11 +1811,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPApplianceControlClusterSignalStateParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1374,11 +1836,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull applianceStatus2;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1393,11 +1861,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull functionData;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1406,11 +1880,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPApplianceControlClusterOverloadPauseResumeParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1419,11 +1899,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPApplianceControlClusterOverloadPauseParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1434,11 +1920,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull warningEvent;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1447,11 +1939,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPPollControlClusterCheckInParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1464,11 +1962,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull fastPollTimeout;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1477,11 +1981,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPPollControlClusterFastPollStopParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1492,11 +2002,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, getter=getNewLongPollInterval) NSNumber * _Nonnull newLongPollInterval;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1507,11 +2023,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, getter=getNewShortPollInterval) NSNumber * _Nonnull newShortPollInterval;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1524,11 +2046,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1543,11 +2071,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1560,11 +2094,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1579,11 +2119,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1596,11 +2142,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1613,11 +2165,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1632,11 +2190,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1649,11 +2213,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1666,11 +2236,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1685,11 +2261,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1702,11 +2284,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable invokeID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1721,11 +2309,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull duration;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1734,11 +2328,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPBasicClusterMfgSpecificPingParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1763,11 +2363,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable metadataForProvider;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1792,11 +2398,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable metadataForRequestor;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1809,11 +2421,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1826,11 +2444,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull delayedActionTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1843,11 +2467,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1866,11 +2496,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull endpoint;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1883,11 +2519,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1900,11 +2542,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull debugText;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1919,11 +2567,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1936,11 +2590,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull debugText;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1949,11 +2609,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPGeneralCommissioningClusterCommissioningCompleteParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1966,11 +2632,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull debugText;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -1983,11 +2655,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2004,11 +2682,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nullable threadScanResults;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2023,11 +2707,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2040,11 +2730,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2057,11 +2753,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2076,11 +2778,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable networkIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2093,11 +2801,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2112,11 +2826,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable errorValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2131,11 +2851,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable breadcrumb;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2150,11 +2876,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull transferFileDesignator;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2171,11 +2903,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull timeSinceBoot;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2184,11 +2922,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPSoftwareDiagnosticsClusterResetWatermarksParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2197,11 +2941,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPThreadNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2210,11 +2960,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2223,11 +2979,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPEthernetNetworkDiagnosticsClusterResetCountsParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2246,11 +3008,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull salt;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2261,11 +3029,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull commissioningTimeout;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2274,11 +3048,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPAdministratorCommissioningClusterRevokeCommissioningParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2289,11 +3069,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull attestationNonce;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2306,11 +3092,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull signature;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2321,11 +3113,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull certificateType;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2336,11 +3134,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull certificate;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2351,11 +3155,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull csrNonce;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2368,11 +3178,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull attestationSignature;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2391,11 +3207,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull adminVendorId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2408,11 +3230,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable icacValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2427,11 +3255,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable debugText;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2442,11 +3276,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull label;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2457,11 +3297,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2472,11 +3318,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull rootCertificate;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2487,11 +3339,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull trustedRootIdentifier;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2502,11 +3360,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2517,11 +3381,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2532,11 +3402,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2547,11 +3423,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2562,11 +3444,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2577,11 +3465,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2592,11 +3486,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, getter=getNewMode) NSNumber * _Nonnull newMode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2607,11 +3507,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable pinCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2622,11 +3528,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable pinCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2639,11 +3551,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable pinCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2654,11 +3572,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull logIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2681,11 +3605,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull pin;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2702,11 +3632,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull pin;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2717,11 +3653,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2738,11 +3680,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable pin;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2753,11 +3701,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull pinSlotIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2766,11 +3720,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPDoorLockClusterClearAllPINCodesParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2783,11 +3743,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2798,11 +3764,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2815,11 +3787,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2842,11 +3820,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull endMinute;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2859,11 +3843,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2888,11 +3878,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable endMinute;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2905,11 +3901,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2926,11 +3928,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2943,11 +3951,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2966,11 +3980,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable localEndTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -2983,11 +4003,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3004,11 +4030,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull operatingMode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3019,11 +4051,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3042,11 +4080,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable operatingMode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3057,11 +4101,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3074,11 +4124,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3089,11 +4145,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3106,11 +4168,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3127,11 +4195,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull rfidCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3142,11 +4216,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3163,11 +4243,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable rfidCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3178,11 +4264,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull rfidSlotIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3191,11 +4283,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPDoorLockClusterClearAllRFIDCodesParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3218,11 +4316,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable credentialRule;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3233,11 +4337,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3266,11 +4376,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable nextUserIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3281,11 +4397,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3306,11 +4428,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3335,11 +4463,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3360,11 +4494,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable userType;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3379,11 +4519,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3394,11 +4540,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nonnull credential;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3413,11 +4565,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3428,11 +4586,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nullable credential;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3441,11 +4605,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPWindowCoveringClusterUpOrOpenParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3454,11 +4624,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPWindowCoveringClusterDownOrCloseParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3467,11 +4643,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPWindowCoveringClusterStopMotionParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3482,11 +4664,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull liftValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3499,11 +4687,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable liftPercent100thsValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3514,11 +4708,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull tiltValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3531,11 +4731,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable tiltPercent100thsValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3546,11 +4752,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull percentOpen;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3559,11 +4771,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPBarrierControlClusterBarrierControlStopParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3576,11 +4794,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull amount;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3597,11 +4821,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull payload;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3618,11 +4848,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull payload;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3643,11 +4879,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull unreadEntries;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3660,11 +4902,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull modeToReturn;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3673,11 +4921,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPThermostatClusterClearWeeklyScheduleParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3686,11 +4940,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPThermostatClusterGetRelayStatusLogParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3709,11 +4969,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3730,11 +4996,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3753,11 +5025,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3774,11 +5052,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3795,11 +5079,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3818,11 +5108,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3841,11 +5137,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3864,11 +5166,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3885,11 +5193,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3908,11 +5222,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3929,11 +5249,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3952,11 +5278,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3973,11 +5305,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -3996,11 +5334,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4019,11 +5363,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4046,11 +5396,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4063,11 +5419,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4088,11 +5450,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4115,11 +5483,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4132,11 +5506,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4153,11 +5533,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull delay;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4166,11 +5552,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasZoneClusterInitiateNormalOperationModeParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4183,11 +5575,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull manufacturerCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4200,11 +5598,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull currentZoneSensitivityLevel;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4213,11 +5617,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasZoneClusterInitiateNormalOperationModeResponseParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4226,11 +5636,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasZoneClusterInitiateTestModeResponseParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4245,11 +5661,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4260,11 +5682,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull armNotification;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4279,11 +5707,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull armDisarmCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4324,11 +5758,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull section15;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4337,11 +5777,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasAceClusterEmergencyParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4358,11 +5804,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull zoneLabel;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4371,11 +5823,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasAceClusterFireParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4392,11 +5850,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull zoneLabel;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4405,11 +5869,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasAceClusterPanicParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4426,11 +5896,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull alarmStatus;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4439,11 +5915,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasAceClusterGetZoneIdMapParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4460,11 +5942,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull alarmStatus;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4475,11 +5963,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4492,11 +5986,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull zoneIds;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4505,11 +6005,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasAceClusterGetPanelStatusParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4522,11 +6028,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull bypassResult;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4535,11 +6047,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPIasAceClusterGetBypassedZoneListParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4554,11 +6072,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull zoneStatusResult;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4575,11 +6099,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull zoneStatusMask;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4596,11 +6126,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull strobeLevel;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4611,11 +6147,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull squawkInfo;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4626,11 +6168,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull match;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4643,11 +6191,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4660,11 +6214,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4675,11 +6235,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic, getter=getCount) NSNumber * _Nonnull count;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4692,11 +6258,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4709,11 +6281,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4722,11 +6300,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterPlayParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4735,11 +6319,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterPauseParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4748,11 +6338,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterStopPlaybackParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4761,11 +6357,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterStartOverParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4774,11 +6376,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterPreviousParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4787,11 +6395,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterNextParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4800,11 +6414,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterRewindParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4813,11 +6433,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaPlaybackClusterFastForwardParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4828,11 +6454,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4843,11 +6475,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4860,11 +6498,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4875,11 +6519,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull position;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4890,11 +6540,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4903,11 +6559,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaInputClusterShowInputStatusParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4916,11 +6578,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMediaInputClusterHideInputStatusParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4933,11 +6601,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull name;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4946,11 +6620,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPLowPowerClusterSleepParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4961,11 +6641,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull keyCode;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4976,11 +6662,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -4995,11 +6687,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5014,11 +6712,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPContentLauncherClusterBrandingInformation * _Nullable brandingInformation;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5031,11 +6735,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5046,11 +6756,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5063,11 +6779,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull name;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5080,11 +6802,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nullable data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5095,11 +6823,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5110,11 +6844,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5127,11 +6867,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull data;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5142,11 +6888,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull tempAccountIdentifier;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5157,11 +6909,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull setupPIN;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5174,11 +6932,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSString * _Nonnull setupPIN;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5187,11 +6951,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPAccountLoginClusterLogoutParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5200,11 +6970,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPTestClusterClusterTestParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5215,11 +6991,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull returnValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5228,11 +7010,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPTestClusterClusterTestNotHandledParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5243,11 +7031,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull returnValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5256,11 +7050,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPTestClusterClusterTestSpecificParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5271,11 +7071,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull returnValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5284,11 +7090,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPTestClusterClusterTestUnknownCommandParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5309,11 +7121,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg6;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5326,11 +7144,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5341,11 +7165,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5356,11 +7186,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5373,11 +7209,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5398,11 +7240,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg6;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5419,11 +7267,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable originalValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5434,11 +7288,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5503,11 +7363,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nullable nullableOptionalListValue;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5518,11 +7384,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPTestClusterClusterNestedStruct * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5533,11 +7405,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5548,11 +7426,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5563,11 +7447,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5578,11 +7468,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5593,11 +7489,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5608,11 +7510,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPTestClusterClusterNestedStructList * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5623,11 +7531,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull value;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5638,11 +7552,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5653,11 +7573,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5670,11 +7596,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg2;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5685,11 +7617,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5722,11 +7660,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nullable nullableOptionalList;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5737,11 +7681,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5750,11 +7700,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPTestClusterClusterTimedInvokeRequestParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5765,11 +7721,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5784,11 +7746,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg3;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5799,11 +7767,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull arg1;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5824,11 +7798,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5837,11 +7817,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPMessagingClusterGetLastMessageParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5854,11 +7840,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull messageControl;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5875,11 +7867,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSData * _Nonnull messageResponse;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5900,11 +7898,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull optionalExtendedMessageControl;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5915,11 +7919,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull earliestImplementationTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5930,11 +7940,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull implementationDateTime;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5943,11 +7959,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPApplianceEventsAndAlertClusterGetAlertsParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5960,11 +7982,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull alertStructures;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5977,11 +8005,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull alertStructures;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -5994,11 +8028,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull eventId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6015,11 +8055,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull logPayload;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6030,11 +8076,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull logId;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6051,11 +8103,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull logPayload;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6064,11 +8122,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPApplianceStatisticsClusterLogQueueRequestParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6081,11 +8145,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull logIds;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6098,11 +8168,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull logIds;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6119,11 +8195,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull listOfAttributes;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6132,11 +8214,17 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6157,11 +8245,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSArray * _Nonnull intervals;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
@@ -6176,11 +8270,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull numberOfIntervals;
 /**
- * Whether a Timed Invoke Command Request is sent. Default is nil and is treated as
- * if a cluster command is sent.
+ * Controls whether the command is a timed command (using Timed Invoke).
  *
- * If the property contains a value, the command will request a timed command within the
- * specified time.
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
  *
  */
 @property (strong, nonatomic, nullable) NSNumber * timedInvokeTimeoutMs;
