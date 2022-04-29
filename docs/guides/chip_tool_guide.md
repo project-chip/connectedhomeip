@@ -412,7 +412,7 @@ Example of command:
 
 ```
 $ ./chip-tool interactive start
-otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0
+otasoftwareupdaterequestor subscribe-event state-transition 5 10 ${NODE_ID} 0
 ```
 
 ### Printing all supported clusters
