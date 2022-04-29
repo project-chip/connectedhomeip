@@ -178,6 +178,9 @@ public:
 
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
+    //// SessionReleaseDelegate ////
+    void OnSessionReleased() override;
+
 private:
     enum Spake2pErrorType : uint8_t
     {
