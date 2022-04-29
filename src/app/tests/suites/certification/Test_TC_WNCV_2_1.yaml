@@ -33,7 +33,7 @@ tests:
     ### MANDATORY Attributes
     ### 1 MANDATORY Attributes
     ### Attribute[  0]: Type  =======================================
-    - label: "2: read the RO mandatory attribute default: Type"
+    - label: "1a: read the RO mandatory attribute default: Type"
       command: "readAttribute"
       attribute: "Type"
       response:
@@ -43,7 +43,7 @@ tests:
               maxValue: 9
 
     ### Attribute[  7]: ConfigStatus  ===============================
-    - label: "2: read the RO mandatory attribute default: ConfigStatus"
+    - label: "1b: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
       response:
@@ -53,7 +53,7 @@ tests:
               maxValue: 63
 
     ### Attribute[ 10]: OperationalStatus  ==========================
-    - label: "2: read the RO mandatory attribute default: OperationalStatus"
+    - label: "1c: read the RO mandatory attribute default: OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
@@ -63,7 +63,7 @@ tests:
               maxValue: 63
 
     ### Attribute[ 13]: EndProductType ==============================
-    - label: "2: read the RO mandatory attribute default: EndProductType"
+    - label: "1d: read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
       attribute: "EndProductType"
       response:
@@ -91,7 +91,7 @@ tests:
     ### 2 CONDITIONALLY MANDATORY Attributes
     ### Attribute[ 11]: TargetPositionLiftPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
+          "2a: read the RO optional attribute default:
           TargetPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
@@ -103,7 +103,7 @@ tests:
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
+          "2b: read the RO optional attribute default:
           TargetPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
@@ -115,7 +115,7 @@ tests:
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
+          "2c: read the RO optional attribute default:
           CurrentPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
@@ -127,7 +127,7 @@ tests:
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
     - label:
-          "2: read the RO optional attribute default:
+          "2d: read the RO optional attribute default:
           CurrentPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
@@ -138,7 +138,7 @@ tests:
               maxValue: 10000
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
-    - label: "2: read the RO optional attribute default: InstalledOpenLimitLift"
+    - label: "2e: read the RO optional attribute default: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
       response:
@@ -149,7 +149,7 @@ tests:
 
     ### Attribute[ 17]: InstalledClosedLimitLift  ====================
     - label:
-          "2: read the RO optional attribute default: InstalledClosedLimitLift"
+          "2f: read the RO optional attribute default: InstalledClosedLimitLift"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
       response:
@@ -159,7 +159,7 @@ tests:
               maxValue: 65535
 
     ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
-    - label: "2: read the RO optional attribute default: InstalledOpenLimitTilt"
+    - label: "2g: read the RO optional attribute default: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
       response:
@@ -170,7 +170,7 @@ tests:
 
     ### Attribute[ 19]: InstalledClosedLimitTilt  ====================
     - label:
-          "2: read the RO optional attribute default: InstalledClosedLimitTilt"
+          "2h: read the RO optional attribute default: InstalledClosedLimitTilt"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
       response:
@@ -181,7 +181,7 @@ tests:
 
     ### 3 CONDITIONALLY and PURELY OPTIONAL Attributes
     ### Attribute[ 26]: SafetyStatus  ==========================
-    - label: "4: read the RO mandatory attribute default: SafetyStatus"
+    - label: "3a: read the RO mandatory attribute default: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
       response:
@@ -192,7 +192,7 @@ tests:
 
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
-          "4: read the RO optional attribute default: PhysicalClosedLimitLift"
+          "3b: read the RO optional attribute default: PhysicalClosedLimitLift"
       disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
@@ -204,7 +204,7 @@ tests:
 
     ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
     - label:
-          "4: read the RO optional attribute default: PhysicalClosedLimitTilt"
+          "3c: read the RO optional attribute default: PhysicalClosedLimitTilt"
       disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
@@ -215,7 +215,7 @@ tests:
               maxValue: 65535
 
     ### Attribute[  3]: CurrentPositionLift  ====================
-    - label: "4: read the RO optional attribute default: CurrentPositionLift"
+    - label: "3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
       response:
@@ -225,7 +225,7 @@ tests:
               maxValue: 65535
 
     ### Attribute[  4]: CurrentPositionTilt  ====================
-    - label: "4: read the RO optional attribute default: CurrentPositionTilt"
+    - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
       response:
@@ -235,7 +235,7 @@ tests:
               maxValue: 65535
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
-    - label: "4: read the RO optional attribute default: NumberOfActuationsLift"
+    - label: "3f: read the RO optional attribute default: NumberOfActuationsLift"
       disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
@@ -246,7 +246,7 @@ tests:
               maxValue: 65535
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
-    - label: "4: read the RO optional attribute default: NumberOfActuationsTilt"
+    - label: "3g: read the RO optional attribute default: NumberOfActuationsTilt"
       disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
@@ -257,8 +257,7 @@ tests:
               maxValue: 65535
 
     ### Attribute[  8]: CurrentPositionLiftPercentage  ====================
-    - label:
-          "4: read the RO optional attribute default:
+    - label: "3h: read the RO optional attribute default:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
@@ -269,9 +268,7 @@ tests:
               maxValue: 100
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
-    - label:
-          "4: read the RO optional attribute default:
-          CurrentPositionTiltPercentage"
+    - label: "3i:read the RO optional attribute default: CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:
@@ -279,6 +276,7 @@ tests:
               type: Percent
               minValue: 0
               maxValue: 100
+
     ###################################################
     # FYI Non Tested deprecated attributes
     # 20 VelocityLift
