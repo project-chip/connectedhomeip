@@ -65,7 +65,7 @@ if ({{source}}.IsNull()) {
         std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
         std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
         {{#if_is_bitmap type}}
-          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
+          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}.Raw(), {{target}});
         {{else}}
           chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
         {{/if_is_bitmap}}

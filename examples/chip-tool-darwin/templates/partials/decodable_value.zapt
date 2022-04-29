@@ -31,7 +31,7 @@
       {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
     {{else}}
       {{#if_is_bitmap type}}
-        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
       {{else if (isOctetString type)}}
         {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
       {{else if (isCharString type)}}
