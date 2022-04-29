@@ -83,8 +83,8 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
-        chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(ArraySize(logStorageResources),
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter, &ctx->GetFabricTable());
 
         return SUCCESS;
     }

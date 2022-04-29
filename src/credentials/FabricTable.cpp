@@ -46,6 +46,7 @@ namespace {
 // Tags for our metadata storage.
 constexpr TLV::Tag kVendorIdTag    = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricLabelTag = TLV::ContextTag(1);
+constexpr TLV::Tag kEventNumberTag = TLV::ContextTag(2);
 
 // Tags for our operational keypair storage.
 constexpr TLV::Tag kOpKeyVersionTag = TLV::ContextTag(0);
@@ -137,6 +138,12 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
         ReturnErrorOnFailure(writer.Put(kVendorIdTag, mVendorId));
 
         ReturnErrorOnFailure(writer.PutString(kFabricLabelTag, CharSpan::fromCharString(mFabricLabel)));
+
+        uint16_t size = sizeof(mEventNumber);
+        if (storage->SyncGetKeyValue(keyAlloc.IMEventNumber(), &mEventNumber, size) == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            mEventNumber = 0;
+        }
 
         ReturnErrorOnFailure(writer.EndContainer(outerType));
 
@@ -259,6 +266,9 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 
         VerifyOrReturnError(label.size() <= kFabricLabelMaxLengthInBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(mFabricLabel, label);
+
+        ReturnErrorOnFailure(reader.Next(kEventNumberTag));
+        ReturnErrorOnFailure(reader.Get(mEventNumber));
 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
         ReturnErrorOnFailure(reader.VerifyEndOfContainer());

@@ -82,26 +82,22 @@ struct CopyAndAdjustDeltaTimeContext
     EventLoadOutContext * mpContext = nullptr;
 };
 
-void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+void EventManagement::Init(uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
+                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable)
 {
+    VerifyOrDie(aNumBuffers != 0);
+    VerifyOrDie(apCircularEventBuffer != nullptr);
+    VerifyOrDie(apLogStorageResources != nullptr);
+    VerifyOrDie(apEventNumberCounter != nullptr);
+    VerifyOrDie(apFabricTable != nullptr);
+
+    VerifyOrDie(mState == EventManagementStates::Shutdown);
+
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
     CircularEventBuffer * next    = nullptr;
-
-    if (aNumBuffers == 0)
-    {
-        ChipLogError(EventLogging, "Invalid aNumBuffers");
-        return;
-    }
-
-    if (mState != EventManagementStates::Shutdown)
-    {
-        ChipLogError(EventLogging, "Invalid EventManagement State");
-        return;
-    }
-    mpExchangeMgr = apExchangeManager;
+    mpFabricTable = apFabricTable;
 
     for (uint32_t bufferIndex = 0; bufferIndex < aNumBuffers; bufferIndex++)
     {
@@ -322,6 +318,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
+        apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kCachedEventNumberTag), mpFabricTable->FindFabricWithIndex(apOptions->mFabricIndex)->GetEventNumber());
     }
     eventDataIBBuilder.EndOfEventDataIB();
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
@@ -332,13 +329,12 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     return CHIP_NO_ERROR;
 }
 
-void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+void EventManagement::CreateEventManagement(uint32_t aNumBuffers,
                                             CircularEventBuffer * apCircularEventBuffer,
                                             const LogStorageResources * const apLogStorageResources,
-                                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
+                                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable)
 {
-
-    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter);
+    sInstance.Init(aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter, apFabricTable);
 }
 
 /**
@@ -351,7 +347,6 @@ void EventManagement::DestroyEventManagement()
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
-    sInstance.mpExchangeMgr = nullptr;
 }
 
 CircularEventBuffer * EventManagement::GetPriorityBuffer(PriorityLevel aPriority) const
@@ -570,9 +565,16 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
-    if (event.mFabricIndex != kUndefinedFabricIndex && eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex)
+    if (event.mFabricIndex != kUndefinedFabricIndex)
     {
-        return CHIP_ERROR_UNEXPECTED_EVENT;
+        if (eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex)
+        {
+            return CHIP_ERROR_UNEXPECTED_EVENT;
+        }
+        else if (eventLoadOutContext->mCachedEventNumber != event.mCachedEventNumber)
+        {
+            return CHIP_ERROR_UNEXPECTED_EVENT;
+        }
     }
 
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
@@ -722,7 +724,13 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectLi
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    context.mSubjectDescriptor     = aSubjectDescriptor;
+    context.mSubjectDescriptor      = aSubjectDescriptor;
+    FabricInfo * info = mpFabricTable->FindFabricWithIndex(aSubjectDescriptor.fabricIndex);
+    if (info != nullptr)
+    {
+        context.mCachedEventNumber = info->GetEventNumber();
+    }
+
     context.mpInterestedEventPaths = apEventPathList;
     err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
     SuccessOrExit(err);
@@ -809,6 +817,11 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
     if (reader.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
     {
         ReturnErrorOnFailure(reader.Get(envelope->mFabricIndex));
+    }
+
+    if (reader.GetTag() == TLV::ProfileTag(kEventManagementProfile, kCachedEventNumberTag))
+    {
+        ReturnErrorOnFailure(reader.Get(envelope->mCachedEventNumber));
     }
     return CHIP_NO_ERROR;
 }

@@ -42,9 +42,10 @@
 
 namespace chip {
 namespace app {
-constexpr const uint32_t kEventManagementProfile = 0x1;
-constexpr const uint32_t kFabricIndexTag         = 0x1;
-constexpr size_t kMaxEventSizeReserve            = 512;
+constexpr const uint32_t kEventManagementProfile            = 0x1;
+constexpr const uint32_t kFabricIndexTag                    = 0x1;
+constexpr const uint32_t kCachedEventNumberTag         = 0x2;
+constexpr size_t kMaxEventSizeReserve                       = 512;
 constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
@@ -183,8 +184,6 @@ public:
      * resources allocated for least important events, and the last element
      * corresponds to the most critical events.
      *
-     * @param[in] apExchangeManager         ExchangeManager to be used with this logging subsystem
-     *
      * @param[in] aNumBuffers  Number of elements in inLogStorageResources array
      *
      * @param[in] apCircularEventBuffer  An array of CircularEventBuffer for each priority level.
@@ -193,10 +192,12 @@ public:
      *
      * @param[in] apEventNumberCounter   A counter to use for event numbers.
      *
+     * @param[in] apFabricTable   A fabric table to use to check if fabric-scoped event is valid when fetching events
+     *
      */
-    void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
+    void Init(uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources,
-              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
+              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable);
 
     static EventManagement & GetInstance();
 
@@ -211,8 +212,6 @@ public:
      * resources allocated for the most critical events, and the last element
      * corresponds to the least important events.
      *
-     * @param[in] apExchangeManager         ExchangeManager to be used with this logging subsystem
-     *
      * @param[in] aNumBuffers  Number of elements in inLogStorageResources array
      *
      * @param[in] apCircularEventBuffer  An array of CircularEventBuffer for each priority level.
@@ -220,12 +219,13 @@ public:
      *
      * @param[in] apEventNumberCounter   A counter to use for event numbers.
      *
+     * @param[in] apFabricTable   A fabric table to use to check if fabric-scoped event is valid when fetching events
      * @note This function must be called prior to the logging being used.
      */
-    static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+    static void CreateEventManagement(uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources,
-                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
+                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable);
 
     static void DestroyEventManagement();
 
@@ -340,9 +340,9 @@ public:
 
     /**
      * @brief
-     *   Fetch the most recently vended Number for a particular priority level
+     *   Fetch the most recently vended number
      *
-     * @return EventNumber most recently vended event Number for that event priority
+     * @return EventNumber most recently vended event number
      */
     EventNumber GetLastEventNumber() const { return mLastEventNumber; }
 
@@ -379,6 +379,7 @@ private:
         EventId mEventId         = 0;
         EventNumber mEventNumber = 0;
         FabricIndex mFabricIndex = kUndefinedFabricIndex;
+        EventNumber mCachedEventNumber = 0;
     };
 
     void VendEventNumber();
@@ -505,7 +506,6 @@ private:
 
     // EventBuffer for debug level,
     CircularEventBuffer * mpEventBuffer        = nullptr;
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
@@ -517,6 +517,7 @@ private:
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+    FabricTable * mpFabricTable = nullptr;
 };
 } // namespace app
 } // namespace chip

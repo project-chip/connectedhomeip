@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +18,13 @@
 
 /**
  *    @file
- *      This file implements a test for  CHIP Interaction Model Event logging
+ *      This file implements a test for  CHIP Interaction Model Fabric-scope event
  *
  */
 
 #include <access/SubjectDescriptor.h>
+#include <credentials/FabricTable.h>
+#include <credentials/tests/CHIPCert_test_vectors.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
@@ -33,16 +35,18 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
+#include <lib/support/PersistedCounter.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <nlunit-test.h>
 
 namespace {
@@ -57,6 +61,12 @@ static uint8_t gDebugEventBuffer[128];
 static uint8_t gInfoEventBuffer[128];
 static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
+
+static chip::FabricInfo sAliceFabric;
+static chip::FabricIndex sAliceFabricIndex = chip::kUndefinedFabricIndex;
+static chip::FabricTable sFabricTable;
+static chip::TestPersistentStorageDelegate sStorage;
+static chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
 
 class TestContext : public chip::Test::AppContext
 {
@@ -79,8 +89,24 @@ public:
             { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
+        chip::Platform::MemoryInit();
+        sFabricTable.Init(&sStorage);
+        sGlobalEventIdCounter.Init(&sStorage, &chip::DefaultStorageKeyAllocator::IMEventNumber,
+                                         CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
+        sGlobalEventIdCounter.Advance();
+        sAliceFabric.TestOnlyBuildFabric(
+                chip::ByteSpan(chip::TestCerts::sTestCert_Root01_Chip, chip::TestCerts::sTestCert_Root01_Chip_Len),
+                chip::ByteSpan(chip::TestCerts::sTestCert_ICA01_Chip, chip::TestCerts::sTestCert_ICA01_Chip_Len),
+                chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_Chip, chip::TestCerts::sTestCert_Node01_01_Chip_Len),
+                chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_PublicKey, chip::TestCerts::sTestCert_Node01_01_PublicKey_Len),
+                chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_PrivateKey, chip::TestCerts::sTestCert_Node01_01_PrivateKey_Len));
+        if (sFabricTable.AddNewFabric(sAliceFabric, &sAliceFabricIndex) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
+
         chip::app::EventManagement::CreateEventManagement(sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter, &ctx->GetFabricTable());
+                                                          gCircularEventBuffer, logStorageResources, &sGlobalEventIdCounter, &sFabricTable);
 
         return SUCCESS;
     }
@@ -141,7 +167,7 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo)
+                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo, chip::Access::SubjectDescriptor &descriptor)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -150,7 +176,7 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     size_t totalNumElements;
     writer.Init(backingStore, 1024);
-    err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, chip::Access::SubjectDescriptor{});
+    err = alogMgmt.FetchEventsSince(writer, clusterInfo, startingEventNumber, eventCount, descriptor);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());
@@ -183,18 +209,21 @@ private:
     int32_t mStatus;
 };
 
-static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apContext)
+static void CheckLogEventWithFabricScopedEventEvictToNextBuffer(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
+    chip::EventNumber eid1, eid2, eid3, eid4;
     chip::app::EventOptions options1;
     chip::app::EventOptions options2;
     TestEventGenerator testEventGenerator;
 
     options1.mPath                       = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
     options1.mPriority                   = chip::app::PriorityLevel::Info;
+    options1.mFabricIndex                = sAliceFabricIndex;
+
     options2.mPath                       = { kTestEndpointId2, kLivenessClusterId, kLivenessChangeEvent };
     options2.mPriority                   = chip::app::PriorityLevel::Info;
+    options2.mFabricIndex                = sAliceFabricIndex;
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
@@ -207,116 +236,51 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Info);
     // Start to copy info event to next buffer since current debug buffer is full and info event is higher priority
     testEventGenerator.SetStatus(1);
     err = logMgmt.LogEvent(&testEventGenerator, options2, eid4);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Info);
 
-    testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options2, eid5);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 5, chip::app::PriorityLevel::Info);
-
-    testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options2, eid6);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 6, chip::app::PriorityLevel::Info);
-
     PrintEventLog();
 
     NL_TEST_ASSERT(apSuite, (eid1 + 1) == eid2);
     NL_TEST_ASSERT(apSuite, (eid2 + 1) == eid3);
     NL_TEST_ASSERT(apSuite, (eid3 + 1) == eid4);
-    NL_TEST_ASSERT(apSuite, (eid4 + 1) == eid5);
-    NL_TEST_ASSERT(apSuite, (eid5 + 1) == eid6);
 
-    chip::app::ObjectList<chip::app::EventPathParams> paths[2];
+    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams1;
+    testEventPathParams1.mValue.mEndpointId = kTestEndpointId1;
+    testEventPathParams1.mValue.mClusterId  = kLivenessClusterId;
+    chip::app::ObjectList<chip::app::EventPathParams> testEventPathParams2;
+    testEventPathParams2.mValue.mEndpointId = kTestEndpointId2;
+    testEventPathParams2.mValue.mClusterId  = kLivenessClusterId;
+    testEventPathParams2.mValue.mEventId    = kLivenessChangeEvent;
 
-    paths[0].mValue.mEndpointId = kTestEndpointId1;
-    paths[0].mValue.mClusterId  = kLivenessClusterId;
+    chip::Access::SubjectDescriptor descriptor;
+    descriptor.fabricIndex = sAliceFabricIndex;
+    //Test Event fetch from circular event buffer with same fabric and event number
+    CheckLogReadOut(apSuite, logMgmt, 1, 3, &testEventPathParams1, descriptor);
+    CheckLogReadOut(apSuite, logMgmt, 2, 2, &testEventPathParams1, descriptor);
+    CheckLogReadOut(apSuite, logMgmt, 3, 1, &testEventPathParams1, descriptor);
+    CheckLogReadOut(apSuite, logMgmt, 4, 1, &testEventPathParams2, descriptor);
 
-    paths[1].mValue.mEndpointId = kTestEndpointId2;
-    paths[1].mValue.mClusterId  = kLivenessClusterId;
-    paths[1].mValue.mEventId    = kLivenessChangeEvent;
-
-    // interested paths are path list, expect to retrieve all events for each particular interested path
-    CheckLogReadOut(apSuite, logMgmt, 0, 3, &paths[0]);
-    CheckLogReadOut(apSuite, logMgmt, 1, 2, &paths[0]);
-    CheckLogReadOut(apSuite, logMgmt, 2, 1, &paths[0]);
-    CheckLogReadOut(apSuite, logMgmt, 3, 3, &paths[1]);
-    CheckLogReadOut(apSuite, logMgmt, 4, 2, &paths[1]);
-    CheckLogReadOut(apSuite, logMgmt, 5, 1, &paths[1]);
-
-    paths[0].mpNext = &paths[1];
-    // interested paths are path list, expect to retrieve all events for those interested paths
-    CheckLogReadOut(apSuite, logMgmt, 0, 6, paths);
-
-    chip::app::ObjectList<chip::app::EventPathParams> pathsWithWildcard[2];
-    paths[0].mValue.mEndpointId = kTestEndpointId1;
-    paths[0].mValue.mClusterId  = kLivenessClusterId;
-
-    // second path is wildcard path at default, expect to retrieve all events
-    CheckLogReadOut(apSuite, logMgmt, 0, 6, &pathsWithWildcard[1]);
-
-    paths[0].mpNext = &paths[1];
-    // first path is not wildcard, second path is wildcard path at default, expect to retrieve all events
-    CheckLogReadOut(apSuite, logMgmt, 0, 6, pathsWithWildcard);
+    //Test Event fetch from circular event buffer with same fabric and different event number
+    sFabricTable.FindFabricWithIndex(sAliceFabricIndex)->TestOnlySetEventNumber(2);
+    CheckLogReadOut(apSuite, logMgmt, 1, 0, &testEventPathParams1, descriptor);
+    CheckLogReadOut(apSuite, logMgmt, 1, 0, &testEventPathParams2, descriptor);
 }
 
-static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
-    chip::app::EventOptions options;
-    options.mPath     = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
-    options.mPriority = chip::app::PriorityLevel::Debug;
-    TestEventGenerator testEventGenerator;
-
-    chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid1);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
-    testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid2);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
-    testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid3);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
-    CheckLogState(apSuite, logMgmt, 6, chip::app::PriorityLevel::Info);
-    // Start to drop off debug event since debug event can only be saved in debug buffer
-    testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid4);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
-    CheckLogState(apSuite, logMgmt, 6, chip::app::PriorityLevel::Info);
-
-    testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid5);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
-    CheckLogState(apSuite, logMgmt, 6, chip::app::PriorityLevel::Info);
-
-    testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, options, eid6);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
-}
 /**
  *   Test Suite. It lists all the test functions.
  */
 
-const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
-                          NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent), NL_TEST_SENTINEL() };
+const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithFabricScopedEventEvictToNextBuffer", CheckLogEventWithFabricScopedEventEvictToNextBuffer), NL_TEST_SENTINEL() };
 
 // clang-format off
 nlTestSuite sSuite =
 {
-    "EventLogging",
+    "TestFabricScopedEvent",
     &sTests[0],
     TestContext::Initialize,
     TestContext::Finalize
@@ -325,11 +289,11 @@ nlTestSuite sSuite =
 
 } // namespace
 
-int TestEventLogging()
+int TestFabricScopedEvent()
 {
     TestContext gContext;
     nlTestRunner(&sSuite, &gContext);
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestEventLogging)
+CHIP_REGISTER_TEST_SUITE(TestFabricScopedEvent)

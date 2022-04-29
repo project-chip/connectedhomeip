@@ -80,6 +80,7 @@ chip_test_suite("tests") {
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
     "TestEventLogging.cpp",
+    "TestFabricScopedEvent.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
@@ -108,6 +109,7 @@ chip_test_suite("tests") {
   public_deps = [
     ":binding-test-srcs",
     ":ota-requestor-test-srcs",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/tests:helpers",
@@ -115,10 +117,4 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  if (chip_config_network_layer_ble &&
-      (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
-    test_sources += [ "TestCommissionManager.cpp" ]
-    public_deps += [ "${chip_root}/src/app/server" ]
-  }
 }

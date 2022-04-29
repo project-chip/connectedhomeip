@@ -38,6 +38,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 
@@ -65,7 +66,10 @@ static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fab
 class DLL_EXPORT FabricInfo
 {
 public:
-    FabricInfo() { Reset(); }
+    FabricInfo()
+    {
+        Reset();
+    }
 
     // Returns a span into our internal storage.
     CharSpan GetFabricLabel() const { return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes)); }
@@ -95,6 +99,8 @@ public:
 
     FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    EventNumber GetEventNumber() const { return mEventNumber; }
 
     CompressedFabricId GetCompressedId() const { return mOperationalId.GetCompressedFabricId(); }
 
@@ -178,6 +184,7 @@ public:
     {
         mOperationalId  = PeerId();
         mVendorId       = VendorId::NotSpecified;
+        mEventNumber    = 0;
         mFabricLabel[0] = '\0';
 
         if (mOperationalKey != nullptr)
@@ -202,6 +209,8 @@ public:
     CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
                                    ByteSpan nodePrivateKey);
 
+    void TestOnlySetEventNumber(EventNumber aNumber) { mEventNumber = aNumber; }
+
 private:
     static constexpr size_t MetadataTLVMaxSize()
     {
@@ -217,6 +226,7 @@ private:
 
     FabricIndex mFabricIndex                            = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = VendorId::NotSpecified;
+    EventNumber mEventNumber                            = 0;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -247,6 +257,7 @@ private:
 
     struct StorableFabricInfo
     {
+        EventNumber mEventNumber;
         uint8_t mFabricIndex;
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 

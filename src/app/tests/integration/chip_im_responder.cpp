@@ -162,7 +162,7 @@ chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 chip::MonotonicallyIncreasingCounter<chip::EventNumber> gEventCounter;
 
-CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
+CHIP_ERROR InitializeEventLogging(chip::FabricTable *apFabricTable)
 {
     ReturnErrorOnFailure(gEventCounter.Init(0));
 
@@ -172,8 +172,8 @@ CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
         { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
     };
 
-    chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                      gCircularEventBuffer, logStorageResources, &gEventCounter);
+    chip::app::EventManagement::CreateEventManagement(sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+                                                      gCircularEventBuffer, logStorageResources, &gEventCounter, apFabricTable);
     return CHIP_NO_ERROR;
 }
 
@@ -207,7 +207,7 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable);
     SuccessOrExit(err);
 
-    err = InitializeEventLogging(&gExchangeManager);
+    err = InitializeEventLogging(&gFabricTable);
     SuccessOrExit(err);
 
     err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, chip::kTestControllerNodeId, 1, gFabricIndex, peer,

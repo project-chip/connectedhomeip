@@ -207,8 +207,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
         };
 
-        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &sGlobalEventIdCounter);
+        chip::app::EventManagement::GetInstance().Init(CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                       &logStorageResources[0], &sGlobalEventIdCounter, &GetFabricTable());
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
