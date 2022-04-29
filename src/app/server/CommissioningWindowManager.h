@@ -50,16 +50,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static constexpr System::Clock::Seconds16 MaxCommissioningTimeout()
+    System::Clock::Seconds16 MaxCommissioningTimeout()
     {
         // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
         return System::Clock::Seconds16(15 * 60);
     }
 
-    static constexpr System::Clock::Seconds16 MinCommissioningTimeout()
+    System::Clock::Seconds16 MinCommissioningTimeout()
     {
         // Specification section 5.4.2.3. Announcement Duration says 3 minutes.
-        return System::Clock::Seconds16(3 * 60);
+        return mMinCommissioningTimeoutOverride.ValueOr(System::Clock::Seconds16(3 * 60));
     }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
