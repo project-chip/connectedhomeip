@@ -38,6 +38,8 @@ typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
 typedef DataModel::Nullable<uint16_t> NAbsolute;
 
+typedef Optional<Percent> OPercent;
+typedef Optional<Percent100ths> OPercent100ths;
 // Match directly with OperationalStatus 2 bits Fields
 enum class OperationalState : uint8_t
 {
