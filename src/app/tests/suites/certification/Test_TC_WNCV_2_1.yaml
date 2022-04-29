@@ -208,7 +208,6 @@ tests:
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
           "3b: read the RO optional attribute default: PhysicalClosedLimitLift"
-      disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
       PICS: PICS_A_PHYSICALCLOSEDLIMITLIFT
@@ -221,7 +220,6 @@ tests:
     ### Attribute[  2]: PhysicalClosedLimitTilt  ====================
     - label:
           "3c: read the RO optional attribute default: PhysicalClosedLimitTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
       PICS: PICS_A_PHYSICALCLOSEDLIMITTILT
@@ -255,7 +253,6 @@ tests:
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label: "3f: read the RO optional attribute default: NumberOfActuationsLift"
-      disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
       PICS: PICS_A_NUMBEROFACTUATIONSLIFT
@@ -267,7 +264,6 @@ tests:
 
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
     - label: "3g: read the RO optional attribute default: NumberOfActuationsTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
       PICS: PICS_A_NUMBEROFACTUATIONSTILT
