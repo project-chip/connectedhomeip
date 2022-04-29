@@ -28,10 +28,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # TODO: Need to enable when we can properly verify vendor id and uint16
-    - label: "Read launch list attribute."
-      disabled: true
+    - label: "Read CatalogList attribute."
       command: "readAttribute"
       attribute: "CatalogList"
       response:
-          value: []
+          constraints:
+              type: list

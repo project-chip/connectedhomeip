@@ -169,12 +169,12 @@ bool AttributePathExpandIterator::Next()
 {
     for (; mpAttributePath != nullptr; (mpAttributePath = mpAttributePath->mpNext, mEndpointIndex = UINT16_MAX))
     {
-        mOutputPath.mExpanded = mpAttributePath->mValue.HasAttributeWildcard();
+        mOutputPath.mExpanded = mpAttributePath->mValue.IsWildcardPath();
 
         if (mEndpointIndex == UINT16_MAX)
         {
             // Special case: If this is a concrete path, we just return its value as-is.
-            if (!mpAttributePath->mValue.HasAttributeWildcard())
+            if (!mpAttributePath->mValue.IsWildcardPath())
             {
                 mOutputPath.mEndpointId  = mpAttributePath->mValue.mEndpointId;
                 mOutputPath.mClusterId   = mpAttributePath->mValue.mClusterId;

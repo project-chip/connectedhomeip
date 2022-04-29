@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    "13.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
-    commissioned to the same fabric [DUT Commissionee, TH2 Commissionee]"
+    3.4.8. [TC-SC-4.8] Compressed Fabric ID remains the same for Nodes
+    commissioned to the same fabric [DUT Commissionee, TH2 Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -23,28 +24,46 @@ config:
 
 tests:
     - label: "TH1 creates a Fabric"
+      verification: |
+
       disabled: true
 
     - label: "Commission DUT to TH1s Fabric"
+      verification: |
+          ./chip-tool pairing ble-wifi 1 zigbeehome mater123 20202021 3840  (./chip-tool pairing ble-wifi {NODE ID} {SSID} {PASSWORD} {SETUPPINCODE} {DISCRIMINATOR})
       disabled: true
 
     - label: "Commission TH2 to TH1s Fabric"
+      verification: |
+
       disabled: true
 
     - label: "Scan for DNS-SD advertising from DUT"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 1 1
       disabled: true
 
     - label: "Scan for DNS-SD advertising from TH2"
+      verification: |
+          ./chip-tool operationalcredentials read fabrics 2 1
       disabled: true
 
     - label: "Remove DUT from TH1s fabric using Remove Fabric method"
+      verification: |
+          ./chip-tool operationalcredentials remove-fabrics 1 0
       disabled: true
 
     - label: "Commission DUT to TH1s Fabric again"
+      verification: |
+          ./chip-tool pairing ble-wifi 1 zigbeehome mater123 20202021 3840 (./chip-tool pairing ble-wifi {NODE ID} {SSID} {PASSWORD} {SETUPPINCODE} {DISCRIMINATOR})
       disabled: true
 
     - label: "Scan for DNS-SD advertising from DUT"
+      verification: |
+          verify fabric ID value is exactly same as what we got in step 4
       disabled: true
 
     - label: "Repeat step 7 to 9 for DUT using Factory Reset Method"
+      verification: |
+          DUT vendor has to provide a way to put the device in factory reset
       disabled: true

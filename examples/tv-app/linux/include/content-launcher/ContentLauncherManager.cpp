@@ -40,7 +40,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
     LaunchResponseType response;
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::StatusEnum::kSuccess;
+    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -55,7 +55,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     // TODO: Insert code here
     LaunchResponseType response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::StatusEnum::kSuccess;
+    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
     helper.Success(response);
 }
 

@@ -36,7 +36,10 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Tag::kStatus):

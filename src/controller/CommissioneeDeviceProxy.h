@@ -138,9 +138,6 @@ public:
     CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
     const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }
 
-    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
-
-    SessionHolder & GetSecureSessionHolder() { return mSecureSession; }
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }

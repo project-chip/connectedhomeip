@@ -156,6 +156,38 @@ private:
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+class LinuxEthernetDriver final : public EthernetDriver
+{
+public:
+    struct EthernetNetworkIterator final : public NetworkIterator
+    {
+        EthernetNetworkIterator() = default;
+        size_t Count() override { return interfaceNameLen > 0 ? 1 : 0; }
+        bool Next(Network & item) override
+        {
+            if (exhausted)
+            {
+                return false;
+            }
+            exhausted = true;
+            memcpy(item.networkID, interfaceName, interfaceNameLen);
+            item.networkIDLen = interfaceNameLen;
+            item.connected    = true;
+            return true;
+        }
+        void Release() override { delete this; }
+        ~EthernetNetworkIterator() override = default;
+
+        // Public, but cannot be accessed via NetworkIterator interface.
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen = 0;
+        bool exhausted           = false;
+    };
+
+    uint8_t GetMaxNetworks() override { return 1; };
+    NetworkIterator * GetNetworks() override;
+};
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip

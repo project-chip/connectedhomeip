@@ -127,7 +127,7 @@ TimerHandle_t connectionTimeout;
 EventGroupHandle_t bleAppTaskLoopEvent;
 
 /* keep the device ID of the connected peer */
-uint8_t device_id;
+uint8_t g_device_id;
 
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -786,8 +786,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint16_t discriminator;
     uint16_t advInterval                                  = 0;
     gapAdvertisingData_t adv                              = { 0 };
-    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { 0 };
-    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { 0 };
+    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { { 0 } };
+    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { { 0 } };
     uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN]            = { 0 };
     gapScanResponseData_t scanRsp                         = { 0 };
     gapAdvertisingParameters_t adv_params                 = { 0 };
@@ -1035,7 +1035,7 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
                 ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
 
                 /* Set the advertising parameters */
-                if (Gap_Disconnect(device_id) != gBleSuccess_c)
+                if (Gap_Disconnect(g_device_id) != gBleSuccess_c)
                 {
                     ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
                 }
@@ -1053,7 +1053,7 @@ void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t device_id_loc = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", device_id_loc);
 
-    device_id = device_id_loc;
+    g_device_id = device_id_loc;
     blekw_start_connection_timeout();
     sInstance.AddConnection(device_id_loc);
     mFlags.Set(Flags::kRestartAdvertising);

@@ -159,7 +159,7 @@ void emberAfPrintAttributeTable(void)
     {
         EmberAfDefinedEndpoint * ep = &(emAfEndpoints[endpointIndex]);
         emberAfAttributesPrintln("ENDPOINT %x", ep->endpoint);
-        emberAfAttributesPrintln("clus / side / attr / mfg  /type(len)/ rw / storage / data (raw)");
+        emberAfAttributesPrintln("clus / attr / mfg  /type(len)/ rw / storage / data (raw)");
         emberAfAttributesFlush();
         for (clusterIndex = 0; clusterIndex < ep->endpointType->clusterCount; clusterIndex++)
         {
@@ -174,8 +174,7 @@ void emberAfPrintAttributeTable(void)
                 // manually reset the watchdog.
                 //        halResetWatchdog();
 
-                emberAfAttributesPrint(ChipLogFormatMEI " / %p / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
-                                       (emberAfAttributeIsClient(metaData) ? "clnt" : "srvr"),
+                emberAfAttributesPrint(ChipLogFormatMEI " / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
                                        ChipLogValueMEI(metaData->attributeId));
                 emberAfAttributesPrint("----");
                 emberAfAttributesPrint(
@@ -183,8 +182,7 @@ void emberAfPrintAttributeTable(void)
                     (metaData->IsReadOnly() ? "RO" : "RW"),
                     (metaData->IsNonVolatile() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
                 emberAfAttributesFlush();
-                status = emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId,
-                                           (emberAfAttributeIsClient(metaData) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER), data,
+                status = emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId, CLUSTER_MASK_SERVER, data,
                                            ATTRIBUTE_LARGEST, nullptr);
                 if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
                 {
@@ -299,11 +297,15 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
 {
+    if (mask != CLUSTER_MASK_SERVER)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    }
+
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
     record.endpoint    = endpoint;
     record.clusterId   = cluster;
-    record.clusterMask = mask;
     record.attributeId = attributeID;
     emAfReadOrWriteAttribute(&record, &metadata,
                              nullptr, // buffer
@@ -444,12 +446,16 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * dataPtr,
                                 uint16_t readLength, EmberAfAttributeType * dataType)
 {
+    if (mask != CLUSTER_MASK_SERVER)
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    }
+
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
     EmberAfStatus status;
     record.endpoint    = endpoint;
     record.clusterId   = cluster;
-    record.clusterMask = mask;
     record.attributeId = attributeID;
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
                                       false); // write?

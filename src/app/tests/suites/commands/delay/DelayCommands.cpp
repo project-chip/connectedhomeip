@@ -26,7 +26,7 @@ const char * getScriptsFolder()
 }
 } // namespace
 
-CHIP_ERROR DelayCommands::WaitForMs(uint16_t ms)
+CHIP_ERROR DelayCommands::WaitForMs(uint32_t ms)
 {
     const auto duration = chip::System::Clock::Milliseconds32(ms);
     return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);

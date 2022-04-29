@@ -91,7 +91,7 @@ private:
 struct RegisterContext : public GenericContext
 {
     DnssdPublishCallback callback;
-    char mType[kDnssdTypeMaxSize + 1];
+    std::string mType;
 
     RegisterContext(const char * sType, DnssdPublishCallback cb, void * cbContext);
     virtual ~RegisterContext() {}
@@ -99,7 +99,7 @@ struct RegisterContext : public GenericContext
     void DispatchFailure(DNSServiceErrorType err) override;
     void DispatchSuccess() override;
 
-    bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
+    bool matches(const char * sType) { return mType.compare(sType) == 0; }
 };
 
 struct BrowseContext : public GenericContext

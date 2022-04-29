@@ -33,15 +33,15 @@ public:
         ChipLogProgress(chipTool, " ***** Test Step %u : %s\n", stepNumber, stepName);
     }
 
-    void LogEnd(CHIP_ERROR err)
+    void LogEnd(std::string message, CHIP_ERROR err)
     {
         if (CHIP_NO_ERROR == err)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: %s\n", mTestName);
+            ChipLogProgress(chipTool, " **** Test Complete: %s\n", message.c_str());
         }
         else
         {
-            ChipLogError(chipTool, " ***** Test Failure: %s\n", mTestName);
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
         }
     }
 
@@ -50,7 +50,12 @@ public:
 
     void NextTest()
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        if (mTestSubStepIndex != mTestSubStepCount)
+        {
+            Exit(mTestName, CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        mTestSubStepIndex = 0;
+        mTestSubStepCount = 0;
 
         if (0 == mTestIndex)
         {
@@ -59,7 +64,6 @@ public:
 
         if (mTestCount == mTestIndex)
         {
-            LogEnd(CHIP_NO_ERROR);
             Exit(mTestName, CHIP_NO_ERROR);
             return;
         }
@@ -73,7 +77,7 @@ public:
         // command.  That way if we lose the timeslice after we send the message
         // but before our function call returns, we won't end up with an
         // incorrect mTestIndex value observed when we get the response.
-        DoTestStep(mTestIndex++);
+        auto err = DoTestStep(mTestIndex++);
         if (CHIP_NO_ERROR != err)
         {
             Exit(chip::ErrorStr(err));
@@ -85,4 +89,7 @@ protected:
     const uint16_t mTestCount;
     std::atomic_uint16_t mTestIndex;
     chip::Optional<uint64_t> mDelayInMs;
+
+    uint16_t mTestSubStepIndex = 0;
+    uint16_t mTestSubStepCount = 0;
 };

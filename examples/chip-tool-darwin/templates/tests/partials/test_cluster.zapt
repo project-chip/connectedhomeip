@@ -82,13 +82,15 @@ class {{filename}}: public TestCommandBridge
 
     {{#chip_tests_items}}
     {{#if async}}
-    bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = false;
+    bool testSendCluster{{parent.filename}}_{{index}}_{{asUpperCamelCase command}}_Fulfilled = false;
     {{/if}}
+    {{#chip_tests_item_responses}}
     {{#chip_tests_item_response_parameters}}
     {{#if saveAs}}
     {{asObjectiveCType type ../cluster}} {{saveAs}};
     {{/if}}
     {{/chip_tests_item_response_parameters}}
+    {{/chip_tests_item_responses}}
 
     {{~#*inline "subscribeDataCallback"}}
     test_{{parent.filename}}_{{attribute}}_Reported
@@ -106,7 +108,7 @@ class {{filename}}: public TestCommandBridge
         {{~#not_first}}, {{/not_first~}}
         {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
           {{~#if (chip_tests_config_has definedValue)~}}
-              m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{>defaultValue}}
+              m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
           {{else}}
           {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}
           {{~/if~}}
@@ -138,7 +140,7 @@ class {{filename}}: public TestCommandBridge
                                                                    maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument] 
                                                                    params:params
                                                                    subscriptionEstablished:^{
-              VerifyOrReturn(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+              VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
               NextTest();
           }
           reportHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isArray}} * _Nullable value, NSError * _Nullable err) {
@@ -172,11 +174,9 @@ class {{filename}}: public TestCommandBridge
             }
             {{/if}}
 
-            {{#if response.error}}
-              VerifyOrReturn(CheckValue("status", err, {{response.error}}));
-              NextTest();
-            {{else if response.errorWrongValue}}
-              VerifyOrReturn(CheckConstraintNotValue("status", err, 0));
+            {{#chip_tests_item_responses}}
+            {{#if error}}
+              VerifyOrReturn(CheckValue("status", err, {{error}}));
               NextTest();
             {{else}}
               VerifyOrReturn(CheckValue("status", err, 0));
@@ -235,7 +235,7 @@ class {{filename}}: public TestCommandBridge
         {{#unless async}}
         NextTest();
         {{else}}
-        testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = true;
+        testSendCluster{{parent.filename}}_{{../index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
         {{else}}
           {{! We're a subscription }}
@@ -246,6 +246,7 @@ class {{filename}}: public TestCommandBridge
           }
         {{/unless}}
         {{/if}}
+        {{/chip_tests_item_responses}}
     }{{#unless isWaitForReport}}]{{/unless}};
 
     {{/if}}

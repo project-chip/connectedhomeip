@@ -65,7 +65,7 @@ tests:
       response:
           values:
               - name: "returnValue"
-              - value: 0
+                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -94,7 +94,7 @@ tests:
       response:
           values:
               - name: "returnValue"
-              - value: 0
+                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -142,7 +142,7 @@ tests:
       response:
           values:
               - name: "returnValue"
-              - value: 0
+                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -165,7 +165,7 @@ tests:
       response:
           values:
               - name: "returnValue"
-              - value: 0
+                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"

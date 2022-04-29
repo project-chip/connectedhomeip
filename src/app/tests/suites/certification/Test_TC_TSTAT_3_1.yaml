@@ -1,0 +1,102 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 42.3.1. [TC-TSTAT-3.1] Attributes with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT reads all supported mandatory attributes from TH once at a time
+          in a manufacturer specific order"
+      verification: |
+          On TestHarnes (all-cluster-app) a received read of local-temperature (id 0) looks like this:
+
+          [1646062486.687816][33190:33190] CHIP:IM: Received Read request
+          [1646062486.687873][33190:33190] CHIP:DMG: ReadRequestMessage =
+          [1646062486.687902][33190:33190] CHIP:DMG: {
+          [1646062486.687924][33190:33190] CHIP:DMG:         AttributePathIBs =
+          [1646062486.687951][33190:33190] CHIP:DMG:         [
+          [1646062486.687975][33190:33190] CHIP:DMG:                 AttributePathIB =
+          [1646062486.688010][33190:33190] CHIP:DMG:                 {
+          [1646062486.688040][33190:33190] CHIP:DMG:                         Endpoint = 0x1,
+          [1646062486.688073][33190:33190] CHIP:DMG:                         Cluster = 0x201,
+          [1646062486.688107][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1646062486.688136][33190:33190] CHIP:DMG:                 }
+          [1646062486.688165][33190:33190] CHIP:DMG:
+          [1646062486.688192][33190:33190] CHIP:DMG:         ],
+          [1646062486.688219][33190:33190] CHIP:DMG:
+          [1646062486.688245][33190:33190] CHIP:DMG:         isFabricFiltered = false,
+          [1646062486.688269][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646062486.688291][33190:33190] CHIP:DMG: },
+          [1646062486.688354][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1646062486.688608][33190:33190] CHIP:DMG: <RE:Run> Cluster 201, Attribute 0 is dirty
+          [1646062486.688644][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_0201 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1646062486.688675][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0201 e=1 p=v
+          [1646062486.688742][33190:33190] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH once at a time in
+          a manufacturer specific order"
+      verification: |
+          see above
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          On TestHarnes (all-cluster-app) a received write request looks like this (f.e local-temperature-calibration (id 16) value 10):
+
+          [1646062753.451418][33190:33190] CHIP:IM: Received Write request
+          [1646062753.451455][33190:33190] CHIP:DMG: IM WH moving to [Initialized]
+          [1646062753.451518][33190:33190] CHIP:DMG: WriteRequestMessage =
+          [1646062753.451549][33190:33190] CHIP:DMG: {
+          [1646062753.451578][33190:33190] CHIP:DMG:         timedRequest = false,
+          [1646062753.451614][33190:33190] CHIP:DMG:         AttributeDataIBs =
+          [1646062753.451652][33190:33190] CHIP:DMG:         [
+          [1646062753.451681][33190:33190] CHIP:DMG:                 AttributeDataIB =
+          [1646062753.451718][33190:33190] CHIP:DMG:                 {
+          [1646062753.451785][33190:33190] CHIP:DMG:                         AttributePathIB =
+          [1646062753.451831][33190:33190] CHIP:DMG:                         {
+          [1646062753.451875][33190:33190] CHIP:DMG:                                 Endpoint = 0x1,
+          [1646062753.451920][33190:33190] CHIP:DMG:                                 Cluster = 0x201,
+          [1646062753.451964][33190:33190] CHIP:DMG:                                 Attribute = 0x0000_0010,
+          [1646062753.452351][33190:33190] CHIP:DMG:                         }
+          [1646062753.452402][33190:33190] CHIP:DMG:
+          [1646062753.452445][33190:33190] CHIP:DMG:                                 Data = 10,
+          [1646062753.452482][33190:33190] CHIP:DMG:                 },
+          [1646062753.452520][33190:33190] CHIP:DMG:
+          [1646062753.452549][33190:33190] CHIP:DMG:         ],
+          [1646062753.452586][33190:33190] CHIP:DMG:
+          [1646062753.452616][33190:33190] CHIP:DMG:         moreChunkedMessages = false,
+          [1646062753.452648][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646062753.452678][33190:33190] CHIP:DMG: },
+          [1646062753.452791][33190:33190] CHIP:DMG: IM WH moving to [AddStatus]
+          [1646062753.452844][33190:33190] CHIP:EM: Piggybacking Ack for MessageCounter:8013357 on exchange: 61433r
+          [1646062753.452923][33190:33190] CHIP:IN: Prepared secure message 0xaaaace176940 to 0x000000000001B669 (1)  of type 0x7 and protocolId (0, 1) on exchange 61433r with MessageCounter:10838634.
+          [1646062753.452971][33190:33190] CHIP:IN: Sending encrypted msg 0xaaaace176940 with MessageCounter:10838634 to 0x000000000001B669 (1) at monotonic time: 256943237 msec
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          see above
+      disabled: true

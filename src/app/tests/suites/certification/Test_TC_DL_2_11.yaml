@@ -1,0 +1,85 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    100.2.11. [TC-DL-2.11] Verification for the following Commands - Set Year
+    Schedule, Get Year Schedule, Get Year Day Schedule Response and Clear Year
+    Day Schedule[DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "TH reads RFID Users Supported attribute and saves as usersupported
+          for future use."
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15776
+      disabled: true
+
+    - label:
+          "TH sends Set RFID Code Command to DUT with the following values: User
+          ID as 1 User Status as 0 User Type as 0 RFID Code as 785"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Set RFID Code Command to DUT with the following values: User
+          ID as usersupported+1 User Status as 0 User Type as 0 RFID Code as 824"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Set RFID Code Command to DUT with the following values: User
+          ID as 2 User Status as 0 User Type as 0 RFID Code as 824"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Get RFID Code Command to DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends Get RFID Code Command to the DUT with User ID value as
+          usersupported +1"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Clear RFID Code Command to DUT with the User ID as 2"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Get RFID Code Command to DUT for User ID as 2"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Clear All RFID Codes Command to DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Get RFID Code Command to DUT"
+      verification: |
+
+      disabled: true

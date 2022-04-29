@@ -24,12 +24,18 @@ function getManualTests()
     'Test_TC_DD_1_8',
     'Test_TC_DD_1_9',
     'Test_TC_DD_1_10',
+    'Test_TC_DD_1_11',
+    'Test_TC_DD_1_12',
     'Test_TC_DD_2_1',
     'Test_TC_DD_2_2',
     'Test_TC_DD_3_1',
     'Test_TC_DD_3_2',
+    'Test_TC_DD_3_3',
+    'Test_TC_DD_3_4',
     'Test_TC_DD_3_5',
     'Test_TC_DD_3_6',
+    'Test_TC_DD_3_7',
+    'Test_TC_DD_3_8',
     'Test_TC_DD_3_9',
     'Test_TC_DD_3_10',
     'Test_TC_DD_3_11',
@@ -48,6 +54,7 @@ function getManualTests()
     'Test_TC_BDX_1_1',
     'Test_TC_BDX_1_2',
     'Test_TC_BDX_1_3',
+    'Test_TC_BDX_1_4',
     'Test_TC_BDX_1_5',
     'Test_TC_BDX_1_6',
     'Test_TC_BDX_2_1',
@@ -66,11 +73,13 @@ function getManualTests()
   const BridgedActions = [
     'Test_TC_BRAC_2_1',
     'Test_TC_BRAC_2_2',
+    'Test_TC_BRAC_3_1',
   ];
 
   const DeviceManagement = [
     'Test_TC_DM_1_2',
     'Test_TC_DM_1_4',
+    'Test_TC_DM_2_1',
     'Test_TC_DM_2_3',
     'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
@@ -78,9 +87,9 @@ function getManualTests()
   ];
 
   const DiagnosticsLogs = [
-    'Test_TC_DIAG_LOG_1_1',
-    'Test_TC_DIAG_LOG_1_2',
-    'Test_TC_DIAG_LOG_1_3',
+    'Test_TC_Diag_Log_2_1',
+    'Test_TC_Diag_Log_2_2',
+    'Test_TC_Diag_Log_2_3',
   ];
 
   const Descriptor = [
@@ -92,8 +101,9 @@ function getManualTests()
   ];
 
   const GeneralCommissioning = [
-    'Test_TC_GC_1_2',
-    'Test_TC_GC_1_3',
+    'Test_TC_GC_2_2',
+    'Test_TC_GC_2_3',
+    'Test_TC_GC_2_4',
   ];
 
   const GeneralDiagnostics = [
@@ -104,10 +114,13 @@ function getManualTests()
 
   const Identify = [
     'Test_TC_I_2_2',
+    'Test_TC_I_3_1',
+    'Test_TC_I_3_2',
   ];
 
   const IlluminanceMeasurement = [
     'Test_TC_ILL_2_2',
+    'Test_TC_ILL_3_1',
   ];
 
   const InteractionDataModel = [
@@ -125,9 +138,11 @@ function getManualTests()
     'Test_TC_IDM_6_2',
     'Test_TC_IDM_6_3',
     'Test_TC_IDM_6_4',
+    'Test_TC_IDM_7_1',
   ];
 
   const MediaControl = [
+    'Test_TC_MC_2_2',
     'Test_TC_MC_3_12',
     'Test_TC_MC_3_13',
     'Test_TC_MC_4_1',
@@ -138,13 +153,12 @@ function getManualTests()
     'Test_TC_MC_10_4',
     'Test_TC_MC_10_5',
     'Test_TC_MC_10_6',
+    'Test_TC_MC_10_7',
   ];
 
   const MultipleFabrics = [
     'Test_TC_MF_1_1',
     'Test_TC_MF_1_2',
-    'Test_TC_MF_1_3',
-    'Test_TC_MF_1_5',
     'Test_TC_MF_1_7',
     'Test_TC_MF_1_8',
     'Test_TC_MF_1_9',
@@ -153,7 +167,6 @@ function getManualTests()
     'Test_TC_MF_1_12',
     'Test_TC_MF_1_13',
     'Test_TC_MF_1_14',
-    'Test_TC_MF_1_15',
     'Test_TC_MF_1_16',
     'Test_TC_MF_1_17',
     'Test_TC_MF_1_18',
@@ -171,6 +184,7 @@ function getManualTests()
 
   const ModeSelect = [
     'Test_TC_MOD_1_2',
+    'Test_TC_MOD_1_3',
     'Test_TC_MOD_2_1',
     'Test_TC_MOD_2_2',
     'Test_TC_MOD_3_1',
@@ -197,15 +211,20 @@ function getManualTests()
 
   const PowerSourceConfiguration = [
     'Test_TC_PSCFG_2_1',
+    'Test_TC_PSCFG_2_2',
     'Test_TC_PSCFG_3_1',
   ];
 
   const SecureChannel = [
+    'Test_TC_SC_4_1',
+    'Test_TC_SC_4_3',
+    'Test_TC_SC_4_4',
     'Test_TC_SC_4_5',
     'Test_TC_SC_4_6',
     'Test_TC_SC_4_7',
     'Test_TC_SC_4_8',
     'Test_TC_SC_4_9',
+    'Test_TC_SC_4_10',
   ];
 
   const SoftwareDiagnostics = [
@@ -219,6 +238,7 @@ function getManualTests()
 
   const WindowCovering = [
     'Test_TC_WNCV_6_1',
+    'Test_TC_WNCV_7_1',
   ];
 
   const FlowMeasurement = [
@@ -229,15 +249,113 @@ function getManualTests()
     'Test_TC_OCC_2_3',
     'Test_TC_OCC_2_4',
     'Test_TC_OCC_3_1',
+    'Test_TC_OCC_3_2',
   ];
 
   const PressureMeasurement = [
     'Test_TC_PRS_2_2',
     'Test_TC_PRS_2_3',
+    'Test_TC_PRS_3_1',
   ];
 
   const PowerSource = [
     'Test_TC_PS_2_2',
+    'Test_TC_PS_3_1',
+  ];
+
+  const BooleanState = [
+    'Test_TC_BOOL_2_2',
+    'Test_TC_BOOL_3_1',
+  ];
+
+  const ColorControl = [
+    'Test_TC_CC_2_2',
+    'Test_TC_CC_3_4',
+    'Test_TC_CC_4_5',
+    'Test_TC_CC_5_4',
+    'Test_TC_CC_6_4',
+    'Test_TC_CC_7_5',
+    'Test_TC_CC_9_4',
+  ];
+
+  const DoorLock = [
+    'Test_TC_DL_2_1',
+    'Test_TC_DL_2_2',
+    'Test_TC_DL_2_4',
+    'Test_TC_DL_2_5',
+    'Test_TC_DL_2_6',
+    'Test_TC_DL_2_7',
+    'Test_TC_DL_2_8',
+    'Test_TC_DL_2_10',
+    'Test_TC_DL_2_11',
+    'Test_TC_DL_2_13',
+    'Test_TC_DL_2_14',
+    'Test_TC_DL_2_15',
+    'Test_TC_DL_2_16',
+    'Test_TC_DL_2_17',
+  ];
+
+  const UserLabel = [
+    'Test_TC_LC_1_1',
+    'Test_TC_LC_2_3',
+    'Test_TC_LC_2_4',
+    'Test_TC_LC_2_5',
+  ];
+
+  const LocalizationConfiguration = [
+    'Test_TC_LO_1_1',
+  ];
+
+  const LevelControl = [
+    'Test_TC_LVL_2_3',
+  ];
+
+  const NetworkCommissioning = [
+    'Test_TC_NC_1_1',
+    'Test_TC_NC_1_2',
+    'Test_TC_NC_1_3',
+    'Test_TC_NC_1_4',
+    'Test_TC_NC_1_5',
+    'Test_TC_NC_1_6',
+    'Test_TC_NC_1_7',
+    'Test_TC_NC_1_8',
+    'Test_TC_NC_1_9',
+    'Test_TC_NC_1_10',
+    'Test_TC_NC_1_11',
+    'Test_TC_NC_1_12',
+    'Test_TC_NC_1_13',
+    'Test_TC_NC_1_14',
+    'Test_TC_NC_1_15',
+    'Test_TC_NC_1_16',
+    'Test_TC_NC_1_17',
+    'Test_TC_NC_1_18',
+  ];
+
+  const OnOff = [
+    'Test_TC_OO_3_1',
+    'Test_TC_OO_3_2',
+  ];
+
+  const RelativeHumidityMeasurement = [
+    'Test_TC_RH_3_1',
+  ];
+
+  const Switch = [
+    'Test_TC_SWTCH_1_1',
+    'Test_TC_SWTCH_3_1',
+  ];
+
+  const TemperatureMeasurement = [
+    'Test_TC_TM_3_1',
+  ];
+
+  const Thermostat = [
+    'Test_TC_TSTAT_3_1',
+    'Test_TC_TSTAT_3_2',
+  ];
+
+  const ThermostatUserConfiguration = [
+    'Test_TC_TSUIC_3_1',
   ];
 
   const tests = [
@@ -268,6 +386,19 @@ function getManualTests()
     OccupancySensing, //
     PressureMeasurement, //
     PowerSource, //
+    BooleanState, //
+    ColorControl, //
+    DoorLock, //
+    UserLabel, //
+    LocalizationConfiguration, //
+    LevelControl, //
+    NetworkCommissioning, //
+    OnOff, //
+    RelativeHumidityMeasurement, //
+    Switch, //
+    TemperatureMeasurement, //
+    Thermostat, //
+    ThermostatUserConfiguration, //
 
   ];
   return tests.flat(1);
@@ -420,8 +551,11 @@ function getTests()
   ];
 
   const MultipleFabrics = [
+    'Test_TC_MF_1_3',
     'Test_TC_MF_1_4',
+    'Test_TC_MF_1_5',
     'Test_TC_MF_1_6',
+    'Test_TC_MF_1_15',
   ];
 
   const OnOff = [
@@ -536,6 +670,7 @@ function getTests()
     'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
+    'TestEvents',
     'TestDiscovery',
     'TestLogCommands',
     'TestSaveAs',
@@ -546,6 +681,7 @@ function getTests()
     'TestIdentifyCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
+    'TestSelfFabricRemoval',
     'TestSystemCommands',
     'TestBinding',
     'TestUserLabelCluster',

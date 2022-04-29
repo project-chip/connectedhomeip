@@ -80,7 +80,7 @@ def setupArgumentsParser():
         description='Generate content from ZAP files')
     parser.add_argument('--type', default='all', choices=['all', 'tests'],
                         help='Choose which content type to generate (default: all)')
-    parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'chip-tool-darwin', 'darwin', 'app1', 'app2'],
+    parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'chip-tool-darwin', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generationl just log what targets would be generated (default: False)")
@@ -145,11 +145,6 @@ def getTestsTemplatesTargets(test_target):
             'zap': 'src/controller/data_model/controller-clusters.zap',
             'template': 'examples/chip-tool-darwin/templates/tests/templates.json',
             'output_dir': 'zzz_generated/chip-tool-darwin/zap-generated'
-        },
-        'darwin': {
-            'zap': 'src/controller/data_model/controller-clusters.zap',
-            'template': 'src/darwin/Framework/CHIP/templates/tests/templates.json',
-            'output_dir': None
         }
     }
 
