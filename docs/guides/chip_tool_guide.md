@@ -403,8 +403,18 @@ Example of error:
 [1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
 ```
 
-For commands such as event subscriptions that need to run for longer periods of
-time, chip-tool can be started in interactive mode first before running the
+This timeout can be modified for any command execution bu supplying the optional
+`--timeout` parameter, which takes a value in seconds, with the maximum being
+65535 seconds.
+
+Example of command:
+
+```
+$ ./chip-tool otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0 --timeout 65535
+```
+
+For commands such as event subscriptions that need to run for an extended period
+of time, chip-tool can be started in interactive mode first before running the
 command. In interactive mode, there will be no timeout and multiple commands can
 be issued.
 
