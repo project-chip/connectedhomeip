@@ -37,7 +37,8 @@ namespace Shell {
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
+    streamer_printf(sout, "  help                 Usage: cast <subcommand>\r\n");
+    streamer_printf(sout, "  print-bindings       Usage: cast print-bindings\r\n");
     streamer_printf(sout,
                     "  init <nodeid> <fabric-index>  Initialize casting app using given nodeid and index from previous "
                     "commissioning. Usage: init 18446744004990074879 2\r\n");
@@ -122,6 +123,11 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         return SendUDC(chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    if (strcmp(argv[0], "print-bindings") == 0)
+    {
+        PrintBindings();
+        return CHIP_NO_ERROR;
+    }
     if (strcmp(argv[0], "cluster") == 0)
     {
         return ProcessClusterCommand(argc, argv);

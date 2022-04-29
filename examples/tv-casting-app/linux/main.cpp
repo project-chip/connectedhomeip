@@ -66,15 +66,6 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 using chip::Shell::Engine;
 #endif
 
-struct TVExampleDeviceType
-{
-    const char * name;
-    uint16_t id;
-};
-
-constexpr TVExampleDeviceType kKnownDeviceTypes[]              = { { "video-player", 35 }, { "dimmable-light", 257 } };
-constexpr int kKnownDeviceTypesCount                           = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
-constexpr uint16_t kOptionDeviceType                           = 't';
 constexpr System::Clock::Seconds16 kCommissioningWindowTimeout = System::Clock::Seconds16(3 * 60);
 constexpr uint32_t kCommissionerDiscoveryTimeoutInMs           = 5 * 1000;
 
@@ -84,57 +75,9 @@ const char * kContentDisplayStr  = "Test video";
 constexpr EndpointId kTvEndpoint = 1;
 
 CommissionableNodeController gCommissionableNodeController;
-chip::System::SocketWatchToken gToken;
-Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
-bool gInited                            = false;
-
-CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
-
-bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
-{
-    switch (aIdentifier)
-    {
-    case kOptionDeviceType: {
-        char * endPtr;
-        long deviceType = strtol(aValue, &endPtr, 10);
-        if (*endPtr == '\0' && deviceType > 0 && CanCastTo<uint16_t>(deviceType))
-        {
-            gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
-            return true;
-        }
-
-        for (int i = 0; i < kKnownDeviceTypesCount; i++)
-        {
-            if (strcasecmp(aValue, kKnownDeviceTypes[i].name) == 0)
-            {
-                gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
-                return true;
-            }
-        }
-
-        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option value: %s %s", aProgram, aName, aValue);
-        return false;
-    }
-    default:
-        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option: %s", aProgram, aName);
-        return false;
-    }
-}
-
-OptionDef cmdLineOptionsDef[] = {
-    { "device-type", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
-    {},
-};
-
-OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -t <commissioner device type>\n"
-                             "  --device-type <commissioner device type>\n"
-                             "        Device type of the commissioner to discover and request commissioning from. Specify value as "
-                             "a decimal integer or a known text representation. Defaults to all device types\n" };
-
-HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.0");
-
-OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+Dnssd::DiscoveryFilter gDiscoveryFilter =
+    Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35));
+bool gInited = false;
 
 void ReadServerClusters(EndpointId endpointId);
 CHIP_ERROR InitBindingHandlers()
@@ -275,6 +218,62 @@ void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::Deco
 void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
 {
     ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
+}
+
+// given a fabric index, try to determine the video-player nodeId by searching the binding table
+NodeId GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        if (binding.type == EMBER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
+        {
+            ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex nodeId=0x" ChipLogFormatX64,
+                            ChipLogValueX64(binding.nodeId));
+            return binding.nodeId;
+        }
+    }
+    ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex no bindings found for fabricIndex=%d", fabricIndex);
+    return kUndefinedNodeId;
+}
+
+// given a nodeId, try to determine the video-player fabric index by searching the binding table
+FabricIndex GetVideoPlayerFabricIndexForNode(NodeId nodeId)
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        if (binding.type == EMBER_UNICAST_BINDING && nodeId == binding.nodeId)
+        {
+            ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode fabricIndex=%d nodeId=0x" ChipLogFormatX64,
+                            binding.fabricIndex, ChipLogValueX64(binding.nodeId));
+            return binding.fabricIndex;
+        }
+    }
+    ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode no bindings found for nodeId=0x" ChipLogFormatX64,
+                    ChipLogValueX64(nodeId));
+    return kUndefinedFabricIndex;
+}
+
+void PrintBindings()
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+    }
+    return;
 }
 
 class TargetEndpointInfo
@@ -520,13 +519,22 @@ void SetDefaultFabricIndex()
             ChipLogError(AppServer, " -- Not initialized");
             continue;
         }
+        NodeId myNodeId = fb.GetNodeId();
         ChipLogProgress(NotSpecified,
                         "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
-                        ChipLogValueX64(fb.GetNodeId()), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
-        gTargetVideoPlayerInfo.Initialize(fb.GetNodeId(), fabricIndex);
+                        ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
+
+        NodeId videoPlayerNodeId = GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        if (videoPlayerNodeId == kUndefinedNodeId)
+        {
+            // could not determine video player nodeid for this fabric
+            continue;
+        }
+
+        gTargetVideoPlayerInfo.Initialize(videoPlayerNodeId, fabricIndex);
         return;
     }
-    ChipLogError(AppServer, " -- No initialized fabrics");
+    ChipLogError(AppServer, " -- No initialized fabrics with video players");
 }
 
 // For shell and command line processing of commands

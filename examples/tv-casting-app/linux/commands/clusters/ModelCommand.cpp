@@ -28,18 +28,24 @@ CHIP_ERROR ModelCommand::RunCommand()
 {
     FabricIndex fabricIndex = CurrentFabricIndex();
 
+    if (mNodeId == 0)
+    {
+        ChipLogProgress(chipTool, "nodeId set to 0, using default for fabric %d", fabricIndex);
+        mNodeId = GetVideoPlayerNodeForFabricIndex(fabricIndex);
+    }
+    else
+    {
+        // potentially change fabric index if this is not the right one for the given nodeId
+        fabricIndex = GetVideoPlayerFabricIndexForNode(mNodeId);
+    }
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
+
     if (IsGroupId(mNodeId))
     {
         ChipLogProgress(chipTool, "Sending command to group 0x%" PRIx16, GroupIdFromNodeId(mNodeId));
 
         return SendGroupCommand(GroupIdFromNodeId(mNodeId), fabricIndex);
     }
-
-    if (mNodeId == 0)
-    {
-        ChipLogProgress(chipTool, "nodeId set to 0, using default?");
-    }
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 
     Server * server           = &(chip::Server::GetInstance());
     chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
@@ -48,6 +54,7 @@ CHIP_ERROR ModelCommand::RunCommand()
         ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
         return CHIP_ERROR_INVALID_FABRIC_ID;
     }
+
     PeerId peerID = fabric->GetPeerIdForNode(mNodeId);
     return server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
                                                                    &mOnDeviceConnectionFailureCallback);

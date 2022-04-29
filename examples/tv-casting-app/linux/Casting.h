@@ -23,6 +23,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
+void PrintBindings();
+chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
+chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
 chip::FabricIndex CurrentFabricIndex();
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv);
 CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
