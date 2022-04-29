@@ -41,8 +41,8 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
     // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-    if (params!=nil) {
-      if (params.timedInvokeTimeoutMs!=nil) {
+    if (params != nil) {
+      if (params.timedInvokeTimeoutMs != nil) {
         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
       }
     }
