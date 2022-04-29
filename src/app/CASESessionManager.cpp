@@ -83,11 +83,6 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
-{
-    return mConfig.devicePool->FindDevice(session);
-}
-
 OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const
 {
     return mConfig.devicePool->FindDevice(peerId);
