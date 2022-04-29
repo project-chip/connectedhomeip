@@ -117,7 +117,8 @@ using namespace chip::app::Clusters;
 
 {{#if isWritableAttribute}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler{
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
+{
   [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completionHandler:completionHandler];
 }
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(CHIPWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
