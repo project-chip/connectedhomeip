@@ -403,7 +403,7 @@ Example of error:
 [1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
 ```
 
-This timeout can be modified for any command execution bu supplying the optional
+This timeout can be modified for any command execution by supplying the optional
 `--timeout` parameter, which takes a value in seconds, with the maximum being
 65535 seconds.
 
