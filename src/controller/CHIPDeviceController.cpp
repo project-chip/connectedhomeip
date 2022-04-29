@@ -426,22 +426,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const SessionHandle & session)
-{
-    MATTER_TRACE_EVENT_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");
-    CommissioneeDeviceProxy * foundDevice = nullptr;
-    mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {
-        if (deviceProxy->MatchesSession(session))
-        {
-            foundDevice = deviceProxy;
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
-
-    return foundDevice;
-}
-
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
 {
     MATTER_TRACE_EVENT_SCOPE("FindCommissioneeDevice", "DeviceCommissioner");

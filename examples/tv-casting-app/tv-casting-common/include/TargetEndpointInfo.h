@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +16,27 @@
  *    limitations under the License.
  */
 
-/*
- * In order to run the tests into an expected order, an index is
- * added to the generated test step. This is because tests using
- * the XCTest framework are expected to be independent and should
- * normally run as independent steps. But since the current code is
- * dealing with a simulated accessory running into its own process
- * for the whole duration of the tests, its state is not resetted
- * between each steps which defeats XCTest expectation.
- */
-function asTestIndex(index)
-{
-  return index.toString().padStart(6, 0);
-}
+#pragma once
 
-//
-// Module exports
-//
-exports.asTestIndex = asTestIndex;
+#include <platform/CHIPDeviceLayer.h>
+
+using namespace chip;
+
+class TargetEndpointInfo
+{
+public:
+    void Initialize(EndpointId endpointId);
+    void Reset() { mInitialized = false; }
+    bool IsInitialized() { return mInitialized; }
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
+    bool HasCluster(ClusterId clusterId);
+    bool AddCluster(ClusterId clusterId);
+    void PrintInfo();
+
+private:
+    static constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
+    ClusterId mClusters[kMaxNumberOfClustersPerEndpoint]    = {};
+    EndpointId mEndpointId;
+    bool mInitialized = false;
+};
