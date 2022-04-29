@@ -31,8 +31,8 @@ namespace Dnssd {
 using namespace System::Clock::Literals;
 
 // Operational node TXT entries
-static constexpr size_t kKeySleepyIdleIntervalMaxLength        = 7; // [SII] 0-3600000
-static constexpr size_t kKeySleepyActiveIntervalMaxLength      = 7; // [SAI] 0-3600000
+static constexpr size_t kKeySleepyIdleIntervalMaxLength          = 7; // [SII] 0-3600000
+static constexpr size_t kKeySleepyActiveIntervalMaxLength        = 7; // [SAI] 0-3600000
 static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 
