@@ -193,11 +193,22 @@ chip::BitFlags<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint
     return status;
 }
 
+void OperationalStatusSet(chip::EndpointId endpoint, chip::BitFlags<OperationalStatus> newStatus)
+{
+    chip::BitFlags<OperationalStatus> prevStatus;
+    Attributes::OperationalStatus::Get(endpoint, &prevStatus);
+
+    // Filter changes
+    if (newStatus != prevStatus)
+    {
+        Attributes::OperationalStatus::Set(endpoint, newStatus);
+    }
+}
+
 void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<OperationalStatus> field, OperationalState state)
 {
-    chip::BitFlags<OperationalStatus> status, prevStatus;
+    chip::BitFlags<OperationalStatus> status;
     Attributes::OperationalStatus::Get(endpoint, &status);
-    prevStatus = status;
 
     /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
     if ((OperationalStatus::kLift == field) || (OperationalStatus::kTilt == field))
@@ -205,17 +216,11 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<Operati
         status.SetField(field, static_cast<uint8_t>(state));
         status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
 
-        /* Global Always follow Lift by priority and then fallback to Tilt */
-        if (static_cast<uint8_t>(OperationalState::Stall) != status.GetField(OperationalStatus::kLift))
-        {
-            status.SetField(OperationalStatus::kGlobal, status.GetField(OperationalStatus::kLift));
-        }
+        /* Global Always follow Lift by priority or therefore fallback to Tilt */
+        chip::BitFlags<OperationalStatus> opGlobal = status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
+        status.SetField(OperationalStatus::kGlobal, status.GetField(opGlobal));
 
-        if (status != prevStatus)
-        {
-            emberAfWindowCoveringClusterPrint("Attr update %u %x %x", static_cast<uint8_t>(state), status.Raw(), prevStatus.Raw());
-            Attributes::OperationalStatus::Set(endpoint, status);
-        }
+        OperationalStatusSet(endpoint, status);
     }
 }
 
