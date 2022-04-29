@@ -1,0 +1,117 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    10.4.13. [TC-DM-4.13][WiFi] Verification for ReorderNetwork command
+    [DUT-Commissionee]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH1 sends ArmFailSafe command to the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+
+          [1650381469.290921][44062:44067] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1650381469.290983][44062:44067] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1650381469.291087][44062:44067] CHIP:TOO:   ArmFailSafeResponse: {
+          [1650381469.291148][44062:44067] CHIP:TOO:     errorCode: 0
+          [1650381469.291184][44062:44067] CHIP:TOO:     debugText:
+          [1650381469.291218][44062:44067] CHIP:TOO:    }
+          [1650381469.291273][44062:44067] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650381469.291343][44062:44067] CHIP:EM: Sending Standalone Ack for MessageCounter:7893211 on exchange 64557i
+      disabled: true
+
+    - label:
+          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          argument value as 'Userwifi_ssid1', Credentials argument value as
+          'xxxxx' and Breadcrumb argument value as 0"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+
+          [1650381475.218029][44068:44073] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650381475.218092][44068:44073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650381475.218190][44068:44073] CHIP:TOO:   NetworkConfigResponse: {
+          [1650381475.218252][44068:44073] CHIP:TOO:     networkingStatus: 0
+          [1650381475.218289][44068:44073] CHIP:TOO:     networkIndex: 0
+          [1650381475.218323][44068:44073] CHIP:TOO:    }
+          [1650381475.218376][44068:44073] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650381475.218447][44068:44073] CHIP:EM: Sending Standalone Ack for MessageCounter:7658401 on exchange 620i
+      disabled: true
+
+    - label:
+          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          argument value as 'Userwifi_ssid2', Credentials argument value as
+          'xxxxx' and Breadcrumb argument value as 0"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C507269766174655F455854 matter123 1 0
+
+          [1650381481.251038][44074:44079] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650381481.251102][44074:44079] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650381481.251189][44074:44079] CHIP:TOO:   NetworkConfigResponse: {
+          [1650381481.251250][44074:44079] CHIP:TOO:     networkingStatus: 2
+          [1650381481.251289][44074:44079] CHIP:TOO:    }
+          [1650381481.251342][44074:44079] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650381481.251412][44074:44079] CHIP:EM: Sending Standalone Ack for MessageCounter:11373968 on exchange 55916i
+      disabled: true
+
+    - label:
+          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          argument value as 'Userwifi_ssid3', Credentials argument value as
+          'xxxxx' and Breadcrumb argument value as 0"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:7369766172616D2773206950686F6E65 maskmask 1 0
+
+          [1650381487.889851][44081:44086] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650381487.889909][44081:44086] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650381487.889987][44081:44086] CHIP:TOO:   NetworkConfigResponse: {
+          [1650381487.890043][44081:44086] CHIP:TOO:     networkingStatus: 2
+          [1650381487.890079][44081:44086] CHIP:TOO:    }
+          [1650381487.890127][44081:44086] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650381487.890188][44081:44086] CHIP:EM: Sending Standalone Ack for MessageCounter:3375326 on exchange 62297i
+      disabled: true
+
+    - label:
+          "TH1 sends ReorderNetwork Command to the DUT with the following
+          arguments: NetworkID argument value as 'Userwifi_ssid1' NetworkIndex
+          argument value as 'Wifinet_idx3' Breadcrumb argument value as 0"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
+
+          [1650381494.820649][44087:44092] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650381494.820749][44087:44092] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650381494.820860][44087:44092] CHIP:TOO:   NetworkConfigResponse: {
+          [1650381494.820940][44087:44092] CHIP:TOO:     networkingStatus: 0
+          [1650381494.820979][44087:44092] CHIP:TOO:     networkIndex: 3
+          [1650381494.821016][44087:44092] CHIP:TOO:    }
+          [1650381494.821087][44087:44092] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650381494.821174][44087:44092] CHIP:EM: Sending Standalone Ack for MessageCounter:5656346 on exchange 4849i
+      disabled: true
+
+    - label: "TH1 reads Networks attribute list from the DUT"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+
+          [1650381501.447787][44093:44098] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3182776035
+          [1650381501.447899][44093:44098] CHIP:TOO:   Networks: 1 entries
+          [1650381501.447965][44093:44098] CHIP:TOO:     [1]: {
+          [1650381501.448003][44093:44098] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1650381501.448037][44093:44098] CHIP:TOO:       Connected: FALSE
+          [1650381501.448071][44093:44098] CHIP:TOO:      }
+          [1650381501.448221][44093:44098] CHIP:EM: Sending Standalone Ack for MessageCounter:10492805 on exchange 43057i
+      disabled: true

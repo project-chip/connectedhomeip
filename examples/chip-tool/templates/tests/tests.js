@@ -68,6 +68,10 @@ function getManualTests()
     'Test_TC_BRAC_2_2',
   ];
 
+  const DeviceAttestation = [
+    'Test_TC_DA_1_3',
+  ];
+
   const DeviceManagement = [
     'Test_TC_DM_1_2',
     'Test_TC_DM_1_4',
@@ -75,6 +79,27 @@ function getManualTests()
     'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
     'Test_TC_DM_3_4',
+    'Test_TC_DM_4_1',
+    'Test_TC_DM_4_2',
+    'Test_TC_DM_4_3',
+    'Test_TC_DM_4_4',
+    'Test_TC_DM_4_5',
+    'Test_TC_DM_4_6',
+    'Test_TC_DM_4_7',
+    'Test_TC_DM_4_8',
+    'Test_TC_DM_4_9',
+    'Test_TC_DM_4_10',
+    'Test_TC_DM_4_11',
+    'Test_TC_DM_4_12',
+    'Test_TC_DM_4_13',
+    'Test_TC_DM_4_14',
+    'Test_TC_DM_4_15',
+    'Test_TC_DM_4_16',
+    'Test_TC_DM_4_17',
+    'Test_TC_DM_4_18',
+    'Test_TC_DM_4_19',
+    'Test_TC_DM_4_20',
+    'Test_TC_DM_4_21',
   ];
 
   const DiagnosticsLogs = [
@@ -240,12 +265,22 @@ function getManualTests()
     'Test_TC_PS_2_2',
   ];
 
+  const ThreadNetworkDiagnostics = [
+    'Test_TC_DIAG_TH_NW_2_2',
+    'Test_TC_DIAG_TH_NW_2_3',
+    'Test_TC_DIAG_TH_NW_2_6',
+    'Test_TC_DIAG_TH_NW_2_7',
+    'Test_TC_DIAG_TH_NW_2_8',
+    'Test_TC_DIAG_TH_NW_2_9',
+  ];
+
   const tests = [
     DeviceDiscovery, //
     Groups, //
     BulkDataExchangeProtocol, //
     bridge, //
     BridgedActions, //
+    DeviceAttestation, //
     DeviceManagement, //
     DiagnosticsLogs, //
     Descriptor, //
@@ -268,6 +303,7 @@ function getManualTests()
     OccupancySensing, //
     PressureMeasurement, //
     PowerSource, //
+    ThreadNetworkDiagnostics, //
 
   ];
   return tests.flat(1);
