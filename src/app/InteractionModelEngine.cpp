@@ -865,7 +865,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
     {
         bool duplicate = false;
         // skip all wildcard paths and invalid concrete attribute
-        if (path1->mValue.HasAttributeWildcard() ||
+        if (path1->mValue.IsWildcardPath() ||
             !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId, true))
         {
             prev  = path1;
@@ -881,7 +881,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
                 continue;
             }
 
-            if (path2->mValue.HasAttributeWildcard() && path2->mValue.IsAttributePathSupersetOf(path1->mValue))
+            if (path2->mValue.IsWildcardPath() && path2->mValue.IsAttributePathSupersetOf(path1->mValue))
             {
                 duplicate = true;
                 break;
