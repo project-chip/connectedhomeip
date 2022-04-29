@@ -464,13 +464,31 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     if (types.isEnum) {
       let res = await templateUtil.ensureZclPackageId(this).then(
           (packageId) => zclQuery.selectEnumByName(this.global.db, type, packageId))
-      return 'uint' + res.size * 8 + '_t';
+      let size = res.size
+      if (size == 3)
+      {
+        size = 4
+      }
+      else if (size == 6)
+      {
+        size = 8
+      }
+      return 'uint' + size * 8 + '_t';
     }
 
     if (types.isBitmap) {
       let res = await templateUtil.ensureZclPackageId(this).then(
           (packageId) => zclQuery.selectBitmapByName(this.global.db, packageId, type))
-      return 'uint' + res.size * 8 + '_t';
+      let size = res.size
+      if (size == 3)
+      {
+        size = 4
+      }
+      else if (size == 6)
+      {
+        size = 8
+      }
+      return 'uint' + size * 8 + '_t';
     }
 
     if (types.isStruct) {

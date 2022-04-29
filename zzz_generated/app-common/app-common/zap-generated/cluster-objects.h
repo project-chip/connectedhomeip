@@ -39083,7 +39083,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     uint8_t alertsCount = static_cast<uint8_t>(0);
-    DataModel::List<const uint24_t> alertStructures;
+    DataModel::List<const uint32_t> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -39099,7 +39099,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     uint8_t alertsCount = static_cast<uint8_t>(0);
-    DataModel::DecodableList<uint24_t> alertStructures;
+    DataModel::DecodableList<uint32_t> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetAlertsResponse
@@ -39118,7 +39118,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     uint8_t alertsCount = static_cast<uint8_t>(0);
-    DataModel::List<const uint24_t> alertStructures;
+    DataModel::List<const uint32_t> alertStructures;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -39134,7 +39134,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
 
     uint8_t alertsCount = static_cast<uint8_t>(0);
-    DataModel::DecodableList<uint24_t> alertStructures;
+    DataModel::DecodableList<uint32_t> alertStructures;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AlertsNotification
