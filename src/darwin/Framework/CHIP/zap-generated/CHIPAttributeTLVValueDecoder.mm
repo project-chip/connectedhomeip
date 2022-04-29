@@ -13319,6 +13319,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
+        case Attributes::PhysicalClosedLimitLift::Id: {
+            using TypeInfo = Attributes::PhysicalClosedLimitLift::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::PhysicalClosedLimitTilt::Id: {
+            using TypeInfo = Attributes::PhysicalClosedLimitTilt::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
         case Attributes::CurrentPositionLift::Id: {
             using TypeInfo = Attributes::CurrentPositionLift::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -13347,6 +13369,28 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             } else {
                 value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
             }
+            return value;
+        }
+        case Attributes::NumberOfActuationsLift::Id: {
+            using TypeInfo = Attributes::NumberOfActuationsLift::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::NumberOfActuationsTilt::Id: {
+            using TypeInfo = Attributes::NumberOfActuationsTilt::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::ConfigStatus::Id: {

@@ -1265,10 +1265,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestWindowCovering : CHIPWindowCovering
 
 - (void)writeAttributeTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributePhysicalClosedLimitLiftWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributePhysicalClosedLimitTiltWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nullable)value
                                  completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfActuationsLiftWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfActuationsTiltWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeConfigStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
