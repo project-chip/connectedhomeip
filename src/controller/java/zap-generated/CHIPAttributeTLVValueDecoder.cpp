@@ -1264,7 +1264,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::BarrierCapabilities::Id: {
@@ -1279,7 +1279,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::BarrierPosition::Id: {
@@ -1824,7 +1824,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -3277,7 +3277,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::NumberOfPrimaries::Id: {
@@ -3847,7 +3847,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ColorTempPhysicalMin::Id: {
@@ -4040,7 +4040,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -4734,7 +4734,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::EnableOneTouchLocking::Id: {
@@ -4921,7 +4921,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::TotalActivePower::Id: {
@@ -5411,7 +5411,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -5556,7 +5556,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::RockSetting::Id: {
@@ -5571,7 +5571,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::WindSupport::Id: {
@@ -5586,7 +5586,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::WindSetting::Id: {
@@ -5601,7 +5601,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -5688,7 +5688,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6854,7 +6854,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -7495,7 +7495,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::OnOffTransitionTime::Id: {
@@ -7707,7 +7707,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8606,7 +8606,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8869,7 +8869,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9117,7 +9117,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::OccupancySensorType::Id: {
@@ -9147,7 +9147,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -9413,7 +9413,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -10433,7 +10433,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -11106,7 +11106,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::EffectiveOperationMode::Id: {
@@ -11291,7 +11291,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -11378,7 +11378,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -11656,7 +11656,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -11950,7 +11950,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -12107,7 +12107,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -12451,7 +12451,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::Bitmap16::Id: {
@@ -12466,7 +12466,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::Bitmap32::Id: {
@@ -12481,7 +12481,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::Bitmap64::Id: {
@@ -12496,7 +12496,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::Int8u::Id: {
@@ -13153,7 +13153,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     std::string newElement_0_nullableStruct_fCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                         newElement_0_nullableStruct_fClassName.c_str(), newElement_0_nullableStruct_fCtorSignature.c_str(),
-                        entry_0.nullableStruct.Value().f.Raw(), newElement_0_nullableStruct_f);
+                        entry_0.nullableStruct.Value().f, newElement_0_nullableStruct_f);
                     jobject newElement_0_nullableStruct_g;
                     std::string newElement_0_nullableStruct_gClassName     = "java/lang/Float";
                     std::string newElement_0_nullableStruct_gCtorSignature = "(F)V";
@@ -13235,7 +13235,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     std::string newElement_0_optionalStructInsideOptional_fCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                         newElement_0_optionalStructInsideOptional_fClassName.c_str(),
-                        newElement_0_optionalStructInsideOptional_fCtorSignature.c_str(), entry_0.optionalStruct.Value().f.Raw(),
+                        newElement_0_optionalStructInsideOptional_fCtorSignature.c_str(), entry_0.optionalStruct.Value().f,
                         newElement_0_optionalStructInsideOptional_f);
                     jobject newElement_0_optionalStructInsideOptional_g;
                     std::string newElement_0_optionalStructInsideOptional_gClassName     = "java/lang/Float";
@@ -13335,8 +13335,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                             newElement_0_nullableOptionalStructInsideOptional_fClassName.c_str(),
                             newElement_0_nullableOptionalStructInsideOptional_fCtorSignature.c_str(),
-                            entry_0.nullableOptionalStruct.Value().Value().f.Raw(),
-                            newElement_0_nullableOptionalStructInsideOptional_f);
+                            entry_0.nullableOptionalStruct.Value().Value().f, newElement_0_nullableOptionalStructInsideOptional_f);
                         jobject newElement_0_nullableOptionalStructInsideOptional_g;
                         std::string newElement_0_nullableOptionalStructInsideOptional_gClassName     = "java/lang/Float";
                         std::string newElement_0_nullableOptionalStructInsideOptional_gCtorSignature = "(F)V";
@@ -13545,7 +13544,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string value_fClassName     = "java/lang/Integer";
             std::string value_fCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_fClassName.c_str(), value_fCtorSignature.c_str(),
-                                                                          cppValue.f.Raw(), value_f);
+                                                                          cppValue.f, value_f);
             jobject value_g;
             std::string value_gClassName     = "java/lang/Float";
             std::string value_gCtorSignature = "(F)V";
@@ -13782,7 +13781,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0_fabricSensitiveStruct_fCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0_fabricSensitiveStruct_fClassName.c_str(),
-                    newElement_0_fabricSensitiveStruct_fCtorSignature.c_str(), entry_0.fabricSensitiveStruct.f.Raw(),
+                    newElement_0_fabricSensitiveStruct_fCtorSignature.c_str(), entry_0.fabricSensitiveStruct.f,
                     newElement_0_fabricSensitiveStruct_f);
                 jobject newElement_0_fabricSensitiveStruct_g;
                 std::string newElement_0_fabricSensitiveStruct_gClassName     = "java/lang/Float";
@@ -13971,7 +13970,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                              cppValue.Value().Raw(), value);
+                                                                              cppValue.Value(), value);
             }
             return value;
         }
@@ -13993,7 +13992,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value().Raw(), value);
+                                                                               cppValue.Value(), value);
             }
             return value;
         }
@@ -14015,7 +14014,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Long";
                 std::string valueCtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value().Raw(), value);
+                                                                               cppValue.Value(), value);
             }
             return value;
         }
@@ -14037,7 +14036,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Long";
                 std::string valueCtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                               cppValue.Value().Raw(), value);
+                                                                               cppValue.Value(), value);
             }
             return value;
         }
@@ -14585,7 +14584,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string value_fClassName     = "java/lang/Integer";
                 std::string value_fCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    value_fClassName.c_str(), value_fCtorSignature.c_str(), cppValue.Value().f.Raw(), value_f);
+                    value_fClassName.c_str(), value_fCtorSignature.c_str(), cppValue.Value().f, value_f);
                 jobject value_g;
                 std::string value_gClassName     = "java/lang/Float";
                 std::string value_gCtorSignature = "(F)V";
@@ -15096,7 +15095,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16375,7 +16374,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0_flagsCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_flagsClassName.c_str(),
                                                                                newElement_0_flagsCtorSignature.c_str(),
-                                                                               entry_0.flags.Raw(), newElement_0_flags);
+                                                                               entry_0.flags, newElement_0_flags);
 
                 jclass securityPolicyStructClass;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -16645,7 +16644,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16851,7 +16850,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -17418,7 +17417,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -17517,7 +17516,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::CurrentPositionLiftPercentage::Id: {
@@ -17576,7 +17575,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::TargetPositionLiftPercent100ths::Id: {
@@ -17754,7 +17753,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue.Raw(), value);
+                                                                          cppValue, value);
             return value;
         }
         case Attributes::SafetyStatus::Id: {
@@ -17769,7 +17768,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -17856,7 +17855,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Long";
             std::string valueCtorSignature = "(J)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue.Raw(), value);
+                                                                           cppValue, value);
             return value;
         }
         case Attributes::ClusterRevision::Id: {

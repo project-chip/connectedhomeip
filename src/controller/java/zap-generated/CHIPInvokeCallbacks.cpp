@@ -865,7 +865,7 @@ void CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::CallbackFn(
         std::string daysMaskInsideOptionalCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(daysMaskInsideOptionalClassName.c_str(),
                                                                       daysMaskInsideOptionalCtorSignature.c_str(),
-                                                                      dataResponse.daysMask.Value().Raw(), daysMaskInsideOptional);
+                                                                      dataResponse.daysMask.Value(), daysMaskInsideOptional);
         chip::JniReferences::GetInstance().CreateOptional(daysMaskInsideOptional, daysMask);
     }
     jobject startHour;
@@ -2300,7 +2300,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
             std::string newElement_1_securityCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1_securityClassName.c_str(),
                                                                           newElement_1_securityCtorSignature.c_str(),
-                                                                          entry_1.security.Raw(), newElement_1_security);
+                                                                          entry_1.security, newElement_1_security);
             jobject newElement_1_ssid;
             jbyteArray newElement_1_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry_1.ssid.size()));
             env->SetByteArrayRegion(newElement_1_ssidByteArray, 0, static_cast<jsize>(entry_1.ssid.size()),
@@ -3664,7 +3664,7 @@ void CHIPTestClusterClusterSimpleStructResponseCallback::CallbackFn(
     std::string arg1_fClassName     = "java/lang/Integer";
     std::string arg1_fCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(arg1_fClassName.c_str(), arg1_fCtorSignature.c_str(),
-                                                                  dataResponse.arg1.f.Raw(), arg1_f);
+                                                                  dataResponse.arg1.f, arg1_f);
     jobject arg1_g;
     std::string arg1_gClassName     = "java/lang/Float";
     std::string arg1_gCtorSignature = "(F)V";
@@ -4287,13 +4287,12 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
     std::string dayOfWeekForSequenceCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(dayOfWeekForSequenceClassName.c_str(),
                                                                   dayOfWeekForSequenceCtorSignature.c_str(),
-                                                                  dataResponse.dayOfWeekForSequence.Raw(), dayOfWeekForSequence);
+                                                                  dataResponse.dayOfWeekForSequence, dayOfWeekForSequence);
     jobject modeForSequence;
     std::string modeForSequenceClassName     = "java/lang/Integer";
     std::string modeForSequenceCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(modeForSequenceClassName.c_str(),
-                                                                  modeForSequenceCtorSignature.c_str(),
-                                                                  dataResponse.modeForSequence.Raw(), modeForSequence);
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        modeForSequenceClassName.c_str(), modeForSequenceCtorSignature.c_str(), dataResponse.modeForSequence, modeForSequence);
     jobject payload;
     chip::JniReferences::GetInstance().CreateArrayList(payload);
 

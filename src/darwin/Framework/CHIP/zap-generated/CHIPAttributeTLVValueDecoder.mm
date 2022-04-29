@@ -1088,7 +1088,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::BarrierCapabilities::Id: {
@@ -1099,7 +1099,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::BarrierOpenEvents::Id: {
@@ -1704,7 +1704,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::ApplicationType::Id: {
@@ -2914,7 +2914,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::NumberOfPrimaries::Id: {
@@ -3332,7 +3332,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::ColorTempPhysicalMin::Id: {
@@ -3524,7 +3524,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -4251,7 +4251,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::DefaultConfigurationRegister::Id: {
@@ -4362,10 +4362,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithBool:cppValue];
 =======
             value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::ExpiringUserTimeout::Id: {
@@ -4717,10 +4721,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
 =======
             value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::DcCurrentDivisor::Id: {
@@ -4820,10 +4828,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithInt:cppValue];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::TotalApparentPower::Id: {
@@ -4835,10 +4847,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedInt:cppValue];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::Measured1stHarmonicCurrent::Id: {
@@ -4850,10 +4866,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::Measured3rdHarmonicCurrent::Id: {
@@ -4865,10 +4885,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::Measured5thHarmonicCurrent::Id: {
@@ -4924,10 +4948,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
 =======
             value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::MeasuredPhase3rdHarmonicCurrent::Id: {
@@ -5426,7 +5454,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::AcCurrentOverload::Id: {
@@ -5851,10 +5883,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::RmsCurrentPhaseC::Id: {
@@ -5990,7 +6026,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id: {
@@ -6745,7 +6785,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6886,7 +6926,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -6999,10 +7039,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::LocationCapability::Id: {
@@ -7025,10 +7069,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
 <<<<<<< HEAD
+<<<<<<< HEAD
             value = [NSNumber numberWithBool:cppValue];
 =======
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -7349,7 +7397,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -7896,7 +7944,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8402,7 +8450,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::MaxFrequency::Id: {
@@ -8514,8 +8562,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
 <<<<<<< HEAD
 =======
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
 >>>>>>> Changes for cleaner regen
+=======
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -8604,7 +8656,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -8790,7 +8842,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
 >>>>>>> Changes for cleaner regen
         }
@@ -9039,7 +9091,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9251,7 +9303,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -9731,6 +9783,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+<<<<<<< HEAD
+=======
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::AcceptedCommandList::Id: {
@@ -9740,6 +9797,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSArray * _Nonnull value;
             { // Scope for our temporary variables
                 auto * array_0 = [NSMutableArray new];
@@ -9757,6 +9815,10 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+=======
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -9766,6 +9828,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSArray * _Nonnull value;
             { // Scope for our temporary variables
                 auto * array_0 = [NSMutableArray new];
@@ -9783,6 +9846,10 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
                 value = array_0;
             }
+=======
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -9793,7 +9860,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedInt:cppValue];
+=======
+            value = [NSNumber numberWithUnsignedLongLong:cppValue];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -10443,8 +10514,185 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
+<<<<<<< HEAD
                     NSNumber * newElement_0;
                     newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+=======
+                    CHIPTestClusterClusterNullablesAndOptionalsStruct * newElement_0;
+                    newElement_0 = [CHIPTestClusterClusterNullablesAndOptionalsStruct new];
+                    if (entry_0.nullableInt.IsNull()) {
+                        newElement_0.nullableInt = nil;
+                    } else {
+                        newElement_0.nullableInt = [NSNumber numberWithUnsignedShort:entry_0.nullableInt.Value()];
+                    }
+                    if (entry_0.optionalInt.HasValue()) {
+                        newElement_0.optionalInt = [NSNumber numberWithUnsignedShort:entry_0.optionalInt.Value()];
+                    } else {
+                        newElement_0.optionalInt = nil;
+                    }
+                    if (entry_0.nullableOptionalInt.HasValue()) {
+                        if (entry_0.nullableOptionalInt.Value().IsNull()) {
+                            newElement_0.nullableOptionalInt = nil;
+                        } else {
+                            newElement_0.nullableOptionalInt =
+                                [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.nullableOptionalInt = nil;
+                    }
+                    if (entry_0.nullableString.IsNull()) {
+                        newElement_0.nullableString = nil;
+                    } else {
+                        newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
+                                                                               length:entry_0.nullableString.Value().size()
+                                                                             encoding:NSUTF8StringEncoding];
+                    }
+                    if (entry_0.optionalString.HasValue()) {
+                        newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
+                                                                               length:entry_0.optionalString.Value().size()
+                                                                             encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_0.optionalString = nil;
+                    }
+                    if (entry_0.nullableOptionalString.HasValue()) {
+                        if (entry_0.nullableOptionalString.Value().IsNull()) {
+                            newElement_0.nullableOptionalString = nil;
+                        } else {
+                            newElement_0.nullableOptionalString =
+                                [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
+                                                         length:entry_0.nullableOptionalString.Value().Value().size()
+                                                       encoding:NSUTF8StringEncoding];
+                        }
+                    } else {
+                        newElement_0.nullableOptionalString = nil;
+                    }
+                    if (entry_0.nullableStruct.IsNull()) {
+                        newElement_0.nullableStruct = nil;
+                    } else {
+                        newElement_0.nullableStruct = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
+                        newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
+                        newElement_0.nullableStruct.c =
+                            [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
+                        newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
+                                                                       length:entry_0.nullableStruct.Value().d.size()];
+                        newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
+                                                                                 length:entry_0.nullableStruct.Value().e.size()
+                                                                               encoding:NSUTF8StringEncoding];
+                        newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f];
+                        newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
+                        newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
+                    }
+                    if (entry_0.optionalStruct.HasValue()) {
+                        newElement_0.optionalStruct = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
+                        newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
+                        newElement_0.optionalStruct.c =
+                            [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
+                        newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
+                                                                       length:entry_0.optionalStruct.Value().d.size()];
+                        newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
+                                                                                 length:entry_0.optionalStruct.Value().e.size()
+                                                                               encoding:NSUTF8StringEncoding];
+                        newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f];
+                        newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
+                        newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
+                    } else {
+                        newElement_0.optionalStruct = nil;
+                    }
+                    if (entry_0.nullableOptionalStruct.HasValue()) {
+                        if (entry_0.nullableOptionalStruct.Value().IsNull()) {
+                            newElement_0.nullableOptionalStruct = nil;
+                        } else {
+                            newElement_0.nullableOptionalStruct = [CHIPTestClusterClusterSimpleStruct new];
+                            newElement_0.nullableOptionalStruct.a =
+                                [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
+                            newElement_0.nullableOptionalStruct.b =
+                                [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
+                            newElement_0.nullableOptionalStruct.c = [NSNumber
+                                numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
+                            newElement_0.nullableOptionalStruct.d =
+                                [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
+                                               length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
+                            newElement_0.nullableOptionalStruct.e =
+                                [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
+                                                         length:entry_0.nullableOptionalStruct.Value().Value().e.size()
+                                                       encoding:NSUTF8StringEncoding];
+                            newElement_0.nullableOptionalStruct.f =
+                                [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f];
+                            newElement_0.nullableOptionalStruct.g =
+                                [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
+                            newElement_0.nullableOptionalStruct.h =
+                                [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
+                        }
+                    } else {
+                        newElement_0.nullableOptionalStruct = nil;
+                    }
+                    if (entry_0.nullableList.IsNull()) {
+                        newElement_0.nullableList = nil;
+                    } else {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_0.nullableList.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                NSNumber * newElement_3;
+                                newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.nullableList = array_3;
+                        }
+                    }
+                    if (entry_0.optionalList.HasValue()) {
+                        { // Scope for our temporary variables
+                            auto * array_3 = [NSMutableArray new];
+                            auto iter_3 = entry_0.optionalList.Value().begin();
+                            while (iter_3.Next()) {
+                                auto & entry_3 = iter_3.GetValue();
+                                NSNumber * newElement_3;
+                                newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                                [array_3 addObject:newElement_3];
+                            }
+                            CHIP_ERROR err = iter_3.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_0.optionalList = array_3;
+                        }
+                    } else {
+                        newElement_0.optionalList = nil;
+                    }
+                    if (entry_0.nullableOptionalList.HasValue()) {
+                        if (entry_0.nullableOptionalList.Value().IsNull()) {
+                            newElement_0.nullableOptionalList = nil;
+                        } else {
+                            { // Scope for our temporary variables
+                                auto * array_4 = [NSMutableArray new];
+                                auto iter_4 = entry_0.nullableOptionalList.Value().Value().begin();
+                                while (iter_4.Next()) {
+                                    auto & entry_4 = iter_4.GetValue();
+                                    NSNumber * newElement_4;
+                                    newElement_4 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4)];
+                                    [array_4 addObject:newElement_4];
+                                }
+                                CHIP_ERROR err = iter_4.GetStatus();
+                                if (err != CHIP_NO_ERROR) {
+                                    *aError = err;
+                                    return nil;
+                                }
+                                newElement_0.nullableOptionalList = array_4;
+                            }
+                        }
+                    } else {
+                        newElement_0.nullableOptionalList = nil;
+                    }
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -14174,12 +14422,25 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSNumber * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
                 value = [NSNumber numberWithLongLong:cppValue.Value()];
             }
+=======
+            CHIPTestClusterClusterSimpleStruct * _Nonnull value;
+            value = [CHIPTestClusterClusterSimpleStruct new];
+            value.a = [NSNumber numberWithUnsignedChar:cppValue.a];
+            value.b = [NSNumber numberWithBool:cppValue.b];
+            value.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.c)];
+            value.d = [NSData dataWithBytes:cppValue.d.data() length:cppValue.d.size()];
+            value.e = [[NSString alloc] initWithBytes:cppValue.e.data() length:cppValue.e.size() encoding:NSUTF8StringEncoding];
+            value.f = [NSNumber numberWithUnsignedChar:cppValue.f];
+            value.g = [NSNumber numberWithFloat:cppValue.g];
+            value.h = [NSNumber numberWithDouble:cppValue.h];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::NullableInt48s::Id: {
@@ -14264,11 +14525,87 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSNumber * _Nullable value;
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
                 value = [NSNumber numberWithFloat:cppValue.Value()];
+=======
+            NSArray * _Nonnull value;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    CHIPTestClusterClusterTestFabricScoped * newElement_0;
+                    newElement_0 = [CHIPTestClusterClusterTestFabricScoped new];
+                    newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
+                    if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
+                        newElement_0.optionalFabricSensitiveInt8u =
+                            [NSNumber numberWithUnsignedChar:entry_0.optionalFabricSensitiveInt8u.Value()];
+                    } else {
+                        newElement_0.optionalFabricSensitiveInt8u = nil;
+                    }
+                    if (entry_0.nullableFabricSensitiveInt8u.IsNull()) {
+                        newElement_0.nullableFabricSensitiveInt8u = nil;
+                    } else {
+                        newElement_0.nullableFabricSensitiveInt8u =
+                            [NSNumber numberWithUnsignedChar:entry_0.nullableFabricSensitiveInt8u.Value()];
+                    }
+                    if (entry_0.nullableOptionalFabricSensitiveInt8u.HasValue()) {
+                        if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull()) {
+                            newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
+                        } else {
+                            newElement_0.nullableOptionalFabricSensitiveInt8u =
+                                [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value()];
+                        }
+                    } else {
+                        newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
+                    }
+                    newElement_0.fabricSensitiveCharString =
+                        [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
+                                                 length:entry_0.fabricSensitiveCharString.size()
+                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.fabricSensitiveStruct = [CHIPTestClusterClusterSimpleStruct new];
+                    newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
+                    newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
+                    newElement_0.fabricSensitiveStruct.c =
+                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
+                    newElement_0.fabricSensitiveStruct.d = [NSData dataWithBytes:entry_0.fabricSensitiveStruct.d.data()
+                                                                          length:entry_0.fabricSensitiveStruct.d.size()];
+                    newElement_0.fabricSensitiveStruct.e = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveStruct.e.data()
+                                                                                    length:entry_0.fabricSensitiveStruct.e.size()
+                                                                                  encoding:NSUTF8StringEncoding];
+                    newElement_0.fabricSensitiveStruct.f = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.f];
+                    newElement_0.fabricSensitiveStruct.g = [NSNumber numberWithFloat:entry_0.fabricSensitiveStruct.g];
+                    newElement_0.fabricSensitiveStruct.h = [NSNumber numberWithDouble:entry_0.fabricSensitiveStruct.h];
+                    { // Scope for our temporary variables
+                        auto * array_2 = [NSMutableArray new];
+                        auto iter_2 = entry_0.fabricSensitiveInt8uList.begin();
+                        while (iter_2.Next()) {
+                            auto & entry_2 = iter_2.GetValue();
+                            NSNumber * newElement_2;
+                            newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                            [array_2 addObject:newElement_2];
+                        }
+                        CHIP_ERROR err = iter_2.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.fabricSensitiveInt8uList = array_2;
+                    }
+                    newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_0;
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             }
             return value;
         }
@@ -14385,7 +14722,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
+<<<<<<< HEAD
                 value = [NSNumber numberWithChar:cppValue.Value()];
+=======
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             }
             return value;
         }
@@ -14400,7 +14741,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
+<<<<<<< HEAD
                 value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+=======
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             }
             return value;
         }
@@ -14415,7 +14760,11 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (cppValue.IsNull()) {
                 value = nil;
             } else {
+<<<<<<< HEAD
                 value = [NSNumber numberWithShort:cppValue.Value()];
+=======
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             }
             return value;
         }
@@ -14761,8 +15110,27 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
+<<<<<<< HEAD
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithChar:cppValue];
+=======
+            CHIPTestClusterClusterSimpleStruct * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [CHIPTestClusterClusterSimpleStruct new];
+                value.a = [NSNumber numberWithUnsignedChar:cppValue.Value().a];
+                value.b = [NSNumber numberWithBool:cppValue.Value().b];
+                value.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().c)];
+                value.d = [NSData dataWithBytes:cppValue.Value().d.data() length:cppValue.Value().d.size()];
+                value.e = [[NSString alloc] initWithBytes:cppValue.Value().e.data()
+                                                   length:cppValue.Value().e.size()
+                                                 encoding:NSUTF8StringEncoding];
+                value.f = [NSNumber numberWithUnsignedChar:cppValue.Value().f];
+                value.g = [NSNumber numberWithFloat:cppValue.Value().g];
+                value.h = [NSNumber numberWithDouble:cppValue.Value().h];
+            }
+>>>>>>> Cleaning up the decodable_value.zapt templates to remove .Raw() for bitmaps
             return value;
         }
         case Attributes::RemoteSensing::Id: {
@@ -15108,7 +15476,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -15992,7 +16360,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
                     newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
                     newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-                    newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags.Raw()];
+                    newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -16165,7 +16533,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16442,7 +16810,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -16975,7 +17343,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {
@@ -17091,7 +17459,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::CurrentPositionLiftPercentage::Id: {
@@ -17132,7 +17500,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::TargetPositionLiftPercent100ths::Id: {
@@ -17258,7 +17626,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
         case Attributes::SafetyStatus::Id: {
@@ -17269,7 +17637,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -17358,7 +17726,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {

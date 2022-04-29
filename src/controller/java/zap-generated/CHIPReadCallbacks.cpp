@@ -19501,7 +19501,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
             std::string newElement_0_nullableStruct_fCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 newElement_0_nullableStruct_fClassName.c_str(), newElement_0_nullableStruct_fCtorSignature.c_str(),
-                entry_0.nullableStruct.Value().f.Raw(), newElement_0_nullableStruct_f);
+                entry_0.nullableStruct.Value().f, newElement_0_nullableStruct_f);
             jobject newElement_0_nullableStruct_g;
             std::string newElement_0_nullableStruct_gClassName     = "java/lang/Float";
             std::string newElement_0_nullableStruct_gCtorSignature = "(F)V";
@@ -19582,7 +19582,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
             std::string newElement_0_optionalStructInsideOptional_fCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 newElement_0_optionalStructInsideOptional_fClassName.c_str(),
-                newElement_0_optionalStructInsideOptional_fCtorSignature.c_str(), entry_0.optionalStruct.Value().f.Raw(),
+                newElement_0_optionalStructInsideOptional_fCtorSignature.c_str(), entry_0.optionalStruct.Value().f,
                 newElement_0_optionalStructInsideOptional_f);
             jobject newElement_0_optionalStructInsideOptional_g;
             std::string newElement_0_optionalStructInsideOptional_gClassName     = "java/lang/Float";
@@ -19680,7 +19680,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                     newElement_0_nullableOptionalStructInsideOptional_fClassName.c_str(),
                     newElement_0_nullableOptionalStructInsideOptional_fCtorSignature.c_str(),
-                    entry_0.nullableOptionalStruct.Value().Value().f.Raw(), newElement_0_nullableOptionalStructInsideOptional_f);
+                    entry_0.nullableOptionalStruct.Value().Value().f, newElement_0_nullableOptionalStructInsideOptional_f);
                 jobject newElement_0_nullableOptionalStructInsideOptional_g;
                 std::string newElement_0_nullableOptionalStructInsideOptional_gClassName     = "java/lang/Float";
                 std::string newElement_0_nullableOptionalStructInsideOptional_gCtorSignature = "(F)V";
@@ -20067,7 +20067,7 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(
         std::string newElement_0_fabricSensitiveStruct_fCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
             newElement_0_fabricSensitiveStruct_fClassName.c_str(), newElement_0_fabricSensitiveStruct_fCtorSignature.c_str(),
-            entry_0.fabricSensitiveStruct.f.Raw(), newElement_0_fabricSensitiveStruct_f);
+            entry_0.fabricSensitiveStruct.f, newElement_0_fabricSensitiveStruct_f);
         jobject newElement_0_fabricSensitiveStruct_g;
         std::string newElement_0_fabricSensitiveStruct_gClassName     = "java/lang/Float";
         std::string newElement_0_fabricSensitiveStruct_gCtorSignature = "(F)V";
@@ -20281,7 +20281,7 @@ void CHIPTestClusterNullableBitmap8AttributeCallback::CallbackFn(void * context,
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                      value.Value().Raw(), javaValue);
+                                                                      value.Value(), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -20348,7 +20348,7 @@ void CHIPTestClusterNullableBitmap16AttributeCallback::CallbackFn(void * context
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                       value.Value().Raw(), javaValue);
+                                                                       value.Value(), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -20415,7 +20415,7 @@ void CHIPTestClusterNullableBitmap32AttributeCallback::CallbackFn(void * context
         std::string javaValueClassName     = "java/lang/Long";
         std::string javaValueCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                       value.Value().Raw(), javaValue);
+                                                                       value.Value(), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -20482,7 +20482,7 @@ void CHIPTestClusterNullableBitmap64AttributeCallback::CallbackFn(void * context
         std::string javaValueClassName     = "java/lang/Long";
         std::string javaValueCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                       value.Value().Raw(), javaValue);
+                                                                       value.Value(), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
@@ -23181,7 +23181,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::CallbackFn(
         std::string newElement_0_flagsClassName     = "java/lang/Integer";
         std::string newElement_0_flagsCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-            newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags.Raw(), newElement_0_flags);
+            newElement_0_flagsClassName.c_str(), newElement_0_flagsCtorSignature.c_str(), entry_0.flags, newElement_0_flags);
 
         jclass securityPolicyStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(

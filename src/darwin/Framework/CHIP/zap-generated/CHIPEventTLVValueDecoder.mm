@@ -1909,7 +1909,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
                 memberValue.e = [[NSString alloc] initWithBytes:cppValue.arg4.e.data()
                                                          length:cppValue.arg4.e.size()
                                                        encoding:NSUTF8StringEncoding];
-                memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
+                memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f];
                 memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
                 memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
                 value.arg4 = memberValue;
@@ -1930,7 +1930,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
                         newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
                                                                   length:entry_0.e.size()
                                                                 encoding:NSUTF8StringEncoding];
-                        newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+                        newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f];
                         newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                         newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
                         [array_0 addObject:newElement_0];
