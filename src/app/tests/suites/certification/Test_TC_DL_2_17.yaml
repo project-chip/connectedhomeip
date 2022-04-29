@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 104.18. [TC-DL-2.17] Verification for the Door Lock Events [DUT-Server]
+name: 100.2.17. [TC-DL-2.17] Verification for the Door Lock Events [DUT-Server]
 
 config:
     nodeId: 0x12344321

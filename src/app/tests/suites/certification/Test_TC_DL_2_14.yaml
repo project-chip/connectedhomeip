@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    107.14. [TC-DL-1.14] Verification for the following Commands - Set
+    100.2.14. [TC-DL-2.14] Verification for the following Commands - Set
     Credential , Set Credential Response, Get Credential Status, Get Credential
     Status Response, Clear Credential [DUT-Server]
 

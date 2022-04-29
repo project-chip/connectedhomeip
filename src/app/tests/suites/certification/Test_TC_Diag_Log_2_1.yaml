@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    54.1. TC-Diag Log-1.1 Diagnostic Logs Cluster Commands Checks with BDX [DUT
-    Server]
+    54.2. [TC-Diag Log-2.1] Diagnostic Logs Cluster Commands Checks with BDX
+    [DUT Server]
 
 config:
     nodeId: 0x12344321
