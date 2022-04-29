@@ -336,6 +336,11 @@ public:
      */
     size_t Capacity() const { return SIZE_MAX; }
 
+    /*
+     * This method exists purely to line up with the static allocator version. Heap based object pool will never be exhausted.
+     */
+    bool Exhausted() const { return false; }
+
     void ReleaseObject(T * object)
     {
         if (object != nullptr)
