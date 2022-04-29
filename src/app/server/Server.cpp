@@ -99,6 +99,8 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
+    ChipLogProgress(AppServer, "Server initializing...");
+
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
@@ -109,8 +111,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -127,10 +129,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
-    InitDataModelHandler(&mExchangeMgr);
-
     err = mFabrics.Init(mDeviceStorage);
     SuccessOrExit(err);
+
+    SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
+    Access::SetAccessControl(mAccessControl);
+    SuccessOrExit(err = mAclStorage.Init(*mDeviceStorage, mFabrics));
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
@@ -144,9 +148,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
-    err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver);
-    SuccessOrExit(err);
-    Access::SetAccessControl(mAccessControl);
+    // This initializes clusters, so should come after lower level initialization.
+    InitDataModelHandler(&mExchangeMgr);
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -282,6 +285,7 @@ exit:
     }
     else
     {
+        // NOTE: this log is scraped by the test harness.
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
