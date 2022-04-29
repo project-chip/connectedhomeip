@@ -1616,13 +1616,11 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     }
     readCallback.ClearCounters();
 
-    // Run until the global dirtyset is cleared.
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return app::InteractionModelEngine::GetInstance()->GetReportingEngine().GetGlobalDirtySetSize() == 0 &&
-            app::InteractionModelEngine::GetInstance()->GetReportingEngine().GetNumReportsInFlight() == 0;
-    });
+    ctx.DrainAndServiceIO();
+    // Ensure the global dirty set is cleared.
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetReportingEngine().GetGlobalDirtySetSize() == 0);
 
-    // We should evict the subscription with exceeded resources, so we should used exactly all resources.
+    // We should evict the subscriptions with excess resources, so we should use exactly all resources.
     NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == kExpectedParallelPaths);
     NL_TEST_ASSERT(apSuite,
                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
@@ -1633,7 +1631,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
                        app::ReadHandler::InteractionType::Subscribe, ctx.GetAliceFabricIndex()) >
                        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
 
-    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    // The following check will trigger the logic in im to kill the read handlers that use more paths than the limit per fabric.
     {
         EstablishSubscriptions(apSuite, ctx.GetSessionAliceToBob(),
                                app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric,
