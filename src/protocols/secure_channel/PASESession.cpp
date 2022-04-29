@@ -69,6 +69,13 @@ PASESession::~PASESession()
     Clear();
 }
 
+void PASESession::OnSessionReleased()
+{
+    Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+}
+
 void PASESession::Finish()
 {
     mPairingComplete = true;
