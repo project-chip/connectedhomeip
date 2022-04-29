@@ -13,7 +13,10 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 107.2. [TC-DL-1.2] Verification for Door lock command[DUT-Server]
+name:
+    100.2.8. [TC-DL-2.8] Verification for the following Commands - Set Week Day
+    Schedule, Get Week Day Schedule , Get Week Day Schedule Response, Clear Week
+    Day Schedule [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -22,62 +25,51 @@ config:
 
 tests:
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as False
-          on the DUT"
+          "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute and saves
+          for future use."
       verification: |
           https://github.com/project-chip/connectedhomeip/issues/15776
       disabled: true
 
-    - label: "TH sends Lock Door Command to the DUT without any valid PINCode"
+    - label:
+          "TH reads NumberOfTotalUsersSupported attribute and saves for future
+          use."
       verification: |
 
       disabled: true
 
     - label:
-          "TH writes the RequirePINforRemoteOperation attribute value as True on
-          the DUT"
+          "TH send Set Week Day Schedule Command to DUT with the following
+          values: WeekDayIndex as 2 NumberOfTotalUsersSupported as 2 DaysMaskMap
+          as 2 StartHour as 15 StartMinute as 45 EndHour as 16 EndMinute as 55"
       verification: |
 
       disabled: true
 
-    - label: "TH sends Lock Door Command to the DUT with valid PINCode"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends Lock Door Command to the DUT without any argument PINCode"
-      verification: |
-
-      disabled: true
-
-    - label: "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT"
+    - label: "TH send Get Week Day Schedule Command to DUT"
       verification: |
 
       disabled: true
 
     - label:
-          "TH writes UserCodeTemporaryDisableTime attribute value as 5 seconds
-          on the DUT"
+          "TH send Set Week Day Schedule Command to DUT with the following
+          values: WeekDayIndex as 0 NumberOfTotalUsersSupported as 2 DaysMaskMap
+          as 7 StartHour as 15 StartMinute as 45 EndHour as 16 EndMinute as 55"
       verification: |
 
       disabled: true
 
-    - label: "TH sends Lock Door Command to the DUT with invalid PINCode"
+    - label: "TH send Get Week Day Schedule Command to DUT"
       verification: |
 
       disabled: true
 
-    - label:
-          "Repeat the above step 3 times TH reads UserCodeTemporaryDisableTime
-          attribute from DUT"
+    - label: "TH sends Clear Week Day Schedule Command to DUT"
       verification: |
 
       disabled: true
 
-    - label:
-          "After UserCodeTemporaryDisableTime attribute time expires, TH sends
-          Lock Command to the DUT with valid PINCode"
+    - label: "TH sends Get Week Day Schedule Command to DUT"
       verification: |
 
       disabled: true
