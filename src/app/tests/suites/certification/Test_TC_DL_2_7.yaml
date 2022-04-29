@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    107.7. [TC-DL-1.7] Verification for the following Commands - Set User
+    100.2.7. [TC-DL-2.7] Verification for the following Commands - Set User
     Status, Get User Status , Get User Status Response [DUT-Server]
 
 config:

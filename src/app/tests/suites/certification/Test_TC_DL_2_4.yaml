@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    95.5. [TC-LC-1.5] User Label cluster empty entry verification [DUT -
-    Commissionee]
+    100.2.4. [TC-DL-2.4] Verification for Unlock with Timeout command
+    [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -23,14 +23,15 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "TH1 writes LabelList attribute of the DUT by setting 'room:bedroom
-          1','Orientation:east', '','','', 'direction:down'"
+    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
       verification: |
-          sudo ./chip-tool userlabel write label-list '[{"label":"bedroom", "value":"bedroom1"}, {"label":"orientation", "value":"east"}, {"label":"floor", "value":"3"},{"label":"", "value":""},{"label":"", "value":""},{"label":"", "value":""} {"label":"direction", "value":"down"}]' 1 0
+          https://github.com/project-chip/connectedhomeip/issues/15776
       disabled: true
 
-    - label: "TH1 reads LabelList attribute of the DUT"
+    - label:
+          "TH sends the unlock with Timeout command to the DUT with argument
+          PINCode value as 'xxxxxxxx' and the Timeout argument value as 5
+          seconds"
       verification: |
-          ./chip-tool userlabel read label-list 1 0
+
       disabled: true

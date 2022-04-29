@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# add this gni as import in your build args to use pigweed in the example
-# 'import("//with_pw_rpc.gni")'
+import("//build_overrides/build.gni")
 
-import("//build_overrides/chip.gni")
-import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
-import("${chip_root}/examples/platform/efr32/args.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
 
-efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+template("arm_clang_toolchain") {
+  gcc_toolchain(target_name) {
+    ar = "llvm-ar"
 
-chip_enable_pw_rpc = true
-chip_enable_openthread = true
-chip_openthread_ftd = true
+    toolchain_args = {
+      current_cpu = "arm"
+      current_os = invoker.current_os
+      is_clang = true
 
-cpp_standard = "gnu++17"
+      forward_variables_from(invoker.toolchain_args, "*")
+    }
+  }
+}

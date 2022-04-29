@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    107.15. [TC-DL-1.15] Verification for the Operation Event Notification
+    100.2.16. [TC-DL-2.16] Verification for the Programming Event Notification
     Command [DUT-Server]
 
 config:
@@ -47,22 +47,41 @@ tests:
 
       disabled: true
 
-    - label: "TH reads KeypadOperationEventMask Attribute from DUT"
+    - label: "TH sends Get User Type command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "TH reads Remote Operation Event Mask attribute from DUT"
+    - label:
+          "From the Get User Type Response extract User Type for the above User
+          ID and save for future use"
       verification: |
 
       disabled: true
 
-    - label: "TH reads Manual Operation Event Mask attribute from DUT"
+    - label: "TH sends Get User Status command to DUT"
       verification: |
 
       disabled: true
 
-    - label: "TH reads RFID Operation Event Mask attribute from DUT"
+    - label:
+          "From the Get User Status Response extract the User Status for the
+          above User ID and saves for future use"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Keypad Programming Event Mask attribute from DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Remote Programming Event Mask attribute from DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads RFID Programming Event Mask attribute from DUT"
       verification: |
 
       disabled: true

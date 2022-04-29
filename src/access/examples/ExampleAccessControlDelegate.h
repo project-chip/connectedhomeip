@@ -29,10 +29,9 @@ namespace Examples {
  * NOTE: This function should be followed by an ::Init() method call. This function does
  *       not manage lifecycle considerations.
  *
- * @param storageDelegate Storage instance to access persisted ACL data.
  * @return a pointer to the AccessControl::Delegate singleton.
  */
-AccessControl::Delegate * GetAccessControlDelegate(PersistentStorageDelegate * storageDelegate);
+AccessControl::Delegate * GetAccessControlDelegate();
 
 } // namespace Examples
 } // namespace Access

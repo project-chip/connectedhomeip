@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 90.4. [TC-GC-1.4] Verification For ErrorCode message [DUT - Commissionee]
+name: 88.5. [TC-GC-2.4] Verification For ErrorCode message [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
