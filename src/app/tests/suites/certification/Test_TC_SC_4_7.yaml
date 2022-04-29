@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 13.4.7. [TC-SC-4.7] Commissioner Discovery - Commissionee
+name: 3.4.7. [TC-SC-4.7] Commissioner Discovery - Commissionee
 
 config:
     nodeId: 0x12344321
@@ -23,15 +24,49 @@ tests:
     - label:
           "TH is instructed to start advertising its presence as a commissioner
           in the network"
+      verification: |
+          Launch Example TV app
       disabled: true
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
+      verification: |
+          if DUT supports discovering UDC, DUT should be able to scan the TV-app
+          ~$ avahi-browse -rt _matterc._udp
+
+          =+ wlp3s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+          + enp2s0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+          + enp2s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+          = wlp3s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [matter-7.local]
+             address = [192.168.1.105]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+          = enp2s0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [matter-7.local]
+             address = [2002:c0a8:40c:10:e65f:1ff:fe0f:2877]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+          = enp2s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [matter-7.local]
+             address = [192.168.1.105]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+          + enp2s0 IPv6 20B078AC19BDBCF9                              _matterd._udp        local
+          = enp2s0 IPv6 20B078AC19BDBCF9                              _matterd._udp        local
+             hostname = [E45F010F28770000.local]
+             address = [fe80::e65f:1ff:fe0f:2877]
+             port = [5550]
+             txt = ["T=1" "CRA=300" "CRI=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
       disabled: true
 
     - label:
           "By any means, TH adds an unknown key/value pair in the advertised
           data(e.g. AB=12345)"
+      verification: |
+          Not in Scope of TE8
       disabled: true
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
+      verification: |
+          Not in Scope of TE8
       disabled: true

@@ -19,17 +19,23 @@
 #pragma once
 
 #include "../common/CHIPCommandBridge.h"
+#include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/ValueChecker.h>
 #include <lib/support/UnitTestUtils.h>
 #include <zap-generated/cluster/CHIPTestClustersObjc.h>
 
+#import <CHIP/CHIPDevice_Internal.h>
 #import <CHIP/CHIPError.h>
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
-class TestCommandBridge : public CHIPCommandBridge, public ValueChecker, public ConstraintsChecker, public PICSChecker {
+class TestCommandBridge : public CHIPCommandBridge,
+                          public ValueChecker,
+                          public ConstraintsChecker,
+                          public PICSChecker,
+                          public SystemCommands {
 public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
@@ -63,13 +69,13 @@ public:
         SetCommandExitStatus(err);
     }
 
-    /////////// GlobalCommands Interface /////////
     void Log(NSString * _Nonnull message)
     {
         NSLog(@"%@", message);
         NextTest();
     }
 
+    /////////// DelayCommands-like Interface /////////
     void WaitForMs(unsigned int ms)
     {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC), mCallbackQueue, ^{
@@ -84,6 +90,17 @@ public:
         CHIPDeviceController * controller = CurrentCommissioner();
         VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
 
+        // Disconnect our existing device; otherwise getConnectedDevice will
+        // just hand it right back to us without establishing a new CASE
+        // session.
+        if (mConnectedDevice != nil) {
+            auto device = [mConnectedDevice internalDevice];
+            if (device != nullptr) {
+                device->Disconnect();
+            }
+            mConnectedDevice = nil;
+        }
+
         [controller getConnectedDevice:nodeId
                                  queue:mCallbackQueue
                      completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
@@ -93,6 +110,18 @@ public:
                          mConnectedDevice = device;
                          NextTest();
                      }];
+    }
+
+    /////////// SystemCommands Interface /////////
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
+    {
+        if (CHIP_NO_ERROR == err) {
+            WaitForMs(0);
+
+        } else {
+            Exit(chip::ErrorStr(err), err);
+        }
+        return CHIP_NO_ERROR;
     }
 
     CHIPDevice * _Nullable GetConnectedDevice(void) { return mConnectedDevice; }

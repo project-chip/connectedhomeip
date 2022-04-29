@@ -927,6 +927,99 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+server cluster Groups = 4 {
+  readonly attribute bitmap8 nameSupport = 0;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddGroupRequest {
+    group_id groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  request struct ViewGroupRequest {
+    group_id groupId = 0;
+  }
+
+  request struct GetGroupMembershipRequest {
+    group_id groupList[] = 0;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupId = 0;
+  }
+
+  request struct AddGroupIfIdentifyingRequest {
+    group_id groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  response struct AddGroupResponse = 0 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  response struct ViewGroupResponse = 1 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+    CHAR_STRING groupName = 2;
+  }
+
+  response struct GetGroupMembershipResponse = 2 {
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
+  }
+
+  response struct RemoveGroupResponse = 3 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+}
+
+server cluster Identify = 3 {
+  enum IdentifyEffectIdentifier : ENUM8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum IdentifyEffectVariant : ENUM8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyIdentifyType : ENUM8 {
+    kNone = 0;
+    kVisibleLight = 1;
+    kVisibleLED = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    INT16U identifyTime = 0;
+  }
+
+  response struct IdentifyQueryResponse = 0 {
+    INT16U timeout = 0;
+  }
+
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  command access(invoke: manage) IdentifyQuery(): IdentifyQueryResponse = 1;
+}
+
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 1;
   readonly attribute CHAR_STRING supportedLocales[] = 2;
@@ -1735,6 +1828,8 @@ endpoint 0 {
 endpoint 1 {
   server  cluster Descriptor;
   server  cluster DoorLock;
+  server  cluster Groups;
+  server  cluster Identify;
   server  cluster OnOff;
   server  cluster PowerSource;
 }

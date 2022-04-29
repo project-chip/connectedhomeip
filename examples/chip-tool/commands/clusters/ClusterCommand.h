@@ -104,8 +104,11 @@ public:
 
     virtual void OnDone(chip::app::CommandSender * client) override
     {
-        mCommandSender.front().reset();
-        mCommandSender.erase(mCommandSender.begin());
+        if (mCommandSender.size())
+        {
+            mCommandSender.front().reset();
+            mCommandSender.erase(mCommandSender.begin());
+        }
 
         // If the command is repeated N times, wait for all the responses to comes in
         // before exiting.

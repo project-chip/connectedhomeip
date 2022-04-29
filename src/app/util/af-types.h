@@ -159,13 +159,6 @@ typedef struct
     chip::ClusterId clusterId;
 
     /**
-     * Cluster mask for the cluster, used to determine if it is
-     * the server or client version of the cluster. See CLUSTER_MASK_
-     * macros defined in att-storage.h
-     */
-    EmberAfClusterMask clusterMask;
-
-    /**
      * The identifier for the attribute.
      */
     chip::AttributeId attributeId;

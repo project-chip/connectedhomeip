@@ -17,7 +17,7 @@
 
 #include <app/server/AclStorage.h>
 
-#include <app/server/Server.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 using namespace chip;
 using namespace chip::app;

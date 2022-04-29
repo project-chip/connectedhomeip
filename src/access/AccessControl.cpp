@@ -216,7 +216,6 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
     }
 
     NotifyEntryChanged(subjectDescriptor, fabric, i, &entry, EntryListener::ChangeType::kAdded);
-
     return CHIP_NO_ERROR;
 }
 
@@ -245,7 +244,7 @@ CHIP_ERROR AccessControl::DeleteEntry(const SubjectDescriptor * subjectDescripto
         // The entry was read prior to deletion so its latest value could be provided
         // to the listener after deletion. If it's been reset to its default delegate,
         // that best effort attempt to retain the latest value failed. This is
-        // regretable but OK.
+        // regrettable but OK.
         p = nullptr;
     }
     NotifyEntryChanged(subjectDescriptor, fabric, index, p, EntryListener::ChangeType::kRemoved);

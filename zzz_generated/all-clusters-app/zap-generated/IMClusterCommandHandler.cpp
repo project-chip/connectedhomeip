@@ -436,6 +436,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::ClearWeekDaySchedule::Id: {
+            Commands::ClearWeekDaySchedule::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterClearWeekDayScheduleCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::SetYearDaySchedule::Id: {
             Commands::SetYearDaySchedule::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

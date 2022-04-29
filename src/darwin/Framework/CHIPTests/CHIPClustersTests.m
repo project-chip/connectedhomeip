@@ -22,7 +22,6 @@
 
 // module headers
 #import <CHIP/CHIP.h>
-#import <CHIP/CHIPTestClustersObjc.h>
 
 #import "CHIPErrorTestUtils.h"
 #import "CHIPTestStorage.h"
@@ -52,40 +51,6 @@ static CHIPDevice * mConnectedDevice;
 
 // Singleton controller we use.
 static CHIPDeviceController * sController = nil;
-
-// Test Util APIs
-void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned int ms)
-{
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC), queue, ^{
-        [expectation fulfill];
-    });
-}
-
-void Log(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message)
-{
-    NSLog(@"%@", message);
-    [expectation fulfill];
-}
-
-// Stub for User Prompts for XCTests to run.
-void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message) { [expectation fulfill]; }
-
-// Stub for reboot target device.
-void Reboot(XCTestExpectation * expectation, dispatch_queue_t queue, uint16_t discriminator) { [expectation fulfill]; }
-
-void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue, uint64_t deviceId)
-{
-    CHIPDeviceController * controller = sController;
-    XCTAssertNotNil(controller);
-
-    [controller getConnectedDevice:deviceId
-                             queue:dispatch_get_main_queue()
-                 completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                     XCTAssertEqual(error.code, 0);
-                     [expectation fulfill];
-                     mConnectedDevice = device;
-                 }];
-}
 
 CHIPDevice * GetConnectedDevice(void)
 {
@@ -246,6 +211,7 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+<<<<<<< HEAD
 - (void)testSendClusterTestAccessControlCluster_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for commissionee"];
@@ -50566,4 +50532,6 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+=======
+>>>>>>> master
 @end
