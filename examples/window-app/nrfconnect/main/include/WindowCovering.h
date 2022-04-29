@@ -54,17 +54,16 @@ public:
 private:
     void SetBrightness(MoveType aMoveType, uint16_t aPosition);
     void SetTargetPosition(OperationalState aDirection, chip::Percent100ths aPosition);
-    void UpdateOperationalStatus(MoveType aMoveType, OperationalState aDirection);
     uint8_t PositionToBrightness(uint16_t aPosition, MoveType aMoveType);
-    bool TargetCompleted(NPercent100ths aCurrent, NPercent100ths aTarget);
 
+    static void UpdateOperationalStatus(MoveType aMoveType, OperationalState aDirection);
+    static bool TargetCompleted(MoveType aMoveType, NPercent100ths aCurrent, NPercent100ths aTarget);
     static void StartTimer(MoveType aMoveType, uint32_t aTimeoutMs);
     static chip::Percent100ths CalculateSingleStep(MoveType aMoveType);
     static void DriveCurrentLiftPosition(intptr_t);
     static void DriveCurrentTiltPosition(intptr_t);
     static void MoveTimerTimeoutCallback(k_timer * aTimer);
 
-    OperationalStatus mOperationalStatus;
     MoveType mCurrentUIMoveType;
     LEDWidget mLiftLED;
     LEDWidget mTiltLED;
