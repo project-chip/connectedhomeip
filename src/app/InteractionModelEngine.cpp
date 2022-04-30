@@ -29,8 +29,7 @@
 
 #include <lib/core/CHIPTLVUtilities.hpp>
 
-extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                     bool asServer);
+extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 namespace chip {
 namespace app {
@@ -866,7 +865,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
         bool duplicate = false;
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId, true))
+            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
         {
             prev  = path1;
             path1 = path1->mpNext;
