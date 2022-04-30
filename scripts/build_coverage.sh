@@ -25,6 +25,7 @@ _normpath() {
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
+skip_gn=false
 
 help() {
 
@@ -33,7 +34,10 @@ help() {
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
-  -o, --output_root         Set the build output directory"
+  -o, --output_root         Set the build output directory.  When set manually, performs only lcov stage 
+                            on provided build output.  Assumes output_root has been built with 'use_coverage=true'
+                            and that 'ninja check' was run.
+  "
 }
 
 file_name=${0##*/}
@@ -46,6 +50,8 @@ while (($#)); do
             ;;
         --output_root | -o)
             OUTPUT_ROOT=$2
+            COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
+            skip_gn=true
             shift
             ;;
         -*)
@@ -64,8 +70,10 @@ echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$
 source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true'
-ninja -C "$OUTPUT_ROOT" check
+if [ "$skip_gn" == false ]; then
+    gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args='use_coverage=true'
+    ninja -C "$OUTPUT_ROOT" check
+fi
 
 mkdir -p "$COVERAGE_ROOT"
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj" --output-file "$COVERAGE_ROOT/lcov_base.info"
