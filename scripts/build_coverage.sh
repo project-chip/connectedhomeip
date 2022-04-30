@@ -34,7 +34,7 @@ help() {
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
-  -o, --output_root         Set the build output directory.  When set manually, performs only lcov stage 
+  -o, --output_root         Set the build output directory.  When set manually, performs only lcov stage
                             on provided build output.  Assumes output_root has been built with 'use_coverage=true'
                             and that 'ninja check' was run.
   "
