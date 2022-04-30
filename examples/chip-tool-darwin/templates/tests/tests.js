@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+const testPath  = '../../../../src/app/tests/suites/';
+const TestSuite = require(testPath + 'tests.js');
+
 function getManualTests()
 {
   return [];
@@ -23,383 +26,53 @@ function getManualTests()
 // clang-format off
 
 function getTests() {
-  const AccessControl = [
-    'TestAccessControlCluster',
-  ];
 
-  const BinaryInput = [
-    'Test_TC_BI_1_1',
-    'Test_TC_BI_2_1',
-    'Test_TC_BI_2_2',
-  ];
+  let tests = TestSuite.getTests();
 
-  const BooleanState = [
-    'Test_TC_BOOL_1_1',
-    'Test_TC_BOOL_2_1',
-  ];
+  // TODO: These tests all need PairWithQRCode
+  tests.disable('Test_TC_MF_1_3');
+  tests.disable('Test_TC_MF_1_4');
+  tests.disable('Test_TC_MF_1_5');
+  tests.disable('Test_TC_MF_1_6');
+  tests.disable('Test_TC_MF_1_15');
 
-  const BridgedActions = [
-    'Test_TC_BRAC_1_1',
-  ];
+  // TODO: This test needs FindCommissionable
+  tests.disable('Test_TC_SC_4_2');
 
-  const ColorControl = [
-    'Test_TC_CC_1_1',
-    'Test_TC_CC_2_1',
-    'Test_TC_CC_3_1',
-    'Test_TC_CC_3_2',
-    'Test_TC_CC_3_3',
-    'Test_TC_CC_4_1',
-    'Test_TC_CC_4_2',
-    'Test_TC_CC_4_3',
-    'Test_TC_CC_4_4',
-    'Test_TC_CC_5_1',
-    'Test_TC_CC_5_2',
-    'Test_TC_CC_5_3',
-    'Test_TC_CC_6_1',
-    'Test_TC_CC_6_2',
-    'Test_TC_CC_6_3',
-    'Test_TC_CC_7_1',
-    'Test_TC_CC_7_2',
-    'Test_TC_CC_7_3',
-    'Test_TC_CC_7_4',
-    'Test_TC_CC_8_1',
-    'Test_TC_CC_9_1',
-    'Test_TC_CC_9_2',
-    'Test_TC_CC_9_3',
-  ];
+  // TestClusterComplexTypes requires representing nullable optionals in ways
+  // that can differentiate missing and null, which Darwin can't right now.
+  tests.disable('TestClusterComplexTypes');
 
-  const DeviceDiscovery = [
-    'Test_TC_DD_1_5',
-    'Test_TC_DD_1_6',
-    'Test_TC_DD_1_7',
-    'Test_TC_DD_1_8',
-    'Test_TC_DD_1_9',
-  ];
+  // TODO: TestEvents not supported in the codegen yet.
+  tests.disable('TestEvents');
 
-  const DeviceManagement = [
-    'Test_TC_DM_1_1',
-    'Test_TC_DM_3_1',
-    'Test_TC_DM_2_2',
-  ];
+  // TODO: TestDiscovery needs FindCommissionable
+  tests.disable('TestDiscovery');
 
-  const ElectricalMeasurement = [
-    'Test_TC_EMR_1_1',
-  ];
+  // TODO: TestConfigVariables not supported properly in codegen yet.
+  tests.disable('TestConfigVariables');
 
-  const EthernetNetworkDiagnostics = [
-    'Test_TC_ETHDIAG_1_1',
-    'Test_TC_ETHDIAG_2_1',
-  ];
+  // TODO: TestGeneralCommissioning needs PairWithQRCode
+  tests.disable('TestGeneralCommissioning');
 
-  const FlowMeasurement = [
-    'Test_TC_FLW_1_1',
-    'Test_TC_FLW_2_1',
-    'Test_TC_FLW_2_2',
-  ];
+  // TODO: TestSystemCommands needs codegen changes or changes to the system
+  // command implementation.
+  tests.disable('TestSystemCommands');
 
-  const GeneralCommissioning = [
-    'Test_TC_GC_1_1',
-  ];
+  // TODO: TestMultiAdmin needs PairWithQRCode
+  tests.disable('TestMultiAdmin');
 
-  const Identify = [
-    'Test_TC_I_1_1',
-    'Test_TC_I_2_1',
-    'Test_TC_I_2_3',
-  ];
+  // TODO: DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
+  tests.disable('DL_UsersAndCredentials');
 
-  const IlluminanceMeasurement = [
-    'Test_TC_ILL_1_1',
-    'Test_TC_ILL_2_1',
-  ];
+  // TODO: DL_Schedules needs some sort of codegen fixes to produce compiling code.
+  tests.disable('DL_Schedules');
 
-  const OccupancySensing = [
-    'Test_TC_OCC_1_1',
-    'Test_TC_OCC_2_1',
-    'Test_TC_OCC_2_2',
-  ];
+  // TODO: TestGroupMessaging does not work on Darwin for now.
+  tests.disable('TestGroupMessaging');
 
-  const LevelControl = [
-    'Test_TC_LVL_1_1',
-    'Test_TC_LVL_2_1',
-    'Test_TC_LVL_2_2',
-    'Test_TC_LVL_3_1',
-    'Test_TC_LVL_4_1',
-    'Test_TC_LVL_5_1',
-    'Test_TC_LVL_6_1',
-  ];
-
-  const UserLabel = [
-    'Test_TC_LC_1_2',
-  ];
-
-  const MediaControl = [
-    'Test_TC_MC_1_1',
-    'Test_TC_MC_1_2',
-    'Test_TC_MC_1_3',
-    'Test_TC_MC_1_4',
-    'Test_TC_MC_1_5',
-    'Test_TC_MC_1_6',
-    'Test_TC_MC_1_7',
-    'Test_TC_MC_1_8',
-    'Test_TC_MC_1_9',
-    'Test_TC_MC_1_10',
-    'Test_TC_MC_1_11',
-    'Test_TC_MC_1_12',
-    'Test_TC_MC_2_1',
-    'Test_TC_MC_3_1',
-    'Test_TC_MC_3_2',
-    'Test_TC_MC_3_3',
-    'Test_TC_MC_3_4',
-    'Test_TC_MC_3_5',
-    'Test_TC_MC_3_6',
-    'Test_TC_MC_3_7',
-    'Test_TC_MC_3_8',
-    'Test_TC_MC_3_9',
-    'Test_TC_MC_3_10',
-    'Test_TC_MC_3_11',
-    'Test_TC_MC_5_1',
-    'Test_TC_MC_5_2',
-    'Test_TC_MC_5_3',
-    'Test_TC_MC_6_1',
-    'Test_TC_MC_6_2',
-    'Test_TC_MC_6_3',
-    'Test_TC_MC_6_4',
-    'Test_TC_MC_7_1',
-    'Test_TC_MC_7_2',
-    'Test_TC_MC_8_1',
-    'Test_TC_MC_9_1',
-    'Test_TC_MC_10_1',
-  ];
-
-  const ModeSelect = [
-    'Test_TC_MOD_1_1',
-  ];
-
-  const MultipleFabrics = [
-    // TODO: These tests all need PairWithQRCode
-    //'Test_TC_MF_1_3',
-    //'Test_TC_MF_1_4',
-    //'Test_TC_MF_1_5',
-    //'Test_TC_MF_1_6',
-    //'Test_TC_MF_1_15',
-  ];
-
-  const OnOff = [
-    'Test_TC_OO_1_1',
-    'Test_TC_OO_2_1',
-    'Test_TC_OO_2_2',
-    'Test_TC_OO_2_3',
-    'Test_TC_OO_2_4',
-  ];
-
-  const PowerSource = [
-    'Test_TC_PS_1_1',
-    'Test_TC_PS_2_1',
-  ];
-
-  const PressureMeasurement = [
-    'Test_TC_PRS_1_1',
-    'Test_TC_PRS_2_1',
-  ];
-
-  const PumpConfigurationControl = [
-    'Test_TC_PCC_1_1',
-    'Test_TC_PCC_2_1',
-    'Test_TC_PCC_2_2',
-    'Test_TC_PCC_2_3',
-    'Test_TC_PCC_2_4',
-  ];
-
-  const PowerSourceConfiguration = [
-    'Test_TC_PSCFG_1_1',
-  ];
-
-  const RelativeHumidityMeasurement = [
-    'Test_TC_RH_1_1',
-    'Test_TC_RH_2_1',
-    'Test_TC_RH_2_2',
-  ];
-
-  const SecureChannel = [
-    // TODO: This test needs FindCommissionable
-    //'Test_TC_SC_4_2',
-  ];
-
-  const Switch = [
-    'Test_TC_SWTCH_2_1',
-    'Test_TC_SWTCH_2_2',
-  ];
-
-  const TemperatureMeasurement = [
-    'Test_TC_TM_1_1',
-    'Test_TC_TM_2_1',
-    'Test_TC_TM_2_2',
-  ];
-
-  const Thermostat = [
-    'Test_TC_TSTAT_1_1',
-    'Test_TC_TSTAT_2_1',
-    'Test_TC_TSTAT_2_2',
-  ];
-
-  const ThermostatUserConfiguration = [
-    'Test_TC_TSUIC_1_1',
-    'Test_TC_TSUIC_2_1',
-    'Test_TC_TSUIC_2_2',
-  ];
-
-  const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_1_1',
-    'Test_TC_DIAG_TH_NW_1_2',
-  ];
-
-  const WiFiNetworkDiagnostics = [
-    'Test_TC_WIFIDIAG_1_1',
-    'Test_TC_WIFIDIAG_3_1',
-  ];
-
-  const WindowCovering = [
-    'Test_TC_WNCV_1_1',
-    'Test_TC_WNCV_2_1',
-    'Test_TC_WNCV_2_2',
-    'Test_TC_WNCV_2_3',
-    'Test_TC_WNCV_2_4',
-    'Test_TC_WNCV_2_5',
-    'Test_TC_WNCV_3_1',
-    'Test_TC_WNCV_3_2',
-    'Test_TC_WNCV_3_3',
-    'Test_TC_WNCV_3_4',
-    'Test_TC_WNCV_3_5',
-    'Test_TC_WNCV_4_1',
-    'Test_TC_WNCV_4_2',
-    'Test_TC_WNCV_4_3',
-    'Test_TC_WNCV_4_4',
-    'Test_TC_WNCV_4_5',
-  ];
-
-  const TV = [
-    'TV_TargetNavigatorCluster',
-    'TV_AudioOutputCluster',
-    'TV_ApplicationLauncherCluster',
-    'TV_KeypadInputCluster',
-    'TV_AccountLoginCluster',
-    'TV_WakeOnLanCluster',
-    'TV_ApplicationBasicCluster',
-    'TV_MediaPlaybackCluster',
-    'TV_ChannelCluster',
-    'TV_LowPowerCluster',
-    'TV_ContentLauncherCluster',
-    'TV_MediaInputCluster',
-  ];
-
-  const Others = [
-    'TestCluster',
-    // TestClusterComplexTypes requires representing nullable optionals in ways
-    // that can differentiate missing and null, which Darwin can't right now.
-    //'TestClusterComplexTypes',
-    'TestConstraints',
-    'TestDelayCommands',
-    // TODO: TestEvents not supported in the codegen yet.
-    //'TestEvents',
-    // TODO: TestDiscovery needs FindCommissionable
-    //'TestDiscovery',
-    'TestLogCommands',
-    'TestSaveAs',
-    // TODO: TestConfigVariables not supported properly in codegen yet.
-    //'TestConfigVariables',
-    'TestDescriptorCluster',
-    'TestBasicInformation',
-    // TODO: TestGeneralCommissioning needs PairWithQRCode
-    //'TestGeneralCommissioning',
-    'TestIdentifyCluster',
-    'TestOperationalCredentialsCluster',
-    'TestModeSelectCluster',
-    'TestSelfFabricRemoval',
-    // TODO: TestSystemCommands needs codegen changes or changes to the system
-    // command implementation.
-    //'TestSystemCommands',
-    'TestBinding',
-    'TestUserLabelCluster',
-    'TestArmFailSafe',
-  ];
-
-  const MultiAdmin = [
-    // TODO: TestMultiAdmin needs PairWithQRCode
-    //'TestMultiAdmin',
-  ];
-
-  const SoftwareDiagnostics = [
-    'Test_TC_SWDIAG_1_1',
-    'Test_TC_SWDIAG_2_1',
-    'Test_TC_SWDIAG_3_1',
-  ];
-
-  const Subscriptions = [
-    'TestSubscribe_OnOff',
-  ];
-
-  const DoorLock = [
-    // TODO: DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
-    //'DL_UsersAndCredentials',
-    'DL_LockUnlock',
-    // TODO: DL_Schedules needs some sort of codegen fixes to produce compiling code.
-    //'DL_Schedules',
-    'Test_TC_DL_1_3',
-  ];
-
-  const Groups = [
-    // TestGroupMessaging does not work on Darwin for now.
-    //'TestGroupMessaging',
-    'TestGroupsCluster',
-    'TestGroupKeyManagementCluster',
-  ];
-
-  const tests = [
-    AccessControl, //
-    BinaryInput, //
-    BooleanState, //
-    BridgedActions, //
-    ColorControl, //
-    DeviceDiscovery, //
-    DeviceManagement, //
-    ElectricalMeasurement, //
-    EthernetNetworkDiagnostics, //
-    FlowMeasurement, //
-    GeneralCommissioning, //
-    Identify, //
-    IlluminanceMeasurement, //
-    LevelControl, //
-    MediaControl, //
-    ModeSelect, //
-    MultipleFabrics, //
-    OccupancySensing, //
-    OnOff, //
-    PowerSource, //
-    PressureMeasurement, //
-    PumpConfigurationControl, //
-    PowerSourceConfiguration, //
-    RelativeHumidityMeasurement, //
-    SecureChannel, //
-    Switch, //
-    TemperatureMeasurement, //
-    Thermostat, //
-    ThermostatUserConfiguration, //
-    ThreadNetworkDiagnostics, //
-    UserLabel, //
-    WiFiNetworkDiagnostics, //
-    WindowCovering, //
-    TV, //
-    Others, //
-    MultiAdmin, //
-    SoftwareDiagnostics, //
-    Subscriptions, //
-    DoorLock, //
-    Groups, //
-  ];
-  return tests.flat(1);
+  return tests;
 }
-
-// clang-format on
 
 //
 // Module exports
