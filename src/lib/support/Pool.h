@@ -240,8 +240,15 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
-     *  @return    Loop     Returns Break or Finish according to the iteration
+     *  @param     function A functor of type `Loop (*)(T*)`.
+     *                      Return Loop::Break to break the iteration.
+     *                      The only modification the functor is allowed to make
+     *                      to the pool before returning is releasing the
+     *                      object that was passed to the functor.  Any other
+     *                      desired changes need to be made after iteration
+     *                      completes.
+     *  @return    Loop     Returns Break if some call to the functor returned
+     *                      Break.  Otherwise returns Finish.
      *
      * caution
      *   this function is not thread-safe, make sure all usage of the
@@ -365,8 +372,15 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
-     *  @return    Loop     Returns Break or Finish according to the iteration
+     *  @param     function A functor of type `Loop (*)(T*)`.
+     *                      Return Loop::Break to break the iteration.
+     *                      The only modification the functor is allowed to make
+     *                      to the pool before returning is releasing the
+     *                      object that was passed to the functor.  Any other
+     *                      desired changes need to be made after iteration
+     *                      completes.
+     *  @return    Loop     Returns Break if some call to the functor returned
+     *                      Break.  Otherwise returns Finish.
      */
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
