@@ -29,13 +29,6 @@ function getTests() {
 
   let tests = TestSuite.getTests();
 
-  // TODO: These tests all need PairWithQRCode
-  tests.disable('Test_TC_MF_1_3');
-  tests.disable('Test_TC_MF_1_4');
-  tests.disable('Test_TC_MF_1_5');
-  tests.disable('Test_TC_MF_1_6');
-  tests.disable('Test_TC_MF_1_15');
-
   // TODO: This test needs FindCommissionable
   tests.disable('Test_TC_SC_4_2');
 
@@ -52,15 +45,9 @@ function getTests() {
   // TODO: TestConfigVariables not supported properly in codegen yet.
   tests.disable('TestConfigVariables');
 
-  // TODO: TestGeneralCommissioning needs PairWithQRCode
-  tests.disable('TestGeneralCommissioning');
-
   // TODO: TestSystemCommands needs codegen changes or changes to the system
   // command implementation.
   tests.disable('TestSystemCommands');
-
-  // TODO: TestMultiAdmin needs PairWithQRCode
-  tests.disable('TestMultiAdmin');
 
   // TODO: DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
   tests.disable('DL_UsersAndCredentials');
