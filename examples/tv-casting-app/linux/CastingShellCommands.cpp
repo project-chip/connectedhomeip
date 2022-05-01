@@ -35,6 +35,25 @@
 namespace chip {
 namespace Shell {
 
+void PrintFabrics()
+{
+    // set fabric to be the first in the list
+    for (const auto & fb : chip::Server::GetInstance().GetFabricTable())
+    {
+        FabricIndex fabricIndex = fb.GetFabricIndex();
+        ChipLogError(AppServer, "Next Fabric index=%d", fabricIndex);
+        if (!fb.IsInitialized())
+        {
+            ChipLogError(AppServer, " -- Not initialized");
+            continue;
+        }
+        NodeId myNodeId = fb.GetNodeId();
+        ChipLogProgress(NotSpecified,
+                        "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                        ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
+    }
+}
+
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
@@ -129,6 +148,18 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
     if (strcmp(argv[0], "print-bindings") == 0)
     {
         CastingServer::GetInstance()->PrintBindings();
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "print-fabrics") == 0)
+    {
+        PrintFabrics();
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "delete-fabric") == 0)
+    {
+        char * eptr;
+        chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
+        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "cluster") == 0)
