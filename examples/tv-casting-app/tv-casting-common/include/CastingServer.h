@@ -67,6 +67,8 @@ public:
     CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
     static void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response);
     static void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error);
+    static void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     NodeId GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex);
     FabricIndex GetVideoPlayerFabricIndexForNode(NodeId nodeId);
     void PrintBindings();

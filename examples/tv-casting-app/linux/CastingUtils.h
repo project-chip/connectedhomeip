@@ -30,8 +30,6 @@ constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv);
 
-CHIP_ERROR TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex);
-
 CHIP_ERROR DiscoverCommissioners();
 
 CHIP_ERROR RequestCommissioning(int index);

@@ -19,7 +19,10 @@
 #include "CastingServer.h"
 
 CastingServer * CastingServer::castingServer_ = nullptr;
-;
+
+// TODO: Accept these values over CLI
+const char * kContentUrl        = "https://www.test.com/videoid";
+const char * kContentDisplayStr = "Test video";
 
 CastingServer * CastingServer::GetInstance()
 {
@@ -45,6 +48,9 @@ void CastingServer::InitServer()
 
     // Initialize binding handlers
     ReturnOnFailure(InitBindingHandlers());
+
+    // Add callback to send Content casting commands after commissioning completes
+    ReturnOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
     mInited = true;
 }
@@ -200,6 +206,25 @@ void CastingServer::OnContentLauncherSuccessResponse(void * context, const Launc
 void CastingServer::OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
 {
     ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
+}
+
+void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
+    {
+        if (CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
+        {
+            CastingServer::GetInstance()->ReadServerClustersForNode(
+                CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
+        }
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
+            event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex));
+
+        CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
+    }
 }
 
 // given a fabric index, try to determine the video-player nodeId by searching the binding table

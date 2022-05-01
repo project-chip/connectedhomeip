@@ -47,29 +47,6 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 using chip::Shell::Engine;
 #endif
 
-// TODO: Accept these values over CLI
-const char * kContentUrl        = "https://www.test.com/videoid";
-const char * kContentDisplayStr = "Test video";
-
-void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
-{
-    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
-    {
-        if (CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
-        {
-            CastingServer::GetInstance()->ReadServerClustersForNode(
-                CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
-        }
-    }
-    else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
-    {
-        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
-            event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex));
-
-        CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
-    }
-}
-
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
 {
     chip::Optional<uint32_t> setupPasscode;
@@ -163,9 +140,6 @@ int main(int argc, char * argv[])
     DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
-
-    // Add callback to send Content casting commands after commissioning completes
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0);
 
     registerClusters(gCommands, &gCredIssuerCommands);
     registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
