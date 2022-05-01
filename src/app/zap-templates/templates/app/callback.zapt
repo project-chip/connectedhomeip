@@ -72,14 +72,6 @@ void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId
  */
 void Matter{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief {{label}} Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void Matter{{asUpperCamelCase label}}ClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
 /** @brief {{label}} Cluster Server Message Sent
  *
  * Server Message Sent
@@ -212,7 +204,7 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  * restricted by the application implementing this callback.
  */
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                          chip::AttributeId attributeId, uint8_t mask,
+                                                                          chip::AttributeId attributeId,
                                                                           uint8_t * value, uint8_t type);
 
 /** @brief Attribute Read Access
@@ -421,7 +413,7 @@ bool emberAfStartMoveCallback();
  * any other code to reject it.
  */
 chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                           uint8_t mask, uint8_t type, uint16_t size, uint8_t * value);
+                                                                           uint8_t type, uint16_t size, uint8_t * value);
 
 /** @brief Post Attribute Change
  *
@@ -430,4 +422,4 @@ chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const
  * the attribute was set by the framework.
  */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                       uint8_t mask, uint8_t type, uint16_t size, uint8_t * value);
+                                       uint8_t type, uint16_t size, uint8_t * value);

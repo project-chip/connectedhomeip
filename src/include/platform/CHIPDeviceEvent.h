@@ -161,11 +161,11 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
-     * SED Polling Interval Change
+     * SED Interval Change
      *
-     * Signals a change to the sleepy end device polling interval.
+     * Signals a change to the sleepy end device interval.
      */
-    kSEDPollingIntervalChange,
+    kSEDIntervalChange,
 
     /**
      * Security Session Established

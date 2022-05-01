@@ -32,8 +32,7 @@ public:
         ModelCommand(commandName, credsIssuerConfig), mBufferedReadAdapter(*this)
     {}
 
-    virtual void OnAttributeSubscription(){};
-    virtual void OnEventSubscription(){};
+    virtual void OnSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
@@ -105,7 +104,7 @@ public:
         SetCommandExitStatus(mError);
     }
 
-    void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnAttributeSubscription(); }
+    void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnSubscription(); }
 
 protected:
     CHIP_ERROR ReportAttribute(ChipDevice * device, std::vector<chip::EndpointId> endpointIds,
@@ -431,11 +430,9 @@ public:
                                               mDataVersion);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return ReportCommand::GetWaitDuration(); }
-
-    void OnAttributeSubscription() override
+    void OnSubscription() override
     {
-        // The ReadClient instance can not be released directly into the OnAttributeSubscription
+        // The ReadClient instance can not be released directly into the OnSubscription
         // callback since it happens to be called by ReadClient itself which is doing additional
         // work after that.
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
@@ -547,9 +544,7 @@ public:
                                           chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return ReportCommand::GetWaitDuration(); }
-
-    void OnEventSubscription() override
+    void OnSubscription() override
     {
         // The ReadClient instance can not be released directly into the OnEventSubscription
         // callback since it happens to be called by ReadClient itself which is doing additional

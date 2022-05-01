@@ -18,7 +18,8 @@
 
 #include "ModelCommand.h"
 
-#include <Casting.h>
+#include <CastingServer.h>
+// #include <CastingUtils.h>
 #include <app/InteractionModelEngine.h>
 #include <inttypes.h>
 
@@ -26,17 +27,17 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
-    FabricIndex fabricIndex = CurrentFabricIndex();
+    FabricIndex fabricIndex = CastingServer::GetInstance()->CurrentFabricIndex();
 
     if (mNodeId == 0)
     {
         ChipLogProgress(chipTool, "nodeId set to 0, using default for fabric %d", fabricIndex);
-        mNodeId = GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        mNodeId = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
     }
     else
     {
         // potentially change fabric index if this is not the right one for the given nodeId
-        fabricIndex = GetVideoPlayerFabricIndexForNode(mNodeId);
+        fabricIndex = CastingServer::GetInstance()->GetVideoPlayerFabricIndexForNode(mNodeId);
     }
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 

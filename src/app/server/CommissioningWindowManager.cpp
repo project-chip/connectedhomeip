@@ -68,7 +68,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
         app::DnssdServer::Instance().AdvertiseOperational();
-        ChipLogError(AppServer, "Operational advertising enabled");
+        ChipLogProgress(AppServer, "Operational advertising enabled");
     }
 }
 
@@ -182,8 +182,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
 
 CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commissioningTimeout)
 {
-    VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() &&
-                            commissioningTimeout >= mMinCommissioningTimeoutOverride.ValueOr(MinCommissioningTimeout()),
+    VerifyOrReturnError(commissioningTimeout <= MaxCommissioningTimeout() && commissioningTimeout >= MinCommissioningTimeout(),
                         CHIP_ERROR_INVALID_ARGUMENT);
     DeviceLayer::FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
     VerifyOrReturnError(!failSafeContext.IsFailSafeArmed(), CHIP_ERROR_INCORRECT_STATE);
@@ -339,7 +338,7 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     if (!mIsBLE && mWindowStatus == AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
-        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
     }
 #endif
 
@@ -381,7 +380,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     if (!mIsBLE && mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
-        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
     }
 #endif
 

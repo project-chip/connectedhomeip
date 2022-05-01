@@ -10801,6 +10801,14 @@
               "outgoing": 0
             },
             {
+              "name": "ClearWeekDaySchedule",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "SetYearDaySchedule",
               "code": 14,
               "mfgCode": null,

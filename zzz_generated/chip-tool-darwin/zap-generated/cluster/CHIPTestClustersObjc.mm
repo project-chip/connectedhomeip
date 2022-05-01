@@ -24,7 +24,7 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 
-#import "zap-generated/CHIPTestClustersObjc.h"
+#import "zap-generated/cluster/CHIPTestClustersObjc.h"
 #import "zap-generated/tests/CHIPClustersTest.h"
 
 #include <lib/support/CHIPListUtils.h>
