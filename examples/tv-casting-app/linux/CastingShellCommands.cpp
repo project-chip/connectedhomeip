@@ -59,6 +59,10 @@ static CHIP_ERROR PrintAllCommands()
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                 Usage: cast <subcommand>\r\n");
     streamer_printf(sout, "  print-bindings       Usage: cast print-bindings\r\n");
+    streamer_printf(sout, "  print-fabrics        Usage: cast print-fabrics\r\n");
+    streamer_printf(
+        sout,
+        "  delete-fabric <index>     Delete a fabric from the casting client's fabric store. Usage: cast delete-fabric 1\r\n");
     streamer_printf(sout,
                     "  init <nodeid> <fabric-index>  Initialize casting app using given nodeid and index from previous "
                     "commissioning. Usage: init 18446744004990074879 2\r\n");
