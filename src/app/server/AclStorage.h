@@ -144,7 +144,7 @@ public:
      * Initialize should be called after chip::Access::AccessControl is initialized.
      *
      * Implementations should take this opportunity to populate AccessControl with ACL entries
-     * loaded from persistent storage. A half-open range of fabrics (first to last) is provided
+     * loaded from persistent storage. A half-open range of fabrics [first, last) is provided
      * so this can be done on a per-fabric basis.
      *
      * Implementations should also install an entry change listener on AccessControl to maintain
