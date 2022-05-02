@@ -159,7 +159,7 @@ protected:
         {
             ChipLogError(
                 chipTool,
-                "\n%sAttribute commands targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
+                "\n%sAttribute commands targeting multiple paths needs to have: \n \t * One element with multiple ids (for "
                 "example 1 cluster id, 1 attribute id, 2 endpoint ids)\n\t * Or the same "
                 "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %u "
                 "cluster ids, %u attribute ids, %u endpoint ids.",
@@ -264,7 +264,7 @@ protected:
         else
         {
             ChipLogError(chipTool,
-                         "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
+                         "\n%sEvent command targeting multiple paths needs to have: \n \t * One element with multiple ids (for "
                          "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
                          "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %u "
                          "cluster ids, %u event ids, %u endpoint ids.",

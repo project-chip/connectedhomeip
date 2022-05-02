@@ -73,7 +73,7 @@ printed list.
 
         > cast request 0
 
--   Re-reun commissioner discovery
+-   Re-run commissioner discovery
 
         > cast discover
 
@@ -103,7 +103,7 @@ valid cached fabric will be used.
 
         > cast set-fabric 1
 
-### Sending Arbitratry Cluster commands
+### Sending Arbitrary Cluster commands
 
 The linux tv-casting-app can invoke any cluster command using the same syntax as
 chip-tool. This can be done from the command line and from the shell. The
