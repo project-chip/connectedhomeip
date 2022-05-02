@@ -142,7 +142,7 @@ public:
     static constexpr uint16_t kMaxStringLength = OT_IP6_ADDRESS_STRING_SIZE;
 #endif
 
-    IPAddress()                        = default;
+    IPAddress() = default;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     explicit IPAddress(const ip6_addr_t & ipv6Addr);
