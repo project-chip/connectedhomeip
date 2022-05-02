@@ -40,11 +40,13 @@ tests:
           value: 1
 
     - label: "Check Saturation attribute value matched before any change"
-      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 90
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move to saturation command"
       command: "MoveToSaturation"
@@ -59,14 +61,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 6ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 6
+
     - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      disabled: true
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 90
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 8ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 8
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

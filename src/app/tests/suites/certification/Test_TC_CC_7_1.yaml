@@ -57,11 +57,13 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: 1025
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move To Hue command"
       command: "EnhancedMoveToHue"
@@ -78,14 +80,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 290ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 290
+
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: 1100
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 295ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 295
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 300ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 300
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move To Hue command"
       command: "EnhancedMoveToHue"
@@ -102,14 +152,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 290ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 290
+
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: 1150
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 295ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 295
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 300ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 300
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move To Hue command"
       command: "EnhancedMoveToHue"
@@ -126,14 +224,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 290ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 290
+
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: 1200
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 295ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 295
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 300ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 300
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move To Hue command"
       command: "EnhancedMoveToHue"
@@ -150,14 +296,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 290ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 290
+
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: 1300
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 295ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 295
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 300ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 300
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
