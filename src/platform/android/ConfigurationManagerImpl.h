@@ -45,12 +45,9 @@ public:
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
-    CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize) override;
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
 
 private:

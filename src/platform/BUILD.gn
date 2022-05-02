@@ -108,6 +108,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
       "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
+      "CHIP_DISABLE_PLATFORM_KVS=${chip_disable_platform_kvs}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
@@ -343,7 +344,8 @@ if (chip_device_platform != "none") {
     ]
 
     # Linux has its own NetworkCommissioningThreadDriver
-    if (chip_enable_openthread && chip_device_platform != "linux") {
+    if (chip_enable_openthread && chip_device_platform != "linux" &&
+        chip_device_platform != "tizen") {
       sources += [
         "OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
         "OpenThread/GenericNetworkCommissioningThreadDriver.h",

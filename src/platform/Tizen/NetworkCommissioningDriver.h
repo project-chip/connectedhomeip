@@ -81,6 +81,53 @@ private:
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+class TizenThreadDriver final : public ThreadDriver
+{
+public:
+    class ThreadNetworkIterator final : public NetworkIterator
+    {
+    public:
+        ThreadNetworkIterator(TizenThreadDriver * aDriver) : driver(aDriver) {}
+        size_t Count() override;
+        bool Next(Network & item) override;
+        void Release() override { delete this; }
+        ~ThreadNetworkIterator() = default;
+
+    private:
+        TizenThreadDriver * driver;
+        bool exhausted = false;
+    };
+
+    // BaseDriver
+    NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+
+    // WirelessDriver
+    uint8_t GetMaxNetworks() override { return 1; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+
+    CHIP_ERROR CommitConfiguration() override;
+    CHIP_ERROR RevertConfiguration() override;
+
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
+    void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
+
+    // ThreadDriver
+    Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
+
+private:
+    ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);
+    Thread::OperationalDataset mSavedNetwork;
+    Thread::OperationalDataset mStagingNetwork;
+};
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip

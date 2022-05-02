@@ -78,6 +78,13 @@ public:
     {
         return ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex);
     }
+
+    ScopedNodeId GetLocalScopedNodeId() const override
+    {
+        // For PASE, source is always the undefined node ID
+        return ScopedNodeId();
+    }
+
     CATValues GetPeerCATs() const override { return CATValues(); };
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;

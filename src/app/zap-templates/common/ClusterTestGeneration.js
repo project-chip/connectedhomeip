@@ -173,8 +173,12 @@ function setDefaultTypeForCommand(test)
     break;
 
   case 'waitForReport':
-    test.commandName     = 'WaitForReport';
-    test.isAttribute     = true;
+    test.commandName = 'WaitForReport';
+    if ('attribute' in test) {
+      test.isAttribute = true;
+    } else if ('event' in test) {
+      test.isEvent = true;
+    }
     test.isWaitForReport = true;
     break;
 
@@ -247,90 +251,128 @@ function ensureValidError(response, errorName)
 
 function setDefaultResponse(test, useSynthesizeWaitForReport)
 {
+  // Some of the tests does not have any command defined.
+  if (!test.command || test.isWait) {
+    setDefault(test, kResponseName, []);
+    return;
+  }
+
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
 
-  const hasResponseError = (kResponseErrorName in test[kResponseName]);
+  // There is different syntax for expressing the expected response, but in the
+  // end it needs to be converted to an array of responses.
+  if (kResponseName in test && !Array.isArray(test[kResponseName])) {
+    let testValues = {};
 
-  const defaultResponseError = 0;
-  setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
+    const response = test[kResponseName];
 
-  const defaultResponseValues = [];
-  setDefault(test[kResponseName], kValuesName, defaultResponseValues);
-
-  // Ensure only valid keywords are used for response values.
-  const values = test[kResponseName][kValuesName];
-  for (let i = 0; i < values.length; i++) {
-    for (let key in values[i]) {
-      if (key == "name" || key == "value" || key == kConstraintsName || key == kSaveAsName) {
-        continue;
+    if (kValuesName in response) {
+      testValues[kValuesName] = response[kValuesName];
+    } else if ('value' in response || kConstraintsName in response || kSaveAsName in response) {
+      let obj = {};
+      if ('value' in response) {
+        obj['value'] = response['value'];
       }
 
-      const errorStr = `Unknown key "${key}"`;
-      throwError(test, errorStr);
-    }
-  }
+      if (kConstraintsName in response) {
+        obj[kConstraintsName] = response[kConstraintsName];
+      }
 
-  const defaultResponseConstraints = {};
-  setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
+      if (kSaveAsName in response) {
+        obj[kSaveAsName] = response[kSaveAsName];
+      }
 
-  const defaultResponseSaveAs = '';
-  setDefault(test[kResponseName], kSaveAsName, defaultResponseSaveAs);
-
-  const hasResponseValue              = 'value' in test[kResponseName];
-  const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
-  const hasResponseValueOrConstraints = hasResponseValue || hasResponseConstraints;
-
-  if (test.isCommand && hasResponseValueOrConstraints) {
-    const errorStr = 'Test has a "value" or a "constraints" defined.\n' +
-        '\n' +
-        'Command should explicitly use the response argument name. Example: \n' +
-        '- label: "Send Test Specific Command"\n' +
-        '  command: "testSpecific"\n' +
-        '  response: \n' +
-        '    values: \n' +
-        '      - name: "returnValue"\n' +
-        '      - value: 7\n';
-    throwError(test, errorStr);
-  }
-
-  ensureValidError(test[kResponseName], kResponseErrorName);
-
-  // Step that waits for a particular event does not requires constraints nor expected values.
-  if (test.isWait) {
-    return;
-  }
-
-  if (!test.isAttribute && !test.isEvent) {
-    return;
-  }
-
-  if (test.isWriteAttribute || (useSynthesizeWaitForReport && test.isSubscribe)) {
-    if (hasResponseValueOrConstraints) {
-      const errorStr = 'Test has a "value" or a "constraints" defined.';
-      throwError(test, errorStr);
+      testValues[kValuesName] = [ obj ];
+    } else {
+      testValues[kValuesName] = [];
     }
 
-    return;
+    if (kResponseErrorName in response) {
+      testValues[kResponseErrorName] = response[kResponseErrorName];
+    }
+
+    if ('clusterError' in response) {
+      testValues['clusterError'] = response['clusterError'];
+    }
+
+    test[kResponseName] = [ testValues ];
   }
 
-  if (!hasResponseValueOrConstraints && !hasResponseError) {
-    console.log(test);
-    console.log(test[kResponseName]);
-    const errorStr = 'Test does not have a "value" or a "constraints" defined and is not expecting an error.';
-    throwError(test, errorStr);
+  // Ensure only valid keywords are used for response values.
+  test[kResponseName].forEach(response => {
+    const values = response[kValuesName];
+    for (let i = 0; i < values.length; i++) {
+      for (let key in values[i]) {
+        if (key == "name" || key == "value" || key == kConstraintsName || key == kSaveAsName) {
+          continue;
+        }
+
+        const errorStr = `Unknown key "${key}" in "${JSON.stringify(values)}"`;
+        throwError(test, errorStr);
+      }
+    }
+  });
+
+  let responseType = '';
+  if (test.isCommand) {
+    responseType = 'command';
+  } else if (test.isAttribute) {
+    responseType = 'attribute';
+  } else if (test.isEvent) {
+    responseType = 'event';
+  } else {
+    const errorStr = 'Unknown response type';
+    throwError(response, errorStr);
   }
 
-  if (hasResponseValueOrConstraints) {
-    const name             = test.isAttribute ? test.attribute : test.event;
-    const response         = test[kResponseName];
-    const responseValue    = hasResponseValue ? { value : response.value } : null;
-    const constraintsValue = hasResponseConstraints ? { constraints : response.constraints } : null;
+  const defaultName = test[responseType];
 
-    response.values.push({ name, saveAs : response.saveAs, ...responseValue, ...constraintsValue });
-  }
+  test[kResponseName].forEach(response => {
+    const hasResponseError = (kResponseErrorName in response);
 
-  delete test[kResponseName].value;
+    const defaultResponseError = 0;
+    setDefault(response, kResponseErrorName, defaultResponseError);
+    ensureValidError(response, kResponseErrorName);
+
+    const values = response[kValuesName];
+    values.forEach(expectedValue => {
+      const hasResponseValue       = 'value' in expectedValue;
+      const hasResponseConstraints = (kConstraintsName in expectedValue) && !!Object.keys(expectedValue.constraints).length;
+      const hasResponseSaveAs      = (kSaveAsName in expectedValue);
+
+      if (test.isWriteAttribute || (useSynthesizeWaitForReport && test.isSubscribe)) {
+        if (hasResponseValue || hasResponseConstraints) {
+          const errorStr = 'Test has a "value" or a "constraints" defined.';
+          throwError(test, errorStr);
+        }
+      }
+
+      if (test.isCommand && !('name' in expectedValue)) {
+        const errorStr = 'Test value does not have a named argument.\n' +
+            '\n' +
+            'Command should explicitly use the response argument name. Example: \n' +
+            '- label: "Send Test Specific Command"\n' +
+            '  command: "testSpecific"\n' +
+            '  response: \n' +
+            '    values: \n' +
+            '      - name: "returnValue"\n' +
+            '      - value: 7\n';
+        throwError(test, errorStr);
+      }
+
+      setDefault(expectedValue, 'name', defaultName);
+    });
+
+    test.expectMultipleResponses = test[kResponseName].length > 1;
+
+    setDefault(response, kCommandName, test.command);
+    setDefault(response, responseType, test[responseType]);
+    setDefault(response, kClusterName, test.cluster);
+    setDefault(response, 'optional', test.optional || false);
+    setDefault(response, 'async', test.async || false);
+    setDefaultType(response);
+  });
 }
 
 function setDefaults(test, defaultConfig, useSynthesizeWaitForReport)
@@ -496,6 +538,26 @@ function chip_tests_pics(options)
   return templateUtil.collectBlocks(PICS.getAll(), options, this);
 }
 
+async function configureTestItem(item)
+{
+  if (item.isCommand) {
+    let command               = await assertCommandOrAttributeOrEvent(item);
+    item.commandObject        = command;
+    item.hasSpecificArguments = true;
+    item.hasSpecificResponse  = command.hasSpecificResponse || false;
+  } else if (item.isAttribute) {
+    let attr                  = await assertCommandOrAttributeOrEvent(item);
+    item.attributeObject      = attr;
+    item.hasSpecificArguments = item.isWriteAttribute || false;
+    item.hasSpecificResponse  = item.isReadAttribute || item.isSubscribeAttribute || item.isWaitForReport || false;
+  } else if (item.isEvent) {
+    let evt                   = await assertCommandOrAttributeOrEvent(item);
+    item.eventObject          = evt;
+    item.hasSpecificArguments = false;
+    item.hasSpecificResponse  = true;
+  }
+}
+
 async function chip_tests(list, options)
 {
   // Set a global on our items so assertCommandOrAttributeOrEvent can work.
@@ -508,22 +570,12 @@ async function chip_tests(list, options)
   tests         = await Promise.all(tests.map(async function(test) {
     test.tests = await Promise.all(test.tests.map(async function(item) {
       item.global = global;
-      if (item.isCommand) {
-        let command               = await assertCommandOrAttributeOrEvent(item);
-        item.commandObject        = command;
-        item.hasSpecificArguments = true;
-        item.hasSpecificResponse  = command.hasSpecificResponse;
-      } else if (item.isAttribute) {
-        let attr                  = await assertCommandOrAttributeOrEvent(item);
-        item.attributeObject      = attr;
-        item.hasSpecificArguments = item.isWriteAttribute;
-        item.hasSpecificResponse  = item.isReadAttribute || item.isSubscribeAttribute || item.isWaitForReport;
-      } else if (item.isEvent) {
-        let evt                   = await assertCommandOrAttributeOrEvent(item);
-        item.eventObject          = evt;
-        item.hasSpecificArguments = false;
-        item.hasSpecificResponse  = true;
+      await configureTestItem(item);
+
+      if (kResponseName in item) {
+        await Promise.all(item[kResponseName].map(response => configureTestItem(response)));
       }
+
       return item;
     }));
 
@@ -708,9 +760,14 @@ function chip_tests_item_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function chip_tests_item_responses(options)
+{
+  return templateUtil.collectBlocks(this[kResponseName], options, this);
+}
+
 function chip_tests_item_response_parameters(options)
 {
-  const responseValues = this.response.values.slice();
+  const responseValues = this.values.slice();
 
   const promise = assertCommandOrAttributeOrEvent(this).then(item => {
     if (this.isWriteAttribute) {
@@ -831,6 +888,7 @@ exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_has_list            = chip_tests_item_has_list;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
+exports.chip_tests_item_responses           = chip_tests_item_responses;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;
 exports.chip_tests_config                   = chip_tests_config;

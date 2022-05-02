@@ -1,0 +1,99 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.3.1. [TC-OO-3.1] Attributes with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT reads all supported mandatory attributes from TH once at a time
+          in a manufacturer specific order"
+      verification: |
+          On TestHarnes (all-cluster-app) a received read of OnOff (id 0) looks like this:
+
+          [1646100811.596736][33190:33190] CHIP:IM: Received Read request
+          [1646100811.596807][33190:33190] CHIP:DMG: ReadRequestMessage =
+          [1646100811.596833][33190:33190] CHIP:DMG: {
+          [1646100811.596855][33190:33190] CHIP:DMG: 	AttributePathIBs =
+          [1646100811.596888][33190:33190] CHIP:DMG: 	[
+          [1646100811.596912][33190:33190] CHIP:DMG: 		AttributePathIB =
+          [1646100811.596955][33190:33190] CHIP:DMG: 		{
+          [1646100811.596985][33190:33190] CHIP:DMG: 			Endpoint = 0x1,
+          [1646100811.597019][33190:33190] CHIP:DMG: 			Cluster = 0x6,
+          [1646100811.597062][33190:33190] CHIP:DMG: 			Attribute = 0x0000_0000,
+          [1646100811.597094][33190:33190] CHIP:DMG: 		}
+          [1646100811.597169][33190:33190] CHIP:DMG:
+          [1646100811.597209][33190:33190] CHIP:DMG: 	],
+          [1646100811.597237][33190:33190] CHIP:DMG:
+          [1646100811.597272][33190:33190] CHIP:DMG: 	isFabricFiltered = false,
+          [1646100811.597297][33190:33190] CHIP:DMG: 	InteractionModelRevision = 1
+          [1646100811.597320][33190:33190] CHIP:DMG: },
+          [1646100811.597401][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1646100811.598115][33190:33190] CHIP:DMG: <RE:Run> Cluster 6, Attribute 0 is dirty
+          [1646100811.598165][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_0006 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1646100811.598196][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=v
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH once at a time in
+          a manufacturer specific order"
+      verification: |
+          see above
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          On TestHarnes (all-cluster-app) a received write request looks like this (f.e OnTime (id 16385) value 60):
+
+          [1646100983.669189][33190:33190] CHIP:IM: Received Write request
+          [1646100983.669246][33190:33190] CHIP:DMG: IM WH moving to [Initialized]
+          [1646100983.669312][33190:33190] CHIP:DMG: WriteRequestMessage =
+          [1646100983.669345][33190:33190] CHIP:DMG: {
+          [1646100983.669372][33190:33190] CHIP:DMG:         timedRequest = false,
+          [1646100983.669400][33190:33190] CHIP:DMG:         AttributeDataIBs =
+          [1646100983.669455][33190:33190] CHIP:DMG:         [
+          [1646100983.669483][33190:33190] CHIP:DMG:                 AttributeDataIB =
+          [1646100983.669527][33190:33190] CHIP:DMG:                 {
+          [1646100983.669560][33190:33190] CHIP:DMG:                         AttributePathIB =
+          [1646100983.669606][33190:33190] CHIP:DMG:                         {
+          [1646100983.669644][33190:33190] CHIP:DMG:                                 Endpoint = 0x1,
+          [1646100983.669694][33190:33190] CHIP:DMG:                                 Cluster = 0x6,
+          [1646100983.669741][33190:33190] CHIP:DMG:                                 Attribute = 0x0000_4001,
+          [1646100983.669777][33190:33190] CHIP:DMG:                         }
+          [1646100983.669824][33190:33190] CHIP:DMG:
+          [1646100983.669875][33190:33190] CHIP:DMG:                                 Data = 60,
+          [1646100983.669916][33190:33190] CHIP:DMG:                 },
+          [1646100983.669960][33190:33190] CHIP:DMG:
+          [1646100983.669987][33190:33190] CHIP:DMG:         ],
+          [1646100983.670031][33190:33190] CHIP:DMG:
+          [1646100983.670060][33190:33190] CHIP:DMG:         moreChunkedMessages = false,
+          [1646100983.670098][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646100983.670125][33190:33190] CHIP:DMG: },
+          [1646100983.670234][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1646100983.670301][33190:33190] CHIP:DMG: Endpoint 1, Cluster 0x0000_0006 update version to 6ba329dc
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          see above
+      disabled: true

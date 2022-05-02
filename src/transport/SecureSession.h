@@ -72,11 +72,11 @@ public:
 
     // TODO: This constructor should be private.  Tests should allocate a
     // kPending session and then call Activate(), just like non-test code does.
-    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
-                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId localNodeId, NodeId peerNodeId, CATValues peerCATs,
+                  uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
-        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
+        mLocalSessionId(localSessionId), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId), mPeerCATs(peerCATs),
+        mPeerSessionId(peerSessionId), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()),
         mLastPeerActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {
         SetFabricIndex(fabric);
@@ -89,7 +89,8 @@ public:
      *   receives a local session ID, but no other state.
      */
     SecureSession(uint16_t localSessionId) :
-        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex, GetLocalMRPConfig())
+        SecureSession(Type::kPending, localSessionId, kUndefinedNodeId, kUndefinedNodeId, CATValues{}, 0, kUndefinedFabricIndex,
+                      GetLocalMRPConfig())
     {}
 
     /**
@@ -98,15 +99,26 @@ public:
      *   PASE, setting internal state according to the parameters used and
      *   discovered during session establishment.
      */
-    void Activate(Type secureSessionType, const ScopedNodeId & peer, CATValues peerCATs, uint16_t peerSessionId,
-                  const ReliableMessageProtocolConfig & config)
+    void Activate(Type secureSessionType, const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs,
+                  uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
     {
+        VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
+
+        // PASE sessions must always start unassociated with a Fabric!
+        VerifyOrDie(!((secureSessionType == Type::kPASE) && (peerNode.GetFabricIndex() != kUndefinedFabricIndex)));
+        // CASE sessions must always start "associated" a given Fabric!
+        VerifyOrDie(!((secureSessionType == Type::kCASE) && (peerNode.GetFabricIndex() == kUndefinedFabricIndex)));
+        // CASE sessions can only be activated against operational node IDs!
+        VerifyOrDie(!((secureSessionType == Type::kCASE) &&
+                      (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
+
         mSecureSessionType = secureSessionType;
-        mPeerNodeId        = peer.GetNodeId();
+        mPeerNodeId        = peerNode.GetNodeId();
+        mLocalNodeId       = localNode.GetNodeId();
         mPeerCATs          = peerCATs;
         mPeerSessionId     = peerSessionId;
         mMRPConfig         = config;
-        SetFabricIndex(peer.GetFabricIndex());
+        SetFabricIndex(peerNode.GetFabricIndex());
     }
     ~SecureSession() override { NotifySessionReleased(); }
 
@@ -120,7 +132,10 @@ public:
     const char * GetSessionTypeString() const override { return "secure"; };
 #endif
 
-    ScopedNodeId GetPeer() const override;
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(mLocalNodeId, GetFabricIndex()); }
+
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
     bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
@@ -147,6 +162,8 @@ public:
     bool IsPASESession() const { return GetSecureSessionType() == Type::kPASE; }
     bool IsActiveSession() const { return GetSecureSessionType() != Type::kPending; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    NodeId GetLocalNodeId() const { return mLocalNodeId; }
+
     CATValues GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
@@ -187,13 +204,16 @@ public:
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
+    const CryptoContext & GetCryptoContext() const { return mCryptoContext; }
+
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
     Type mSecureSessionType;
+    const uint16_t mLocalSessionId;
+    NodeId mLocalNodeId;
     NodeId mPeerNodeId;
     CATValues mPeerCATs;
-    const uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
 
     PeerAddress mPeerAddress;

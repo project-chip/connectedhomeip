@@ -237,17 +237,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetHardwareVersionString(char * buf, size_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetNodeLabel(char * buf, size_t bufSize)
-{
-    size_t dateLen;
-    return ReadConfigValueStr(AndroidConfig::kConfigKey_NodeLabel, buf, bufSize, dateLen);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreNodeLabel(const char * buf, size_t bufSize)
-{
-    return WriteConfigValueStr(AndroidConfig::kConfigKey_NodeLabel, buf, bufSize);
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetPartNumber(char * buf, size_t bufSize)
 {
     size_t dateLen;
@@ -264,11 +253,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
 {
     size_t dateLen;
     return ReadConfigValueStr(AndroidConfig::kConfigKey_ProductLabel, buf, bufSize, dateLen);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetLocalConfigDisabled(bool & disabled)
-{
-    return ReadConfigValue(AndroidConfig::kConfigKey_LocalConfigDisabled, disabled);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)

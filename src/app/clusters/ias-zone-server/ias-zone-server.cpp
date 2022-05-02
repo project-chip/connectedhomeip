@@ -560,7 +560,7 @@ void emberAfIasZoneClusterServerInitCallback(EndpointId endpoint)
 #endif
 
     zoneType = (EmberAfIasZoneType) EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE;
-    emberAfWriteAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, (uint8_t *) &zoneType,
+    emberAfWriteAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) &zoneType,
                           ZCL_INT16U_ATTRIBUTE_TYPE);
 
     emberAfPluginIasZoneServerUpdateZoneStatus(endpoint,
@@ -590,10 +590,10 @@ uint8_t emberAfPluginIasZoneServerGetZoneId(EndpointId endpoint)
 //------------------------------------------------------------------------------
 static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
 {
-    if (!emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id, true) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id, true) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id, true) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, true))
+    if (!emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id))
     {
         return false;
     }

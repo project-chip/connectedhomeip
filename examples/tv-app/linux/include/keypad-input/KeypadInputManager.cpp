@@ -29,31 +29,31 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
     switch (keycCode)
     {
     case CecKeyCodeType::kUp:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kDown:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kLeft:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kRight:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kSelect:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kBackward:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kExit:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     case CecKeyCodeType::kRootMenu:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
     default:
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kUnsupportedKey;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kUnsupportedKey;
     }
 
     helper.Success(response);

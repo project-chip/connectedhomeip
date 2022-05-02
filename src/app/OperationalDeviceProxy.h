@@ -179,8 +179,6 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
-
     CHIP_ERROR ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }

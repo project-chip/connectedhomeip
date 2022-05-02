@@ -86,8 +86,8 @@ exit:
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
@@ -153,7 +153,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             if (cb != nullptr)
             {
-                cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, type, size, value);
+                cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, type, size, value);
             }
             ChipLogProgress(Zcl, "ZCL_IDENTIFY_TIME_ATTRIBUTE_ID value: %u ", *value);
         }

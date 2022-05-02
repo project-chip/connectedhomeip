@@ -27,7 +27,7 @@
  * varargs.
  */
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__clang__)
 #define ENFORCE_FORMAT(n, m) __attribute__((format(printf, n, m)))
 #else                        // __GNUC__
 #define ENFORCE_FORMAT(n, m) /* How to do with MSVC? */

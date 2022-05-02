@@ -20,6 +20,7 @@
  * OTA Requestor logic is contained in this class.
  */
 
+#include <app/clusters/basic/basic.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -733,7 +734,7 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(OperationalDeviceProxy & d
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
+    args.requestorCanConsent.SetValue(!Basic::IsLocalConfigDisabled() && mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
     if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)

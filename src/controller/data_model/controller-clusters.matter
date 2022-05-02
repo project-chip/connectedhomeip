@@ -163,7 +163,7 @@ client cluster ApplicationBasic = 1293 {
 }
 
 client cluster ApplicationLauncher = 1292 {
-  enum StatusEnum : ENUM8 {
+  enum ApplicationLauncherStatusEnum : ENUM8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -204,7 +204,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   response struct LauncherResponse = 3 {
-    StatusEnum status = 0;
+    ApplicationLauncherStatusEnum status = 0;
     OCTET_STRING data = 1;
   }
 
@@ -552,14 +552,14 @@ client cluster BridgedDeviceBasic = 57 {
 }
 
 client cluster Channel = 1284 {
-  enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
-  }
-
-  enum StatusEnum : ENUM8 {
+  enum ChannelStatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
+  }
+
+  enum LineupInfoTypeEnum : ENUM8 {
+    kMso = 0;
   }
 
   bitmap ChannelFeature : BITMAP32 {
@@ -604,7 +604,7 @@ client cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse = 1 {
-    StatusEnum status = 0;
+    ChannelStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -910,6 +910,12 @@ client cluster ColorControl = 768 {
 }
 
 client cluster ContentLauncher = 1290 {
+  enum ContentLaunchStatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   enum MetricTypeEnum : ENUM8 {
     kPixels = 0;
     kPercentage = 1;
@@ -929,12 +935,6 @@ client cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
-  }
-
-  enum StatusEnum : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -1003,7 +1003,7 @@ client cluster ContentLauncher = 1290 {
   }
 
   response struct LaunchResponse = 2 {
-    StatusEnum status = 0;
+    ContentLaunchStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -2218,7 +2218,7 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum KeypadInputStatusEnum : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -2240,7 +2240,7 @@ client cluster KeypadInput = 1289 {
   }
 
   response struct SendKeyResponse = 1 {
-    StatusEnum status = 0;
+    KeypadInputStatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2403,20 +2403,20 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster MediaPlayback = 1286 {
-  enum PlaybackStateEnum : ENUM8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
-  }
-
-  enum StatusEnum : ENUM8 {
+  enum MediaPlaybackStatusEnum : ENUM8 {
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
     kNotActive = 3;
     kSpeedOutOfRange = 4;
     kSeekOutOfRange = 5;
+  }
+
+  enum PlaybackStateEnum : ENUM8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
   }
 
   struct PlaybackPosition {
@@ -2449,7 +2449,7 @@ client cluster MediaPlayback = 1286 {
   }
 
   response struct PlaybackResponse = 10 {
-    StatusEnum status = 0;
+    MediaPlaybackStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -3173,9 +3173,9 @@ client cluster PumpConfigurationAndControl = 512 {
 }
 
 client cluster RelativeHumidityMeasurement = 1029 {
-  readonly attribute int16u measuredValue = 0;
-  readonly attribute int16u minMeasuredValue = 1;
-  readonly attribute int16u maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3358,7 +3358,7 @@ client cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -3382,7 +3382,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   response struct NavigateTargetResponse = 1 {
-    StatusEnum status = 0;
+    TargetNavigatorStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 

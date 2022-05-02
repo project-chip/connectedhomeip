@@ -20,6 +20,8 @@
 #import <CHIP/CHIPDeviceController.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
+#include <map>
+#include <string>
 
 #pragma once
 
@@ -71,7 +73,12 @@ private:
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();
-    CHIPDeviceController * mController;
+
+    // Our three controllers: alpha, beta, gamma.
+    std::map<std::string, CHIPDeviceController *> mControllers;
+
+    // The current controller; the one the current command should be using.
+    CHIPDeviceController * mCurrentController;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;

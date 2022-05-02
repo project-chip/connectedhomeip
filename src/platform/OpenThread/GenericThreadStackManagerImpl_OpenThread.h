@@ -101,9 +101,9 @@ protected:
     void _UpdateNetworkStatus();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
 #endif
 
     bool _HaveMeshConnectivity(void);
@@ -157,9 +157,9 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    ConnectivityManager::SEDPollingConfig mPollingConfig;
-    ConnectivityManager::SEDPollingMode mPollingMode = ConnectivityManager::SEDPollingMode::Idle;
-    uint32_t mFastPollingConsumers                   = 0;
+    ConnectivityManager::SEDIntervalsConfig mIntervalsConfig;
+    ConnectivityManager::SEDIntervalMode mIntervalsMode = ConnectivityManager::SEDIntervalMode::Idle;
+    uint32_t mActiveModeConsumers                       = 0;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -271,7 +271,7 @@ private:
     void OnJoinerComplete(otError aError);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR SetSEDPollingMode(ConnectivityManager::SEDPollingMode pollingType);
+    CHIP_ERROR SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType);
 #endif
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }

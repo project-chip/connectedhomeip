@@ -205,12 +205,11 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoin
                                         const EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
-void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);
+void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     uint8_t clientServerMask, EmberAfAttributeType attributeType, uint16_t size,
-                                                     uint8_t * value);
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 // Calls the default response callback for a specific cluster.
 // with the EMBER_NULL_MANUFACTURER_CODE
