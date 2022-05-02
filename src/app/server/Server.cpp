@@ -112,6 +112,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.aclStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
@@ -134,7 +135,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
-    SuccessOrExit(err = mAclStorage.Init(*mDeviceStorage, mFabrics));
+
+    mAclStorage = initParams.aclStorage;
+    SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);

@@ -46,6 +46,8 @@ static_library("server") {
     "Dnssd.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
+    "ExampleAclStorage.cpp",
+    "ExampleAclStorage.h",
     "OnboardingCodesUtil.cpp",
     "OnboardingCodesUtil.h",
     "Server.cpp",
