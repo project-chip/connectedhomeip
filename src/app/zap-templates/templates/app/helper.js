@@ -28,6 +28,7 @@ const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+const TestHelper      = require('../../common/ClusterTestGeneration.js');
 
 zclHelper['isEvent'] = function(db, event_name, packageId) {
     return queryEvents
@@ -399,6 +400,20 @@ async function asTypedExpression(value, type)
   if (tokens.length < 2) {
     return asTypedLiteral.call(this, value, type);
   }
+
+  value = tokens
+              .map(token => {
+                if (!TestHelper.chip_tests_variables_has.call(this, token)) {
+                  return token;
+                }
+
+                if (!TestHelper.chip_tests_variables_is_nullable.call(this, token)) {
+                  return token;
+                }
+
+                return `${token}.Value()`;
+              })
+              .join(' ');
 
   const resultType = await asNativeType.call(this, type);
   return `static_cast<${resultType}>(${value})`;
