@@ -21,7 +21,7 @@
 
 #include "trace/MatterCustomTrace.h"
 
-#else  // MATTER_CUSTOM_TRACE
+#else // MATTER_CUSTOM_TRACE
 
 #if defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
 
