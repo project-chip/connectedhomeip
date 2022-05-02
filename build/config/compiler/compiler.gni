@@ -48,6 +48,6 @@ declare_args() {
   # enable libfuzzer
   is_libfuzzer = false
 
-  # Passes `--coverage` flag to clang when enabled.
+  # Generate code coverage analysis artifacts when enabled.
   use_coverage = false
 }
