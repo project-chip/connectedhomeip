@@ -120,6 +120,7 @@ union SockAddr
  * @details
  *  The CHIP Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
+ *
  */
 class DLL_EXPORT IPAddress
 {
@@ -323,15 +324,6 @@ public:
      * @retval false Otherwise
      */
     bool operator!=(const IPAddress & other) const;
-
-    /**
-     * @brief   Conventional assignment operator.
-     *
-     * @param[in]   other   The address to copy.
-     *
-     * @return  A reference to this object.
-     */
-    IPAddress & operator=(const IPAddress & other);
 
     /**
      * @brief   Emit the IP address in conventional text presentation format.
@@ -666,6 +658,8 @@ public:
      */
     static IPAddress Any;
 };
+
+static_assert(std::is_trivial<IPAddress>::value, "IPAddress is not trivial");
 
 } // namespace Inet
 } // namespace chip

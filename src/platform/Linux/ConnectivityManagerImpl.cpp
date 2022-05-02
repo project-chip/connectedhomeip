@@ -1184,10 +1184,12 @@ void ConnectivityManagerImpl::PostNetworkConnect()
                 event.Type                            = DeviceEventType::kInternetConnectivityChange;
                 event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                 event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-                addr.ToString(event.InternetConnectivityChange.address);
+                event.InternetConnectivityChange.ipAddress = addr;
 
-                ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
-                              event.InternetConnectivityChange.address);
+                char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+                addr.ToString(ipStrBuf);
+
+                ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName, ipStrBuf);
 
                 PlatformMgr().PostEventOrDie(&event);
             }

@@ -212,7 +212,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     static bool isOTAInitialized = false;
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
-        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+        ESP_LOGI(TAG, "IPv4 Server ready...");
         wifiLED.Set(true);
         chip::app::DnssdServer::Instance().StartServer();
 

@@ -442,6 +442,7 @@ void WiFiDriverImpl::OnNetworkConnected()
             event.Type                            = DeviceEventType::kInternetConnectivityChange;
             event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
             event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+            event.InternetConnectivityChange.ipAddress = mIp4Address;
             ConnectivityMgrImpl().PostEvent(&event, true);
             ChipLogError(DeviceLayer, "Unexpected loss of Ip4 address");
         }
@@ -454,6 +455,7 @@ void WiFiDriverImpl::OnNetworkConnected()
             event.Type                            = DeviceEventType::kInternetConnectivityChange;
             event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
             event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+            event.InternetConnectivityChange.ipAddress = mIp6Address;
             ConnectivityMgrImpl().PostEvent(&event, true);
             ChipLogError(DeviceLayer, "Unexpected loss of Ip6 address");
         }
@@ -470,6 +472,7 @@ void WiFiDriverImpl::OnNetworkConnected()
                 event.Type                            = DeviceEventType::kInternetConnectivityChange;
                 event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                 event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                event.InternetConnectivityChange.ipAddress = mIp4Address;
                 ConnectivityMgrImpl().PostEvent(&event, true);
                 ChipLogProgress(DeviceLayer, "New Ip4 address set: %s", address.get_ip_address());
             }
@@ -485,6 +488,7 @@ void WiFiDriverImpl::OnNetworkConnected()
                     event.Type                            = DeviceEventType::kInternetConnectivityChange;
                     event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
                     event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+                    event.InternetConnectivityChange.ipAddress = mIp6Address;
                     ConnectivityMgrImpl().PostEvent(&event, true);
                     ChipLogError(DeviceLayer, "Unexpected loss of Ip6 address");
                 }
@@ -498,6 +502,7 @@ void WiFiDriverImpl::OnNetworkConnected()
                     event.Type                            = DeviceEventType::kInternetConnectivityChange;
                     event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
                     event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+                    event.InternetConnectivityChange.ipAddress = mIp6Address;
                     ConnectivityMgrImpl().PostEvent(&event, true);
                     ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
                 }
@@ -512,6 +517,7 @@ void WiFiDriverImpl::OnNetworkConnected()
                 event.Type                            = DeviceEventType::kInternetConnectivityChange;
                 event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
                 event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+                event.InternetConnectivityChange.ipAddress = mIp6Address;
                 ConnectivityMgrImpl().PostEvent(&event, true);
                 ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
             }
@@ -537,6 +543,7 @@ void WiFiDriverImpl::OnNetworkDisconnected()
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+        event.InternetConnectivityChange.ipAddress = mIp4Address;
         ConnectivityMgrImpl().PostEvent(&event, true);
         ChipLogError(DeviceLayer, "Loss of Ip4 address");
     }
@@ -549,6 +556,7 @@ void WiFiDriverImpl::OnNetworkDisconnected()
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
         event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+        event.InternetConnectivityChange.ipAddress = mIp6Address;
         ConnectivityMgrImpl().PostEvent(&event, true);
         ChipLogError(DeviceLayer, "Loss of Ip6 address");
     }
