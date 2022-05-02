@@ -1472,7 +1472,8 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
     else
     {
-        // TODO: We should propogate detailed error information (commissioningError, networkCommissioningStatus) from completionStatus.
+        // TODO: We should propogate detailed error information (commissioningError, networkCommissioningStatus) from
+        // completionStatus.
         mPairingDelegate->OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(kError),
                                                  completionStatus.attestationResult);
     }
@@ -1764,8 +1765,7 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u",
-                    to_underlying(data.networkingStatus));
+    ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u", to_underlying(data.networkingStatus));
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
@@ -1781,8 +1781,7 @@ void DeviceCommissioner::OnConnectNetworkResponse(
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received ConnectNetwork response, networkingStatus=%u",
-                    to_underlying(data.networkingStatus));
+    ChipLogProgress(Controller, "Received ConnectNetwork response, networkingStatus=%u", to_underlying(data.networkingStatus));
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
