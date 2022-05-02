@@ -48,6 +48,6 @@ declare_args() {
   # enable libfuzzer
   is_libfuzzer = false
 
-  # initialize gn argument: use_coverage
+  # Passes `--coverage` flag to clang when enabled.
   use_coverage = false
 }

@@ -63,9 +63,6 @@ while (($#)); do
     shift
 done
 
-# Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\""
-
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 

@@ -271,8 +271,6 @@ def HostTargets():
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
-    builder.AppendVariant(name="coverage", requires=[
-                          "clang"], use_coverage=True),
     builder.AppendVariant(name="clang", use_clang=True),
     builder.AppendVariant(name="test", extra_tests=True),
 
