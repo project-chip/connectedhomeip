@@ -18,7 +18,7 @@
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
-
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters}}
 @implementation CHIP{{asUpperCamelCase name}}
 
@@ -40,7 +40,6 @@ using namespace chip::app::Clusters;
     chip::Optional<uint16_t> timedInvokeTimeoutMs;
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     if (params != nil) {
       if (params.timedInvokeTimeoutMs != nil) {
         timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
@@ -83,7 +82,6 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
     });
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 {{/chip_cluster_commands}}
 
@@ -97,7 +95,6 @@ using namespace chip::app::Clusters;
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     new CHIP{{>attribute_data_callback_name}}CallbackBridge(self.callbackQueue,
       {{! This treats completionHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
@@ -112,7 +109,6 @@ using namespace chip::app::Clusters;
           {{~/if_is_fabric_scoped_struct~}}
           );
       });
-      // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 {{#if isWritableAttribute}}
@@ -124,9 +120,8 @@ using namespace chip::app::Clusters;
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(CHIPWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
 {
     chip::Optional<uint16_t> timedWriteTimeoutMs;
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-    if (params!=nil) {
-      if (params.timedWriteTimeoutMs!=nil){
+    if (params != nil) {
+      if (params.timedWriteTimeoutMs != nil){
         timedWriteTimeoutMs.SetValue(params.timedWriteTimeoutMs.unsignedShortValue);
       }
     }
@@ -152,7 +147,7 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeoutMs);
     });
-    // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
+    
 }
 
 {{/if}}
@@ -161,7 +156,6 @@ using namespace chip::app::Clusters;
        params:(CHIPSubscribeParams * _Nullable)params
 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     new CHIP{{>attribute_data_callback_name}}CallbackSubscriptionBridge(self.callbackQueue,
       {{! This treats reportHandler as taking an id for the data.  This is
           not great from a type-safety perspective, of course. }}
@@ -179,12 +173,10 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
               params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]
           );
       }, subscriptionEstablishedHandler);
-      // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 + (void) read{{>attribute}}WithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
     new CHIP{{>attribute_data_callback_name}}CallbackBridge(queue,
       completionHandler,
       ^(Cancelable * success, Cancelable * failure) {
@@ -205,7 +197,6 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
           }
           return CHIP_ERROR_NOT_FOUND;
       });
-      // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 {{/if}}
@@ -214,4 +205,5 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 @end
 
 {{/chip_client_clusters}}
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
 {{/if}}
