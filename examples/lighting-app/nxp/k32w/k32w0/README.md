@@ -191,7 +191,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ 
         Exactly the same steps as above but set chip_with_se05x=1 in the gn command
         and add arguments chip_pw_tokenizer_logging=true chip_enable_ota_requestor=false
 
-Note that options chip_pw_tokenizer_logging=true and chip_enable_ota_requestor=false are required for building with Secure Element.
+Note that options chip_pw_tokenizer_logging=true and
+chip_enable_ota_requestor=false are required for building with Secure Element.
 These can be changed if building without Secure Element
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
