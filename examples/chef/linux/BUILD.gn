@@ -12,38 +12,92 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
-import("sample.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+import("sample.gni")
 
 project_dir = "./.."
 
 chip_data_model("chef-data-model") {
   zap_file = "${project_dir}/devices/${sample_zap_file}"
-
   zap_pregenerated_dir =
       "${chip_root}/examples/chef/out/${sample_name}/zap-generated/"
   is_server = true
 }
 
 executable("${sample_name}") {
-  sources = [ "${project_dir}/linux/main.cpp" ]
+  sources = [
+    "${project_dir}/common/stubs.cpp",
+    "${project_dir}/linux/main.cpp",
+  ]
 
   deps = [
     ":chef-data-model",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/controller",
     "${chip_root}/src/credentials",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/platform",
     "${project_dir}/shell_common:shell_common",
   ]
 
-  cflags = [ "-Wconversion" ]
+  include_dirs = [ "include" ]
+
+  if (chip_enable_pw_rpc) {
+    defines = [
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/platform/linux/Rpc.cpp",
+      "${dir_pigweed}/targets/host/system_rpc_server.cc",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:pw_rpc",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_log",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_sync:mutex",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:rpc_services",
+    ]
+
+    deps += pw_build_LINK_DEPS
+  } else {
+    # The system_rpc_server.cc file is in pigweed and doesn't compile with
+    # -Wconversion, remove check for RPC build only.
+    cflags = [ "-Wconversion" ]
+  }
 
   output_dir = root_out_dir
 }
@@ -52,4 +106,6 @@ group("chef") {
   deps = [ ":${sample_name}" ]
 }
 
-import("//build_overrides/chip.gni")
+group("default") {
+  deps = [ ":chef" ]
+}
