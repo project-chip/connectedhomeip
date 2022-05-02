@@ -112,11 +112,11 @@ using namespace System::Clock::Literals;
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    SessionManager sessionManager;
 
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
     PASESession pairing;
-    SessionManager sessionManager;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kPASE);
 
@@ -152,11 +152,11 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    SessionManager sessionManager;
 
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
     PASESession pairing;
-    SessionManager sessionManager;
 
     gLoopback.Reset();
 
@@ -193,7 +193,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
+void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
+                                      PASESession & pairingCommissioner,
                                       Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,
                                       Optional<ReliableMessageProtocolConfig> mrpAccessoryConfig,
                                       TestSecurePairingDelegate & delegateCommissioner)
@@ -202,7 +203,6 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
 
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
-    SessionManager sessionManager;
 
     PASETestLoopbackTransportDelegate delegate;
     gLoopback.SetLoopbackTransportDelegate(&delegate);
@@ -279,53 +279,61 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
 
 void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
+    SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
     gLoopback.Reset();
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithCommissionerMRPTest(nlTestSuite * inSuite, void * inContext)
 {
+    SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
     gLoopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner,
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(config),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inContext)
 {
+    SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
     gLoopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Value(config), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithAllMRPTest(nlTestSuite * inSuite, void * inContext)
 {
+    SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
     gLoopback.Reset();
     ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32);
     ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32);
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner,
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Value(commissionerConfig),
                                      Optional<ReliableMessageProtocolConfig>::Value(deviceConfig), delegateCommissioner);
 }
 
 void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inContext)
 {
+    SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
     gLoopback.Reset();
     gLoopback.mNumMessagesToDrop = 2;
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, Optional<ReliableMessageProtocolConfig>::Missing(),
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
+                                     Optional<ReliableMessageProtocolConfig>::Missing(),
                                      Optional<ReliableMessageProtocolConfig>::Missing(), delegateCommissioner);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
@@ -334,14 +342,13 @@ void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inCo
 void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    SessionManager sessionManager;
 
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
 
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
-
-    SessionManager sessionManager;
 
     gLoopback.Reset();
     gLoopback.mSentMessageCount = 0;
