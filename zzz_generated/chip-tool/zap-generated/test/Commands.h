@@ -39326,7 +39326,7 @@ private:
             LogStep(295, "Write attribute NULLABLE_INT64S Invalid Value");
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
-            value.Value() = -9223372036854775807LL - 1;
+            value.Value() = static_cast<int64_t>(-9223372036854775807LL - 1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id,
                                   value);
         }
@@ -41222,7 +41222,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, eventNumber + 1));
+                VerifyOrReturn(CheckValue("value", value.value, static_cast<uint64_t>(eventNumber + 1)));
             }
             break;
         case 6:
@@ -41290,7 +41290,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, eventNumber + 2));
+                VerifyOrReturn(CheckValue("value", value.value, static_cast<uint64_t>(eventNumber + 2)));
             }
             break;
         case 9:
@@ -49515,7 +49515,7 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("weekDayIndex", value.weekDayIndex, 1));
 
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)));
 
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
@@ -49606,7 +49606,7 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1));
 
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)));
 
                 VerifyOrReturn(CheckValue("status", value.status, 133));
             }
@@ -50175,7 +50175,7 @@ private:
             LogStep(8, "Create Week Day schedule with out-of-bounds user index");
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
-            value.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             value.daysMask     = static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlDaysMaskMap>>(1);
             value.startHour    = 15;
             value.startMinute  = 16;
@@ -50335,7 +50335,7 @@ private:
             LogStep(23, "Get Week Day schedule with out-of-bounds user index");
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
-            value.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value);
         }
         case 24: {
@@ -50376,7 +50376,7 @@ private:
             LogStep(28, "Create Year Day schedule with out-of-bounds user index");
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
-            value.userIndex      = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+            value.userIndex      = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             value.localStartTime = 12345UL;
             value.localEndTime   = 12345689UL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value);
@@ -50431,7 +50431,7 @@ private:
             LogStep(35, "Get Year Day schedule with out-of-bounds user index");
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
-            value.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value);
         }
         case 36: {
@@ -50501,7 +50501,7 @@ private:
             LogStep(44, "Clear Week Day schedule with out-of-bounds user index");
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
-            value.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value);
         }
         case 45: {
@@ -50536,7 +50536,7 @@ private:
             LogStep(49, "Clear Year Day schedule with out-of-bounds user index");
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 1;
-            value.userIndex    = static_cast<uint8_t>(NumberOfTotalUsersSupported + 1);
+            value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value);
         }
         case 50: {
