@@ -44,6 +44,9 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(chip::DeviceLayer::SystemLayer());
+#endif
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
     mThreadStackLock = xSemaphoreCreateMutexStatic(&mThreadStackLockMutex);
 #else
@@ -55,7 +58,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
         ChipLogError(DeviceLayer, "Failed to create Thread stack lock");
         ExitNow(err = CHIP_ERROR_NO_MEMORY);
     }
-
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+    lSystemLayer.RegisterLock(chip::System::Layer::TaskLocks_e::THREAD_TASK, &mThreadStackLock);
+#endif
     mThreadTask = NULL;
 
 exit:

@@ -47,6 +47,13 @@
 
 #include <utility>
 
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
+#include "timers.h"
+#endif
+
 namespace chip {
 namespace System {
 
@@ -166,6 +173,16 @@ public:
         return ScheduleLambdaBridge(std::move(bridge));
     }
 
+    typedef enum
+    {
+        APP_TASK = 0,
+        THREAD_TASK,
+        CHIP_TASK,
+        TASK_UNDEFINED
+    } TaskLocks_e;
+    virtual CHIP_ERROR LockTask(TaskLocks_e task) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR UnlockTask(TaskLocks_e task) { return CHIP_NO_ERROR; }
+
 private:
     // Copy and assignment NOT DEFINED
     Layer(const Layer &) = delete;
@@ -176,6 +193,17 @@ private:
 
 class LayerFreeRTOS : public Layer
 {
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+public:
+    CHIP_ERROR RegisterLock(TaskLocks_e task, SemaphoreHandle_t * handle);
+    CHIP_ERROR DeregisterLock(TaskLocks_e task);
+
+    CHIP_ERROR LockTask(TaskLocks_e task) override;
+    CHIP_ERROR UnlockTask(TaskLocks_e task) override;
+
+private:
+    SemaphoreHandle_t * mRegisteredLocks[TASK_UNDEFINED] = { nullptr };
+#endif
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

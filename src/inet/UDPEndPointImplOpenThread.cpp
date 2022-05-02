@@ -24,7 +24,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
-
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -50,8 +49,8 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
         return;
     }
 
-    pktInfo.SrcAddress  = chip::DeviceLayer::Internal::ToIPAddress(aMessageInfo->mPeerAddr);
-    pktInfo.DestAddress = chip::DeviceLayer::Internal::ToIPAddress(aMessageInfo->mSockAddr);
+    pktInfo.SrcAddress  = IPAddress::FromOtAddr(aMessageInfo->mPeerAddr);
+    pktInfo.DestAddress = IPAddress::FromOtAddr(aMessageInfo->mSockAddr);
     pktInfo.SrcPort     = aMessageInfo->mPeerPort;
     pktInfo.DestPort    = aMessageInfo->mSockPort;
 
@@ -103,15 +102,18 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
     (void) interface;
     otError err = OT_ERROR_NONE;
     otSockAddr listenSockAddr;
+    GetSystemLayer().LockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
 
     memset(&socket, 0, sizeof(socket));
     memset(&listenSockAddr, 0, sizeof(listenSockAddr));
 
     listenSockAddr.mPort    = port;
-    listenSockAddr.mAddress = chip::DeviceLayer::Internal::ToOpenThreadIP6Address(address);
+    listenSockAddr.mAddress = address.ToIPv6();
 
     otUdpOpen(mOTInstance, &socket, handleUdpReceive, this);
     otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD);
+
+    GetSystemLayer().UnlockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
 
     return chip::DeviceLayer::Internal::MapOpenThreadError(err);
 }
@@ -198,13 +200,15 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
     otMessage * message;
     otMessageInfo messageInfo;
 
+    GetSystemLayer().LockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
+
     // For now the entire message must fit within a single buffer.
     VerifyOrReturnError(!msg->HasChainedBuffer(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
     memset(&messageInfo, 0, sizeof(messageInfo));
 
-    messageInfo.mSockAddr = chip::DeviceLayer::Internal::ToOpenThreadIP6Address(aPktInfo->SrcAddress);
-    messageInfo.mPeerAddr = chip::DeviceLayer::Internal::ToOpenThreadIP6Address(aPktInfo->DestAddress);
+    messageInfo.mSockAddr = aPktInfo->SrcAddress.ToIPv6();
+    messageInfo.mPeerAddr = aPktInfo->DestAddress.ToIPv6();
     messageInfo.mPeerPort = aPktInfo->DestPort;
 
     message = otUdpNewMessage(mOTInstance, NULL);
@@ -223,15 +227,19 @@ exit:
         otMessageFree(message);
     }
 
+    GetSystemLayer().UnlockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
+
     return chip::DeviceLayer::Internal::MapOpenThreadError(error);
 }
 
 void UDPEndPointImplOT::CloseImpl()
 {
+    GetSystemLayer().LockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
     if (otUdpIsOpen(mOTInstance, &mSocket))
     {
         otUdpClose(mOTInstance, &mSocket);
     }
+    GetSystemLayer().UnlockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
 }
 
 void UDPEndPointImplOT::Free()
@@ -242,16 +250,22 @@ void UDPEndPointImplOT::Free()
 
 CHIP_ERROR UDPEndPointImplOT::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
-    const otIp6Address otAddress = chip::DeviceLayer::Internal::ToOpenThreadIP6Address(aAddress);
+    GetSystemLayer().LockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
+    const otIp6Address otAddress = aAddress.ToIPv6();
+    otError err;
 
     if (join)
     {
-        return chip::DeviceLayer::Internal::MapOpenThreadError(otIp6SubscribeMulticastAddress(mOTInstance, &otAddress));
+        err = otIp6SubscribeMulticastAddress(mOTInstance, &otAddress);
     }
     else
     {
-        return chip::DeviceLayer::Internal::MapOpenThreadError(otIp6UnsubscribeMulticastAddress(mOTInstance, &otAddress));
+        err = otIp6UnsubscribeMulticastAddress(mOTInstance, &otAddress);
     }
+
+    GetSystemLayer().UnlockTask(chip::System::Layer::TaskLocks_e::THREAD_TASK);
+
+    return chip::DeviceLayer::Internal::MapOpenThreadError(err);
 }
 
 IPPacketInfo * UDPEndPointImplOT::GetPacketInfo(const System::PacketBufferHandle & aBuffer)

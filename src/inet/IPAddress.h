@@ -556,7 +556,7 @@ public:
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     otIp6Address ToIPv6() const;
-    static IPAddress FromOtAddr(otIp6Address & address);
+    static IPAddress FromOtAddr(const otIp6Address & address);
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
     /**

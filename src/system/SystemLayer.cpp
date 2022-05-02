@@ -31,5 +31,54 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
     return lReturn;
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+
+CHIP_ERROR LayerFreeRTOS::RegisterLock(TaskLocks_e task, SemaphoreHandle_t * handle)
+{
+    if (handle == nullptr || task >= TASK_UNDEFINED)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (mRegisteredLocks[task] != nullptr)
+    {
+        // Already registered ??
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    mRegisteredLocks[task] = handle;
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LayerFreeRTOS::DeregisterLock(TaskLocks_e task)
+{
+    if (task >= TASK_UNDEFINED)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    mRegisteredLocks[task] = nullptr;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR LayerFreeRTOS::LockTask(TaskLocks_e task)
+{
+    if (task < TASK_UNDEFINED && mRegisteredLocks[task] != nullptr)
+    {
+        xSemaphoreTake(*mRegisteredLocks[task], portMAX_DELAY);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+CHIP_ERROR LayerFreeRTOS::UnlockTask(TaskLocks_e task)
+{
+    if (task < TASK_UNDEFINED && mRegisteredLocks[task] != nullptr)
+    {
+        xSemaphoreGive(*mRegisteredLocks[task]);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+#endif
 } // namespace System
 } // namespace chip
