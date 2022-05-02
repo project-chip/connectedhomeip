@@ -8159,7 +8159,7 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHue attribute from DUT.\n");
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHue attribute from DUT\n");
             err = TestReadsCurrentHueAttributeFromDut_3();
             break;
         case 4:
@@ -8167,24 +8167,132 @@ public:
             err = TestMoveToHueShortestDistanceCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Move to hue longest distance command\n");
-            err = TestMoveToHueLongestDistanceCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 290ms\n");
+            err = TestWait290ms_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Move to hue up command\n");
-            err = TestMoveToHueUpCommand_6();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 6 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Move to hue down command\n");
-            err = TestMoveToHueDownCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 295ms\n");
+            err = TestWait295ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_8();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 8 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 300ms\n");
+            err = TestWait300ms_9();
+            break;
+        case 10:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 10 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Move to hue longest distance command\n");
+            err = TestMoveToHueLongestDistanceCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 290ms\n");
+            err = TestWait290ms_12();
+            break;
+        case 13:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 13 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 295ms\n");
+            err = TestWait295ms_14();
+            break;
+        case 15:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 15 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 300ms\n");
+            err = TestWait300ms_16();
+            break;
+        case 17:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 17 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Move to hue up command\n");
+            err = TestMoveToHueUpCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Wait 290ms\n");
+            err = TestWait290ms_19();
+            break;
+        case 20:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 20 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Wait 295ms\n");
+            err = TestWait295ms_21();
+            break;
+        case 22:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 22 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait 300ms\n");
+            err = TestWait300ms_23();
+            break;
+        case 24:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 24 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Move to hue down command\n");
+            err = TestMoveToHueDownCommand_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Wait 290ms\n");
+            err = TestWait290ms_26();
+            break;
+        case 27:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 27 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Wait 295ms\n");
+            err = TestWait295ms_28();
+            break;
+        case 29:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 29 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Wait 300ms\n");
+            err = TestWait300ms_30();
+            break;
+        case 31:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 31 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_33();
             break;
         }
 
@@ -8227,6 +8335,78 @@ public:
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -8240,7 +8420,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 34;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -8303,7 +8483,7 @@ private:
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-            NSLog(@"Reads CurrentHue attribute from DUT. Error: %@", err);
+            NSLog(@"Reads CurrentHue attribute from DUT Error: %@", err);
 
             VerifyOrReturn(CheckValue("status", err, 0));
 
@@ -8346,7 +8526,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToHueLongestDistanceCommand_5()
+    CHIP_ERROR TestWait290ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToHueLongestDistanceCommand_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8371,7 +8650,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToHueUpCommand_6()
+    CHIP_ERROR TestWait290ms_12()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_13()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_14()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_15()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_16()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_17()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToHueUpCommand_18()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8396,7 +8774,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToHueDownCommand_7()
+    CHIP_ERROR TestWait290ms_19()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_20()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_21()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_22()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_23()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_24()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToHueDownCommand_25()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8421,7 +8898,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_8()
+    CHIP_ERROR TestWait290ms_26()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_27()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_28()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_29()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_30()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_31()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_32()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8439,7 +9015,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_9()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_33()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8514,28 +9090,140 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move hue up command\n");
-            err = TestMoveHueUpCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHue attribute from DUT\n");
+            err = TestReadsCurrentHueAttributeFromDut_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Move hue stop command\n");
-            err = TestMoveHueStopCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Move hue up command\n");
+            err = TestMoveHueUpCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Move hue down command\n");
-            err = TestMoveHueDownCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 140ms\n");
+            err = TestWait140ms_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Move hue stop command\n");
-            err = TestMoveHueStopCommand_6();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 6 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 145ms\n");
+            err = TestWait145ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 8 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 150ms\n");
+            err = TestWait150ms_9();
+            break;
+        case 10:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 10 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Move hue stop command\n");
+            err = TestMoveHueStopCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 140ms\n");
+            err = TestWait140ms_12();
+            break;
+        case 13:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 13 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 145ms\n");
+            err = TestWait145ms_14();
+            break;
+        case 15:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 15 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 150ms\n");
+            err = TestWait150ms_16();
+            break;
+        case 17:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 17 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Move hue down command\n");
+            err = TestMoveHueDownCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Wait 140ms\n");
+            err = TestWait140ms_19();
+            break;
+        case 20:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 20 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Wait 145ms\n");
+            err = TestWait145ms_21();
+            break;
+        case 22:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 22 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait 150ms\n");
+            err = TestWait150ms_23();
+            break;
+        case 24:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 24 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Move hue stop command\n");
+            err = TestMoveHueStopCommand_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Wait 140ms\n");
+            err = TestWait140ms_26();
+            break;
+        case 27:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 27 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Wait 145ms\n");
+            err = TestWait145ms_28();
+            break;
+        case 29:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 29 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Wait 150ms\n");
+            err = TestWait150ms_30();
+            break;
+        case 31:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 31 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_33();
             break;
         }
 
@@ -8575,6 +9263,81 @@ public:
         case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -8588,7 +9351,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 34;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -8643,7 +9406,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveHueUpCommand_3()
+    CHIP_ERROR TestReadsCurrentHueAttributeFromDut_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads CurrentHue attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveHueUpCommand_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8667,7 +9456,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveHueStopCommand_4()
+    CHIP_ERROR TestWait140ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(140);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait145ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(145);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait150ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(150);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveHueStopCommand_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8691,7 +9579,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveHueDownCommand_5()
+    CHIP_ERROR TestWait140ms_12()
+    {
+        SetIdentity("alpha");
+        WaitForMs(140);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_13()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait145ms_14()
+    {
+        SetIdentity("alpha");
+        WaitForMs(145);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_15()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait150ms_16()
+    {
+        SetIdentity("alpha");
+        WaitForMs(150);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_17()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveHueDownCommand_18()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8715,7 +9702,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveHueStopCommand_6()
+    CHIP_ERROR TestWait140ms_19()
+    {
+        SetIdentity("alpha");
+        WaitForMs(140);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_20()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait145ms_21()
+    {
+        SetIdentity("alpha");
+        WaitForMs(145);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_22()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait150ms_23()
+    {
+        SetIdentity("alpha");
+        WaitForMs(150);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_24()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveHueStopCommand_25()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8739,7 +9825,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
+    CHIP_ERROR TestWait140ms_26()
+    {
+        SetIdentity("alpha");
+        WaitForMs(140);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_27()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait145ms_28()
+    {
+        SetIdentity("alpha");
+        WaitForMs(145);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_29()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait150ms_30()
+    {
+        SetIdentity("alpha");
+        WaitForMs(150);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_31()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_32()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -8757,7 +9942,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_33()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9090,16 +10275,47 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move to saturation command\n");
-            err = TestMoveToSaturationCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Check Saturation attribute value matched before any change\n");
+            err = TestCheckSaturationAttributeValueMatchedBeforeAnyChange_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Move to saturation command\n");
+            err = TestMoveToSaturationCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 6ms\n");
+            err = TestWait6ms_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 8ms\n");
+            err = TestWait8ms_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 8 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 10ms\n");
+            err = TestWait10ms_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 10 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_12();
             break;
         }
 
@@ -9130,6 +10346,27 @@ public:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -9143,7 +10380,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 13;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -9198,7 +10435,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToSaturationCommand_3()
+    CHIP_ERROR TestCheckSaturationAttributeValueMatchedBeforeAnyChange_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check Saturation attribute value matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToSaturationCommand_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9222,7 +10485,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
+    CHIP_ERROR TestWait6ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(6);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait8ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(8);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait10ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(10);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9240,7 +10602,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_12()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9315,36 +10677,203 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move saturation up command\n");
-            err = TestMoveSaturationUpCommand_3();
+            ChipLogProgress(
+                chipTool, " ***** Test Step 3 : Check Saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckSaturationAttributeValueMatchedTheValueSentByTheLastCommand_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Move saturation down command\n");
-            err = TestMoveSaturationDownCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Move saturation up command\n");
+            err = TestMoveSaturationUpCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Move saturation up command\n");
-            err = TestMoveSaturationUpCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 40ms\n");
+            err = TestWait40ms_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Move saturation stop command\n");
-            err = TestMoveSaturationStopCommand_6();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Move saturation down command\n");
-            err = TestMoveSaturationDownCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 45ms\n");
+            err = TestWait45ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Move saturation stop command\n");
-            err = TestMoveSaturationStopCommand_8();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 8 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 50ms\n");
+            err = TestWait50ms_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 10 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Move saturation down command\n");
+            err = TestMoveSaturationDownCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 40ms\n");
+            err = TestWait40ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 13 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 45ms\n");
+            err = TestWait45ms_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 15 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 50ms\n");
+            err = TestWait50ms_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 17 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Move saturation up command\n");
+            err = TestMoveSaturationUpCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Wait 40ms\n");
+            err = TestWait40ms_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 20 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Wait 45ms\n");
+            err = TestWait45ms_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 22 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Wait 50ms\n");
+            err = TestWait50ms_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 24 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Move saturation stop command\n");
+            err = TestMoveSaturationStopCommand_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Wait 40ms\n");
+            err = TestWait40ms_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 27 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Wait 45ms\n");
+            err = TestWait45ms_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 29 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Wait 50ms\n");
+            err = TestWait50ms_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 31 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Move saturation down command\n");
+            err = TestMoveSaturationDownCommand_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Wait 40ms\n");
+            err = TestWait40ms_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 34 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Wait 45ms\n");
+            err = TestWait45ms_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 36 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Wait 50ms\n");
+            err = TestWait50ms_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 38 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Move saturation stop command\n");
+            err = TestMoveSaturationStopCommand_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Wait 40ms\n");
+            err = TestWait40ms_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 41 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Wait 45ms\n");
+            err = TestWait45ms_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 43 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Wait 50ms\n");
+            err = TestWait50ms_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 45 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_47();
             break;
         }
 
@@ -9390,6 +10919,117 @@ public:
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 34:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 35:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 36:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 37:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 38:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 39:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 40:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 41:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 42:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 43:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 44:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 45:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 46:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 47:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -9403,7 +11043,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 11;
+    const uint16_t mTestCount = 48;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -9458,7 +11098,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveSaturationUpCommand_3()
+    CHIP_ERROR TestCheckSaturationAttributeValueMatchedTheValueSentByTheLastCommand_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveSaturationUpCommand_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9482,7 +11148,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveSaturationDownCommand_4()
+    CHIP_ERROR TestWait40ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveSaturationDownCommand_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9506,7 +11271,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveSaturationUpCommand_5()
+    CHIP_ERROR TestWait40ms_12()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_13()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_14()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_15()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_16()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_17()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveSaturationUpCommand_18()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9530,7 +11394,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveSaturationStopCommand_6()
+    CHIP_ERROR TestWait40ms_19()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_20()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_21()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_22()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_23()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_24()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveSaturationStopCommand_25()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9554,7 +11517,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveSaturationDownCommand_7()
+    CHIP_ERROR TestWait40ms_26()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_27()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_28()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_29()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_30()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_31()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveSaturationDownCommand_32()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9578,7 +11640,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveSaturationStopCommand_8()
+    CHIP_ERROR TestWait40ms_33()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_34()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_35()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_36()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_37()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_38()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveSaturationStopCommand_39()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9602,7 +11763,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
+    CHIP_ERROR TestWait40ms_40()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_41()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_42()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_43()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_44()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_45()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_46()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9620,7 +11880,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_47()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -9953,16 +12213,38 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move To current hue and saturation command\n");
-            err = TestMoveToCurrentHueAndSaturationCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Check current hue attribute value matched before any change\n");
+            err = TestCheckCurrentHueAttributeValueMatchedBeforeAnyChange_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Check Saturation attribute value matched before any change\n");
+            err = TestCheckSaturationAttributeValueMatchedBeforeAnyChange_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Move To current hue and saturation command\n");
+            err = TestMoveToCurrentHueAndSaturationCommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 10ms\n");
+            err = TestWait10ms_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 7 : Check current hue attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 8 : Check current saturation attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10();
             break;
         }
 
@@ -9993,6 +12275,21 @@ public:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -10006,7 +12303,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 11;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -10061,7 +12358,59 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToCurrentHueAndSaturationCommand_3()
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedBeforeAnyChange_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckSaturationAttributeValueMatchedBeforeAnyChange_4()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check Saturation attribute value matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToCurrentHueAndSaturationCommand_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10086,7 +12435,66 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
+    CHIP_ERROR TestWait10ms_6()
+    {
+        SetIdentity("alpha");
+        WaitForMs(10);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_7()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentSaturationAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentSaturationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current saturation attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", [value unsignedCharValue], 0));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", [value unsignedCharValue], 254));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10104,7 +12512,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10179,16 +12587,38 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move to Color command\n");
-            err = TestMoveToColorCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Check current x attribute value matched before any change\n");
+            err = TestCheckCurrentXAttributeValueMatchedBeforeAnyChange_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Check current y attribute value matched before any change\n");
+            err = TestCheckCurrentYAttributeValueMatchedBeforeAnyChange_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Move to Color command\n");
+            err = TestMoveToColorCommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 20ms\n");
+            err = TestWait20ms_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 7 : Check current x attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_7();
+            break;
+        case 8:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 8 : Check current y attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10();
             break;
         }
 
@@ -10219,6 +12649,21 @@ public:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -10232,7 +12677,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 11;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -10287,7 +12732,59 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToColorCommand_3()
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedBeforeAnyChange_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedBeforeAnyChange_4()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute value matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToColorCommand_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10312,7 +12809,66 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
+    CHIP_ERROR TestWait20ms_6()
+    {
+        SetIdentity("alpha");
+        WaitForMs(20);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_7()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10330,7 +12886,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10405,20 +12961,52 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move Color command\n");
-            err = TestMoveColorCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Check current x attribute value  matched before any change\n");
+            err = TestCheckCurrentXAttributeValueMatchedBeforeAnyChange_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Stop Move Step command\n");
-            err = TestStopMoveStepCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Check current y attribute value matched before any change\n");
+            err = TestCheckCurrentYAttributeValueMatchedBeforeAnyChange_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Move Color command\n");
+            err = TestMoveColorCommand_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 150ms\n");
+            err = TestWait150ms_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 7 : Check current x attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_7();
+            break;
+        case 8:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 8 : Check current y attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Stop Move Step command\n");
+            err = TestStopMoveStepCommand_9();
+            break;
+        case 10:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 10 : Check current x attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_10();
+            break;
+        case 11:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 11 : Check current y attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_13();
             break;
         }
 
@@ -10452,6 +13040,27 @@ public:
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -10465,7 +13074,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -10520,7 +13129,59 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveColorCommand_3()
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedBeforeAnyChange_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value  matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedBeforeAnyChange_4()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute value matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveColorCommand_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10544,7 +13205,66 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestStopMoveStepCommand_4()
+    CHIP_ERROR TestWait150ms_6()
+    {
+        SetIdentity("alpha");
+        WaitForMs(150);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_7()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestStopMoveStepCommand_9()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10566,7 +13286,59 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_11()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_12()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10584,7 +13356,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_13()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10659,16 +13431,38 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Step Color command\n");
-            err = TestStepColorCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Check current x attribute value  matched before any change\n");
+            err = TestCheckCurrentXAttributeValueMatchedBeforeAnyChange_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Check current y attribute  value  matched before any change\n");
+            err = TestCheckCurrentYAttributeValueMatchedBeforeAnyChange_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Step Color command\n");
+            err = TestStepColorCommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 50ms\n");
+            err = TestWait50ms_6();
+            break;
+        case 7:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 7 : Check current x attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_7();
+            break;
+        case 8:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 8 : Check current y attribute value matched the value sent by the last command\n");
+            err = TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10();
             break;
         }
 
@@ -10699,6 +13493,21 @@ public:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -10712,7 +13521,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 11;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -10767,7 +13576,59 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestStepColorCommand_3()
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedBeforeAnyChange_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value  matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedBeforeAnyChange_4()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute  value  matched before any change Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestStepColorCommand_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10792,7 +13653,66 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
+    CHIP_ERROR TestWait50ms_6()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentXAttributeValueMatchedTheValueSentByTheLastCommand_7()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentXWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckCurrentYAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeCurrentYWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10810,7 +13730,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -10885,16 +13805,28 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Move To Color Temperature command\n");
-            err = TestMoveToColorTemperatureCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Move To Color Temperature command\n");
+            err = TestMoveToColorTemperatureCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 10ms\n");
+            err = TestWait10ms_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8();
             break;
         }
 
@@ -10925,6 +13857,15 @@ public:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -10938,7 +13879,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -10993,7 +13934,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveToColorTemperatureCommand_3()
+    CHIP_ERROR TestReadCurrentColorTemprature_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveToColorTemperatureCommand_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11017,7 +13984,40 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
+    CHIP_ERROR TestWait10ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(10);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11035,7 +14035,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11118,32 +14118,128 @@ public:
             err = TestMoveUpColorTemperatureCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Move down color temperature command\n");
-            err = TestMoveDownColorTemperatureCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 90ms\n");
+            err = TestWait90ms_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Move up color temperature command\n");
-            err = TestMoveUpColorTemperatureCommand_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Stop Color Temperature command\n");
-            err = TestStopColorTemperatureCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 95ms\n");
+            err = TestWait95ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Move down color temperature command\n");
-            err = TestMoveDownColorTemperatureCommand_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Stop Color Temperature command\n");
-            err = TestStopColorTemperatureCommand_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 100ms\n");
+            err = TestWait100ms_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Move down color temperature command\n");
+            err = TestMoveDownColorTemperatureCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 190ms\n");
+            err = TestWait190ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 195ms\n");
+            err = TestWait195ms_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 200ms\n");
+            err = TestWait200ms_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Move up color temperature command\n");
+            err = TestMoveUpColorTemperatureCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Stop Color Temperature command\n");
+            err = TestStopColorTemperatureCommand_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Wait 90ms\n");
+            err = TestWait90ms_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Wait 95ms\n");
+            err = TestWait95ms_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Wait 100ms\n");
+            err = TestWait100ms_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Move down color temperature command\n");
+            err = TestMoveDownColorTemperatureCommand_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Stop Color Temperature command\n");
+            err = TestStopColorTemperatureCommand_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : Wait 140ms\n");
+            err = TestWait140ms_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : Wait 145ms\n");
+            err = TestWait145ms_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Wait 150ms\n");
+            err = TestWait150ms_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Read current color temprature attribute from DUT several times\n");
+            err = TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_35();
             break;
         }
 
@@ -11192,6 +14288,78 @@ public:
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 34:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 35:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -11205,7 +14373,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 12;
+    const uint16_t mTestCount = 36;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -11312,7 +14480,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveDownColorTemperatureCommand_5()
+    CHIP_ERROR TestWait90ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(90);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait95ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(95);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait100ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(100);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveDownColorTemperatureCommand_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11338,7 +14605,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveUpColorTemperatureCommand_6()
+    CHIP_ERROR TestWait190ms_12()
+    {
+        SetIdentity("alpha");
+        WaitForMs(190);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_13()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait195ms_14()
+    {
+        SetIdentity("alpha");
+        WaitForMs(195);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_15()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait200ms_16()
+    {
+        SetIdentity("alpha");
+        WaitForMs(200);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_17()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveUpColorTemperatureCommand_18()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11364,7 +14730,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestStopColorTemperatureCommand_7()
+    CHIP_ERROR TestStopColorTemperatureCommand_19()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11390,7 +14756,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestMoveDownColorTemperatureCommand_8()
+    CHIP_ERROR TestWait90ms_20()
+    {
+        SetIdentity("alpha");
+        WaitForMs(90);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_21()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait95ms_22()
+    {
+        SetIdentity("alpha");
+        WaitForMs(95);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_23()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait100ms_24()
+    {
+        SetIdentity("alpha");
+        WaitForMs(100);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_25()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestMoveDownColorTemperatureCommand_26()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11416,7 +14881,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestStopColorTemperatureCommand_9()
+    CHIP_ERROR TestStopColorTemperatureCommand_27()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11442,7 +14907,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_10()
+    CHIP_ERROR TestWait140ms_28()
+    {
+        SetIdentity("alpha");
+        WaitForMs(140);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_29()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait145ms_30()
+    {
+        SetIdentity("alpha");
+        WaitForMs(145);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_31()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait150ms_32()
+    {
+        SetIdentity("alpha");
+        WaitForMs(150);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTempratureAttributeFromDutSeveralTimes_33()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature attribute from DUT several times Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_34()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11460,7 +15024,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_11()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_35()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11535,20 +15099,72 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Step up color temperature command\n");
-            err = TestStepUpColorTemperatureCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Step down color temperature command\n");
-            err = TestStepDownColorTemperatureCommand_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Step up color temperature command\n");
+            err = TestStepUpColorTemperatureCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 40ms\n");
+            err = TestWait40ms_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 45ms\n");
+            err = TestWait45ms_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 50ms\n");
+            err = TestWait50ms_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Step down color temperature command\n");
+            err = TestStepDownColorTemperatureCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 40ms\n");
+            err = TestWait40ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 45ms\n");
+            err = TestWait45ms_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 50ms\n");
+            err = TestWait50ms_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Read current color temprature\n");
+            err = TestReadCurrentColorTemprature_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_19();
             break;
         }
 
@@ -11582,6 +15198,45 @@ public:
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -11595,7 +15250,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 20;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -11650,7 +15305,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestStepUpColorTemperatureCommand_3()
+    CHIP_ERROR TestReadCurrentColorTemprature_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestStepUpColorTemperatureCommand_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11677,7 +15358,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestStepDownColorTemperatureCommand_4()
+    CHIP_ERROR TestWait40ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestStepDownColorTemperatureCommand_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11704,7 +15484,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
+    CHIP_ERROR TestWait40ms_12()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_13()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_14()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_15()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_16()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestReadCurrentColorTemprature_17()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeColorTemperatureWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Read current color temprature Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", [value unsignedShortValue], 65279U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_18()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11722,7 +15601,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_19()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11801,28 +15680,141 @@ public:
             err = TestEnhancedMoveToHueCommand_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Enhanced Move To Hue command\n");
-            err = TestEnhancedMoveToHueCommand_4();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 4 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Enhanced Move To Hue command\n");
             err = TestEnhancedMoveToHueCommand_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Enhanced Move To Hue command\n");
-            err = TestEnhancedMoveToHueCommand_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 290ms\n");
+            err = TestWait290ms_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Enhanced Move To Hue command\n");
-            err = TestEnhancedMoveToHueCommand_7();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 7 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 295ms\n");
+            err = TestWait295ms_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_9();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 9 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 300ms\n");
+            err = TestWait300ms_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 11 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Enhanced Move To Hue command\n");
+            err = TestEnhancedMoveToHueCommand_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Wait 290ms\n");
+            err = TestWait290ms_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 14 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Wait 295ms\n");
+            err = TestWait295ms_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 16 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Wait 300ms\n");
+            err = TestWait300ms_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 18 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Enhanced Move To Hue command\n");
+            err = TestEnhancedMoveToHueCommand_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Wait 290ms\n");
+            err = TestWait290ms_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 21 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Wait 295ms\n");
+            err = TestWait295ms_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 23 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : Wait 300ms\n");
+            err = TestWait300ms_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 25 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Enhanced Move To Hue command\n");
+            err = TestEnhancedMoveToHueCommand_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : Wait 290ms\n");
+            err = TestWait290ms_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 28 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : Wait 295ms\n");
+            err = TestWait295ms_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 30 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : Wait 300ms\n");
+            err = TestWait300ms_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 32 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_34();
             break;
         }
 
@@ -11865,6 +15857,81 @@ public:
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 34:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -11878,7 +15945,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 35;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -11958,7 +16025,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveToHueCommand_4()
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_4()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveToHueCommand_5()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -11983,7 +16076,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveToHueCommand_5()
+    CHIP_ERROR TestWait290ms_6()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_7()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_8()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_9()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_10()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_11()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveToHueCommand_12()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12008,7 +16200,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveToHueCommand_6()
+    CHIP_ERROR TestWait290ms_13()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_14()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_15()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_16()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_17()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_18()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveToHueCommand_19()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12033,7 +16324,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveToHueCommand_7()
+    CHIP_ERROR TestWait290ms_20()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_21()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_22()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_23()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_24()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_25()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveToHueCommand_26()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12058,7 +16448,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_8()
+    CHIP_ERROR TestWait290ms_27()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_28()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_29()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_30()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_31()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_32()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_33()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12076,7 +16565,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_9()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_34()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12159,24 +16648,88 @@ public:
             err = TestEnhancedMoveHueUpCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Enhanced Move Hue Stop command\n");
-            err = TestEnhancedMoveHueStopCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 290ms\n");
+            err = TestWait290ms_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Enhanced Move Hue Down command \n");
-            err = TestEnhancedMoveHueDownCommand_6();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Enhanced Move Hue Stop command\n");
-            err = TestEnhancedMoveHueStopCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Wait 295ms\n");
+            err = TestWait295ms_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_8();
+            ChipLogProgress(chipTool,
+                " ***** Test Step 8 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Wait 300ms\n");
+            err = TestWait300ms_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 10 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Enhanced Move Hue Stop command\n");
+            err = TestEnhancedMoveHueStopCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 12 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Enhanced Move Hue Down command \n");
+            err = TestEnhancedMoveHueDownCommand_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Wait 40ms\n");
+            err = TestWait40ms_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 15 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 45ms\n");
+            err = TestWait45ms_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 17 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Wait 50ms\n");
+            err = TestWait50ms_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 19 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Enhanced Move Hue Stop command\n");
+            err = TestEnhancedMoveHueStopCommand_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 21 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_23();
             break;
         }
 
@@ -12219,6 +16772,48 @@ public:
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -12232,7 +16827,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 10;
+    const uint16_t mTestCount = 24;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -12337,7 +16932,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveHueStopCommand_5()
+    CHIP_ERROR TestWait290ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(290);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait295ms_7()
+    {
+        SetIdentity("alpha");
+        WaitForMs(295);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_8()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait300ms_9()
+    {
+        SetIdentity("alpha");
+        WaitForMs(300);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_10()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveHueStopCommand_11()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12361,7 +17055,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveHueDownCommand_6()
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_12()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveHueDownCommand_13()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12385,7 +17105,106 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveHueStopCommand_7()
+    CHIP_ERROR TestWait40ms_14()
+    {
+        SetIdentity("alpha");
+        WaitForMs(40);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_15()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait45ms_16()
+    {
+        SetIdentity("alpha");
+        WaitForMs(45);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_17()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestWait50ms_18()
+    {
+        SetIdentity("alpha");
+        WaitForMs(50);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_19()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveHueStopCommand_20()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12409,7 +17228,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_8()
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_21()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_22()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12427,7 +17272,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_9()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_23()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12760,16 +17605,29 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Enhanced move to hue and saturation command\n");
-            err = TestEnhancedMoveToHueAndSaturationCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads EnhancedCurrentHue attribute from DUT\n");
+            err = TestReadsEnhancedCurrentHueAttributeFromDut_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Enhanced move to hue and saturation command\n");
+            err = TestEnhancedMoveToHueAndSaturationCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 10ms\n");
+            err = TestWait10ms_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                " ***** Test Step 6 : Check EnhancedCurrentHue attribute value matched the value sent by the last command\n");
+            err = TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8();
             break;
         }
 
@@ -12800,6 +17658,15 @@ public:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
         }
 
         // Go on to the next test.
@@ -12813,7 +17680,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 9;
 
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
@@ -12868,7 +17735,33 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestEnhancedMoveToHueAndSaturationCommand_3()
+    CHIP_ERROR TestReadsEnhancedCurrentHueAttributeFromDut_3()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Reads EnhancedCurrentHue attribute from DUT Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestEnhancedMoveToHueAndSaturationCommand_4()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12893,7 +17786,40 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
+    CHIP_ERROR TestWait10ms_5()
+    {
+        SetIdentity("alpha");
+        WaitForMs(10);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestCheckEnhancedCurrentHueAttributeValueMatchedTheValueSentByTheLastCommand_6()
+    {
+        SetIdentity("alpha");
+        CHIPDevice * device = GetConnectedDevice();
+        CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:mCallbackQueue];
+        VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [cluster readAttributeEnhancedCurrentHueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+            VerifyOrReturn(CheckValue("status", err, 0));
+
+            VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMinValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 0U));
+            }
+            if (value != nil) {
+                VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("enhancedCurrentHue", [value unsignedShortValue], 65535U));
+            }
+
+            NextTest();
+        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
@@ -12911,7 +17837,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
         SetIdentity("alpha");
         CHIPDevice * device = GetConnectedDevice();
