@@ -2875,7 +2875,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -2884,7 +2884,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OnOff::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -6438,7 +6438,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace UpdateState
@@ -6697,7 +6697,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace HourFormat
@@ -6728,7 +6728,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ActiveCalendarType
@@ -6827,7 +6827,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitLocalization::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace TemperatureUnit
@@ -7957,7 +7957,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace RegulatoryConfig
@@ -7988,7 +7988,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::GeneralCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocationCapability
@@ -8245,7 +8245,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -8254,7 +8254,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -10811,7 +10811,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -10820,7 +10820,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -10864,7 +10864,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -10873,7 +10873,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WiFiNetworkDiagnostics::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -11340,7 +11340,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -11349,7 +11349,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::EthernetNetworkDiagnostics::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -13929,7 +13929,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -13938,7 +13938,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -13979,7 +13979,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LockType
@@ -14044,7 +14044,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -14053,7 +14053,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -14528,7 +14528,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace CredentialRulesSupport
@@ -14713,7 +14713,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperatingMode
@@ -14744,7 +14744,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportedOperatingModes
@@ -14775,7 +14775,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultConfigurationRegister
@@ -14930,7 +14930,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalProgrammingFeatures
@@ -15116,7 +15116,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmMask
@@ -15147,7 +15147,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace KeypadOperationEventMask
@@ -15178,7 +15178,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace RemoteOperationEventMask
@@ -15209,7 +15209,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace ManualOperationEventMask
@@ -15240,7 +15240,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace RFIDOperationEventMask
@@ -15271,7 +15271,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace KeypadProgrammingEventMask
@@ -15302,7 +15302,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace RemoteProgrammingEventMask
@@ -15333,7 +15333,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace RFIDProgrammingEventMask
@@ -15432,7 +15432,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Type
@@ -15693,7 +15693,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ConfigStatus
@@ -15967,7 +15967,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EndProductType
@@ -16228,7 +16228,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Mode
@@ -17498,7 +17498,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EffectiveOperationMode
@@ -17530,7 +17530,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EffectiveControlMode
@@ -17842,7 +17842,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace OperationMode
@@ -17874,7 +17874,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ControlMode
@@ -18661,7 +18661,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace ControlSequenceOfOperation
@@ -19411,7 +19411,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace FanMode
@@ -19442,7 +19442,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::FanControl::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace FanModeSequence
@@ -31406,7 +31406,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentState
@@ -32371,7 +32371,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Status
@@ -32599,7 +32599,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap8
@@ -32630,7 +32630,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap16
@@ -32661,7 +32661,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap32
@@ -32692,7 +32692,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap64
@@ -33556,7 +33556,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnumAttr
@@ -33891,7 +33891,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -33900,7 +33900,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -33944,7 +33944,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -33953,7 +33953,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
@@ -33997,7 +33997,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -34006,7 +34006,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
@@ -34050,7 +34050,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -34059,7 +34059,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
@@ -35259,7 +35259,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -35268,7 +35268,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
