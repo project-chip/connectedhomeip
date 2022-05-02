@@ -40,21 +40,23 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Check current hue attribute value matched before any change"
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: 250
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Check Saturation attribute value matched before any change"
-      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 90
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move To current hue and saturation command"
       command: "MoveToHueAndSaturation"
@@ -70,23 +72,36 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
+
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: 40
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      disabled: true
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 160
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
