@@ -1011,9 +1011,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
         event.InternetConnectivityChange.ipAddress = addr;
 
         PlatformMgr().PostEventOrDie(&event);
