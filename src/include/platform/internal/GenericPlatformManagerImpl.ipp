@@ -321,6 +321,7 @@ void GenericPlatformManagerImpl<ImplClass>::HandleMessageLayerActivityChanged(bo
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
 template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 
 } // namespace Internal

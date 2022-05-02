@@ -152,6 +152,16 @@ esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 esp32-qemu-tests
+imx-all-clusters-app
+imx-all-clusters-app-release
+imx-chip-tool
+imx-chip-tool-release
+imx-lighting-app
+imx-lighting-app-release
+imx-ota-provider-app
+imx-ota-provider-app-release
+imx-thermostat
+imx-thermostat-release
 infineon-p6-all-clusters
 infineon-p6-light
 infineon-p6-lock

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-const { zapTypeToDecodableClusterObjectType, asUpperCamelCase, asLowerCamelCase }
+const { zapTypeToDecodableClusterObjectType, zapTypeToEncodableClusterObjectType, asUpperCamelCase, asLowerCamelCase }
 = require('../../../../src/app/zap-templates/templates/app/helper.js');
 const { isTestOnlyCluster } = require('../../../../src/app/zap-templates/common/simulated-clusters/SimulatedClusters.js');
 
@@ -31,21 +31,44 @@ function utf8StringLength(str)
  */
 function asPropertyValue(options)
 {
-  let name = '';
+  let rootObject = 'value';
 
-  // The decodable type for simulated cluster is a struct by default, even if the
+  // The decodable type for commands is a struct by default, even if the
   // command just returns a single value.
-  if (isTestOnlyCluster(this.parent.cluster)) {
-    name = 'value.'
+  if (this.parent.isCommand) {
+    rootObject += '.' + asLowerCamelCase(this.name);
   }
-
-  name += asLowerCamelCase(this.name);
 
   if (this.isOptional && !options.hash.dontUnwrapValue) {
-    name += '.Value()';
+    rootObject += '.Value()';
   }
 
-  return name;
+  return rootObject;
+}
+
+async function asEncodableType()
+{
+  // Copy some properties needed by zapTypeToEncodableClusterObjectType
+  let target = { global : this.global, entryType : this.entryType };
+
+  let type;
+  if ('commandObject' in this) {
+    type = this.commandObject.name;
+  } else if ('attributeObject' in this) {
+    type              = this.attributeObject.type;
+    target.isArray    = this.attributeObject.isArray;
+    target.isOptional = this.attributeObject.isOptional;
+    target.isNullable = this.attributeObject.isNullable;
+  } else {
+    throw new Error("Unsupported encodable type");
+  }
+
+  if (isTestOnlyCluster(this.cluster) || 'commandObject' in this) {
+    return `chip::app::Clusters::${asUpperCamelCase(this.cluster)}::Commands::${asUpperCamelCase(type)}::Type`;
+  }
+
+  const options = { 'hash' : { ns : this.cluster } };
+  return await zapTypeToEncodableClusterObjectType.call(target, type, options);
 }
 
 async function asDecodableType()
@@ -62,7 +85,7 @@ async function asDecodableType()
     target.isOptional = this.attributeObject.isOptional;
     target.isNullable = this.attributeObject.isNullable;
   } else if ('eventObject' in this) {
-    type = this.eventObject.type;
+    type = this.event;
   } else {
     throw new Error("Unsupported decodable type");
   }
@@ -81,3 +104,4 @@ async function asDecodableType()
 exports.utf8StringLength = utf8StringLength;
 exports.asPropertyValue  = asPropertyValue;
 exports.asDecodableType  = asDecodableType;
+exports.asEncodableType  = asEncodableType;

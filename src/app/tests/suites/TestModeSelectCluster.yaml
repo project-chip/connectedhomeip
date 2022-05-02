@@ -96,7 +96,7 @@ tests:
               - name: "NewMode"
                 value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
@@ -118,7 +118,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Change OnMode"
       command: "writeAttribute"
@@ -153,7 +153,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Change to Supported StartUp Mode"
       command: "writeAttribute"

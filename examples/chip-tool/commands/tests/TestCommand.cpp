@@ -66,18 +66,42 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
     LogErrorOnFailure(command->ContinueOnChipMainThread(error));
 }
 
-void TestCommand::Exit(std::string message)
+void TestCommand::ExitAsync(intptr_t context)
 {
-    ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
-    SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+    auto testCommand = reinterpret_cast<TestCommand *>(context);
+    testCommand->InteractionModel::Shutdown();
+    testCommand->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-void TestCommand::ThrowFailureResponse(CHIP_ERROR error)
+void TestCommand::Exit(std::string message, CHIP_ERROR err)
 {
-    Exit(std::string("Expecting success response but got a failure response: ") + chip::ErrorStr(error));
+    mContinueProcessing = false;
+
+    LogEnd(message, err);
+
+    if (CHIP_NO_ERROR == err)
+    {
+        InteractionModel::Shutdown();
+        SetCommandExitStatus(err);
+    }
+    else
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(ExitAsync, reinterpret_cast<intptr_t>(this));
+    }
 }
 
-void TestCommand::ThrowSuccessResponse()
+CHIP_ERROR TestCommand::ContinueOnChipMainThread(CHIP_ERROR err)
 {
-    Exit("Expecting failure response but got a success response");
+    if (mContinueProcessing == false)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (CHIP_NO_ERROR == err)
+    {
+        return WaitForMs(0);
+    }
+
+    Exit(chip::ErrorStr(err), err);
+    return CHIP_NO_ERROR;
 }

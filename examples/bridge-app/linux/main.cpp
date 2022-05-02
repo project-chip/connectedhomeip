@@ -38,6 +38,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include "CommissionableInit.h"
 #include "Device.h"
 #include "Options.h"
 #include <app/server/Server.h>
@@ -51,16 +52,21 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
-static const int kNodeLabelSize = 32;
-// Current ZCL implementation of Struct uses a max-size array of 254 bytes
-static const int kDescriptorAttributeArraySize = 254;
-static const int kFixedLabelAttributeArraySize = 254;
-// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
-static const int kFixedLabelElementsOctetStringSize = 16;
+namespace {
 
-static EndpointId gCurrentEndpointId;
-static EndpointId gFirstDynamicEndpointId;
-static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+const int kNodeLabelSize = 32;
+// Current ZCL implementation of Struct uses a max-size array of 254 bytes
+const int kDescriptorAttributeArraySize = 254;
+const int kFixedLabelAttributeArraySize = 254;
+// Four attributes in descriptor cluster: DeviceTypeList, ServerList, ClientList, PartsList
+const int kFixedLabelElementsOctetStringSize = 16;
+
+EndpointId gCurrentEndpointId;
+EndpointId gFirstDynamicEndpointId;
+Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+
+// To hold SPAKE2+ verifier, discriminator, passcode
+LinuxCommissionableDataProvider gCommissionableDataProvider;
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -194,6 +200,8 @@ DECLARE_DYNAMIC_ENDPOINT(bridgedSwitchEndpoint, bridgedSwitchClusters);
 DataVersion gSwitch1DataVersions[ArraySize(bridgedSwitchClusters)];
 DataVersion gSwitch2DataVersions[ArraySize(bridgedSwitchClusters)];
 
+} // namespace
+
 // REVISION DEFINITIONS:
 // =================================================================================
 
@@ -286,8 +294,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     {
         uint8_t reachable = dev->IsReachable() ? 1 : 0;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_REACHABLE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                               &reachable);
+                                               ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
@@ -296,8 +303,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         MutableByteSpan zclNameSpan(zclName);
         MakeZclCharString(zclNameSpan, dev->GetName());
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               zclNameSpan.data());
+                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclNameSpan.data());
     }
 
     if (itemChangedMask & Device::kChanged_Location)
@@ -310,7 +316,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
 
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
+                                               ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
     }
 }
 
@@ -325,7 +331,7 @@ void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t it
     {
         uint8_t isOn = dev->IsOn() ? 1 : 0;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+                                               ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
     }
 }
 
@@ -340,21 +346,21 @@ void HandleDeviceSwitchStatusChanged(DeviceSwitch * dev, DeviceSwitch::Changed_t
     {
         uint8_t numberOfPositions = dev->GetNumberOfPositions();
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_SWITCH_CLUSTER_ID, ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_INT8U_ATTRIBUTE_TYPE, &numberOfPositions);
+                                               ZCL_INT8U_ATTRIBUTE_TYPE, &numberOfPositions);
     }
 
     if (itemChangedMask & DeviceSwitch::kChanged_CurrentPosition)
     {
         uint8_t currentPosition = dev->GetCurrentPosition();
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_INT8U_ATTRIBUTE_TYPE, &currentPosition);
+                                               ZCL_INT8U_ATTRIBUTE_TYPE, &currentPosition);
     }
 
     if (itemChangedMask & DeviceSwitch::kChanged_MultiPressMax)
     {
         uint8_t multiPressMax = dev->GetMultiPressMax();
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_SWITCH_CLUSTER_ID, ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_INT8U_ATTRIBUTE_TYPE, &multiPressMax);
+                                               ZCL_INT8U_ATTRIBUTE_TYPE, &multiPressMax);
     }
 }
 
@@ -653,22 +659,37 @@ int main(int argc, char * argv[])
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+    // Init the commissionable data provider based on command line options
+    // to handle custom verifiers, discriminators, etc.
+    err = chip::examples::InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
+    DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
+
+    err = chip::examples::InitConfigurationManager(reinterpret_cast<ConfigurationManagerImpl &>(ConfigurationMgr()),
+                                                   LinuxDeviceOptions::GetInstance());
+    SuccessOrExit(err);
+
     err = PrintQRCodeContent();
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
-
 #if CONFIG_NETWORK_LAYER_BLE
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
+    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-
-    // Init ZCL Data Model and CHIP App Server
+    // Init Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+#if CHIP_DEVICE_ENABLE_PORT_PARAMS
+    // use a different service port to make testing possible with other sample devices running on same host
+    initParams.operationalServicePort = LinuxDeviceOptions::GetInstance().securedDevicePort;
+#endif
+
+    initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config

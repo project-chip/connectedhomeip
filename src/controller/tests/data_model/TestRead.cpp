@@ -186,6 +186,8 @@ public:
     static void TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext);
 
 private:
     static constexpr uint16_t kTestMinInterval = 33;
@@ -362,9 +364,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     MockInteractionModelApp delegate;
     chip::app::ClusterStateCache cache(delegate);
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::EventPathParams eventPathParams[100];
     for (uint32_t index = 0; index < 100; index++)
@@ -384,7 +383,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
     int testId = 0;
-    // Initial Read of E2C3A1, E2C3A2 and E3C2A2.
+    // Read of E2C3A1, E2C3A2 and E3C2A2.
     // Expect no versions would be cached.
     {
         testId++;
@@ -420,7 +419,46 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
-    // Second read of E2C2A* and E3C2A2. We cannot use the stored data versions in the cache since there is no cached version from
+
+    // Read of E*C2A2, E2C2A2 and E3C2A2 where 2nd, 3rd concrete paths are part of first wildcard path, would be deduplicate,
+    // E*C2A2 don't have wildcard attribute so no version would be cached.
+    // Expect no versions would be cached.
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kInvalidEndpointId;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // read of E2C2A* and E3C2A2. We cannot use the stored data versions in the cache since there is no cached version from
     // previous test. Expect cache E2C2 version
     {
         testId++;
@@ -453,7 +491,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Third read of E2C3A1, E2C3A2, and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A1
+    // Read of E2C3A1, E2C3A2, and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A1
     // path intersects with previous cached data version Expect no E2C3 attributes in report, only E3C2A1 attribute in report
     {
         testId++;
@@ -490,7 +528,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Fourth read of E2C3A* and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A* path
+    // Read of E2C3A* and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A* path
     // intersects with previous cached data version Expect no C1 attributes in report, only E3C2A2 attribute in report
     {
         testId++;
@@ -524,7 +562,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     Test::BumpVersion();
 
-    // Fifth read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A*
+    // Read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A*
     // path intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in
     // report, and invalidate the cached pending and committed data version since no wildcard attributes exists in mRequestPathSet.
     {
@@ -562,7 +600,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Sixth read of E2C3A1, E2C3A2 and E3C2A2. It would use none stored data versions in the cache since previous read does not
+    // Read of E2C3A1, E2C3A2 and E3C2A2. It would use none stored data versions in the cache since previous read does not
     // cache any committed data version. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report
     {
         testId++;
@@ -599,7 +637,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Seventh read of E2C3A* and E3C2A2, here there is no cached data version filter
+    // Read of E2C3A* and E3C2A2, here there is no cached data version filter
     // Expect E2C3A* attributes in report, and E3C2A2 attribute in report and cache latest data version
     {
         testId++;
@@ -631,7 +669,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Eighth read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache
+    // Read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache
     // latest data version and construct data version list but no enough memory, finally fully rollback data version filter. Expect
     // E2C3A* attributes in report, and E3C2A2 attribute in report
     {
@@ -672,7 +710,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
 
     Test::BumpVersion();
 
-    // Ninth read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has
+    // Read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has
     // changed in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
     {
         testId++;
@@ -714,7 +752,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         delegate.mNumAttributeResponse = 0;
     }
 
-    // Tenth read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path
+    // Read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path
     // list, then it would try to apply previous cache latest data version and construct data version list with the ordering from
     // largest cluster size to smallest cluster size(C2, C3, C1) but no enough memory, finally partially rollback data version
     // filter with only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
@@ -760,8 +798,7 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         readPrepareParams.mEventPathParamsListSize = 0;
     }
 
-    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
-    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
@@ -921,11 +958,16 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     {
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
                            onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
     }
 
-    ctx.DrainAndServiceIO();
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
+            numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
+    });
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -1250,7 +1292,16 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
                            onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
-    ctx.DrainAndServiceIO();
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
+        return numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
+            numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
+    });
+
+    ChipLogError(Zcl, "Success call cnt: %u (expect %u) subscription cnt: %u (expect %u)", numSuccessCalls,
+                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1), numSubscriptionEstablishedCalls,
+                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1));
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -1461,6 +1512,257 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+namespace SubscriptionPathQuotaHelpers {
+class TestReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestReadCallback() {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override
+    {
+        if (apData != nullptr)
+        {
+            mAttributeCount++;
+        }
+    }
+
+    void OnDone() override { mOnDone++; }
+
+    void OnReportEnd() override { mOnReportEnd++; }
+
+    void OnError(CHIP_ERROR aError) override
+    {
+        mOnError++;
+        mLastError = aError;
+    }
+
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+
+    void ClearCounters()
+    {
+        mAttributeCount                 = 0;
+        mOnReportEnd                    = 0;
+        mOnSubscriptionEstablishedCount = 0;
+        mOnDone                         = 0;
+        mOnError                        = 0;
+        mLastError                      = CHIP_NO_ERROR;
+    }
+
+    int32_t mAttributeCount                 = 0;
+    int32_t mOnReportEnd                    = 0;
+    int32_t mOnSubscriptionEstablishedCount = 0;
+    int32_t mOnDone                         = 0;
+    int32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
+};
+
+void EstablishSubscriptions(nlTestSuite * apSuite, void * apContext, int32_t numSubs, int32_t pathPerSub,
+                            app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+    std::vector<app::AttributePathParams> attributePaths(
+        pathPerSub, app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id));
+
+    app::ReadPrepareParams readParams(sessionHandle);
+    readParams.mpAttributePathParamsList    = attributePaths.data();
+    readParams.mAttributePathParamsListSize = pathPerSub;
+    readParams.mMaxIntervalCeilingSeconds   = 1;
+    readParams.mKeepSubscriptions           = true;
+
+    for (int32_t i = 0; i < numSubs; i++)
+    {
+        std::unique_ptr<app::ReadClient> readClient =
+            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), *callback,
+                                              app::ReadClient::InteractionType::Subscribe);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        readClients.push_back(std::move(readClient));
+    }
+}
+
+} // namespace SubscriptionPathQuotaHelpers
+
+// TODO: (#17381) Need to add the case with more than one fabrics.
+void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    const int32_t kExpectedParallelSubs =
+        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
+    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    TestReadCallback readCallback;
+    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+
+    // Intentially establish subscriptions using exceeded resources.
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    EstablishSubscriptions(apSuite, apContext, kExpectedParallelSubs,
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1, &readCallback, readClients);
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return readCallback.mOnSubscriptionEstablishedCount == static_cast<size_t>(CHIP_IM_MAX_NUM_READ_HANDLER);
+    });
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount ==
+                       kExpectedParallelSubs *
+                           static_cast<int32_t>(app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1));
+    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs);
+
+    // We have set up the environment for testing the evicting logic.
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        TestReadCallback callback;
+        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1, &callback,
+                               outReadClient);
+
+        ctx.DrainAndServiceIO();
+
+        // Over-sized request after used all paths will receive Paths Exhausted status code.
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+    }
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        TestReadCallback callback;
+        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &callback,
+                               outReadClient);
+
+        ctx.DrainAndServiceIO();
+
+        // This read handler should evict some existing subscriptions for enough space
+        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, callback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
+    }
+
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+    readCallback.ClearCounters();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount <= kExpectedParallelPaths);
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() <=
+                       static_cast<size_t>(kExpectedParallelSubs));
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    // Shutdown all clients
+    readClients.clear();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+}
+
+void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    const int32_t kExpectedParallelSubs =
+        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
+    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    TestReadCallback readCallback;
+    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+
+    // This should just use all availbale resources.
+    EstablishSubscriptions(apSuite, apContext, kExpectedParallelSubs,
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallback, readClients);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount ==
+                       kExpectedParallelSubs *
+                           static_cast<int32_t>(app::InteractionModelEngine::kMinSupportedPathsPerSubscription));
+    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs);
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
+                       static_cast<size_t>(kExpectedParallelSubs));
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        TestReadCallback callback;
+        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1, &callback,
+                               outReadClient);
+
+        ctx.DrainAndServiceIO();
+
+        // Over-sized request after used all paths will receive Paths Exhausted status code.
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+    }
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        EstablishSubscriptions(apSuite, apContext, 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallback,
+                               readClients);
+        readCallback.ClearCounters();
+
+        ctx.DrainAndServiceIO();
+
+        // This read handler should evict some existing subscriptions for enough space
+        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
+        NL_TEST_ASSERT(apSuite,
+                       app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
+                           static_cast<size_t>(kExpectedParallelSubs));
+    }
+
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+    readCallback.ClearCounters();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount <= kExpectedParallelPaths);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    // Shutdown all clients
+    readClients.clear();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -1481,6 +1783,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals),
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
+    NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
+    NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -1490,7 +1794,7 @@ nlTestSuite sSuite =
 {
     "TestRead",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

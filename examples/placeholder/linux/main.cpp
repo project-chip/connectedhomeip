@@ -32,6 +32,7 @@ int main(int argc, char * argv[])
         test->NextTest();
     }
 
-    ChipLinuxAppMainLoop(AppOptions::GetDACProvider());
+    LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
+    ChipLinuxAppMainLoop();
     return 0;
 }

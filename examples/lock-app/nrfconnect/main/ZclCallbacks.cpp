@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -30,35 +31,52 @@ using namespace ::chip::app::Clusters::DoorLock;
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    VerifyOrReturn(attributePath.mClusterId == DoorLock::Id && attributePath.mAttributeId == DoorLock::Attributes::LockState::Id);
+
+    switch (*value)
+    {
+    case to_underlying(DlLockState::kLocked):
+        BoltLockMgr().Lock(BoltLockManager::OperationSource::kRemote);
+        break;
+    case to_underlying(DlLockState::kUnlocked):
+        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kRemote);
+        break;
+    default:
+        break;
+    }
+}
+
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
-    LOG_INF("Locking");
-    BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
     return true;
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
                                               DlOperationError & err)
 {
-    LOG_INF("Unlocking");
-    BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
     return true;
 }
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     DoorLockServer::Instance().InitServer(endpoint);
+
     EmberAfStatus status = DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Updating type %x", status);
     }
-    // Set FeatureMap to 0, defaults is
-    //(kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
+
+    // Set FeatureMap to 0, default is:
+    // (kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
     status = DoorLock::Attributes::FeatureMap::Set(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        LOG_ERR("Updating type %x", status);
+        LOG_ERR("Updating feature map %x", status);
     }
-    GetAppTask().UpdateClusterState();
+
+    GetAppTask().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
 }

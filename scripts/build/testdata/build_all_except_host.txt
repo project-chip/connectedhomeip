@@ -10,9 +10,6 @@ bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {ro
 # Generating ameba-amebad-pigweed
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh -r {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -21,9 +18,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm-chip-tool '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -34,9 +28,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-arm64-chip-tool
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -45,9 +36,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-x64-chip-tool '
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -58,9 +46,6 @@ gn gen --check --fail-on-unused-args {out}/android-androidstudio-x86-chip-tool '
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -69,9 +54,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm-chip-tool '--args=target_
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -82,9 +64,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm-chip-tv-casting-app '--ar
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -93,9 +72,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm-chip-tvserver '--args=tar
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -106,9 +82,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-test '--args=targe
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -117,9 +90,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tool '--args=targe
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -130,9 +100,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tv-casting-app '--
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -141,9 +108,6 @@ gn gen --check --fail-on-unused-args {out}/android-arm64-chip-tvserver '--args=t
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -154,9 +118,6 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip-tool '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -166,9 +127,6 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip-tvserver '--args=tar
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
-
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
 
@@ -177,9 +135,6 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
-
-# Generating JARs for Java build rules test
-python3 build/chip/java/tests/generate_jars_for_test.py
 
 # Setting up Android deps through Gradle
 python3 third_party/android_deps/set_up_android_deps.py
@@ -716,6 +671,56 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests reconfigure'
 
+# Generating imx-all-clusters-app
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"'"'"' {out}/imx-all-clusters-app'
+
+# Generating imx-all-clusters-app-release
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-all-clusters-app-release'
+
+# Generating imx-chip-tool
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"'"'"' {out}/imx-chip-tool'
+
+# Generating imx-chip-tool-release
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-chip-tool-release'
+
+# Generating imx-lighting-app
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"'"'"' {out}/imx-lighting-app'
+
+# Generating imx-lighting-app-release
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-lighting-app-release'
+
+# Generating imx-ota-provider-app
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"'"'"' {out}/imx-ota-provider-app'
+
+# Generating imx-ota-provider-app-release
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/ota-provider-app/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-ota-provider-app-release'
+
+# Generating imx-thermostat
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar"'"'"' {out}/imx-thermostat'
+
+# Generating imx-thermostat-release
+bash -c '
+PKG_CONFIG_PATH="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux '"'"'--args=target_os="linux" target_cpu="arm64" arm_arch="armv8-a" import("//build_overrides/build.gni") custom_toolchain="${build_root}/toolchain/custom" sysroot="IMX_SDK_ROOT/sysroots/cortexa53-crypto-poky-linux" target_cflags=[ "-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"" ] target_cc="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc" target_cxx="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++" target_ar="IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-ar" is_debug=false'"'"' {out}/imx-thermostat-release'
+
 # Generating infineon-p6-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
 
@@ -1053,8 +1058,11 @@ cp {out}/android-arm-chip-tvserver/lib/third_party/connectedhomeip/src/app/serve
 
 cp {out}/android-arm-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-arm-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver assembleDebug
+# Building Example android-arm-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-arm-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building JNI android-arm64-chip-test
 ninja -C {out}/android-arm64-chip-test
@@ -1141,8 +1149,11 @@ cp {out}/android-arm64-chip-tvserver/lib/third_party/connectedhomeip/src/app/ser
 
 cp {out}/android-arm64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-arm64-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver assembleDebug
+# Building Example android-arm64-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-arm64-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-arm64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-arm64-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building JNI android-x64-chip-tool
 ninja -C {out}/android-x64-chip-tool
@@ -1185,8 +1196,11 @@ cp {out}/android-x64-chip-tvserver/lib/third_party/connectedhomeip/src/app/serve
 
 cp {out}/android-x64-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-x64-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver assembleDebug
+# Building Example android-x64-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-x64-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x64-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x64-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building JNI android-x86-chip-tool
 ninja -C {out}/android-x86-chip-tool
@@ -1229,8 +1243,11 @@ cp {out}/android-x86-chip-tvserver/lib/third_party/connectedhomeip/src/app/serve
 
 cp {out}/android-x86-chip-tvserver/lib/TvApp.jar {root}/examples/tv-app/android/App/app/libs/TvApp.jar
 
-# Building Example android-x86-chip-tvserver
-{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver assembleDebug
+# Building Example android-x86-chip-tvserver, module platform-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver/platform-app :platform-app:assembleDebug
+
+# Building Example android-x86-chip-tvserver, module content-app
+{root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-chip-tvserver -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-chip-tvserver/content-app :content-app:assembleDebug
 
 # Building bl602-light
 ninja -C {out}/bl602-light
@@ -1695,6 +1712,36 @@ rm -f src/test_driver/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests build'
+
+# Building imx-all-clusters-app
+ninja -C {out}/imx-all-clusters-app
+
+# Building imx-all-clusters-app-release
+ninja -C {out}/imx-all-clusters-app-release
+
+# Building imx-chip-tool
+ninja -C {out}/imx-chip-tool
+
+# Building imx-chip-tool-release
+ninja -C {out}/imx-chip-tool-release
+
+# Building imx-lighting-app
+ninja -C {out}/imx-lighting-app
+
+# Building imx-lighting-app-release
+ninja -C {out}/imx-lighting-app-release
+
+# Building imx-ota-provider-app
+ninja -C {out}/imx-ota-provider-app
+
+# Building imx-ota-provider-app-release
+ninja -C {out}/imx-ota-provider-app-release
+
+# Building imx-thermostat
+ninja -C {out}/imx-thermostat
+
+# Building imx-thermostat-release
+ninja -C {out}/imx-thermostat-release
 
 # Building infineon-p6-all-clusters
 ninja -C {out}/infineon-p6-all-clusters

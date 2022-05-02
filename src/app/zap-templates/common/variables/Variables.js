@@ -109,17 +109,19 @@ async function extractVariablesFromTests(context, suite)
 {
   let variables = {};
   suite.tests.forEach(test => {
-    test.response.values.filter(value => value.saveAs).forEach(saveAsValue => {
-      const key = saveAsValue.saveAs;
-      if (key in variables) {
-        throwError(test, `Variable with name: ${key} is already registered.`);
-      }
+    test.response.forEach(response => {
+      response.values.filter(value => value.saveAs).forEach(saveAsValue => {
+        const key = saveAsValue.saveAs;
+        if (key in variables) {
+          throwError(test, `Variable with name: ${key} is already registered.`);
+        }
 
-      if (!test.isCommand && !test.isAttribute) {
-        throwError(test, `Variable support for step ${test} is not supported. Only commands and attributes are supported.`);
-      }
+        if (!test.isCommand && !test.isAttribute) {
+          throwError(test, `Variable support for step ${test} is not supported. Only commands and attributes are supported.`);
+        }
 
-      variables[key] = { test, name : saveAsValue.name };
+        variables[key] = { test, name : saveAsValue.name };
+      });
     });
   });
 

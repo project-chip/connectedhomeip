@@ -56,11 +56,6 @@ NS_ASSUME_NONNULL_BEGIN
  * connections.  Defaults to NO.
  */
 @property (nonatomic) BOOL startServer;
-/*
- * Path to a file to use for backing our KVS storage.  This should not
- * be used, generally; it will be removed soon.  Defaults to nil.
- */
-@property (strong, nonatomic, nullable) NSString * kvsPath;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<CHIPPersistentStorageDelegate>)storageDelegate;

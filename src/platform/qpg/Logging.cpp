@@ -9,6 +9,7 @@
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 
+#include <cstdio>
 #include <ctype.h>
 #include <string.h>
 
@@ -86,6 +87,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
 } // namespace Logging
 } // namespace chip
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * LwIP log output function.
  */
@@ -110,6 +112,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
 }
+#endif // #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)

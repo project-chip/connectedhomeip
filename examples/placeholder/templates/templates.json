@@ -22,6 +22,10 @@
             "path": "../../../examples/chip-tool/templates/tests/partials/test_cluster.zapt"
         },
         {
+            "name": "test_step",
+            "path": "../../../examples/chip-tool/templates/tests/partials/test_step.zapt"
+        },
+        {
             "name": "test_step_response",
             "path": "../../../examples/chip-tool/templates/tests/partials/test_step_response.zapt"
         },

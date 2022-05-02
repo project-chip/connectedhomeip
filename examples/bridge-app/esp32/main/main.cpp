@@ -348,15 +348,14 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     {
         uint8_t reachable = dev->IsReachable() ? 1 : 0;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_REACHABLE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                               &reachable);
+                                               ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
     }
 
     if (itemChangedMask & Device::kChanged_State)
     {
         uint8_t isOn = dev->IsOn() ? 1 : 0;
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+                                               ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
@@ -364,8 +363,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         uint8_t zclName[kNodeLabelSize + 1];
         ToZclCharString(zclName, dev->GetName(), kNodeLabelSize);
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               zclName);
+                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclName);
     }
     if (itemChangedMask & Device::kChanged_Location)
     {
@@ -377,7 +375,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
 
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_FIXED_LABEL_CLUSTER_ID, ZCL_LABEL_LIST_ATTRIBUTE_ID,
-                                               CLUSTER_MASK_SERVER, ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
+                                               ZCL_ARRAY_ATTRIBUTE_TYPE, buffer);
     }
 }
 

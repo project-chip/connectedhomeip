@@ -142,6 +142,10 @@ source_set("system_config_header") {
       if (chip_device_platform == "efr32") {
         public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
       }
+      if (chip_device_platform == "qpg") {
+        public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
+      }
+
       # Add platform here as needed.
     }
   }

@@ -135,7 +135,6 @@ public:
      *
      *  @param[in]    messageCounter  The message counter of the packet.
      *  @param[in]    payloadHeader   A reference to the PayloadHeader object.
-     *  @param[in]    peerAddress     The address of the sender
      *  @param[in]    msgFlags        The message flags corresponding to the received message
      *  @param[in]    msgBuf          A handle to the packet buffer holding the CHIP message.
      *
@@ -144,8 +143,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+    CHIP_ERROR HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                              System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
@@ -242,23 +240,23 @@ private:
     void MessageHandled();
 
     /**
-     * Updates Sleepy End Device polling mode in the following way:
+     * Updates Sleepy End Device intervals mode in the following way:
      * - does nothing for exchanges over Bluetooth LE
-     * - requests fast-polling (active) mode if there are more messages,
+     * - requests active mode if there are more messages,
      *   including MRP acknowledgements, expected to be sent or received on
      *   this exchange.
-     * - withdraws the request for fast-polling (active) mode, otherwise.
+     * - withdraws the request for active mode, otherwise.
      */
-    void UpdateSEDPollingMode();
+    void UpdateSEDIntervalMode();
 
     /**
-     * Requests or withdraws the request for Sleepy End Device fast-polling mode
+     * Requests or withdraws the request for Sleepy End Device active mode
      * based on the argument value.
      *
-     * Note that the device switches to the slow-polling (idle) mode if no
-     * exchange nor other component requests the fast-polling mode.
+     * Note that the device switches to the idle mode if no
+     * exchange nor other component requests the active mode.
      */
-    void UpdateSEDPollingMode(bool fastPollingMode);
+    void UpdateSEDIntervalMode(bool activeMode);
 };
 
 } // namespace Messaging

@@ -54,6 +54,7 @@ private:
     static void OnOffProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
     static void LevelControlProcessCommand(chip::CommandId, const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
     static void LightSwitchChangedHandler(const EmberBindingTableEntry &, chip::DeviceProxy *, void *);
+    static void LightSwitchContextReleaseHandler(void * context);
     static void InitInternal(intptr_t);
 
     bool mCaseSessionRecovered = false;

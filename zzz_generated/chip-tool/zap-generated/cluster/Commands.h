@@ -10761,7 +10761,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::FanControl::FanModeType mValue;
 };
 
 class WriteFanControlFanModeSequence : public WriteAttribute
@@ -10788,7 +10788,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::FanControl::FanModeSequenceType mValue;
 };
 
 class WriteFanControlPercentSetting : public WriteAttribute
@@ -15474,39 +15474,39 @@ private:
 | * GeneralErrorBoolean                                               | 0x0031 |
 | * ClusterErrorBoolean                                               | 0x0032 |
 | * Unsupported                                                       | 0x00FF |
-| * NullableBoolean                                                   | 0x8000 |
-| * NullableBitmap8                                                   | 0x8001 |
-| * NullableBitmap16                                                  | 0x8002 |
-| * NullableBitmap32                                                  | 0x8003 |
-| * NullableBitmap64                                                  | 0x8004 |
-| * NullableInt8u                                                     | 0x8005 |
-| * NullableInt16u                                                    | 0x8006 |
-| * NullableInt24u                                                    | 0x8007 |
-| * NullableInt32u                                                    | 0x8008 |
-| * NullableInt40u                                                    | 0x8009 |
-| * NullableInt48u                                                    | 0x800A |
-| * NullableInt56u                                                    | 0x800B |
-| * NullableInt64u                                                    | 0x800C |
-| * NullableInt8s                                                     | 0x800D |
-| * NullableInt16s                                                    | 0x800E |
-| * NullableInt24s                                                    | 0x800F |
-| * NullableInt32s                                                    | 0x8010 |
-| * NullableInt40s                                                    | 0x8011 |
-| * NullableInt48s                                                    | 0x8012 |
-| * NullableInt56s                                                    | 0x8013 |
-| * NullableInt64s                                                    | 0x8014 |
-| * NullableEnum8                                                     | 0x8015 |
-| * NullableEnum16                                                    | 0x8016 |
-| * NullableFloatSingle                                               | 0x8017 |
-| * NullableFloatDouble                                               | 0x8018 |
-| * NullableOctetString                                               | 0x8019 |
-| * NullableCharString                                                | 0x801E |
-| * NullableEnumAttr                                                  | 0x8024 |
-| * NullableStruct                                                    | 0x8025 |
-| * NullableRangeRestrictedInt8u                                      | 0x8026 |
-| * NullableRangeRestrictedInt8s                                      | 0x8027 |
-| * NullableRangeRestrictedInt16u                                     | 0x8028 |
-| * NullableRangeRestrictedInt16s                                     | 0x8029 |
+| * NullableBoolean                                                   | 0x4000 |
+| * NullableBitmap8                                                   | 0x4001 |
+| * NullableBitmap16                                                  | 0x4002 |
+| * NullableBitmap32                                                  | 0x4003 |
+| * NullableBitmap64                                                  | 0x4004 |
+| * NullableInt8u                                                     | 0x4005 |
+| * NullableInt16u                                                    | 0x4006 |
+| * NullableInt24u                                                    | 0x4007 |
+| * NullableInt32u                                                    | 0x4008 |
+| * NullableInt40u                                                    | 0x4009 |
+| * NullableInt48u                                                    | 0x400A |
+| * NullableInt56u                                                    | 0x400B |
+| * NullableInt64u                                                    | 0x400C |
+| * NullableInt8s                                                     | 0x400D |
+| * NullableInt16s                                                    | 0x400E |
+| * NullableInt24s                                                    | 0x400F |
+| * NullableInt32s                                                    | 0x4010 |
+| * NullableInt40s                                                    | 0x4011 |
+| * NullableInt48s                                                    | 0x4012 |
+| * NullableInt56s                                                    | 0x4013 |
+| * NullableInt64s                                                    | 0x4014 |
+| * NullableEnum8                                                     | 0x4015 |
+| * NullableEnum16                                                    | 0x4016 |
+| * NullableFloatSingle                                               | 0x4017 |
+| * NullableFloatDouble                                               | 0x4018 |
+| * NullableOctetString                                               | 0x4019 |
+| * NullableCharString                                                | 0x401E |
+| * NullableEnumAttr                                                  | 0x4024 |
+| * NullableStruct                                                    | 0x4025 |
+| * NullableRangeRestrictedInt8u                                      | 0x4026 |
+| * NullableRangeRestrictedInt8s                                      | 0x4027 |
+| * NullableRangeRestrictedInt16u                                     | 0x4028 |
+| * NullableRangeRestrictedInt16s                                     | 0x4029 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -17536,12 +17536,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008000, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004000, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008000, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004000, mValue);
     }
 
 private:
@@ -17563,12 +17563,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008001, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004001, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004001, mValue);
     }
 
 private:
@@ -17590,12 +17590,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008002, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004002, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008002, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004002, mValue);
     }
 
 private:
@@ -17617,12 +17617,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008003, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004003, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008003, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004003, mValue);
     }
 
 private:
@@ -17644,12 +17644,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008004, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004004, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008004, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004004, mValue);
     }
 
 private:
@@ -17670,12 +17670,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008005, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004005, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008005, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004005, mValue);
     }
 
 private:
@@ -17697,12 +17697,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008006, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004006, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008006, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004006, mValue);
     }
 
 private:
@@ -17724,12 +17724,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008007, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004007, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008007, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004007, mValue);
     }
 
 private:
@@ -17751,12 +17751,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008008, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004008, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008008, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004008, mValue);
     }
 
 private:
@@ -17778,12 +17778,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008009, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004009, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008009, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004009, mValue);
     }
 
 private:
@@ -17805,12 +17805,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800A, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400A, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800A, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400A, mValue);
     }
 
 private:
@@ -17832,12 +17832,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800B, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400B, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800B, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400B, mValue);
     }
 
 private:
@@ -17859,12 +17859,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800C, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400C, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800C, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400C, mValue);
     }
 
 private:
@@ -17885,12 +17885,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800D, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400D, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800D, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400D, mValue);
     }
 
 private:
@@ -17912,12 +17912,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800E, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400E, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400E, mValue);
     }
 
 private:
@@ -17939,12 +17939,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000800F, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400F, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000800F, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000400F, mValue);
     }
 
 private:
@@ -17966,12 +17966,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008010, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004010, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008010, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004010, mValue);
     }
 
 private:
@@ -17993,12 +17993,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008011, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004011, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008011, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004011, mValue);
     }
 
 private:
@@ -18020,12 +18020,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008012, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004012, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008012, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004012, mValue);
     }
 
 private:
@@ -18047,12 +18047,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008013, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004013, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008013, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004013, mValue);
     }
 
 private:
@@ -18074,12 +18074,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008014, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004014, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008014, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004014, mValue);
     }
 
 private:
@@ -18100,12 +18100,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008015, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004015, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008015, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004015, mValue);
     }
 
 private:
@@ -18127,12 +18127,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008016, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004016, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008016, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004016, mValue);
     }
 
 private:
@@ -18154,12 +18154,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008017, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004017, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008017, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004017, mValue);
     }
 
 private:
@@ -18181,12 +18181,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008018, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004018, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008018, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004018, mValue);
     }
 
 private:
@@ -18208,12 +18208,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008019, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004019, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008019, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004019, mValue);
     }
 
 private:
@@ -18235,12 +18235,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000801E, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000401E, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000801E, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x0000401E, mValue);
     }
 
 private:
@@ -18262,12 +18262,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008024, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004024, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008024, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004024, mValue);
     }
 
 private:
@@ -18289,12 +18289,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008025, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004025, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008025, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004025, mValue);
     }
 
 private:
@@ -18317,12 +18317,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008026, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004026, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008026, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004026, mValue);
     }
 
 private:
@@ -18344,12 +18344,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008027, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004027, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008027, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004027, mValue);
     }
 
 private:
@@ -18371,12 +18371,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008028, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004028, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008028, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004028, mValue);
     }
 
 private:
@@ -18398,12 +18398,12 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00008029, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004029, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00008029, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000050F, 0x00004029, mValue);
     }
 
 private:

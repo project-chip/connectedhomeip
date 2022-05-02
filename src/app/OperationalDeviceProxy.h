@@ -154,7 +154,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mMRPConfig = nodeResolutionData.GetMRPConfig();
+        mRemoteMRPConfig = nodeResolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -179,17 +179,11 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
-
-    uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
     CHIP_ERROR ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
-
-    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
@@ -258,8 +252,6 @@ private:
     State mState = State::Uninitialized;
 
     SessionHolderWithDelegate mSecureSession;
-
-    uint8_t mSequenceNumber = 0;
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;

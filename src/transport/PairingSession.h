@@ -44,6 +44,7 @@ public:
 
     virtual Transport::SecureSession::Type GetSecureSessionType() const = 0;
     virtual ScopedNodeId GetPeer() const                                = 0;
+    virtual ScopedNodeId GetLocalScopedNodeId() const                   = 0;
     virtual CATValues GetPeerCATs() const                               = 0;
 
     Optional<uint16_t> GetLocalSessionId() const

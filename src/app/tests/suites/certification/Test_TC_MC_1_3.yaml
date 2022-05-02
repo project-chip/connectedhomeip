@@ -43,41 +43,67 @@ tests:
           constraints:
               type: uint16
 
+    #Issue 10988
     - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
+          value: [0, 1, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
+    #Issue 17454
     - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: [0, 1, 2]
           constraints:
               type: list
 
+    #Issue 17454
     - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: [3]
           constraints:
               type: list
 
-    - label: "read the optional global attribute: FeatureMap"
-      disabled: true
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
+    - label:
+          "Read attribute Feature map and verify that DUT response indicates
+          that the FeatureMap attribute has bit 0 set to 1 if the DUT supports
+          the Application Platform feature (PICS_AP_S is true)."
+      verification: |
+          ./chip-tool  applicationlauncher  read feature-map 1 1
+          Verify we are getting feature-map values based on features or pic supported sent in the above command
+          [1649661177918] [67258:746649] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1649661177918] [67258:746649] CHIP: [EM] Sending Standalone Ack for MessageCounter:16467393 on exchange 63291i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

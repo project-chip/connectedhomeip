@@ -34,15 +34,25 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
 
 CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & peerAddress)
 {
-    Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
+    // TODO(17568): Replace with proper expiry logic. This current method makes sure there
+    // are not multiple sessions established, until eventual exhaustion of the resources
+    // for CASE sessions. Current method is quick fix for #17698, cannot remain.
+    mSessionManager->ExpireAllPairingsForPeerExceptPending(GetPeer());
 
+    // Prepare SecureSession fields, including key derivation, first, before activation
+    Transport::SecureSession * secureSession = mSecureSessionHolder->AsSecureSession();
+    ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
     uint16_t peerSessionId = GetPeerSessionId();
+    secureSession->SetPeerAddress(peerAddress);
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+
+    // Call Activate last, otherwise errors on anything after would lead to
+    // a partially valid session.
+    secureSession->Activate(GetSecureSessionType(), GetLocalScopedNodeId(), GetPeer(), GetPeerCATs(), peerSessionId,
+                            mRemoteMRPConfig);
+
     ChipLogDetail(Inet, "New secure session created for device " ChipLogFormatScopedNodeId ", LSID:%d PSID:%d!",
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
-    secureSession->Activate(GetSecureSessionType(), GetPeer(), GetPeerCATs(), peerSessionId, mRemoteMRPConfig);
-    secureSession->SetPeerAddress(peerAddress);
-    ReturnErrorOnFailure(DeriveSecureSession(secureSession->GetCryptoContext()));
-    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
 
     return CHIP_NO_ERROR;
 }

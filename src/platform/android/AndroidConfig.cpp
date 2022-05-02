@@ -71,33 +71,23 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_ProductId             = { kCo
 const AndroidConfig::Key AndroidConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-version" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipFactory, "software-version-str" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_NodeLabel             = { kConfigNamespace_ChipFactory, "node-label" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_PartNumber            = { kConfigNamespace_ChipFactory, "part-number" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ProductURL            = { kConfigNamespace_ChipFactory, "product-url" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ProductLabel          = { kConfigNamespace_ChipFactory, "product-label" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_LocalConfigDisabled = { kConfigNamespace_ChipFactory, "local-config-disabled" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_Reachable           = { kConfigNamespace_ChipFactory, "reachable" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId            = { kConfigNamespace_ChipFactory, "uniqueId" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "uniqueId" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
 
 // Keys stored in the Chip-config namespace
-const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
-
-// Prefix used for NVS keys that contain Chip group encryption keys.
-const char AndroidConfig::kGroupKeyNamePrefix[] = "gk-";
 
 void AndroidConfig::InitializeWithObject(jobject managerObject)
 {

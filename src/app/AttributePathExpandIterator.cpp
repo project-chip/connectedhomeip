@@ -127,7 +127,11 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
             // and overflow to 0 for the max index) to us not going through
             // non-metadata global attributes for this attribute.
             mGlobalAttributeIndex = UINT8_MAX;
-            for (uint8_t idx = 0; idx < ArraySize(GlobalAttributesNotInMetadata); ++idx)
+
+            static_assert(ArraySize(GlobalAttributesNotInMetadata) <= UINT8_MAX, "Iterating over at most 256 array entries");
+
+            const uint8_t arraySize = static_cast<uint8_t>(ArraySize(GlobalAttributesNotInMetadata));
+            for (uint8_t idx = 0; idx < arraySize; ++idx)
             {
                 if (GlobalAttributesNotInMetadata[idx] == aAttributePath.mAttributeId)
                 {
@@ -165,12 +169,12 @@ bool AttributePathExpandIterator::Next()
 {
     for (; mpAttributePath != nullptr; (mpAttributePath = mpAttributePath->mpNext, mEndpointIndex = UINT16_MAX))
     {
-        mOutputPath.mExpanded = mpAttributePath->mValue.HasAttributeWildcard();
+        mOutputPath.mExpanded = mpAttributePath->mValue.IsWildcardPath();
 
         if (mEndpointIndex == UINT16_MAX)
         {
             // Special case: If this is a concrete path, we just return its value as-is.
-            if (!mpAttributePath->mValue.HasAttributeWildcard())
+            if (!mpAttributePath->mValue.IsWildcardPath())
             {
                 mOutputPath.mEndpointId  = mpAttributePath->mValue.mEndpointId;
                 mOutputPath.mClusterId   = mpAttributePath->mValue.mClusterId;

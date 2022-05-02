@@ -118,6 +118,11 @@ public:
 
     void OnConnectWiFiNetwork();
     void OnScanWiFiNetworkDone();
+    void OnNetworkStatusChange();
+
+    CHIP_ERROR SetLastDisconnectReason(int32_t reason);
+    int32_t GetLastDisconnectReason();
+
     static P6WiFiDriver & GetInstance()
     {
         static P6WiFiDriver instance;
@@ -133,6 +138,8 @@ private:
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+    int32_t mLastDisconnectedReason;
 };
 
 } // namespace NetworkCommissioning

@@ -54,11 +54,9 @@ public:
     static constexpr Key kConfigKey_Spake2pSalt           = 9;
     static constexpr Key kConfigKey_Spake2pVerifier       = 10;
     // CHIP Config Keys
-    static constexpr Key kConfigKey_FabricId           = 8;
     static constexpr Key kConfigKey_ServiceConfig      = 9;
     static constexpr Key kConfigKey_PairedAccountId    = 10;
     static constexpr Key kConfigKey_ServiceId          = 11;
-    static constexpr Key kConfigKey_FabricSecret       = 12;
     static constexpr Key kConfigKey_LastUsedEpochKeyId = 13;
     static constexpr Key kConfigKey_FailSafeArmed      = 14;
     static constexpr Key kConfigKey_GroupKey           = 15;
@@ -67,7 +65,6 @@ public:
     static constexpr Key kConfigKey_CountryCode        = 18;
     static constexpr Key kConfigKey_HourFormat         = 20;
     static constexpr Key kConfigKey_CalendarType       = 21;
-    static constexpr Key kConfigKey_Breadcrumb         = 22;
     static constexpr Key kConfigKey_UniqueId           = 23;
 
     // Set key id limits for each group.

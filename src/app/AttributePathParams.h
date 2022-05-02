@@ -49,7 +49,7 @@ struct AttributePathParams
 
     AttributePathParams() {}
 
-    bool HasAttributeWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+    bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
 
     /**
      * SPEC 8.9.2.2

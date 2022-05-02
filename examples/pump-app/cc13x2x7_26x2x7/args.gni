@@ -23,7 +23,8 @@ ti_simplelink_board = "LP_CC2652R7"
 
 # Size Optimizations
 # use -Os instead of -Og, LWIP release build
-is_debug = false
+optimize_debug_level = "s"
+lwip_debug = false
 
 chip_enable_ota_requestor = false
 

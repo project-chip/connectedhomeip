@@ -2167,103 +2167,103 @@ public final class ChipIdLookup {
       if (attributeId == 255L) {
         return "Unsupported";
       }
-      if (attributeId == 32768L) {
+      if (attributeId == 16384L) {
         return "NullableBoolean";
       }
-      if (attributeId == 32769L) {
+      if (attributeId == 16385L) {
         return "NullableBitmap8";
       }
-      if (attributeId == 32770L) {
+      if (attributeId == 16386L) {
         return "NullableBitmap16";
       }
-      if (attributeId == 32771L) {
+      if (attributeId == 16387L) {
         return "NullableBitmap32";
       }
-      if (attributeId == 32772L) {
+      if (attributeId == 16388L) {
         return "NullableBitmap64";
       }
-      if (attributeId == 32773L) {
+      if (attributeId == 16389L) {
         return "NullableInt8u";
       }
-      if (attributeId == 32774L) {
+      if (attributeId == 16390L) {
         return "NullableInt16u";
       }
-      if (attributeId == 32775L) {
+      if (attributeId == 16391L) {
         return "NullableInt24u";
       }
-      if (attributeId == 32776L) {
+      if (attributeId == 16392L) {
         return "NullableInt32u";
       }
-      if (attributeId == 32777L) {
+      if (attributeId == 16393L) {
         return "NullableInt40u";
       }
-      if (attributeId == 32778L) {
+      if (attributeId == 16394L) {
         return "NullableInt48u";
       }
-      if (attributeId == 32779L) {
+      if (attributeId == 16395L) {
         return "NullableInt56u";
       }
-      if (attributeId == 32780L) {
+      if (attributeId == 16396L) {
         return "NullableInt64u";
       }
-      if (attributeId == 32781L) {
+      if (attributeId == 16397L) {
         return "NullableInt8s";
       }
-      if (attributeId == 32782L) {
+      if (attributeId == 16398L) {
         return "NullableInt16s";
       }
-      if (attributeId == 32783L) {
+      if (attributeId == 16399L) {
         return "NullableInt24s";
       }
-      if (attributeId == 32784L) {
+      if (attributeId == 16400L) {
         return "NullableInt32s";
       }
-      if (attributeId == 32785L) {
+      if (attributeId == 16401L) {
         return "NullableInt40s";
       }
-      if (attributeId == 32786L) {
+      if (attributeId == 16402L) {
         return "NullableInt48s";
       }
-      if (attributeId == 32787L) {
+      if (attributeId == 16403L) {
         return "NullableInt56s";
       }
-      if (attributeId == 32788L) {
+      if (attributeId == 16404L) {
         return "NullableInt64s";
       }
-      if (attributeId == 32789L) {
+      if (attributeId == 16405L) {
         return "NullableEnum8";
       }
-      if (attributeId == 32790L) {
+      if (attributeId == 16406L) {
         return "NullableEnum16";
       }
-      if (attributeId == 32791L) {
+      if (attributeId == 16407L) {
         return "NullableFloatSingle";
       }
-      if (attributeId == 32792L) {
+      if (attributeId == 16408L) {
         return "NullableFloatDouble";
       }
-      if (attributeId == 32793L) {
+      if (attributeId == 16409L) {
         return "NullableOctetString";
       }
-      if (attributeId == 32798L) {
+      if (attributeId == 16414L) {
         return "NullableCharString";
       }
-      if (attributeId == 32804L) {
+      if (attributeId == 16420L) {
         return "NullableEnumAttr";
       }
-      if (attributeId == 32805L) {
+      if (attributeId == 16421L) {
         return "NullableStruct";
       }
-      if (attributeId == 32806L) {
+      if (attributeId == 16422L) {
         return "NullableRangeRestrictedInt8u";
       }
-      if (attributeId == 32807L) {
+      if (attributeId == 16423L) {
         return "NullableRangeRestrictedInt8s";
       }
-      if (attributeId == 32808L) {
+      if (attributeId == 16424L) {
         return "NullableRangeRestrictedInt16u";
       }
-      if (attributeId == 32809L) {
+      if (attributeId == 16425L) {
         return "NullableRangeRestrictedInt16s";
       }
       if (attributeId == 65528L) {

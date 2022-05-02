@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.2.1. [TC-DD-2.1] Announcement by device verification
+name: 3.2.1. [TC-DD-2.1] Announcement by device verification
 
 config:
     nodeId: 0x12344321
@@ -24,46 +25,68 @@ tests:
           "If TH knows the DUTs Discovery Capability Bitmask, it starts the
           commissioning process in any order of priority on all of the
           networking technologies that are supported by both the TH and the DUT"
+      verification: |
+          sudo ./chip-all-clusters-app --wifi
       disabled: true
 
     - label:
           "If (PICS_CHIP_DEV) then If !(PICS_CHIP_DEV) then If (PICS_DEV_LOCK)
           then If (PICS_DEV_BARRIER) then"
+      verification: |
+
       disabled: true
 
     - label:
           "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs"
+      verification: |
+
       disabled: true
 
     - label:
           "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs"
+      verification: |
+
       disabled: true
 
     - label:
           "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs"
+      verification: |
+          Out of scope for TE8
       disabled: true
 
     - label:
           "if (PICS_BLE) TH does not respond to DUT and sends a power cycle
           command to DUT"
+      verification: |
+          Out of scope for TE8
       disabled: true
 
     - label:
           "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs.
           TH waits at least 15 minutes"
+      verification: |
+          Out of scope for TE8
       disabled: true
 
     - label: "if (PICS_WIFI) TH scans and finds the DUT SSID"
+      verification: |
+          Out of scope for TE8
       disabled: true
 
     - label:
           "if (PICS_WIFI) TH scans and finds the DUT SSID TH sends to DUT a 1st
           power cycle command (or reset manually) TH sends to DUT a 2nd power
           cycle command (or reset manually)"
+      verification: |
+          Out of scope for TE8
       disabled: true
 
     - label: "if (PICS_WIFI) & (PICS_IE) TH scans and finds the DUT SSID"
+      verification: |
+          Out of scope for TE8
       disabled: true
 
     - label: "TH is connected to the DUT through an Ethernet connection"
+      verification: |
+          Out of scope for TE8
       disabled: true

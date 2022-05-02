@@ -38,7 +38,6 @@ fi
 source scripts/activate.sh
 
 # Set up JARs
-python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Build CMake for Android Studio

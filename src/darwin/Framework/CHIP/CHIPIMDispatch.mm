@@ -272,6 +272,8 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(EndpointId endpoint, Cluste
     return UINT16_MAX;
 }
 
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId) { return false; }
+
 uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 {
     if (endpoint == kSupportedEndpoint && server) {

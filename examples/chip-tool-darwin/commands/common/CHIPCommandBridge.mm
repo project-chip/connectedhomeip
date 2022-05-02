@@ -43,7 +43,6 @@ CHIP_ERROR CHIPCommandBridge::Run()
     auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
     params.startServer = YES;
-    params.kvsPath = @("/tmp/chip_kvs_darwin");
 
     if ([factory startup:params] == NO) {
         ChipLogError(chipTool, "Controller factory startup failed");
@@ -54,22 +53,30 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     ipk = [nocSigner getIPK];
 
-    auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner];
-    controllerParams.vendorId = chip::VendorId::TestVendor1;
-    controllerParams.fabricId = 1;
-    controllerParams.ipk = ipk;
+    constexpr const char * identities[] = { "alpha", "beta", "gamma" };
+    for (size_t i = 0; i < ArraySize(identities); ++i) {
+        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner];
+        controllerParams.vendorId = chip::VendorId::TestVendor1;
+        controllerParams.fabricId = i + 1;
+        controllerParams.ipk = ipk;
 
-    // We're not sure whether we're creating a new fabric or using an
-    // existing one, so just try both.
-    mController = [factory startControllerOnExistingFabric:controllerParams];
-    if (mController == nil) {
-        // Maybe we didn't have this fabric yet.
-        mController = [factory startControllerOnNewFabric:controllerParams];
+        // We're not sure whether we're creating a new fabric or using an
+        // existing one, so just try both.
+        auto controller = [factory startControllerOnExistingFabric:controllerParams];
+        if (controller == nil) {
+            // Maybe we didn't have this fabric yet.
+            controller = [factory startControllerOnNewFabric:controllerParams];
+        }
+        if (controller == nil) {
+            ChipLogError(chipTool, "Controller startup failure.");
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        mControllers[identities[i]] = controller;
     }
-    if (mController == nil) {
-        ChipLogError(chipTool, "Controller startup failure.");
-        return CHIP_ERROR_INTERNAL;
-    }
+
+    // Default to alpha.
+    SetIdentity("alpha");
 
     ReturnLogErrorOnFailure(RunCommand());
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -77,12 +84,18 @@ CHIP_ERROR CHIPCommandBridge::Run()
     return CHIP_NO_ERROR;
 }
 
-CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mController; }
+void CHIPCommandBridge::SetIdentity(const char * name) { mCurrentController = mControllers[name]; }
+
+CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
-    [CurrentCommissioner() shutdown];
+    for (auto & pair : mControllers) {
+        [pair.second shutdown];
+    }
+    mControllers.clear();
+    mCurrentController = nil;
 
     [[MatterControllerFactory sharedInstance] shutdown];
 

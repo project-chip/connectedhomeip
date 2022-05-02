@@ -447,6 +447,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    // If GetNextCommissioningStage indicated a failure, don't lose track of
+    // that.  But don't overwrite any existing failures we had hanging
+    // around.
+    if (completionStatus.err == CHIP_NO_ERROR)
+    {
+        completionStatus.err = err;
+    }
+
     DeviceProxy * proxy = mCommissioneeDeviceProxy;
     if (nextStage == CommissioningStage::kSendComplete ||
         (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))

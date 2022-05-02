@@ -42,8 +42,7 @@ public:
     CHIP_ERROR SendMessage(SessionManager * sessionManager, const SessionHandle & session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
-    CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                 const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+    CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                                  ReliableMessageContext * reliableMessageContext);
 
 protected:

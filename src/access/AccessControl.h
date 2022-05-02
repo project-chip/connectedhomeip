@@ -25,6 +25,9 @@
 #include "lib/support/CodeUtils.h"
 #include <lib/core/CHIPCore.h>
 
+// Dump function for use during development only (0 for disabled, non-zero for enabled).
+#define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
+
 namespace chip {
 namespace Access {
 
@@ -213,6 +216,8 @@ public:
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
+        bool HasDefaultDelegate() const { return mDelegate == &mDefaultDelegate; }
+
         const Delegate & GetDelegate() const { return *mDelegate; }
 
         Delegate & GetDelegate() { return *mDelegate; }
@@ -287,24 +292,41 @@ public:
         Delegate * mDelegate = &mDefaultDelegate;
     };
 
-    class Extension
-    {
-        // TODO: implement extension
-    };
-
-    class ExtensionIterator
-    {
-        // TODO: implement extension iterator
-    };
-
-    class Listener
+    /**
+     * Used by access control to notify of changes in access control list.
+     */
+    class EntryListener
     {
     public:
-        virtual ~Listener() = default;
+        enum class ChangeType
+        {
+            kAdded   = 1,
+            kRemoved = 2,
+            kUpdated = 3
+        };
 
-        // TODO: add entry/extension to listener interface
-        virtual void OnEntryChanged()     = 0;
-        virtual void OnExtensionChanged() = 0;
+        virtual ~EntryListener() = default;
+
+        /**
+         * Notifies of a change in the access control list.
+         *
+         * The fabric is indicated by its own parameter. If available, a subject descriptor will
+         * have more detail (and its fabric index will match). A best effort is made to provide
+         * the latest value of the changed entry.
+         *
+         * @param [in] subjectDescriptor Optional (if available) subject descriptor for this operation.
+         * @param [in] fabric            Index of fabric in which entry has changed.
+         * @param [in] index             Index of entry to which has changed (relative to fabric).
+         * @param [in] entry             Optional (best effort) latest value of entry which has changed.
+         * @param [in] changeType        Type of change.
+         */
+        virtual void OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                                    const Entry * entry, ChangeType changeType) = 0;
+
+    private:
+        EntryListener * mNext = nullptr;
+
+        friend class AccessControl;
     };
 
     class Delegate
@@ -332,6 +354,12 @@ public:
         // TODO: add more capabilities
 
         // Actualities
+        virtual CHIP_ERROR GetEntryCount(FabricIndex fabric, size_t & value) const
+        {
+            value = 0;
+            return CHIP_NO_ERROR;
+        }
+
         virtual CHIP_ERROR GetEntryCount(size_t & value) const
         {
             value = 0;
@@ -359,13 +387,6 @@ public:
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
-
-        // Listening
-        virtual void SetListener(Listener & listener) { mListener = &listener; }
-        virtual void ClearListener() { mListener = nullptr; }
-
-    private:
-        Listener * mListener = nullptr;
     };
 
     AccessControl() = default;
@@ -403,6 +424,12 @@ public:
     }
 
     // Actualities
+    CHIP_ERROR GetEntryCount(FabricIndex fabric, size_t & value) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->GetEntryCount(fabric, value);
+    }
+
     CHIP_ERROR GetEntryCount(size_t & value) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
@@ -425,6 +452,28 @@ public:
     /**
      * Creates an entry in the access control list.
      *
+     * @param [in]  subjectDescriptor Optional subject descriptor for this operation.
+     * @param [in]  fabric            Index of fabric in which to create entry.
+     * @param [out] index             (If not nullptr) index of created entry (relative to fabric).
+     * @param [in]  entry             Entry from which created entry is copied.
+     */
+    CHIP_ERROR CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index, const Entry & entry)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        size_t i;
+        ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
+        if (index)
+        {
+            *index = i;
+        }
+        NotifyEntryChanged(subjectDescriptor, fabric, i, &entry, EntryListener::ChangeType::kAdded);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Creates an entry in the access control list.
+     *
      * @param [out] index       Entry index of created entry, if not null. May be relative to `fabricIndex`.
      * @param [in]  entry       Entry from which to copy.
      * @param [out] fabricIndex Fabric index of created entry, if not null, in which case entry `index` will be relative to fabric.
@@ -434,6 +483,19 @@ public:
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->CreateEntry(index, entry, fabricIndex);
+    }
+
+    /**
+     * Reads an entry in the access control list.
+     *
+     * @param [in] fabric            Index of fabric in which to read entry.
+     * @param [in] index             Index of entry to read (relative to fabric).
+     * @param [in] entry             Entry into which read entry is copied.
+     */
+    CHIP_ERROR ReadEntry(FabricIndex fabric, size_t index, Entry & entry) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->ReadEntry(index, entry, &fabric);
     }
 
     /**
@@ -452,6 +514,23 @@ public:
     /**
      * Updates an entry in the access control list.
      *
+     * @param [in] subjectDescriptor Optional subject descriptor for this operation.
+     * @param [in] fabric            Index of fabric in which to update entry.
+     * @param [in] index             Index of entry to update (relative to fabric).
+     * @param [in] entry             Entry from which updated entry is copied.
+     */
+    CHIP_ERROR UpdateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry & entry)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(mDelegate->UpdateEntry(index, entry, &fabric));
+        NotifyEntryChanged(subjectDescriptor, fabric, index, &entry, EntryListener::ChangeType::kUpdated);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Updates an entry in the access control list.
+     *
      * @param [in] index        Entry index of entry to update, if not null. May be relative to `fabricIndex`.
      * @param [in] entry        Entry from which to copy.
      * @param [in] fabricIndex  Fabric to which entry `index` is relative, if not null.
@@ -461,6 +540,35 @@ public:
         ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         return mDelegate->UpdateEntry(index, entry, fabricIndex);
+    }
+
+    /**
+     * Deletes an entry in the access control list.
+     *
+     * @param [in] subjectDescriptor Optional subject descriptor for this operation.
+     * @param [in] fabric            Index of fabric in which to delete entry.
+     * @param [in] index             Index of entry to delete (relative to fabric).
+     */
+    CHIP_ERROR DeleteEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index)
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        Entry entry;
+        Entry * p = nullptr;
+        if (mEntryListener != nullptr && ReadEntry(fabric, index, entry) == CHIP_NO_ERROR)
+        {
+            p = &entry;
+        }
+        ReturnErrorOnFailure(mDelegate->DeleteEntry(index, &fabric));
+        if (p && p->HasDefaultDelegate())
+        {
+            // The entry was read prior to deletion so its latest value could be provided
+            // to the listener after deletion. If it's been reset to its default delegate,
+            // that best effort attempt to retain the latest value failed. This is
+            // regretable but OK.
+            p = nullptr;
+        }
+        NotifyEntryChanged(subjectDescriptor, fabric, index, p, EntryListener::ChangeType::kRemoved);
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -475,7 +583,17 @@ public:
         return mDelegate->DeleteEntry(index, fabricIndex);
     }
 
-    CHIP_ERROR RemoveFabric(FabricIndex fabricIndex);
+    /**
+     * Iterates over entries in the access control list.
+     *
+     * @param [in]  fabric   Fabric over which to iterate entries.
+     * @param [out] iterator Iterator controlling the iteration.
+     */
+    CHIP_ERROR Entries(FabricIndex fabric, EntryIterator & iterator) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        return mDelegate->Entries(iterator, &fabric);
+    }
 
     /**
      * Iterates over entries in the access control list.
@@ -489,6 +607,12 @@ public:
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
+    // Adds a listener to the end of the listener list, if not already in the list.
+    void AddEntryListener(EntryListener & listener);
+
+    // Removes a listener from the listener list, if in the list.
+    void RemoveEntryListener(EntryListener & listener);
+
     /**
      * Check whether access (by a subject descriptor, to a request path,
      * requiring a privilege) should be allowed or denied.
@@ -499,14 +623,24 @@ public:
      */
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
+#if CHIP_ACCESS_CONTROL_DUMP_ENABLED
+    CHIP_ERROR Dump(const Entry & entry);
+#endif
+
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
 
     bool IsValid(const Entry & entry);
 
+    void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
+                            EntryListener::ChangeType changeType);
+
+private:
     Delegate * mDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
+
+    EntryListener * mEntryListener = nullptr;
 };
 
 /**

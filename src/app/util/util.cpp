@@ -515,7 +515,12 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 // default value of NULL is treated as all zeroes.
 int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber)
 {
-    uint8_t i, j, k;
+    if (len == 0)
+    {
+        // no length means nothing to compare.  Shouldn't even happen, since len is sizeof(some-integer-type).
+        return 0;
+    }
+
     if (signedNumber)
     { // signed number comparison
         if (len <= 4)
@@ -524,12 +529,12 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
             int32_t accum2 = 0x0;
             int32_t all1s  = -1;
 
-            for (i = 0; i < len; i++)
+            for (uint16_t i = 0; i < len; i++)
             {
-                j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+                uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
                 accum1 |= j << (8 * (len - 1 - i));
 
-                k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+                uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
                 accum2 |= k << (8 * (len - 1 - i));
             }
 
@@ -563,10 +568,10 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     }
 
     // regular unsigned number comparison
-    for (i = 0; i < len; i++)
+    for (uint16_t i = 0; i < len; i++)
     {
-        j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
-        k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
+        uint8_t j = (val1 == nullptr ? 0 : (EM_BIG_ENDIAN ? val1[i] : val1[(len - 1) - i]));
+        uint8_t k = (EM_BIG_ENDIAN ? val2[i] : val2[(len - 1) - i]);
 
         if (j > k)
         {
@@ -764,17 +769,14 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
     }
 }
 
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer)
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
-    uint8_t mask = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
-    return (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask) != nullptr);
+    return (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId) != nullptr);
 }
 
-bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                   bool asServer)
+bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
-    uint8_t mask                              = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
-    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask);
+    const EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId);
 
     if (metadata == nullptr)
     {

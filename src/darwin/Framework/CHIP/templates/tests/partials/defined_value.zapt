@@ -1,7 +1,0 @@
-{{! If the defined value is the name of a config variable, just
-    substitute the value of the variable instead. }}
-{{#if (chip_tests_config_has definedValue)~}}
-  {{chip_tests_config_get_default_value definedValue}}
-{{~else~}}
-  {{definedValue}}
-{{~/if}}

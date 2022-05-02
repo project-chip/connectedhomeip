@@ -312,3 +312,9 @@ PICS:
 
     - label: "Prompts user for input. Unable to run in CI"
       id: PICS_USER_PROMPT
+
+    - label: "Skip sample app"
+      id: PICS_SKIP_SAMPLE_APP
+
+    - label: "Level Control for Lighting"
+      id: OO_LT
