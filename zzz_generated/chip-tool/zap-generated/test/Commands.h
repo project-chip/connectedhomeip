@@ -21819,7 +21819,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("pumpStatus", value, 0U));
             }
@@ -21831,7 +21831,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map16"));
             }
@@ -22048,7 +22048,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("pumpStatus", value, 0U));
             }
@@ -22060,7 +22060,7 @@ private:
             }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::BitFlags<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "map16"));
             }
