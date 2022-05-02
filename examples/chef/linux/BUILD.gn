@@ -15,8 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
@@ -46,16 +46,16 @@ executable("${sample_name}") {
   ]
 
   deps = [
-    "${project_dir}/shell_common:shell_common",
     ":chef-data-model",
+    "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/controller",
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib",
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/platform",
-    "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/lib",
+    "${project_dir}/shell_common:shell_common",
   ]
 
   include_dirs = [ "include" ]
