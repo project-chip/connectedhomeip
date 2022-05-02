@@ -143,7 +143,6 @@ public:
 #endif
 
     IPAddress()                        = default;
-    IPAddress(const IPAddress & other) = default;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     explicit IPAddress(const ip6_addr_t & ipv6Addr);
