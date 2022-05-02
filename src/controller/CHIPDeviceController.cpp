@@ -1472,7 +1472,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
     else
     {
-        // TODO: We should propogate errors commissioningError networkCommissioningStatus errors from completionStatus.
+        // TODO: We should propogate detailed error information (commissioningError, networkCommissioningStatus) from completionStatus.
         mPairingDelegate->OnCommissioningFailure(peerId, completionStatus.err, completionStatus.failedStage.ValueOr(kError),
                                                  completionStatus.attestationResult);
     }
@@ -1731,7 +1731,7 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received ArmFailSafe response errorCode=%u", static_cast<uint8_t>(data.errorCode));
+    ChipLogProgress(Controller, "Received ArmFailSafe response errorCode=%u", to_underlying(data.errorCode));
     if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
@@ -1748,7 +1748,7 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received SetRegulatoryConfig response errorCode=%u", static_cast<uint8_t>(data.errorCode));
+    ChipLogProgress(Controller, "Received SetRegulatoryConfig response errorCode=%u", to_underlying(data.errorCode));
     if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
@@ -1765,7 +1765,7 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u",
-                    static_cast<uint8_t>(data.networkingStatus));
+                    to_underlying(data.networkingStatus));
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
@@ -1782,7 +1782,7 @@ void DeviceCommissioner::OnConnectNetworkResponse(
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received ConnectNetwork response, networkingStatus=%u",
-                    static_cast<uint8_t>(data.networkingStatus));
+                    to_underlying(data.networkingStatus));
     if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
@@ -1798,7 +1798,7 @@ void DeviceCommissioner::OnCommissioningCompleteResponse(
     CommissioningDelegate::CommissioningReport report;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received CommissioningComplete response, errorCode=%u", static_cast<uint8_t>(data.errorCode));
+    ChipLogProgress(Controller, "Received CommissioningComplete response, errorCode=%u", to_underlying(data.errorCode));
     if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
     {
         err = CHIP_ERROR_INTERNAL;

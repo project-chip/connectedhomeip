@@ -486,9 +486,9 @@ public:
      * kSendTrustedRootCert: None
      * kSendNOC: none
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
-     * kThreadNetworkSetup: none
+     * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
-     * kThreadNetworkEnable: none
+     * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kFindOperational: OperationalNodeFoundData
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
