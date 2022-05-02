@@ -30,6 +30,7 @@ class AttributeTransformSetCallback:
     def __call__(self, attr):
         attr.tags.add(AttributeTag.CALLBACK)
 
+
 class AttributeTransformSetPersisted:
     def __init__(self):
         pass
