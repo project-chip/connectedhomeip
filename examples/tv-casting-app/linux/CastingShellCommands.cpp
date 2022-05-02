@@ -35,25 +35,6 @@
 namespace chip {
 namespace Shell {
 
-void PrintFabrics()
-{
-    // set fabric to be the first in the list
-    for (const auto & fb : chip::Server::GetInstance().GetFabricTable())
-    {
-        FabricIndex fabricIndex = fb.GetFabricIndex();
-        ChipLogError(AppServer, "Next Fabric index=%d", fabricIndex);
-        if (!fb.IsInitialized())
-        {
-            ChipLogError(AppServer, " -- Not initialized");
-            continue;
-        }
-        NodeId myNodeId = fb.GetNodeId();
-        ChipLogProgress(NotSpecified,
-                        "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
-                        ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
-    }
-}
-
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
@@ -63,6 +44,9 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(
         sout,
         "  delete-fabric <index>     Delete a fabric from the casting client's fabric store. Usage: cast delete-fabric 1\r\n");
+    streamer_printf(
+        sout,
+        "  set-fabric <index>        Set current fabric from the casting client's fabric store. Usage: cast set-fabric 1\r\n");
     streamer_printf(sout,
                     "  init <nodeid> <fabric-index>  Initialize casting app using given nodeid and index from previous "
                     "commissioning. Usage: init 18446744004990074879 2\r\n");
@@ -165,6 +149,18 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
         chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
         return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "set-fabric") == 0)
+    {
+        char * eptr;
+        chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
+        chip::NodeId nodeId           = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        if (nodeId == kUndefinedFabricIndex)
+        {
+            streamer_printf(streamer_get(), "ERROR - invalid fabric or video player nodeId not found\r\n");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "cluster") == 0)
     {
