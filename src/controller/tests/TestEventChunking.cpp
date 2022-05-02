@@ -73,7 +73,8 @@ public:
         };
 
         chip::app::EventManagement::CreateEventManagement(sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter, &ctx->GetFabricTable());
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter,
+                                                          &ctx->GetFabricTable());
 
         return SUCCESS;
     }

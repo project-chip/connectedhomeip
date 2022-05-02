@@ -162,7 +162,7 @@ chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 chip::MonotonicallyIncreasingCounter<chip::EventNumber> gEventCounter;
 
-CHIP_ERROR InitializeEventLogging(chip::FabricTable *apFabricTable)
+CHIP_ERROR InitializeEventLogging(chip::FabricTable * apFabricTable)
 {
     ReturnErrorOnFailure(gEventCounter.Init(0));
 

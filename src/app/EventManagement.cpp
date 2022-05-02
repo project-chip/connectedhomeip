@@ -82,8 +82,8 @@ struct CopyAndAdjustDeltaTimeContext
     EventLoadOutContext * mpContext = nullptr;
 };
 
-void EventManagement::Init(uint32_t aNumBuffers,
-                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
+void EventManagement::Init(uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
+                           const LogStorageResources * const apLogStorageResources,
                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable)
 {
     VerifyOrDie(aNumBuffers != 0);
@@ -97,7 +97,7 @@ void EventManagement::Init(uint32_t aNumBuffers,
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
     CircularEventBuffer * next    = nullptr;
-    mpFabricTable = apFabricTable;
+    mpFabricTable                 = apFabricTable;
 
     for (uint32_t bufferIndex = 0; bufferIndex < aNumBuffers; bufferIndex++)
     {
@@ -318,7 +318,8 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
-        apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kCachedEventNumberTag), mpFabricTable->FindFabricWithIndex(apOptions->mFabricIndex)->GetEventNumber());
+        apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kCachedEventNumberTag),
+                               mpFabricTable->FindFabricWithIndex(apOptions->mFabricIndex)->GetEventNumber());
     }
     eventDataIBBuilder.EndOfEventDataIB();
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
@@ -329,10 +330,10 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     return CHIP_NO_ERROR;
 }
 
-void EventManagement::CreateEventManagement(uint32_t aNumBuffers,
-                                            CircularEventBuffer * apCircularEventBuffer,
+void EventManagement::CreateEventManagement(uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
                                             const LogStorageResources * const apLogStorageResources,
-                                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable)
+                                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                                            FabricTable * apFabricTable)
 {
     sInstance.Init(aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter, apFabricTable);
 }
@@ -724,8 +725,8 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, const ObjectLi
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    context.mSubjectDescriptor      = aSubjectDescriptor;
-    FabricInfo * info = mpFabricTable->FindFabricWithIndex(aSubjectDescriptor.fabricIndex);
+    context.mSubjectDescriptor = aSubjectDescriptor;
+    FabricInfo * info          = mpFabricTable->FindFabricWithIndex(aSubjectDescriptor.fabricIndex);
     if (info != nullptr)
     {
         context.mCachedEventNumber = info->GetEventNumber();

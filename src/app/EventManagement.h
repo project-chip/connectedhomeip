@@ -42,10 +42,10 @@
 
 namespace chip {
 namespace app {
-constexpr const uint32_t kEventManagementProfile            = 0x1;
-constexpr const uint32_t kFabricIndexTag                    = 0x1;
-constexpr const uint32_t kCachedEventNumberTag         = 0x2;
-constexpr size_t kMaxEventSizeReserve                       = 512;
+constexpr const uint32_t kEventManagementProfile = 0x1;
+constexpr const uint32_t kFabricIndexTag         = 0x1;
+constexpr const uint32_t kCachedEventNumberTag   = 0x2;
+constexpr size_t kMaxEventSizeReserve            = 512;
 constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
@@ -222,10 +222,10 @@ public:
      * @param[in] apFabricTable   A fabric table to use to check if fabric-scoped event is valid when fetching events
      * @note This function must be called prior to the logging being used.
      */
-    static void CreateEventManagement(uint32_t aNumBuffers,
-                                      CircularEventBuffer * apCircularEventBuffer,
+    static void CreateEventManagement(uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources,
-                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, FabricTable * apFabricTable);
+                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                                      FabricTable * apFabricTable);
 
     static void DestroyEventManagement();
 
@@ -373,12 +373,12 @@ private:
 #else
         Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
 #endif
-        PriorityLevel mPriority  = PriorityLevel::First;
-        ClusterId mClusterId     = 0;
-        EndpointId mEndpointId   = 0;
-        EventId mEventId         = 0;
-        EventNumber mEventNumber = 0;
-        FabricIndex mFabricIndex = kUndefinedFabricIndex;
+        PriorityLevel mPriority        = PriorityLevel::First;
+        ClusterId mClusterId           = 0;
+        EndpointId mEndpointId         = 0;
+        EventId mEventId               = 0;
+        EventNumber mEventNumber       = 0;
+        FabricIndex mFabricIndex       = kUndefinedFabricIndex;
         EventNumber mCachedEventNumber = 0;
     };
 
@@ -505,9 +505,9 @@ private:
     CircularEventBuffer * GetPriorityBuffer(PriorityLevel aPriority) const;
 
     // EventBuffer for debug level,
-    CircularEventBuffer * mpEventBuffer        = nullptr;
-    EventManagementStates mState               = EventManagementStates::Shutdown;
-    uint32_t mBytesWritten                     = 0;
+    CircularEventBuffer * mpEventBuffer = nullptr;
+    EventManagementStates mState        = EventManagementStates::Shutdown;
+    uint32_t mBytesWritten              = 0;
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     System::Mutex mAccessLock;
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING

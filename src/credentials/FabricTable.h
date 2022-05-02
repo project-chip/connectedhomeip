@@ -38,7 +38,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
-#include <lib/support/Span.h>
 
 namespace chip {
 
@@ -66,10 +65,7 @@ static_assert(kUndefinedFabricIndex < chip::kMinValidFabricIndex, "Undefined fab
 class DLL_EXPORT FabricInfo
 {
 public:
-    FabricInfo()
-    {
-        Reset();
-    }
+    FabricInfo() { Reset(); }
 
     // Returns a span into our internal storage.
     CharSpan GetFabricLabel() const { return CharSpan(mFabricLabel, strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes)); }

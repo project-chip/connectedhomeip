@@ -23,31 +23,31 @@
  */
 
 #include <access/SubjectDescriptor.h>
-#include <credentials/FabricTable.h>
-#include <credentials/tests/CHIPCert_test_vectors.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ObjectList.h>
 #include <app/tests/AppTestContext.h>
+#include <credentials/FabricTable.h>
+#include <credentials/tests/CHIPCert_test_vectors.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
-#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/PersistedCounter.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/Constants.h>
-#include <lib/support/PersistedCounter.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
+#include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
-#include <nlunit-test.h>
 
 namespace {
 
@@ -92,21 +92,22 @@ public:
         chip::Platform::MemoryInit();
         sFabricTable.Init(&sStorage);
         sGlobalEventIdCounter.Init(&sStorage, &chip::DefaultStorageKeyAllocator::IMEventNumber,
-                                         CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
+                                   CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
         sGlobalEventIdCounter.Advance();
         sAliceFabric.TestOnlyBuildFabric(
-                chip::ByteSpan(chip::TestCerts::sTestCert_Root01_Chip, chip::TestCerts::sTestCert_Root01_Chip_Len),
-                chip::ByteSpan(chip::TestCerts::sTestCert_ICA01_Chip, chip::TestCerts::sTestCert_ICA01_Chip_Len),
-                chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_Chip, chip::TestCerts::sTestCert_Node01_01_Chip_Len),
-                chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_PublicKey, chip::TestCerts::sTestCert_Node01_01_PublicKey_Len),
-                chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_PrivateKey, chip::TestCerts::sTestCert_Node01_01_PrivateKey_Len));
+            chip::ByteSpan(chip::TestCerts::sTestCert_Root01_Chip, chip::TestCerts::sTestCert_Root01_Chip_Len),
+            chip::ByteSpan(chip::TestCerts::sTestCert_ICA01_Chip, chip::TestCerts::sTestCert_ICA01_Chip_Len),
+            chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_Chip, chip::TestCerts::sTestCert_Node01_01_Chip_Len),
+            chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_PublicKey, chip::TestCerts::sTestCert_Node01_01_PublicKey_Len),
+            chip::ByteSpan(chip::TestCerts::sTestCert_Node01_01_PrivateKey, chip::TestCerts::sTestCert_Node01_01_PrivateKey_Len));
         if (sFabricTable.AddNewFabric(sAliceFabric, &sAliceFabricIndex) != CHIP_NO_ERROR)
         {
             return FAILURE;
         }
 
         chip::app::EventManagement::CreateEventManagement(sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, &sGlobalEventIdCounter, &sFabricTable);
+                                                          gCircularEventBuffer, logStorageResources, &sGlobalEventIdCounter,
+                                                          &sFabricTable);
 
         return SUCCESS;
     }
@@ -167,7 +168,8 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo, chip::Access::SubjectDescriptor &descriptor)
+                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo,
+                            chip::Access::SubjectDescriptor & descriptor)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -217,9 +219,9 @@ static void CheckLogEventWithFabricScopedEventEvictToNextBuffer(nlTestSuite * ap
     chip::app::EventOptions options2;
     TestEventGenerator testEventGenerator;
 
-    options1.mPath                       = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
-    options1.mPriority                   = chip::app::PriorityLevel::Info;
-    options1.mFabricIndex                = sAliceFabricIndex;
+    options1.mPath        = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
+    options1.mPriority    = chip::app::PriorityLevel::Info;
+    options1.mFabricIndex = sAliceFabricIndex;
 
     options2.mPath                       = { kTestEndpointId2, kLivenessClusterId, kLivenessChangeEvent };
     options2.mPriority                   = chip::app::PriorityLevel::Info;
@@ -259,13 +261,13 @@ static void CheckLogEventWithFabricScopedEventEvictToNextBuffer(nlTestSuite * ap
 
     chip::Access::SubjectDescriptor descriptor;
     descriptor.fabricIndex = sAliceFabricIndex;
-    //Test Event fetch from circular event buffer with same fabric and event number
+    // Test Event fetch from circular event buffer with same fabric and event number
     CheckLogReadOut(apSuite, logMgmt, 1, 3, &testEventPathParams1, descriptor);
     CheckLogReadOut(apSuite, logMgmt, 2, 2, &testEventPathParams1, descriptor);
     CheckLogReadOut(apSuite, logMgmt, 3, 1, &testEventPathParams1, descriptor);
     CheckLogReadOut(apSuite, logMgmt, 4, 1, &testEventPathParams2, descriptor);
 
-    //Test Event fetch from circular event buffer with same fabric and different event number
+    // Test Event fetch from circular event buffer with same fabric and different event number
     sFabricTable.FindFabricWithIndex(sAliceFabricIndex)->TestOnlySetEventNumber(2);
     CheckLogReadOut(apSuite, logMgmt, 1, 0, &testEventPathParams1, descriptor);
     CheckLogReadOut(apSuite, logMgmt, 1, 0, &testEventPathParams2, descriptor);
@@ -275,7 +277,9 @@ static void CheckLogEventWithFabricScopedEventEvictToNextBuffer(nlTestSuite * ap
  *   Test Suite. It lists all the test functions.
  */
 
-const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithFabricScopedEventEvictToNextBuffer", CheckLogEventWithFabricScopedEventEvictToNextBuffer), NL_TEST_SENTINEL() };
+const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithFabricScopedEventEvictToNextBuffer",
+                                      CheckLogEventWithFabricScopedEventEvictToNextBuffer),
+                          NL_TEST_SENTINEL() };
 
 // clang-format off
 nlTestSuite sSuite =
