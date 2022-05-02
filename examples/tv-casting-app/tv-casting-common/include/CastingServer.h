@@ -41,7 +41,7 @@ constexpr EndpointId kTvEndpoint                               = 1;
 class CastingServer
 {
 public:
-    CastingServer(CastingServer & other)  = delete;
+    CastingServer(CastingServer & other) = delete;
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
@@ -55,10 +55,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     CHIP_ERROR InitBindingHandlers();
-    TargetVideoPlayerInfo * GetTargetVideoPlayerInfo()
-    {
-        return &mTargetVideoPlayerInfo;
-    }
+    TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
     CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
     void ReadServerClusters(EndpointId endpointId);
     void ReadServerClustersForNode(chip::NodeId nodeId);
@@ -72,10 +69,7 @@ public:
     NodeId GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex);
     FabricIndex GetVideoPlayerFabricIndexForNode(NodeId nodeId);
     void PrintBindings();
-    FabricIndex CurrentFabricIndex()
-    {
-        return mTargetVideoPlayerInfo.GetFabricIndex();
-    }
+    FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
     void SetDefaultFabricIndex();
 
 private:
