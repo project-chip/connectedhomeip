@@ -30,6 +30,13 @@ class AttributeTransformSetCallback:
     def __call__(self, attr):
         attr.tags.add(AttributeTag.CALLBACK)
 
+class AttributeTransformSetPersisted:
+    def __init__(self):
+        pass
+
+    def __call__(self, attr):
+        attr.tags.add(AttributeTag.PERSIST)
+
 
 class MatterIdlTransformer(Transformer):
     """
@@ -254,6 +261,10 @@ class MatterIdlTransformer(Transformer):
     @v_args(inline=True)
     def attribute_is_callback(self):
         return AttributeTransformSetCallback()
+
+    @v_args(inline=True)
+    def attribute_is_persist(self):
+        return AttributeTransformSetPersisted()
 
     def attribute_traits(self, traits):
         # traits as is as a list

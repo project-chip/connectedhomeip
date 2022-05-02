@@ -187,7 +187,9 @@ class TestParser(unittest.TestCase):
                 attribute char_string<33> attr2 = 2 [default="abc\\n with escapes: \\""];
                 attribute int32u withDefault = 3 [default=11];
                 attribute int32u intWithCallback = 4 [callback];
-                readonly attribute int32u readonlyDefault = 5 [default=321];
+                attribute int32u persisted = 5 [persist];
+                attribute int32u persisted_with_default = 6 [persist, default=55];
+                readonly attribute int32u readonlyDefault = 7 [default=321];
             }
         """)
 
@@ -204,8 +206,12 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int32u"), code=3, name="withDefault"), default=11),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.CALLBACK]), definition=Field(
                             data_type=DataType(name="int32u"), code=4, name="intWithCallback")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.PERSIST]), definition=Field(
+                            data_type=DataType(name="int32u"), code=5, name="persisted")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.PERSIST]), definition=Field(
+                            data_type=DataType(name="int32u"), code=6, name="persisted_with_default"), default=55),
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
-                            data_type=DataType(name="int32u"), code=5, name="readonlyDefault"), default=321),
+                            data_type=DataType(name="int32u"), code=7, name="readonlyDefault"), default=321),
                     ]
                     )])
         self.assertEqual(actual, expected)

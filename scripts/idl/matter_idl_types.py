@@ -18,6 +18,7 @@ class AttributeTag(enum.Enum):
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
     CALLBACK = enum.auto()
+    PERSIST = enum.auto()
 
 
 class EventPriority(enum.Enum):

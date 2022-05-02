@@ -25,7 +25,8 @@ attribute_access_entry: attribute_access_type ":" access_privilege
 default_value: "default"i "=" (number | ESCAPED_STRING)
 
 attribute_is_callback: "callback"i
-?single_attribute_trait: attribute_is_callback | default_value
+attribute_is_persist: "persist"i
+?single_attribute_trait: attribute_is_callback | attribute_is_persist | default_value
 
 attribute_traits: "[" single_attribute_trait ("," single_attribute_trait)* "]"
 
