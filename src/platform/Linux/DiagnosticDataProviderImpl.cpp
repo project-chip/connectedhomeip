@@ -266,6 +266,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 #endif
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::SetCurrentHeapHighWatermark(uint64_t heapHighWatermark)
+{
+    // On Linux, the write operation is non-op since we always rely on the mallinfo system
+    // function to get the current heap memory.
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
