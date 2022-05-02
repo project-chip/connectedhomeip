@@ -80,8 +80,7 @@ private:
                         return Loop::Continue;
                     }
                 }
-                ChipLogDetail(DataManagement,
-                              "Dirty path Endpoint %" PRIx16 " Cluster %" PRIx32 ", Attribute %" PRIx32 " is not expected",
+                ChipLogDetail(DataManagement, "Dirty path Endpoint %x Cluster %" PRIx32 ", Attribute %" PRIx32 " is not expected",
                               uint16_t(path->mEndpointId), path->mClusterId, path->mAttributeId);
                 return Loop::Break;
             }) == Loop::Break)
@@ -94,8 +93,7 @@ private:
             if (!content[i].verified)
             {
                 ChipLogDetail(DataManagement,
-                              "Dirty path Endpoint %" PRIx16 " Cluster %" PRIx32 ", Attribute %" PRIx32
-                              " is not found in the dirty set",
+                              "Dirty path Endpoint %x Cluster %" PRIx32 ", Attribute %" PRIx32 " is not found in the dirty set",
                               uint16_t(content[i].mEndpointId), content[i].mClusterId, content[i].mAttributeId);
                 return false;
             }
@@ -238,7 +236,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
+    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().mGlobalDirtySet.ReleaseAll();
