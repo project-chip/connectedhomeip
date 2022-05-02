@@ -104,7 +104,7 @@ server cluster AccessControl = 31 {
   //   - `persist` is the equivalent of NVM in ember/zap, which means
   //     the value will be persisted to storage when written (boot-time restores
   //     any set value)
-  //   - `default` is supported to set a default value in RAM
+  //   - `default` is supported to set a default value in RAM-based attribute store
   //
   // Not all combination of values are compatible. In particular:
   //  - `callback` is incompatible with `default` or `persist` as all value
