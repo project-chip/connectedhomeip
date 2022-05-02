@@ -251,7 +251,7 @@ class MatterIdlTransformer(Transformer):
         return (args[-1], acl)
 
     def ESCAPED_STRING(self, s):
-        # handle escapese, skip the start and end quotes
+        # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
     @v_args(inline=True)
