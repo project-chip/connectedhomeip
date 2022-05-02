@@ -22,6 +22,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
 const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/ChipTypesHelper.js');
+const TestHelper      = require('../../../../../src/app/zap-templates/common/ClusterTestGeneration.js');
 const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
 const appHelper       = require('../../../../../src/app/zap-templates/templates/app/helper.js');
 
@@ -34,6 +35,39 @@ function asObjectiveCBasicType(type, options)
   } else {
     return ChipTypesHelper.asBasicType(this.chipType);
   }
+}
+
+/**
+ * Converts an expression involving possible variables whose types are objective C objects into an expression whose type is a C++
+ * type
+ */
+async function asTypedExpressionFromObjectiveC(value, type)
+{
+  const valueIsANumber = !isNaN(value);
+  if (!value || valueIsANumber) {
+    return appHelper.asTypedLiteral.call(this, value, type);
+  }
+
+  const tokens = value.split(' ');
+  if (tokens.length < 2) {
+    return appHelper.asTypedLiteral.call(this, value, type);
+  }
+
+  let expr = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    if ([ '+', '-', '/', '*', '%' ].includes(token)) {
+      expr[i] = token;
+    } else if (!isNaN(token.replace(/ULL$|UL$|U$|LL$|L$/i, ''))) {
+      expr[i] = await appHelper.asTypedLiteral.call(this, token, type);
+    } else {
+      const variableType = TestHelper.chip_tests_variables_get_type.call(this, token);
+      const asType       = await asObjectiveCNumberType.call(this, token, variableType, true);
+      expr[i]            = `[${token} ${asType}Value]`;
+    }
+  }
+
+  return expr.join(' ');
 }
 
 function asObjectiveCNumberType(label, type, asLowerCased)
@@ -197,13 +231,14 @@ function hasArguments()
 //
 // Module exports
 //
-exports.asObjectiveCBasicType   = asObjectiveCBasicType;
-exports.asObjectiveCNumberType  = asObjectiveCNumberType;
-exports.asObjectiveCClass       = asObjectiveCClass;
-exports.asObjectiveCType        = asObjectiveCType;
-exports.asStructPropertyName    = asStructPropertyName;
-exports.asGetterName            = asGetterName;
-exports.commandHasRequiredField = commandHasRequiredField;
-exports.objCEnumName            = objCEnumName;
-exports.objCEnumItemLabel       = objCEnumItemLabel;
-exports.hasArguments            = hasArguments;
+exports.asObjectiveCBasicType           = asObjectiveCBasicType;
+exports.asObjectiveCNumberType          = asObjectiveCNumberType;
+exports.asObjectiveCClass               = asObjectiveCClass;
+exports.asObjectiveCType                = asObjectiveCType;
+exports.asStructPropertyName            = asStructPropertyName;
+exports.asTypedExpressionFromObjectiveC = asTypedExpressionFromObjectiveC;
+exports.asGetterName                    = asGetterName;
+exports.commandHasRequiredField         = commandHasRequiredField;
+exports.objCEnumName                    = objCEnumName;
+exports.objCEnumItemLabel               = objCEnumItemLabel;
+exports.hasArguments                    = hasArguments;
