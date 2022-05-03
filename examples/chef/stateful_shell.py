@@ -54,7 +54,7 @@ class StatefulShell:
         for env_var in self.env:
             quoted_value = shlex.quote(self.env[env_var])
             if env_var:
-              print(f"export {env_var}={quoted_value}")
+                print(f"export {env_var}={quoted_value}")
 
     def run_cmd(self, cmd: str, *, raise_on_returncode=False) -> None:
         """Runs a command and updates environment.
@@ -80,14 +80,14 @@ class StatefulShell:
 
         # Load env state from envfile.
         with open(self.envfile_path) as f:
-          # Split on null char because we use env -0.
-          env_entries = f.read().split("\0")
-          for entry in env_entries:
-            parts = entry.split("=")
-            # Handle case where an env variable contains text with '='.
-            env_dict[parts[0]] = "=".join(parts[1:])
-          self.env = env_dict
-          self.cwd = self.env["PWD"]
+            # Split on null char because we use env -0.
+            env_entries = f.read().split("\0")
+            for entry in env_entries:
+                parts = entry.split("=")
+                # Handle case where an env variable contains text with '='.
+                env_dict[parts[0]] = "=".join(parts[1:])
+            self.env = env_dict
+            self.cwd = self.env["PWD"]
 
         if raise_on_returncode and returncode != 0:
             raise RuntimeError(
