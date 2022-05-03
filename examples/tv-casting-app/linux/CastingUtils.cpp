@@ -53,7 +53,7 @@ CHIP_ERROR RequestCommissioning(int index)
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
-    if(!CastingServer::GetInstance()->isServerInitialized())
+    if (!CastingServer::GetInstance()->isServerInitialized())
     {
         DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
     }

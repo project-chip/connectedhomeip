@@ -33,8 +33,8 @@ public:
     void PrintInfo();
 
 private:
-    static constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
-    chip::ClusterId mClusters[kMaxNumberOfClustersPerEndpoint]    = {};
+    static constexpr size_t kMaxNumberOfClustersPerEndpoint    = 10;
+    chip::ClusterId mClusters[kMaxNumberOfClustersPerEndpoint] = {};
     chip::EndpointId mEndpointId;
     bool mInitialized = false;
 };

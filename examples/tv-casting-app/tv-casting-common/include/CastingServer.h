@@ -55,10 +55,12 @@ public:
     CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
     void ReadServerClusters(chip::EndpointId endpointId);
     void ReadServerClustersForNode(chip::NodeId nodeId);
-    static void OnDescriptorReadSuccessResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
+    static void OnDescriptorReadSuccessResponse(void * context,
+                                                const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
     CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
-    static void OnContentLauncherSuccessResponse(void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & response);
+    static void OnContentLauncherSuccessResponse(
+        void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & response);
     static void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error);
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
