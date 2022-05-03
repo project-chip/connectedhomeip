@@ -386,7 +386,9 @@ function inlineStructItems(args)
       return;
     }
 
-    argument.items.forEach(item => { arguments.push(item); });
+    argument.items.forEach(item => {
+      arguments.push(item);
+    });
   });
 
   return arguments;
