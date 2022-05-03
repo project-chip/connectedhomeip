@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/server/ExampleAclStorage.h>
+#include <app/server/DefaultAclStorage.h>
 
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
@@ -113,7 +113,7 @@ public:
         return;
 
     exit:
-        ChipLogError(DataManagement, "ExampleAclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DataManagement, "DefaultAclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Must initialize before use.
@@ -129,10 +129,10 @@ private:
 namespace chip {
 namespace app {
 
-CHIP_ERROR ExampleAclStorage::Init(PersistentStorageDelegate & persistentStorage, ConstFabricIterator first,
+CHIP_ERROR DefaultAclStorage::Init(PersistentStorageDelegate & persistentStorage, ConstFabricIterator first,
                                    ConstFabricIterator last)
 {
-    ChipLogProgress(DataManagement, "ExampleAclStorage: initializing");
+    ChipLogProgress(DataManagement, "DefaultAclStorage: initializing");
 
     CHIP_ERROR err;
 
@@ -169,7 +169,7 @@ CHIP_ERROR ExampleAclStorage::Init(PersistentStorageDelegate & persistentStorage
         }
     }
 
-    ChipLogProgress(DataManagement, "ExampleAclStorage: %u entries loaded", (unsigned) count);
+    ChipLogProgress(DataManagement, "DefaultAclStorage: %u entries loaded", (unsigned) count);
 
     sEntryListener.Init(persistentStorage);
     GetAccessControl().AddEntryListener(sEntryListener);
@@ -177,7 +177,7 @@ CHIP_ERROR ExampleAclStorage::Init(PersistentStorageDelegate & persistentStorage
     return CHIP_NO_ERROR;
 
 exit:
-    ChipLogError(DataManagement, "ExampleAclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
+    ChipLogError(DataManagement, "DefaultAclStorage: failed %" CHIP_ERROR_FORMAT, err.Format());
     return err;
 }
 

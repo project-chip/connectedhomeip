@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-class ExampleAclStorage : public AclStorage
+class DefaultAclStorage : public AclStorage
 {
 public:
     /**

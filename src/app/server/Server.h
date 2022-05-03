@@ -28,7 +28,7 @@
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
-#include <app/server/ExampleAclStorage.h>
+#include <app/server/DefaultAclStorage.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -155,7 +155,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
-        static chip::app::ExampleAclStorage sAclStorage;
+        static chip::app::DefaultAclStorage sAclStorage;
 
         // KVS-based persistent storage delegate injection
         chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
