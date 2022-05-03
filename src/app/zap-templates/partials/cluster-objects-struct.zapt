@@ -9,7 +9,7 @@ namespace {{asUpperCamelCase name}} {
     struct Type {
     public:
         {{#zcl_struct_items}}
-        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
+        {{zapTypeToEncodableClusterObjectType dataTypeReferenceName}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
 
         {{#unless struct_contains_array}}

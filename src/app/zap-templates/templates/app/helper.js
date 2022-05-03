@@ -462,33 +462,21 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     }
 
     if (types.isEnum) {
-      let res = await templateUtil.ensureZclPackageId(this).then(
-          (packageId) => zclQuery.selectEnumByName(this.global.db, type, packageId))
-      let size = res.size
-      if (size == 3)
-      {
-        size = 4
+      // Catching baseline enums and converting them into 'uint[size]_t'
+      if (type.toLowerCase().startsWith('enum')) {
+        let s = type.match(/\d+/g).join('')
+        return 'uint' + s + '_t'
       }
-      else if (size == 6)
-      {
-        size = 8
-      }
-      return 'uint' + size * 8 + '_t';
+      return ns + type;
     }
 
     if (types.isBitmap) {
-      let res = await templateUtil.ensureZclPackageId(this).then(
-          (packageId) => zclQuery.selectBitmapByName(this.global.db, packageId, type))
-      let size = res.size
-      if (size == 3)
-      {
-        size = 4
+      // Catching baseline bitmaps and converting them into 'uint[size]_t'
+      if (type.toLowerCase().startsWith('bitmap')) {
+        let s = type.match(/\d+/g).join('')
+        return 'uint' + s + '_t'
       }
-      else if (size == 6)
-      {
-        size = 8
-      }
-      return 'uint' + size * 8 + '_t';
+      return ns + type;
     }
 
     if (types.isStruct) {

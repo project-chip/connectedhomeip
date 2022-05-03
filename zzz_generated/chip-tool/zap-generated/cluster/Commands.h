@@ -2604,7 +2604,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5196,7 +5196,8 @@ public:
 
 private:
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_ProtocolsSupported;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol>>
+        mComplex_ProtocolsSupported;
 };
 
 /*
@@ -5437,7 +5438,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::TimeFormatLocalization::HourFormat mValue;
 };
 
 class WriteTimeFormatLocalizationActiveCalendarType : public WriteAttribute
@@ -5464,7 +5465,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::TimeFormatLocalization::CalendarType mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5507,7 +5508,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::UnitLocalization::TempUnit mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -8662,7 +8663,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::DoorLock::DlOperatingMode mValue;
 };
 
 class WriteDoorLockEnableLocalProgramming : public WriteAttribute
@@ -8797,7 +8798,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8958,7 +8959,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlAlarmMask mValue;
 };
 
 class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
@@ -8985,7 +8986,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlKeypadOperationEventMask mValue;
 };
 
 class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
@@ -9012,7 +9013,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlRemoteOperationEventMask mValue;
 };
 
 class WriteDoorLockManualOperationEventMask : public WriteAttribute
@@ -9039,7 +9040,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlManualOperationEventMask mValue;
 };
 
 class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
@@ -9066,7 +9067,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlRFIDOperationEventMask mValue;
 };
 
 class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
@@ -9093,7 +9094,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlKeypadOperationEventMask mValue;
 };
 
 class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
@@ -9120,7 +9121,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask mValue;
 };
 
 class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
@@ -9147,7 +9148,7 @@ public:
     }
 
 private:
-    uint16_t mValue;
+    chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9430,7 +9431,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::WindowCovering::Mode mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9817,7 +9818,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode mValue;
 };
 
 class WritePumpConfigurationAndControlControlMode : public WriteAttribute
@@ -9844,7 +9845,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -10416,7 +10417,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::Thermostat::ThermostatControlSequence mValue;
 };
 
 class WriteThermostatSystemMode : public WriteAttribute
@@ -10761,7 +10762,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::FanControl::FanModeType mValue;
 };
 
 class WriteFanControlFanModeSequence : public WriteAttribute
@@ -10788,7 +10789,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::FanControl::FanModeSequenceType mValue;
 };
 
 class WriteFanControlPercentSetting : public WriteAttribute
@@ -15737,7 +15738,7 @@ private:
         mComplex_Arg1;
     TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>
         mComplex_Arg2;
-    TypedComplexArgument<chip::app::DataModel::List<const uint8_t>> mComplex_Arg3;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>> mComplex_Arg3;
     TypedComplexArgument<chip::app::DataModel::List<const bool>> mComplex_Arg4;
 };
 
@@ -16079,9 +16080,13 @@ private:
     TypedComplexArgument<
         chip::Optional<chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>>>
         mComplex_NullableOptionalStruct;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>> mComplex_NullableList;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const uint8_t>>> mComplex_OptionalList;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>>>
+    TypedComplexArgument<
+        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
+        mComplex_NullableList;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>
+        mComplex_OptionalList;
+    TypedComplexArgument<chip::Optional<
+        chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::app::Clusters::TestCluster::SimpleEnum>>>>
         mComplex_NullableOptionalList;
 };
 
@@ -17214,7 +17219,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::Clusters::TestCluster::SimpleEnum mValue;
 };
 
 class WriteTestClusterStructAttr : public WriteAttribute
@@ -18267,7 +18272,7 @@ public:
     }
 
 private:
-    chip::app::DataModel::Nullable<uint8_t> mValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
 };
 
 class WriteTestClusterNullableStruct : public WriteAttribute
