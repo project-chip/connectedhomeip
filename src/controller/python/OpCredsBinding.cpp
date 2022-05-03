@@ -336,7 +336,9 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
     if (paaTrustStorePath == nullptr)
+    {
         paaTrustStorePath = "./credentials/development/paa-root-certs";
+    }
     ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
 
     // Initialize device attestation verifier
