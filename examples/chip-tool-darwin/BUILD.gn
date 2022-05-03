@@ -38,7 +38,10 @@ config("config") {
 executable("chip-tool-darwin") {
   sources = [
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
+    "commands/clusters/ReportCommandBridge.h",
+    "commands/clusters/WriteAttributeCommandBridge.h",
     "commands/common/CHIPCommandBridge.mm",
     "commands/common/CHIPCommandStorageDelegate.mm",
     "commands/common/CHIPToolKeypair.mm",
