@@ -20254,8 +20254,8 @@ CHIPTestClusterNullableBitmap8AttributeCallback::~CHIPTestClusterNullableBitmap8
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap8AttributeCallback::CallbackFn(void * context,
-                                                                 const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPTestClusterNullableBitmap8AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20321,8 +20321,8 @@ CHIPTestClusterNullableBitmap16AttributeCallback::~CHIPTestClusterNullableBitmap
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap16AttributeCallback::CallbackFn(void * context,
-                                                                  const chip::app::DataModel::Nullable<uint16_t> & value)
+void CHIPTestClusterNullableBitmap16AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20388,8 +20388,8 @@ CHIPTestClusterNullableBitmap32AttributeCallback::~CHIPTestClusterNullableBitmap
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap32AttributeCallback::CallbackFn(void * context,
-                                                                  const chip::app::DataModel::Nullable<uint32_t> & value)
+void CHIPTestClusterNullableBitmap32AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20455,8 +20455,8 @@ CHIPTestClusterNullableBitmap64AttributeCallback::~CHIPTestClusterNullableBitmap
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPTestClusterNullableBitmap64AttributeCallback::CallbackFn(void * context,
-                                                                  const chip::app::DataModel::Nullable<uint64_t> & value)
+void CHIPTestClusterNullableBitmap64AttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

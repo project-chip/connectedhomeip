@@ -9935,7 +9935,8 @@ void CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
+void CHIPTestClusterBitmap8AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -9958,7 +9959,8 @@ void CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
+void CHIPTestClusterBitmap16AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -9981,7 +9983,8 @@ void CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
+void CHIPTestClusterBitmap32AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10004,7 +10007,8 @@ void CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
+void CHIPTestClusterBitmap64AttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
@@ -10528,7 +10532,7 @@ void CHIPTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void CHIPTestClusterNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10556,7 +10560,7 @@ void CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void CHIPTestClusterNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10584,7 +10588,7 @@ void CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10612,7 +10616,7 @@ void CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void CHIPTestClusterNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {

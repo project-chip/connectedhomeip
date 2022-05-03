@@ -36955,9 +36955,9 @@ struct TypeInfo
 namespace Bitmap8 {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap8::Id; }
@@ -36967,9 +36967,9 @@ struct TypeInfo
 namespace Bitmap16 {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap16::Id; }
@@ -36979,9 +36979,9 @@ struct TypeInfo
 namespace Bitmap32 {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap32::Id; }
@@ -36991,9 +36991,9 @@ struct TypeInfo
 namespace Bitmap64 {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>;
+    using DecodableType    = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>;
+    using DecodableArgType = chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap64::Id; }
@@ -37541,9 +37541,10 @@ struct TypeInfo
 namespace NullableBitmap8 {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type          = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap8::Id; }
@@ -37553,9 +37554,10 @@ struct TypeInfo
 namespace NullableBitmap16 {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type          = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap16::Id; }
@@ -37565,9 +37567,10 @@ struct TypeInfo
 namespace NullableBitmap32 {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint32_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+    using Type          = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap32::Id; }
@@ -37577,9 +37580,10 @@ struct TypeInfo
 namespace NullableBitmap64 {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+    using Type          = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap64::Id; }
@@ -37994,11 +37998,15 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Boolean::TypeInfo::DecodableType boolean         = static_cast<bool>(0);
-        Attributes::Bitmap8::TypeInfo::DecodableType bitmap8         = static_cast<uint8_t>(0);
-        Attributes::Bitmap16::TypeInfo::DecodableType bitmap16       = static_cast<uint16_t>(0);
-        Attributes::Bitmap32::TypeInfo::DecodableType bitmap32       = static_cast<uint32_t>(0);
-        Attributes::Bitmap64::TypeInfo::DecodableType bitmap64       = static_cast<uint64_t>(0);
+        Attributes::Boolean::TypeInfo::DecodableType boolean = static_cast<bool>(0);
+        Attributes::Bitmap8::TypeInfo::DecodableType bitmap8 =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0);
+        Attributes::Bitmap16::TypeInfo::DecodableType bitmap16 =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(0);
+        Attributes::Bitmap32::TypeInfo::DecodableType bitmap32 =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(0);
+        Attributes::Bitmap64::TypeInfo::DecodableType bitmap64 =
+            static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(0);
         Attributes::Int8u::TypeInfo::DecodableType int8u             = static_cast<uint8_t>(0);
         Attributes::Int16u::TypeInfo::DecodableType int16u           = static_cast<uint16_t>(0);
         Attributes::Int24u::TypeInfo::DecodableType int24u           = static_cast<uint32_t>(0);

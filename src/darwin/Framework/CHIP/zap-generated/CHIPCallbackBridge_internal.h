@@ -1292,16 +1292,20 @@ typedef void (*PumpConfigurationAndControlFeatureMapAttributeCallback)(void *, u
 typedef void (*ScenesNameSupportAttributeCallback)(void *, uint8_t);
 typedef void (*SoftwareDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*SwitchFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*TestClusterBitmap8AttributeCallback)(void *, uint8_t);
-typedef void (*TestClusterBitmap16AttributeCallback)(void *, uint16_t);
-typedef void (*TestClusterBitmap32AttributeCallback)(void *, uint32_t);
-typedef void (*TestClusterBitmap64AttributeCallback)(void *, uint64_t);
+typedef void (*TestClusterBitmap8AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>);
+typedef void (*TestClusterBitmap16AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>);
+typedef void (*TestClusterBitmap32AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>);
+typedef void (*TestClusterBitmap64AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>);
 typedef void (*TestClusterStructAttrStructAttributeCallback)(
     void *, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType &);
-typedef void (*TestClusterNullableBitmap8AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint8_t> &);
-typedef void (*TestClusterNullableBitmap16AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint16_t> &);
-typedef void (*TestClusterNullableBitmap32AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint32_t> &);
-typedef void (*TestClusterNullableBitmap64AttributeCallback)(void *, const chip::app::DataModel::Nullable<uint64_t> &);
+typedef void (*TestClusterNullableBitmap8AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> &);
+typedef void (*TestClusterNullableBitmap16AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> &);
+typedef void (*TestClusterNullableBitmap32AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> &);
+typedef void (*TestClusterNullableBitmap64AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &);
 typedef void (*TestClusterNullableStructStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &);
 typedef void (*ThermostatFeatureMapAttributeCallback)(void *, uint32_t);
@@ -8965,7 +8969,7 @@ public:
                                                   bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value);
 };
 
 class CHIPTestClusterBitmap8AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap8AttributeCallbackBridge
@@ -8991,7 +8995,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value);
 };
 
 class CHIPTestClusterBitmap16AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap16AttributeCallbackBridge
@@ -9017,7 +9021,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint32_t value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value);
 };
 
 class CHIPTestClusterBitmap32AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap32AttributeCallbackBridge
@@ -9043,7 +9047,7 @@ public:
                                                    bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint64_t value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value);
 };
 
 class CHIPTestClusterBitmap64AttributeCallbackSubscriptionBridge : public CHIPTestClusterBitmap64AttributeCallbackBridge
@@ -9272,7 +9276,9 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge
@@ -9300,7 +9306,9 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge
@@ -9328,7 +9336,9 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge
@@ -9356,7 +9366,9 @@ public:
                                                            bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterNullableBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
 };
 
 class CHIPTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge
