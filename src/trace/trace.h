@@ -17,7 +17,7 @@
 
 #pragma once
 
-#if MATTER_CUSTOM_TRACE
+#if defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
 
 #include "trace/MatterCustomTrace.h"
 
@@ -76,4 +76,4 @@
 
 #endif // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
 
-#endif // MATTER_CUSTOM_TRACE
+#endif // defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
