@@ -37,8 +37,8 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/EFR32/freertos_bluetooth.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/EFR32/freertos_bluetooth.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;
