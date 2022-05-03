@@ -29,7 +29,6 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <map>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,6 +38,9 @@ using namespace chip::app::Clusters::PowerSource;
 
 namespace {
 
+// Can be upto max endpoints count
+constexpr uint8_t kMaxPowerSources = 10;
+
 class PowerSourceConfigurationAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -47,6 +49,11 @@ public:
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
+
+int compareOrder(const void * a, const void * b)
+{
+    return (int) ((*(uint16_t *) a - *(uint16_t *) b));
+}
 
 PowerSourceConfigurationAttrAccess gAttrAccess;
 
@@ -63,16 +70,23 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
     {
     case Sources::Id:
         err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-            std::multimap<uint8_t, uint16_t> orderEpMap;
-            uint8_t order;
+            uint16_t orderEpPair[kMaxPowerSources * 2];
+            uint8_t idx = 0, order = 0;
+            memset(orderEpPair, 0, sizeof(orderEpPair));
             for (auto endpoint : EnabledEndpointsWithServerCluster(PowerSource::Id))
             {
+                if (idx >= sizeof(orderEpPair))
+                    break;
                 PowerSource::Attributes::Order::Get(endpoint, &order);
-                orderEpMap.insert(std::pair<uint8_t, uint16_t>(order, endpoint));
+                orderEpPair[idx]   = (uint16_t) order;
+                orderEpPair[++idx] = (uint16_t) endpoint;
+                idx++;
             }
-            for (auto orderPair : orderEpMap)
+
+            std::qsort(orderEpPair, idx / 2, sizeof(uint16_t) * 2, compareOrder);
+            for (uint8_t i = 0; i < idx; i += 2)
             {
-                ReturnErrorOnFailure(encoder.Encode(orderPair.second));
+                ReturnErrorOnFailure(encoder.Encode((uint16_t) orderEpPair[i + 1]));
             }
             return CHIP_NO_ERROR;
         });
