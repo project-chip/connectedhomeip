@@ -515,7 +515,7 @@ class ChipDeviceController():
                 deviceAvailableCV.wait()
 
         if returnDevice.value is None:
-            raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
+            raise RuntimeError("Failed to get connected device!")
         return returnDevice
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None):
