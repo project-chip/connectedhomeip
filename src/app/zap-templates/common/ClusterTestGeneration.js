@@ -887,26 +887,79 @@ function chip_tests_item_has_list(options)
   });
 }
 
+async function chip_tests_only_clusters(options)
+{
+  const clusters         = await getClusters(this);
+  const testOnlyClusters = clusters.filter(cluster => isTestOnlyCluster(cluster.name));
+  return asBlocks.call(this, Promise.resolve(testOnlyClusters), options);
+}
+
+async function chip_tests_only_cluster_commands(options)
+{
+  const commands = await getCommands(this, this.name);
+  return asBlocks.call(this, Promise.resolve(commands), options);
+}
+
+async function chip_tests_only_cluster_command_parameters(options)
+{
+  return asBlocks.call(this, Promise.resolve(this.arguments), options);
+}
+
+async function chip_tests_only_cluster_responses(options)
+{
+  const commands  = await getCommands(this, this.name);
+  const responses = [];
+  commands.forEach(command => {
+    if (!command.response.arguments) {
+      return;
+    }
+
+    if (!('responseName' in command)) {
+      return;
+    }
+
+    const alreadyExists = responses.some(item => item.responseName == command.responseName);
+    if (alreadyExists) {
+      return;
+    }
+
+    command.response.responseName = command.responseName;
+    responses.push(command.response);
+  });
+
+  return asBlocks.call(this, Promise.resolve(responses), options);
+}
+
+async function chip_tests_only_cluster_response_parameters(options)
+{
+  return asBlocks.call(this, Promise.resolve(this.arguments), options);
+}
+
 //
 // Module exports
 //
-exports.chip_tests                          = chip_tests;
-exports.chip_tests_items                    = chip_tests_items;
-exports.chip_tests_item_has_list            = chip_tests_item_has_list;
-exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_responses           = chip_tests_item_responses;
-exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
-exports.chip_tests_pics                     = chip_tests_pics;
-exports.chip_tests_config                   = chip_tests_config;
-exports.chip_tests_config_has               = chip_tests_config_has;
-exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
-exports.chip_tests_config_get_type          = chip_tests_config_get_type;
-exports.chip_tests_variables                = chip_tests_variables;
-exports.chip_tests_variables_has            = chip_tests_variables_has;
-exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
-exports.chip_tests_variables_is_nullable    = chip_tests_variables_is_nullable;
-exports.isTestOnlyCluster                   = isTestOnlyCluster;
-exports.isLiteralNull                       = isLiteralNull;
-exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
-exports.if_include_struct_item_value        = if_include_struct_item_value;
-exports.ensureIsArray                       = ensureIsArray;
+exports.chip_tests                                  = chip_tests;
+exports.chip_tests_items                            = chip_tests_items;
+exports.chip_tests_item_has_list                    = chip_tests_item_has_list;
+exports.chip_tests_item_parameters                  = chip_tests_item_parameters;
+exports.chip_tests_item_responses                   = chip_tests_item_responses;
+exports.chip_tests_item_response_parameters         = chip_tests_item_response_parameters;
+exports.chip_tests_pics                             = chip_tests_pics;
+exports.chip_tests_config                           = chip_tests_config;
+exports.chip_tests_config_has                       = chip_tests_config_has;
+exports.chip_tests_config_get_default_value         = chip_tests_config_get_default_value;
+exports.chip_tests_config_get_type                  = chip_tests_config_get_type;
+exports.chip_tests_variables                        = chip_tests_variables;
+exports.chip_tests_variables_has                    = chip_tests_variables_has;
+exports.chip_tests_variables_get_type               = chip_tests_variables_get_type;
+exports.chip_tests_variables_is_nullable            = chip_tests_variables_is_nullable;
+exports.isTestOnlyCluster                           = isTestOnlyCluster;
+exports.isLiteralNull                               = isLiteralNull;
+exports.octetStringEscapedForCLiteral               = octetStringEscapedForCLiteral;
+exports.if_include_struct_item_value                = if_include_struct_item_value;
+exports.ensureIsArray                               = ensureIsArray;
+exports.chip_tests_only_clusters                    = chip_tests_only_clusters;
+exports.chip_tests_only_cluster_commands            = chip_tests_only_cluster_commands;
+exports.chip_tests_only_cluster_command_parameters  = chip_tests_only_cluster_command_parameters;
+exports.chip_tests_only_cluster_responses           = chip_tests_only_cluster_responses;
+exports.chip_tests_only_cluster_response_parameters = chip_tests_only_cluster_response_parameters;

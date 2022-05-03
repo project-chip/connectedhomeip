@@ -19,49 +19,10 @@
 #pragma once
 
 #include <app/MessageDef/StatusIB.h>
-#include <app/data-model/Decode.h>
-#include <app/data-model/Encode.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/CodeUtils.h>
 
-struct DiscoveryCommandResult
-{
-    chip::CharSpan hostName;
-    chip::CharSpan instanceName;
-    uint16_t longDiscriminator;
-    uint8_t shortDiscriminator;
-    uint16_t vendorId;
-    uint16_t productId;
-    uint8_t commissioningMode;
-    uint16_t deviceType;
-    chip::CharSpan deviceName;
-    chip::ByteSpan rotatingId;
-    uint64_t rotatingIdLen;
-    uint16_t pairingHint;
-    chip::CharSpan pairingInstruction;
-    bool supportsTcp;
-    uint8_t numIPs;
-    uint16_t port;
-    chip::Optional<uint32_t> mrpRetryIntervalIdle;
-    chip::Optional<uint32_t> mrpRetryIntervalActive;
-
-    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const;
-    CHIP_ERROR Decode(chip::TLV::TLVReader & reader);
-};
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace DiscoveryCommands {
-namespace Commands {
-namespace DiscoveryCommandResponse {
-using DecodableType = DiscoveryCommandResult;
-}
-} // namespace Commands
-} // namespace DiscoveryCommands
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <app-common/zap-generated/tests/simulated-cluster-objects.h>
 
 class DiscoveryCommands : public chip::Dnssd::CommissioningResolveDelegate, public chip::Dnssd::OperationalResolveDelegate
 {
