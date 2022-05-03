@@ -125,7 +125,7 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
 
     nodeData.LogDetail();
 
-    DiscoveryCommandResult data;
+    chip::DiscoveryCommandResponse data;
     data.hostName           = chip::CharSpan(nodeData.hostName, strlen(nodeData.hostName));
     data.instanceName       = chip::CharSpan(nodeData.instanceName, strlen(nodeData.instanceName));
     data.longDiscriminator  = nodeData.longDiscriminator;
@@ -190,106 +190,3 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
 
     chip::Platform::MemoryFree(buffer);
 }
-
-CHIP_ERROR DiscoveryCommandResult::Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-{
-    chip::TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), hostName));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), instanceName));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), longDiscriminator));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(3), shortDiscriminator));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(4), vendorId));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(5), productId));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(6), commissioningMode));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(7), deviceType));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(8), deviceName));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(9), rotatingId));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(10), rotatingIdLen));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(11), pairingHint));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(12), pairingInstruction));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(13), supportsTcp));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(14), numIPs));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(15), port));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(16), mrpRetryIntervalIdle));
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(17), mrpRetryIntervalActive));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiscoveryCommandResult::Decode(chip::TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVType outer;
-    VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case 0:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, hostName));
-            break;
-        case 1:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, instanceName));
-            break;
-        case 2:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, longDiscriminator));
-            break;
-        case 3:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, shortDiscriminator));
-            break;
-        case 4:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, vendorId));
-            break;
-        case 5:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, productId));
-            break;
-        case 6:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, commissioningMode));
-            break;
-        case 7:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, deviceType));
-            break;
-        case 8:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, deviceName));
-            break;
-        case 9:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, rotatingId));
-            break;
-        case 10:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, rotatingIdLen));
-            break;
-        case 11:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, pairingHint));
-            break;
-        case 12:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, pairingInstruction));
-            break;
-        case 13:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, supportsTcp));
-            break;
-        case 14:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, numIPs));
-            break;
-        case 15:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, port));
-            break;
-        case 16:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryIntervalIdle));
-            break;
-        case 17:
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryIntervalActive));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-};
