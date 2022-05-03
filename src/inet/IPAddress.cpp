@@ -270,7 +270,7 @@ otIp6Address IPAddress::ToIPv6() const
     return otAddr;
 }
 
-IPAddress IPAddress::FromOtAddr(otIp6Address & address)
+IPAddress IPAddress::FromOtAddr(const otIp6Address & address)
 {
     IPAddress addr;
     static_assert(sizeof(address.mFields.m32) == sizeof(addr), "otIp6Address size mismatch");

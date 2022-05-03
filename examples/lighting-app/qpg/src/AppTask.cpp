@@ -35,6 +35,8 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <inet/EndpointStateOpenThread.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -70,6 +72,16 @@ AppTask AppTask::sAppTask;
 
 namespace {
 constexpr int extDiscTimeoutSecs = 20;
+}
+
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -115,6 +127,11 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.networkNativeParams     = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
     // Init OTA engine

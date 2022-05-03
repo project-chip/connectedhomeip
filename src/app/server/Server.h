@@ -98,6 +98,9 @@ struct ServerInitParams
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    // Network native params can be injected depending on the
+    // selected Endpoint implementation
+    void * networkNativeParams = nullptr;
 };
 
 /**
