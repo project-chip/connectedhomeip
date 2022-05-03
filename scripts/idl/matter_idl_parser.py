@@ -65,7 +65,7 @@ class MatterIdlTransformer(Transformer):
 
     """
 
-    def number(self, tokens):
+    def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:

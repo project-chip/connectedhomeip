@@ -14,7 +14,7 @@ event_access: "access" "(" ("read" ":" access_privilege)? ")"
 
 event_with_access: "event" event_access? id
 
-event: event_priority event_with_access "=" number "{" (struct_field ";")* "}"
+event: event_priority event_with_access "=" positive_integer "{" (struct_field ";")* "}"
 
 ?event_priority: "critical"i -> critical_priority
                | "info"i     -> info_priority
@@ -24,7 +24,7 @@ attribute_access_entry: attribute_access_type ":" access_privilege
 
 bool_default: "true"i  -> bool_default_true
             | "false"i -> bool_default_false
-default_value: "default"i "=" (number | ESCAPED_STRING | bool_default)
+default_value: "default"i "=" (positive_integer | ESCAPED_STRING | bool_default)
 
 attribute_is_callback: "callback"i
 attribute_is_persist: "persist"i
@@ -43,7 +43,7 @@ attribute_tag: "readonly"i -> attr_readonly
 request_struct: "request"i struct
 
 // Response structures must have a response id
-response_struct: "response"i "struct"i id "=" number "{" (struct_field ";") * "}"
+response_struct: "response"i "struct"i id "=" positive_integer "{" (struct_field ";") * "}"
 
 command_attribute: "timed"i -> timed_command
 command_attributes: command_attribute*
@@ -53,30 +53,30 @@ command_access: "access"i "(" ("invoke"i ":" access_privilege)? ")"
 
 command_with_access: "command"i command_access? id
 
-command: command_attributes command_with_access "(" id? ")" ":" id "=" number ";"
+command: command_attributes command_with_access "(" id? ")" ":" id "=" positive_integer ";"
 
-cluster: cluster_side "cluster"i id "=" number "{" (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)* "}"
+cluster: cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)* "}"
 ?cluster_side: "server"i -> server_cluster
              | "client"i -> client_cluster
 
-endpoint: "endpoint"i number "{" endpoint_cluster* "}"
+endpoint: "endpoint"i positive_integer "{" endpoint_cluster* "}"
 endpoint_cluster: endpoint_cluster_type "cluster"i id ";"
 
 ?endpoint_cluster_type: "server"i   -> endpoint_server_cluster
                       | "binding"i  -> endpoint_binding_to_cluster
 
-constant_entry: id "=" number ";"
-number: POSITIVE_INTEGER | HEX_INTEGER
+constant_entry: id "=" positive_integer ";"
+positive_integer: POSITIVE_INTEGER | HEX_INTEGER
 
 struct_field: member_attribute* field
 
 member_attribute: "optional"i -> optional
                 | "nullable"i -> nullable
 
-field: data_type id list_marker? "=" number
+field: data_type id list_marker? "=" positive_integer
 list_marker: "[" "]"
 
-data_type: type ("<" number ">")?
+data_type: type ("<" positive_integer ">")?
 
 id: ID
 type: ID

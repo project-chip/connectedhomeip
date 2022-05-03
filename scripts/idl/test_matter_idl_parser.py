@@ -192,6 +192,7 @@ class TestParser(unittest.TestCase):
                 readonly attribute int32u readonlyDefault = 7 [default=321];
                 attribute bool boolDefault = 8 [default=true];
                 attribute bool boolDefault2 = 9 [default=false];
+                attribute int32s negativeDefault = 10 [default=-123];
             }
         """)
 
@@ -218,6 +219,8 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="bool"), code=8, name="boolDefault"), default=True),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="bool"), code=9, name="boolDefault2"), default=False),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int32s"), code=9, name="negativeDefault"), default=-123),
                     ]
                     )])
         self.assertEqual(actual, expected)
