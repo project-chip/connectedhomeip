@@ -65,7 +65,7 @@ bool SendStatusIfDelegateNull(app::CommandHandler * commandObj, const app::Concr
 {
     if (GetDelegate(path.mEndpointId) == nullptr)
     {
-        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%" PRIu16, path.mEndpointId);
+        ChipLogError(Zcl, "No OTAProviderDelegate set for ep:%u", path.mEndpointId);
         commandObj->AddStatus(path, Status::UnsupportedCommand);
         return true;
     }
@@ -87,7 +87,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received ApplyUpdateRequest");
-    ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
     ChipLogDetail(Zcl, "  New Version: %" PRIu32, commandData.newVersion);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -97,7 +97,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
+                     static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -119,7 +120,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
 
     ChipLogProgress(Zcl, "OTA Provider received NotifyUpdateApplied");
-    ChipLogDetail(Zcl, "  Update Token: %zu", commandData.updateToken.size());
+    ChipLogDetail(Zcl, "  Update Token: %u", static_cast<unsigned int>(commandData.updateToken.size()));
     ChipLogDetail(Zcl, "  Software Version: %" PRIu32, commandData.softwareVersion);
 
     if (SendStatusIfDelegateNull(commandObj, commandPath))
@@ -129,7 +130,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
 
     if (updateToken.size() > kUpdateTokenMaxLength || updateToken.size() < kUpdateTokenMinLength)
     {
-        ChipLogError(Zcl, "expected size %zu for UpdateToken, got %zu", kUpdateTokenMaxLength, updateToken.size());
+        ChipLogError(Zcl, "expected size %u for UpdateToken, got %u", static_cast<unsigned int>(kUpdateTokenMaxLength),
+                     static_cast<unsigned int>(updateToken.size()));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -168,8 +170,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     };
 
     ChipLogProgress(Zcl, "OTA Provider received QueryImage");
-    ChipLogDetail(Zcl, "  VendorID: 0x%" PRIx16, vendorId);
-    ChipLogDetail(Zcl, "  ProductID: %" PRIu16, productId);
+    ChipLogDetail(Zcl, "  VendorID: 0x%x", vendorId);
+    ChipLogDetail(Zcl, "  ProductID: %u", productId);
     ChipLogDetail(Zcl, "  SoftwareVersion: %" PRIu32, softwareVersion);
     ChipLogDetail(Zcl, "  ProtocolsSupported: [");
     auto protocolIter = protocolsSupported.begin();
@@ -180,7 +182,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     ChipLogDetail(Zcl, "  ]");
     if (hardwareVersion.HasValue())
     {
-        ChipLogDetail(Zcl, "  HardwareVersion: %" PRIu16, hardwareVersion.Value());
+        ChipLogDetail(Zcl, "  HardwareVersion: %u", hardwareVersion.Value());
     }
     if (location.HasValue())
     {
@@ -192,19 +194,21 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     }
     if (metadataForProvider.HasValue())
     {
-        ChipLogDetail(Zcl, "  MetadataForProvider: %zu", metadataForProvider.Value().size());
+        ChipLogDetail(Zcl, "  MetadataForProvider: %u", static_cast<unsigned int>(metadataForProvider.Value().size()));
     }
 
     if (location.HasValue() && location.Value().size() != kLocationLen)
     {
-        ChipLogError(Zcl, "location param length %zu != expected length %zu", location.Value().size(), kLocationLen);
+        ChipLogError(Zcl, "location param length %u != expected length %u", static_cast<unsigned int>(location.Value().size()),
+                     static_cast<unsigned int>(kLocationLen));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
     if (metadataForProvider.HasValue() && metadataForProvider.Value().size() > kMaxMetadataLen)
     {
-        ChipLogError(Zcl, "metadata size %zu exceeds max %zu", metadataForProvider.Value().size(), kMaxMetadataLen);
+        ChipLogError(Zcl, "metadata size %u exceeds max %u", static_cast<unsigned int>(metadataForProvider.Value().size()),
+                     static_cast<unsigned int>(kMaxMetadataLen));
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }

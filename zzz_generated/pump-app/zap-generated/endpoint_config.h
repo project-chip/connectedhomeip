@@ -670,9 +670,9 @@
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* options */                                                      \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                    \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFE }, /* OperationMode */                                               \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* OperationMode */                                                \
         {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFE                                                                        \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x7                                                                         \
         } /* ControlMode */                                                                                                        \
     }
 
@@ -725,7 +725,8 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
-            { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(10) }, /* DataModelRevision */    \
+            { 0x00000000, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),               \
+              ZAP_EMPTY_DEFAULT() }, /* DataModelRevision */                                                                       \
             { 0x00000001, ZAP_TYPE(CHAR_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),          \
               ZAP_EMPTY_DEFAULT() }, /* VendorName */                                                                              \
             { 0x00000002, ZAP_TYPE(VENDOR_ID), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),            \
@@ -1003,27 +1004,27 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                    \
-            { 0x00000000, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxPressure */                                       \
-            { 0x00000001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxSpeed */                                          \
-            { 0x00000002, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxFlow */                                           \
-            { 0x00000003, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MinConstPressure */                                  \
-            { 0x00000004, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxConstPressure */                                  \
-            { 0x00000005, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MinCompPressure */                                   \
-            { 0x00000006, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxCompPressure */                                   \
-            { 0x00000007, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MinConstSpeed */                                     \
-            { 0x00000008, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxConstSpeed */                                     \
-            { 0x00000009, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MinConstFlow */                                      \
-            { 0x0000000A, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxConstFlow */                                      \
-            { 0x0000000B, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MinConstTemp */                                      \
-            { 0x0000000C, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* MaxConstTemp */                                      \
-            { 0x00000010, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() }, /* PumpStatus */                                        \
-            { 0x00000011, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* EffectiveOperationMode */                            \
-            { 0x00000012, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* EffectiveControlMode */                              \
-            { 0x00000013, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Capacity */                                          \
-            { 0x00000014, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Speed */                                             \
+            { 0x00000000, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxPressure */              \
+            { 0x00000001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxSpeed */                 \
+            { 0x00000002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxFlow */                  \
+            { 0x00000003, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MinConstPressure */         \
+            { 0x00000004, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxConstPressure */         \
+            { 0x00000005, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MinCompPressure */          \
+            { 0x00000006, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxCompPressure */          \
+            { 0x00000007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MinConstSpeed */            \
+            { 0x00000008, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxConstSpeed */            \
+            { 0x00000009, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MinConstFlow */             \
+            { 0x0000000A, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxConstFlow */             \
+            { 0x0000000B, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MinConstTemp */             \
+            { 0x0000000C, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* MaxConstTemp */             \
+            { 0x00000010, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() },                          /* PumpStatus */               \
+            { 0x00000011, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                             /* EffectiveOperationMode */   \
+            { 0x00000012, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                             /* EffectiveControlMode */     \
+            { 0x00000013, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* Capacity */                 \
+            { 0x00000014, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* Speed */                    \
             { 0x00000015, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(335) },                                     /* LifetimeRunningHours */                       \
-            { 0x00000016, ZAP_TYPE(INT24U), 3, 0, ZAP_LONG_DEFAULTS_INDEX(338) }, /* Power */                                      \
+              ZAP_LONG_DEFAULTS_INDEX(335) }, /* LifetimeRunningHours */                                                           \
+            { 0x00000016, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_LONG_DEFAULTS_INDEX(338) }, /* Power */           \
             { 0x00000017, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
               ZAP_LONG_DEFAULTS_INDEX(341) }, /* LifetimeEnergyConsumed */                                                         \
             { 0x00000020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
@@ -1313,7 +1314,7 @@
       .clusterId = 0x00000028,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(27), \
       .attributeCount = 22, \
-      .clusterSize = 43, \
+      .clusterSize = 41, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayBasicServer, \
       .acceptedCommandList = nullptr ,\
@@ -1627,7 +1628,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 22, 551 }, { ZAP_CLUSTER_INDEX(22), 11, 149 },                                                     \
+        { ZAP_CLUSTER_INDEX(0), 22, 549 }, { ZAP_CLUSTER_INDEX(22), 11, 149 },                                                     \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1636,10 +1637,10 @@
 static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE, "ATTRIBUTE_LARGEST larger than expected");
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (43)
+#define ATTRIBUTE_SINGLETONS_SIZE (41)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (700)
+#define ATTRIBUTE_MAX_SIZE (698)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

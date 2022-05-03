@@ -39,7 +39,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
-        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing session found");
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalDeviceProxy instance found");
 
         session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
 
@@ -81,11 +81,6 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();
     return CHIP_NO_ERROR;
-}
-
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
-{
-    return mConfig.devicePool->FindDevice(session);
 }
 
 OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const

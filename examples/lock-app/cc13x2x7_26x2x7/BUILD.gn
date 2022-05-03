@@ -30,13 +30,7 @@ project_dir = "${chip_root}/examples/lock-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
-
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
+  public_configs = [ ":lock_app_config" ]
 }
 
 ti_sysconfig("sysconfig") {

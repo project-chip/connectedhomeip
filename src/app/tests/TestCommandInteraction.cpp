@@ -93,8 +93,7 @@ InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
-    ChipLogDetail(Controller,
-                  "Received Cluster Command: Endpoint=%" PRIx16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+    ChipLogDetail(Controller, "Received Cluster Command: Endpoint=%x Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                   aCommandPath.mEndpointId, ChipLogValueMEI(aCommandPath.mClusterId), ChipLogValueMEI(aCommandPath.mCommandId));
 
     if (asyncCommand)
@@ -129,8 +128,8 @@ public:
     {
         IgnoreUnusedVariable(apCommandSender);
         IgnoreUnusedVariable(aData);
-        ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16,
-                      aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
+        ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x", aPath.mClusterId,
+                      aPath.mCommandId, aPath.mEndpointId);
         onResponseCalledTimes++;
     }
     void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
@@ -925,7 +924,7 @@ nlTestSuite sSuite =
 {
     "TestCommandInteraction",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

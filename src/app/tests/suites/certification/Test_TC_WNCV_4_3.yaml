@@ -47,19 +47,18 @@ tests:
               maxValue: 10000
 
     - label:
-          "1b: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from DUT"
+          "1b 1c: If (PA_LF & LF) TH reads CurrentPositionLiftPercentage from
+          DUT + assert CurrentPositionLiftPercent100ths/100 equals
+          CurrentPositionLiftPercentage"
+      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
       response:
-          saveAs: attrCurrentPositionLiftPercentage
+          value: attrCurrentPositionLiftPercent100ths / 100
           constraints:
               minValue: 0
               maxValue: 100
-
-    ##- label: "1c: If (PA_LF & LF) TH assert CurrentPositionLiftPercent100ths/100 equals CurrentPositionLiftPercentage"
-    ##  PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
-    # TODO [TC_WNCV_4_3] WindowCovering Fix this arithmetic operation issue #15190
 
     ######## Command BadParams 1 #######
     ### Step 2x -> Verify the GoToLiftPercentage with a BadParam
@@ -70,7 +69,7 @@ tests:
 
     - label: "2b: TH sends GoToLiftPercentage command with BadParam to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -84,7 +83,7 @@ tests:
     ### Step 3x -> Verify the GoToLiftPercentage with 10001 as param
     - label: "3a: TH sends GoToLiftPercentage command with 10001 to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -98,7 +97,7 @@ tests:
     ### Step 4x -> Verify the GoToLiftPercentage with 0xFFFF as param
     - label: "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && PICS_CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
       arguments:
           values:
               - name: "LiftPercent100thsValue"

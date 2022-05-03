@@ -65,7 +65,8 @@ server cluster AccessControl = 31 {
   }
 
   // Response structures are used for command outputs
-  response struct ConnectNetworkResponse {
+  // Responses are encoded as a command and use a unique ID for encoding
+  response struct ConnectNetworkResponse = 123 {
     CHAR_STRING debugText = 1;
     INT32S errorValue = 2;
   }
@@ -96,6 +97,24 @@ server cluster AccessControl = 31 {
   // attributes may be read-only as well
   readonly attribute int16u clusterRevision = 65533;
 
+  // Code-gen specific information for storage can be added as a keyword list
+  // after the attribute number. Specifically these are supported
+  //   - `callback` is the equivalent of EXTERNAL in ember/zap, which means
+  //     the value does not have a RAM backing store (use callbacks for get/set)
+  //   - `persist` is the equivalent of NVM in ember/zap, which means
+  //     the value will be persisted to storage when written (boot-time restores
+  //     any set value)
+  //   - `default` is supported to set a default value in RAM-based attribute store
+  //
+  // Not all combination of values are compatible. In particular:
+  //  - `callback` is incompatible with `default` or `persist` as all value
+  //    computation is deferred to the app.
+  readonly attribute int16u usingExternalAccess = 10 [callback];
+  readonly attribute int16u isPersisted = 10 [persist];
+  readonly attribute int16u hasDefaultValue = 11 [default=123];
+  readonly attribute char_string<16> defaultStringValue = 12 [default="abc"];
+
+
   // Commands have spec-defined numbers which are used for over-the-wire
   // invocation.
   //
@@ -115,6 +134,9 @@ server cluster AccessControl = 31 {
   // command invocation default to "operate" privilege, however these
   // can be modified as well
   command access(invoke: administer) Off(): DefaultSuccess = 4;
+
+  // command invocation can require timed invoke usage
+  timed command RequiresTimedInvok(): DefaultSuccess = 4;
 }
 
 // A client cluster represents something that is used by an app

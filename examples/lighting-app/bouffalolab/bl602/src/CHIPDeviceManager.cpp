@@ -94,14 +94,14 @@ exit:
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, mask, type,
-                                        size, value);
+        cb->PostAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId, type, size,
+                                        value);
     }
 }

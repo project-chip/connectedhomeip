@@ -78,7 +78,7 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
     case DeviceEventType::kInternetConnectivityChange:
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
-            ChipLogProgress(Shell, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+            ChipLogProgress(Shell, "IPv4 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
@@ -129,7 +129,7 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
         break;
     }
 
-    ChipLogProgress(Shell, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ChipLogProgress(Shell, "Current free heap: %u\n", static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT)));
 }
 
 const char * TAG = "chef-app";
@@ -161,7 +161,9 @@ void printQRCode()
 void InitServer(intptr_t)
 {
     // Start IM server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());

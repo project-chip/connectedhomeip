@@ -198,7 +198,7 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     ReturnErrorOnFailure(reader.Next());
     if (reader.GetTag() == TLV::ContextTag(kTagCluster))
     {
-        uint16_t clusterId;
+        ClusterId clusterId;
         ReturnErrorOnFailure(reader.Get(clusterId));
         entry.clusterId.SetValue(clusterId);
         ReturnErrorOnFailure(reader.Next());

@@ -26,6 +26,7 @@
 #include "CHIPLogging.h"
 
 #include <lib/core/CHIPCore.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
@@ -42,7 +43,7 @@ extern "C" void pw_tokenizer_HandleEncodedMessageWithPayload(uintptr_t levels, c
 {
     uint8_t log_category = levels >> 8 & 0xFF;
     uint8_t log_module   = levels & 0xFF;
-    char * buffer        = (char *) malloc(2 * size_bytes + 1);
+    char * buffer        = (char *) chip::Platform::MemoryAlloc(2 * size_bytes + 1);
 
     if (buffer)
     {
@@ -52,7 +53,7 @@ extern "C" void pw_tokenizer_HandleEncodedMessageWithPayload(uintptr_t levels, c
         }
         buffer[2 * size_bytes] = '\0';
         chip::Logging::Log(log_module, log_category, "%s", buffer);
-        free(buffer);
+        chip::Platform::MemoryFree(buffer);
     }
 }
 

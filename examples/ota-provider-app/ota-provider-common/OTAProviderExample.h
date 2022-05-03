@@ -94,7 +94,7 @@ private:
                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
                           uint32_t targetVersion);
 
-    bool ParseOTAHeader(const char * otaFilePath, chip::OTAImageHeader & header);
+    bool ParseOTAHeader(chip::OTAImageHeaderParser & parser, const char * otaFilePath, chip::OTAImageHeader & header);
 
     /**
      * Called to send the response for a QueryImage command. If an error is encountered, an error status will be sent.

@@ -326,6 +326,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
         chip::NodeId nodeId = mCommissionerNodeId.ValueOr(mCommissionerStorage.GetLocalNodeId());
+
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(
             nodeId, fabricId, mCommissionerStorage.GetCommissionerCATs(), ephemeralKey, rcacSpan, icacSpan, nocSpan));
         commissionerParams.operationalKeypair = &ephemeralKey;

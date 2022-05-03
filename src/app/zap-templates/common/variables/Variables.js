@@ -27,10 +27,10 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const { getCommands, getAttributes } = require('../simulated-clusters/SimulatedClusters.js');
 
 const knownVariables = {
-  'nodeId' : { type : 'NODE_ID', defaultValue : 0x12345 },
-  'endpoint' : { type : 'ENDPOINT_NO', defaultValue : '' },
-  'cluster' : { type : 'CHAR_STRING', defaultValue : '' },
-  'timeout' : { type : 'INT16U', defaultValue : "kTimeoutInSeconds" },
+  'nodeId' : { type : 'NODE_ID', defaultValue : 0x12345, isNullable : false },
+  'endpoint' : { type : 'ENDPOINT_NO', defaultValue : '', isNullable : false },
+  'cluster' : { type : 'CHAR_STRING', defaultValue : '', isNullable : false },
+  'timeout' : { type : 'INT16U', defaultValue : "kTimeoutInSeconds", isNullable : false },
 };
 
 function throwError(test, errorStr)
@@ -57,13 +57,13 @@ async function getCommandInformationsFor(context, test, argumentName)
 {
   const command  = await getItems(test, getCommands(context, test.cluster), test.command);
   const argument = command.response.arguments.find(item => item.name.toLowerCase() == argumentName.toLowerCase());
-  return { type : argument.type, chipType : argument.chipType };
+  return { type : argument.type, chipType : argument.chipType, isNullable : argument.isNullable };
 }
 
 async function getAttributeInformationsFor(context, test, attributeName)
 {
   const attribute = await getItems(test, getAttributes(context, test.cluster), attributeName);
-  return { type : attribute.type, chipType : attribute.chipType };
+  return { type : attribute.type, chipType : attribute.chipType, isNullable : attribute.isNullable };
 }
 
 async function extractVariablesFromConfig(context, suite)
@@ -109,17 +109,19 @@ async function extractVariablesFromTests(context, suite)
 {
   let variables = {};
   suite.tests.forEach(test => {
-    test.response.values.filter(value => value.saveAs).forEach(saveAsValue => {
-      const key = saveAsValue.saveAs;
-      if (key in variables) {
-        throwError(test, `Variable with name: ${key} is already registered.`);
-      }
+    test.response.forEach(response => {
+      response.values.filter(value => value.saveAs).forEach(saveAsValue => {
+        const key = saveAsValue.saveAs;
+        if (key in variables) {
+          throwError(test, `Variable with name: ${key} is already registered.`);
+        }
 
-      if (!test.isCommand && !test.isAttribute) {
-        throwError(test, `Variable support for step ${test} is not supported. Only commands and attributes are supported.`);
-      }
+        if (!test.isCommand && !test.isAttribute) {
+          throwError(test, `Variable support for step ${test} is not supported. Only commands and attributes are supported.`);
+        }
 
-      variables[key] = { test, name : saveAsValue.name };
+        variables[key] = { test, name : saveAsValue.name };
+      });
     });
   });
 

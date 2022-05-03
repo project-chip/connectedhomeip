@@ -88,7 +88,7 @@ client cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 1;
   }
 
-  response struct GetSetupPINResponse {
+  response struct GetSetupPINResponse = 1 {
     CHAR_STRING setupPIN = 0;
   }
 
@@ -163,7 +163,7 @@ client cluster ApplicationBasic = 1293 {
 }
 
 client cluster ApplicationLauncher = 1292 {
-  enum StatusEnum : ENUM8 {
+  enum ApplicationLauncherStatusEnum : ENUM8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -203,8 +203,8 @@ client cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
-  response struct LauncherResponse {
-    StatusEnum status = 0;
+  response struct LauncherResponse = 3 {
+    ApplicationLauncherStatusEnum status = 0;
     OCTET_STRING data = 1;
   }
 
@@ -223,7 +223,7 @@ client cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
-  bitmap AudiouOutputFeature : BITMAP32 {
+  bitmap AudioOutputFeature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -552,14 +552,14 @@ client cluster BridgedDeviceBasic = 57 {
 }
 
 client cluster Channel = 1284 {
-  enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
-  }
-
-  enum StatusEnum : ENUM8 {
+  enum ChannelStatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
+  }
+
+  enum LineupInfoTypeEnum : ENUM8 {
+    kMso = 0;
   }
 
   bitmap ChannelFeature : BITMAP32 {
@@ -603,8 +603,8 @@ client cluster Channel = 1284 {
     INT16U count = 0;
   }
 
-  response struct ChangeChannelResponse {
-    StatusEnum status = 0;
+  response struct ChangeChannelResponse = 1 {
+    ChannelStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -910,6 +910,12 @@ client cluster ColorControl = 768 {
 }
 
 client cluster ContentLauncher = 1290 {
+  enum ContentLaunchStatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
   enum MetricTypeEnum : ENUM8 {
     kPixels = 0;
     kPercentage = 1;
@@ -929,12 +935,6 @@ client cluster ContentLauncher = 1290 {
     kSport = 10;
     kSportsTeam = 11;
     kType = 12;
-  }
-
-  enum StatusEnum : ENUM8 {
-    kSuccess = 0;
-    kUrlNotAvailable = 1;
-    kAuthFailed = 2;
   }
 
   bitmap ContentLauncherFeature : BITMAP32 {
@@ -1002,8 +1002,8 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformation brandingInformation = 2;
   }
 
-  response struct LaunchResponse {
-    StatusEnum status = 0;
+  response struct LaunchResponse = 2 {
+    ContentLaunchStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -1057,7 +1057,7 @@ client cluster DiagnosticLogs = 50 {
     OCTET_STRING transferFileDesignator = 2;
   }
 
-  response struct RetrieveLogsResponse {
+  response struct RetrieveLogsResponse = 1 {
     LogsStatus status = 0;
     OCTET_STRING content = 1;
     epoch_s timeStamp = 2;
@@ -1455,6 +1455,7 @@ client cluster DoorLock = 257 {
   readonly attribute int16u numberOfRFIDUsersSupported = 19;
   readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
   readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
+  readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
@@ -1467,6 +1468,8 @@ client cluster DoorLock = 257 {
   attribute access(write: manage) boolean enableOneTouchLocking = 41;
   attribute access(write: manage) boolean enablePrivacyModeButton = 43;
   attribute access(write: administer) int8u wrongCodeEntryLimit = 48;
+  attribute access(write: administer) int8u userCodeTemporaryDisableTime = 49;
+  nosubscribe attribute access(write: administer) boolean requirePINforRemoteOperation = 51;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1572,7 +1575,7 @@ client cluster DoorLock = 257 {
     nullable DlCredential credential = 0;
   }
 
-  response struct GetWeekDayScheduleResponse {
+  response struct GetWeekDayScheduleResponse = 12 {
     INT8U weekDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
@@ -1583,7 +1586,7 @@ client cluster DoorLock = 257 {
     optional INT8U endMinute = 7;
   }
 
-  response struct GetYearDayScheduleResponse {
+  response struct GetYearDayScheduleResponse = 15 {
     INT8U yearDayIndex = 0;
     INT16U userIndex = 1;
     DlStatus status = 2;
@@ -1591,7 +1594,7 @@ client cluster DoorLock = 257 {
     optional epoch_s localEndTime = 4;
   }
 
-  response struct GetHolidayScheduleResponse {
+  response struct GetHolidayScheduleResponse = 18 {
     INT8U holidayIndex = 0;
     DlStatus status = 1;
     optional epoch_s localStartTime = 2;
@@ -1599,12 +1602,12 @@ client cluster DoorLock = 257 {
     optional DlOperatingMode operatingMode = 4;
   }
 
-  response struct GetUserTypeResponse {
+  response struct GetUserTypeResponse = 21 {
     INT16U userId = 0;
     DlUserType userType = 1;
   }
 
-  response struct GetUserResponse {
+  response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
     nullable INT32U userUniqueId = 2;
@@ -1617,13 +1620,13 @@ client cluster DoorLock = 257 {
     nullable INT16U nextUserIndex = 9;
   }
 
-  response struct SetCredentialResponse {
+  response struct SetCredentialResponse = 35 {
     DlStatus status = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
   }
 
-  response struct GetCredentialStatusResponse {
+  response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
     nullable INT16U nextCredentialIndex = 2;
@@ -1700,8 +1703,59 @@ client cluster EthernetNetworkDiagnostics = 55 {
 }
 
 client cluster FanControl = 514 {
-  attribute enum8 fanMode = 0;
-  attribute enum8 fanModeSequence = 1;
+  enum FanModeSequenceType : ENUM8 {
+    kOffLowMedHigh = 0;
+    kOffLowHigh = 1;
+    kOffLowMedHighAuto = 2;
+    kOffLowHighAuto = 3;
+    kOffOnAuto = 4;
+    kOffOn = 5;
+  }
+
+  enum FanModeType : ENUM8 {
+    kOff = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kOn = 4;
+    kAuto = 5;
+    kSmart = 6;
+  }
+
+  bitmap FanControlFeature : BITMAP32 {
+    kMultiSpeed = 0x1;
+    kAuto = 0x2;
+    kRocking = 0x4;
+    kWind = 0x8;
+  }
+
+  bitmap RockSupportMask : BITMAP8 {
+    kRockLeftRight = 0x1;
+    kRockUpDown = 0x2;
+    kRockRound = 0x4;
+  }
+
+  bitmap WindSettingMask : BITMAP8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
+  bitmap WindSupportMask : BITMAP8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
+  attribute FanModeType fanMode = 0;
+  attribute FanModeSequenceType fanModeSequence = 1;
+  attribute int8u percentSetting = 2;
+  readonly attribute int8u percentCurrent = 3;
+  readonly attribute int8u speedMax = 4;
+  attribute int8u speedSetting = 5;
+  readonly attribute int8u speedCurrent = 6;
+  readonly attribute bitmap8 rockSupport = 7;
+  attribute bitmap8 rockSetting = 8;
+  readonly attribute bitmap8 windSupport = 9;
+  attribute bitmap8 windSetting = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1768,17 +1822,17 @@ client cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  response struct ArmFailSafeResponse {
+  response struct ArmFailSafeResponse = 1 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct SetRegulatoryConfigResponse {
+  response struct SetRegulatoryConfigResponse = 3 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
+  response struct CommissioningCompleteResponse = 5 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
@@ -1937,11 +1991,11 @@ client cluster GroupKeyManagement = 63 {
     INT16U groupKeySetIDs[] = 0;
   }
 
-  response struct KeySetReadResponse {
+  response struct KeySetReadResponse = 2 {
     GroupKeySetStruct groupKeySet = 0;
   }
 
-  response struct KeySetReadAllIndicesResponse {
+  response struct KeySetReadAllIndicesResponse = 5 {
     INT16U groupKeySetIDs[] = 0;
   }
 
@@ -1980,23 +2034,23 @@ client cluster Groups = 4 {
     CHAR_STRING groupName = 1;
   }
 
-  response struct AddGroupResponse {
+  response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
 
-  response struct ViewGroupResponse {
+  response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
     group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
-  response struct GetGroupMembershipResponse {
+  response struct GetGroupMembershipResponse = 2 {
     nullable INT8U capacity = 0;
     group_id groupList[] = 1;
   }
 
-  response struct RemoveGroupResponse {
+  response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
@@ -2048,7 +2102,7 @@ client cluster Identify = 3 {
     IdentifyEffectVariant effectVariant = 1;
   }
 
-  response struct IdentifyQueryResponse {
+  response struct IdentifyQueryResponse = 0 {
     INT16U timeout = 0;
   }
 
@@ -2164,7 +2218,7 @@ client cluster KeypadInput = 1289 {
     kData = 118;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum KeypadInputStatusEnum : ENUM8 {
     kSuccess = 0;
     kUnsupportedKey = 1;
     kInvalidKeyInCurrentState = 2;
@@ -2185,8 +2239,8 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
-  response struct SendKeyResponse {
-    StatusEnum status = 0;
+  response struct SendKeyResponse = 1 {
+    KeypadInputStatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2349,20 +2403,20 @@ client cluster MediaInput = 1287 {
 }
 
 client cluster MediaPlayback = 1286 {
-  enum PlaybackStateEnum : ENUM8 {
-    kPlaying = 0;
-    kPaused = 1;
-    kNotPlaying = 2;
-    kBuffering = 3;
-  }
-
-  enum StatusEnum : ENUM8 {
+  enum MediaPlaybackStatusEnum : ENUM8 {
     kSuccess = 0;
     kInvalidStateForCommand = 1;
     kNotAllowed = 2;
     kNotActive = 3;
     kSpeedOutOfRange = 4;
     kSeekOutOfRange = 5;
+  }
+
+  enum PlaybackStateEnum : ENUM8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
   }
 
   struct PlaybackPosition {
@@ -2394,8 +2448,8 @@ client cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
-  response struct PlaybackResponse {
-    StatusEnum status = 0;
+  response struct PlaybackResponse = 10 {
+    MediaPlaybackStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -2551,20 +2605,20 @@ client cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  response struct NetworkConfigResponse {
+  response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
-  response struct ConnectNetworkResponse {
+  response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
@@ -2623,7 +2677,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
-  response struct QueryImageResponse {
+  response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING imageURI = 2;
@@ -2634,7 +2688,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING metadataForRequestor = 7;
   }
 
-  response struct ApplyUpdateResponse {
+  response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
   }
@@ -2874,21 +2928,21 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING trustedRootIdentifier = 0;
   }
 
-  response struct AttestationResponse {
+  response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
   }
 
-  response struct CertificateChainResponse {
+  response struct CertificateChainResponse = 3 {
     OCTET_STRING certificate = 0;
   }
 
-  response struct CSRResponse {
+  response struct CSRResponse = 5 {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
   }
 
-  response struct NOCResponse {
+  response struct NOCResponse = 8 {
     OperationalCertStatus statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
@@ -3087,29 +3141,29 @@ client cluster PumpConfigurationAndControl = 512 {
   info event TurbineOperation = 16 {
   }
 
-  readonly attribute int16s maxPressure = 0;
-  readonly attribute int16u maxSpeed = 1;
-  readonly attribute int16u maxFlow = 2;
-  readonly attribute int16s minConstPressure = 3;
-  readonly attribute int16s maxConstPressure = 4;
-  readonly attribute int16s minCompPressure = 5;
-  readonly attribute int16s maxCompPressure = 6;
-  readonly attribute int16u minConstSpeed = 7;
-  readonly attribute int16u maxConstSpeed = 8;
-  readonly attribute int16u minConstFlow = 9;
-  readonly attribute int16u maxConstFlow = 10;
-  readonly attribute int16s minConstTemp = 11;
-  readonly attribute int16s maxConstTemp = 12;
+  readonly attribute nullable int16s maxPressure = 0;
+  readonly attribute nullable int16u maxSpeed = 1;
+  readonly attribute nullable int16u maxFlow = 2;
+  readonly attribute nullable int16s minConstPressure = 3;
+  readonly attribute nullable int16s maxConstPressure = 4;
+  readonly attribute nullable int16s minCompPressure = 5;
+  readonly attribute nullable int16s maxCompPressure = 6;
+  readonly attribute nullable int16u minConstSpeed = 7;
+  readonly attribute nullable int16u maxConstSpeed = 8;
+  readonly attribute nullable int16u minConstFlow = 9;
+  readonly attribute nullable int16u maxConstFlow = 10;
+  readonly attribute nullable int16s minConstTemp = 11;
+  readonly attribute nullable int16s maxConstTemp = 12;
   readonly attribute bitmap16 pumpStatus = 16;
-  readonly attribute enum8 effectiveOperationMode = 17;
-  readonly attribute enum8 effectiveControlMode = 18;
-  readonly attribute int16s capacity = 19;
-  readonly attribute int16u speed = 20;
-  attribute nullable int24u lifetimeRunningHours = 21;
-  readonly attribute int24u power = 22;
-  attribute nullable int32u lifetimeEnergyConsumed = 23;
-  attribute enum8 operationMode = 32;
-  attribute enum8 controlMode = 33;
+  readonly attribute PumpOperationMode effectiveOperationMode = 17;
+  readonly attribute PumpControlMode effectiveControlMode = 18;
+  readonly attribute nullable int16s capacity = 19;
+  readonly attribute nullable int16u speed = 20;
+  attribute access(write: manage) nullable int24u lifetimeRunningHours = 21;
+  readonly attribute nullable int24u power = 22;
+  attribute access(write: manage) nullable int32u lifetimeEnergyConsumed = 23;
+  attribute access(write: manage) PumpOperationMode operationMode = 32;
+  attribute access(write: manage) PumpControlMode controlMode = 33;
   readonly attribute bitmap16 alarmMask = 34;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3119,9 +3173,9 @@ client cluster PumpConfigurationAndControl = 512 {
 }
 
 client cluster RelativeHumidityMeasurement = 1029 {
-  readonly attribute int16u measuredValue = 0;
-  readonly attribute int16u minMeasuredValue = 1;
-  readonly attribute int16u maxMeasuredValue = 2;
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3187,13 +3241,13 @@ client cluster Scenes = 5 {
     INT16U groupId = 0;
   }
 
-  response struct AddSceneResponse {
+  response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct ViewSceneResponse {
+  response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
@@ -3202,24 +3256,24 @@ client cluster Scenes = 5 {
     SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
 
-  response struct RemoveSceneResponse {
+  response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct RemoveAllScenesResponse {
+  response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
     INT16U groupId = 1;
   }
 
-  response struct StoreSceneResponse {
+  response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
     INT16U groupId = 1;
     INT8U sceneId = 2;
   }
 
-  response struct GetSceneMembershipResponse {
+  response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     INT8U capacity = 1;
     INT16U groupId = 2;
@@ -3304,7 +3358,7 @@ client cluster Switch = 59 {
 }
 
 client cluster TargetNavigator = 1285 {
-  enum StatusEnum : ENUM8 {
+  enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
     kTargetNotFound = 1;
     kNotAllowed = 2;
@@ -3327,8 +3381,8 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
-  response struct NavigateTargetResponse {
-    StatusEnum status = 0;
+  response struct NavigateTargetResponse = 1 {
+    TargetNavigatorStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -3505,39 +3559,39 @@ client cluster TestCluster = 1295 {
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;
   attribute boolean unsupported = 255;
-  attribute nullable boolean nullableBoolean = 32768;
-  attribute nullable Bitmap8MaskMap nullableBitmap8 = 32769;
-  attribute nullable Bitmap16MaskMap nullableBitmap16 = 32770;
-  attribute nullable Bitmap32MaskMap nullableBitmap32 = 32771;
-  attribute nullable Bitmap64MaskMap nullableBitmap64 = 32772;
-  attribute nullable int8u nullableInt8u = 32773;
-  attribute nullable int16u nullableInt16u = 32774;
-  attribute nullable int24u nullableInt24u = 32775;
-  attribute nullable int32u nullableInt32u = 32776;
-  attribute nullable int40u nullableInt40u = 32777;
-  attribute nullable int48u nullableInt48u = 32778;
-  attribute nullable int56u nullableInt56u = 32779;
-  attribute nullable int64u nullableInt64u = 32780;
-  attribute nullable int8s nullableInt8s = 32781;
-  attribute nullable int16s nullableInt16s = 32782;
-  attribute nullable int24s nullableInt24s = 32783;
-  attribute nullable int32s nullableInt32s = 32784;
-  attribute nullable int40s nullableInt40s = 32785;
-  attribute nullable int48s nullableInt48s = 32786;
-  attribute nullable int56s nullableInt56s = 32787;
-  attribute nullable int64s nullableInt64s = 32788;
-  attribute nullable enum8 nullableEnum8 = 32789;
-  attribute nullable enum16 nullableEnum16 = 32790;
-  attribute nullable single nullableFloatSingle = 32791;
-  attribute nullable double nullableFloatDouble = 32792;
-  attribute nullable octet_string<10> nullableOctetString = 32793;
-  attribute nullable char_string<10> nullableCharString = 32798;
-  attribute nullable SimpleEnum nullableEnumAttr = 32804;
-  attribute nullable SimpleStruct nullableStruct = 32805;
-  attribute nullable int8u nullableRangeRestrictedInt8u = 32806;
-  attribute nullable int8s nullableRangeRestrictedInt8s = 32807;
-  attribute nullable int16u nullableRangeRestrictedInt16u = 32808;
-  attribute nullable int16s nullableRangeRestrictedInt16s = 32809;
+  attribute nullable boolean nullableBoolean = 16384;
+  attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
+  attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;
+  attribute nullable Bitmap32MaskMap nullableBitmap32 = 16387;
+  attribute nullable Bitmap64MaskMap nullableBitmap64 = 16388;
+  attribute nullable int8u nullableInt8u = 16389;
+  attribute nullable int16u nullableInt16u = 16390;
+  attribute nullable int24u nullableInt24u = 16391;
+  attribute nullable int32u nullableInt32u = 16392;
+  attribute nullable int40u nullableInt40u = 16393;
+  attribute nullable int48u nullableInt48u = 16394;
+  attribute nullable int56u nullableInt56u = 16395;
+  attribute nullable int64u nullableInt64u = 16396;
+  attribute nullable int8s nullableInt8s = 16397;
+  attribute nullable int16s nullableInt16s = 16398;
+  attribute nullable int24s nullableInt24s = 16399;
+  attribute nullable int32s nullableInt32s = 16400;
+  attribute nullable int40s nullableInt40s = 16401;
+  attribute nullable int48s nullableInt48s = 16402;
+  attribute nullable int56s nullableInt56s = 16403;
+  attribute nullable int64s nullableInt64s = 16404;
+  attribute nullable enum8 nullableEnum8 = 16405;
+  attribute nullable enum16 nullableEnum16 = 16406;
+  attribute nullable single nullableFloatSingle = 16407;
+  attribute nullable double nullableFloatDouble = 16408;
+  attribute nullable octet_string<10> nullableOctetString = 16409;
+  attribute nullable char_string<10> nullableCharString = 16414;
+  attribute nullable SimpleEnum nullableEnumAttr = 16420;
+  attribute nullable SimpleStruct nullableStruct = 16421;
+  attribute nullable int8u nullableRangeRestrictedInt8u = 16422;
+  attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
+  attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
+  attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3599,39 +3653,39 @@ client cluster TestCluster = 1295 {
     BOOLEAN arg3 = 2;
   }
 
-  response struct TestSpecificResponse {
+  response struct TestSpecificResponse = 0 {
     INT8U returnValue = 0;
   }
 
-  response struct TestAddArgumentsResponse {
+  response struct TestAddArgumentsResponse = 1 {
     INT8U returnValue = 0;
   }
 
-  response struct TestListInt8UReverseResponse {
+  response struct TestListInt8UReverseResponse = 4 {
     INT8U arg1[] = 0;
   }
 
-  response struct TestEnumsResponse {
+  response struct TestEnumsResponse = 5 {
     vendor_id arg1 = 0;
     SimpleEnum arg2 = 1;
   }
 
-  response struct TestNullableOptionalResponse {
+  response struct TestNullableOptionalResponse = 6 {
     BOOLEAN wasPresent = 0;
     optional BOOLEAN wasNull = 1;
     optional INT8U value = 2;
     optional nullable INT8U originalValue = 3;
   }
 
-  response struct BooleanResponse {
+  response struct BooleanResponse = 8 {
     BOOLEAN value = 0;
   }
 
-  response struct SimpleStructResponse {
+  response struct SimpleStructResponse = 9 {
     SimpleStruct arg1 = 0;
   }
 
-  response struct TestEmitTestEventResponse {
+  response struct TestEmitTestEventResponse = 10 {
     INT64U value = 0;
   }
 
@@ -3750,14 +3804,14 @@ client cluster Thermostat = 513 {
     ModeForSequence modeToReturn = 1;
   }
 
-  response struct GetWeeklyScheduleResponse {
+  response struct GetWeeklyScheduleResponse = 0 {
     ENUM8 numberOfTransitionsForSequence = 0;
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
     INT8U payload[] = 3;
   }
 
-  response struct GetRelayStatusLogResponse {
+  response struct GetRelayStatusLogResponse = 1 {
     INT16U timeOfDay = 0;
     BITMAP16 relayStatus = 1;
     INT16S localTemperature = 2;
@@ -4109,14 +4163,21 @@ client cluster WindowCovering = 258 {
     kUnknown = 255;
   }
 
-  bitmap WcConfigStatus : BITMAP8 {
+  bitmap ConfigStatus : BITMAP8 {
     kOperational = 0x1;
-    kOnline = 0x2;
-    kOpenAndUpCommandsReversed = 0x4;
+    kOnlineReserved = 0x2;
+    kLiftMovementReversed = 0x4;
     kLiftPositionAware = 0x8;
     kTiltPositionAware = 0x10;
     kLiftEncoderControlled = 0x20;
     kTiltEncoderControlled = 0x40;
+  }
+
+  bitmap Mode : BITMAP8 {
+    kMotorDirectionReversed = 0x1;
+    kCalibrationMode = 0x2;
+    kMaintenanceMode = 0x4;
+    kLedFeedback = 0x8;
   }
 
   bitmap WcFeature : BITMAP32 {
@@ -4125,13 +4186,6 @@ client cluster WindowCovering = 258 {
     kPositionAwareLift = 0x4;
     kAbsolutePosition = 0x8;
     kPositionAwareTilt = 0x10;
-  }
-
-  bitmap WcMode : BITMAP8 {
-    kMotorDirectionReversed = 0x1;
-    kCalibrationMode = 0x2;
-    kMaintenanceMode = 0x4;
-    kLedFeedback = 0x8;
   }
 
   bitmap WcOperationalStatus : BITMAP8 {
@@ -4158,7 +4212,7 @@ client cluster WindowCovering = 258 {
   readonly attribute Type type = 0;
   readonly attribute nullable int16u currentPositionLift = 3;
   readonly attribute nullable int16u currentPositionTilt = 4;
-  readonly attribute bitmap8 configStatus = 7;
+  readonly attribute ConfigStatus configStatus = 7;
   readonly attribute nullable Percent currentPositionLiftPercentage = 8;
   readonly attribute nullable Percent currentPositionTiltPercentage = 9;
   readonly attribute bitmap8 operationalStatus = 10;
@@ -4171,7 +4225,7 @@ client cluster WindowCovering = 258 {
   readonly attribute int16u installedClosedLimitLift = 17;
   readonly attribute int16u installedOpenLimitTilt = 18;
   readonly attribute int16u installedClosedLimitTilt = 19;
-  attribute access(write: manage) bitmap8 mode = 23;
+  attribute access(write: manage) Mode mode = 23;
   readonly attribute bitmap16 safetyStatus = 26;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4185,7 +4239,7 @@ client cluster WindowCovering = 258 {
 
   request struct GoToLiftPercentageRequest {
     Percent liftPercentageValue = 0;
-    Percent100ths liftPercent100thsValue = 1;
+    optional Percent100ths liftPercent100thsValue = 1;
   }
 
   request struct GoToTiltValueRequest {
@@ -4194,7 +4248,7 @@ client cluster WindowCovering = 258 {
 
   request struct GoToTiltPercentageRequest {
     Percent tiltPercentageValue = 0;
-    Percent100ths tiltPercent100thsValue = 1;
+    optional Percent100ths tiltPercent100thsValue = 1;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;

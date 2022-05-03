@@ -62,16 +62,11 @@ public:
     const char * SessionResumption(const char * resumptionIdBase64) { return Format("g/s/%s", resumptionIdBase64); }
 
     // Access Control
-    const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
-
-    // TODO: We should probably store the fabric-specific parts of the ACL list
-    // under keys starting with "f/%x/".
-    const char * AccessControlList() { return Format("g/acl"); }
-    const char * AccessControlEntry(size_t index)
+    const char * AccessControlAclEntry(FabricIndex fabric, size_t index)
     {
-        // This cast will never overflow because the number of ACL entries will be low.
-        return Format("g/acl/%x", static_cast<unsigned int>(index));
+        return Format("f/%x/ac/0/%x", fabric, static_cast<unsigned>(index));
     }
+    const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
 
     // Group Message Counters
     const char * GroupDataCounter() { return Format("g/gdc"); }
@@ -98,7 +93,7 @@ public:
     {
         // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return Format("g/a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+        return Format("g/a/%x/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
     // TODO: Should store fabric-specific parts of the binding list under keys

@@ -39,10 +39,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-#define CASE_OPS_KEY 0xCA5EECC0
-#endif
-
 namespace chip {
 
 static constexpr FabricIndex kMinValidFabricIndex = 1;
@@ -119,14 +115,10 @@ public:
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+            mOperationalKey->CreateOperationalKey(mFabricIndex);
 #else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-#endif
             mOperationalKey->Initialize();
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            // Set provisioned_key = true , so that key is not deleted from HSM.
-            mOperationalKey->provisioned_key = true;
 #endif
         }
         return mOperationalKey;
@@ -252,22 +244,6 @@ private:
     }
 
     CHIP_ERROR SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCert);
-
-    struct StorableFabricInfo
-    {
-        uint8_t mFabricIndex;
-        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
-
-        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
-        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
-
-        Crypto::P256SerializedKeypair mOperationalKey;
-        uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
-        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
-        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-    };
 };
 
 // Once attribute store has persistence implemented, FabricTable shoud be backed using

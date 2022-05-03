@@ -93,12 +93,14 @@ Server Server::sServer;
 static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
 static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
 static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static ::chip::PersistedCounter sGlobalEventIdCounter;
+static ::chip::PersistedCounter<chip::EventNumber> sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
+    ChipLogProgress(AppServer, "Server initializing...");
+
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
@@ -109,8 +111,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
@@ -127,10 +129,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
-    InitDataModelHandler(&mExchangeMgr);
-
     err = mFabrics.Init(mDeviceStorage);
     SuccessOrExit(err);
+
+    SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
+    Access::SetAccessControl(mAccessControl);
+    SuccessOrExit(err = mAclStorage.Init(*mDeviceStorage, mFabrics));
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
@@ -144,17 +148,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
-    err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver);
-    SuccessOrExit(err);
-    Access::SetAccessControl(mAccessControl);
+    // This initializes clusters, so should come after lower level initialization.
+    InitDataModelHandler(&mExchangeMgr);
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-                               .SetNativeParams(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+                               .SetNativeParams(initParams.endpointNativeParams)
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
@@ -189,7 +190,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mMessageCounterManager.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable());
     SuccessOrExit(err);
 
     chip::Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
@@ -260,11 +261,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
-    err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports,
-#if CONFIG_NETWORK_LAYER_BLE
-                                                    chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
-#endif
-                                                    &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
+    err =
+        mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage, mGroupsProvider);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -285,6 +283,7 @@ exit:
     }
     else
     {
+        // NOTE: this log is scraped by the test harness.
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
@@ -308,7 +307,7 @@ void Server::RejoinExistingMulticastGroups()
                     Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %u : %" CHIP_ERROR_FORMAT,
+                    ChipLogError(AppServer, "Error when trying to join Group %u of fabric index %u : %" CHIP_ERROR_FORMAT,
                                  groupInfo.group_id, fabric.GetFabricIndex(), err.Format());
 
                     // We assume the failure is caused by a network issue or a lack of rescources; neither of which will be solved

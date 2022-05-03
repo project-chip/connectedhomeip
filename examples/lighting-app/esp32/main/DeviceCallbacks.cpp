@@ -38,8 +38,10 @@
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
+#include <ota/OTAHelper.h>
 
-static const char * TAG = "light-app-callbacks";
+static const char * TAG                      = "light-app-callbacks";
+constexpr uint32_t kInitOTARequestorDelaySec = 3;
 
 extern LEDWidget AppLED;
 
@@ -116,11 +118,11 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
         break;
     }
 
-    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %u\n", static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT)));
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                                  uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -146,15 +148,28 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
         break;
     }
 
-    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %u\n", static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT)));
+}
+
+void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
+    OTAHelpers::Instance().InitOTARequestor();
 }
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
+    static bool isOTAInitialized = false;
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
-        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+        ESP_LOGI(TAG, "IPv4 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+
+        if (!isOTAInitialized)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            isOTAInitialized = true;
+        }
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -164,6 +179,13 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+
+        if (!isOTAInitialized)
+        {
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                        InitOTARequestorHandler, nullptr);
+            isOTAInitialized = true;
+        }
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

@@ -20,7 +20,8 @@
  */
 
 #include "CastingShellCommands.h"
-#include "Casting.h"
+#include "CastingServer.h"
+#include "CastingUtils.h"
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
@@ -37,15 +38,29 @@ namespace Shell {
 static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "  help                 Usage: app <subcommand>\r\n");
+    streamer_printf(sout, "  help                 Usage: cast <subcommand>\r\n");
+    streamer_printf(sout, "  print-bindings       Usage: cast print-bindings\r\n");
+    streamer_printf(sout, "  print-fabrics        Usage: cast print-fabrics\r\n");
+    streamer_printf(
+        sout,
+        "  delete-fabric <index>     Delete a fabric from the casting client's fabric store. Usage: cast delete-fabric 1\r\n");
+    streamer_printf(
+        sout,
+        "  set-fabric <index>        Set current fabric from the casting client's fabric store. Usage: cast set-fabric 1\r\n");
+    streamer_printf(sout,
+                    "  init <nodeid> <fabric-index>  Initialize casting app using given nodeid and index from previous "
+                    "commissioning. Usage: init 18446744004990074879 2\r\n");
     streamer_printf(sout, "  discover             Discover commissioners. Usage: cast discover\r\n");
     streamer_printf(
         sout, "  request <index>      Request commissioning from discovered commissioner with [index]. Usage: cast request 0\r\n");
-    streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launc https://www.yahoo.com Hello\r\n");
+    streamer_printf(sout, "  launch <url> <display>   Launch content. Usage: cast launch https://www.yahoo.com Hello\r\n");
     streamer_printf(
         sout,
         "  access <node>        Read and display clusters on each endpoint for <node>. Usage: cast access 0xFFFFFFEFFFFFFFFF\r\n");
     streamer_printf(sout, "  sendudc <address> <port> Send UDC message to address. Usage: cast sendudc ::1 5543\r\n");
+    streamer_printf(
+        sout,
+        "  cluster [clustercommand] Send cluster command. Usage: cast cluster keypadinput send-key 1 18446744004990074879 1\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -56,6 +71,15 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
+    }
+    if (strcmp(argv[0], "init") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "init");
+
+        char * eptr;
+        chip::NodeId nodeId           = (chip::NodeId) strtoull(argv[1], &eptr, 10);
+        chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[2], &eptr, 10);
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "discover") == 0)
     {
@@ -83,7 +107,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         char * url     = argv[1];
         char * display = argv[2];
-        return ContentLauncherLaunchURL(url, display);
+        return CastingServer::GetInstance()->ContentLauncherLaunchURL(url, display);
     }
     if (strcmp(argv[0], "access") == 0)
     {
@@ -94,7 +118,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         }
         char * eptr;
         chip::NodeId node = (chip::NodeId) strtoull(argv[1], &eptr, 0);
-        ReadServerClustersForNode(node);
+        CastingServer::GetInstance()->ReadServerClustersForNode(node);
         return CHIP_NO_ERROR;
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
@@ -104,9 +128,44 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
-        return SendUDC(chip::Transport::PeerAddress::UDP(commissioner, port));
+        PrepareForCommissioning();
+        return CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(
+            chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    if (strcmp(argv[0], "print-bindings") == 0)
+    {
+        CastingServer::GetInstance()->PrintBindings();
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "print-fabrics") == 0)
+    {
+        PrintFabrics();
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "delete-fabric") == 0)
+    {
+        char * eptr;
+        chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
+        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "set-fabric") == 0)
+    {
+        char * eptr;
+        chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
+        chip::NodeId nodeId           = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        if (nodeId == kUndefinedFabricIndex)
+        {
+            streamer_printf(streamer_get(), "ERROR - invalid fabric or video player nodeId not found\r\n");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
+    }
+    if (strcmp(argv[0], "cluster") == 0)
+    {
+        return ProcessClusterCommand(argc, argv);
+    }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 

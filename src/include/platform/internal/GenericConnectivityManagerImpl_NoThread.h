@@ -50,9 +50,9 @@ protected:
     bool _IsThreadApplicationControlled(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
     bool _IsThreadAttached(void);
     bool _IsThreadProvisioned(void);
     void _ErasePersistentInfo(void);
@@ -116,21 +116,21 @@ GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetThreadDeviceType(Connect
 }
 
 template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_GetSEDIntervalsConfig(
+    ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetSEDPollingConfig(
-    const ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_SetSEDIntervalsConfig(
+    const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

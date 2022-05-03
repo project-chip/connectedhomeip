@@ -27,6 +27,4 @@ chip_openthread_ftd = false
 # Example will not be maintained in the long term and will be depraceted now that OTA is beeing intagrated into our examples
 chip_stack_lock_tracking = "None"
 
-declare_args() {
-  chip_enable_ota_requestor = true
-}
+chip_enable_ota_requestor = true

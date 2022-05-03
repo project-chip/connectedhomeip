@@ -60,11 +60,12 @@ class DLL_EXPORT CASESession : public Messaging::UnsolicitedMessageHandler,
                                public PairingSession
 {
 public:
-    CASESession();
-    CASESession(CASESession &&)      = default;
-    CASESession(const CASESession &) = default;
-
     ~CASESession() override;
+
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(mLocalNodeId, GetFabricIndex()); }
+    CATValues GetPeerCATs() const override { return mPeerCATs; };
 
     /**
      * @brief
@@ -86,7 +87,6 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param sessionManager                session manager from which to allocate a secure session object
-     * @param peerAddress                   Address of peer with which to establish a session.
      * @param fabric                        The fabric that should be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -95,9 +95,9 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR
-    EstablishSession(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, FabricInfo * fabric,
-                     NodeId peerNodeId, Messaging::ExchangeContext * exchangeCtxt,
-                     SessionResumptionStorage * sessionResumptionStorage, SessionEstablishmentDelegate * delegate,
+    EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
+                     Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
+                     SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
@@ -135,15 +135,12 @@ public:
 
     /**
      * @brief
-     *   Derive a secure session from the established session. The API will return error
-     *   if called before session is established.
+     *   Derive a secure session from the established session. The API will return error if called before session is established.
      *
-     * @param session     Reference to the secure session that will be
-     *                    initialized once session establishment is complete
-     * @param role        Role of the new session (initiator or responder)
+     * @param session     Reference to the secure session that will be initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
 
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
@@ -166,14 +163,16 @@ public:
     void Clear();
 
 private:
-    enum State : uint8_t
+    enum class State : uint8_t
     {
-        kInitialized      = 0,
-        kSentSigma1       = 1,
-        kSentSigma2       = 2,
-        kSentSigma3       = 3,
-        kSentSigma1Resume = 4,
-        kSentSigma2Resume = 5,
+        kInitialized       = 0,
+        kSentSigma1        = 1,
+        kSentSigma2        = 2,
+        kSentSigma3        = 3,
+        kSentSigma1Resume  = 4,
+        kSentSigma2Resume  = 5,
+        kFinished          = 6,
+        kFinishedViaResume = 7,
     };
 
     CHIP_ERROR Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate);
@@ -196,7 +195,7 @@ private:
     CHIP_ERROR SendSigma3();
     CHIP_ERROR HandleSigma3(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendSigma2Resume(const ByteSpan & initiatorRandom);
+    CHIP_ERROR SendSigma2Resume();
 
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
@@ -216,6 +215,9 @@ private:
 
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
+
+    // TODO: pull up Finish to PairingSession class
+    void Finish();
 
     void AbortExchange();
 
@@ -253,18 +255,16 @@ private:
 
     FabricTable * mFabricsTable    = nullptr;
     const FabricInfo * mFabricInfo = nullptr;
+    NodeId mPeerNodeId             = kUndefinedNodeId;
+    NodeId mLocalNodeId            = kUndefinedNodeId;
+    CATValues mPeerCATs;
 
-    // This field is only used for CASE responder, when during sending sigma2 and waiting for sigma3
-    SessionResumptionStorage::ResumptionIdStorage mResumptionId;
+    SessionResumptionStorage::ResumptionIdStorage mResumeResumptionId; // ResumptionId which is used to resume this session
+    SessionResumptionStorage::ResumptionIdStorage mNewResumptionId;    // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;
-
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
-
-protected:
-    bool mCASESessionEstablished = false;
 };
 
 } // namespace chip

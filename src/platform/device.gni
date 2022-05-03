@@ -47,7 +47,8 @@ declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
-      chip_device_platform == "cc13x2_26x2" || chip_device_platform == "k32w0"
+      chip_device_platform == "cc13x2_26x2" ||
+      chip_device_platform == "k32w0" || chip_device_platform == "tizen"
 }
 
 declare_args() {
@@ -142,6 +143,15 @@ if (chip_device_platform != "external") {
     chip_system_layer_impl_config_file = ""
   }
 }
+
+declare_args() {
+  # If true, disables KVS implementation for the platform.  May not be
+  # supported on all platforms.
+  chip_disable_platform_kvs = false
+}
+
+assert(chip_disable_platform_kvs == false || chip_device_platform == "darwin",
+       "Can only disable KVS on some platforms")
 
 if (_chip_device_layer != "none" && chip_device_platform != "external") {
   chip_ble_platform_config_include =

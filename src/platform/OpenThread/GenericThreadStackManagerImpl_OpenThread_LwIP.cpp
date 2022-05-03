@@ -48,9 +48,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
-
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
@@ -421,6 +418,10 @@ exit:
         // TODO: deliver CHIP platform event signaling loss of inbound packet.
     }
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

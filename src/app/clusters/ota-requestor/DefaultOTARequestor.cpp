@@ -20,6 +20,7 @@
  * OTA Requestor logic is contained in this class.
  */
 
+#include <app/clusters/basic/basic.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -74,7 +75,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.updateToken.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  updateToken: %zu", response.updateToken.Value().size());
+        ChipLogDetail(SoftwareUpdate, "  updateToken: %u", static_cast<unsigned int>(response.updateToken.Value().size()));
     }
     if (response.userConsentNeeded.HasValue())
     {
@@ -82,7 +83,8 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.metadataForRequestor.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  metadataForRequestor: %zu", response.metadataForRequestor.Value().size());
+        ChipLogDetail(SoftwareUpdate, "  metadataForRequestor: %u",
+                      static_cast<unsigned int>(response.metadataForRequestor.Value().size()));
     }
 }
 
@@ -198,7 +200,8 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
             MutableCharSpan fileDesignator(requestorCore->mFileDesignatorBuffer);
             if (update.fileDesignator.size() > fileDesignator.size())
             {
-                ChipLogError(SoftwareUpdate, "File designator size %zu is too large to store", update.fileDesignator.size());
+                ChipLogError(SoftwareUpdate, "File designator size %u is too large to store",
+                             static_cast<unsigned int>(update.fileDesignator.size()));
                 requestorCore->RecordErrorUpdateState(CHIP_ERROR_BUFFER_TOO_SMALL);
                 return;
             }
@@ -334,13 +337,14 @@ void DefaultOTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comman
 
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %u", providerLocation.fabricIndex);
     ChipLogDetail(SoftwareUpdate, "  ProviderNodeID: 0x" ChipLogFormatX64, ChipLogValueX64(providerLocation.providerNodeID));
-    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%" PRIx16, commandData.vendorId);
+    ChipLogDetail(SoftwareUpdate, "  VendorID: 0x%x", commandData.vendorId);
     ChipLogDetail(SoftwareUpdate, "  AnnouncementReason: %u", to_underlying(announcementReason));
     if (commandData.metadataForNode.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
+        ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %u",
+                      static_cast<unsigned int>(commandData.metadataForNode.Value().size()));
     }
-    ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, providerLocation.endpoint);
+    ChipLogDetail(SoftwareUpdate, "  Endpoint: %u", providerLocation.endpoint);
 
     mOtaRequestorDriver->ProcessAnnounceOTAProviders(providerLocation, announcementReason);
 
@@ -730,7 +734,7 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(OperationalDeviceProxy & d
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(args.softwareVersion));
 
     args.protocolsSupported = kProtocolsSupported;
-    args.requestorCanConsent.SetValue(mOtaRequestorDriver->CanConsent());
+    args.requestorCanConsent.SetValue(!Basic::IsLocalConfigDisabled() && mOtaRequestorDriver->CanConsent());
 
     uint16_t hardwareVersion;
     if (DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion) == CHIP_NO_ERROR)

@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w0_sdk.gni")
 import("//build_overrides/openthread.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/third_party/nxp/k32w0_sdk/k32w0_sdk.gni")
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
@@ -22,6 +25,10 @@ openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 config("openthread_k32w0_config") {
   include_dirs = [ "${openthread_nxp_root}/src/k32w0/k32w061" ]
   include_dirs += [ "${chip_root}/examples/platform/nxp/k32w/k32w0" ]
+
+  if (is_clang) {
+    cflags = [ "-Wno-format-nonliteral" ]
+  }
 
   defines = [
     "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",

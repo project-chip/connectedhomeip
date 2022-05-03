@@ -34,8 +34,6 @@
 
 #define LOG_MODULE_ID 1
 
-static TaskHandle_t sTestTaskHandle;
-
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 

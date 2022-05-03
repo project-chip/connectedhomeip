@@ -163,7 +163,7 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 48 // 96
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
@@ -178,7 +178,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION (0)
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configMAX_PRIORITIES (56)
-#define configMINIMAL_STACK_SIZE (140) /* Number of words to use for Idle and Timer stacks */
+#define configMINIMAL_STACK_SIZE (320) /* Number of words to use for Idle and Timer stacks */
 #define configMAX_TASK_NAME_LEN (10)
 #define configUSE_16_BIT_TICKS (0)
 #define configIDLE_SHOULD_YIELD (1)
@@ -189,7 +189,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_TRACE_FACILITY 1
 #define configQUEUE_REGISTRY_SIZE (10)
 #define configUSE_QUEUE_SETS (0)
-#define configUSE_NEWLIB_REENTRANT (0)
+#define configUSE_NEWLIB_REENTRANT (1)
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
 #define configSUPPORT_STATIC_ALLOCATION (1)
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)

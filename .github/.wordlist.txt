@@ -252,6 +252,7 @@ ColorControl
 Comcast
 Commandline
 Commissionable
+CommissionableDataProvider
 commissionables
 commissionee
 CommissioningFlow
@@ -352,6 +353,7 @@ demangle
 deployable
 depottools
 deps
+der
 desc
 descheduled
 detokenization
@@ -360,6 +362,7 @@ dev
 devcontainer
 devCtrl
 DevelopmentCerts
+DeviceAttestationCredentialsProvider
 DeviceAttestationCredsExample
 DeviceCaCerts
 DeviceCert
@@ -587,6 +590,7 @@ hciattach
 hciconfig
 hdlc
 HKDF
+HMAC
 hoc
 homebrew
 hostapd
@@ -844,6 +848,7 @@ mydir
 MyPASSWORD
 MySSID
 NAMESERVER
+NAMESPACE
 namespacing
 nano
 natively
@@ -881,6 +886,7 @@ nullable
 nullptr
 NUM
 NVM
+NVS
 nwk
 NXP
 objcopy
@@ -1416,6 +1422,7 @@ xFF
 xFFF
 xFFFF
 xfffff
+xFFFFFFEFFFFFFFFF
 xtensa
 xwayland
 xyz

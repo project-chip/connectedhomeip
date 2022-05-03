@@ -103,11 +103,13 @@ uint16_t emberAfEndpointCount(void)
 
 uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
 {
-    for (uint16_t i = 0; i < ArraySize(endpoints); i++)
+    static_assert(ArraySize(endpoints) < UINT16_MAX, "Need to be able to return endpoint index as a 16-bit value.");
+
+    for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
         if (endpoints[i] == endpoint)
         {
-            return i;
+            return static_cast<uint16_t>(i);
         }
     }
     return UINT16_MAX;
@@ -115,7 +117,7 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
 
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
 {
-    for (uint16_t i = 0; i < ArraySize(endpoints); i++)
+    for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
         if (endpoints[i] == endpoint)
         {
@@ -127,9 +129,9 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
 {
-    uint16_t endpointIndex          = emberAfIndexFromEndpoint(endpoint);
-    uint16_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint16_t i = 0; i < clusterCountOnEndpoint; i++)
+    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
+    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
+    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)
         {
@@ -142,9 +144,9 @@ uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::Cluster
 uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                      chip::AttributeId attributeId)
 {
-    uint16_t endpointIndex          = emberAfIndexFromEndpoint(endpoint);
-    uint16_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint16_t i = 0; i < clusterCountOnEndpoint; i++)
+    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
+    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
+    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)
         {
@@ -160,6 +162,11 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, 
         }
     }
     return UINT16_MAX;
+}
+
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
+{
+    return !(emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) == UINT16_MAX);
 }
 
 chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
@@ -180,9 +187,9 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                                      uint16_t index)
 {
-    uint16_t endpointIndex          = emberAfIndexFromEndpoint(endpoint);
-    uint16_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint16_t i = 0; i < clusterCountOnEndpoint; i++)
+    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
+    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
+    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)
         {
@@ -199,8 +206,8 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
 
 uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, EmberAfClusterMask mask)
 {
-    uint16_t endpointIndex          = emberAfIndexFromEndpoint(endpoint);
-    uint16_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
+    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
+    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
     for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
     {
         if (clusters[i + clusterIndex[endpointIndex]] == cluster)

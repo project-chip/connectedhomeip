@@ -71,15 +71,21 @@ class DLL_EXPORT PASESession : public Messaging::UnsolicitedMessageHandler,
                                public PairingSession
 {
 public:
-    PASESession();
-    PASESession(PASESession &&)      = default;
-    PASESession(const PASESession &) = delete;
-
     ~PASESession() override;
 
-    // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
-    // should not need to be told their peer node ID
-    using PairingSession::SetPeerNodeId;
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
+    ScopedNodeId GetPeer() const override
+    {
+        return ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex);
+    }
+
+    ScopedNodeId GetLocalScopedNodeId() const override
+    {
+        // For PASE, source is always the undefined node ID
+        return ScopedNodeId();
+    }
+
+    CATValues GetPeerCATs() const override { return CATValues(); };
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
@@ -104,7 +110,6 @@ public:
      *   Create a pairing request using peer's setup PIN code.
      *
      * @param sessionManager      session manager from which to allocate a secure session object
-     * @param peerAddress         Address of peer to pair
      * @param peerSetUpPINCode    Setup PIN code of the peer device
      * @param exchangeCtxt        The exchange context to send and receive messages with the peer
      *                            Note: It's expected that the caller of this API hands over the
@@ -114,9 +119,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(SessionManager & sessionManager, const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode,
-                    Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Pair(SessionManager & sessionManager, uint32_t peerSetUpPINCode, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -135,15 +139,12 @@ public:
 
     /**
      * @brief
-     *   Derive a secure session from the paired session. The API will return error
-     *   if called before pairing is established.
+     *   Derive a secure session from the paired session. The API will return error if called before pairing is established.
      *
-     * @param session     Reference to the secure session that will be
-     *                    initialized once pairing is complete
-     * @param role        Role of the new session (initiator or responder)
+     * @param session     Reference to the secure session that will be initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override;
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
@@ -207,6 +208,9 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
+    // TODO: pull up Finish to PairingSession class
+    void Finish();
+
     void CloseExchange();
 
     /**
@@ -240,8 +244,6 @@ private:
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
 
-    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
-
     struct Spake2pErrorMsg
     {
         Spake2pErrorType error;
@@ -255,56 +257,8 @@ protected:
     bool mPairingComplete = false;
 };
 
-/*
- * The following constants are node IDs that test devices and test
- * controllers use while using the SecurePairingUsingTestSecret to
- * establish secure channel
- */
+// The following constants are node IDs that test devices and test controllers use.
 constexpr chip::NodeId kTestControllerNodeId = 112233;
 constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
-
-/*
- * The following class should only be used for test usecases.
- * The class is currently also used for devices that do no yet support
- * rendezvous. Once all the non-test usecases start supporting
- * rendezvous, this class will be moved to the test code.
- */
-class SecurePairingUsingTestSecret : public PairingSession
-{
-public:
-    SecurePairingUsingTestSecret() : PairingSession(Transport::SecureSession::Type::kPASE)
-    {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        SetPeerSessionId(1);
-    }
-
-    void Init(SessionManager & sessionManager)
-    {
-        // Do not set to 0 to prevent an unwanted unsecured session
-        // since the session type is unknown.
-        AllocateSecureSession(sessionManager, mLocalSessionId);
-    }
-
-    SecurePairingUsingTestSecret(uint16_t peerSessionId, uint16_t localSessionId, SessionManager & sessionManager) :
-        PairingSession(Transport::SecureSession::Type::kPASE), mLocalSessionId(localSessionId)
-    {
-        AllocateSecureSession(sessionManager, localSessionId);
-        SetPeerSessionId(peerSessionId);
-    }
-
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override
-    {
-        size_t secretLen = strlen(kTestSecret);
-        return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
-                                      CryptoContext::SessionInfoType::kSessionEstablishment, role);
-    }
-
-private:
-    // Do not set to 0 to prevent an unwanted unsecured session
-    // since the session type is unknown.
-    uint16_t mLocalSessionId = 1;
-    const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-};
 
 } // namespace chip

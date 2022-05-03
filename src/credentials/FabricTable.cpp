@@ -228,17 +228,12 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
             mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
         }
         VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-        // Set provisioned_key = true , so that key is not deleted from HSM.
-        mOperationalKey->provisioned_key = true;
-#endif
 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
         ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -332,7 +327,6 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
         mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
         mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif

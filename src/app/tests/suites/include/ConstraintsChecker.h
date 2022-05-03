@@ -30,7 +30,7 @@ public:
     virtual ~ConstraintsChecker(){};
 
 protected:
-    virtual void Exit(std::string message) = 0;
+    virtual void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) = 0;
 
     bool CheckConstraintType(const char * itemName, const char * current, const char * expected)
     {
@@ -208,6 +208,18 @@ protected:
     }
 
     template <typename T, typename U>
+    bool CheckConstraintMinValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() < expected)
+        {
+            Exit(std::string(itemName) + " value < minValue: " + std::to_string(current.Raw()) + " < " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
     bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current, U expected)
     {
         if (current.IsNull())
@@ -233,6 +245,18 @@ protected:
     bool CheckConstraintMaxValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintMaxValue(itemName, chip::to_underlying(current), expected);
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintMaxValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() > expected)
+        {
+            Exit(std::string(itemName) + " value > maxValue: " + std::to_string(current.Raw()) + " > " + std::to_string(expected));
+            return false;
+        }
+
+        return true;
     }
 
     template <typename T, typename U>
@@ -268,6 +292,19 @@ protected:
     {
         if (current == expected)
         {
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintNotValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        if (current.Raw() == expected)
+        {
+
             Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current.Raw()));
             return false;
         }

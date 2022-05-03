@@ -82,5 +82,15 @@ EventFilterIBs::Builder & EventFilterIBs::Builder::EndOfEventFilters()
     EndOfContainer();
     return *this;
 }
+
+CHIP_ERROR EventFilterIBs::Builder::GenerateEventFilter(EventNumber aEventNumber)
+{
+    EventFilterIB::Builder & eventFilter = CreateEventFilter();
+    ReturnErrorOnFailure(GetError());
+    ReturnErrorOnFailure(eventFilter.EventMin(aEventNumber).EndOfEventFilterIB().GetError());
+    ReturnErrorOnFailure(EndOfEventFilters().GetError());
+    return CHIP_NO_ERROR;
+}
+
 }; // namespace app
 }; // namespace chip

@@ -84,7 +84,7 @@ struct CopyAndAdjustDeltaTimeContext
 
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                           MonotonicallyIncreasingCounter * apEventNumberCounter)
+                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
 {
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
@@ -335,7 +335,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                             CircularEventBuffer * apCircularEventBuffer,
                                             const LogStorageResources * const apLogStorageResources,
-                                            MonotonicallyIncreasingCounter * apEventNumberCounter)
+                                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
 {
 
     sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter);
@@ -401,7 +401,7 @@ void EventManagement::VendEventNumber()
     }
 
     // Assign event Number to the buffer's counter's value.
-    mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
+    mLastEventNumber = mpEventNumberCounter->GetValue();
 }
 
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
@@ -497,7 +497,7 @@ exit:
         mLastEventTimestamp = timestamp;
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%" PRIx16
+                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%x"
                       " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), opts.mPath.mEndpointId,
                       ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId,

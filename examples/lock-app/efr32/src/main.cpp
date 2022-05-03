@@ -40,6 +40,10 @@
 #include "sl_system_kernel.h"
 #include <app/server/Server.h>
 
+#ifdef EFR32_OTA_ENABLED
+#include "OTAConfig.h"
+#endif // EFR32_OTA_ENABLED
+
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
@@ -48,20 +52,9 @@
 #include "lcd.h"
 #endif
 
-#if PW_RPC_ENABLED
-#include "Rpc.h"
-#endif
-
-#ifdef ENABLE_CHIP_SHELL
-#include "matter_shell.h"
-#endif
-
-#ifdef EFR32_OTA_ENABLED
-#include "OTAConfig.h"
-#endif // EFR32_OTA_ENABLED
-
 #include <mbedtls/platform.h>
 #if CHIP_ENABLE_OPENTHREAD
+#include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -78,6 +71,15 @@
 #include "wfx_host_events.h"
 #endif /* RS911X_WIFI */
 
+#if PW_RPC_ENABLED
+#include "Rpc.h"
+#endif
+
+#ifdef ENABLE_CHIP_SHELL
+#include "matter_shell.h"
+#endif
+
+#define BLE_DEV_NAME "SiLabs-Door-Lock"
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -111,7 +113,20 @@ extern "C" void vApplicationIdleHook(void)
     // Check CHIP Config nvm3 and repack flash if necessary.
     Internal::EFR32Config::RepackNvm3Flash();
 }
+#if CHIP_ENABLE_OPENTHREAD
+// ================================================================================
+// Matter Networking Callbacks
+// ================================================================================
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
 
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+#endif
 // ================================================================================
 // Main Code
 // ================================================================================
@@ -124,12 +139,15 @@ int main(void)
     chip::rpc::Init();
 #endif
 
+#ifdef HEAP_MONITORING
+    MemMonitoring::startHeapMonitoring();
+#endif
+
     EFR32_LOG("==================================================");
-    EFR32_LOG("chip-efr32-lock-example starting");
+    EFR32_LOG("chip-efr32-door-lock-example starting");
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");
-
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
@@ -139,7 +157,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LOCK");
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(BLE_DEV_NAME);
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();
@@ -169,6 +187,13 @@ int main(void)
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+#if CHIP_ENABLE_OPENTHREAD
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
     chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -179,6 +204,14 @@ int main(void)
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
+
+#ifdef WF200_WIFI
+    // Start wfx bus communication task.
+    wfx_bus_start();
+#ifdef SL_WFX_USE_SECURE_LINK
+    wfx_securelink_task_start(); // start securelink key renegotiation task
+#endif                           // SL_WFX_USE_SECURE_LINK
+#endif                           /* WF200_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Starting OpenThread task");
@@ -191,13 +224,13 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-#ifdef WF200_WIFI
-    // Start wfx bus communication task.
-    wfx_bus_start();
-#ifdef SL_WFX_USE_SECURE_LINK
-    wfx_securelink_task_start(); // start securelink key renegotiation task
-#endif                           // SL_WFX_USE_SECURE_LINK
-#endif                           /* WF200_WIFI */
+#ifdef RS911X_WIFI
+    /*
+     * Start up any RSI interface stuff
+     * (Not required) - Note that wfx_wifi_start will deal with
+     * starting up a rsi task - which will initialize the SPI interface.
+     */
+#endif
 #ifdef EFR32_OTA_ENABLED
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OTAConfig::Init();

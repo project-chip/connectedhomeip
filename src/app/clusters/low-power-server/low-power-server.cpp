@@ -55,7 +55,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "LowPower has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "LowPower has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;

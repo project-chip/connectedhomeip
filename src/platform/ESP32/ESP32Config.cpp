@@ -62,28 +62,27 @@ const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator    = { kConfig
 const ESP32Config::Key ESP32Config::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
 const ESP32Config::Key ESP32Config::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
 const ESP32Config::Key ESP32Config::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const ESP32Config::Key ESP32Config::kConfigKey_DACCert               = { kConfigNamespace_ChipFactory, "dac-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_DACPrivateKey         = { kConfigNamespace_ChipFactory, "dac-key" };
+const ESP32Config::Key ESP32Config::kConfigKey_DACPublicKey          = { kConfigNamespace_ChipFactory, "dac-pub-key" };
+const ESP32Config::Key ESP32Config::kConfigKey_PAICert               = { kConfigNamespace_ChipFactory, "pai-cert" };
+const ESP32Config::Key ESP32Config::kConfigKey_CertDeclaration       = { kConfigNamespace_ChipFactory, "cert-dclrn" };
 
 // Keys stored in the chip-config namespace
-const ESP32Config::Key ESP32Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
 const ESP32Config::Key ESP32Config::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const ESP32Config::Key ESP32Config::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
 const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
 const ESP32Config::Key ESP32Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
 const ESP32Config::Key ESP32Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
-
-// Prefix used for NVS keys that contain Chip group encryption keys.
-const char ESP32Config::kGroupKeyNamePrefix[] = "gk-";
 
 const char * ESP32Config::GetPartitionLabelByNamespace(const char * ns)
 {

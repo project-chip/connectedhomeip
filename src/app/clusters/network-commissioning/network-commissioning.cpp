@@ -247,24 +247,22 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-        if (!req.ssid.HasValue())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-        const auto nullableSSID = req.ssid.Value();
         ByteSpan ssid;
-        if (!nullableSSID.IsNull())
+        if (req.ssid.HasValue())
         {
-            ssid = nullableSSID.Value();
-            if (ssid.empty())
+            const auto & nullableSSID = req.ssid.Value();
+            if (!nullableSSID.IsNull())
             {
-                // Normalize the zero value to null ByteSpan.
-                // Spec 7.17.1. Empty string is an equivalent of null.
-                ssid = ByteSpan();
+                ssid = nullableSSID.Value();
+                if (ssid.empty())
+                {
+                    // Normalize empty span value to null ByteSpan.
+                    // Spec 7.17.1. Empty string is an equivalent of null.
+                    ssid = ByteSpan();
+                }
             }
         }
-        if (!(ssid.size() <= DeviceLayer::Internal::kMaxWiFiSSIDLength))
+        if (ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
             return;
@@ -625,6 +623,68 @@ void Instance::OnFailSafeTimerExpired()
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
     mpWirelessDriver->RevertConfiguration();
     mAsyncCommandHandle.Release();
+}
+
+CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+{
+    using namespace Clusters::NetworkCommissioning::Commands;
+
+    constexpr CommandId acceptedCommandsListWiFi[] = {
+        ScanNetworks::Id, AddOrUpdateWiFiNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
+    };
+    constexpr CommandId acceptedCommandsListThread[] = {
+        ScanNetworks::Id, AddOrUpdateThreadNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
+    };
+
+    if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
+    {
+        for (const auto & cmd : acceptedCommandsListThread)
+        {
+            if (callback(cmd, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
+    {
+        for (const auto & cmd : acceptedCommandsListWiFi)
+        {
+            if (callback(cmd, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+{
+    using namespace Clusters::NetworkCommissioning::Commands;
+
+    constexpr CommandId generatedCommandsListWireless[] = { ScanNetworksResponse::Id, NetworkConfigResponse::Id,
+                                                            ConnectNetworkResponse::Id };
+
+    if (mFeatureFlags.HasAny(NetworkCommissioningFeature::kWiFiNetworkInterface,
+                             NetworkCommissioningFeature::kThreadNetworkInterface))
+    {
+        for (const auto & cmd : generatedCommandsListWireless)
+        {
+            if (callback(cmd, context) != Loop::Continue)
+            {
+                break;
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 bool NullNetworkDriver::GetEnabled()

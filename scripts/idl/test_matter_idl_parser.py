@@ -180,12 +180,48 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_attribute_storage_info(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute char_string<11> attr1 = 1 [callback];
+                attribute char_string<33> attr2 = 2 [default="abc\\n with escapes: \\""];
+                attribute int32u withDefault = 3 [default=11];
+                attribute int32u intWithCallback = 4 [callback];
+                attribute int32u persisted = 5 [persist];
+                attribute int32u persisted_with_default = 6 [persist, default=55];
+                readonly attribute int32u readonlyDefault = 7 [default=321];
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.CALLBACK]), definition=Field(
+                            data_type=DataType(name="char_string", max_length=11), code=1, name="attr1")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="char_string", max_length=33), code=2, name="attr2"), default='abc\n with escapes: "'),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="int32u"), code=3, name="withDefault"), default=11),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.CALLBACK]), definition=Field(
+                            data_type=DataType(name="int32u"), code=4, name="intWithCallback")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.PERSIST]), definition=Field(
+                            data_type=DataType(name="int32u"), code=5, name="persisted")),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.PERSIST]), definition=Field(
+                            data_type=DataType(name="int32u"), code=6, name="persisted_with_default"), default=55),
+                        Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
+                            data_type=DataType(name="int32u"), code=7, name="readonlyDefault"), default=321),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_commands(self):
         actual = parseText("""
             server cluster WithCommands = 1 {
                 struct FreeStruct {}
                 request struct InParam {}
-                response struct OutParam {}
+                response struct OutParam = 223 {}
 
                 command WithoutArg(): DefaultSuccess = 123;
                 command InOutStuff(InParam): OutParam = 222;
@@ -200,8 +236,7 @@ class TestParser(unittest.TestCase):
                         Struct(name="FreeStruct", fields=[]),
                         Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", fields=[],
-                               tag=StructTag.RESPONSE),
+                        Struct(name="OutParam", fields=[], tag=StructTag.RESPONSE, code=223),
                     ],
                     commands=[
                         Command(name="WithoutArg", code=123,
@@ -219,7 +254,7 @@ class TestParser(unittest.TestCase):
         actual = parseText("""
             server cluster WithCommands = 1 {
                 request struct InParam {}
-                response struct OutParam {}
+                response struct OutParam = 4 {}
 
                 command WithoutArg(): DefaultSuccess = 1;
                 timed command access(invoke: manage) TimedCommand(InParam): OutParam = 2;
@@ -233,8 +268,7 @@ class TestParser(unittest.TestCase):
                     structs=[
                         Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", fields=[],
-                               tag=StructTag.RESPONSE),
+                        Struct(name="OutParam", fields=[], tag=StructTag.RESPONSE, code=4),
                     ],
                     commands=[
                         Command(name="WithoutArg", code=1,

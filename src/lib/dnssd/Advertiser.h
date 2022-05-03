@@ -333,7 +333,14 @@ public:
     /**
      * Returns the commissionable node service instance name formatted as hex string.
      */
-    virtual CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) = 0;
+    virtual CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const = 0;
+
+    /**
+     * Generates an updated commissionable instance name.  This happens
+     * automatically when Init() is called, but may be needed at other times as
+     * well.
+     */
+    virtual CHIP_ERROR UpdateCommissionableInstanceName() = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();

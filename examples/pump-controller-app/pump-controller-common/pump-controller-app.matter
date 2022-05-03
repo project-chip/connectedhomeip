@@ -198,7 +198,7 @@ server cluster DiagnosticLogs = 50 {
     OCTET_STRING transferFileDesignator = 2;
   }
 
-  response struct RetrieveLogsResponse {
+  response struct RetrieveLogsResponse = 1 {
     LogsStatus status = 0;
     OCTET_STRING content = 1;
     epoch_s timeStamp = 2;
@@ -259,17 +259,17 @@ server cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  response struct ArmFailSafeResponse {
+  response struct ArmFailSafeResponse = 1 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct SetRegulatoryConfigResponse {
+  response struct SetRegulatoryConfigResponse = 3 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
+  response struct CommissioningCompleteResponse = 5 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
@@ -427,11 +427,11 @@ server cluster GroupKeyManagement = 63 {
     INT16U groupKeySetIDs[] = 0;
   }
 
-  response struct KeySetReadResponse {
+  response struct KeySetReadResponse = 2 {
     GroupKeySetStruct groupKeySet = 0;
   }
 
-  response struct KeySetReadAllIndicesResponse {
+  response struct KeySetReadAllIndicesResponse = 5 {
     INT16U groupKeySetIDs[] = 0;
   }
 
@@ -468,23 +468,23 @@ server cluster Groups = 4 {
     CHAR_STRING groupName = 1;
   }
 
-  response struct AddGroupResponse {
+  response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
 
-  response struct ViewGroupResponse {
+  response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
     group_id groupId = 1;
     CHAR_STRING groupName = 2;
   }
 
-  response struct GetGroupMembershipResponse {
+  response struct GetGroupMembershipResponse = 2 {
     nullable INT8U capacity = 0;
     group_id groupList[] = 1;
   }
 
-  response struct RemoveGroupResponse {
+  response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
     group_id groupId = 1;
   }
@@ -534,7 +534,7 @@ server cluster Identify = 3 {
     IdentifyEffectVariant effectVariant = 1;
   }
 
-  response struct IdentifyQueryResponse {
+  response struct IdentifyQueryResponse = 0 {
     INT16U timeout = 0;
   }
 
@@ -657,20 +657,20 @@ server cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  response struct NetworkConfigResponse {
+  response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
-  response struct ConnectNetworkResponse {
+  response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
@@ -727,7 +727,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
-  response struct QueryImageResponse {
+  response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING imageURI = 2;
@@ -738,7 +738,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING metadataForRequestor = 7;
   }
 
-  response struct ApplyUpdateResponse {
+  response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
   }
@@ -928,21 +928,21 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING trustedRootIdentifier = 0;
   }
 
-  response struct AttestationResponse {
+  response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
   }
 
-  response struct CertificateChainResponse {
+  response struct CertificateChainResponse = 3 {
     OCTET_STRING certificate = 0;
   }
 
-  response struct CSRResponse {
+  response struct CSRResponse = 5 {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
   }
 
-  response struct NOCResponse {
+  response struct NOCResponse = 8 {
     OperationalCertStatus statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
@@ -1050,13 +1050,13 @@ client cluster PumpConfigurationAndControl = 512 {
   info event TurbineOperation = 16 {
   }
 
-  readonly attribute int16s maxPressure = 0;
-  readonly attribute int16u maxSpeed = 1;
-  readonly attribute int16u maxFlow = 2;
-  readonly attribute enum8 effectiveOperationMode = 17;
-  readonly attribute enum8 effectiveControlMode = 18;
-  readonly attribute int16s capacity = 19;
-  attribute enum8 operationMode = 32;
+  readonly attribute nullable int16s maxPressure = 0;
+  readonly attribute nullable int16u maxSpeed = 1;
+  readonly attribute nullable int16u maxFlow = 2;
+  readonly attribute PumpOperationMode effectiveOperationMode = 17;
+  readonly attribute PumpControlMode effectiveControlMode = 18;
+  readonly attribute nullable int16s capacity = 19;
+  attribute access(write: manage) PumpOperationMode operationMode = 32;
   readonly attribute int16u clusterRevision = 65533;
 }
 

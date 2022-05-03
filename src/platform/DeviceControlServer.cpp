@@ -47,7 +47,7 @@ CHIP_ERROR DeviceControlServer::CommissioningComplete(NodeId peerNodeId, FabricI
     return PlatformMgr().PostEvent(&event);
 }
 
-CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb)
+CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -55,9 +55,6 @@ CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const Char
     SuccessOrExit(err);
 
     err = ConfigurationMgr().StoreCountryCode(countryCode.data(), countryCode.size());
-    SuccessOrExit(err);
-
-    err = ConfigurationMgr().StoreBreadcrumb(breadcrumb);
     SuccessOrExit(err);
 
 exit:

@@ -44,7 +44,6 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 namespace {
 
@@ -55,7 +54,7 @@ using namespace chip::Messaging;
 using namespace chip::Protocols;
 using namespace chip::System::Clock::Literals;
 
-using TestContext = Test::LoopbackMessagingContext<>;
+using TestContext = Test::LoopbackMessagingContext;
 
 TestContext sContext;
 
@@ -1522,7 +1521,7 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
         {
             struct BackoffComplianceTestVector * test = &theBackoffComplianceTestVector[i];
             System::Clock::Timestamp backoff          = ReliableMessageMgr::GetBackoff(test->backoffBase, test->sendCount);
-            ChipLogProgress(Test, "Backoff # %d: %d", test->sendCount, (uint32_t) backoff.count());
+            ChipLogProgress(Test, "Backoff # %d: %" PRIu32, test->sendCount, (uint32_t) backoff.count());
 
             NL_TEST_ASSERT(inSuite, backoff >= test->backoffMin);
             NL_TEST_ASSERT(inSuite, backoff <= test->backoffMax);
@@ -1587,7 +1586,7 @@ nlTestSuite sSuite =
 {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize,
     InitializeTestCase,
 };

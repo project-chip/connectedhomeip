@@ -64,18 +64,14 @@ const PosixConfig::Key PosixConfig::kConfigKey_VendorId              = { kConfig
 const PosixConfig::Key PosixConfig::kConfigKey_ProductId             = { kConfigNamespace_ChipFactory, "product-id" };
 
 // Keys stored in the Chip-config namespace
-const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
 const PosixConfig::Key PosixConfig::kConfigKey_ServiceConfig      = { kConfigNamespace_ChipConfig, "service-config" };
 const PosixConfig::Key PosixConfig::kConfigKey_PairedAccountId    = { kConfigNamespace_ChipConfig, "account-id" };
 const PosixConfig::Key PosixConfig::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
-const PosixConfig::Key PosixConfig::kConfigKey_FabricSecret       = { kConfigNamespace_ChipConfig, "fabric-secret" };
-const PosixConfig::Key PosixConfig::kConfigKey_GroupKeyIndex      = { kConfigNamespace_ChipConfig, "group-key-index" };
 const PosixConfig::Key PosixConfig::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const PosixConfig::Key PosixConfig::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
-const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
 const PosixConfig::Key PosixConfig::kConfigKey_UniqueId           = { kConfigNamespace_ChipFactory, "unique-id" };
 
@@ -85,9 +81,6 @@ const PosixConfig::Key PosixConfig::kCounterKey_UpTime                = { kConfi
 const PosixConfig::Key PosixConfig::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters,
                                                                           "total-operational-hours" };
 const PosixConfig::Key PosixConfig::kCounterKey_BootReason            = { kConfigNamespace_ChipCounters, "boot-reason" };
-
-// Prefix used for NVS keys that contain Chip group encryption keys.
-const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
 ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 {
@@ -287,7 +280,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint16_t val)
     err = storage->Commit();
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu16 " (0x%" PRIX16 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %u (0x%X)", key.Namespace, key.Name, val, val);
 
 exit:
     return err;
@@ -407,7 +400,8 @@ CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_
         err = storage->Commit();
         SuccessOrExit(err);
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %zu)", key.Namespace, key.Name, dataLen);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %u)", key.Namespace, key.Name,
+                        static_cast<unsigned int>(dataLen));
     }
     else
     {

@@ -33,8 +33,8 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     EndpointId endpoint     = attributePath.mEndpointId;
     ClusterId clusterId     = attributePath.mClusterId;
@@ -46,7 +46,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     switch (clusterId)
     {
     case Identify::Id:
-        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %" PRIu16 ", length %" PRIu16,
+        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
         break;
     default:

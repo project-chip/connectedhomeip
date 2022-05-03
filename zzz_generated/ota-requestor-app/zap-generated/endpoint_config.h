@@ -130,7 +130,8 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
-            { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(10) }, /* DataModelRevision */    \
+            { 0x00000000, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),               \
+              ZAP_EMPTY_DEFAULT() }, /* DataModelRevision */                                                                       \
             { 0x00000001, ZAP_TYPE(CHAR_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),          \
               ZAP_EMPTY_DEFAULT() }, /* VendorName */                                                                              \
             { 0x00000002, ZAP_TYPE(VENDOR_ID), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON),            \
@@ -221,10 +222,11 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },         /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
-            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },      /* WindowStatus */                                    \
-            { 0x00000001, ZAP_TYPE(FABRIC_IDX), 1, 0, ZAP_EMPTY_DEFAULT() }, /* AdminFabricIndex */                                \
-            { 0x00000002, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* AdminVendorId */                                   \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },   /* ClusterRevision */                                 \
+            { 0x00000000, ZAP_TYPE(INT8U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* WindowStatus */      \
+            { 0x00000001, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                           \
+              ZAP_EMPTY_DEFAULT() },                                                                        /* AdminFabricIndex */ \
+            { 0x00000002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AdminVendorId */    \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                  /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NOCs */              \
@@ -344,7 +346,7 @@
       .clusterId = 0x00000028,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(6), \
       .attributeCount = 21, \
-      .clusterSize = 39, \
+      .clusterSize = 37, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
       .functions = chipFuncArrayBasicServer, \
       .acceptedCommandList = nullptr ,\
@@ -421,7 +423,7 @@
       .clusterId = 0x0000003C,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(56), \
       .attributeCount = 4, \
-      .clusterSize = 6, \
+      .clusterSize = 2, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 19 ) ,\
@@ -471,7 +473,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 166 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 12, 160 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
@@ -480,10 +482,10 @@
 static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE, "ATTRIBUTE_LARGEST larger than expected");
 
 // Total size of singleton attributes
-#define ATTRIBUTE_SINGLETONS_SIZE (39)
+#define ATTRIBUTE_SINGLETONS_SIZE (37)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (166)
+#define ATTRIBUTE_MAX_SIZE (160)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)

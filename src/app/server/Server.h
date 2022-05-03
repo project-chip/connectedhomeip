@@ -25,6 +25,7 @@
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
+#include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
@@ -97,6 +98,9 @@ struct ServerInitParams
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    // Network native params can be injected depending on the
+    // selected Endpoint implementation
+    void * endpointNativeParams = nullptr;
 };
 
 /**
@@ -169,7 +173,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate(&sKvsPersistenStorageDelegate);
+        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
 
         return CHIP_NO_ERROR;
     }
@@ -302,7 +306,20 @@ private:
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
-            Access::GetAccessControl().RemoveFabric(fabricIndex);
+
+            {
+                // Remove access control entries in reverse order. (It could be
+                // any order, but reverse order will cause less churn in
+                // persistent storage.)
+                size_t count = 0;
+                if (Access::GetAccessControl().GetEntryCount(fabricIndex, count) == CHIP_NO_ERROR)
+                {
+                    while (count)
+                    {
+                        Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
+                    }
+                }
+            }
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
@@ -340,6 +357,7 @@ private:
     ServerFabricDelegate mFabricDelegate;
 
     Access::AccessControl mAccessControl;
+    app::AclStorage mAclStorage;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

@@ -41,9 +41,14 @@ using namespace chip::System::Clock;
 class TestPairingSession : public PairingSession
 {
 public:
-    TestPairingSession(Transport::SecureSession::Type secureSessionType) : PairingSession(secureSessionType) {}
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
+    CATValues GetPeerCATs() const override { return CATValues(); };
 
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override { return CHIP_NO_ERROR; }
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
+
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session) const override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
     {
@@ -53,7 +58,7 @@ public:
 
 void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext)
 {
-    TestPairingSession session(Transport::SecureSession::Type::kCASE);
+    TestPairingSession session;
 
     ReliableMessageProtocolConfig config(Milliseconds32(100), Milliseconds32(200));
 
@@ -80,13 +85,13 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == config.mIdleRetransTimeout);
-    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == config.mActiveRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mIdleRetransTimeout == config.mIdleRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mActiveRetransTimeout == config.mActiveRetransTimeout);
 }
 
 void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inContext)
 {
-    TestPairingSession session(Transport::SecureSession::Type::kPASE);
+    TestPairingSession session;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(64, 0);
     System::PacketBufferTLVWriter writer;
@@ -108,8 +113,8 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == GetLocalMRPConfig().mIdleRetransTimeout);
-    NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == GetLocalMRPConfig().mActiveRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mIdleRetransTimeout == GetLocalMRPConfig().mIdleRetransTimeout);
+    NL_TEST_ASSERT(inSuite, session.GetRemoteMRPConfig().mActiveRetransTimeout == GetLocalMRPConfig().mActiveRetransTimeout);
 }
 
 // Test Suite

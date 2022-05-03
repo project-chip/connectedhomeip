@@ -392,7 +392,6 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
-constexpr ClusterId kNoClusterIdSpecified            = kInvalidClusterId;
 constexpr ClusterId kClusterIdDescriptor             = 0x001d;
 constexpr ClusterId kClusterIdOnOff                  = 0x0006;
 constexpr ClusterId kClusterIdWakeOnLAN              = 0x0503;
@@ -456,7 +455,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
-            .cluster     = MakeOptional(kNoClusterIdSpecified),
+            .cluster     = NullOptional,
             .fabricIndex = kUndefinedFabricIndex,
         });
     }
@@ -471,7 +470,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalSpeakerEndpointId),
-            .cluster     = MakeOptional(kNoClusterIdSpecified),
+            .cluster     = NullOptional,
             .fabricIndex = kUndefinedFabricIndex,
         });
     }
@@ -499,7 +498,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                         .node        = MakeOptional(localNodeId),
                         .group       = NullOptional,
                         .endpoint    = MakeOptional(app->GetEndpointId()),
-                        .cluster     = MakeOptional(kNoClusterIdSpecified),
+                        .cluster     = NullOptional,
                         .fabricIndex = kUndefinedFabricIndex,
                     });
                 }

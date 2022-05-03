@@ -58,7 +58,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "WakeOnLan has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "WakeOnLan has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;

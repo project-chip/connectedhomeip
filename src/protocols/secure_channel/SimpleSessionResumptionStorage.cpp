@@ -57,7 +57,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveIndex(const SessionIndex & index)
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
-    for (size_t i = index.mSize; i < index.mSize; ++i)
+    for (size_t i = 0; i < index.mSize; ++i)
     {
         TLV::TLVType innerType;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, innerType));
@@ -83,7 +83,11 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadIndex(SessionIndex & index)
     uint16_t len = static_cast<uint16_t>(buf.size());
 
     DefaultStorageKeyAllocator keyAlloc;
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(keyAlloc.SessionResumptionIndex(), buf.data(), len));
+    if (mStorage->SyncGetKeyValue(keyAlloc.SessionResumptionIndex(), buf.data(), len) != CHIP_NO_ERROR)
+    {
+        index.mSize = 0;
+        return CHIP_NO_ERROR;
+    }
 
     TLV::ContiguousBufferTLVReader reader;
     reader.Init(buf.data(), len);

@@ -1425,16 +1425,25 @@ enum class Type : uint8_t
     kUnknown                   = 0xFF,
 };
 
-// Bitmap for WcConfigStatus
-enum class WcConfigStatus : uint8_t
+// Bitmap for ConfigStatus
+enum class ConfigStatus : uint8_t
 {
-    kOperational               = 0x1,
-    kOnline                    = 0x2,
-    kOpenAndUpCommandsReversed = 0x4,
-    kLiftPositionAware         = 0x8,
-    kTiltPositionAware         = 0x10,
-    kLiftEncoderControlled     = 0x20,
-    kTiltEncoderControlled     = 0x40,
+    kOperational           = 0x1,
+    kOnlineReserved        = 0x2,
+    kLiftMovementReversed  = 0x4,
+    kLiftPositionAware     = 0x8,
+    kTiltPositionAware     = 0x10,
+    kLiftEncoderControlled = 0x20,
+    kTiltEncoderControlled = 0x40,
+};
+
+// Bitmap for Mode
+enum class Mode : uint8_t
+{
+    kMotorDirectionReversed = 0x1,
+    kCalibrationMode        = 0x2,
+    kMaintenanceMode        = 0x4,
+    kLedFeedback            = 0x8,
 };
 
 // Bitmap for WcFeature
@@ -1445,15 +1454,6 @@ enum class WcFeature : uint32_t
     kPositionAwareLift = 0x4,
     kAbsolutePosition  = 0x8,
     kPositionAwareTilt = 0x10,
-};
-
-// Bitmap for WcMode
-enum class WcMode : uint8_t
-{
-    kMotorDirectionReversed = 0x1,
-    kCalibrationMode        = 0x2,
-    kMaintenanceMode        = 0x4,
-    kLedFeedback            = 0x8,
 };
 
 // Bitmap for WcOperationalStatus
@@ -1602,6 +1602,60 @@ enum class ThermostatFeature : uint32_t
 } // namespace Thermostat
 
 namespace FanControl {
+
+// Enum for FanModeSequenceType
+enum class FanModeSequenceType : uint8_t
+{
+    kOffLowMedHigh     = 0x00,
+    kOffLowHigh        = 0x01,
+    kOffLowMedHighAuto = 0x02,
+    kOffLowHighAuto    = 0x03,
+    kOffOnAuto         = 0x04,
+    kOffOn             = 0x05,
+};
+
+// Enum for FanModeType
+enum class FanModeType : uint8_t
+{
+    kOff    = 0x00,
+    kLow    = 0x01,
+    kMedium = 0x02,
+    kHigh   = 0x03,
+    kOn     = 0x04,
+    kAuto   = 0x05,
+    kSmart  = 0x06,
+};
+
+// Bitmap for FanControlFeature
+enum class FanControlFeature : uint32_t
+{
+    kMultiSpeed = 0x1,
+    kAuto       = 0x2,
+    kRocking    = 0x4,
+    kWind       = 0x8,
+};
+
+// Bitmap for RockSupportMask
+enum class RockSupportMask : uint8_t
+{
+    kRockLeftRight = 0x1,
+    kRockUpDown    = 0x2,
+    kRockRound     = 0x4,
+};
+
+// Bitmap for WindSettingMask
+enum class WindSettingMask : uint8_t
+{
+    kSleepWind   = 0x1,
+    kNaturalWind = 0x2,
+};
+
+// Bitmap for WindSupportMask
+enum class WindSupportMask : uint8_t
+{
+    kSleepWind   = 0x1,
+    kNaturalWind = 0x2,
+};
 } // namespace FanControl
 
 namespace DehumidificationControl {
@@ -2072,18 +2126,18 @@ namespace WakeOnLan {
 
 namespace Channel {
 
-// Enum for LineupInfoTypeEnum
-enum class LineupInfoTypeEnum : uint8_t
-{
-    kMso = 0x00,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for ChannelStatusEnum
+enum class ChannelStatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kMultipleMatches = 0x01,
     kNoMatches       = 0x02,
+};
+
+// Enum for LineupInfoTypeEnum
+enum class LineupInfoTypeEnum : uint8_t
+{
+    kMso = 0x00,
 };
 
 // Bitmap for ChannelFeature
@@ -2096,8 +2150,8 @@ enum class ChannelFeature : uint32_t
 
 namespace TargetNavigator {
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for TargetNavigatorStatusEnum
+enum class TargetNavigatorStatusEnum : uint8_t
 {
     kSuccess        = 0x00,
     kTargetNotFound = 0x01,
@@ -2107,17 +2161,8 @@ enum class StatusEnum : uint8_t
 
 namespace MediaPlayback {
 
-// Enum for PlaybackStateEnum
-enum class PlaybackStateEnum : uint8_t
-{
-    kPlaying    = 0x00,
-    kPaused     = 0x01,
-    kNotPlaying = 0x02,
-    kBuffering  = 0x03,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for MediaPlaybackStatusEnum
+enum class MediaPlaybackStatusEnum : uint8_t
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -2125,6 +2170,15 @@ enum class StatusEnum : uint8_t
     kNotActive              = 0x03,
     kSpeedOutOfRange        = 0x04,
     kSeekOutOfRange         = 0x05,
+};
+
+// Enum for PlaybackStateEnum
+enum class PlaybackStateEnum : uint8_t
+{
+    kPlaying    = 0x00,
+    kPaused     = 0x01,
+    kNotPlaying = 0x02,
+    kBuffering  = 0x03,
 };
 } // namespace MediaPlayback
 
@@ -2250,8 +2304,8 @@ enum class CecKeyCode : uint8_t
     kData                      = 0x76,
 };
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for KeypadInputStatusEnum
+enum class KeypadInputStatusEnum : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
@@ -2268,6 +2322,14 @@ enum class KeypadInputFeature : uint32_t
 } // namespace KeypadInput
 
 namespace ContentLauncher {
+
+// Enum for ContentLaunchStatusEnum
+enum class ContentLaunchStatusEnum : uint8_t
+{
+    kSuccess         = 0x00,
+    kUrlNotAvailable = 0x01,
+    kAuthFailed      = 0x02,
+};
 
 // Enum for MetricTypeEnum
 enum class MetricTypeEnum : uint8_t
@@ -2292,14 +2354,6 @@ enum class ParameterEnum : uint8_t
     kSport      = 0x0A,
     kSportsTeam = 0x0B,
     kType       = 0x0C,
-};
-
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
-{
-    kSuccess         = 0x00,
-    kUrlNotAvailable = 0x01,
-    kAuthFailed      = 0x02,
 };
 
 // Bitmap for ContentLauncherFeature
@@ -2330,8 +2384,8 @@ enum class OutputTypeEnum : uint8_t
     kOther     = 0x05,
 };
 
-// Bitmap for AudiouOutputFeature
-enum class AudiouOutputFeature : uint32_t
+// Bitmap for AudioOutputFeature
+enum class AudioOutputFeature : uint32_t
 {
     kNameUpdates = 0x1,
 };
@@ -2339,8 +2393,8 @@ enum class AudiouOutputFeature : uint32_t
 
 namespace ApplicationLauncher {
 
-// Enum for StatusEnum
-enum class StatusEnum : uint8_t
+// Enum for ApplicationLauncherStatusEnum
+enum class ApplicationLauncherStatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,

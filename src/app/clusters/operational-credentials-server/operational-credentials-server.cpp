@@ -51,6 +51,9 @@
 #include <platform/DeviceControlServer.h>
 #include <string.h>
 #include <trace/trace.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -69,7 +72,8 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
-CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricIndex, NodeId subject)
+CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
+                                                             FabricIndex fabricIndex, NodeId subject)
 {
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(Access::GetAccessControl().PrepareEntry(entry));
@@ -77,12 +81,10 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricI
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kAdminister));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(nullptr, entry));
+    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry));
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
                    fabricIndex, ChipLogValueX64(subject));
-
-    // TODO: event notification for newly created ACL entry
 
     return CHIP_NO_ERROR;
 }
@@ -382,7 +384,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -393,7 +395,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
-                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -465,7 +467,6 @@ exit:
     {
         SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kSuccess, fabricBeingRemoved, CharSpan());
 
-        // Use a more direct getter for FabricIndex from commandObj
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
         FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
@@ -655,11 +656,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         SuccessOrExit(err);
     }
 
-    // Keep this after other possible failures, so it doesn't need to be rolled back in case of
-    // subsequent failures. This should only typically fail if there is no space for the new entry.
-    err = CreateAccessControlEntryForNewFabricAdministrator(fabricIndex, commandData.caseAdminNode);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
@@ -694,6 +690,12 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         err = secureSession->AdoptFabricIndex(fabricIndex);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
     }
+
+    // Creating the initial ACL must occur after the PASE session has adopted the fabric index
+    // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
+    err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), fabricIndex,
+                                                            commandData.caseAdminNode);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();
@@ -918,7 +920,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        Crypto::P256KeypairHSM keypair;
+#else
         Crypto::P256Keypair keypair;
+#endif
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
@@ -929,7 +935,11 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             gFabricBeingCommissioned.GetOperationalKey()->Clear();
         }
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+        keypair.CreateOperationalKey(gFabricBeingCommissioned.GetFabricIndex());
+#else
         keypair.Initialize();
+#endif
         SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKeypair(&keypair));
 
         // Generate the actual CSR from the ephemeral key

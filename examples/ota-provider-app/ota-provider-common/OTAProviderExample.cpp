@@ -123,8 +123,9 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
     // Validate that each candidate matches the info in the image header
     for (auto candidate : mCandidates)
     {
+        OTAImageHeaderParser parser;
         OTAImageHeader header;
-        ParseOTAHeader(candidate.otaURL, header);
+        ParseOTAHeader(parser, candidate.otaURL, header);
 
         ChipLogDetail(SoftwareUpdate, "Validating image list candidate %s: ", candidate.otaURL);
         VerifyOrDie(candidate.vendorId == header.mVendorId);
@@ -141,6 +142,7 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
         {
             VerifyOrDie(candidate.maxApplicableSoftwareVersion == header.mMaxApplicableVersion.Value());
         }
+        parser.Clear();
     }
 }
 
@@ -190,9 +192,8 @@ UserConsentSubject OTAProviderExample::GetUserConsentSubject(const app::CommandH
     return subject;
 }
 
-bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader & header)
+bool OTAProviderExample::ParseOTAHeader(OTAImageHeaderParser & parser, const char * otaFilePath, OTAImageHeader & header)
 {
-    OTAImageHeaderParser parser;
     uint8_t otaFileContent[kOtaHeaderMaxSize];
     ByteSpan buffer(otaFileContent);
 
@@ -222,8 +223,6 @@ bool OTAProviderExample::ParseOTAHeader(const char * otaFilePath, OTAImageHeader
         ChipLogError(SoftwareUpdate, "Error parsing OTA image header: %" CHIP_ERROR_FORMAT, error.Format());
         return false;
     }
-
-    parser.Clear();
 
     return true;
 }
@@ -348,11 +347,13 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
         else if (strlen(mOTAFilePath) > 0) // If OTA file is directly provided
         {
             // Parse the header and set version info based on the header
+            OTAImageHeaderParser parser;
             OTAImageHeader header;
-            VerifyOrDie(ParseOTAHeader(mOTAFilePath, header) == true);
+            VerifyOrDie(ParseOTAHeader(parser, mOTAFilePath, header) == true);
             VerifyOrDie(sizeof(mSoftwareVersionString) > header.mSoftwareVersionString.size());
             mSoftwareVersion = header.mSoftwareVersion;
             memcpy(mSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
+            parser.Clear();
         }
 
         // If mUserConsentNeeded (set by the CLI) is true and requestor is capable of taking user consent

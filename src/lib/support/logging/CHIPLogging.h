@@ -353,7 +353,7 @@ bool IsCategoryEnabled(uint8_t category);
  *  @endcode
  *
  */
-#define ChipLogFormatMEI "0x%04" PRIX16 "_%04" PRIX16
+#define ChipLogFormatMEI "0x%04X_%04X"
 
 /*
  *  @brief
@@ -380,7 +380,7 @@ bool IsCategoryEnabled(uint8_t category);
  * have the exchange id and initiator/responder boolean, not an actual exchange,
  * so we want to have a helper for that case too.
  */
-#define ChipLogFormatExchangeId "%" PRIu16 "%c"
+#define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
 #define ChipLogFormatExchange ChipLogFormatExchangeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
@@ -394,7 +394,7 @@ bool IsCategoryEnabled(uint8_t category);
  * Logging helpers for protocol ids.  A protocol id is a (vendor-id,
  * protocol-id) pair.
  */
-#define ChipLogFormatProtocolId "(%" PRIu16 ", %" PRIu16 ")"
+#define ChipLogFormatProtocolId "(%u, %u)"
 #define ChipLogValueProtocolId(id) (id).GetVendorId(), (id).GetProtocolId()
 
 /**
@@ -406,6 +406,10 @@ bool IsCategoryEnabled(uint8_t category);
  * Logging helpers for message types, so we format them consistently.
  */
 #define ChipLogFormatMessageType "0x%x"
+
+/** Logging helpers for scoped node ids, which is a tuple of <NodeId, FabricIndex> */
+#define ChipLogFormatScopedNodeId "<" ChipLogFormatX64 ", %d>"
+#define ChipLogValueScopedNodeId(id) ChipLogValueX64((id).GetNodeId()), (id).GetFabricIndex()
 
 } // namespace Logging
 } // namespace chip

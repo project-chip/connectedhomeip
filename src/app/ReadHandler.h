@@ -255,6 +255,8 @@ private:
 
     const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
+    auto GetSubscriptionStartGeneration() const { return mSubscriptionStartGeneration; }
+
     void UnblockUrgentEventDelivery()
     {
         mHoldReport = false;
@@ -264,6 +266,12 @@ private:
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
     uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
+
+    // Returns the number of interested paths, including wildcard and concrete paths.
+    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count(); };
+    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->Count(); };
+    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count(); };
+
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
     friend class TestReadInteraction;
@@ -413,7 +421,12 @@ private:
      * should generate report on timeout reached.
      */
 
+    // When we don't have enough resources for a new subscription, the oldest subscription might be evicted by interaction model
+    // engine, the "oldest" subscription is the subscription with the smallest generation.
+    uint64_t mSubscriptionStartGeneration = 0;
+
     uint32_t mLastWrittenEventsBytes = 0;
+
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;

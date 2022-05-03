@@ -345,8 +345,9 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
     //   - if at least one broadcast succeeds, assume success overall
     //   + some internal consistency validations for state error.
 
-    bool hadSuccesfulSend = false;
-    CHIP_ERROR lastError  = CHIP_ERROR_NO_ENDPOINT;
+    unsigned successes   = 0;
+    unsigned failures    = 0;
+    CHIP_ERROR lastError = CHIP_ERROR_NO_ENDPOINT;
 
     if (chip::Loop::Break == mEndpoints.ForEachActiveObject([&](auto * info) {
             chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
@@ -382,10 +383,11 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
 
             if (err == CHIP_NO_ERROR)
             {
-                hadSuccesfulSend = true;
+                successes++;
             }
             else
             {
+                failures++;
                 lastError = err;
 #if CHIP_DETAIL_LOGGING
                 char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
@@ -401,7 +403,21 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
         return lastError;
     }
 
-    if (!hadSuccesfulSend)
+    if (failures != 0)
+    {
+        // if we had failures, log if the final status was success or failure, to make log reading
+        // easier. Some mDNS failures may be expected (e.g. for interfaces unavailable)
+        if (successes != 0)
+        {
+            ChipLogDetail(Discovery, "mDNS broadcast had only partial success: %u successes and %u failures.", successes, failures);
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "mDNS broadcast full failed in %u separate send attempts.", failures);
+        }
+    }
+
+    if (!successes)
     {
         return lastError;
     }
