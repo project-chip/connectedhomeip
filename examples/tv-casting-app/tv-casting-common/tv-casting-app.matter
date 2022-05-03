@@ -1876,7 +1876,7 @@ server cluster TestCluster = 1295 {
     fabric_idx arg1 = 254;
   }
 
-  attribute boolean boolean = 0 [default=false];
+  attribute boolean boolean = 0;
   attribute Bitmap8MaskMap bitmap8 = 1;
   attribute Bitmap16MaskMap bitmap16 = 2;
   attribute Bitmap32MaskMap bitmap32 = 3;

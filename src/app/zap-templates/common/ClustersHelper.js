@@ -386,9 +386,7 @@ function inlineStructItems(args)
       return;
     }
 
-    argument.items.forEach(item => {
-      arguments.push(item);
-    });
+    argument.items.forEach(item => { arguments.push(item); });
   });
 
   return arguments;
@@ -485,6 +483,12 @@ function hasNonZeroDefault(attribute)
   // Hex value usage is inconsistent in XML. It looks we have
   // all of 0x0, 0x00, 0x0000 so support all here.
   if (attribute.defaultValue.match(/^0x0+$/)) {
+    return false;
+  }
+
+  // boolean 0 is false. We do not do a type check here
+  // so if anyone defaults a string to 'false' this will be wrong.
+  if (attribute.defaultValue === 'false') {
     return false;
   }
 

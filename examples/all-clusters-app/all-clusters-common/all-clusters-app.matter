@@ -2417,7 +2417,7 @@ server cluster OnOff = 6 {
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
   attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387 [persist, default=0xFF];
-  readonly attribute bitmap32 featureMap = 65532 [default=0x0001];
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533 [default=4];
 
   request struct OffWithEffectRequest {
@@ -3068,7 +3068,7 @@ server cluster TestCluster = 1295 {
     fabric_idx arg1 = 254;
   }
 
-  attribute boolean boolean = 0 [default=false];
+  attribute boolean boolean = 0;
   attribute Bitmap8MaskMap bitmap8 = 1;
   attribute Bitmap16MaskMap bitmap16 = 2;
   attribute Bitmap32MaskMap bitmap32 = 3;
@@ -3115,7 +3115,7 @@ server cluster TestCluster = 1295 {
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49 [callback];
   attribute boolean clusterErrorBoolean = 50 [callback];
-  attribute nullable boolean nullableBoolean = 16384 [default=false];
+  attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
   attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;
   attribute nullable Bitmap32MaskMap nullableBitmap32 = 16387;
