@@ -899,8 +899,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for commissionee");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write entries");
@@ -1555,8 +1556,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -1732,8 +1734,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read mandatory non-global attribute: OutOfService");
@@ -1922,8 +1925,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads PresentValue attribute from DUT");
@@ -2105,8 +2109,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -2124,8 +2129,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -2142,8 +2150,11 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -2223,8 +2234,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read mandatory non-global attribute: StateValue");
@@ -2336,8 +2348,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read the global attribute: ClusterRevision");
@@ -2484,8 +2497,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -2514,8 +2528,11 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Read the global attribute: AcceptedCommandList");
@@ -2532,8 +2549,11 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -3770,8 +3790,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Validate constraints of attribute: current hue");
@@ -4570,8 +4591,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -4731,8 +4753,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -4878,8 +4901,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5006,8 +5030,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5139,8 +5164,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5304,8 +5330,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5432,8 +5459,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5551,8 +5579,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5672,8 +5701,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5796,8 +5826,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -5914,8 +5945,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -6057,8 +6089,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -6244,8 +6277,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -6390,8 +6424,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -6572,8 +6607,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -6728,8 +6764,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -6858,8 +6895,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -7050,8 +7088,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
@@ -7564,8 +7603,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition : Turn on light for color control tests");
@@ -7803,8 +7843,9 @@ private:
         }
         case 30: {
             LogStep(30, "Wait 2000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 31: {
             LogStep(31, "Read EnhancedCurrentHue attribute from DUT");
@@ -8168,8 +8209,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition: Turn on light for color control tests");
@@ -8492,8 +8534,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition: Turn on light for color control tests");
@@ -8891,8 +8934,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Query Data Model Revision");
@@ -9059,8 +9103,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Query MaxNetworks");
@@ -9176,8 +9221,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Query fabrics list");
@@ -9296,8 +9342,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -9463,8 +9510,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read PHYRate attribute constraints");
@@ -9574,8 +9622,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -9698,8 +9747,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -9732,8 +9782,11 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Read the global attribute: AcceptedCommandList");
@@ -9750,8 +9803,11 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -9913,8 +9969,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MeasuredValue");
@@ -10067,8 +10124,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MeasuredValue");
@@ -10179,8 +10237,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH1 reads the BreadCrumb Attribute from the DUT");
@@ -10351,8 +10410,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH reads the ClusterRevision attribute from the DUT");
@@ -10378,16 +10438,22 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7,
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -10469,8 +10535,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH reads the IdentifyTime attribute from the DUT");
@@ -10612,8 +10679,9 @@ private:
         {
         case 0: {
             LogStep(0, "1.Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1,
@@ -10626,8 +10694,9 @@ private:
         }
         case 2: {
             LogStep(2, "Manually check DUT executes a blink effect");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes a blink effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes a blink effectgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3,
@@ -10640,8 +10709,9 @@ private:
         }
         case 4: {
             LogStep(4, "check DUT executes a breathe effect");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes a breathe effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5,
@@ -10654,8 +10724,9 @@ private:
         }
         case 6: {
             LogStep(6, "check DUT executes an okay effect");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes an okay effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes an okay effectgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7,
@@ -10668,8 +10739,9 @@ private:
         }
         case 8: {
             LogStep(8, "check DUT executes a channel change effect");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes a channel change effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes a channel change effectgarbage: not in length on purpose", 36);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9,
@@ -10682,8 +10754,9 @@ private:
         }
         case 10: {
             LogStep(10, "check DUT executes a breathe effect");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes a breathe effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11,
@@ -10696,8 +10769,10 @@ private:
         }
         case 12: {
             LogStep(12, "Manually check DUT stops the breathe effect after the current effect sequence");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT stops the breathe effect after the current effect sequence");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "DUT stops the breathe effect after the current effect sequencegarbage: not in length on purpose", 62);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13,
@@ -10710,8 +10785,9 @@ private:
         }
         case 14: {
             LogStep(14, "Manually check DUT executes a breathe effect");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes a breathe effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15,
@@ -10724,8 +10800,10 @@ private:
         }
         case 16: {
             LogStep(16, "Check DUT stops the breathe effect as soon as possible.");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT stops the breathe effect as soon as possible");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("DUT stops the breathe effect as soon as possiblegarbage: not in length on purpose", 48);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17,
@@ -10738,8 +10816,9 @@ private:
         }
         case 18: {
             LogStep(18, "Check DUT executes a blink effect.");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT executes a blink effect");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("DUT executes a blink effectgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19,
@@ -10752,8 +10831,10 @@ private:
         }
         case 20: {
             LogStep(20, "Check DUT stops any effect that may be still running as soon as possible");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("DUT stops any effect that may be still running as soon as possible");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "DUT stops any effect that may be still running as soon as possiblegarbage: not in length on purpose", 66);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -10895,8 +10976,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -10917,8 +10999,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -10935,8 +11020,11 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -11038,8 +11126,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH reads MinMeasuredValue attribute from DUT");
@@ -11219,8 +11308,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -11239,8 +11329,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -11432,8 +11525,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reset level to 254");
@@ -11446,8 +11540,9 @@ private:
         }
         case 2: {
             LogStep(2, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Reads the CurrentLevel attribute");
@@ -11663,8 +11758,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads the OnOffTransitionTime attribute from the DUT");
@@ -11900,8 +11996,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "reads CurrentLevel attribute from DUT");
@@ -11926,8 +12023,9 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "reads CurrentLevel attribute from DUT");
@@ -11944,8 +12042,9 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 11000 second");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(11000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 11000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "reads CurrentLevel attribute from DUT");
@@ -11967,8 +12066,9 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 1000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "reads CurrentLevel attribute from DUT");
@@ -11985,8 +12085,9 @@ private:
         }
         case 15: {
             LogStep(15, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -12147,8 +12248,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "reads max level attribute from DUT");
@@ -12165,14 +12267,18 @@ private:
         }
         case 3: {
             LogStep(3, "user prompt message");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the DUT moves at a rate of 32 units per second or as close as possible to "
-                              "this rate and completes moving to its maximum level");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Physically verify that the DUT moves at a rate of 32 units per second or as close as possible to this rate and "
+                "completes moving to its maximum levelgarbage: not in length on purpose",
+                148);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Wait 3000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "reads CurrentLevel attribute from DUT");
@@ -12193,14 +12299,18 @@ private:
         }
         case 8: {
             LogStep(8, "user prompt message");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the DUT moves at a rate of 64 units per second or as close as possible to "
-                              "this rate and complete moving to its minimum level");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Physically verify that the DUT moves at a rate of 64 units per second or as close as possible to this rate and "
+                "complete moving to its minimum levelgarbage: not in length on purpose",
+                147);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Wait 5000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(5000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "reads CurrentLevel attribute from DUT");
@@ -12221,8 +12331,9 @@ private:
         }
         case 13: {
             LogStep(13, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "reads CurrentLevel attribute from DUT");
@@ -12230,9 +12341,11 @@ private:
         }
         case 15: {
             LogStep(15, "user prompt message");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the device moves at the rate recorded in step 3a and completes moving to its "
-                              "maximum level.");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Physically verify that the device moves at the rate recorded in step 3a and "
+                                                   "completes moving to its maximum level.garbage: not in length on purpose",
+                                                   114);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Reset level to 254");
@@ -12245,8 +12358,9 @@ private:
         }
         case 17: {
             LogStep(17, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -12371,8 +12485,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sending on command");
@@ -12391,8 +12506,9 @@ private:
         }
         case 3: {
             LogStep(3, "Wait 3000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Reads current level attribute from DUT");
@@ -12410,8 +12526,9 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 5000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(5000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Reads current level attribute from DUT");
@@ -12429,8 +12546,9 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 4000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(4000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 4000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "Reads current level attribute from DUT");
@@ -12447,8 +12565,9 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Sending off command");
@@ -12567,8 +12686,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sending on command");
@@ -12586,8 +12706,9 @@ private:
         }
         case 3: {
             LogStep(3, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Reads CurrentLevel attribute from DUT");
@@ -12604,8 +12725,9 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 2000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Sends stop command to DUT");
@@ -12629,8 +12751,9 @@ private:
         }
         case 10: {
             LogStep(10, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Sending off command");
@@ -12762,8 +12885,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -12777,8 +12901,11 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AcceptedCommandList");
@@ -12793,8 +12920,11 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates either value 0 or throws a "
                     "general error if the attribute is not supported");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -12932,8 +13062,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -12952,8 +13083,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -12968,8 +13102,11 @@ private:
         case 7: {
             LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -13115,8 +13252,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -13138,8 +13276,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -13158,8 +13299,11 @@ private:
                     "Read attribute Feature map and verify that DUT response indicates that the FeatureMap attribute has bit 0 set "
                     "to 1 if the DUT supports the Application Platform feature (PICS_AP_S is true).");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -13305,8 +13449,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -13325,8 +13470,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -13341,8 +13489,11 @@ private:
                     "Read attribute Feature map and Verify that the DUT response indicates that the FeatureMap attribute has bit 0 "
                     "set to 1 if the DUT supports the Name Updates feature PICS_NU_S is true");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -13478,8 +13629,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -13498,8 +13650,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -13512,8 +13667,11 @@ private:
         case 7: {
             LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -13645,8 +13803,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -13665,8 +13824,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -13684,8 +13846,11 @@ private:
                     "Bit 0 - Set to 1 if the DUT supports Channel Lists (PICS_CL_S is true) Bit 1 - Set to 1 if the DUT supports "
                     "Lineup Info (PICS_LI_S is true)");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -13853,8 +14018,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -13887,8 +14053,11 @@ private:
                     "Set to 1 if the DUT supports Advanced Seek (PICS_ADVANCEDSEEK is true) Bit 1 - Set to 1 if the DUT supports "
                     "Variable Speed (PICS_VARIABLESPEED is true)");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -14030,8 +14199,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -14050,8 +14220,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -14069,8 +14242,11 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT has bit 1 set to 1 if the device supports Name "
                     "Updates PICS_NAMEUPDATES is true");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -14210,8 +14386,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -14233,8 +14410,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -14252,8 +14432,11 @@ private:
                     "Read FeatureMap attribute from the DUT and verify response has the value 0 or throws a general error if the "
                     "attribute is not supported..");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -14407,8 +14590,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -14430,8 +14614,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -14450,8 +14637,11 @@ private:
                     "Read FeatureMap attribute from the DUT and verify response has the value 0 or throws a general error if the "
                     "attribute is not supported..");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -14591,8 +14781,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -14614,8 +14805,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -14635,8 +14829,11 @@ private:
                     "supports Content Search (PICS_CONTENTSEARCH is true) Bit 1 - Set to 1 if the DUT supports URL Playback "
                     "(PICS_URLPLAYBACK is true)");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -14776,8 +14973,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -14795,8 +14993,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -14813,8 +15014,11 @@ private:
         case 7: {
             LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -14881,8 +15085,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Put the device into low power mode");
@@ -15052,8 +15257,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Select");
@@ -15236,8 +15442,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send RootMenu");
@@ -15378,8 +15585,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Numbers1");
@@ -15576,8 +15784,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send RootMenu");
@@ -15719,8 +15928,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read CatalogList attribute.");
@@ -15789,8 +15999,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -15854,8 +16065,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -15919,8 +16131,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -15984,8 +16197,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16049,8 +16263,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16114,8 +16329,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16187,8 +16403,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads the ChannelList attribute from the DUT");
@@ -16260,13 +16477,16 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("verify that the channel has changed on the device.");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("verify that the channel has changed on the device.garbage: not in length on purpose", 50);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16334,13 +16554,16 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("verify that the channel has changed on the device");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("verify that the channel has changed on the devicegarbage: not in length on purpose", 49);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16428,18 +16651,22 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that media is paused");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the media is playing");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Physically verify that the media is playinggarbage: not in length on purpose", 43);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Reads the playback state attribute");
@@ -16447,13 +16674,17 @@ private:
         }
         case 4: {
             LogStep(4, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the media is paused");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Physically verify that the media is pausedgarbage: not in length on purpose", 42);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the media is stoped");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Physically verify that the media is stopedgarbage: not in length on purpose", 42);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16553,18 +16784,22 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that media is paused");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the media is playing");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Physically verify that the media is playinggarbage: not in length on purpose", 43);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Reads the CurrentState attribute");
@@ -16572,28 +16807,38 @@ private:
         }
         case 4: {
             LogStep(4, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Physically verify that the media is started over");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Physically verify that the media is started overgarbage: not in length on purpose", 48);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the next media item in the queue has been loaded");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Verify that the next media item in the queue has been loadedgarbage: not in length on purpose", 60);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the previous media item in the queue has been loaded");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Verify that the previous media item in the queue has been loadedgarbage: not in length on purpose", 64);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media has skipped forward 10 seconds");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Verify that the media has skipped forward 10 secondsgarbage: not in length on purpose", 52);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media has skipped backward 10 seconds");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Verify that the media has skipped backward 10 secondsgarbage: not in length on purpose", 53);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16669,23 +16914,29 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that media is paused");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media has moved to 10 seconds from the starting point.");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Verify that the media has moved to 10 seconds from the starting point.garbage: not in length on purpose", 70);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("User prompt needed to enter the value beyond the furthest valid position");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "User prompt needed to enter the value beyond the furthest valid positiongarbage: not in length on purpose", 72);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16797,13 +17048,15 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that media is paused");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Reads the PlaybackSpeed attribute from the DUT");
@@ -16811,8 +17064,9 @@ private:
         }
         case 3: {
             LogStep(3, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media is playing");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Verify that the media is playinggarbage: not in length on purpose", 32);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Reads the CurrentState attribute");
@@ -16820,13 +17074,17 @@ private:
         }
         case 5: {
             LogStep(5, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media play speed has increased");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Verify that the media play speed has increasedgarbage: not in length on purpose", 46);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media play has reversed direction");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Verify that the media play has reversed directiongarbage: not in length on purpose", 49);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Reads the CurrentState attribute");
@@ -16834,13 +17092,17 @@ private:
         }
         case 8: {
             LogStep(8, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media play has reversed direction");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Verify that the media play has reversed directiongarbage: not in length on purpose", 49);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "log a command");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Verify that the media is has resumed playing forward at the default speed");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Verify that the media is has resumed playing forward at the default speedgarbage: not in length on purpose", 73);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16904,8 +17166,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -16969,8 +17232,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -17050,8 +17314,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads the CurrentTarget attribute");
@@ -17179,13 +17444,16 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition");
-            SetIdentity(kIdentityAlpha);
-            return Log("DUT has one or more Content Apps available");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message =
+                chip::Span<const char>("DUT has one or more Content Apps availablegarbage: not in length on purpose", 42);
+            return Log(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Reads the VendorName attribute");
@@ -17292,8 +17560,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH reads the AcceptHeader attribute from the DUT");
@@ -17400,8 +17669,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH reads the ClusterRevision attribute from the DUT");
@@ -17577,29 +17847,32 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "TH_CR1 opens a commissioning window on DUT_CE");
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -17619,15 +17892,17 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:0000000000I31506010"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:0000000000I31506010", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityBeta);
-            return WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
         }
         case 8: {
             LogStep(8, "Query fabrics list");
@@ -17812,18 +18087,21 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -17845,15 +18123,17 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityBeta);
-            return WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
         }
         case 8: {
             LogStep(8, "Query fabrics list");
@@ -18010,24 +18290,25 @@ private:
         {
         case 0: {
             LogStep(0, "Reboot target device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 opens a new commissioning window on DUT_CE");
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18037,41 +18318,46 @@ private:
         }
         case 3: {
             LogStep(3, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(28000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 28000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 8: {
             LogStep(8, "TH_CR1 opens a new commissioning window on DUT_CE");
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18088,10 +18374,11 @@ private:
         }
         case 10: {
             LogStep(10, "TH_CR2 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 11: {
             LogStep(11, "TH_CR1 revokes the commissioning window on DUT_CE");
@@ -18115,11 +18402,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18129,10 +18416,11 @@ private:
         }
         case 15: {
             LogStep(15, "TH_CR3 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityGamma);
-            return PairWithQRCode(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityGamma, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -18271,18 +18559,21 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -18294,30 +18585,35 @@ private:
         }
         case 4: {
             LogStep(4, "Wait for PIXIT_COMM_WIN(180) + 10");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for PIXIT_COMM_WIN(180) + 10");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Wait for PIXIT_COMM_WIN(180) + 10");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Wait for PIXIT_COMM_WIN(180) + 10");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(28000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 28000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 9: {
             LogStep(9, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -18336,10 +18632,11 @@ private:
         }
         case 11: {
             LogStep(11, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 12: {
             LogStep(12, "TH_CR1 revokes the commissioning window on DUT_CE");
@@ -18368,22 +18665,25 @@ private:
         }
         case 16: {
             LogStep(16, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 17: {
             LogStep(17, "TH_CR2 starts a commissioning process on DUT_CE");
-            SetIdentity(kIdentityBeta);
-            return WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
         }
         case 18: {
             LogStep(18, "TH_CR3 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityGamma);
-            return PairWithQRCode(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityGamma, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -18568,13 +18868,14 @@ private:
         {
         case 0: {
             LogStep(0, "Reboot target device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -18586,15 +18887,17 @@ private:
         }
         case 3: {
             LogStep(3, "Commission from gamma");
-            SetIdentity(kIdentityGamma);
-            return PairWithQRCode(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityGamma, value);
         }
         case 4: {
             LogStep(4, "TH_CR3 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityGamma);
-            return WaitForCommissionee(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
+            return WaitForCommissionee(kIdentityGamma, value);
         }
         case 5: {
             LogStep(5, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -18606,15 +18909,17 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
-            SetIdentity(kIdentityBeta);
-            return WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
         }
         case 8: {
             LogStep(8, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -18629,11 +18934,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18648,34 +18953,38 @@ private:
         }
         case 11: {
             LogStep(11, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(18000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 18000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "TH_CR1 re-opens new commissioning window on DUT_CE");
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18688,11 +18997,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18707,34 +19016,38 @@ private:
         }
         case 18: {
             LogStep(18, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(54000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 54000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "Wait for the expiration of PIXIT_COMM_WIN seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(18000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 18000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "TH_CR1 opens a new commissioning window on DUT_CE");
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18747,11 +19060,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -18880,8 +19193,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -18914,8 +19228,11 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Read the global attribute: AcceptedCommandList");
@@ -18930,8 +19247,11 @@ private:
         case 9: {
             LogStep(9, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -19058,8 +19378,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads mandatory attribute constrains: Occupancy");
@@ -19191,8 +19512,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads Occupancy attribute from DUT");
@@ -19346,8 +19668,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -19362,8 +19685,11 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AcceptedCommandList");
@@ -19497,8 +19823,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: OnOff");
@@ -19686,8 +20013,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Off Command");
@@ -19741,8 +20069,9 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 1000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Check on/off attribute value is true after toggle command");
@@ -19755,8 +20084,9 @@ private:
         }
         case 15: {
             LogStep(15, "Wait 1000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Check on/off attribute value is false after toggle command");
@@ -19764,13 +20094,17 @@ private:
         }
         case 17: {
             LogStep(17, "User prompt Set OnOff attribute manually to on");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operate on device to set OnOff attribute manually to on");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Operate on device to set OnOff attribute manually to ongarbage: not in length on purpose", 55);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "User prompt Set OnOff attribute manually to off");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operate on device to set OnOff attribute manually to off");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Operate on device to set OnOff attribute manually to offgarbage: not in length on purpose", 56);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Reset Off Command");
@@ -20149,8 +20483,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send On Command");
@@ -20160,8 +20495,9 @@ private:
         }
         case 2: {
             LogStep(2, "Wait 1000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Reads OnOff attribute from DUT");
@@ -20181,8 +20517,9 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 1000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Reads OnOff attribute from DUT");
@@ -20202,8 +20539,9 @@ private:
         }
         case 10: {
             LogStep(10, "Wait 1000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Reads OnOff attribute from DUT");
@@ -20577,8 +20915,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH sends On command to DUT");
@@ -20598,13 +20937,14 @@ private:
         }
         case 4: {
             LogStep(4, "Power off DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "TH reads the OnOff attribute from the DUT");
@@ -20619,13 +20959,14 @@ private:
         }
         case 8: {
             LogStep(8, "Power off DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "TH reads the OnOff attribute from the DUT");
@@ -20640,13 +20981,14 @@ private:
         }
         case 12: {
             LogStep(12, "Power off DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "TH reads the OnOff attribute from the DUT");
@@ -20654,13 +20996,14 @@ private:
         }
         case 15: {
             LogStep(15, "Power off DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "TH reads the OnOff attribute from the DUT");
@@ -20674,13 +21017,14 @@ private:
         }
         case 19: {
             LogStep(19, "Power off DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "TH reads the OnOff attribute from the DUT");
@@ -20693,13 +21037,14 @@ private:
         }
         case 23: {
             LogStep(23, "Power off DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 24: {
             LogStep(24, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 25: {
             LogStep(25, "TH reads the OnOff attribute from the DUT");
@@ -20859,8 +21204,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the global attribute: ClusterRevision");
@@ -20879,8 +21225,11 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
@@ -21037,8 +21386,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Test Harness Client reads Status attribute from Server DUT");
@@ -21191,8 +21541,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read the global attribute: ClusterRevision");
@@ -21225,26 +21576,38 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Read AcceptedCommandList attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Read GeneratedCommandList attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter '0' for success", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -21368,8 +21731,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read the mandatory attribute constraints: MeasuredValue");
@@ -21550,8 +21914,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read the global attribute constraints: ClusterRevision");
@@ -22205,8 +22570,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MaxPressure");
@@ -22551,8 +22917,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write 1 to the OperationMode attribute to DUT: OperationMode");
@@ -22735,8 +23102,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write 0 to the OperationMode attribute to DUT");
@@ -22970,8 +23338,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write 1 to the LifetimeRunningHours attribute to DUT");
@@ -23145,8 +23514,9 @@ private:
         {
         case 0: {
             LogStep(0, "Commission DUT to TH");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH reads the ClusterRevision attribute from the DUT");
@@ -23284,16 +23654,20 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1,
                     "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
                     "attribute has the value 3");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Enter the Value", "3");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter the Valuegarbage: not in length on purpose", 15);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("3garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
@@ -23305,8 +23679,11 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AcceptedCommandList");
@@ -23321,8 +23698,11 @@ private:
         case 6: {
             LogStep(6, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter FeatureMap attribute value", "0");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter FeatureMap attribute valuegarbage: not in length on purpose", 39);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("0garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -23430,8 +23810,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads constraints of attribute: MeasuredValue");
@@ -23544,8 +23925,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads constraints of attribute: MinMeasuredValue");
@@ -23832,18 +24214,21 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3,
@@ -23857,107 +24242,116 @@ private:
         }
         case 4: {
             LogStep(4, "Check Instance Name");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Check Long Discriminator _L");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type value;
+            value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return FindCommissionableByLongDiscriminator(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Check Short Discriminator (_S)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type value;
+            value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return FindCommissionableByShortDiscriminator(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Check Vendor ID (_V)");
             VerifyOrdo(!ShouldSkip("VENDOR_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByVendorId(mVendorId.HasValue() ? mVendorId.Value() : 65521U);
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type value;
+            value.value = mVendorId.HasValue() ? mVendorId.Value() : 65521U;
+            return FindCommissionableByVendorId(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Check Commissioning Mode (_CM)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByCommissioningMode();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type value;
+            return FindCommissionableByCommissioningMode(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Optional TXT key for MRP Retry Interval Idle (CRI)");
             VerifyOrdo(!ShouldSkip("CRI_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "Optional TXT key for MRP Retry Interval Active (CRA)");
             VerifyOrdo(!ShouldSkip("CRA_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "TXT key for commissioning mode (CM)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Optional TXT key for device name (DN)");
             VerifyOrdo(!ShouldSkip("DN_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Optional TXT key for rotating device identifier (RI)");
             VerifyOrdo(!ShouldSkip("RI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Optional TXT key for pairing hint (PH)");
             VerifyOrdo(!ShouldSkip("PH_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Optional TXT key for pairing instructions (PI)");
             VerifyOrdo(!ShouldSkip("PI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "Check IPs");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "Log commands");
-            SetIdentity(kIdentityAlpha);
-            return Log("TH adds an unknown key/value pair in the advertised data");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>(
+                "TH adds an unknown key/value pair in the advertised datagarbage: not in length on purpose", 56);
+            return Log(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "Log commands");
-            SetIdentity(kIdentityAlpha);
-            return Log("Scan for DNS-SD commissioner advertisements from TH");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message =
+                chip::Span<const char>("Scan for DNS-SD commissioner advertisements from THgarbage: not in length on purpose", 51);
+            return Log(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -24072,8 +24466,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read NumberOfPositions attribute");
@@ -24317,18 +24712,22 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Set up subscription to SwitchLatched event");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Set up subscription to SwitchLatched eventgarbage: not in length on purpose", 42);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator sets switch to first position");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator sets switch to first positiongarbage: not in length on purpose", 38);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Read CurrentPosition attribute");
@@ -24336,18 +24735,22 @@ private:
         }
         case 4: {
             LogStep(4, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator sets switch to second position");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator sets switch to second positiongarbage: not in length on purpose", 39);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Set up subscription to InitialPress event");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Set up subscription to InitialPress eventgarbage: not in length on purpose", 41);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator does not operate switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Read CurrentPosition attribute");
@@ -24355,153 +24758,193 @@ private:
         }
         case 8: {
             LogStep(8, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator sets switch to second position");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator sets switch to second positiongarbage: not in length on purpose", 39);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator does not operate switch (release switch)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Operator does not operate switch (release switch)garbage: not in length on purpose", 49);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Set up subscription to InitialPress and ShortRelease events");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Set up subscription to InitialPress and ShortRelease eventsgarbage: not in length on purpose", 59);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator does not operate switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch for 5 seconds");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator operates switch for 5 secondsgarbage: not in length on purpose", 38);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Wait 3000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Set up subscription to InitialPress, LongPress, ShortRelease, LongRelease events");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>(
+                "Set up subscription to InitialPress, LongPress, ShortRelease, LongRelease eventsgarbage: not in length on purpose",
+                80);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator does not operate switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch for 5 seconds");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator operates switch for 5 secondsgarbage: not in length on purpose", 38);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "Wait 3000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 23: {
             LogStep(23, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 24: {
             LogStep(24, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Set up subscription to InitialPress, ShortRelease, MultiPressOngoing, MultiPressComplete events");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Set up subscription to InitialPress, ShortRelease, MultiPressOngoing, "
+                                                   "MultiPressComplete eventsgarbage: not in length on purpose",
+                                                   95);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 25: {
             LogStep(25, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator does not operate switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 26: {
             LogStep(26, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 27: {
             LogStep(27, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 28: {
             LogStep(28, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 29: {
             LogStep(29, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 30: {
             LogStep(30, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch again (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 31: {
             LogStep(31, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 32: {
             LogStep(32, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch again (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 33: {
             LogStep(33, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 34: {
             LogStep(34, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch again (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 35: {
             LogStep(35, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 36: {
             LogStep(36, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator operates switch again (press briefly)");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 37: {
             LogStep(37, "User interaction needed");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Operator releases switch");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -24601,16 +25044,21 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1,
                     "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
                     "attribute has the value 4");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter ClusterRevision attribute value", "4");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Please enter ClusterRevision attribute valuegarbage: not in length on purpose", 44);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("4garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
@@ -24622,24 +25070,33 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4,
                     "Read AcceptedCommandList attribute from the DUT and Verify that the DUT response provides a list of supported "
                     "commands,This list SHALL include all the mandatory commands.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5,
                     "Read GeneratedCommandList attribute from the DUT and Verify that the DUT response provides a list of "
                     "supported commands.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -24745,8 +25202,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MeasuredValue");
@@ -24866,8 +25324,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MinMeasuredValue");
@@ -24977,8 +25436,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read the global attribute constraints: ClusterRevision");
@@ -25254,8 +25714,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads constraints of mandatory attributes from DUT: LocalTemperature");
@@ -25726,8 +26187,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range");
@@ -26197,16 +26659,21 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1,
                     "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
                     "attribute has the value 2");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter ClusterRevision attribute value", "2");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message =
+                chip::Span<const char>("Please enter ClusterRevision attribute valuegarbage: not in length on purpose", 44);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("2garbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Read the global attribute: AttributeList");
@@ -26218,8 +26685,11 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("Please enter 'y' for success", "y");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AcceptedCommandList");
@@ -26347,8 +26817,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: TemperatureDisplayMode");
@@ -26481,8 +26952,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Writes a value of 0 to TemperatureDisplayMode attribute of DUT");
@@ -26662,8 +27134,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sends ResetCounts command");
@@ -27548,8 +28021,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Validate constraints of attribute: Channel");
@@ -28125,8 +28599,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH1 reads LabelList attribute from the DUT");
@@ -28249,8 +28724,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads NetworkInterface structure attribute from DUT");
@@ -28345,8 +28821,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -28462,8 +28939,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "2: read the global attribute: ClusterRevision");
@@ -28964,8 +29442,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "2: read the RO mandatory attribute default: Type");
@@ -29333,8 +29812,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -29505,8 +29985,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH set the Mode Attribute bit0 of the DUT");
@@ -29698,8 +30179,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads Type attribute from DUT");
@@ -29791,8 +30273,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads EndProductType attribute from DUT");
@@ -30037,8 +30520,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
@@ -30048,8 +30532,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 10 seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(10000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -30089,8 +30574,9 @@ private:
         }
         case 9: {
             LogStep(9, "2b: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT");
@@ -30100,8 +30586,9 @@ private:
         }
         case 11: {
             LogStep(11, "2e: TH leave the device moving for 2 seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "3a1: Verify DUT reports OperationalStatus attribute to TH after a UpOrOpen");
@@ -30109,8 +30596,9 @@ private:
         }
         case 13: {
             LogStep(13, "3a2: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -30145,8 +30633,9 @@ private:
         }
         case 19: {
             LogStep(19, "4b: TH waits for 3 seconds the end of inertial movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion");
@@ -30155,8 +30644,9 @@ private:
         }
         case 21: {
             LogStep(21, "5a: TH waits for x seconds attributes update on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT");
@@ -30401,8 +30891,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction");
@@ -30411,8 +30902,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 10 seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(10000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -30453,8 +30945,9 @@ private:
         }
         case 9: {
             LogStep(9, "2b: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT");
@@ -30464,8 +30957,9 @@ private:
         }
         case 11: {
             LogStep(11, "2e: TH leave the device moving for 2 seconds");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "3a: Verify DUT reports OperationalStatus attribute to TH after a DownOrClose");
@@ -30473,8 +30967,9 @@ private:
         }
         case 13: {
             LogStep(13, "3a2: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "3b: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -30509,8 +31004,9 @@ private:
         }
         case 19: {
             LogStep(19, "4b: TH waits for 3 seconds the end of inertial movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "4c: Verify DUT update OperationalStatus attribute to TH after a StopMotion");
@@ -30519,8 +31015,9 @@ private:
         }
         case 21: {
             LogStep(21, "5a: TH waits for x seconds attributes update on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "5b: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT");
@@ -30703,8 +31200,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
@@ -30714,8 +31212,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 6-8 seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(6000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 6000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "1c: TH sends UpOrOpen command to preposition the DUT in the opposite direction");
@@ -30724,8 +31223,9 @@ private:
         }
         case 4: {
             LogStep(4, "1d: TH Waits for 2 seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "2: Subscribe to DUT reports on OperationalStatus attribute");
@@ -30739,8 +31239,9 @@ private:
         }
         case 7: {
             LogStep(7, "2b: TH waits for 3 seconds the end of inertial movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "2c: Verify DUT reports OperationalStatus attribute to TH after a StopMotion");
@@ -30748,8 +31249,9 @@ private:
         }
         case 9: {
             LogStep(9, "2d: TH waits for 100ms - 3s attributes update on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(2000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 2000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "2e: TH reads OperationalStatus attribute from DUT");
@@ -30900,8 +31402,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
@@ -30911,8 +31414,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for fastMotionDuration seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "2a: TH sends UpOrOpen command to DUT");
@@ -30921,8 +31425,9 @@ private:
         }
         case 4: {
             LogStep(4, "2b: TH Waits for fullMotionDuration seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -31066,8 +31571,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction");
@@ -31076,8 +31582,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for fastMotionDuration seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "2a: TH sends DownOrClose command to DUT");
@@ -31087,8 +31594,9 @@ private:
         }
         case 4: {
             LogStep(4, "2b: TH Waits for fullMotionDuration seconds movement(s) on the device");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "3a: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -31242,8 +31750,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
@@ -31253,8 +31762,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH waits for x seconds movement(s) on the DUT");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "1c: If (PA & LF) TH reads CurrentPositionLiftPercent100ths attribute from DUT");
@@ -31274,8 +31784,9 @@ private:
         }
         case 5: {
             LogStep(5, "2b: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "2c: If (PA & LF) TH reads TargetPositionLiftPercent100ths attribute from DUT");
@@ -31285,8 +31796,9 @@ private:
         }
         case 7: {
             LogStep(7, "3a: TH set a timeout of X minutes for failure");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "3b: TH reads OperationalStatus attribute from DUT");
@@ -31305,13 +31817,15 @@ private:
         }
         case 10: {
             LogStep(10, "4b: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "5a: TH waits for x seconds movement(s) on the DUT");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "5b: TH reads OperationalStatus attribute from DUT");
@@ -31444,8 +31958,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
@@ -31455,8 +31970,9 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH waits for x seconds movement(s) on the DUT");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "1c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute from DUT");
@@ -31476,8 +31992,9 @@ private:
         }
         case 5: {
             LogStep(5, "2b: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "2c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute from DUT");
@@ -31487,8 +32004,9 @@ private:
         }
         case 7: {
             LogStep(7, "3a: TH set a timeout of X minutes for failure");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "3b: TH reads OperationalStatus attribute from DUT");
@@ -31507,13 +32025,15 @@ private:
         }
         case 10: {
             LogStep(10, "4b: DUT updates its attributes");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "5a: TH waits for x seconds movement(s) on the DUT");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000U;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "5b: TH reads OperationalStatus attribute from DUT");
@@ -31603,8 +32123,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: If (PA_LF & LF) TH reads CurrentPositionLiftPercent100ths from DUT");
@@ -31739,8 +32260,9 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: If (PA_TL & TL) TH reads CurrentPositionTiltPercent100ths from DUT");
@@ -31946,8 +32468,9 @@ private:
         {
         case 0: {
             LogStep(0, "0a: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "0b: TH sends UpOrOpen command to preposition the DUT");
@@ -31966,8 +32489,9 @@ private:
         }
         case 3: {
             LogStep(3, "1b: TH Waits for 100ms-1s");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(500);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 500UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "1c: TH sends StopMotion command to DUT");
@@ -31976,8 +32500,9 @@ private:
         }
         case 5: {
             LogStep(5, "1d: TH Waits for 100ms-1s");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(500);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 500UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to DUT");
@@ -31991,8 +32516,9 @@ private:
         }
         case 7: {
             LogStep(7, "2b: TH Waits for 100ms-1s");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(500);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 500UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "2c: TH sends StopMotion command to DUT");
@@ -32001,8 +32527,9 @@ private:
         }
         case 9: {
             LogStep(9, "2d: TH Waits for 100ms-1s");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(500);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 500UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "3a: TH reads CurrentPositionLiftPercent100ths from DUT");
@@ -32018,13 +32545,14 @@ private:
         }
         case 12: {
             LogStep(12, "3c: reboot/restart the DUT");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "3d: Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "3e: TH reads CurrentPositionLiftPercent100ths from DUT");
@@ -32139,8 +32667,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute Target Navigator list");
@@ -32284,8 +32813,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute Audio Output list");
@@ -32429,8 +32959,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute Application Launcher list");
@@ -32545,8 +33076,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Key Command");
@@ -32631,8 +33163,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Get Setup PIN Command");
@@ -32726,8 +33259,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read mac address");
@@ -32869,8 +33403,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute vendor name");
@@ -33189,8 +33724,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute playback state");
@@ -33464,8 +34000,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute Channel list");
@@ -33563,8 +34100,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sleep Input Status Command");
@@ -33679,8 +34217,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute accept header list");
@@ -33945,8 +34484,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute media input list");
@@ -37228,8 +37768,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Command");
@@ -40691,8 +41232,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Command with optional arg set to null.");
@@ -41009,8 +41551,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write attribute INT32U Value");
@@ -41180,13 +41723,15 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(100);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 100UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -41372,8 +41917,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Check there is no event on the target endpoint");
@@ -41734,18 +42280,21 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Open Commissioning Window with too-short timeout");
@@ -41773,107 +42322,113 @@ private:
         }
         case 6: {
             LogStep(6, "Check Instance Name");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Check Long Discriminator _L");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByLongDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type value;
+            value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return FindCommissionableByLongDiscriminator(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Check Short Discriminator (_S)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByShortDiscriminator(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type value;
+            value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return FindCommissionableByShortDiscriminator(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Check Commissioning Mode (_CM)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByCommissioningMode();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type value;
+            return FindCommissionableByCommissioningMode(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "Check Vendor ID (_V)");
             VerifyOrdo(!ShouldSkip("VENDOR_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionableByVendorId(mVendorId.HasValue() ? mVendorId.Value() : 65521U);
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type value;
+            value.value = mVendorId.HasValue() ? mVendorId.Value() : 65521U;
+            return FindCommissionableByVendorId(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "TXT key for discriminator (D)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Optional TXT key for MRP Retry Interval Idle (CRI)");
             VerifyOrdo(!ShouldSkip("CRI_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Optional TXT key for MRP Retry Interval Active (CRA)");
             VerifyOrdo(!ShouldSkip("CRA_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "TXT key for commissioning mode (CM)");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Optional TXT key for device name (DN)");
             VerifyOrdo(!ShouldSkip("DN_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "Optional TXT key for rotating device identifier (RI)");
             VerifyOrdo(!ShouldSkip("RI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Optional TXT key for pairing hint (PH)");
             VerifyOrdo(!ShouldSkip("PH_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Optional TXT key for pairing instructions (PI)");
             VerifyOrdo(!ShouldSkip("PI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "Check IPs");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 23: {
             LogStep(23, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 24: {
             LogStep(24, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 25: {
             LogStep(25, "Open Commissioning Window");
@@ -41885,8 +42440,8 @@ private:
         }
         case 26: {
             LogStep(26, "Check Instance Name");
-            SetIdentity(kIdentityAlpha);
-            return FindCommissionable();
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -41958,18 +42513,21 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Log a simple message");
-            SetIdentity(kIdentityAlpha);
-            return Log("This is a simple message");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("This is a simple messagegarbage: not in length on purpose", 24);
+            return Log(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Do a simple user prompt message");
-            SetIdentity(kIdentityAlpha);
-            return UserPrompt("This is a simple message");
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("This is a simple messagegarbage: not in length on purpose", 24);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -42822,8 +43380,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Add Arguments Command");
@@ -43442,8 +44001,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Add Arguments Command");
@@ -43625,8 +44185,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read attribute Device list");
@@ -43856,8 +44417,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read location");
@@ -43913,13 +44475,14 @@ private:
         }
         case 12: {
             LogStep(12, "Reboot the device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Connect to the device again");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Read back NodeLabel after reboot");
@@ -44207,8 +44770,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write Breadcrumb (1/2)");
@@ -44236,13 +44800,14 @@ private:
         }
         case 5: {
             LogStep(5, "Reboot to reset Breadcrumb");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Connect to the device again");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Read back Breadcrumb after reboot and ensure it was not persisted");
@@ -44302,14 +44867,17 @@ private:
         }
         case 16: {
             LogStep(16, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(
-                74565, mPayload.HasValue() ? mPayload.Value() : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = 74565ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 17: {
             LogStep(17, "Wait for the commissioned device to be retrieved for beta");
-            SetIdentity(kIdentityBeta);
-            return WaitForCommissionee(74565);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = 74565ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
         }
         case 18: {
             LogStep(18, "Arm fail-safe");
@@ -44456,8 +45024,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Identify command and expect success response");
@@ -44609,8 +45178,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read number of supported fabrics");
@@ -44906,8 +45476,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read Description");
@@ -45035,13 +45606,14 @@ private:
         }
         case 25: {
             LogStep(25, "Reboot target device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 26: {
             LogStep(26, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 27: {
             LogStep(27, "Verify Current Mode Change based on OnMode, as it overwrites StartUpMode");
@@ -45055,13 +45627,14 @@ private:
         }
         case 29: {
             LogStep(29, "Reboot target device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 30: {
             LogStep(30, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 31: {
             LogStep(31, "Verify Current Mode Change based on new StartUp Mode");
@@ -45158,8 +45731,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read number of commissioned fabrics");
@@ -45326,114 +45900,166 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Stop the default accessory");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Start the default accessory with no command line options");
-            SetIdentity(kIdentityAlpha);
-            return Start();
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            return Start(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Stop the default accessory by key");
-            SetIdentity(kIdentityAlpha);
-            return Stop("default");
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
+            return Stop(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Start the default accessory with discriminator command line option");
-            SetIdentity(kIdentityAlpha);
-            return Start(1111);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = 1111U;
+            return Start(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Stop the default accessory");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Start the default accessory with discriminator and port command line options");
-            SetIdentity(kIdentityAlpha);
-            return Start(1111, 5560);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = 1111U;
+            value.port.Emplace();
+            value.port.Value() = 5560U;
+            return Start(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Stop the default accessory");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Start the default accessory with all command line options");
-            SetIdentity(kIdentityAlpha);
-            return Start(1111, 5560, "/tmp/chip_kvs_default");
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = 1111U;
+            value.port.Emplace();
+            value.port.Value() = 5560U;
+            value.kvs.Emplace();
+            value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_defaultgarbage: not in length on purpose", 21);
+            return Start(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Stop the default accessory");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "Start the default accessory by key with all command line options");
-            SetIdentity(kIdentityAlpha);
-            return Start(1111, 5560, "/tmp/chip_kvs_default", "default");
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = 1111U;
+            value.port.Emplace();
+            value.port.Value() = 5560U;
+            value.kvs.Emplace();
+            value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_defaultgarbage: not in length on purpose", 21);
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
+            return Start(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Start a second accessory with all command line options");
-            SetIdentity(kIdentityAlpha);
-            return Start(50, 5561, "/tmp/chip_kvs_lock", "chip-lock-app");
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = 50U;
+            value.port.Emplace();
+            value.port.Value() = 5561U;
+            value.kvs.Emplace();
+            value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_lockgarbage: not in length on purpose", 18);
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
+            return Start(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "Commission second accessory from alpha");
-            SetIdentity(kIdentityAlpha);
-            return PairWithQRCode(
-                3735928559, mPayload.HasValue() ? mPayload.Value() : chip::CharSpan::fromCharString("MT:-24J0IX4122-.548G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = 3735928559ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0IX4122-.548G00", 22);
+            ;
+            return PairWithQRCode(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Wait for the second commissioned device to be retrieved for alpha");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(3735928559);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = 3735928559ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Stop the second accessory");
-            SetIdentity(kIdentityAlpha);
-            return Stop("chip-lock-app");
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
+            return Stop(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Start a second accessory with different KVS");
-            SetIdentity(kIdentityAlpha);
-            return Start(50, 5561, "/tmp/chip_kvs_lock2", "chip-lock-app");
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = 50U;
+            value.port.Emplace();
+            value.port.Value() = 5561U;
+            value.kvs.Emplace();
+            value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_lock2garbage: not in length on purpose", 19);
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
+            return Start(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Reboot the default accessory");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Reboot the default accessory by key");
-            SetIdentity(kIdentityAlpha);
-            return Reboot("default");
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
+            return Reboot(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "Reboot the second accessory");
-            SetIdentity(kIdentityAlpha);
-            return Reboot("chip-lock-app");
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
+            return Reboot(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Factory Reset the default accessory");
-            SetIdentity(kIdentityAlpha);
-            return FactoryReset();
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            return FactoryReset(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Factory Reset the default accessory by key");
-            SetIdentity(kIdentityAlpha);
-            return FactoryReset("default");
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
+            return FactoryReset(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "Factory Reset the second accessory");
-            SetIdentity(kIdentityAlpha);
-            return FactoryReset("chip-lock-app");
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            value.registerKey.Emplace();
+            value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
+            return FactoryReset(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -45595,8 +46221,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write empty binding table");
@@ -45814,8 +46441,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Clear User Label List");
@@ -45857,13 +46485,14 @@ private:
         }
         case 4: {
             LogStep(4, "Reboot target device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Verify");
@@ -45965,13 +46594,14 @@ private:
         {
         case 0: {
             LogStep(0, "Reboot target device");
-            SetIdentity(kIdentityAlpha);
-            return Reboot();
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Wait for the alpha device to be retrieved ");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Query fabrics list");
@@ -46160,25 +46790,29 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
-            SetIdentity(kIdentityAlpha);
-            return Stop();
+            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
+            return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            SetIdentity(kIdentityAlpha);
-            return Start(mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U);
+            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
+            value.discriminator.Emplace();
+            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
+            return Start(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Wait for the commissioned device to be retrieved for alpha");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Commission from alpha when the commissioning window is not opened");
-            SetIdentity(kIdentityAlpha);
-            return PairWithQRCode(mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Open Commissioning Window from alpha");
@@ -46190,10 +46824,11 @@ private:
         }
         case 5: {
             LogStep(5, "Commission from alpha again");
-            SetIdentity(kIdentityAlpha);
-            return PairWithQRCode(mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Check that we just have the one fabric and did not add a new one");
@@ -46217,15 +46852,17 @@ private:
         }
         case 9: {
             LogStep(9, "Commission from beta");
-            SetIdentity(kIdentityBeta);
-            return PairWithQRCode(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityBeta, value);
         }
         case 10: {
             LogStep(10, "Wait for the commissioned device to be retrieved for beta");
-            SetIdentity(kIdentityBeta);
-            return WaitForCommissionee(mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
         }
         case 11: {
             LogStep(11, "Open Commissioning Window from beta");
@@ -46237,15 +46874,17 @@ private:
         }
         case 12: {
             LogStep(12, "Commission from gamma");
-            SetIdentity(kIdentityGamma);
-            return PairWithQRCode(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL,
-                                  mPayload.HasValue() ? mPayload.Value()
-                                                      : chip::CharSpan::fromCharString("MT:-24J0AFN00KA0648G00"));
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            ;
+            return PairWithQRCode(kIdentityGamma, value);
         }
         case 13: {
             LogStep(13, "Wait for the commissioned device to be retrieved for gamma");
-            SetIdentity(kIdentityGamma);
-            return WaitForCommissionee(mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
+            return WaitForCommissionee(kIdentityGamma, value);
         }
         case 14: {
             LogStep(14, "read the mandatory attribute: NodeLabel from alpha");
@@ -46374,8 +47013,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reads a list of ThreadMetrics struct non-global attribute from DUT.");
@@ -46545,8 +47185,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sends ResetWatermarks to DUT");
@@ -46665,8 +47306,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Set OnOff Attribute to false");
@@ -48198,8 +48840,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read available user slot and verify response fields");
@@ -49392,8 +50035,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and lock/unlock user");
@@ -50247,8 +50891,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and schedule user");
@@ -51063,8 +51708,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and lock/unlock user");
@@ -51109,8 +51755,9 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 10000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(10000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 10000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "TH reads LockState attriute");
@@ -51265,8 +51912,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Add Group 1 (endpoint 1)");
@@ -51702,8 +52350,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "View Group 0 (invalid)");
@@ -52050,8 +52699,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read maxGroupsPerFabric");
@@ -52302,9 +52952,12 @@ private:
         {
         case 0: {
             LogStep(0, "Step 1");
-            SetIdentity(kIdentityAlpha);
-            return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by "
-                       "NFC Forum in URI Record Type Definition RTD URI");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>(
+                "Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC Forum "
+                "in URI Record Type Definition RTD URIgarbage: not in length on purpose",
+                151);
+            return Log(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -52376,20 +53029,26 @@ private:
         {
         case 0: {
             LogStep(0, "Step 1");
-            SetIdentity(kIdentityAlpha);
-            return Log("Scan the DUTs QR code using a QR code reader");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message =
+                chip::Span<const char>("Scan the DUTs QR code using a QR code readergarbage: not in length on purpose", 44);
+            return Log(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Step 1 verification");
-            SetIdentity(kIdentityAlpha);
-            return Log(
-                "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective "
-                "to surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message =
+                chip::Span<const char>("Verify the QR code gets scanned successfully and the QR code must be of sufficient size "
+                                       "and contrast respective to surface material as to be readable with standard readers such "
+                                       "as smartphones in normal lighting conditionsgarbage: not in length on purpose",
+                                       221);
+            return Log(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Step 2 verificaiton");
-            SetIdentity(kIdentityAlpha);
-            return Log("Verify QR code version is 1 or higher");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Verify QR code version is 1 or highergarbage: not in length on purpose", 37);
+            return Log(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -52457,14 +53116,20 @@ private:
         {
         case 0: {
             LogStep(0, "Precondition");
-            SetIdentity(kIdentityAlpha);
-            return Log("Verify manual pairing code is printed on the device or in additional provided materials");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Verify manual pairing code is printed on the device or in additional provided "
+                                                   "materialsgarbage: not in length on purpose",
+                                                   87);
+            return Log(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Step 1");
-            SetIdentity(kIdentityAlpha);
-            return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
-                       "producing a typeface height of 2.1 mm");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message =
+                chip::Span<const char>("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 "
+                                       "points typically producing a typeface height of 2.1 mmgarbage: not in length on purpose",
+                                       139);
+            return Log(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -52532,14 +53197,17 @@ private:
         {
         case 0: {
             LogStep(0, "Step 1");
-            SetIdentity(kIdentityAlpha);
-            return Log("Scan the device QR code using DUT");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Scan the device QR code using DUTgarbage: not in length on purpose", 33);
+            return Log(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Step 1 verification");
-            SetIdentity(kIdentityAlpha);
-            return Log(
-                "Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Verify the DUT is able to scan and parse the QR code successfully to onboard "
+                                                   "the device onto the CHIP networkgarbage: not in length on purpose",
+                                                   109);
+            return Log(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -52611,20 +53279,27 @@ private:
         {
         case 0: {
             LogStep(0, "Precondition");
-            SetIdentity(kIdentityAlpha);
-            return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Verify that the manual pairing code is printed on the device or in additional "
+                                                   "provided materialsgarbage: not in length on purpose",
+                                                   96);
+            return Log(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Step 1");
-            SetIdentity(kIdentityAlpha);
-            return Log(
-                "Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Provide the 11 digit or 21 digit pairing code from the Device in text speech "
+                                                   "or any format supported by DUTgarbage: not in length on purpose",
+                                                   107);
+            return Log(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Step 1 verification");
-            SetIdentity(kIdentityAlpha);
-            return Log("Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP "
-                       "network");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("Verify that the manual pairing code can be provided to DUT and parsed to "
+                                                   "onboard the device onto the CHIP networkgarbage: not in length on purpose",
+                                                   113);
+            return Log(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -53879,8 +54554,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn On the light to see attribute change");
@@ -53889,8 +54565,9 @@ private:
         }
         case 2: {
             LogStep(2, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Turn Off the light to see attribute change");
@@ -53899,8 +54576,9 @@ private:
         }
         case 4: {
             LogStep(4, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Turn On the light to see attribute change");
@@ -53909,8 +54587,9 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Turn Off the light to see attribute change");
@@ -53919,8 +54598,9 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Turn On the light to see attribute change");
@@ -53929,8 +54609,9 @@ private:
         }
         case 10: {
             LogStep(10, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Turn Off the light to see attribute change");
@@ -53939,8 +54620,9 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Turn On the light to see attribute change");
@@ -53949,8 +54631,9 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Turn Off the light to see attribute change");
@@ -53959,8 +54642,9 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Turn On the light to see attribute change");
@@ -53969,8 +54653,9 @@ private:
         }
         case 18: {
             LogStep(18, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Turn Off the light to see attribute change");
@@ -53979,8 +54664,9 @@ private:
         }
         case 20: {
             LogStep(20, "Wait 100ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(1000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 1000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -54064,8 +54750,9 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissionee(mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL);
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Add Group 1 - endpoint 1");
