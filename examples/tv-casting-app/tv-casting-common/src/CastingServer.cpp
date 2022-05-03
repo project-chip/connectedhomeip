@@ -44,7 +44,7 @@ void CastingServer::InitServer()
     {
         return;
     }
-    
+
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
