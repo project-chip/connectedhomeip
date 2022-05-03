@@ -18,6 +18,11 @@
 
 #include "CastingServer.h"
 
+using namespace chip;
+using namespace chip::Controller;
+using namespace chip::Credentials;
+using namespace chip::app::Clusters::ContentLauncher::Commands;
+
 CastingServer * CastingServer::castingServer_ = nullptr;
 
 // TODO: Accept these values over CLI
@@ -39,7 +44,6 @@ void CastingServer::InitServer()
     {
         return;
     }
-    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
