@@ -28,7 +28,7 @@ concurrency:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 120
+        timeout-minutes: 130
 
         strategy:
             matrix:
@@ -76,13 +76,15 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 30
+              timeout-minutes: 40
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
                         --target linux-x64-lock-${BUILD_VARIANT} \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -97,6 +99,8 @@ jobs:
                      --iterations 1 \
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
@@ -117,7 +121,7 @@ jobs:
                   retention-days: 5
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 120
+        timeout-minutes: 130
 
         strategy:
             matrix:
@@ -172,13 +176,15 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 30
+              timeout-minutes: 40
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
                         --target darwin-x64-lock-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -194,6 +200,8 @@ jobs:
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files

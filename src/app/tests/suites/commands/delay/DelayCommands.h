@@ -49,6 +49,8 @@ public:
         const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionableAdvertisement::Type & value);
     CHIP_ERROR WaitForOperationalAdvertisement(
         const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForOperationalAdvertisement::Type & value);
+    CHIP_ERROR WaitForMessage(const char * identity,
+                              const chip::app::Clusters::DelayCommands::Commands::WaitForMessage::Type & value);
 
     // Busy-wait for a given duration in milliseconds
     CHIP_ERROR BusyWaitFor(chip::System::Clock::Milliseconds32 durationInMs);
