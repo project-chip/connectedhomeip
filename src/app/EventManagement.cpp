@@ -771,8 +771,13 @@ CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader
             ReturnErrorOnFailure(event.Get(fabricIndex));
             if (fabricIndex == *invalidFabricIndex)
             {
-                uint8_t * dataPtr = const_cast<uint8_t *>(event.GetReadPoint());
-                dataPtr           = dataPtr - 1;
+                uint8_t * dataPtr                  = const_cast<uint8_t *>(event.GetReadPoint());
+                CHIPCircularTLVBuffer * readBuffer = static_cast<CHIPCircularTLVBuffer *>(event.GetBackingStore());
+                if (readBuffer->GetQueue() != dataPtr)
+                    dataPtr = dataPtr - 1;
+                else
+                    dataPtr = readBuffer->GetQueue() + readBuffer->GetTotalDataLength() - 1;
+
                 memset(dataPtr, 0, 1);
                 event.Get(fabricIndex);
                 return CHIP_NO_ERROR;
