@@ -60,7 +60,7 @@ test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetHostName(host)
                                           .AddSubtype("_I5555666677778888")
                                           .AddTxt("SII", "32")
-                                          .AddTxt("SAI", "33")
+                                          .AddTxt("SAI", "30")
                                           .AddTxt("T", "1");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
