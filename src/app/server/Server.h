@@ -100,7 +100,7 @@ struct ServerInitParams
     Access::AccessControl::Delegate * accessDelegate = nullptr;
     // Network native params can be injected depending on the
     // selected Endpoint implementation
-    void * networkNativeParams = nullptr;
+    void * endpointNativeParams = nullptr;
 };
 
 /**

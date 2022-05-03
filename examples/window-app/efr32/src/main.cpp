@@ -30,7 +30,7 @@
 
 #include <mbedtls/platform.h>
 #if CHIP_ENABLE_OPENTHREAD
-#include <inet/EndpointStateOpenThread.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -164,7 +164,7 @@ int main(void)
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
-    initParams.networkNativeParams     = static_cast<void *>(&nativeParams);
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 #endif
     chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

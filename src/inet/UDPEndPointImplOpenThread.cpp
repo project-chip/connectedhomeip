@@ -177,7 +177,7 @@ void UDPEndPointImplOT::SetNativeParams(void * params)
 {
     if (params == nullptr)
     {
-        ChipLogError(Inet, "FATAL!! Failed to provide OtInstance!!!!!");
+        ChipLogError(Inet, "FATAL!! No native parameters provided!!!!!");
         VerifyOrDie(false);
     }
 
