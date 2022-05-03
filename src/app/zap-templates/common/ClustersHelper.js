@@ -386,9 +386,7 @@ function inlineStructItems(args)
       return;
     }
 
-    argument.items.forEach(item => {
-      arguments.push(item);
-    });
+    argument.items.forEach(item => { arguments.push(item); });
   });
 
   return arguments;
@@ -468,15 +466,43 @@ function enhancedEvents(events, types)
   return events;
 }
 
+function hasNonZeroDefault(attribute)
+{
+  // try to match 0 values. Note that this does not check
+  // data type, but assumes hex/numeric 0 values are actually
+  // 0-fill
+
+  if (!attribute.defaultValue) {
+    return false;
+  }
+
+  if (attribute.defaultValue === '0') {
+    return false;
+  }
+
+  // Hex value usage is inconsistent in XML. It looks we have
+  // all of 0x0, 0x00, 0x0000 so support all here.
+  if (attribute.defaultValue.match(/^0x0+$/)) {
+    return false;
+  }
+
+  return true;
+}
+
 function enhancedAttributes(attributes, globalAttributes, types)
 {
   attributes.forEach(attribute => {
     enhancedItem(attribute, types);
-    attribute.isGlobalAttribute     = globalAttributes.includes(attribute.code);
-    attribute.isWritableAttribute   = attribute.isWritable === 1;
-    attribute.isReportableAttribute = attribute.includedReportable === 1;
-    attribute.chipCallback          = asChipCallback(attribute);
-    attribute.isComplex             = attribute.isList || attribute.isStruct || attribute.isArray;
+    attribute.isGlobalAttribute            = globalAttributes.includes(attribute.code);
+    attribute.isWritableAttribute          = attribute.isWritable === 1;
+    attribute.isReportableAttribute        = attribute.includedReportable === 1;
+    attribute.chipCallback                 = asChipCallback(attribute);
+    attribute.isComplex                    = attribute.isList || attribute.isStruct || attribute.isArray;
+    attribute.hasNonZeroDefault            = hasNonZeroDefault(attribute);
+    attribute.isString                     = StringHelper.isString(attribute.type);
+    attribute.isNVMStorage                 = attribute.storage === 'NVM';
+    attribute.isExternalStorage            = attribute.storage === 'External';
+    attribute.hasNonDefaultStorageSettings = attribute.hasNonZeroDefault || attribute.isNVMStorage || attribute.isExternalStorage;
   });
 
   attributes.forEach(attribute => {

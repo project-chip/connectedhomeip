@@ -70,7 +70,25 @@
         {{~/if~}}
       {{~/if~}}
     {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isArray~}} [] {{~/if}} = {{code}};
+    {{~#if isArray~}} [] {{~/if}} = {{code~}}
+
+    {{#if hasNonDefaultStorageSettings~}}
+      {{~!ensure space}} [
+        {{~!FIXME: storage callback or NVM ~}}
+        {{~#if isExternalStorage~}}
+          callback
+          {{~#if hasNonZeroDefault~}}, {{/if~}}
+        {{/if}}
+        {{~#if isNVMStorage~}}
+          persist
+          {{~#if hasNonZeroDefault~}}, {{/if~}}
+        {{/if}}
+        {{~#if hasNonZeroDefault~}}
+          default={{#if isString}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+        {{~/if~}}
+      ]
+    {{~/if~}}
+    ;
   {{/chip_server_cluster_attributes}}
   {{~!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
