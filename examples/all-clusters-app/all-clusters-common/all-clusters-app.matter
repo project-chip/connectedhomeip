@@ -2412,12 +2412,12 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384 [default=1];
+  readonly attribute boolean onOff = 0 [persist];
+  readonly attribute boolean globalSceneControl = 16384 [default=0x01];
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
-  readonly attribute bitmap32 featureMap = 65532;
+  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387 [persist, default=0xFF];
+  readonly attribute bitmap32 featureMap = 65532 [default=0x0001];
   readonly attribute int16u clusterRevision = 65533 [default=4];
 
   request struct OffWithEffectRequest {
