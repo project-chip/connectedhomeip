@@ -1339,7 +1339,7 @@ server cluster WindowCovering = 258 {
   readonly attribute int16u installedClosedLimitLift = 17 [persist, default=0xFFFF];
   readonly attribute int16u installedOpenLimitTilt = 18 [persist];
   readonly attribute int16u installedClosedLimitTilt = 19 [persist, default=0xFFFF];
-  attribute access(write: manage) Mode mode = 23 [persist];
+  attribute access(write: manage) Mode mode = 23 [persist, default=0x14];
   readonly attribute bitmap16 safetyStatus = 26;
   readonly attribute bitmap32 featureMap = 65532 [default=0x0017];
   readonly attribute int16u clusterRevision = 65533 [default=5];
