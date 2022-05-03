@@ -34,10 +34,18 @@
     {{/zcl_struct_items_by_struct_name}}
   {{else}}
     {{#if_chip_enum type}}
-      {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
+      {{#if_is_atomic type}}
+        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+      {{else}}
+        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
+      {{/if_is_atomic}}
     {{else}}
       {{#if_is_bitmap type}}
-        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
+        {{#if_is_atomic type}}
+          {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+        {{else}}
+          {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}.Raw()];
+        {{/if_is_atomic}}
       {{else if (isOctetString type)}}
         {{target}} = [NSData dataWithBytes:{{source}}.data() length:{{source}}.size()];
       {{else if (isCharString type)}}

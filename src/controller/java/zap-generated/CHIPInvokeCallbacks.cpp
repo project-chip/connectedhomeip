@@ -3876,7 +3876,7 @@ void CHIPTestClusterClusterTestEnumsResponseCallback::CallbackFn(
     std::string arg1ClassName     = "java/lang/Integer";
     std::string arg1CtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(arg1ClassName.c_str(), arg1CtorSignature.c_str(),
-                                                                   static_cast<uint16_t>(dataResponse.arg1), arg1);
+                                                                   dataResponse.arg1, arg1);
     jobject arg2;
     std::string arg2ClassName     = "java/lang/Integer";
     std::string arg2CtorSignature = "(I)V";

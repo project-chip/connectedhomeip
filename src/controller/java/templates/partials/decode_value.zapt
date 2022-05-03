@@ -53,7 +53,11 @@ if ({{source}}.IsNull()) {
     {{#if_chip_enum type}}
       std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
       std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-      chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
+      {{#if_is_atomic type}}
+        chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
+      {{else}}
+        chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
+      {{/if_is_atomic}}
     {{else}}
       {{#if (isOctetString type)}}
         jbyteArray {{target}}ByteArray = env->NewByteArray(static_cast<jsize>({{source}}.size()));
@@ -65,7 +69,11 @@ if ({{source}}.IsNull()) {
         std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
         std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
         {{#if_is_bitmap type}}
-          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}.Raw(), {{target}});
+          {{#if_is_atomic type}}
+            chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
+          {{else}}
+            chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}.Raw(), {{target}});
+          {{/if_is_atomic}}
         {{else}}
           chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
         {{/if_is_bitmap}}

@@ -685,7 +685,7 @@ void CHIPNullableDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstabl
 void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -712,7 +712,7 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
     }
     DispatchSuccess(context, objCValue);
 };
@@ -1263,7 +1263,7 @@ void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccess
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
+            newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -1767,7 +1767,7 @@ void CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
 void CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -1790,7 +1790,7 @@ void CHIPBarrierControlBarrierSafetyStatusAttributeCallbackSubscriptionBridge::O
 void CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -2073,7 +2073,7 @@ void CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
 void CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -3125,7 +3125,7 @@ void CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
 void CHIPColorControlColorControlOptionsAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -3148,7 +3148,7 @@ void CHIPColorControlColorControlOptionsAttributeCallbackSubscriptionBridge::OnS
 void CHIPColorControlColorCapabilitiesAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -3327,7 +3327,7 @@ void CHIPContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnS
 void CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4277,7 +4277,7 @@ void CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
 void CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4536,7 +4536,7 @@ void CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptio
 void CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4559,7 +4559,7 @@ void CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
 void CHIPFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4582,7 +4582,7 @@ void CHIPFanControlRockSupportAttributeCallbackSubscriptionBridge::OnSubscriptio
 void CHIPFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4605,7 +4605,7 @@ void CHIPFanControlRockSettingAttributeCallbackSubscriptionBridge::OnSubscriptio
 void CHIPFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4628,7 +4628,7 @@ void CHIPFanControlWindSupportAttributeCallbackSubscriptionBridge::OnSubscriptio
 void CHIPFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -4768,7 +4768,7 @@ void CHIPFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
 void CHIPFanControlFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -5763,7 +5763,7 @@ void CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge:
 void CHIPGroupsNameSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -6255,7 +6255,7 @@ void CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
 void CHIPLevelControlOptionsAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -6395,7 +6395,7 @@ void CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
 void CHIPLevelControlFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -7169,7 +7169,7 @@ void CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
 void CHIPModeSelectFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -7318,7 +7318,7 @@ void CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccess
 void CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -7662,7 +7662,7 @@ void CHIPOtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptio
 void CHIPOccupancySensingOccupancyAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -7685,7 +7685,7 @@ void CHIPOccupancySensingOccupancyAttributeCallbackSubscriptionBridge::OnSubscri
 void CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -7942,7 +7942,7 @@ void CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
 void CHIPOnOffFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -8571,7 +8571,7 @@ void CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
 void CHIPPowerSourceFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -8883,7 +8883,7 @@ void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridg
 <<<<<<< HEAD
 =======
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -8907,7 +8907,7 @@ void CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridg
 void CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -9050,7 +9050,7 @@ void CHIPPumpConfigurationAndControlAttributeListListAttributeCallbackSubscripti
 void CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -9193,7 +9193,7 @@ void CHIPRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscripti
 void CHIPScenesNameSupportAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -9497,7 +9497,7 @@ void CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge
 void CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -9637,7 +9637,7 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
 void CHIPSwitchFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -10837,8 +10837,19 @@ void CHIPThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
+<<<<<<< HEAD
 void CHIPThermostatAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+=======
+void CHIPThermostatFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedInt:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThermostatFeatureMapAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+>>>>>>> Cleaning up atomic enums and bitmaps for generation
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11179,7 +11190,7 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
             CHIPThreadNetworkDiagnosticsClusterSecurityPolicy * newElement_0;
             newElement_0 = [CHIPThreadNetworkDiagnosticsClusterSecurityPolicy new];
             newElement_0.rotationTime = [NSNumber numberWithUnsignedShort:entry_0.rotationTime];
-            newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags.Raw()];
+            newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -11425,7 +11436,7 @@ void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionB
 void CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -11615,7 +11626,7 @@ void CHIPUnitLocalizationFeatureMapAttributeCallbackBridge::OnSuccessFn(void * c
 >>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -12153,7 +12164,7 @@ void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBri
 void CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -12200,7 +12211,7 @@ void CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscr
 void CHIPWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -12247,7 +12258,7 @@ void CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEs
 void CHIPWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -12387,7 +12398,7 @@ void CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnS
 void CHIPWindowCoveringFeatureMapAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
 
@@ -13659,6 +13670,7 @@ void CHIPTestClusterClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn
 void CHIPTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
+<<<<<<< HEAD
     auto * response = [CHIPTestClusterClusterTestStructArrayArgumentResponseParams new];
     { { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
@@ -13755,6 +13767,11 @@ void CHIPTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucc
             newElement_0.g = array_2;
         }
         [array_0 addObject:newElement_0];
+=======
+    auto * response = [CHIPTestClusterClusterTestEnumsResponseParams new];
+    {
+        response.arg1 = [NSNumber numberWithUnsignedShort:data.arg1];
+>>>>>>> Cleaning up atomic enums and bitmaps for generation
     }
     CHIP_ERROR err = iter_0.GetStatus();
     if (err != CHIP_NO_ERROR) {
