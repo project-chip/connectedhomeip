@@ -143,7 +143,7 @@ const FindCommissioner = {
 };
 
 const FindCommissionerByVendorId = {
-  name : 'FindCommissionableByVendorId',
+  name : 'FindCommissionerByVendorId',
   arguments : [ kNumberValueArgument ],
   hasSpecificResponse : true,
   responseName : 'DiscoveryCommandResponse',
