@@ -266,9 +266,6 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     // has finished its init process, it might setup these attributevalues
     // to something NonNull, and then we must re-calcualte the feature set.
 
-    Attributes::MaxConstPressure::SetNull(endpoint);
-    Attributes::MinConstTemp::SetNull(endpoint);
-
     constPressureSupported = IsFeatureSupported(endpoint, Attributes::MinConstPressure::Get, Attributes::MaxConstPressure::Get);
     emberAfDebugPrintln("Constant Pressure %s", constPressureSupported ? "Supported" : "Not Supported");
     constPropPressureSupported = IsFeatureSupported(endpoint, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get);
