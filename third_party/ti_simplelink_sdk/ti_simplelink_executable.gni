@@ -21,12 +21,25 @@ import("${chip_root}/src/platform/device.gni")
 import("ti_simplelink_board.gni")
 import("ti_simplelink_sdk.gni")
 
+declare_args() {
+  matter_device_vid = ""
+  matter_device_pid = ""
+  matter_software_ver = ""
+  matter_software_ver_str = ""
+}
+
+assert(matter_device_vid != "", "matter_device_vid must be specified")
+assert(matter_device_pid != "", "matter_device_pid must be specified")
+assert(matter_software_ver != "", "matter_software_ver must be specified")
+assert(matter_software_ver_str != "",
+       "matter_software_ver_str must be specified")
+
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
 
   if (chip_enable_ota_requestor) {
     # Generating the ota binary image
-    final_target = "${target_name}_ota"
+    final_target = "${target_name}.ota"
   } else {
     # The executable is the final target.
     final_target = "${simplelink_target_name}.out"
@@ -37,8 +50,26 @@ template("ti_simplelink_executable") {
   objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
 
+  config("${simplelink_target_name}_config") {
+    defines = []
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+
+    # add OTA options if available
+    defines += [
+      "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${matter_device_vid}",
+      "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}",
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_software_ver}",
+      "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_software_ver_str}\"",
+    ]
+  }
+
   flashable_executable("${simplelink_target_name}.out") {
     forward_variables_from(invoker, "*")
+
+    public_configs = [ ":${simplelink_target_name}_config" ]
 
     if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       if (chip_enable_ota_requestor) {
@@ -63,21 +94,43 @@ template("ti_simplelink_executable") {
 
   if (chip_enable_ota_requestor &&
       ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-    pw_python_action("${target_name}_ota") {
+    pw_python_action("${simplelink_target_name}.bin") {
       public_deps = [ ":${simplelink_target_name}.out.image" ]
 
-      script = "${ti_simplelink_sdk_build_root}/run_oad_tool.py"
+      script = "${ti_simplelink_sdk_root}//tools/common/oad/oad_image_tool.py"
       sources = [ "${root_out_dir}/${objcopy_image_name}" ]
-      outputs = [
-        "${root_out_dir}/${output_base_name}.bin",
-        "${root_out_dir}/${output_base_name}-bim.hex",
+      outputs = [ "${root_out_dir}/${output_base_name}.bin" ]
+
+      args = [
+        "--verbose",
+        "ccs",
+        rebase_path(root_out_dir, root_build_dir),
+        "7",
+        "-hex1",
+        rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
+        "-o",
+        output_base_name,
       ]
 
       if (defined(invoker.pem_file)) {
-        pem_file = invoker.pem_file
+        args += [
+          "-k",
+          rebase_path(invoker.pem_file, root_build_dir),
+        ]
       } else {
-        pem_file = "${ti_simplelink_sdk_root}/tools/common/oad/private.pem"
+        args += [
+          "-k",
+          rebase_path("${ti_simplelink_sdk_root}/tools/common/oad/private.pem",
+                      root_build_dir),
+        ]
       }
+    }
+    pw_python_action("${simplelink_target_name}-bim.hex") {
+      public_deps = [ ":${simplelink_target_name}.bin" ]
+
+      script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
+      sources = [ "${root_out_dir}/${output_base_name}.bin" ]
+      outputs = [ "${root_out_dir}/${output_base_name}-bim.hex" ]
 
       if (defined(invoker.bim_hex)) {
         bim_hex = invoker.bim_hex
@@ -86,12 +139,51 @@ template("ti_simplelink_executable") {
       }
 
       args = [
-        rebase_path(ti_simplelink_sdk_root, root_build_dir),
-        rebase_path(root_out_dir, root_build_dir),
-        output_base_name,
-        rebase_path(pem_file, root_build_dir),
+        rebase_path("${root_out_dir}/${output_base_name}.bin", root_build_dir),
         rebase_path(bim_hex, root_build_dir),
+        rebase_path("${root_out_dir}/${output_base_name}-bim.hex",
+                    root_build_dir),
       ]
+
+      args += [ "${root_out_dir}/${output_base_name}-bim.hex" ]
+    }
+    pw_python_action("${target_name}.ota") {
+      public_deps = [ ":${simplelink_target_name}-bim.hex" ]
+
+      script = "${chip_root}/src/app/ota_image_tool.py"
+      sources = [ "${root_out_dir}/${output_base_name}.bin" ]
+      outputs = [ "${root_out_dir}/${output_base_name}.ota" ]
+
+      args = [
+        "create",
+        rebase_path("${root_out_dir}/${output_base_name}.bin", root_build_dir),
+        rebase_path("${root_out_dir}/${output_base_name}.ota", root_build_dir),
+      ]
+
+      args += [
+        "-v",
+        matter_device_vid,
+        "-p",
+        matter_device_pid,
+        "-vn",
+        matter_software_ver,
+        "-vs",
+        matter_software_ver_str,
+      ]
+      if (defined(invoker.ota_digest)) {
+        args += [
+          "-da",
+          matter_ota_digest,
+        ]
+      } else {
+        args += [
+          "-da",
+          "sha256",
+        ]
+      }
+      if (defined(invoker.ota_args)) {
+        args += invoker.ota_args
+      }
     }
   }
 
