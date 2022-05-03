@@ -47,60 +47,6 @@ const kGlobalAttributes = [
   0xfffd, // FeatureMap
 ];
 
-// TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
-//      of having to call this method separately.
-function asReadType(type)
-{
-  if (StringHelper.isShortString(type)) {
-    return 'String';
-  }
-
-  if (StringHelper.isLongString(type)) {
-    return 'LongString';
-  }
-
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-        return 'Int8u';
-      case 'int8_t':
-        return 'Int8s';
-      case 'uint8_t':
-        return 'Int8u';
-      case 'int16_t':
-        return 'Int16s';
-      case 'uint16_t':
-        return 'Int16u';
-      case 'int24_t':
-        return 'Int24s';
-      case 'uint24_t':
-        return 'Int24u';
-      case 'int32_t':
-        return 'Int32s';
-      case 'uint32_t':
-        return 'Int32u';
-      case 'int64_t':
-        return 'Int64s';
-      case 'uint64_t':
-        return 'Int64u';
-      default:
-        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-        throw error;
-      }
-    })
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
-  return templateUtil.templatePromise(this.global, promise)
-}
-
 //  Endpoint-config specific helpers
 // these helpers are a Hot fix for the "GENERATED_FUNCTIONS" problem
 // They should be removed or replace once issue #4369 is resolved
@@ -324,53 +270,6 @@ function chip_endpoint_data_version_count()
 }
 
 //  End of Endpoint-config specific helpers
-
-function asPrintFormat(type)
-{
-  if (StringHelper.isString(type)) {
-    return '%s';
-  }
-
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-        return '%d';
-      case 'int8_t':
-        return '%d';
-      case 'uint8_t':
-        return '%u';
-      case 'int16_t':
-        return '%d';
-      case 'uint16_t':
-        return '%u';
-      case 'int24_t':
-        return '%" PRId32 "';
-      case 'uint24_t':
-        return '%" PRIu32 "';
-      case 'int32_t':
-        return '%" PRId32 "';
-      case 'uint32_t':
-        return '%" PRIu32 "';
-      case 'int64_t':
-        return '%" PRId64 "';
-      case 'uint64_t':
-        return '%" PRIu64 "';
-      default:
-        return '%p';
-      }
-    })
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
-  return templateUtil.templatePromise(this.global, promise)
-}
 
 async function asNativeType(type)
 {
@@ -886,8 +785,6 @@ async function if_is_fabric_scoped_struct(type, options)
 //
 // Module exports
 //
-exports.asPrintFormat                         = asPrintFormat;
-exports.asReadType                            = asReadType;
 exports.chip_endpoint_generated_functions     = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list            = chip_endpoint_cluster_list
 exports.chip_endpoint_data_version_count      = chip_endpoint_data_version_count;
