@@ -11,7 +11,10 @@
 
 #include <commands/clusters/ComplexArgument.h>
 #include <app/data-model/DecodableList.h>
-#include <commands/clusters/ModelCommandBridge.h>
+#include <commands/clusters/ClusterCommandBridge.h>
+#include <commands/clusters/ReportCommandBridge.h>
+#include <commands/clusters/WriteAttributeCommandBridge.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 {{> clusters_header}}
 
@@ -22,10 +25,10 @@
 /*
  * Command {{asUpperCamelCase name}}
  */
-class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ModelCommand
+class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
@@ -36,8 +39,7 @@ public:
         AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        ModelCommand::AddArguments();
+        ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
@@ -60,22 +62,31 @@ public:
         params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:m{{asUpperCamelCase label}}];
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
-        [cluster {{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:params completionHandler:{{else}}CompletionHandler:{{/if}}
-        {{#if hasSpecificResponse}}
-            ^(CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
-                 NSLog(@"Values: %@", values);
-        {{else}}
-            ^(NSError * _Nullable error) {
-        {{/if}}
-            chipError = [CHIPError errorToCHIPErrorCode:error];
-            ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
-            SetCommandExitStatus(chipError);
-            }];
+        uint16_t repeatCount = mRepeatCount.ValueOr(1);
+        uint16_t __block responsesNeeded = repeatCount;
+        while (repeatCount--)
+        {
+            [cluster {{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:params completionHandler:{{else}}CompletionHandler:{{/if}}
+            {{#if hasSpecificResponse}}
+                ^(CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
+                    NSLog(@"Values: %@", values);
+            {{else}}
+                ^(NSError * _Nullable error) {
+            {{/if}}
+                chipError = [CHIPError errorToCHIPErrorCode:error];
+                responsesNeeded--;
+                if (chipError != CHIP_NO_ERROR) {
+                    ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                }
+                if (responsesNeeded == 0) {
+                    SetCommandExitStatus(chipError);
+                }
+                }];
+        }
         return chipError;
     }
 
 private:
-    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     {{#chip_cluster_command_arguments}}
     {{#if_chip_complex}}
     chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::Commands::{{asUpperCamelCase parent.name}}::Type mRequest;
@@ -98,14 +109,11 @@ private:
 /*
  * Attribute {{asUpperCamelCase name}}
  */
-class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
+class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ReadAttribute
 {
 public:
-    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("read")
+    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ReadAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        ModelCommand::AddArguments();
     }
 
     ~Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
@@ -138,18 +146,16 @@ public:
          }];
         return err;
     }
-private:
-    chip::Optional<bool> mFabricFiltered;
 
 };
 
 {{#if isWritableAttribute}}
 {{! No list support for writing yet.  Need to figure out how to represent the
     values. }}
-class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
+class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public WriteAttribute
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): WriteAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}"){{#if_chip_complex}}, mComplex(&mValue){{/if_chip_complex}}
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
         {{#if_chip_complex}}
@@ -159,8 +165,7 @@ public:
         {{else}}
         AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
         {{/if_chip_complex}}
-        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
-        ModelCommand::AddArguments();
+        WriteAttribute::AddArguments();
     }
 
     ~Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
@@ -195,7 +200,6 @@ public:
     }
 
 private:
-    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     {{#if_chip_complex}}
     {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}} mValue;
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}> mComplex;
@@ -210,17 +214,11 @@ private:
 
 {{/if}}
 {{#if isReportableAttribute}}
-class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
+class SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public SubscribeAttribute
 {
 public:
-    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("subscribe")
+    SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): SubscribeAttribute("{{asDelimitedCommand (asUpperCamelCase name)}}")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
     }
 
     ~SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
@@ -233,6 +231,7 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval] 
                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval] 
@@ -252,11 +251,6 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-private:
-    chip::Optional<bool> mFabricFiltered;
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 {{/if}}
@@ -269,18 +263,29 @@ private:
 {{#chip_client_clusters}}
 void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 {
+    using namespace chip::app::Clusters::{{asUpperCamelCase name}};
+    
     const char * clusterName = "{{asUpperCamelCase name}}";
 
     commands_list clusterCommands = {
+        make_unique<ClusterCommand>(Id), //
         {{#chip_cluster_commands}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
-        {{! TODO: Various types (floats, structs) not supported here. }}
+        {{#first}}
+         make_unique<ReadAttribute>(Id), //
+        {{/first}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{#first}}
+        make_unique<WriteAttribute>(Id), //
+        {{/first}}
         {{#if isWritableAttribute}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
+        {{#first}}
+        make_unique<SubscribeAttribute>(Id), //
+        {{/first}}
         {{#if isReportableAttribute}}
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
@@ -291,8 +296,24 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 }
 {{/chip_client_clusters}}
 
+void registerClusterAny(Commands & commands)
+{
+    const char * clusterName = "Any";
+
+    commands_list clusterCommands = {
+        make_unique<ClusterCommand>(),  //
+        make_unique<ReadAttribute>(),   //
+        make_unique<WriteAttribute>(),  //
+        make_unique<SubscribeAttribute>(), //
+        make_unique<SubscribeEvent>(),     //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+
 void registerClusters(Commands & commands)
 {
+    registerClusterAny(commands);
 {{#chip_client_clusters}}
     registerCluster{{asUpperCamelCase name}}(commands);
 {{/chip_client_clusters}}
