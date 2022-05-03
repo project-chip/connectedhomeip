@@ -16,8 +16,6 @@
  *
  */
 
-#include <lib/support/StringBuilder.h>
-
 #include "SystemCommands.h"
 
 namespace {
@@ -30,43 +28,47 @@ const char * getScriptsFolder()
 
 constexpr size_t kCommandMaxLen = 256;
 
-CHIP_ERROR SystemCommands::Start(uint16_t discriminator, uint16_t port, const char * kvs)
+CHIP_ERROR SystemCommands::Start(uint16_t discriminator, uint16_t port, const char * kvs, const char * registerKey)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Start.py";
 
     char command[kCommandMaxLen];
-    ReturnErrorOnFailure(CreateCommonCommandArgs(command, sizeof(command), scriptDir, scriptName, discriminator, port, kvs));
+    chip::StringBuilderBase builder(command, sizeof(command));
+    ReturnErrorOnFailure(CreateCommonCommandArgs(builder, scriptDir, scriptName, registerKey, discriminator, port, kvs));
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::Stop()
+CHIP_ERROR SystemCommands::Stop(const char * registerKey)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Stop.py";
 
     char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
+                        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::Reboot(uint16_t discriminator, uint16_t port, const char * kvs)
+CHIP_ERROR SystemCommands::Reboot(const char * registerKey)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Reboot.py";
 
-    char command[kCommandMaxLen];
-    ReturnErrorOnFailure(CreateCommonCommandArgs(command, sizeof(command), scriptDir, scriptName, discriminator, port, kvs));
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
+                        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::FactoryReset()
+CHIP_ERROR SystemCommands::FactoryReset(const char * registerKey)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "FactoryReset.py";
 
     char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
+                        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 
@@ -76,12 +78,16 @@ CHIP_ERROR SystemCommands::RunInternal(const char * command)
     return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
-CHIP_ERROR SystemCommands::CreateCommonCommandArgs(char * commandBuffer, size_t commandBufferSize, const char * scriptDir,
-                                                   const char * scriptName, uint16_t discriminator, uint16_t port, const char * kvs)
+CHIP_ERROR SystemCommands::CreateCommonCommandArgs(chip::StringBuilderBase & builder, const char * scriptDir,
+                                                   const char * scriptName, const char * registerKey, uint16_t discriminator,
+                                                   uint16_t port, const char * kvs)
 {
-    chip::StringBuilder<kCommandMaxLen> builder;
+    VerifyOrReturnError(registerKey != nullptr, CHIP_ERROR_INVALID_KEY_ID);
+
     builder.Add(scriptDir);
     builder.Add(scriptName);
+    builder.Add(" ");
+    builder.Add(registerKey);
 
     // Add any applicable optional command line options
     if (discriminator != 0xFFFF)
@@ -100,7 +106,6 @@ CHIP_ERROR SystemCommands::CreateCommonCommandArgs(char * commandBuffer, size_t 
         builder.Add(kvs);
     }
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(commandBuffer, builder.c_str(), commandBufferSize);
 
     return CHIP_NO_ERROR;
 }

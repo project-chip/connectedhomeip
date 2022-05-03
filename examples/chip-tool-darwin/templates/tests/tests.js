@@ -49,12 +49,6 @@ function getTests() {
   // command implementation.
   tests.disable('TestSystemCommands');
 
-  // TODO: DL_UsersAndCredentials needs some sort of codegen fixes to produce compiling code.
-  tests.disable('DL_UsersAndCredentials');
-
-  // TODO: DL_Schedules needs some sort of codegen fixes to produce compiling code.
-  tests.disable('DL_Schedules');
-
   // TODO: TestGroupMessaging does not work on Darwin for now.
   tests.disable('TestGroupMessaging');
 

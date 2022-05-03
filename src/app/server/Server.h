@@ -102,6 +102,9 @@ struct ServerInitParams
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
+    // Network native params can be injected depending on the
+    // selected Endpoint implementation
+    void * endpointNativeParams = nullptr;
 };
 
 /**

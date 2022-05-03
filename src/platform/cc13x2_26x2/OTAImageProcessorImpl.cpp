@@ -17,6 +17,8 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include "OTAImageProcessorImpl.h"
 
@@ -31,29 +33,32 @@
 #include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
 // clang-format on
 
+using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::PersistedStorage;
+
 namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -76,8 +81,24 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
+}
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor;
+    uint32_t runningSwVer;
+
+    if (CHIP_NO_ERROR != ConfigurationMgr().GetSoftwareVersion(runningSwVer))
+    {
+        return false;
+    }
+
+    requestor = GetRequestorInstance();
+
+    return (requestor->GetTargetVersion() == runningSwVer) &&
+        (requestor->GetCurrentUpdateState() == chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kApplying);
 }
 
 /* DESIGN NOTE: The Boot Image Manager will search external flash for an
@@ -92,10 +113,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 #define IMG_START (4 * EFL_SIZE_META)
 
-static bool readExtFlashImgHeader(NVS_Handle handle, imgFixedHdr_t * header)
+static bool readExtFlashImgHeader(NVS_Handle handle, imgFixedHdr_t * header, size_t otaHeaderLen)
 {
     int_fast16_t status;
-    status = NVS_read(handle, IMG_START, header, sizeof(header));
+    status = NVS_read(handle, IMG_START + otaHeaderLen, header, sizeof(imgFixedHdr_t));
     return (status == NVS_STATUS_SUCCESS);
 }
 
@@ -117,17 +138,23 @@ static bool writeExtFlashImgPages(NVS_Handle handle, size_t bytesWritten, Mutabl
         status = NVS_erase(handle, IMG_START + (erasedSectors * sectorSize), (neededSectors - erasedSectors) * sectorSize);
         if (status != NVS_STATUS_SUCCESS)
         {
+            ChipLogError(SoftwareUpdate, "NVS_erase failed status: %d", status);
             return false;
         }
     }
     status = NVS_write(handle, IMG_START + bytesWritten, block.data(), block.size(), NVS_WRITE_POST_VERIFY);
-    return (status == NVS_STATUS_SUCCESS);
+    if (status != NVS_STATUS_SUCCESS)
+    {
+        ChipLogError(SoftwareUpdate, "NVS_write failed status: %d", status);
+        return false;
+    }
+    return true;
 }
 
 static bool readExtFlashMetaHeader(NVS_Handle handle, ExtImageInfo_t * header)
 {
     int_fast16_t status;
-    status = NVS_read(handle, EFL_ADDR_META, header, sizeof(header));
+    status = NVS_read(handle, EFL_ADDR_META, header, sizeof(ExtImageInfo_t));
     return (status == NVS_STATUS_SUCCESS);
 }
 
@@ -152,7 +179,7 @@ static bool writeExtFlashMetaHeader(NVS_Handle handle, ExtImageInfo_t * header)
     {
         return false;
     }
-    status = NVS_write(handle, EFL_ADDR_META, header, sizeof(header), NVS_WRITE_POST_VERIFY);
+    status = NVS_write(handle, EFL_ADDR_META, header, sizeof(ExtImageInfo_t), NVS_WRITE_POST_VERIFY);
     return (status == NVS_STATUS_SUCCESS);
 }
 
@@ -210,20 +237,20 @@ uint32_t crc_update(uint32_t crc, const void * data, size_t data_len)
     return crc & 0xffffffff;
 }
 
-static bool validateExtFlashImage(NVS_Handle handle)
+static bool validateExtFlashImage(NVS_Handle handle, size_t otaHeaderLen)
 {
     uint32_t crc;
     imgFixedHdr_t header;
     size_t addr, endAddr;
 
-    if (!readExtFlashImgHeader(handle, &header))
+    if (!readExtFlashImgHeader(handle, &header, otaHeaderLen))
     {
         return false;
     }
 
     /* CRC is calculated after the CRC element of the image header */
-    addr    = IMG_START + IMG_DATA_OFFSET;
-    endAddr = IMG_START + header.len;
+    addr    = IMG_START + otaHeaderLen + IMG_DATA_OFFSET;
+    endAddr = IMG_START + otaHeaderLen + header.len;
 
     crc = 0xFFFFFFFF;
 
@@ -286,20 +313,26 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
     ExtImageInfo_t header;
-    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    auto * imageProcessor    = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    const uint8_t extImgId[] = OAD_EFL_MAGIC;
+
     if (imageProcessor == nullptr)
     {
         return;
     }
 
-    if (!readExtFlashImgHeader(imageProcessor->mNvsHandle, &(header.fixedHdr)))
+    if (!readExtFlashImgHeader(imageProcessor->mNvsHandle, &(header.fixedHdr),
+                               imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader)))
     {
         return;
     }
-    header.extFlAddr = IMG_START;
+    // offset in the size of the fixed and variable OTA image headers
+    memcpy(&(header.fixedHdr.imgID), extImgId, sizeof(header.fixedHdr.imgID));
+    header.extFlAddr = IMG_START + imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader);
     header.counter   = 0x0;
 
-    if (validateExtFlashImage(imageProcessor->mNvsHandle))
+    if (validateExtFlashImage(imageProcessor->mNvsHandle,
+                              imageProcessor->mFixedOtaHeader.headerSize + sizeof(imageProcessor->mFixedOtaHeader)))
     {
         // only write the meta header if the crc check passes
         writeExtFlashMetaHeader(imageProcessor->mNvsHandle, &header);
@@ -367,8 +400,25 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    // TODO: Process block header if any
+    /* Save the fixed size header */
+    if (imageProcessor->mParams.downloadedBytes < sizeof(imageProcessor->mFixedOtaHeader))
+    {
+        uint8_t * header = reinterpret_cast<uint8_t *>(&(imageProcessor->mFixedOtaHeader));
+        if (imageProcessor->mBlock.size() + imageProcessor->mParams.downloadedBytes < sizeof(imageProcessor->mFixedOtaHeader))
+        {
+            memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+        }
+        else
+        {
+            memcpy(header + imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(),
+                   sizeof(imageProcessor->mFixedOtaHeader) - imageProcessor->mParams.downloadedBytes);
+        }
+    }
 
+    /* chip::OTAImageHeaderParser can be used for processing the variable size header */
+
+    ChipLogDetail(SoftwareUpdate, "Write block %d, %d", (size_t) imageProcessor->mParams.downloadedBytes,
+                  imageProcessor->mBlock.size());
     if (!writeExtFlashImgPages(imageProcessor->mNvsHandle, imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock))
     {
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);

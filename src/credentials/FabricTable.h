@@ -244,22 +244,6 @@ private:
     }
 
     CHIP_ERROR SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCert);
-
-    struct StorableFabricInfo
-    {
-        uint8_t mFabricIndex;
-        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
-
-        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
-        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
-
-        Crypto::P256SerializedKeypair mOperationalKey;
-        uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
-        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
-        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-    };
 };
 
 // Once attribute store has persistence implemented, FabricTable shoud be backed using

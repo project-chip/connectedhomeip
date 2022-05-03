@@ -108,9 +108,7 @@ tests:
       arguments:
           values:
               - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
               - name: "daysMask"
@@ -154,7 +152,7 @@ tests:
               - name: "weekDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
               - name: "daysMask"
                 value: 0x01
               - name: "startHour"
@@ -422,17 +420,13 @@ tests:
       arguments:
           values:
               - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
       response:
           values:
               - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
               - name: "status"
@@ -462,13 +456,13 @@ tests:
               - name: "weekDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
       response:
           values:
               - name: "weekDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
               - name: "status"
                 value: 0x85
 
@@ -512,9 +506,7 @@ tests:
       arguments:
           values:
               - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfYearDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
               - name: "localStartTime"
@@ -546,7 +538,7 @@ tests:
               - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
               - name: "localStartTime"
                 value: 12345
               - name: "localEndTime"
@@ -625,17 +617,13 @@ tests:
       arguments:
           values:
               - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfYearDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
       response:
           values:
               - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfYearDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
               - name: "status"
@@ -665,13 +653,13 @@ tests:
               - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
       response:
           values:
               - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
               - name: "status"
                 value: 0x85
 
@@ -791,9 +779,7 @@ tests:
       arguments:
           values:
               - name: "weekDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
       response:
@@ -817,7 +803,7 @@ tests:
               - name: "weekDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
       response:
           error: INVALID_FIELD
 
@@ -851,9 +837,7 @@ tests:
       arguments:
           values:
               - name: "yearDayIndex"
-                value:
-                    static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser
-                    + 1)
+                value: NumberOfYearDaySchedulesSupportedPerUser + 1
               - name: "userIndex"
                 value: 1
       response:
@@ -877,7 +861,7 @@ tests:
               - name: "yearDayIndex"
                 value: 1
               - name: "userIndex"
-                value: static_cast<uint8_t>(NumberOfTotalUsersSupported + 1)
+                value: NumberOfTotalUsersSupported + 1
       response:
           error: INVALID_FIELD
 

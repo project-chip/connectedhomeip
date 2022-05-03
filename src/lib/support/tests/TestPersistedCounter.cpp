@@ -98,7 +98,7 @@ static void CheckOOB(nlTestSuite * inSuite, void * inContext)
     // a count of 0 and a value of 0x10000 for the next starting value
     // in persistent storage.
 
-    chip::PersistedCounter counter;
+    chip::PersistedCounter<uint64_t> counter;
 
     auto testKey   = &chip::DefaultStorageKeyAllocator::IMEventNumber;
     CHIP_ERROR err = counter.Init(sPersistentStore, testKey, 0x10000);
@@ -114,7 +114,7 @@ static void CheckReboot(nlTestSuite * inSuite, void * inContext)
 
     InitializePersistedStorage(context);
 
-    chip::PersistedCounter counter, counter2;
+    chip::PersistedCounter<uint64_t> counter, counter2;
 
     // When initializing the first time out of the box, we should have
     // a count of 0.
@@ -142,7 +142,7 @@ static void CheckWriteNextCounterStart(nlTestSuite * inSuite, void * inContext)
 
     InitializePersistedStorage(context);
 
-    chip::PersistedCounter counter;
+    chip::PersistedCounter<uint64_t> counter;
 
     // When initializing the first time out of the box, we should have
     // a count of 0.

@@ -30,6 +30,7 @@
 
 #include <mbedtls/platform.h>
 #if CHIP_ENABLE_OPENTHREAD
+#include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/error.h>
@@ -84,7 +85,20 @@ void appError(CHIP_ERROR err)
     while (1)
         ;
 }
+#if CHIP_ENABLE_OPENTHREAD
+// ================================================================================
+// Matter Networking Callbacks
+// ================================================================================
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
 
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+#endif
 // ================================================================================
 // Main Code
 // ================================================================================
@@ -145,6 +159,13 @@ int main(void)
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+#if CHIP_ENABLE_OPENTHREAD
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
     chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 

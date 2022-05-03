@@ -160,7 +160,7 @@ uint8_t gInfoEventBuffer[2048];
 uint8_t gCritEventBuffer[2048];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-chip::MonotonicallyIncreasingCounter gEventCounter;
+chip::MonotonicallyIncreasingCounter<chip::EventNumber> gEventCounter;
 
 CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 {
