@@ -148,7 +148,9 @@ static void updateAttributeLinks(EndpointId endpoint)
         // Maximum, Minimum or Local
 
     case PumpOperationMode::kMaximum: {
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         uint8_t maxLevel;
+#endif
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMaximum);
         Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
@@ -162,11 +164,18 @@ static void updateAttributeLinks(EndpointId endpoint)
     break;
 
     case PumpOperationMode::kMinimum: {
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         uint8_t minLevel;
+#endif
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMinimum);
         Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
+        if (minLevel == 0)
+        {
+            // Bump the minimum level to 1, since the value of 0 means stop
+            minLevel = 1;
+        }
         LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel);
 #endif
         pumpStatus.Clear(PumpStatus::kRemoteFlow);
@@ -176,6 +185,10 @@ static void updateAttributeLinks(EndpointId endpoint)
     break;
 
     case PumpOperationMode::kLocal: {
+        // If the Application sets the OperatioMode to kLocal the application "owns" the EffectiveControlMode, which
+        // it also does if the external entity sets the OperationMode to kLocal. So in any case the application
+        // must set the EffectiveControlMode to something which applies to the current ControlMode in the application.
+        // So to keeps things short: the application layer owns the EffetiveControlMode when OperationMode is kLocal.
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
         Attributes::EffectiveControlMode::Set(endpoint, controlMode);
         pumpStatus.Clear(PumpStatus::kRemoteFlow);
@@ -257,7 +270,9 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
 
     // Determine the internal feature set of the pump, depending on the pump
-    // specific attributes available, and their values. If an attribute is
+    // specific attributes available, and their values. This is a temporary
+    // implementation to get a kind of "pseudo-FeatureMap" until we get a real
+    // FeatureMap implementation in the PCC cluster. If an attribute is
     // present/available, then there is a possibility for the associated
     // feature being present as well. But we will have to distinguis between
     // the attributes being available and null also. At this point (init)
