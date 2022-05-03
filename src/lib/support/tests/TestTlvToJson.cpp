@@ -54,55 +54,30 @@ CHIP_ERROR SetupReader()
 
 bool Matches(const char * referenceString, Json::Value & generatedValue)
 {
-    Json::StyledWriter writer;
     auto generatedStr = JsonToString(generatedValue);
 
-    auto matches = (generatedStr == std::string(referenceString));
+    // Normalize the reference string to the expected compact value.
+    Json::Reader reader;
+    Json::Value referenceValue;
+    reader.parse(referenceString, referenceValue);
+
+    Json::FastWriter writer;
+    writer.omitEndingLineFeed();
+    auto compactReferenceString = writer.write(referenceValue);
+
+    auto matches = (generatedStr == compactReferenceString);
 
     if (!matches)
     {
         printf("Didn't match!\n");
         printf("Reference:\n");
-        printf("%s\n", referenceString);
+        printf("%s\n", compactReferenceString.c_str());
 
         printf("Generated:\n");
         printf("%s\n", generatedStr.c_str());
     }
 
     return matches;
-
-#if 0
-    //
-    // Converting the reference string to a JSON representation and comparing
-    // that against the generated JSON object would have been preferable. This avoids
-    // the need to have reference strings expressed precisely to match the generated string
-    // from the JSON converter, right down to the number of spaces,etc. This would have made
-    // the reference string less britle and coupled to the jsoncpp converter implementation.
-    //
-    // However, jsoncpp converter converts positive values in the JSON to a signed
-    // integer C type. This results in a mis-match with the generated JSON objects
-    // that are created from spec-compliant TLV that correctly represents them as unsigned
-    // integers in the JSON object.
-    //
-    // This mismatch nullifies this approach unfortunately.
-    //
-    // TODO: Investigate a way to compare using JSON objects.
-    //
-    Json::Reader reader;
-    Json::Value referenceValue;
-
-    bool ret = reader.parse(referenceString, referenceValue);
-    if (ret != true) {
-        return ret;
-    }
-
-    std::cout << generatedValue << "\n";
-    std::cout << referenceValue << "\n";
-
-    int rett = generatedValue.compare(referenceValue);
-    printf("%d\n", rett);
-    return (rett == 0);
-#endif
 }
 
 template <typename T>
