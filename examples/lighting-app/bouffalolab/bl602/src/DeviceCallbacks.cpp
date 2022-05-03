@@ -129,7 +129,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
 {
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
-        log_info("Server ready at: %s:%d\r\n", event->InternetConnectivityChange.address, CHIP_PORT);
+        log_info("IPv4 Server ready...\r\n");
         // TODO
         // wifiLED.Set(true);
         chip::app::DnssdServer::Instance().StartServer();

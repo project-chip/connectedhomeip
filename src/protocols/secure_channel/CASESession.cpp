@@ -495,7 +495,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
         }
 
         // Try every IPK candidate we have for a match
-        for (size_t keyIdx = 0; keyIdx <= ipkKeySet.num_keys_used; ++keyIdx)
+        for (size_t keyIdx = 0; keyIdx < ipkKeySet.num_keys_used; ++keyIdx)
         {
             uint8_t candidateDestinationId[kSHA256_Hash_Length];
             MutableByteSpan candidateDestinationIdSpan(candidateDestinationId);

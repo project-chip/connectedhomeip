@@ -372,48 +372,13 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypedLiteral(value, type)
+async function asNativeType(type)
 {
-  const valueIsANumber = !isNaN(value);
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'int32_t':
-        return value + (valueIsANumber ? 'L' : '');
-      case 'int64_t':
-        return value + (valueIsANumber ? 'LL' : '');
-      case 'uint16_t':
-        return value + (valueIsANumber ? 'U' : '');
-      case 'uint32_t':
-        return value + (valueIsANumber ? 'UL' : '');
-      case 'uint64_t':
-        return value + (valueIsANumber ? 'ULL' : '');
-      case 'float':
-        if (!valueIsANumber) {
-          return value;
-        }
-        if (value == Infinity || value == -Infinity) {
-          return `${(value < 0) ? '-' : ''}INFINITY`
-        }
-        // If the number looks like an integer, append ".0" to the end;
-        // otherwise adding an "f" suffix makes compilers complain.
-        value = value.toString();
-        if (value.match(/^[0-9]+$/)) {
-          value = value + ".0";
-        }
-        return value + 'f';
-      default:
-        if (!valueIsANumber) {
-          return value;
-        }
-        if (value == Infinity || value == -Infinity) {
-          return `${(value < 0) ? '-' : ''}INFINITY`
-        }
-        return value;
-      }
+      return ChipTypesHelper.asBasicType(zclType);
     })
   }
 
@@ -422,6 +387,60 @@ function asTypedLiteral(value, type)
     throw err;
   });
   return templateUtil.templatePromise(this.global, promise)
+}
+
+async function asTypedExpression(value, type)
+{
+  const valueIsANumber = !isNaN(value);
+  if (!value || valueIsANumber) {
+    return asTypedLiteral.call(this, value, type);
+  }
+
+  const tokens = value.split(' ');
+  if (tokens.length < 2) {
+    return asTypedLiteral.call(this, value, type);
+  }
+
+  const resultType = await asNativeType.call(this, type);
+  return `static_cast<${resultType}>(${value})`;
+}
+
+async function asTypedLiteral(value, type)
+{
+  const valueIsANumber = !isNaN(value);
+  if (!valueIsANumber) {
+    return value;
+  }
+
+  const basicType = await asNativeType.call(this, type);
+  switch (basicType) {
+  case 'int32_t':
+    return value + 'L';
+  case 'int64_t':
+    return value + 'LL';
+  case 'uint16_t':
+    return value + 'U';
+  case 'uint32_t':
+    return value + 'UL';
+  case 'uint64_t':
+    return value + 'ULL';
+  case 'float':
+    if (value == Infinity || value == -Infinity) {
+      return `${(value < 0) ? '-' : ''}INFINITY`
+    }
+    // If the number looks like an integer, append ".0" to the end;
+    // otherwise adding an "f" suffix makes compilers complain.
+    value = value.toString();
+    if (value.match(/^[0-9]+$/)) {
+      value = value + ".0";
+    }
+    return value + 'f';
+  default:
+    if (value == Infinity || value == -Infinity) {
+      return `${(value < 0) ? '-' : ''}INFINITY`
+    }
+    return value;
+  }
 }
 
 function hasSpecificAttributes(options)
@@ -859,6 +878,7 @@ exports.chip_endpoint_generated_functions     = chip_endpoint_generated_function
 exports.chip_endpoint_cluster_list            = chip_endpoint_cluster_list
 exports.chip_endpoint_data_version_count      = chip_endpoint_data_version_count;
 exports.chip_endpoint_generated_commands_list = chip_endpoint_generated_commands_list
+exports.asTypedExpression                     = asTypedExpression;
 exports.asTypedLiteral                        = asTypedLiteral;
 exports.asLowerCamelCase                      = asLowerCamelCase;
 exports.asUpperCamelCase                      = asUpperCamelCase;

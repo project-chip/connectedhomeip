@@ -174,20 +174,25 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Start building the application either with Secure Element or without
 
-    -   with Secure Element
+    -   without Secure Element
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W061_SDK_ROOT=/home/user/Desktop/SDK_2_6_4_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0/
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=0"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ $NXP_K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-    -   without Secure element
-        Exactly the same steps as above but set chip_with_se05x=0 in the gn command
+    -   with Secure element
+        Exactly the same steps as above but set chip_with_se05x=1 in the gn command
+        and add arguments chip_pw_tokenizer_logging=true chip_enable_ota_requestor=false
+
+Note that options chip_pw_tokenizer_logging=true and
+chip_enable_ota_requestor=false are required for building with Secure Element.
+These can be changed if building without Secure Element
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.4.
