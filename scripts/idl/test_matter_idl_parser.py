@@ -190,6 +190,8 @@ class TestParser(unittest.TestCase):
                 attribute int32u persisted = 5 [persist];
                 attribute int32u persisted_with_default = 6 [persist, default=55];
                 readonly attribute int32u readonlyDefault = 7 [default=321];
+                attribute bool boolDefault = 8 [default=true];
+                attribute bool boolDefault2 = 9 [default=false];
             }
         """)
 
@@ -212,6 +214,10 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int32u"), code=6, name="persisted_with_default"), default=55),
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
                             data_type=DataType(name="int32u"), code=7, name="readonlyDefault"), default=321),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="bool"), code=8, name="boolDefault"), default=True),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
+                            data_type=DataType(name="bool"), code=9, name="boolDefault2"), default=False),
                     ]
                     )])
         self.assertEqual(actual, expected)

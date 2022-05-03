@@ -255,6 +255,12 @@ class MatterIdlTransformer(Transformer):
         # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
+    def bool_default_true(self, _):
+        return True
+
+    def bool_default_false(self, _):
+        return False
+
     @v_args(inline=True)
     def default_value(self, value):
         return AttributeTransformDefaultValue(value)

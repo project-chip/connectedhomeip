@@ -22,7 +22,9 @@ event: event_priority event_with_access "=" number "{" (struct_field ";")* "}"
 
 attribute_access_entry: attribute_access_type ":" access_privilege
 
-default_value: "default"i "=" (number | ESCAPED_STRING)
+bool_default: "true"i  -> bool_default_true
+            | "false"i -> bool_default_false
+default_value: "default"i "=" (number | ESCAPED_STRING | bool_default)
 
 attribute_is_callback: "callback"i
 attribute_is_persist: "persist"i
