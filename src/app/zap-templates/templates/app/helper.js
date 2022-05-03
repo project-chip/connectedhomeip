@@ -476,7 +476,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
         let s = type.match(/\d+/g).join('')
         return 'uint' + s + '_t'
       }
-      return ns + type;
+      return 'chip::BitFlags<' + ns + type + '>';
     }
 
     if (types.isStruct) {

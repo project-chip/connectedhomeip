@@ -2596,8 +2596,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace MinRFIDCodeLength
 
 namespace CredentialRulesSupport {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlCredentialRuleMask * value); // DlCredentialRuleMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlCredentialRuleMask value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> * value); // DlCredentialRuleMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value);
 } // namespace CredentialRulesSupport
 
 namespace EnableLogging {
@@ -2632,14 +2633,15 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlOp
 
 namespace SupportedOperatingModes {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlSupportedOperatingModes * value); // DlSupportedOperatingModes
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlSupportedOperatingModes value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> * value); // DlSupportedOperatingModes
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
 } // namespace SupportedOperatingModes
 
 namespace DefaultConfigurationRegister {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister * value); // DlDefaultConfigurationRegister
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister value);
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> * value); // DlDefaultConfigurationRegister
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value);
 } // namespace DefaultConfigurationRegister
 
 namespace EnableLocalProgramming {
@@ -2664,8 +2666,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 namespace LocalProgrammingFeatures {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures * value); // DlLocalProgrammingFeatures
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> * value); // DlLocalProgrammingFeatures
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value);
 } // namespace LocalProgrammingFeatures
 
 namespace WrongCodeEntryLimit {
@@ -2694,50 +2696,51 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ExpiringUserTimeout
 
 namespace AlarmMask {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlAlarmMask * value); // DlAlarmMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlAlarmMask value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> * value); // DlAlarmMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value);
 } // namespace AlarmMask
 
 namespace KeypadOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlKeypadOperationEventMask * value); // DlKeypadOperationEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKeypadOperationEventMask value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> * value); // DlKeypadOperationEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
 } // namespace KeypadOperationEventMask
 
 namespace RemoteOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlRemoteOperationEventMask * value); // DlRemoteOperationEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRemoteOperationEventMask value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> * value); // DlRemoteOperationEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value);
 } // namespace RemoteOperationEventMask
 
 namespace ManualOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlManualOperationEventMask * value); // DlManualOperationEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlManualOperationEventMask value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> * value); // DlManualOperationEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value);
 } // namespace ManualOperationEventMask
 
 namespace RFIDOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlRFIDOperationEventMask * value); // DlRFIDOperationEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRFIDOperationEventMask value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> * value); // DlRFIDOperationEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value);
 } // namespace RFIDOperationEventMask
 
 namespace KeypadProgrammingEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlKeypadOperationEventMask * value); // DlKeypadOperationEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKeypadOperationEventMask value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> * value); // DlKeypadOperationEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value);
 } // namespace KeypadProgrammingEventMask
 
 namespace RemoteProgrammingEventMask {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask * value); // DlRemoteProgrammingEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask value);
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> * value); // DlRemoteProgrammingEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value);
 } // namespace RemoteProgrammingEventMask
 
 namespace RFIDProgrammingEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask * value); // DlRFIDProgrammingEventMask
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask value);
+                  chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> * value); // DlRFIDProgrammingEventMask
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value);
 } // namespace RFIDProgrammingEventMask
 
 namespace FeatureMap {
@@ -2796,8 +2799,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace NumberOfActuationsTilt
 
 namespace ConfigStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::ConfigStatus * value); // ConfigStatus
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::ConfigStatus value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> * value); // ConfigStatus
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value);
 } // namespace ConfigStatus
 
 namespace CurrentPositionLiftPercentage {
@@ -2873,8 +2877,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace InstalledClosedLimitTilt
 
 namespace Mode {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Mode * value); // Mode
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Mode value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> * value); // Mode
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value);
 } // namespace Mode
 
 namespace SafetyStatus {

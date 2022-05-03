@@ -14515,9 +14515,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace CredentialRulesSupport {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlCredentialRuleMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlCredentialRuleMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -14529,9 +14529,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlCr
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlCredentialRuleMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlCredentialRuleMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -14731,9 +14731,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlOp
 
 namespace SupportedOperatingModes {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlSupportedOperatingModes * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -14745,9 +14745,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlSu
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlSupportedOperatingModes value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -14762,9 +14762,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlSu
 
 namespace DefaultConfigurationRegister {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -14776,9 +14776,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlDe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -14917,9 +14917,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace LocalProgrammingFeatures {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -14931,9 +14931,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLo
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15103,9 +15103,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace AlarmMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlAlarmMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlAlarmMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15117,9 +15117,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlAl
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlAlarmMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlAlarmMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15134,9 +15134,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlAl
 
 namespace KeypadOperationEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKeypadOperationEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15148,9 +15148,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKeypadOperationEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15165,9 +15165,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKe
 
 namespace RemoteOperationEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRemoteOperationEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15179,9 +15179,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRemoteOperationEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15196,9 +15196,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRe
 
 namespace ManualOperationEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlManualOperationEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlManualOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15210,9 +15210,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlMa
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlManualOperationEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlManualOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15227,9 +15227,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlMa
 
 namespace RFIDOperationEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRFIDOperationEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15241,9 +15241,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRF
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRFIDOperationEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15258,9 +15258,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRF
 
 namespace KeypadProgrammingEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKeypadOperationEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15272,9 +15272,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKeypadOperationEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15289,9 +15289,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlKe
 
 namespace RemoteProgrammingEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15303,9 +15303,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRe
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15320,9 +15320,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRe
 
 namespace RFIDProgrammingEventMask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
@@ -15334,9 +15334,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRF
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -15680,9 +15680,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace ConfigStatus {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::ConfigStatus * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::ConfigStatus>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
@@ -15694,9 +15694,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::ConfigStatus value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::ConfigStatus>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -16215,9 +16215,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace Mode {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Mode * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::Mode>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::WindowCovering::Id, Id, readable, sizeof(temp));
@@ -16229,9 +16229,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering::Mode value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::WindowCovering::Mode>;
+    using Traits = NumericAttributeTraits<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

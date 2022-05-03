@@ -3889,8 +3889,12 @@ void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(voi
 >>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 =======
 void CHIPDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
+<<<<<<< HEAD
     void * context, chip::app::Clusters::DoorLock::DlSupportedOperatingModes value)
 >>>>>>> Reverting the changes to helper.js such that baseline/atomic enums and bitmaps return uint and non-atomic/not-baseline enums and bitmaps return like they used to before
+=======
+    void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
+>>>>>>> Reverting the change in cluster-objects-struct.zapt which was not needed
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -12166,7 +12170,7 @@ void CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge::On
 }
 
 void CHIPWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WindowCovering::ConfigStatus value)
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12212,7 +12216,8 @@ void CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::Mode value)
+void CHIPWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];

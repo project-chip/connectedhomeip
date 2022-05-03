@@ -1106,7 +1106,8 @@ typedef void (*FanControlFeatureMapAttributeCallback)(void *, chip::BitFlags<chi
 typedef void (*ColorControlColorControlOptionsAttributeCallback)(void *, uint8_t);
 typedef void (*ColorControlColorCapabilitiesAttributeCallback)(void *, uint16_t);
 typedef void (*ContentLauncherSupportedStreamingProtocolsAttributeCallback)(void *, uint32_t);
-typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(void *, chip::app::Clusters::DoorLock::DlSupportedOperatingModes);
+typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
+    void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes>);
 typedef void (*ElectricalMeasurementMeasurementTypeAttributeCallback)(void *, uint32_t);
 typedef void (*EthernetNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*FanControlRockSupportAttributeCallback)(void *, uint8_t);
@@ -1307,9 +1308,10 @@ typedef void (*ThermostatFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ThreadNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*UnitLocalizationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*WiFiNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *, chip::app::Clusters::WindowCovering::ConfigStatus);
+typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
+                                                            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>);
 typedef void (*WindowCoveringOperationalStatusAttributeCallback)(void *, uint8_t);
-typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::Mode);
+typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>);
 typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *, uint16_t);
 typedef void (*WindowCoveringFeatureMapAttributeCallback)(void *, uint32_t);
 >>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
@@ -4311,7 +4313,7 @@ public:
                                                                CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<DoorLockSupportedOperatingModesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlSupportedOperatingModes value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value);
 };
 
 class CHIPDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge
@@ -10511,7 +10513,7 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::ConfigStatus value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value);
 };
 
 class CHIPWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge
@@ -10566,7 +10568,7 @@ public:
                                                   bool keepAlive = false) :
         CHIPCallbackBridge<WindowCoveringModeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::Mode value);
+    static void OnSuccessFn(void * context, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value);
 };
 
 class CHIPWindowCoveringModeAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringModeAttributeCallbackBridge

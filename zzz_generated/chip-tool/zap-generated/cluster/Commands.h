@@ -8798,7 +8798,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> mValue;
 };
 
 class WriteDoorLockWrongCodeEntryLimit : public WriteAttribute
@@ -8959,7 +8959,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlAlarmMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> mValue;
 };
 
 class WriteDoorLockKeypadOperationEventMask : public WriteAttribute
@@ -8986,7 +8986,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlKeypadOperationEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
 };
 
 class WriteDoorLockRemoteOperationEventMask : public WriteAttribute
@@ -9013,7 +9013,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlRemoteOperationEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> mValue;
 };
 
 class WriteDoorLockManualOperationEventMask : public WriteAttribute
@@ -9040,7 +9040,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlManualOperationEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> mValue;
 };
 
 class WriteDoorLockRFIDOperationEventMask : public WriteAttribute
@@ -9067,7 +9067,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlRFIDOperationEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> mValue;
 };
 
 class WriteDoorLockKeypadProgrammingEventMask : public WriteAttribute
@@ -9094,7 +9094,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlKeypadOperationEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> mValue;
 };
 
 class WriteDoorLockRemoteProgrammingEventMask : public WriteAttribute
@@ -9121,7 +9121,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> mValue;
 };
 
 class WriteDoorLockRFIDProgrammingEventMask : public WriteAttribute
@@ -9148,7 +9148,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask mValue;
+    chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> mValue;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9431,7 +9431,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::WindowCovering::Mode mValue;
+    chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> mValue;
 };
 
 /*----------------------------------------------------------------------------*\

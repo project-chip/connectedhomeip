@@ -5627,7 +5627,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MinRFIDCodeLength", 1, value);
         }
         case DoorLock::Attributes::CredentialRulesSupport::Id: {
-            chip::app::Clusters::DoorLock::DlCredentialRuleMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CredentialRulesSupport", 1, value);
         }
@@ -5662,12 +5662,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OperatingMode", 1, value);
         }
         case DoorLock::Attributes::SupportedOperatingModes::Id: {
-            chip::app::Clusters::DoorLock::DlSupportedOperatingModes value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedOperatingModes", 1, value);
         }
         case DoorLock::Attributes::DefaultConfigurationRegister::Id: {
-            chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DefaultConfigurationRegister", 1, value);
         }
@@ -5692,7 +5692,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("EnablePrivacyModeButton", 1, value);
         }
         case DoorLock::Attributes::LocalProgrammingFeatures::Id: {
-            chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LocalProgrammingFeatures", 1, value);
         }
@@ -5722,42 +5722,42 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ExpiringUserTimeout", 1, value);
         }
         case DoorLock::Attributes::AlarmMask::Id: {
-            chip::app::Clusters::DoorLock::DlAlarmMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlAlarmMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmMask", 1, value);
         }
         case DoorLock::Attributes::KeypadOperationEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlKeypadOperationEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("KeypadOperationEventMask", 1, value);
         }
         case DoorLock::Attributes::RemoteOperationEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlRemoteOperationEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteOperationEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoteOperationEventMask", 1, value);
         }
         case DoorLock::Attributes::ManualOperationEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlManualOperationEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlManualOperationEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ManualOperationEventMask", 1, value);
         }
         case DoorLock::Attributes::RFIDOperationEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlRFIDOperationEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDOperationEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RFIDOperationEventMask", 1, value);
         }
         case DoorLock::Attributes::KeypadProgrammingEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlKeypadOperationEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlKeypadOperationEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("KeypadProgrammingEventMask", 1, value);
         }
         case DoorLock::Attributes::RemoteProgrammingEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlRemoteProgrammingEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoteProgrammingEventMask", 1, value);
         }
         case DoorLock::Attributes::RFIDProgrammingEventMask::Id: {
-            chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask value;
+            chip::BitFlags<chip::app::Clusters::DoorLock::DlRFIDProgrammingEventMask> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RFIDProgrammingEventMask", 1, value);
         }
@@ -9928,7 +9928,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("NumberOfActuationsTilt", 1, value);
         }
         case WindowCovering::Attributes::ConfigStatus::Id: {
-            chip::app::Clusters::WindowCovering::ConfigStatus value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ConfigStatus", 1, value);
         }
@@ -9993,7 +9993,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("InstalledClosedLimitTilt", 1, value);
         }
         case WindowCovering::Attributes::Mode::Id: {
-            chip::app::Clusters::WindowCovering::Mode value;
+            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mode", 1, value);
         }
