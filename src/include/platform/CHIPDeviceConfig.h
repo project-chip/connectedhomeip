@@ -500,7 +500,7 @@
  * CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
  *
  * A prefix string used in forming the BLE device name.  The remainder of the name
- * consists of the final two bytes of the device's chip node id in hex.
+ * typically contains the setup discriminator as a 4-digit decimal number.
  *
  * NOTE: The device layer limits the total length of a device name to 16 characters.
  * However, due to other data sent in CHIPoBLE advertise packets, the device name
