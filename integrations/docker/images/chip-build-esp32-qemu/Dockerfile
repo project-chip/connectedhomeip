@@ -5,7 +5,7 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     ninja-build=1.10.0-1build1 \
-    git=1:2.25.1-1ubuntu3.3 \
+    git=1:2.25.1-1ubuntu3.4 \
     libgcrypt20-dev=1.8.5-5ubuntu1.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \

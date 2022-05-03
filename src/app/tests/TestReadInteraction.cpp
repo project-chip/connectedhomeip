@@ -100,7 +100,7 @@ public:
     }
 
 private:
-    chip::MonotonicallyIncreasingCounter mEventCounter;
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 TestContext sContext;

@@ -15,6 +15,30 @@ except:
     from matter_idl_types import *
 
 
+class AttributeTransformDefaultValue:
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self, attr):
+        attr.default = self.value
+
+
+class AttributeTransformSetCallback:
+    def __init__(self):
+        pass
+
+    def __call__(self, attr):
+        attr.tags.add(AttributeTag.CALLBACK)
+
+
+class AttributeTransformSetPersisted:
+    def __init__(self):
+        pass
+
+    def __call__(self, attr):
+        attr.tags.add(AttributeTag.PERSIST)
+
+
 class MatterIdlTransformer(Transformer):
     """
     A transformer capable to transform data parsed by Lark according to 
@@ -227,12 +251,39 @@ class MatterIdlTransformer(Transformer):
 
         return (args[-1], acl)
 
+    def ESCAPED_STRING(self, s):
+        # handle escapes, skip the start and end quotes
+        return s.value[1:-1].encode('utf-8').decode('unicode-escape')
+
+    @v_args(inline=True)
+    def default_value(self, value):
+        return AttributeTransformDefaultValue(value)
+
+    @v_args(inline=True)
+    def attribute_is_callback(self):
+        return AttributeTransformSetCallback()
+
+    @v_args(inline=True)
+    def attribute_is_persist(self):
+        return AttributeTransformSetPersisted()
+
+    def attribute_traits(self, traits):
+        # traits as is as a list
+        return traits
+
     def attribute(self, args):
         # Input arguments are:
-        #   -  tags (0 or more)
-        #   -  attribute_with_access (i.e. pair of definition and acl arguments)
-        tags = set(args[:-1])
-        (definition, acl) = args[-1]
+        #   - tags (0 or more)
+        #   - attribute_with_access (i.e. pair of definition and acl arguments)
+        #   - attribute traits (last element)
+        if type(args[-1]) is tuple:
+            tags = set(args[:-1])
+            (definition, acl) = args[-1]
+            extra_attrs = []
+        else:
+            tags = set(args[:-2])
+            (definition, acl) = args[-2]
+            extra_attrs = args[-1]
 
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
@@ -241,7 +292,11 @@ class MatterIdlTransformer(Transformer):
             tags.add(AttributeTag.READABLE)
             tags.add(AttributeTag.WRITABLE)
 
-        return Attribute(definition=definition, tags=tags, **acl)
+        attr = Attribute(definition=definition, tags=tags, **acl)
+        for f in extra_attrs:
+            f(attr)
+
+        return attr
 
     @v_args(inline=True)
     def struct(self, id, *fields):
@@ -326,6 +381,7 @@ if __name__ == '__main__':
     # The ability to run is for debug and to print out the parsed AST.
     import click
     import coloredlogs
+    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -352,6 +408,6 @@ if __name__ == '__main__':
         logging.info("Parse completed")
 
         logging.info("Data:")
-        print(data)
+        pprint.pp(data)
 
     main()

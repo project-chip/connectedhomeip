@@ -97,7 +97,7 @@ public:
     }
 
 private:
-    chip::MonotonicallyIncreasingCounter mEventCounter;
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)

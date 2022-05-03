@@ -452,7 +452,7 @@ CHIP_ERROR ClusterStateCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs
 
     for (auto & attribute : aAttributePaths)
     {
-        if (attribute.HasAttributeWildcard())
+        if (attribute.HasWildcardAttributeId())
         {
             mRequestPathSet.insert(attribute);
         }

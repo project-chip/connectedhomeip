@@ -23,15 +23,6 @@ if (current_os == "mac") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
-if (current_os == "webos") {
-  import("${build_root}/config/webos/webos_sdk.gni")
-  target_defines += []
-  target_cflags += [ "--sysroot=" + sysroot_webos ]
-  target_cflags_cc += []
-  target_cflags_c += []
-  target_ldflags += [ "--sysroot=" + sysroot_webos ]
-}
-
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
@@ -330,10 +321,17 @@ config("runtime_default") {
       "rt",
     ]
   }
+
+  cflags = []
+  ldflags = []
+
   if (sysroot != "") {
-    cflags = [ "--sysroot=${sysroot}" ]
-    ldflags = [ "--sysroot=${sysroot}" ]
+    cflags += [ "--sysroot=${sysroot}" ]
+    ldflags += [ "--sysroot=${sysroot}" ]
   }
+
+  cflags += runtime_library_cflags
+  ldflags += runtime_library_ldflags
 }
 
 # To use different sanitizer options, use `gn args .` in the out folder and
@@ -528,7 +526,7 @@ config("aliasing_default") {
 }
 
 config("specs_default") {
-  if (current_cpu == "arm" && current_os == "freertos") {
+  if (current_cpu == "arm" && current_os == "freertos" && !is_clang) {
     cflags = [
       "--specs=nosys.specs",
       "--specs=nano.specs",

@@ -3101,6 +3101,35 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+void TestCHIPTLVEmptyString(nlTestSuite * inSuite)
+{
+    uint8_t buf[2];
+    TLVWriter writer;
+    CHIP_ERROR err;
+    ByteSpan s;
+
+    writer.Init(buf);
+
+    err = writer.PutString(AnonymousTag(), nullptr, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = writer.Finalize();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    TLVReader reader;
+
+    reader.Init(buf);
+
+    err = reader.Next();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = reader.Get(s);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, s.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s.size() == 0);
+}
+
 /**
  *  Test CHIP TLV Writer
  */
@@ -3113,6 +3142,8 @@ void CheckCHIPTLVWriter(nlTestSuite * inSuite, void * inContext)
     TestCHIPTLVWriterPreserveSize(inSuite);
 
     TestCHIPTLVWriterErrorHandling(inSuite);
+
+    TestCHIPTLVEmptyString(inSuite);
 }
 
 void SkipNonContainer(nlTestSuite * inSuite)

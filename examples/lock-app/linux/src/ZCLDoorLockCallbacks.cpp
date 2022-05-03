@@ -74,8 +74,8 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t y
     return LockManager::Instance().GetSchedule(endpointId, yearDayIndex, userIndex, schedule);
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
     if (attributePath.mClusterId == DoorLock::Id)

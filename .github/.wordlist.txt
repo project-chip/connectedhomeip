@@ -1422,6 +1422,7 @@ xFF
 xFFF
 xFFFF
 xfffff
+xFFFFFFEFFFFFFFFF
 xtensa
 xwayland
 xyz

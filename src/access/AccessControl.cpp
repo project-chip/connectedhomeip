@@ -193,20 +193,49 @@ CHIP_ERROR AccessControl::Finish()
     return retval;
 }
 
-CHIP_ERROR AccessControl::RemoveFabric(FabricIndex fabricIndex)
+void AccessControl::AddEntryListener(EntryListener & listener)
 {
-    ChipLogProgress(DataManagement, "AccessControl: removing fabric %u", fabricIndex);
-
-    CHIP_ERROR err;
-    do
+    if (mEntryListener == nullptr)
     {
-        err = DeleteEntry(0, &fabricIndex);
-    } while (err == CHIP_NO_ERROR);
+        mEntryListener = &listener;
+        listener.mNext = nullptr;
+        return;
+    }
 
-    // Sentinel error is OK, just means there was no such entry.
-    ReturnErrorCodeIf(err != CHIP_ERROR_SENTINEL, err);
+    for (EntryListener * l = mEntryListener; /**/; l = l->mNext)
+    {
+        if (l == &listener)
+        {
+            return;
+        }
 
-    return CHIP_NO_ERROR;
+        if (l->mNext == nullptr)
+        {
+            l->mNext       = &listener;
+            listener.mNext = nullptr;
+            return;
+        }
+    }
+}
+
+void AccessControl::RemoveEntryListener(EntryListener & listener)
+{
+    if (mEntryListener == &listener)
+    {
+        mEntryListener = listener.mNext;
+        listener.mNext = nullptr;
+        return;
+    }
+
+    for (EntryListener * l = mEntryListener; l != nullptr; l = l->mNext)
+    {
+        if (l->mNext == &listener)
+        {
+            l->mNext       = listener.mNext;
+            listener.mNext = nullptr;
+            return;
+        }
+    }
 }
 
 CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
@@ -246,6 +275,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
+    // Currently, subject descriptor is only PASE if this node is the responder (aka commissionee);
+    // if this node is the initiator (aka commissioner) then the subject descriptor remains blank.
     if (subjectDescriptor.authMode == AuthMode::kPase)
     {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
@@ -368,6 +399,84 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     return CHIP_ERROR_ACCESS_DENIED;
 }
 
+#if CHIP_ACCESS_CONTROL_DUMP_ENABLED
+CHIP_ERROR AccessControl::Dump(const Entry & entry)
+{
+    CHIP_ERROR err;
+
+    ChipLogDetail(DataManagement, "----- BEGIN ENTRY -----");
+
+    {
+        FabricIndex fabricIndex;
+        SuccessOrExit(err = entry.GetFabricIndex(fabricIndex));
+        ChipLogDetail(DataManagement, "fabricIndex: %u", fabricIndex);
+    }
+
+    {
+        Privilege privilege;
+        SuccessOrExit(err = entry.GetPrivilege(privilege));
+        ChipLogDetail(DataManagement, "privilege: %d", to_underlying(privilege));
+    }
+
+    {
+        AuthMode authMode;
+        SuccessOrExit(err = entry.GetAuthMode(authMode));
+        ChipLogDetail(DataManagement, "authMode: %d", to_underlying(authMode));
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetSubjectCount(count));
+        if (count)
+        {
+            ChipLogDetail(DataManagement, "subjects: %u", static_cast<unsigned>(count));
+            for (size_t i = 0; i < count; ++i)
+            {
+                NodeId subject;
+                SuccessOrExit(err = entry.GetSubject(i, subject));
+                ChipLogDetail(DataManagement, "  %u: 0x" ChipLogFormatX64, static_cast<unsigned>(i), ChipLogValueX64(subject));
+            }
+        }
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetTargetCount(count));
+        if (count)
+        {
+            ChipLogDetail(DataManagement, "targets: %u", static_cast<unsigned>(count));
+            for (size_t i = 0; i < count; ++i)
+            {
+                Entry::Target target;
+                SuccessOrExit(err = entry.GetTarget(i, target));
+                if (target.flags & Entry::Target::kCluster)
+                {
+                    ChipLogDetail(DataManagement, "  %u: cluster: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
+                                  ChipLogValueMEI(target.cluster));
+                }
+                if (target.flags & Entry::Target::kEndpoint)
+                {
+                    ChipLogDetail(DataManagement, "  %u: endpoint: %u", static_cast<unsigned>(i), target.endpoint);
+                }
+                if (target.flags & Entry::Target::kDeviceType)
+                {
+                    ChipLogDetail(DataManagement, "  %u: deviceType: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
+                                  ChipLogValueMEI(target.deviceType));
+                }
+            }
+        }
+    }
+
+    ChipLogDetail(DataManagement, "----- END ENTRY -----");
+
+    return CHIP_NO_ERROR;
+
+exit:
+    ChipLogError(DataManagement, "AccessControl: dump failed %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
+}
+#endif
+
 bool AccessControl::IsValid(const Entry & entry)
 {
     const char * log = "unexpected error";
@@ -434,6 +543,15 @@ bool AccessControl::IsValid(const Entry & entry)
 exit:
     ChipLogError(DataManagement, "AccessControl: %s", log);
     return false;
+}
+
+void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
+                                       const Entry * entry, EntryListener::ChangeType changeType)
+{
+    for (EntryListener * listener = mEntryListener; listener != nullptr; listener = listener->mNext)
+    {
+        listener->OnEntryChanged(subjectDescriptor, fabric, index, entry, changeType);
+    }
 }
 
 AccessControl & GetAccessControl()

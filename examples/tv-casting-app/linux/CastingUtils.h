@@ -28,6 +28,8 @@
 
 constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
+CHIP_ERROR ProcessClusterCommand(int argc, char ** argv);
+
 CHIP_ERROR DiscoverCommissioners();
 
 CHIP_ERROR RequestCommissioning(int index);
@@ -39,3 +41,5 @@ void InitCommissioningFlow(intptr_t commandArg);
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+void PrintFabrics();

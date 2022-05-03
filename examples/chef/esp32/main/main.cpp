@@ -78,7 +78,7 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
     case DeviceEventType::kInternetConnectivityChange:
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
         {
-            ChipLogProgress(Shell, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+            ChipLogProgress(Shell, "IPv4 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
         }
         else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)

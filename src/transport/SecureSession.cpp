@@ -32,9 +32,14 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
-        subjectDescriptor.authMode    = Access::AuthMode::kPase;
-        subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.fabricIndex = GetFabricIndex();
+        // Responder (aka commissionee) gets subject descriptor filled in.
+        // Initiator (aka commissioner) leaves subject descriptor unfilled.
+        if (GetCryptoContext().IsResponder())
+        {
+            subjectDescriptor.authMode    = Access::AuthMode::kPase;
+            subjectDescriptor.subject     = mPeerNodeId;
+            subjectDescriptor.fabricIndex = GetFabricIndex();
+        }
     }
     else
     {

@@ -1,7 +1,7 @@
 import enum
 
 from dataclasses import dataclass, field
-from typing import List, Set, Optional
+from typing import List, Set, Optional, Union
 
 
 class FieldAttribute(enum.Enum):
@@ -17,6 +17,8 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
+    CALLBACK = enum.auto()
+    PERSIST = enum.auto()
 
 
 class EventPriority(enum.Enum):
@@ -83,6 +85,7 @@ class Attribute:
     tags: Set[AttributeTag] = field(default_factory=set)
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
+    default: Optional[Union[str, int]] = None
 
     @property
     def is_readable(self):
@@ -95,6 +98,10 @@ class Attribute:
     @property
     def is_subscribable(self):
         return AttributeTag.NOSUBSCRIBE not in self.tags
+
+    @property
+    def is_callback(self):
+        return AttributeTag.CALLBACK in self.tags
 
 
 @dataclass

@@ -78,7 +78,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
 {
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
-        printf("Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+        printf("IPv4 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
@@ -104,8 +104,8 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     }
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                                  uint16_t size, uint8_t * value)
 {
     switch (clusterId)
     {

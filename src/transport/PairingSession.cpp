@@ -60,13 +60,10 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
 CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
                                                TLV::TLVWriter & tlvWriter)
 {
-    VerifyOrReturnError(CanCastTo<uint16_t>(mrpConfig.mIdleRetransTimeout.count()), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint16_t>(mrpConfig.mActiveRetransTimeout.count()), CHIP_ERROR_INVALID_ARGUMENT);
-
     TLV::TLVType mrpParamsContainer;
     ReturnErrorOnFailure(tlvWriter.StartContainer(tag, TLV::kTLVType_Structure, mrpParamsContainer));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), static_cast<uint16_t>(mrpConfig.mIdleRetransTimeout.count())));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), static_cast<uint16_t>(mrpConfig.mActiveRetransTimeout.count())));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), mrpConfig.mIdleRetransTimeout.count()));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), mrpConfig.mActiveRetransTimeout.count()));
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
@@ -81,7 +78,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
     TLV::TLVType containerType = TLV::kTLVType_Structure;
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
-    uint16_t tlvElementValue = 0;
+    uint32_t tlvElementValue = 0;
 
     ReturnErrorOnFailure(tlvReader.Next());
 

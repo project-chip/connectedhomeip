@@ -19,7 +19,10 @@
 #include "CastingServer.h"
 
 CastingServer * CastingServer::castingServer_ = nullptr;
-;
+
+// TODO: Accept these values over CLI
+const char * kContentUrl        = "https://www.test.com/videoid";
+const char * kContentDisplayStr = "Test video";
 
 CastingServer * CastingServer::GetInstance()
 {
@@ -36,7 +39,6 @@ void CastingServer::InitServer()
     {
         return;
     }
-    // DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_tv_casting_kvs");
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Enter commissioning mode, open commissioning window
@@ -46,6 +48,9 @@ void CastingServer::InitServer()
 
     // Initialize binding handlers
     ReturnOnFailure(InitBindingHandlers());
+
+    // Add callback to send Content casting commands after commissioning completes
+    ReturnOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
     mInited = true;
 }
@@ -67,12 +72,13 @@ CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex f
 CHIP_ERROR CastingServer::DiscoverCommissioners()
 {
     // Send discover commissioners request
-    return mCommissionableNodeController.DiscoverCommissioners(Dnssd::DiscoveryFilter());
+    return mCommissionableNodeController.DiscoverCommissioners(
+        Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(35)));
 }
 
 CHIP_ERROR CastingServer::OpenBasicCommissioningWindow()
 {
-    Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+    // Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout);
 }
 
@@ -200,4 +206,111 @@ void CastingServer::OnContentLauncherSuccessResponse(void * context, const Launc
 void CastingServer::OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
 {
     ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
+}
+
+void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
+    {
+        if (CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
+        {
+            CastingServer::GetInstance()->ReadServerClustersForNode(
+                CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
+        }
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
+            event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex));
+
+        CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
+    }
+}
+
+// given a fabric index, try to determine the video-player nodeId by searching the binding table
+NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        if (binding.type == EMBER_UNICAST_BINDING && fabricIndex == binding.fabricIndex)
+        {
+            ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex nodeId=0x" ChipLogFormatX64,
+                            ChipLogValueX64(binding.nodeId));
+            return binding.nodeId;
+        }
+    }
+    ChipLogProgress(NotSpecified, "GetVideoPlayerNodeForFabricIndex no bindings found for fabricIndex=%d", fabricIndex);
+    return kUndefinedNodeId;
+}
+
+// given a nodeId, try to determine the video-player fabric index by searching the binding table
+FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+        if (binding.type == EMBER_UNICAST_BINDING && nodeId == binding.nodeId)
+        {
+            ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode fabricIndex=%d nodeId=0x" ChipLogFormatX64,
+                            binding.fabricIndex, ChipLogValueX64(binding.nodeId));
+            return binding.fabricIndex;
+        }
+    }
+    ChipLogProgress(NotSpecified, "GetVideoPlayerFabricIndexForNode no bindings found for nodeId=0x" ChipLogFormatX64,
+                    ChipLogValueX64(nodeId));
+    return kUndefinedFabricIndex;
+}
+
+void CastingServer::PrintBindings()
+{
+    for (const auto & binding : BindingTable::GetInstance())
+    {
+        ChipLogProgress(NotSpecified,
+                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                        binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                        binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+    }
+    return;
+}
+
+void CastingServer::SetDefaultFabricIndex()
+{
+    InitServer();
+
+    // set fabric to be the first in the list
+    for (const auto & fb : chip::Server::GetInstance().GetFabricTable())
+    {
+        FabricIndex fabricIndex = fb.GetFabricIndex();
+        ChipLogError(AppServer, "Next Fabric index=%d", fabricIndex);
+        if (!fb.IsInitialized())
+        {
+            ChipLogError(AppServer, " -- Not initialized");
+            continue;
+        }
+        NodeId myNodeId = fb.GetNodeId();
+        ChipLogProgress(NotSpecified,
+                        "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                        ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
+
+        NodeId videoPlayerNodeId = GetVideoPlayerNodeForFabricIndex(fabricIndex);
+        if (videoPlayerNodeId == kUndefinedNodeId)
+        {
+            // could not determine video player nodeid for this fabric
+            continue;
+        }
+
+        mTargetVideoPlayerInfo.Initialize(videoPlayerNodeId, fabricIndex);
+        return;
+    }
+    ChipLogError(AppServer, " -- No initialized fabrics with video players");
 }
