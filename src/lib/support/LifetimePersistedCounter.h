@@ -55,7 +55,7 @@ class LifetimePersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
     LifetimePersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey) {}
-    ~LifetimePersistedCounter() override;
+    ~LifetimePersistedCounter() override = default;
 
     /**
      *  @brief
