@@ -16,8 +16,6 @@
  *
  */
 
-#include <lib/support/StringBuilder.h>
-
 #include "SystemCommands.h"
 
 namespace {
@@ -36,8 +34,8 @@ CHIP_ERROR SystemCommands::Start(uint16_t discriminator, uint16_t port, const ch
     constexpr const char * scriptName = "Start.py";
 
     char command[kCommandMaxLen];
-    ReturnErrorOnFailure(
-        CreateCommonCommandArgs(command, sizeof(command), scriptDir, scriptName, registerKey, discriminator, port, kvs));
+    chip::StringBuilderBase builder(command, sizeof(command));
+    ReturnErrorOnFailure(CreateCommonCommandArgs(builder, scriptDir, scriptName, registerKey, discriminator, port, kvs));
     return RunInternal(command);
 }
 
@@ -80,13 +78,12 @@ CHIP_ERROR SystemCommands::RunInternal(const char * command)
     return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
-CHIP_ERROR SystemCommands::CreateCommonCommandArgs(char * commandBuffer, size_t commandBufferSize, const char * scriptDir,
+CHIP_ERROR SystemCommands::CreateCommonCommandArgs(chip::StringBuilderBase & builder, const char * scriptDir,
                                                    const char * scriptName, const char * registerKey, uint16_t discriminator,
                                                    uint16_t port, const char * kvs)
 {
     VerifyOrReturnError(registerKey != nullptr, CHIP_ERROR_INVALID_KEY_ID);
 
-    chip::StringBuilder<kCommandMaxLen> builder;
     builder.Add(scriptDir);
     builder.Add(scriptName);
     builder.Add(" ");
@@ -109,7 +106,6 @@ CHIP_ERROR SystemCommands::CreateCommonCommandArgs(char * commandBuffer, size_t 
         builder.Add(kvs);
     }
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(commandBuffer, builder.c_str(), commandBufferSize);
 
     return CHIP_NO_ERROR;
 }

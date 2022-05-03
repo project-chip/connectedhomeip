@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 class SystemCommands
 {
@@ -36,7 +37,6 @@ public:
 
 private:
     CHIP_ERROR RunInternal(const char * command);
-    CHIP_ERROR CreateCommonCommandArgs(char * commandBuffer, size_t commandBufferSize, const char * scriptDir,
-                                       const char * scriptName, const char * registerKey, uint16_t discriminator, uint16_t port,
-                                       const char * kvs);
+    CHIP_ERROR CreateCommonCommandArgs(chip::StringBuilderBase & builder, const char * scriptDir, const char * scriptName,
+                                       const char * registerKey, uint16_t discriminator, uint16_t port, const char * kvs);
 };
