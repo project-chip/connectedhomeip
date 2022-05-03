@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the CHIP CASE Session object that provides
- *      APIs for constructing a secure session using a certificate from the device's
- *      operational credentials.
- */
-
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 
 #include <lib/support/Base64.h>

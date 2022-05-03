@@ -15,18 +15,9 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the CHIP CASE Session object that provides
- *      APIs for constructing a secure session using a certificate from the device's
- *      operational credentials.
- */
-
 #pragma once
 
-#include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CASEAuthTag.h>
-#include <lib/core/ScopedNodeId.h>
+#include <protocols/secure_channel/AbstractSessionResumptionStorage.h>
 
 namespace chip {
 
@@ -39,13 +30,10 @@ namespace chip {
  *     * <FabricIndex, PeerNodeId>   => <ResumptionId, ShareSecret, PeerCATs>
  *     * <ResumptionId>              => <FabricIndex, PeerNodeId>
  */
-class SessionResumptionStorage
+class SessionResumptionStorage : public AbstractSessionResumptionStorage
 {
 public:
-    static constexpr size_t kResumptionIdSize = 16;
-    using ResumptionIdStorage                 = std::array<uint8_t, kResumptionIdSize>;
-    using ResumptionIdView                    = FixedSpan<uint8_t, kResumptionIdSize>;
-    using ConstResumptionIdView               = FixedSpan<const uint8_t, kResumptionIdSize>;
+    using ResumptionIdView = FixedSpan<uint8_t, kResumptionIdSize>;
 
     struct SessionIndex
     {
@@ -56,12 +44,12 @@ public:
     virtual ~SessionResumptionStorage() {}
 
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
-                                  Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs);
+                                  Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) override;
     CHIP_ERROR FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
-                                  Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs);
+                                  Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) override;
     CHIP_ERROR FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node);
     CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
-                    const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs);
+                    const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) override;
     CHIP_ERROR Delete(const ScopedNodeId & node);
 
 protected:

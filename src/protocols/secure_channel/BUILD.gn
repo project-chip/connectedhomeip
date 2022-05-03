@@ -4,6 +4,7 @@ static_library("secure_channel") {
   output_name = "libSecureChannel"
 
   sources = [
+    "AbstractSessionResumptionStorage.h",
     "CASEDestinationId.cpp",
     "CASEDestinationId.h",
     "CASEServer.cpp",
