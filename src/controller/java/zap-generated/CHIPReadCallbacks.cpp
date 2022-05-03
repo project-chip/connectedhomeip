@@ -1730,8 +1730,8 @@ void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(
         jobject newElement_0;
         std::string newElement_0ClassName     = "java/lang/Integer";
         std::string newElement_0CtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
-                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint16_t>(entry_0), newElement_0);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -2810,7 +2810,7 @@ void CHIPBasicVendorIDAttributeCallback::CallbackFn(void * context, chip::Vendor
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value, javaValue);
+                                                                   static_cast<uint16_t>(value), javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -4316,7 +4316,7 @@ void CHIPBridgedDeviceBasicVendorIDAttributeCallback::CallbackFn(void * context,
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value, javaValue);
+                                                                   static_cast<uint16_t>(value), javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -19300,7 +19300,7 @@ void CHIPTestClusterVendorIdAttributeCallback::CallbackFn(void * context, chip::
     std::string javaValueClassName     = "java/lang/Integer";
     std::string javaValueCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                   value, javaValue);
+                                                                   static_cast<uint16_t>(value), javaValue);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }

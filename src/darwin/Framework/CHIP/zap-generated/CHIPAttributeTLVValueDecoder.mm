@@ -637,7 +637,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -1318,7 +1318,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ProductName::Id: {
@@ -2323,7 +2323,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ProductName::Id: {
@@ -14411,8 +14411,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
 =======
             NSNumber * _Nonnull value;
+<<<<<<< HEAD
             value = [NSNumber numberWithUnsignedShort:cppValue];
 >>>>>>> Cleaning up atomic enums and bitmaps for generation
+=======
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue)];
+>>>>>>> - Cleaning up the atomic enums and bitmaps in the zapt templates
             return value;
         }
         case Attributes::NullableBitmap64::Id: {

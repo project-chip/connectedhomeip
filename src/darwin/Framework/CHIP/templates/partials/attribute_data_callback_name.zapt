@@ -7,13 +7,21 @@
          than a per-struct-type basis. ~}}
     {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Struct
   {{~else if_is_bitmap type~}}
-    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}
+    {{~#if_is_atomic type~}}
+      {{~chipCallback.name~}}
+    {{else}}
+      {{~asUpperCamelCase parent.name}}{{asUpperCamelCase name~}}
+    {{/if_is_atomic}}
   {{~else~}}
     {{~#if isNullable}}Nullable{{/if~}}
     {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
       VendorId
     {{~else if isEnum~}}
-      {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type}}
+      {{~#if_is_atomic type~}}
+        {{~chipCallback.name~}}
+      {{else}}
+        {{~asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type~}}
+      {{/if_is_atomic}}
     {{~else~}}
       {{chipCallback.name}}
     {{~/if~}}

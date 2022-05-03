@@ -51,13 +51,17 @@ if ({{source}}.IsNull()) {
     );
   {{else}}
     {{#if_chip_enum type}}
-      std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
-      std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-      {{#if_is_atomic type}}
-        chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
-      {{else}}
+        std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
+        std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
+      {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
         chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
-      {{/if_is_atomic}}
+      {{else}}
+        {{#if_is_atomic type}}
+          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
+        {{else}}
+          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
+        {{/if_is_atomic}}
+      {{/if}}
     {{else}}
       {{#if (isOctetString type)}}
         jbyteArray {{target}}ByteArray = env->NewByteArray(static_cast<jsize>({{source}}.size()));

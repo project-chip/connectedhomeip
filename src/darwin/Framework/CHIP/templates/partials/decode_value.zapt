@@ -34,11 +34,15 @@
     {{/zcl_struct_items_by_struct_name}}
   {{else}}
     {{#if_chip_enum type}}
-      {{#if_is_atomic type}}
-        {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
-      {{else}}
+      {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
         {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
-      {{/if_is_atomic}}
+      {{else}}
+        {{#if_is_atomic type}}
+          {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
+        {{else}}
+          {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
+        {{/if_is_atomic}}
+      {{/if}}
     {{else}}
       {{#if_is_bitmap type}}
         {{#if_is_atomic type}}

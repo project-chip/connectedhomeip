@@ -767,7 +767,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0ClassName     = "java/lang/Integer";
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint16_t>(entry_0), newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -1433,7 +1433,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           static_cast<uint16_t>(cppValue), value);
             return value;
         }
         case Attributes::ProductName::Id: {
@@ -2519,7 +2519,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           static_cast<uint16_t>(cppValue), value);
             return value;
         }
         case Attributes::ProductName::Id: {
@@ -12995,7 +12995,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           cppValue, value);
+                                                                           static_cast<uint16_t>(cppValue), value);
             return value;
         }
         case Attributes::ListNullablesAndOptionalsStruct::Id: {

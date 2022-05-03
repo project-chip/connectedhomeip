@@ -685,7 +685,7 @@ void CHIPNullableDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstabl
 void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value];
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
@@ -712,7 +712,7 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
     }
     DispatchSuccess(context, objCValue);
 };
@@ -1263,7 +1263,7 @@ void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccess
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+            newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -13770,8 +13770,12 @@ void CHIPTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucc
 =======
     auto * response = [CHIPTestClusterClusterTestEnumsResponseParams new];
     {
+<<<<<<< HEAD
         response.arg1 = [NSNumber numberWithUnsignedShort:data.arg1];
 >>>>>>> Cleaning up atomic enums and bitmaps for generation
+=======
+        response.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
+>>>>>>> - Cleaning up the atomic enums and bitmaps in the zapt templates
     }
     CHIP_ERROR err = iter_0.GetStatus();
     if (err != CHIP_NO_ERROR) {
