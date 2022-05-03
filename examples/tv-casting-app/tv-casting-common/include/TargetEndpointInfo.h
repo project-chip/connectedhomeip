@@ -20,23 +20,21 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-
 class TargetEndpointInfo
 {
 public:
-    void Initialize(EndpointId endpointId);
+    void Initialize(chip::EndpointId endpointId);
     void Reset() { mInitialized = false; }
     bool IsInitialized() { return mInitialized; }
-    EndpointId GetEndpointId() const { return mEndpointId; }
+    chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool HasCluster(ClusterId clusterId);
-    bool AddCluster(ClusterId clusterId);
+    bool HasCluster(chip::ClusterId clusterId);
+    bool AddCluster(chip::ClusterId clusterId);
     void PrintInfo();
 
 private:
     static constexpr size_t kMaxNumberOfClustersPerEndpoint = 10;
-    ClusterId mClusters[kMaxNumberOfClustersPerEndpoint]    = {};
-    EndpointId mEndpointId;
+    chip::ClusterId mClusters[kMaxNumberOfClustersPerEndpoint]    = {};
+    chip::EndpointId mEndpointId;
     bool mInitialized = false;
 };

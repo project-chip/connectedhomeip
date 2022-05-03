@@ -18,6 +18,11 @@
 
 #include "CastingUtils.h"
 
+using namespace chip;
+using namespace chip::System;
+using namespace chip::DeviceLayer;
+using namespace chip::Dnssd;
+
 CHIP_ERROR DiscoverCommissioners()
 {
     // Send discover commissioners request
@@ -48,6 +53,10 @@ CHIP_ERROR RequestCommissioning(int index)
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
+    if(!CastingServer::GetInstance()->isServerInitialized()) 
+    {
+        DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    }
     CastingServer::GetInstance()->InitServer();
 
     CastingServer::GetInstance()->OpenBasicCommissioningWindow();

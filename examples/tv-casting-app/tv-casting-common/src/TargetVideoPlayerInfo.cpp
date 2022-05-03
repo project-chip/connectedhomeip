@@ -17,6 +17,8 @@
  */
 #include "TargetVideoPlayerInfo.h"
 
+using namespace chip;
+
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 
 CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex)

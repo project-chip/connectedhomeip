@@ -79,6 +79,10 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         char * eptr;
         chip::NodeId nodeId           = (chip::NodeId) strtoull(argv[1], &eptr, 10);
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[2], &eptr, 10);
+        if(!CastingServer::GetInstance()->isServerInitialized()) 
+        {
+            DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+        }
         return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }
     if (strcmp(argv[0], "discover") == 0)
@@ -159,6 +163,10 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         {
             streamer_printf(streamer_get(), "ERROR - invalid fabric or video player nodeId not found\r\n");
             return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if(!CastingServer::GetInstance()->isServerInitialized()) 
+        {
+            DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
         }
         return CastingServer::GetInstance()->TargetVideoPlayerInfoInit(nodeId, fabricIndex);
     }

@@ -99,6 +99,10 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
     if (!CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
     {
+        if(!CastingServer::GetInstance()->isServerInitialized()) 
+        {
+            DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+        }
         CastingServer::GetInstance()->SetDefaultFabricIndex();
     }
     gCommands.Run(argc, argv);
@@ -124,7 +128,7 @@ int main(int argc, char * argv[])
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     // Initialize device attestation verifier from a constant version
     {
