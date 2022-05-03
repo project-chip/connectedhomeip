@@ -84,7 +84,8 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
             }
 
             std::qsort(orderEpPair, idx / 2, sizeof(uint16_t) * 2, compareOrder);
-            for (uint8_t i = 0; i < idx; i += (uint8_t) 2)
+            uint8_t increment = 2;
+            for (uint8_t i = 0; i < idx; i += increment)
             {
                 ReturnErrorOnFailure(encoder.Encode((uint16_t) orderEpPair[i + 1]));
             }
