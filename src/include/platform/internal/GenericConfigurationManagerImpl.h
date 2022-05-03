@@ -122,7 +122,7 @@ public:
 
 protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    chip::LifetimePersistedCounter mLifetimePersistedCounter;
+    chip::LifetimePersistedCounter<uint32_t> mLifetimePersistedCounter;
 #endif
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER

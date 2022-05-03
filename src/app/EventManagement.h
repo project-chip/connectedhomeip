@@ -195,7 +195,8 @@ public:
      *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources, MonotonicallyIncreasingCounter * apEventNumberCounter);
+              const LogStorageResources * const apLogStorageResources,
+              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static EventManagement & GetInstance();
 
@@ -224,7 +225,7 @@ public:
     static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources,
-                                      MonotonicallyIncreasingCounter * apEventNumberCounter);
+                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static void DestroyEventManagement();
 
@@ -512,7 +513,7 @@ private:
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     // The counter we're going to use for event numbers.
-    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
+    MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
