@@ -142,7 +142,8 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::EventNumber startingEventNumber,
-                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo, const chip::Access::SubjectDescriptor & aSubjectDescriptor)
+                            size_t expectedNumEvents, chip::app::ObjectList<chip::app::EventPathParams> * clusterInfo,
+                            const chip::Access::SubjectDescriptor & aSubjectDescriptor)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -243,7 +244,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     descriptor.fabricIndex = 2;
     CheckLogReadOut(apSuite, logMgmt, 3, 1, &paths[1], descriptor);
 
-    paths[0].mpNext = &paths[1];
+    paths[0].mpNext        = &paths[1];
     descriptor.fabricIndex = 1;
 
     CheckLogReadOut(apSuite, logMgmt, 0, 3, paths, descriptor);
@@ -276,7 +277,8 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
  *   Test Suite. It lists all the test functions.
  */
 
-const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer), NL_TEST_SENTINEL() };
+const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
+                          NL_TEST_SENTINEL() };
 
 // clang-format off
 nlTestSuite sSuite =
