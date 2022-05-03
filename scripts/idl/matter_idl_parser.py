@@ -77,6 +77,15 @@ class MatterIdlTransformer(Transformer):
         else:
             return int(n)
 
+
+    @v_args(inline=True)
+    def negative_integer(self, value):
+        return -value
+
+    @v_args(inline=True)
+    def integer(self, value):
+        return value
+
     def id(self, tokens):
         """An id is a string containing an identifier
         """

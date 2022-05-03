@@ -220,7 +220,7 @@ class TestParser(unittest.TestCase):
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
                             data_type=DataType(name="bool"), code=9, name="boolDefault2"), default=False),
                         Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
-                            data_type=DataType(name="int32s"), code=9, name="negativeDefault"), default=-123),
+                            data_type=DataType(name="int32s"), code=10, name="negativeDefault"), default=-123),
                     ]
                     )])
         self.assertEqual(actual, expected)

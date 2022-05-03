@@ -24,7 +24,7 @@ attribute_access_entry: attribute_access_type ":" access_privilege
 
 bool_default: "true"i  -> bool_default_true
             | "false"i -> bool_default_false
-default_value: "default"i "=" (positive_integer | ESCAPED_STRING | bool_default)
+default_value: "default"i "=" (integer | ESCAPED_STRING | bool_default)
 
 attribute_is_callback: "callback"i
 attribute_is_persist: "persist"i
@@ -67,6 +67,10 @@ endpoint_cluster: endpoint_cluster_type "cluster"i id ";"
 
 constant_entry: id "=" positive_integer ";"
 positive_integer: POSITIVE_INTEGER | HEX_INTEGER
+negative_integer: "-" positive_integer
+
+integer: positive_integer 
+       | negative_integer
 
 struct_field: member_attribute* field
 
