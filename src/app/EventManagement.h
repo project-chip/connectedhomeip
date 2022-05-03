@@ -337,6 +337,10 @@ public:
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
+    /**
+     * @brief Iterate all events and invalidate the event with obsolete fabric.
+     */
+    CHIP_ERROR RemoveInvalidFabric(FabricIndex aFabricIndex);
 
     /**
      * @brief
@@ -378,7 +382,7 @@ private:
         EndpointId mEndpointId   = 0;
         EventId mEventId         = 0;
         EventNumber mEventNumber = 0;
-        FabricIndex mFabricIndex = kUndefinedFabricIndex;
+        Optional<FabricIndex> mFabricIndex;
     };
 
     void VendEventNumber();
@@ -418,6 +422,16 @@ private:
      *
      */
     CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
+
+    /**
+     * @brief Iterate the event elements inside event tlv and mark the fabric index as 0 if matching with obsolete fabric index
+     * converted from apContext
+     *
+     * @param[in] aReader  event tlv reader
+     * @param[in] apContext  the obsolete fabric index
+     *
+     */
+    static CHIP_ERROR RemoveInvalidFabricCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
     /**
      * @brief

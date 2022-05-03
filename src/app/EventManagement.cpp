@@ -570,7 +570,9 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
-    if (event.mFabricIndex != kUndefinedFabricIndex && eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex)
+    if (event.mFabricIndex.HasValue() &&
+        (event.mFabricIndex.Value() == kUndefinedFabricIndex ||
+         eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex.Value()))
     {
         return CHIP_ERROR_UNEXPECTED_EVENT;
     }
@@ -748,6 +750,59 @@ exit:
     return err;
 }
 
+CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext)
+{
+    FabricIndex * invalidFabricIndex = static_cast<FabricIndex *>(apContext);
+
+    TLVReader event;
+    TLVType tlvType;
+    TLVType tlvType1;
+    event.Init(aReader);
+    ReturnErrorOnFailure(event.EnterContainer(tlvType));
+    ReturnErrorOnFailure(event.Next());
+    ReturnErrorOnFailure(event.EnterContainer(tlvType1));
+    ReturnErrorOnFailure(event.Next());
+
+    uint8_t fabricIndex = 0;
+    while (CHIP_NO_ERROR == event.Next())
+    {
+        if (event.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
+        {
+            ReturnErrorOnFailure(event.Get(fabricIndex));
+            if (fabricIndex == *invalidFabricIndex)
+            {
+                uint8_t * dataPtr = const_cast<uint8_t *>(event.GetReadPoint());
+                dataPtr           = dataPtr - 1;
+                memset(dataPtr, 0, 1);
+                event.Get(fabricIndex);
+                return CHIP_NO_ERROR;
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EventManagement::RemoveInvalidFabric(FabricIndex aFabricIndex)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    const bool recurse = false;
+    TLVReader reader;
+    CircularEventBufferWrapper bufWrapper;
+
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    ScopedLock lock(sInstance);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
+
+    ReturnErrorOnFailure(GetEventReader(reader, PriorityLevel::Critical, &bufWrapper));
+    err = TLV::Utilities::Iterate(reader, RemoveInvalidFabricCB, &aFabricIndex, recurse);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aPriority, CircularEventBufferWrapper * apBufWrapper)
 {
     CircularEventBuffer * buffer = GetPriorityBuffer(aPriority);
@@ -808,7 +863,9 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
 
     if (reader.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
     {
-        ReturnErrorOnFailure(reader.Get(envelope->mFabricIndex));
+        uint8_t fabricIndex = kUndefinedFabricIndex;
+        ReturnErrorOnFailure(reader.Get(fabricIndex));
+        envelope->mFabricIndex.SetValue(fabricIndex);
     }
     return CHIP_NO_ERROR;
 }
