@@ -155,9 +155,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-                               .SetNativeParams(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+                               .SetNativeParams(initParams.endpointNativeParams)
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
