@@ -29,11 +29,13 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
@@ -158,6 +160,9 @@ void printQRCode()
 }
 #endif // CONFIG_HAVE_DISPLAY
 
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+
 void InitServer(intptr_t)
 {
     // Start IM server
@@ -167,6 +172,7 @@ void InitServer(intptr_t)
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    sWiFiNetworkCommissioningInstance.Init();
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
