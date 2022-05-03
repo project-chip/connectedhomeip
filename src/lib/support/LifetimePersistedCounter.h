@@ -72,7 +72,7 @@ public:
     CHIP_ERROR Init(const chip::Platform::PersistedStorage::Key aId)
     {
         mId = aId;
-        uint32_t startValue;
+        T startValue;
 
         // Read our previously-stored starting value.
         ReturnErrorOnFailure(ReadStartValue(startValue));

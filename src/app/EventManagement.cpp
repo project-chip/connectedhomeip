@@ -401,7 +401,7 @@ void EventManagement::VendEventNumber()
     }
 
     // Assign event Number to the buffer's counter's value.
-    mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
+    mLastEventNumber = mpEventNumberCounter->GetValue();
 }
 
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
