@@ -368,8 +368,8 @@ class TestParser(unittest.TestCase):
 
         expected = Idl(endpoints=[Endpoint(number=12,
                                            server_clusters=[
-                                              ServerClusterInstantiation(name="Foo"),
-                                              ServerClusterInstantiation(name="Bar"),
+                                               ServerClusterInstantiation(name="Foo"),
+                                               ServerClusterInstantiation(name="Bar"),
                                            ],
                                            client_bindings=["Bar", "Test"],)
                                   ])
@@ -391,14 +391,18 @@ class TestParser(unittest.TestCase):
 
         expected = Idl(endpoints=[Endpoint(number=3,
                                            server_clusters=[
-                                              ServerClusterInstantiation(name="Example", attributes=[
-                                                AttributeInstantiation(name='inRamZero', storage=AttributeStorage.RAM),
-                                                AttributeInstantiation(name='inRamWithDefault', storage=AttributeStorage.RAM, default=123),
-                                                AttributeInstantiation(name='inNVMNoDef', storage=AttributeStorage.PERSIST),
-                                                AttributeInstantiation(name='inNVMStr', storage=AttributeStorage.PERSIST, default="abc"),
-                                                AttributeInstantiation(name='inNVMWithDefault', storage=AttributeStorage.PERSIST, default=-33),
-                                                AttributeInstantiation(name='hasCallbackBool', storage=AttributeStorage.CALLBACK, default=True),
-                                              ]),
+                                               ServerClusterInstantiation(name="Example", attributes=[
+                                                   AttributeInstantiation(name='inRamZero', storage=AttributeStorage.RAM),
+                                                   AttributeInstantiation(name='inRamWithDefault',
+                                                                          storage=AttributeStorage.RAM, default=123),
+                                                   AttributeInstantiation(name='inNVMNoDef', storage=AttributeStorage.PERSIST),
+                                                   AttributeInstantiation(
+                                                       name='inNVMStr', storage=AttributeStorage.PERSIST, default="abc"),
+                                                   AttributeInstantiation(name='inNVMWithDefault',
+                                                                          storage=AttributeStorage.PERSIST, default=-33),
+                                                   AttributeInstantiation(name='hasCallbackBool',
+                                                                          storage=AttributeStorage.CALLBACK, default=True),
+                                               ]),
                                            ],
                                            client_bindings=[],)
                                   ])

@@ -168,11 +168,11 @@ class Cluster:
     commands: List[Command] = field(default_factory=list)
 
 
-@dataclass 
+@dataclass
 class AttributeInstantiation:
-   name: str
-   storage: AttributeStorage
-   default: Optional[Union[str|int|bool]] = None
+    name: str
+    storage: AttributeStorage
+    default: Optional[Union[str | int | bool]] = None
 
 
 @dataclass
