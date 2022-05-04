@@ -194,6 +194,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
             continue;
         }
         ++found;
+        --remain;
         if (remain)
         {
             memmove(&index.mNodes[cur], &index.mNodes[cur + 1], remain * sizeof(index.mNodes[0]));
