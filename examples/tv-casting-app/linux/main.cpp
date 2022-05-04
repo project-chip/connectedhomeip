@@ -117,6 +117,8 @@ int main(int argc, char * argv[])
 #endif
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.
     err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
@@ -124,7 +126,7 @@ int main(int argc, char * argv[])
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     // Initialize device attestation verifier from a constant version
     {

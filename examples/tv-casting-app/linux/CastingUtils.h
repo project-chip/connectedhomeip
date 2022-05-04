@@ -34,12 +34,12 @@ CHIP_ERROR DiscoverCommissioners();
 
 CHIP_ERROR RequestCommissioning(int index);
 
-void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr);
+void PrepareForCommissioning(const chip::Dnssd::DiscoveredNodeData * selectedCommissioner = nullptr);
 
 void InitCommissioningFlow(intptr_t commandArg);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context);
+void HandleUDCSendExpiration(chip::System::Layer * aSystemLayer, void * context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 void PrintFabrics();
