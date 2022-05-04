@@ -65,6 +65,8 @@ protected:
     // This method returns the commissioner instance to be used for running the command.
     CHIPDeviceController * CurrentCommissioner();
 
+    CHIPDeviceController * GetCommissioner(const char * identity);
+
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
