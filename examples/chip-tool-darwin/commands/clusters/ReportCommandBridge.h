@@ -154,6 +154,7 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
 protected:
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<bool> mFabricFiltered;
