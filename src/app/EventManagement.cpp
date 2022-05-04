@@ -319,6 +319,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
     // The fabricIndex profile tag is internal use only for fabric filtering when retrieving event from circular event buffer,
     // and would not go on the wire.
+    // Revisit RemoveInvalidFabricCB function should the encoding of fabricIndex change in the future.
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
@@ -752,6 +753,7 @@ exit:
 
 CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext)
 {
+    // the function does not actually remove the event, instead, it sets the fabric index to an invalid value.
     FabricIndex * invalidFabricIndex = static_cast<FabricIndex *>(apContext);
 
     TLVReader event;
@@ -771,13 +773,19 @@ CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader
             ReturnErrorOnFailure(event.Get(fabricIndex));
             if (fabricIndex == *invalidFabricIndex)
             {
+                // fabricIndex is encoded as an integer; the dataPtr will point to a location immediately after its encoding
                 uint8_t * dataPtr                  = const_cast<uint8_t *>(event.GetReadPoint());
                 CHIPCircularTLVBuffer * readBuffer = static_cast<CHIPCircularTLVBuffer *>(event.GetBackingStore());
+                // shift the dataPtr to point to the encoding of the fabric index, accounting for wraparound in backing storage
                 if (readBuffer->GetQueue() != dataPtr)
+                {
                     dataPtr = dataPtr - 1;
+                }
                 else
+                {
                     dataPtr = readBuffer->GetQueue() + readBuffer->GetTotalDataLength() - 1;
-
+                }
+                // set the value of fabricIndex to 0
                 memset(dataPtr, 0, 1);
                 event.Get(fabricIndex);
                 return CHIP_NO_ERROR;
