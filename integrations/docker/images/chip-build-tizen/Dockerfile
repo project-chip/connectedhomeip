@@ -88,11 +88,13 @@ RUN set -x \
     # Base packages
     && wget --progress=dot:mega -r -nd --no-parent \
     http://download.tizen.org/releases/milestone/tizen/base/latest/repos/standard/packages/armv7l/ \
+    -A 'iniparser-*.armv7l.rpm' \
     -A 'libblkid-devel-*.armv7l.rpm' \
     -A 'libcap-*.armv7l.rpm' \
     -A 'libffi-devel-*.armv7l.rpm' \
     -A 'liblzma-*.armv7l.rpm' \
     -A 'libmount-devel-*.armv7l.rpm' \
+    -A 'libuuid-*.armv7l.rpm' \
     -A 'pcre-devel-*.armv7l.rpm' \
     -A 'xdgmime-*.armv7l.rpm' \
     # Unified packages
@@ -100,17 +102,24 @@ RUN set -x \
     http://download.tizen.org/releases/milestone/tizen/unified/latest/repos/standard/packages/armv7l/ \
     -A 'aul-0*.armv7l.rpm' \
     -A 'aul-devel-*.armv7l.rpm' \
+    -A 'bundle-0*.armv7l.rpm' \
+    -A 'bundle-devel-*.armv7l.rpm' \
     -A 'buxton2-*.armv7l.rpm' \
     -A 'cynara-devel-*.armv7l.rpm' \
     -A 'dbus-1*.armv7l.rpm' \
     -A 'dbus-devel-*.armv7l.rpm' \
     -A 'dbus-libs-1*.armv7l.rpm' \
     -A 'glib2-devel-2*.armv7l.rpm' \
-    -A 'libtzplatform-config-*.armv7l.rpm' \
+    -A 'json-glib-devel-*.armv7l.rpm' \
     -A 'libcynara-client-*.armv7l.rpm' \
     -A 'libcynara-commons-*.armv7l.rpm' \
     -A 'libdns_sd-*.armv7l.rpm' \
+    -A 'libjson-glib-*.armv7l.rpm' \
     -A 'libsystemd-*.armv7l.rpm' \
+    -A 'libtzplatform-config-*.armv7l.rpm' \
+    -A 'parcel-0*.armv7l.rpm' \
+    -A 'parcel-devel-*.armv7l.rpm' \
+    -A 'pkgmgr-info-*.armv7l.rpm' \
     -A 'vconf-compat-*.armv7l.rpm' \
     -A 'vconf-internal-keys-devel-*.armv7l.rpm' \
     # Unified packages (snapshots)
