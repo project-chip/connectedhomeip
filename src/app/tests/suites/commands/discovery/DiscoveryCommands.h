@@ -33,16 +33,30 @@ public:
     virtual void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) = 0;
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
 
-    CHIP_ERROR FindCommissionable();
-    CHIP_ERROR FindCommissionableByShortDiscriminator(uint64_t value);
-    CHIP_ERROR FindCommissionableByLongDiscriminator(uint64_t value);
-    CHIP_ERROR FindCommissionableByCommissioningMode();
-    CHIP_ERROR FindCommissionableByVendorId(uint64_t vendorId);
-    CHIP_ERROR FindCommissionableByDeviceType(uint64_t deviceType);
+    CHIP_ERROR FindCommissionable(const char * identity,
+                                  const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type & value);
+    CHIP_ERROR FindCommissionableByShortDiscriminator(
+        const char * identity,
+        const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type & value);
+    CHIP_ERROR FindCommissionableByLongDiscriminator(
+        const char * identity,
+        const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type & value);
+    CHIP_ERROR FindCommissionableByCommissioningMode(
+        const char * identity,
+        const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type & value);
+    CHIP_ERROR FindCommissionableByVendorId(
+        const char * identity, const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type & value);
+    CHIP_ERROR FindCommissionableByDeviceType(
+        const char * identity,
+        const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByDeviceType::Type & value);
 
-    CHIP_ERROR FindCommissioner();
-    CHIP_ERROR FindCommissionerByVendorId(uint64_t vendorId);
-    CHIP_ERROR FindCommissionerByDeviceType(uint64_t deviceType);
+    CHIP_ERROR FindCommissioner(const char * identity,
+                                const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissioner::Type & value);
+    CHIP_ERROR
+    FindCommissionerByVendorId(const char * identity,
+                               const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionerByVendorId::Type & value);
+    CHIP_ERROR FindCommissionerByDeviceType(
+        const char * identity, const chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionerByDeviceType::Type & value);
 
     CHIP_ERROR SetupDiscoveryCommands();
     CHIP_ERROR TearDownDiscoveryCommands();
