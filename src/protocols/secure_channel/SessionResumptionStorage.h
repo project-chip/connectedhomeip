@@ -87,6 +87,16 @@ public:
      * appropriate CHIP error on failure
      */
     virtual CHIP_ERROR Delete(const ScopedNodeId & node) = 0;
+
+    /**
+     * Remove all session resumption information associated with the specified
+     * fabric index.  If no entries for the fabric index exist, this is a no-op
+     * and is considered successful.
+     *
+     * @param fabricIndex the index of the fabric for which to remove session resumption information
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabricIndex) = 0;
 };
 
 } // namespace chip

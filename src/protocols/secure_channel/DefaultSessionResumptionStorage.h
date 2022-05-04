@@ -51,6 +51,7 @@ public:
     CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
                     const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) override;
     CHIP_ERROR Delete(const ScopedNodeId & node) override;
+    CHIP_ERROR RemoveFabric(FabricIndex fabricIndex) override;
 
 protected:
     CHIP_ERROR virtual SaveIndex(const SessionIndex & index) = 0;
