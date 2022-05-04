@@ -180,21 +180,27 @@ public:
                 // update the current humidity here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Humidity changed to : %d", n);
                 app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
-            } else if (name == "SystemMode")
+            }
+            else if (name == "SystemMode")
             {
                 // update the system mode here for hardcoded endpoint 1
                 ESP_LOGI(TAG, "System Mode changed to : %d", n % 5);
-                if (n % 5 == 2) {
+                if (n % 5 == 2)
+                {
                     ESP_LOGI(TAG, "System Mode 2 is not valid");
-                } else {
+                }
+                else
+                {
                     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, static_cast<int16_t>(n % 5));
                 }
-            } else if (name == "OccupiedCoolingSetpoint")
+            }
+            else if (name == "OccupiedCoolingSetpoint")
             {
                 // update the occupied cooling setpoint for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Occupied Cooling Setpoint changed to : %d", n);
                 app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(n * 100));
-            }  else if (name == "OccupiedHeatingSetpoint")
+            }
+            else if (name == "OccupiedHeatingSetpoint")
             {
                 // update the occupied heating setpoint for hardcoded endpoint 1
                 ESP_LOGI(TAG, "Occupied Heating Setpoint changed to : %d", n);
