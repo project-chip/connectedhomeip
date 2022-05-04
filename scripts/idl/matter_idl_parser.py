@@ -14,20 +14,24 @@ except:
 
     from matter_idl_types import *
 
+
 class AddServerClusterToEndpointTransform:
     """Provides an 'apply' method that can be run on endpoints
        to add a server cluster to the given endpoint.
     """
+
     def __init__(self, name):
         self.name = name
 
     def apply(self, endpoint):
         endpoint.server_clusters.append(self.name)
 
+
 class AddBindingToEndpointTransform:
     """Provides an 'apply' method that can be run on endpoints
        to add a cluster binding to the given endpoint.
     """
+
     def __init__(self, name):
         self.name = name
 
