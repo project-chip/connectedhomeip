@@ -40,7 +40,8 @@ def update_line(version: str, line: str, end_quote=False) -> None:
 def update_file(version: str, file: str, search_term: str, end_quote=False) -> None:
     """Reads the specified file and looks for lines containing search_term.
     If a line containts search_term, update it and specify if closing double quotes are needed.
-    fileinput.input replaces lines with std out. print() here updates the file.
+    fileinput.input replaces lines with std out.
+    print(update_line... here updates the file.
     print(line, end='') maintains the existing line.
     """
     with fileinput.input(file, inplace=True) as f:
@@ -51,7 +52,7 @@ def update_file(version: str, file: str, search_term: str, end_quote=False) -> N
                 print(line, end='')
 
 def update_workflows(version: str, directory: str) -> None:
-    """iterate over workflow configs and update.
+    """Iterate over workflow configs and update.
     Closing quotes are not needed.
     """
     for workflow in os.listdir(directory):
@@ -60,7 +61,7 @@ def update_workflows(version: str, directory: str) -> None:
             'image:')
 
 def update_gcb_configs(version: str, directory: str) -> None:
-    """iterate over GCB configs and update.
+    """Iterate over GCB configs and update.
     Closing quotes ARE needed.
     """
     for item in os.listdir(directory):
@@ -69,7 +70,9 @@ def update_gcb_configs(version: str, directory: str) -> None:
             update_file(version, item_path, 'name: "connectedhomeip', end_quote=True)
 
 def main() -> None:
-    """Update workflow and version configs with the version in VERSION_FILE.
+    """Update workflow configs in WORKFLOWS_DIR
+    and gcb configs in GCB_DIR
+    with the version in VERSION_FILE.
     Run this script from the root of the repository.
     """
     version = get_version(VERSION_FILE)
