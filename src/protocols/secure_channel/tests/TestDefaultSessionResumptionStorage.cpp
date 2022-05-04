@@ -159,7 +159,7 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-void TestRemoveFabric(nlTestSuite * inSuite, void * inContext)
+void TestDeleteAll(nlTestSuite * inSuite, void * inContext)
 {
     chip::SimpleSessionResumptionStorage sessionStorage;
     chip::TestPersistentStorageDelegate storage;
@@ -219,7 +219,7 @@ void TestRemoveFabric(nlTestSuite * inSuite, void * inContext)
                                CHIP_NO_ERROR);
         }
         // Delete fabric.
-        NL_TEST_ASSERT(inSuite, sessionStorage.RemoveFabric(vectors[i].fabricIndex) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, sessionStorage.DeleteAll(vectors[i].fabricIndex) == CHIP_NO_ERROR);
         // Verify fabric node entries no longer exist.
         for (size_t j = 0; j < sizeof(vectors[0].nodes) / sizeof(vectors[0].nodes[0]); ++j)
         {
@@ -240,7 +240,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("TestSave", TestSave),
     NL_TEST_DEF("TestDelete", TestDelete),
-    NL_TEST_DEF("TestRemoveFabric", TestRemoveFabric),
+    NL_TEST_DEF("TestDeleteAll", TestDeleteAll),
 
     NL_TEST_SENTINEL()
 };

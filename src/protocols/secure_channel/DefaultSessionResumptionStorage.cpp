@@ -143,7 +143,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSessionResumptionStorage::RemoveFabric(FabricIndex fabricIndex)
+CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     CHIP_ERROR stickyErr = CHIP_NO_ERROR;
