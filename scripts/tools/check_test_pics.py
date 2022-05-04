@@ -39,6 +39,10 @@ def main():
     with open(value_defs, "r") as stream:
         defined_values = set(map(lambda item: re.sub(
             value_regexp, "", item.rstrip()), stream.readlines()))
+        # Remove Comments w/ # and empty lines
+        for elem in list(defined_values):
+            if elem.startswith('#') or (elem == ""):
+                defined_values.discard(elem)
 
     with open(pics_yaml, "r") as stream:
         try:
