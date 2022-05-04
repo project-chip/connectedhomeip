@@ -189,8 +189,7 @@ class AndroidBuilder(Builder):
                       title='Prepare Native libs ' + self.identifier)
 
         if self.app.ExampleName() == 'tv-casting-app':
-            libs = ['libCHIPController.so',
-                    'libc++_shared.so', 'libTvCastingApp.so']
+            libs = ['libc++_shared.so', 'libTvCastingApp.so']
         else:
             libs = ['libSetupPayloadParser.so',
                     'libc++_shared.so', 'libTvApp.so']
@@ -202,7 +201,6 @@ class AndroidBuilder(Builder):
             jars = {
                 'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
                 'CHIPAppServer.jar': 'third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar',
-                'CHIPController.jar': 'third_party/connectedhomeip/src/controller/java/CHIPController.jar',
                 'TvCastingApp.jar': 'TvCastingApp.jar',
             }
         else:
