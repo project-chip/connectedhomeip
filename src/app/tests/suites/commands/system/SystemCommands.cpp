@@ -76,6 +76,12 @@ CHIP_ERROR SystemCommands::Start(const char * identity, const chip::app::Cluster
         builder.Add(kvs);
     }
 
+    if (value.minCommissioningTimeout.HasValue())
+    {
+        builder.Add(" --min_commissioning_timeout ");
+        builder.Add(value.minCommissioningTimeout.Value());
+    }
+
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return RunInternal(command);

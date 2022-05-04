@@ -939,6 +939,7 @@ struct StartCommand
     Optional<uint16_t> discriminator;
     Optional<uint16_t> port;
     Optional<chip::CharSpan> kvs;
+    Optional<uint16_t> minCommissioningTimeout;
     Optional<chip::CharSpan> registerKey;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
@@ -948,7 +949,8 @@ struct StartCommand
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), discriminator));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), port));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), kvs));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(3), registerKey));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(3), minCommissioningTimeout));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(4), registerKey));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -975,6 +977,9 @@ struct StartCommand
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, kvs));
                 break;
             case 3:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, minCommissioningTimeout));
+                break;
+            case 4:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, registerKey));
                 break;
             default:
