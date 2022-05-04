@@ -39,6 +39,22 @@
     {{container}} =
     {{~#if (chip_tests_variables_has definedValue)~}}
     {{definedValue}};
+    {{else if (chip_tests_config_has definedValue)}}
+      m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() :
+    {{~#if_chip_enum type~}}
+      static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{chip_tests_config_get_default_value definedValue}})
+    {{else if (isCharString type)}}
+      chip::Span<const char>("{{chip_tests_config_get_default_value definedValue}}", {{utf8StringLength (chip_tests_config_get_default_value definedValue)}});
+    {{else if (isOctetString type)}}
+      {{!-- TODO Extract the length of the default value for ByteSpan--}}
+    {{else}}
+      {{#if_is_bitmap type}}
+      static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}})
+      {{else}}
+      {{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}
+      {{/if_is_bitmap}}
+    {{/if_chip_enum~}}
+      ;
     {{else~}}
     {{~#if_chip_enum type~}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
@@ -49,8 +65,6 @@
     {{else}}
       {{#if_is_bitmap type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral definedValue type}});
-      {{else if (chip_tests_config_has definedValue)}}
-      m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}};
       {{else}}
       {{asTypedExpression definedValue type}};
       {{/if_is_bitmap}}

@@ -166,7 +166,8 @@ protected:
     /////////// DelayCommands Interface /////////
     void OnWaitForMs() override { NextTest(); }
 
-    CHIP_ERROR WaitForCommissioning() override
+    CHIP_ERROR WaitForCommissioning(const char * identity,
+                                    const chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type & value) override
     {
         isRunning = false;
         return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
