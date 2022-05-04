@@ -543,8 +543,7 @@ static struct if_nameindex * backport_if_nameindex(void)
         lastIntfName = addrIter->ifa_name;
     }
 
-    tmpval =
-        (struct if_nameindex *) Platform::MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
+    tmpval = (struct if_nameindex *) Platform::MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
     VerifyOrExit(tmpval != NULL, );
     memset(tmpval, 0, (numIntf + 1) * sizeof(struct if_nameindex));
 
@@ -576,8 +575,7 @@ static struct if_nameindex * backport_if_nameindex(void)
         }
     }
 
-    retval = (struct if_nameindex *) Platform::MemoryAlloc(
-        (maxIntfNum + 1) * sizeof(struct if_nameindex));
+    retval = (struct if_nameindex *) Platform::MemoryAlloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
     VerifyOrExit(retval != NULL, );
     memset(retval, 0, (maxIntfNum + 1) * sizeof(struct if_nameindex));
 
