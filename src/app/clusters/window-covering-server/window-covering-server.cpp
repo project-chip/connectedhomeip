@@ -687,7 +687,6 @@ EmberAfStatus GetMotionLockStatus(chip::EndpointId endpoint)
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
@@ -846,7 +845,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
                                                             const Commands::GoToLiftPercentage::DecodableType & commandData)
 {
     Percent100ths percent100ths = commandData.liftPercent100thsValue;
-    EndpointId endpoint = commandPath.mEndpointId;
+    EndpointId endpoint         = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u command received", percent100ths);
 
@@ -920,7 +919,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
                                                             const Commands::GoToTiltPercentage::DecodableType & commandData)
 {
     Percent100ths percent100ths = commandData.tiltPercent100thsValue;
-    EndpointId endpoint = commandPath.mEndpointId;
+    EndpointId endpoint         = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u command received", percent100ths);
 
