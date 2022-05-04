@@ -49,7 +49,7 @@ class PowerConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="batteryVoltage", Tag=0x00000020, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryPercentageRemaining", Tag=0x00000021, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryManufacturer", Tag=0x00000030, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="batterySize", Tag=0x00000031, Type=typing.Optional[PowerConfiguration.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="batterySize", Tag=0x00000031, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryAhrRating", Tag=0x00000032, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryQuantity", Tag=0x00000033, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryRatedVoltage", Tag=0x00000034, Type=typing.Optional[uint]),
@@ -66,7 +66,7 @@ class PowerConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="battery2Voltage", Tag=0x00000040, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery2PercentageRemaining", Tag=0x00000041, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery2Manufacturer", Tag=0x00000050, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="battery2Size", Tag=0x00000051, Type=typing.Optional[PowerConfiguration.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="battery2Size", Tag=0x00000051, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery2AhrRating", Tag=0x00000052, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery2Quantity", Tag=0x00000053, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery2RatedVoltage", Tag=0x00000054, Type=typing.Optional[uint]),
@@ -83,7 +83,7 @@ class PowerConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="battery3Voltage", Tag=0x00000060, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery3PercentageRemaining", Tag=0x00000061, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery3Manufacturer", Tag=0x00000070, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="battery3Size", Tag=0x00000071, Type=typing.Optional[PowerConfiguration.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="battery3Size", Tag=0x00000071, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery3AhrRating", Tag=0x00000072, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery3Quantity", Tag=0x00000073, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="battery3RatedVoltage", Tag=0x00000074, Type=typing.Optional[uint]),
@@ -113,7 +113,7 @@ class PowerConfiguration(Cluster):
     batteryVoltage: 'typing.Optional[uint]' = None
     batteryPercentageRemaining: 'typing.Optional[uint]' = None
     batteryManufacturer: 'typing.Optional[str]' = None
-    batterySize: 'typing.Optional[PowerConfiguration.Enums.enum8]' = None
+    batterySize: 'typing.Optional[uint]' = None
     batteryAhrRating: 'typing.Optional[uint]' = None
     batteryQuantity: 'typing.Optional[uint]' = None
     batteryRatedVoltage: 'typing.Optional[uint]' = None
@@ -130,7 +130,7 @@ class PowerConfiguration(Cluster):
     battery2Voltage: 'typing.Optional[uint]' = None
     battery2PercentageRemaining: 'typing.Optional[uint]' = None
     battery2Manufacturer: 'typing.Optional[str]' = None
-    battery2Size: 'typing.Optional[PowerConfiguration.Enums.enum8]' = None
+    battery2Size: 'typing.Optional[uint]' = None
     battery2AhrRating: 'typing.Optional[uint]' = None
     battery2Quantity: 'typing.Optional[uint]' = None
     battery2RatedVoltage: 'typing.Optional[uint]' = None
@@ -147,7 +147,7 @@ class PowerConfiguration(Cluster):
     battery3Voltage: 'typing.Optional[uint]' = None
     battery3PercentageRemaining: 'typing.Optional[uint]' = None
     battery3Manufacturer: 'typing.Optional[str]' = None
-    battery3Size: 'typing.Optional[PowerConfiguration.Enums.enum8]' = None
+    battery3Size: 'typing.Optional[uint]' = None
     battery3AhrRating: 'typing.Optional[uint]' = None
     battery3Quantity: 'typing.Optional[uint]' = None
     battery3RatedVoltage: 'typing.Optional[uint]' = None
@@ -327,9 +327,9 @@ class PowerConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerConfiguration.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerConfiguration.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class BatteryAhrRating(ClusterAttributeDescriptor):
@@ -599,9 +599,9 @@ class PowerConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerConfiguration.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerConfiguration.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class Battery2AhrRating(ClusterAttributeDescriptor):
@@ -871,9 +871,9 @@ class PowerConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerConfiguration.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerConfiguration.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class Battery3AhrRating(ClusterAttributeDescriptor):
@@ -1443,7 +1443,7 @@ class Identify(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="identifyTime", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="identifyType", Tag=0x00000001, Type=Identify.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="identifyType", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -1452,7 +1452,7 @@ class Identify(Cluster):
             ])
 
     identifyTime: 'uint' = None
-    identifyType: 'Identify.Enums.enum8' = None
+    identifyType: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -1572,9 +1572,9 @@ class Identify(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Identify.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'Identify.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -2862,8 +2862,8 @@ class OnOffSwitchConfiguration(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="switchType", Tag=0x00000000, Type=OnOffSwitchConfiguration.Enums.enum8),
-                ClusterObjectFieldDescriptor(Label="switchActions", Tag=0x00000010, Type=OnOffSwitchConfiguration.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="switchType", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="switchActions", Tag=0x00000010, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -2871,8 +2871,8 @@ class OnOffSwitchConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    switchType: 'OnOffSwitchConfiguration.Enums.enum8' = None
-    switchActions: 'OnOffSwitchConfiguration.Enums.enum8' = None
+    switchType: 'uint' = None
+    switchActions: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -2895,9 +2895,9 @@ class OnOffSwitchConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=OnOffSwitchConfiguration.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'OnOffSwitchConfiguration.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class SwitchActions(ClusterAttributeDescriptor):
@@ -2911,9 +2911,9 @@ class OnOffSwitchConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=OnOffSwitchConfiguration.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'OnOffSwitchConfiguration.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -4033,9 +4033,9 @@ class BinaryInputBasic(Cluster):
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x0000001C, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="inactiveText", Tag=0x0000002E, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="outOfService", Tag=0x00000051, Type=bool),
-                ClusterObjectFieldDescriptor(Label="polarity", Tag=0x00000054, Type=typing.Optional[BinaryInputBasic.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="polarity", Tag=0x00000054, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="presentValue", Tag=0x00000055, Type=bool),
-                ClusterObjectFieldDescriptor(Label="reliability", Tag=0x00000067, Type=typing.Optional[BinaryInputBasic.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="reliability", Tag=0x00000067, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="statusFlags", Tag=0x0000006F, Type=uint),
                 ClusterObjectFieldDescriptor(Label="applicationType", Tag=0x00000100, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -4049,9 +4049,9 @@ class BinaryInputBasic(Cluster):
     description: 'typing.Optional[str]' = None
     inactiveText: 'typing.Optional[str]' = None
     outOfService: 'bool' = None
-    polarity: 'typing.Optional[BinaryInputBasic.Enums.enum8]' = None
+    polarity: 'typing.Optional[uint]' = None
     presentValue: 'bool' = None
-    reliability: 'typing.Optional[BinaryInputBasic.Enums.enum8]' = None
+    reliability: 'typing.Optional[uint]' = None
     statusFlags: 'uint' = None
     applicationType: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -4140,9 +4140,9 @@ class BinaryInputBasic(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[BinaryInputBasic.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[BinaryInputBasic.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class PresentValue(ClusterAttributeDescriptor):
@@ -4172,9 +4172,9 @@ class BinaryInputBasic(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[BinaryInputBasic.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[BinaryInputBasic.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class StatusFlags(ClusterAttributeDescriptor):
@@ -4332,13 +4332,13 @@ class PowerProfile(Cluster):
                             ClusterObjectFieldDescriptor(Label="powerProfileId", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="energyPhaseId", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="powerProfileRemoteControl", Tag=2, Type=bool),
-                            ClusterObjectFieldDescriptor(Label="powerProfileState", Tag=3, Type=PowerProfile.Enums.enum8),
+                            ClusterObjectFieldDescriptor(Label="powerProfileState", Tag=3, Type=uint),
                     ])
 
             powerProfileId: 'uint' = 0
             energyPhaseId: 'uint' = 0
             powerProfileRemoteControl: 'bool' = False
-            powerProfileState: 'PowerProfile.Enums.enum8' = 0
+            powerProfileState: 'uint' = 0
 
         @dataclass
         class ScheduledPhase(ClusterObject):
@@ -8508,12 +8508,12 @@ class PowerSource(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="status", Tag=0x00000000, Type=PowerSource.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="status", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="order", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="wiredAssessedInputVoltage", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="wiredAssessedInputFrequency", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="wiredCurrentType", Tag=0x00000005, Type=typing.Optional[PowerSource.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="wiredCurrentType", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="wiredAssessedCurrent", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="wiredNominalVoltage", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="wiredMaximumCurrent", Tag=0x00000008, Type=typing.Optional[uint]),
@@ -8522,9 +8522,9 @@ class PowerSource(Cluster):
                 ClusterObjectFieldDescriptor(Label="batteryVoltage", Tag=0x0000000B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryPercentRemaining", Tag=0x0000000C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryTimeRemaining", Tag=0x0000000D, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="batteryChargeLevel", Tag=0x0000000E, Type=typing.Optional[PowerSource.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="batteryChargeLevel", Tag=0x0000000E, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryReplacementNeeded", Tag=0x0000000F, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="batteryReplaceability", Tag=0x00000010, Type=typing.Optional[PowerSource.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="batteryReplaceability", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryPresent", Tag=0x00000011, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="activeBatteryFaults", Tag=0x00000012, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="batteryReplacementDescription", Tag=0x00000013, Type=typing.Optional[str]),
@@ -8534,7 +8534,7 @@ class PowerSource(Cluster):
                 ClusterObjectFieldDescriptor(Label="batteryApprovedChemistry", Tag=0x00000017, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryCapacity", Tag=0x00000018, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryQuantity", Tag=0x00000019, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="batteryChargeState", Tag=0x0000001A, Type=typing.Optional[PowerSource.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="batteryChargeState", Tag=0x0000001A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryTimeToFullCharge", Tag=0x0000001B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batteryFunctionalWhileCharging", Tag=0x0000001C, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="batteryChargingCurrent", Tag=0x0000001D, Type=typing.Optional[uint]),
@@ -8546,12 +8546,12 @@ class PowerSource(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    status: 'PowerSource.Enums.enum8' = None
+    status: 'uint' = None
     order: 'uint' = None
     description: 'str' = None
     wiredAssessedInputVoltage: 'typing.Optional[uint]' = None
     wiredAssessedInputFrequency: 'typing.Optional[uint]' = None
-    wiredCurrentType: 'typing.Optional[PowerSource.Enums.enum8]' = None
+    wiredCurrentType: 'typing.Optional[uint]' = None
     wiredAssessedCurrent: 'typing.Optional[uint]' = None
     wiredNominalVoltage: 'typing.Optional[uint]' = None
     wiredMaximumCurrent: 'typing.Optional[uint]' = None
@@ -8560,9 +8560,9 @@ class PowerSource(Cluster):
     batteryVoltage: 'typing.Optional[uint]' = None
     batteryPercentRemaining: 'typing.Optional[uint]' = None
     batteryTimeRemaining: 'typing.Optional[uint]' = None
-    batteryChargeLevel: 'typing.Optional[PowerSource.Enums.enum8]' = None
+    batteryChargeLevel: 'typing.Optional[uint]' = None
     batteryReplacementNeeded: 'typing.Optional[bool]' = None
-    batteryReplaceability: 'typing.Optional[PowerSource.Enums.enum8]' = None
+    batteryReplaceability: 'typing.Optional[uint]' = None
     batteryPresent: 'typing.Optional[bool]' = None
     activeBatteryFaults: 'typing.Optional[typing.List[uint]]' = None
     batteryReplacementDescription: 'typing.Optional[str]' = None
@@ -8572,7 +8572,7 @@ class PowerSource(Cluster):
     batteryApprovedChemistry: 'typing.Optional[uint]' = None
     batteryCapacity: 'typing.Optional[uint]' = None
     batteryQuantity: 'typing.Optional[uint]' = None
-    batteryChargeState: 'typing.Optional[PowerSource.Enums.enum8]' = None
+    batteryChargeState: 'typing.Optional[uint]' = None
     batteryTimeToFullCharge: 'typing.Optional[uint]' = None
     batteryFunctionalWhileCharging: 'typing.Optional[bool]' = None
     batteryChargingCurrent: 'typing.Optional[uint]' = None
@@ -8691,9 +8691,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=PowerSource.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'PowerSource.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class Order(ClusterAttributeDescriptor):
@@ -8771,9 +8771,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerSource.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class WiredAssessedCurrent(ClusterAttributeDescriptor):
@@ -8915,9 +8915,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerSource.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class BatteryReplacementNeeded(ClusterAttributeDescriptor):
@@ -8947,9 +8947,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerSource.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class BatteryPresent(ClusterAttributeDescriptor):
@@ -9107,9 +9107,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[PowerSource.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class BatteryTimeToFullCharge(ClusterAttributeDescriptor):
@@ -10259,7 +10259,7 @@ class GeneralDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="rebootCount", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="upTime", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="totalOperationalHours", Tag=0x00000003, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="bootReasons", Tag=0x00000004, Type=typing.Optional[GeneralDiagnostics.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="bootReasons", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="activeHardwareFaults", Tag=0x00000005, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="activeRadioFaults", Tag=0x00000006, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaults", Tag=0x00000007, Type=typing.Optional[typing.List[uint]]),
@@ -10274,7 +10274,7 @@ class GeneralDiagnostics(Cluster):
     rebootCount: 'uint' = None
     upTime: 'typing.Optional[uint]' = None
     totalOperationalHours: 'typing.Optional[uint]' = None
-    bootReasons: 'typing.Optional[GeneralDiagnostics.Enums.enum8]' = None
+    bootReasons: 'typing.Optional[uint]' = None
     activeHardwareFaults: 'typing.Optional[typing.List[uint]]' = None
     activeRadioFaults: 'typing.Optional[typing.List[uint]]' = None
     activeNetworkFaults: 'typing.Optional[typing.List[uint]]' = None
@@ -10436,9 +10436,9 @@ class GeneralDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[GeneralDiagnostics.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[GeneralDiagnostics.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ActiveHardwareFaults(ClusterAttributeDescriptor):
@@ -10911,7 +10911,7 @@ class ThreadNetworkDiagnostics(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="channel", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=ThreadNetworkDiagnostics.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=uint),
@@ -10981,7 +10981,7 @@ class ThreadNetworkDiagnostics(Cluster):
             ])
 
     channel: 'uint' = None
-    routingRole: 'ThreadNetworkDiagnostics.Enums.enum8' = None
+    routingRole: 'uint' = None
     networkName: 'str' = None
     panId: 'uint' = None
     extendedPanId: 'uint' = None
@@ -11229,9 +11229,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ThreadNetworkDiagnostics.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'ThreadNetworkDiagnostics.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class NetworkName(ClusterAttributeDescriptor):
@@ -15710,7 +15710,7 @@ class ModeSelect(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000000, Type=str),
-                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, ModeSelect.Enums.enum16]),
+                ClusterObjectFieldDescriptor(Label="standardNamespace", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000002, Type=typing.List[ModeSelect.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
@@ -15723,7 +15723,7 @@ class ModeSelect(Cluster):
             ])
 
     description: 'str' = None
-    standardNamespace: 'typing.Union[Nullable, ModeSelect.Enums.enum16]' = None
+    standardNamespace: 'typing.Union[Nullable, uint]' = None
     supportedModes: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
     startUpMode: 'typing.Union[None, Nullable, uint]' = None
@@ -15757,12 +15757,12 @@ class ModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=ModeSelect.Enums.enum16),
-                            ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=ModeSelect.Enums.enum16),
+                            ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
                     ])
 
-            mfgCode: 'ModeSelect.Enums.enum16' = 0
-            value: 'ModeSelect.Enums.enum16' = 0
+            mfgCode: 'uint' = 0
+            value: 'uint' = 0
 
 
 
@@ -15812,9 +15812,9 @@ class ModeSelect(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ModeSelect.Enums.enum16])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, ModeSelect.Enums.enum16]' = NullValue
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -15974,7 +15974,7 @@ class ShadeConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="motorStepSize", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="status", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="closedLimit", Tag=0x00000010, Type=uint),
-                ClusterObjectFieldDescriptor(Label="mode", Tag=0x00000011, Type=ShadeConfiguration.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="mode", Tag=0x00000011, Type=uint),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -15986,7 +15986,7 @@ class ShadeConfiguration(Cluster):
     motorStepSize: 'typing.Optional[uint]' = None
     status: 'uint' = None
     closedLimit: 'uint' = None
-    mode: 'ShadeConfiguration.Enums.enum8' = None
+    mode: 'uint' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -16073,9 +16073,9 @@ class ShadeConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ShadeConfiguration.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'ShadeConfiguration.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -18935,7 +18935,7 @@ class BarrierControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="barrierMovingState", Tag=0x00000001, Type=BarrierControl.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="barrierMovingState", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="barrierSafetyStatus", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="barrierCapabilities", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="barrierOpenEvents", Tag=0x00000004, Type=typing.Optional[uint]),
@@ -18952,7 +18952,7 @@ class BarrierControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    barrierMovingState: 'BarrierControl.Enums.enum8' = None
+    barrierMovingState: 'uint' = None
     barrierSafetyStatus: 'uint' = None
     barrierCapabilities: 'uint' = None
     barrierOpenEvents: 'typing.Optional[uint]' = None
@@ -19013,9 +19013,9 @@ class BarrierControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=BarrierControl.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'BarrierControl.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class BarrierSafetyStatus(ClusterAttributeDescriptor):
@@ -20117,27 +20117,27 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="minSetpointDeadBand", Tag=0x00000019, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="remoteSensing", Tag=0x0000001A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ThermostatControlSequence),
-                ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=Thermostat.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=uint),
                 ClusterObjectFieldDescriptor(Label="alarmMask", Tag=0x0000001D, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[Thermostat.Enums.enum8]),
-                ClusterObjectFieldDescriptor(Label="startOfWeek", Tag=0x00000020, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="startOfWeek", Tag=0x00000020, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfWeeklyTransitions", Tag=0x00000021, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfDailyTransitions", Tag=0x00000022, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="temperatureSetpointHold", Tag=0x00000023, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="temperatureSetpointHold", Tag=0x00000023, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldDuration", Tag=0x00000024, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatProgrammingOperationMode", Tag=0x00000025, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatRunningState", Tag=0x00000029, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="setpointChangeSource", Tag=0x00000030, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="setpointChangeSource", Tag=0x00000030, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeAmount", Tag=0x00000031, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeSourceTimestamp", Tag=0x00000032, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="acType", Tag=0x00000040, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="acType", Tag=0x00000040, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acCapacity", Tag=0x00000041, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="acRefrigerantType", Tag=0x00000042, Type=typing.Optional[Thermostat.Enums.enum8]),
-                ClusterObjectFieldDescriptor(Label="acCompressorType", Tag=0x00000043, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="acRefrigerantType", Tag=0x00000042, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="acCompressorType", Tag=0x00000043, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acErrorCode", Tag=0x00000044, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="acLouverPosition", Tag=0x00000045, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="acLouverPosition", Tag=0x00000045, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="acCoilTemperature", Tag=0x00000046, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="acCapacityFormat", Tag=0x00000047, Type=typing.Optional[Thermostat.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="acCapacityFormat", Tag=0x00000047, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -20167,27 +20167,27 @@ class Thermostat(Cluster):
     minSetpointDeadBand: 'typing.Optional[int]' = None
     remoteSensing: 'typing.Optional[uint]' = None
     controlSequenceOfOperation: 'Thermostat.Enums.ThermostatControlSequence' = None
-    systemMode: 'Thermostat.Enums.enum8' = None
+    systemMode: 'uint' = None
     alarmMask: 'typing.Optional[uint]' = None
-    thermostatRunningMode: 'typing.Optional[Thermostat.Enums.enum8]' = None
-    startOfWeek: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    thermostatRunningMode: 'typing.Optional[uint]' = None
+    startOfWeek: 'typing.Optional[uint]' = None
     numberOfWeeklyTransitions: 'typing.Optional[uint]' = None
     numberOfDailyTransitions: 'typing.Optional[uint]' = None
-    temperatureSetpointHold: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    temperatureSetpointHold: 'typing.Optional[uint]' = None
     temperatureSetpointHoldDuration: 'typing.Optional[uint]' = None
     thermostatProgrammingOperationMode: 'typing.Optional[uint]' = None
     thermostatRunningState: 'typing.Optional[uint]' = None
-    setpointChangeSource: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    setpointChangeSource: 'typing.Optional[uint]' = None
     setpointChangeAmount: 'typing.Optional[int]' = None
     setpointChangeSourceTimestamp: 'typing.Optional[uint]' = None
-    acType: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    acType: 'typing.Optional[uint]' = None
     acCapacity: 'typing.Optional[uint]' = None
-    acRefrigerantType: 'typing.Optional[Thermostat.Enums.enum8]' = None
-    acCompressorType: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    acRefrigerantType: 'typing.Optional[uint]' = None
+    acCompressorType: 'typing.Optional[uint]' = None
     acErrorCode: 'typing.Optional[uint]' = None
-    acLouverPosition: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    acLouverPosition: 'typing.Optional[uint]' = None
     acCoilTemperature: 'typing.Optional[int]' = None
-    acCapacityFormat: 'typing.Optional[Thermostat.Enums.enum8]' = None
+    acCapacityFormat: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -20718,9 +20718,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'Thermostat.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class AlarmMask(ClusterAttributeDescriptor):
@@ -20750,9 +20750,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class StartOfWeek(ClusterAttributeDescriptor):
@@ -20766,9 +20766,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class NumberOfWeeklyTransitions(ClusterAttributeDescriptor):
@@ -20814,9 +20814,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class TemperatureSetpointHoldDuration(ClusterAttributeDescriptor):
@@ -20878,9 +20878,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class SetpointChangeAmount(ClusterAttributeDescriptor):
@@ -20926,9 +20926,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class AcCapacity(ClusterAttributeDescriptor):
@@ -20958,9 +20958,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class AcCompressorType(ClusterAttributeDescriptor):
@@ -20974,9 +20974,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class AcErrorCode(ClusterAttributeDescriptor):
@@ -21006,9 +21006,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class AcCoilTemperature(ClusterAttributeDescriptor):
@@ -21038,9 +21038,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[Thermostat.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21458,11 +21458,11 @@ class DehumidificationControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="relativeHumidity", Tag=0x00000000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="dehumidificationCooling", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="rhDehumidificationSetpoint", Tag=0x00000010, Type=uint),
-                ClusterObjectFieldDescriptor(Label="relativeHumidityMode", Tag=0x00000011, Type=typing.Optional[DehumidificationControl.Enums.enum8]),
-                ClusterObjectFieldDescriptor(Label="dehumidificationLockout", Tag=0x00000012, Type=typing.Optional[DehumidificationControl.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="relativeHumidityMode", Tag=0x00000011, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="dehumidificationLockout", Tag=0x00000012, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="dehumidificationHysteresis", Tag=0x00000013, Type=uint),
                 ClusterObjectFieldDescriptor(Label="dehumidificationMaxCool", Tag=0x00000014, Type=uint),
-                ClusterObjectFieldDescriptor(Label="relativeHumidityDisplay", Tag=0x00000015, Type=typing.Optional[DehumidificationControl.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="relativeHumidityDisplay", Tag=0x00000015, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -21473,11 +21473,11 @@ class DehumidificationControl(Cluster):
     relativeHumidity: 'typing.Optional[uint]' = None
     dehumidificationCooling: 'uint' = None
     rhDehumidificationSetpoint: 'uint' = None
-    relativeHumidityMode: 'typing.Optional[DehumidificationControl.Enums.enum8]' = None
-    dehumidificationLockout: 'typing.Optional[DehumidificationControl.Enums.enum8]' = None
+    relativeHumidityMode: 'typing.Optional[uint]' = None
+    dehumidificationLockout: 'typing.Optional[uint]' = None
     dehumidificationHysteresis: 'uint' = None
     dehumidificationMaxCool: 'uint' = None
-    relativeHumidityDisplay: 'typing.Optional[DehumidificationControl.Enums.enum8]' = None
+    relativeHumidityDisplay: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -21548,9 +21548,9 @@ class DehumidificationControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[DehumidificationControl.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[DehumidificationControl.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DehumidificationLockout(ClusterAttributeDescriptor):
@@ -21564,9 +21564,9 @@ class DehumidificationControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[DehumidificationControl.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[DehumidificationControl.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class DehumidificationHysteresis(ClusterAttributeDescriptor):
@@ -21612,9 +21612,9 @@ class DehumidificationControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[DehumidificationControl.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[DehumidificationControl.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21706,9 +21706,9 @@ class ThermostatUserInterfaceConfiguration(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="temperatureDisplayMode", Tag=0x00000000, Type=ThermostatUserInterfaceConfiguration.Enums.enum8),
-                ClusterObjectFieldDescriptor(Label="keypadLockout", Tag=0x00000001, Type=ThermostatUserInterfaceConfiguration.Enums.enum8),
-                ClusterObjectFieldDescriptor(Label="scheduleProgrammingVisibility", Tag=0x00000002, Type=typing.Optional[ThermostatUserInterfaceConfiguration.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="temperatureDisplayMode", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="keypadLockout", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="scheduleProgrammingVisibility", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -21716,9 +21716,9 @@ class ThermostatUserInterfaceConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    temperatureDisplayMode: 'ThermostatUserInterfaceConfiguration.Enums.enum8' = None
-    keypadLockout: 'ThermostatUserInterfaceConfiguration.Enums.enum8' = None
-    scheduleProgrammingVisibility: 'typing.Optional[ThermostatUserInterfaceConfiguration.Enums.enum8]' = None
+    temperatureDisplayMode: 'uint' = None
+    keypadLockout: 'uint' = None
+    scheduleProgrammingVisibility: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -21741,9 +21741,9 @@ class ThermostatUserInterfaceConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ThermostatUserInterfaceConfiguration.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'ThermostatUserInterfaceConfiguration.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class KeypadLockout(ClusterAttributeDescriptor):
@@ -21757,9 +21757,9 @@ class ThermostatUserInterfaceConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ThermostatUserInterfaceConfiguration.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'ThermostatUserInterfaceConfiguration.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class ScheduleProgrammingVisibility(ClusterAttributeDescriptor):
@@ -21773,9 +21773,9 @@ class ThermostatUserInterfaceConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ThermostatUserInterfaceConfiguration.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[ThermostatUserInterfaceConfiguration.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -21872,10 +21872,10 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="remainingTime", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="currentX", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="currentY", Tag=0x00000004, Type=uint),
-                ClusterObjectFieldDescriptor(Label="driftCompensation", Tag=0x00000005, Type=typing.Optional[ColorControl.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="driftCompensation", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="compensationText", Tag=0x00000006, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="colorTemperature", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="colorMode", Tag=0x00000008, Type=typing.Optional[ColorControl.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="colorMode", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorControlOptions", Tag=0x0000000F, Type=uint),
                 ClusterObjectFieldDescriptor(Label="numberOfPrimaries", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="primary1X", Tag=0x00000011, Type=typing.Optional[uint]),
@@ -21908,7 +21908,7 @@ class ColorControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="colorPointBY", Tag=0x0000003B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorPointBIntensity", Tag=0x0000003C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="enhancedCurrentHue", Tag=0x00004000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="enhancedColorMode", Tag=0x00004001, Type=typing.Optional[ColorControl.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="enhancedColorMode", Tag=0x00004001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopActive", Tag=0x00004002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopDirection", Tag=0x00004003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="colorLoopTime", Tag=0x00004004, Type=typing.Optional[uint]),
@@ -21931,10 +21931,10 @@ class ColorControl(Cluster):
     remainingTime: 'typing.Optional[uint]' = None
     currentX: 'uint' = None
     currentY: 'uint' = None
-    driftCompensation: 'typing.Optional[ColorControl.Enums.enum8]' = None
+    driftCompensation: 'typing.Optional[uint]' = None
     compensationText: 'typing.Optional[str]' = None
     colorTemperature: 'typing.Optional[uint]' = None
-    colorMode: 'typing.Optional[ColorControl.Enums.enum8]' = None
+    colorMode: 'typing.Optional[uint]' = None
     colorControlOptions: 'uint' = None
     numberOfPrimaries: 'typing.Optional[uint]' = None
     primary1X: 'typing.Optional[uint]' = None
@@ -21967,7 +21967,7 @@ class ColorControl(Cluster):
     colorPointBY: 'typing.Optional[uint]' = None
     colorPointBIntensity: 'typing.Optional[uint]' = None
     enhancedCurrentHue: 'typing.Optional[uint]' = None
-    enhancedColorMode: 'typing.Optional[ColorControl.Enums.enum8]' = None
+    enhancedColorMode: 'typing.Optional[uint]' = None
     colorLoopActive: 'typing.Optional[uint]' = None
     colorLoopDirection: 'typing.Optional[uint]' = None
     colorLoopTime: 'typing.Optional[uint]' = None
@@ -22549,9 +22549,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ColorControl.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[ColorControl.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class CompensationText(ClusterAttributeDescriptor):
@@ -22597,9 +22597,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ColorControl.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[ColorControl.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ColorControlOptions(ClusterAttributeDescriptor):
@@ -23125,9 +23125,9 @@ class ColorControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[ColorControl.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[ColorControl.Enums.enum8]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class ColorLoopActive(ClusterAttributeDescriptor):
@@ -23778,7 +23778,7 @@ class IlluminanceMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="minMeasuredValue", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="maxMeasuredValue", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="tolerance", Tag=0x00000003, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="lightSensorType", Tag=0x00000004, Type=typing.Union[None, Nullable, IlluminanceMeasurement.Enums.enum8]),
+                ClusterObjectFieldDescriptor(Label="lightSensorType", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -23790,7 +23790,7 @@ class IlluminanceMeasurement(Cluster):
     minMeasuredValue: 'typing.Union[Nullable, uint]' = None
     maxMeasuredValue: 'typing.Union[Nullable, uint]' = None
     tolerance: 'typing.Optional[uint]' = None
-    lightSensorType: 'typing.Union[None, Nullable, IlluminanceMeasurement.Enums.enum8]' = None
+    lightSensorType: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -23882,9 +23882,9 @@ class IlluminanceMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, IlluminanceMeasurement.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Union[None, Nullable, IlluminanceMeasurement.Enums.enum8]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -24783,7 +24783,7 @@ class OccupancySensing(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="occupancy", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=OccupancySensing.Enums.enum8),
+                ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="pirOccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="pirUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
@@ -24802,7 +24802,7 @@ class OccupancySensing(Cluster):
             ])
 
     occupancy: 'uint' = None
-    occupancySensorType: 'OccupancySensing.Enums.enum8' = None
+    occupancySensorType: 'uint' = None
     occupancySensorTypeBitmap: 'uint' = None
     pirOccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     pirUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
@@ -24851,9 +24851,9 @@ class OccupancySensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=OccupancySensing.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'OccupancySensing.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class OccupancySensorTypeBitmap(ClusterAttributeDescriptor):
@@ -30475,8 +30475,8 @@ class IasZone(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="zoneState", Tag=0x00000000, Type=IasZone.Enums.enum8),
-                ClusterObjectFieldDescriptor(Label="zoneType", Tag=0x00000001, Type=IasZone.Enums.enum16),
+                ClusterObjectFieldDescriptor(Label="zoneState", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="zoneType", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="zoneStatus", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="iasCieAddress", Tag=0x00000010, Type=uint),
                 ClusterObjectFieldDescriptor(Label="zoneId", Tag=0x00000011, Type=uint),
@@ -30489,8 +30489,8 @@ class IasZone(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    zoneState: 'IasZone.Enums.enum8' = None
-    zoneType: 'IasZone.Enums.enum16' = None
+    zoneState: 'uint' = None
+    zoneType: 'uint' = None
     zoneStatus: 'uint' = None
     iasCieAddress: 'uint' = None
     zoneId: 'uint' = None
@@ -30655,9 +30655,9 @@ class IasZone(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=IasZone.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'IasZone.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class ZoneType(ClusterAttributeDescriptor):
@@ -30671,9 +30671,9 @@ class IasZone(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=IasZone.Enums.enum16)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'IasZone.Enums.enum16' = 0
+            value: 'uint' = 0
 
         @dataclass
         class ZoneStatus(ClusterAttributeDescriptor):
@@ -34397,8 +34397,8 @@ class TestCluster(Cluster):
                 ClusterObjectFieldDescriptor(Label="int48s", Tag=0x00000012, Type=int),
                 ClusterObjectFieldDescriptor(Label="int56s", Tag=0x00000013, Type=int),
                 ClusterObjectFieldDescriptor(Label="int64s", Tag=0x00000014, Type=int),
-                ClusterObjectFieldDescriptor(Label="enum8", Tag=0x00000015, Type=TestCluster.Enums.enum8),
-                ClusterObjectFieldDescriptor(Label="enum16", Tag=0x00000016, Type=TestCluster.Enums.enum16),
+                ClusterObjectFieldDescriptor(Label="enum8", Tag=0x00000015, Type=uint),
+                ClusterObjectFieldDescriptor(Label="enum16", Tag=0x00000016, Type=uint),
                 ClusterObjectFieldDescriptor(Label="floatSingle", Tag=0x00000017, Type=float32),
                 ClusterObjectFieldDescriptor(Label="floatDouble", Tag=0x00000018, Type=float),
                 ClusterObjectFieldDescriptor(Label="octetString", Tag=0x00000019, Type=bytes),
@@ -34445,8 +34445,8 @@ class TestCluster(Cluster):
                 ClusterObjectFieldDescriptor(Label="nullableInt48s", Tag=0x00004012, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="nullableInt56s", Tag=0x00004013, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="nullableInt64s", Tag=0x00004014, Type=typing.Union[Nullable, int]),
-                ClusterObjectFieldDescriptor(Label="nullableEnum8", Tag=0x00004015, Type=typing.Union[Nullable, TestCluster.Enums.enum8]),
-                ClusterObjectFieldDescriptor(Label="nullableEnum16", Tag=0x00004016, Type=typing.Union[Nullable, TestCluster.Enums.enum16]),
+                ClusterObjectFieldDescriptor(Label="nullableEnum8", Tag=0x00004015, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="nullableEnum16", Tag=0x00004016, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="nullableFloatSingle", Tag=0x00004017, Type=typing.Union[Nullable, float32]),
                 ClusterObjectFieldDescriptor(Label="nullableFloatDouble", Tag=0x00004018, Type=typing.Union[Nullable, float]),
                 ClusterObjectFieldDescriptor(Label="nullableOctetString", Tag=0x00004019, Type=typing.Union[Nullable, bytes]),
@@ -34485,8 +34485,8 @@ class TestCluster(Cluster):
     int48s: 'int' = None
     int56s: 'int' = None
     int64s: 'int' = None
-    enum8: 'TestCluster.Enums.enum8' = None
-    enum16: 'TestCluster.Enums.enum16' = None
+    enum8: 'uint' = None
+    enum16: 'uint' = None
     floatSingle: 'float32' = None
     floatDouble: 'float' = None
     octetString: 'bytes' = None
@@ -34533,8 +34533,8 @@ class TestCluster(Cluster):
     nullableInt48s: 'typing.Union[Nullable, int]' = None
     nullableInt56s: 'typing.Union[Nullable, int]' = None
     nullableInt64s: 'typing.Union[Nullable, int]' = None
-    nullableEnum8: 'typing.Union[Nullable, TestCluster.Enums.enum8]' = None
-    nullableEnum16: 'typing.Union[Nullable, TestCluster.Enums.enum16]' = None
+    nullableEnum8: 'typing.Union[Nullable, uint]' = None
+    nullableEnum16: 'typing.Union[Nullable, uint]' = None
     nullableFloatSingle: 'typing.Union[Nullable, float32]' = None
     nullableFloatDouble: 'typing.Union[Nullable, float]' = None
     nullableOctetString: 'typing.Union[Nullable, bytes]' = None
@@ -35674,9 +35674,9 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TestCluster.Enums.enum8)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'TestCluster.Enums.enum8' = 0
+            value: 'uint' = 0
 
         @dataclass
         class Enum16(ClusterAttributeDescriptor):
@@ -35690,9 +35690,9 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TestCluster.Enums.enum16)
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'TestCluster.Enums.enum16' = 0
+            value: 'uint' = 0
 
         @dataclass
         class FloatSingle(ClusterAttributeDescriptor):
@@ -36446,9 +36446,9 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, TestCluster.Enums.enum8])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, TestCluster.Enums.enum8]' = NullValue
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableEnum16(ClusterAttributeDescriptor):
@@ -36462,9 +36462,9 @@ class TestCluster(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, TestCluster.Enums.enum16])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, TestCluster.Enums.enum16]' = NullValue
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableFloatSingle(ClusterAttributeDescriptor):

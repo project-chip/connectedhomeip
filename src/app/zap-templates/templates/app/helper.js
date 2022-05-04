@@ -549,6 +549,12 @@ async function _zapTypeToPythonClusterObjectType(type, options)
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
+      // Catching baseline enums and converting them into 'uint[size]_t'
+      let s = type.toLowerCase().match(/^enum\d+$/g) ? type.match(/\d+$/g).join('') : null
+      if (s)
+      {
+        return 'uint'
+      }
       return ns + '.Enums.' + type;
     }
 
