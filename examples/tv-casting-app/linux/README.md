@@ -104,7 +104,7 @@ valid cached fabric will be used.
 
         tv-casting-app> cast delete-fabric 1
 
--   Switch to fabric index
+-   Switch to fabric index 
 
         tv-casting-app> cast set-fabric 1
 
@@ -121,9 +121,9 @@ the video player (TV). For convenience, when nodeId '0' is used, the
 tv-casting-app will use the cached nodeId for the video player corresponding to
 the current fabric.
 
-The tv-casting-app is able to determine the nodeId for the given fabric by
-checking its binding table since the video player sets bindings on the
-tv-casting-app for each endpoint to which the tv-casting-app is granted access
+The tv-casting-app is able to determine the nodeId for the given fabric by 
+checking its binding table since the video player sets bindings on the 
+tv-casting-app for each endpoint to which the tv-casting-app is granted access 
 during commissioning.
 
 -   Run the tv-casting-app and invoke a cluster command using default fabric,
@@ -151,7 +151,7 @@ during commissioning.
 
         tv-casting-app> cast cluster keypadinput send-key 1 0 1
 
--   Run the tv-casting-app and invoke a cluster command from the shell using
+-   Run the tv-casting-app and invoke a cluster command from the shell using 
     default fabric, target video player nodeId 0xFFFFFFEFFFFFFFFF
 
         tv-casting-app> cast cluster keypadinput send-key 1 0xFFFFFFEFFFFFFFFF 1
