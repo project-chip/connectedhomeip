@@ -26,49 +26,60 @@ const char * getScriptsFolder()
 }
 } // namespace
 
-constexpr size_t kCommandMaxLen = 256;
+constexpr size_t kCommandMaxLen    = 256;
+constexpr const char * kDefaultKey = "default";
 
-CHIP_ERROR SystemCommands::Start(uint16_t discriminator, uint16_t port, const char * kvs, const char * registerKey)
+CHIP_ERROR SystemCommands::Start(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Start::Type & value)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Start.py";
 
     char command[kCommandMaxLen];
     chip::StringBuilderBase builder(command, sizeof(command));
-    ReturnErrorOnFailure(CreateCommonCommandArgs(builder, scriptDir, scriptName, registerKey, discriminator, port, kvs));
+    ReturnErrorOnFailure(CreateCommonCommandArgs(builder, scriptDir, scriptName, value));
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::Stop(const char * registerKey)
+CHIP_ERROR SystemCommands::Stop(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Stop::Type & value)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Stop.py";
 
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
-                        CHIP_ERROR_INTERNAL);
+    char command[kCommandMaxLen];
+    const char * registerKey    = value.registerKey.HasValue() ? value.registerKey.Value().data() : kDefaultKey;
+    const size_t registerKeyLen = value.registerKey.HasValue() ? value.registerKey.Value().size() : strlen(kDefaultKey);
+    VerifyOrReturnError(
+        snprintf(command, sizeof(command), "%s%s %.*s", scriptDir, scriptName, static_cast<int>(registerKeyLen), registerKey) >= 0,
+        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::Reboot(const char * registerKey)
+CHIP_ERROR SystemCommands::Reboot(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Reboot::Type & value)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "Reboot.py";
 
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
-                        CHIP_ERROR_INTERNAL);
+    char command[kCommandMaxLen];
+    const char * registerKey    = value.registerKey.HasValue() ? value.registerKey.Value().data() : kDefaultKey;
+    const size_t registerKeyLen = value.registerKey.HasValue() ? value.registerKey.Value().size() : strlen(kDefaultKey);
+    VerifyOrReturnError(
+        snprintf(command, sizeof(command), "%s%s %.*s", scriptDir, scriptName, static_cast<int>(registerKeyLen), registerKey) >= 0,
+        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 
-CHIP_ERROR SystemCommands::FactoryReset(const char * registerKey)
+CHIP_ERROR SystemCommands::FactoryReset(const char * identity,
+                                        const chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type & value)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "FactoryReset.py";
 
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %s", scriptDir, scriptName, registerKey) >= 0,
-                        CHIP_ERROR_INTERNAL);
+    char command[kCommandMaxLen];
+    const char * registerKey    = value.registerKey.HasValue() ? value.registerKey.Value().data() : kDefaultKey;
+    const size_t registerKeyLen = value.registerKey.HasValue() ? value.registerKey.Value().size() : strlen(kDefaultKey);
+    VerifyOrReturnError(
+        snprintf(command, sizeof(command), "%s%s %.*s", scriptDir, scriptName, static_cast<int>(registerKeyLen), registerKey) >= 0,
+        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 
@@ -79,30 +90,44 @@ CHIP_ERROR SystemCommands::RunInternal(const char * command)
 }
 
 CHIP_ERROR SystemCommands::CreateCommonCommandArgs(chip::StringBuilderBase & builder, const char * scriptDir,
-                                                   const char * scriptName, const char * registerKey, uint16_t discriminator,
-                                                   uint16_t port, const char * kvs)
+                                                   const char * scriptName,
+                                                   const chip::app::Clusters::SystemCommands::Commands::Start::Type & value)
 {
-    VerifyOrReturnError(registerKey != nullptr, CHIP_ERROR_INVALID_KEY_ID);
-
     builder.Add(scriptDir);
     builder.Add(scriptName);
     builder.Add(" ");
-    builder.Add(registerKey);
+
+    if (value.registerKey.HasValue())
+    {
+        VerifyOrReturnError(value.registerKey.Value().size() < 128, CHIP_ERROR_INVALID_ARGUMENT);
+        char registerKey[128];
+        memset(registerKey, '\0', sizeof(registerKey));
+        strncpy(registerKey, value.registerKey.Value().data(), value.registerKey.Value().size());
+        builder.Add(registerKey);
+    }
+    else
+    {
+        builder.Add("default");
+    }
 
     // Add any applicable optional command line options
-    if (discriminator != 0xFFFF)
+    if (value.discriminator.HasValue())
     {
         builder.Add(" --discriminator ");
-        builder.Add(discriminator);
+        builder.Add(value.discriminator.Value());
     }
-    if (port != CHIP_PORT)
+    if (value.port.HasValue())
     {
         builder.Add(" --secured-device-port ");
-        builder.Add(port);
+        builder.Add(value.port.Value());
     }
-    if (kvs != nullptr)
+    if (value.kvs.HasValue())
     {
+        VerifyOrReturnError(value.kvs.Value().size() < 128, CHIP_ERROR_INVALID_ARGUMENT);
         builder.Add(" --KVS ");
+        char kvs[128];
+        memset(kvs, '\0', sizeof(kvs));
+        strncpy(kvs, value.kvs.Value().data(), value.kvs.Value().size());
         builder.Add(kvs);
     }
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
