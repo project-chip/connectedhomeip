@@ -359,8 +359,8 @@ class TestParser(unittest.TestCase):
     def test_endpoints(self):
         actual = parseText("""
             endpoint 12 {
-                server cluster Foo;
-                server cluster Bar;
+                server cluster Foo {}
+                server cluster Bar {}
                 binding cluster Bar;
                 binding cluster Test;
             }

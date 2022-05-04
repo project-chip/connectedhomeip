@@ -129,12 +129,6 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
-    def endpoint_server_cluster(self, _):
-        return EndpointContentType.SERVER_CLUSTER
-
-    def endpoint_binding_to_cluster(self, _):
-        return EndpointContentType.CLIENT_BINDING
-
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
 
@@ -285,8 +279,12 @@ class MatterIdlTransformer(Transformer):
         return endpoint
 
     @v_args(inline=True)
-    def endpoint_cluster(self, t, id):
-        return (t, id)
+    def endpoint_cluster_binding(self, id):
+        return (EndpointContentType.CLIENT_BINDING, id)
+
+    @v_args(inline=True)
+    def endpoint_server_cluster(self, id):
+        return (EndpointContentType.SERVER_CLUSTER, id)
 
     @v_args(inline=True)
     def cluster(self, side, name, code, *content):

@@ -50,10 +50,10 @@ cluster: cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|
              | "client"i -> client_cluster
 
 endpoint: "endpoint"i positive_integer "{" endpoint_cluster* "}"
-endpoint_cluster: endpoint_cluster_type "cluster"i id ";"
+?endpoint_cluster: endpoint_cluster_binding | endpoint_server_cluster
 
-?endpoint_cluster_type: "server"i   -> endpoint_server_cluster
-                      | "binding"i  -> endpoint_binding_to_cluster
+endpoint_cluster_binding: "binding"i "cluster"i id ";"
+endpoint_server_cluster: "server"i "cluster"i id "{" "}"
 
 bool_default: "true"i  -> bool_default_true
             | "false"i -> bool_default_false
