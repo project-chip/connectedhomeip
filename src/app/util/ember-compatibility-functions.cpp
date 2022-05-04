@@ -580,6 +580,25 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         attributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
+    // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
+    // depending on whether the path was expanded.
+
+    {
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            if (aPath.mExpanded)
+            {
+                return CHIP_NO_ERROR;
+            }
+
+            return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+        }
+    }
+
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
         switch (aPath.mAttributeId)
@@ -599,25 +618,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
             break;
         }
         return SendFailureStatus(aPath, aAttributeReports, UnsupportedAttributeStatus(aPath), nullptr);
-    }
-
-    // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
-    // depending on whether the path was expanded.
-
-    {
-        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadAttribute(aPath);
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
-        if (err != CHIP_NO_ERROR)
-        {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
-            if (aPath.mExpanded)
-            {
-                return CHIP_NO_ERROR;
-            }
-
-            return SendFailureStatus(aPath, aAttributeReports, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
-        }
     }
 
     {
