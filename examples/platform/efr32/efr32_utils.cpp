@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2022 Silabs.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +17,21 @@
  *    limitations under the License.
  */
 
-#pragma once
-
 #include "efr32_utils.h"
+#include "init_efrPlatform.h"
+#include "sl_system_kernel.h"
 
-// ---- Lighting Example App Config ----
+#include <matter_config.h>
 
-#define APP_TASK_NAME "Lit"
+void appError(int err)
+{
+    EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    portDISABLE_INTERRUPTS();
+    while (1)
+        ;
+}
 
-// Time it takes in ms for the simulated actuator to move from one
-// state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 10
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(error.AsInteger()));
+}
