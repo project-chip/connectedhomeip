@@ -75,7 +75,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
                 idx++;
             }
 
-            uint8_t i, j, k;
+            int i, j, k;
             for (i = 0; i < idx - 1; i++)
             {
                 for (j = 0; j < idx - i - 1; j++)
