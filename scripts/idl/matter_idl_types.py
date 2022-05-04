@@ -172,7 +172,7 @@ class Cluster:
 class AttributeInstantiation:
     name: str
     storage: AttributeStorage
-    default: Optional[Union[str | int | bool]] = None
+    default: Optional[Union[str, int, bool]] = None
 
 
 @dataclass
