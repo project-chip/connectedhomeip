@@ -97,7 +97,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
         $ cd ${HOME}/tools/esp-idf
         $ ./install.sh
         $ . ./export.sh
-        $ cd {path-to-connectedhomeip}
+        $ cd {path-to-connectedhomeip}/examples/all-clusters-app/esp32/
         ```
 
     To download and install packages.
