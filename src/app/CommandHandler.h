@@ -302,8 +302,7 @@ private:
      */
     CHIP_ERROR ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
-    CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
-                                 const Optional<ClusterStatus> & aClusterStatus);
+    CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
      * If this function fails, it may leave our TLV buffer in an inconsistent state.  Callers should snapshot as needed before
