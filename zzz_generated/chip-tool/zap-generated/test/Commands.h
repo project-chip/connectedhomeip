@@ -48747,14 +48747,10 @@ private:
             return Stop(kIdentityAlpha, value);
         }
         case 8: {
-            LogStep(8, "Start the default accessory with all command line options");
+            LogStep(8, "Start the default accessory with minCommissioningTimeout only");
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
-            value.discriminator.Emplace();
-            value.discriminator.Value() = 1111U;
-            value.port.Emplace();
-            value.port.Value() = 5560U;
-            value.kvs.Emplace();
-            value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_defaultgarbage: not in length on purpose", 21);
+            value.minCommissioningTimeout.Emplace();
+            value.minCommissioningTimeout.Value() = 10U;
             return Start(kIdentityAlpha, value);
         }
         case 9: {
@@ -48771,6 +48767,8 @@ private:
             value.port.Value() = 5560U;
             value.kvs.Emplace();
             value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_defaultgarbage: not in length on purpose", 21);
+            value.minCommissioningTimeout.Emplace();
+            value.minCommissioningTimeout.Value() = 10U;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
             return Start(kIdentityAlpha, value);
