@@ -3758,899 +3758,893 @@ server cluster WindowCovering = 258 {
 }
 
 
+
 endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
-  server cluster AccessControl {
-      ACL = ;
-      Extension = ;
-      SubjectsPerAccessControlEntry = 4;
-      TargetsPerAccessControlEntry = 3;
-      AccessControlEntriesPerFabric = 3;
-      ClusterRevision = 1;
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute identifyType;
+    ram      attribute clusterRevision default = 4;
   }
 
-  server cluster AdministratorCommissioning {
-      WindowStatus = 0;
-      AdminFabricIndex = 1;
-      AdminVendorId = 0;
-      ClusterRevision = 1;
-  }
-
-  server cluster Basic {
-      DataModelRevision = 10;
-      VendorName = ;
-      VendorID = ;
-      ProductName = ;
-      ProductID = ;
-      NodeLabel = ;
-      Location = XX;
-      HardwareVersion = 0;
-      HardwareVersionString = ;
-      SoftwareVersion = 0;
-      SoftwareVersionString = ;
-      ManufacturingDate = 20210614123456ZZ;
-      PartNumber = ;
-      ProductURL = ;
-      ProductLabel = ;
-      SerialNumber = ;
-      LocalConfigDisabled = 0;
-      Reachable = 1;
-      UniqueID = ;
-      CapabilityMinima = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster Binding {
-      Binding = ;
-      ClusterRevision = 1;
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster Descriptor {
-      device list = ;
-      server list = ;
-      client list = ;
-      parts list = ;
-      ClusterRevision = 1;
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AccessControl {
+    callback attribute acl;
+    callback attribute extension;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OtaSoftwareUpdateRequestor {
+    callback attribute defaultOtaProviders;
+    ram      attribute updatePossible default = 1;
+    ram      attribute updateState;
+    ram      attribute updateStateProgress;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat;
+    persist  attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitLocalization {
+    persist  attribute temperatureUnit;
+    ram      attribute featureMap default = 0x1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster PowerSourceConfiguration {
+    callback attribute sources;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GeneralCommissioning {
+    ram      attribute breadcrumb;
+    callback attribute basicCommissioningInfo;
+    ram      attribute regulatoryConfig;
+    ram      attribute locationCapability;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap default = 6;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster DiagnosticLogs {
   }
 
-  server cluster EthernetNetworkDiagnostics {
-      PHYRate = ;
-      FullDuplex = 0x00;
-      PacketRxCount = 0x0000000000000000;
-      PacketTxCount = 0x0000000000000000;
-      TxErrCount = 0x0000000000000000;
-      CollisionCount = 0x0000000000000000;
-      OverrunCount = 0x0000000000000000;
-      CarrierDetect = 0x00;
-      TimeSinceReset = 0x0000000000000000;
-      FeatureMap = 3;
-      ClusterRevision = 1;
-  }
-
-  server cluster FixedLabel {
-      label list = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster GeneralCommissioning {
-      Breadcrumb = 0x0000000000000000;
-      BasicCommissioningInfo = ;
-      RegulatoryConfig = 0;
-      LocationCapability = 0;
-      SupportsConcurrentConnection = 1;
-      FeatureMap = 6;
-      ClusterRevision = 1;
-  }
-
   server cluster GeneralDiagnostics {
-      NetworkInterfaces = ;
-      RebootCount = 0x0000;
-      UpTime = 0x0000000000000000;
-      TotalOperationalHours = 0x00000000;
-      BootReasons = ;
-      ActiveHardwareFaults = ;
-      ActiveRadioFaults = ;
-      ActiveNetworkFaults = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster GroupKeyManagement {
-      GroupKeyMap = ;
-      GroupTable = ;
-      MaxGroupsPerFabric = ;
-      MaxGroupKeysPerFabric = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster Groups {
-      name support = ;
-      ClusterRevision = 4;
-  }
-
-  server cluster Identify {
-      identify time = 0x0000;
-      identify type = 0x0;
-      ClusterRevision = 4;
-  }
-
-  server cluster LocalizationConfiguration {
-      ActiveLocale = en-US;
-      SupportedLocales = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster NetworkCommissioning {
-      MaxNetworks = ;
-      Networks = ;
-      ScanMaxTimeSeconds = ;
-      ConnectMaxTimeSeconds = ;
-      InterfaceEnabled = ;
-      LastNetworkingStatus = ;
-      LastNetworkID = ;
-      LastConnectErrorValue = ;
-      FeatureMap = 0;
-      ClusterRevision = 1;
-  }
-
-  server cluster OtaSoftwareUpdateRequestor {
-      DefaultOtaProviders = 0;
-      UpdatePossible = 1;
-      UpdateState = 0;
-      UpdateStateProgress = 0;
-      ClusterRevision = 1;
-  }
-
-  server cluster OperationalCredentials {
-      NOCs = ;
-      Fabrics = ;
-      SupportedFabrics = ;
-      CommissionedFabrics = ;
-      TrustedRootCertificates = ;
-      CurrentFabricIndex = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster PowerSourceConfiguration {
-      Sources = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster RelativeHumidityMeasurement {
-      measured value = ;
-      min measured value = 0;
-      max measured value = 0x2710;
-      tolerance = ;
-      ClusterRevision = 2;
+    callback attribute networkInterfaces;
+    ram      attribute rebootCount;
+    ram      attribute upTime;
+    ram      attribute totalOperationalHours;
+    ram      attribute bootReasons;
+    callback attribute activeHardwareFaults;
+    callback attribute activeRadioFaults;
+    callback attribute activeNetworkFaults;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster SoftwareDiagnostics {
-      ThreadMetrics = ;
-      CurrentHeapFree = 0x0000000000000000;
-      CurrentHeapUsed = 0x0000000000000000;
-      CurrentHeapHighWatermark = 0x0000000000000000;
-      FeatureMap = 1;
-      ClusterRevision = 1;
+    callback attribute threadMetrics;
+    ram      attribute currentHeapFree;
+    ram      attribute currentHeapUsed;
+    ram      attribute currentHeapHighWatermark;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster ThreadNetworkDiagnostics {
-      channel = ;
-      RoutingRole = ;
-      NetworkName = 0;
-      PanId = 0x0000;
-      ExtendedPanId = 0x0000000000000000;
-      MeshLocalPrefix = ;
-      OverrunCount = 0x0000000000000000;
-      NeighborTableList = ;
-      RouteTableList = ;
-      PartitionId = ;
-      weighting = ;
-      DataVersion = ;
-      StableDataVersion = ;
-      LeaderRouterId = ;
-      DetachedRoleCount = 0x0000;
-      ChildRoleCount = 0x0000;
-      RouterRoleCount = 0x0000;
-      LeaderRoleCount = 0x0000;
-      AttachAttemptCount = 0x0000;
-      PartitionIdChangeCount = 0x0000;
-      BetterPartitionAttachAttemptCount = 0x0000;
-      ParentChangeCount = 0x0000;
-      TxTotalCount = 0x0000;
-      TxUnicastCount = 0x0000;
-      TxBroadcastCount = 0x0000;
-      TxAckRequestedCount = 0x0000;
-      TxAckedCount = 0x0000;
-      TxNoAckRequestedCount = 0x0000;
-      TxDataCount = 0x0000;
-      TxDataPollCount = 0x0000;
-      TxBeaconCount = 0x0000;
-      TxBeaconRequestCount = 0x0000;
-      TxOtherCount = 0x0000;
-      TxRetryCount = 0x0000;
-      TxDirectMaxRetryExpiryCount = 0x0000;
-      TxIndirectMaxRetryExpiryCount = 0x0000;
-      TxErrCcaCount = 0x0000;
-      TxErrAbortCount = 0x0000;
-      TxErrBusyChannelCount = 0x0000;
-      RxTotalCount = 0x0000;
-      RxUnicastCount = 0x0000;
-      RxBroadcastCount = 0x0000;
-      RxDataCount = 0x0000;
-      RxDataPollCount = 0x0000;
-      RxBeaconCount = 0x0000;
-      RxBeaconRequestCount = 0x0000;
-      RxOtherCount = 0x0000;
-      RxAddressFilteredCount = 0x0000;
-      RxDestAddrFilteredCount = 0x0000;
-      RxDuplicatedCount = 0x0000;
-      RxErrNoFrameCount = 0x0000;
-      RxErrUnknownNeighborCount = 0x0000;
-      RxErrInvalidSrcAddrCount = 0x0000;
-      RxErrSecCount = 0x0000;
-      RxErrFcsCount = 0x0000;
-      RxErrOtherCount = 0x0000;
-      ActiveTimestamp = 0x0000000000000000;
-      PendingTimestamp = 0x0000000000000000;
-      delay = 0x0000;
-      SecurityPolicy = ;
-      ChannelMask = 0x0000;
-      OperationalDatasetComponents = ;
-      ActiveNetworkFaultsList = ;
-      FeatureMap = 0x000F;
-      ClusterRevision = 1;
-  }
-
-  server cluster TimeFormatLocalization {
-      HourFormat = 0;
-      ActiveCalendarType = 0;
-      SupportedCalendarTypes = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster UnitLocalization {
-      TemperatureUnit = 0;
-      FeatureMap = 0x1;
-      ClusterRevision = 1;
-  }
-
-  server cluster UserLabel {
-      label list = ;
-      ClusterRevision = 1;
+    ram      attribute channel;
+    ram      attribute routingRole;
+    ram      attribute networkName;
+    ram      attribute panId;
+    ram      attribute extendedPanId;
+    ram      attribute meshLocalPrefix;
+    ram      attribute overrunCount;
+    callback attribute neighborTableList;
+    callback attribute routeTableList;
+    ram      attribute partitionId;
+    ram      attribute weighting;
+    ram      attribute dataVersion;
+    ram      attribute stableDataVersion;
+    ram      attribute leaderRouterId;
+    ram      attribute detachedRoleCount;
+    ram      attribute childRoleCount;
+    ram      attribute routerRoleCount;
+    ram      attribute leaderRoleCount;
+    ram      attribute attachAttemptCount;
+    ram      attribute partitionIdChangeCount;
+    ram      attribute betterPartitionAttachAttemptCount;
+    ram      attribute parentChangeCount;
+    ram      attribute txTotalCount;
+    ram      attribute txUnicastCount;
+    ram      attribute txBroadcastCount;
+    ram      attribute txAckRequestedCount;
+    ram      attribute txAckedCount;
+    ram      attribute txNoAckRequestedCount;
+    ram      attribute txDataCount;
+    ram      attribute txDataPollCount;
+    ram      attribute txBeaconCount;
+    ram      attribute txBeaconRequestCount;
+    ram      attribute txOtherCount;
+    ram      attribute txRetryCount;
+    ram      attribute txDirectMaxRetryExpiryCount;
+    ram      attribute txIndirectMaxRetryExpiryCount;
+    ram      attribute txErrCcaCount;
+    ram      attribute txErrAbortCount;
+    ram      attribute txErrBusyChannelCount;
+    ram      attribute rxTotalCount;
+    ram      attribute rxUnicastCount;
+    ram      attribute rxBroadcastCount;
+    ram      attribute rxDataCount;
+    ram      attribute rxDataPollCount;
+    ram      attribute rxBeaconCount;
+    ram      attribute rxBeaconRequestCount;
+    ram      attribute rxOtherCount;
+    ram      attribute rxAddressFilteredCount;
+    ram      attribute rxDestAddrFilteredCount;
+    ram      attribute rxDuplicatedCount;
+    ram      attribute rxErrNoFrameCount;
+    ram      attribute rxErrUnknownNeighborCount;
+    ram      attribute rxErrInvalidSrcAddrCount;
+    ram      attribute rxErrSecCount;
+    ram      attribute rxErrFcsCount;
+    ram      attribute rxErrOtherCount;
+    ram      attribute activeTimestamp;
+    ram      attribute pendingTimestamp;
+    ram      attribute delay;
+    callback attribute securityPolicy;
+    ram      attribute channelMask;
+    callback attribute operationalDatasetComponents;
+    callback attribute activeNetworkFaultsList;
+    ram      attribute featureMap default = 0x000F;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster WiFiNetworkDiagnostics {
-      bssid = ;
-      SecurityType = ;
-      WiFiVersion = ;
-      ChannelNumber = 0x0000;
-      Rssi = 0x00;
-      BeaconLostCount = 0x00000000;
-      BeaconRxCount = 0x00000000;
-      PacketMulticastRxCount = 0x00000000;
-      PacketMulticastTxCount = 0x00000000;
-      PacketUnicastRxCount = 0x00000000;
-      PacketUnicastTxCount = 0x00000000;
-      CurrentMaxRate = 0x0000000000000000;
-      OverrunCount = 0x0000000000000000;
-      FeatureMap = 3;
-      ClusterRevision = 1;
+    ram      attribute bssid;
+    ram      attribute securityType;
+    ram      attribute wiFiVersion;
+    ram      attribute channelNumber;
+    ram      attribute rssi;
+    ram      attribute beaconLostCount;
+    ram      attribute beaconRxCount;
+    ram      attribute packetMulticastRxCount;
+    ram      attribute packetMulticastTxCount;
+    ram      attribute packetUnicastRxCount;
+    ram      attribute packetUnicastTxCount;
+    ram      attribute currentMaxRate;
+    ram      attribute overrunCount;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
   }
 
-}
-
-endpoint 1 {
-
-  server cluster AccountLogin {
-      ClusterRevision = 1;
+  server cluster EthernetNetworkDiagnostics {
+    callback attribute PHYRate;
+    callback attribute fullDuplex;
+    callback attribute packetRxCount;
+    callback attribute packetTxCount;
+    callback attribute txErrCount;
+    callback attribute collisionCount;
+    callback attribute overrunCount;
+    callback attribute carrierDetect;
+    callback attribute timeSinceReset;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
   }
 
-  server cluster ApplicationBasic {
-      VendorName = ;
-      VendorID = ;
-      ApplicationName = ;
-      ProductID = ;
-      Status = ;
-      ApplicationVersion = ;
-      AllowedVendorList = ;
-      ClusterRevision = 1;
+  server cluster AdministratorCommissioning {
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex default = 1;
+    callback attribute adminVendorId;
+    ram      attribute clusterRevision default = 1;
   }
 
-  server cluster ApplicationLauncher {
-      CatalogList = ;
-      ClusterRevision = 1;
+  server cluster OperationalCredentials {
+    callback attribute NOCs;
+    callback attribute fabrics;
+    ram      attribute supportedFabrics;
+    ram      attribute commissionedFabrics;
+    callback attribute trustedRootCertificates;
+    callback attribute currentFabricIndex;
+    ram      attribute clusterRevision default = 1;
   }
 
-  server cluster AudioOutput {
-      OutputList = ;
-      CurrentOutput = 0x00;
-      ClusterRevision = 1;
-  }
-
-  server cluster BarrierControl {
-      barrier moving state = ;
-      barrier safety status = ;
-      barrier capabilities = ;
-      barrier position = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster BinaryInputBasic {
-      out of service = 0x00;
-      present value = ;
-      status flags = 0x00;
-      ClusterRevision = 1;
-  }
-
-  server cluster Binding {
-      Binding = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster BooleanState {
-      StateValue = 0;
-      ClusterRevision = 1;
-  }
-
-  server cluster BridgedActions {
-      action list = ;
-      endpoint list = ;
-      setup url = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster Channel {
-      ChannelList = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster ColorControl {
-      current hue = 0x00;
-      current saturation = 0x00;
-      remaining time = 0x0000;
-      current x = 0x616B;
-      current y = 0x607D;
-      drift compensation = ;
-      compensation text = ;
-      color temperature = 0x00FA;
-      color mode = 0x01;
-      color control options = 0x00;
-      number of primaries = ;
-      primary 1 x = ;
-      primary 1 y = ;
-      primary 1 intensity = ;
-      primary 2 x = ;
-      primary 2 y = ;
-      primary 2 intensity = ;
-      primary 3 x = ;
-      primary 3 y = ;
-      primary 3 intensity = ;
-      primary 4 x = ;
-      primary 4 y = ;
-      primary 4 intensity = ;
-      primary 5 x = ;
-      primary 5 y = ;
-      primary 5 intensity = ;
-      primary 6 x = ;
-      primary 6 y = ;
-      primary 6 intensity = ;
-      white point x = ;
-      white point y = ;
-      color point r x = ;
-      color point r y = ;
-      color point r intensity = ;
-      color point g x = ;
-      color point g y = ;
-      color point g intensity = ;
-      color point b x = ;
-      color point b y = ;
-      color point b intensity = ;
-      enhanced current hue = 0x0000;
-      enhanced color mode = 0x01;
-      color loop active = 0x00;
-      color loop direction = 0x00;
-      color loop time = 0x0019;
-      color loop start enhanced hue = 0x2300;
-      color loop stored enhanced hue = 0x0000;
-      color capabilities = 0x0000;
-      color temp physical min = 0x0000;
-      color temp physical max = 0xFEFF;
-      couple color temp to level min-mireds = ;
-      start up color temperature mireds = ;
-      FeatureMap = 0x1F;
-      ClusterRevision = 5;
-  }
-
-  server cluster ContentLauncher {
-      AcceptHeader = ;
-      SupportedStreamingProtocols = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster Descriptor {
-      device list = ;
-      server list = ;
-      client list = ;
-      parts list = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster DoorLock {
-      LockState = 2;
-      LockType = ;
-      ActuatorEnabled = ;
-      DoorState = ;
-      DoorOpenEvents = ;
-      DoorClosedEvents = ;
-      OpenPeriod = ;
-      NumberOfTotalUsersSupported = 10;
-      NumberOfPINUsersSupported = 10;
-      NumberOfRFIDUsersSupported = 10;
-      NumberOfWeekDaySchedulesSupportedPerUser = 10;
-      NumberOfYearDaySchedulesSupportedPerUser = 10;
-      NumberOfHolidaySchedulesSupported = 0;
-      MaxPINCodeLength = 6;
-      MinPINCodeLength = 6;
-      MaxRFIDCodeLength = 20;
-      MinRFIDCodeLength = 10;
-      CredentialRulesSupport = 1;
-      Language = en;
-      AutoRelockTime = 60;
-      SoundVolume = 0x00;
-      OperatingMode = 0x00;
-      SupportedOperatingModes = 0xFFF6;
-      DefaultConfigurationRegister = 0;
-      EnableOneTouchLocking = 0x00;
-      EnableInsideStatusLED = 0;
-      EnablePrivacyModeButton = 0x00;
-      WrongCodeEntryLimit = 3;
-      UserCodeTemporaryDisableTime = 10;
-      RequirePINforRemoteOperation = 0;
-      FeatureMap = 0x113;
-      ClusterRevision = 6;
-  }
-
-  server cluster ElectricalMeasurement {
-      measurement type = 0x000000;
-      total active power = 0x000000;
-      rms voltage = 0xffff;
-      rms voltage min = 0x8000;
-      rms voltage max = 0x8000;
-      rms current = 0xffff;
-      rms current min = 0xffff;
-      rms current max = 0xffff;
-      active power = 0xffff;
-      active power min = 0xffff;
-      active power max = 0xffff;
-      ClusterRevision = 3;
-  }
-
-  server cluster FanControl {
-      fan mode = 0x00;
-      fan mode sequence = 0x02;
-      percent setting = 0x00;
-      percent current = 0x00;
-      speed max = 0x00;
-      speed setting = 0x00;
-      speed current = 0x00;
-      rock support = 0x00;
-      rock setting = 0x00;
-      wind support = 0x00;
-      wind setting = 0x00;
-      FeatureMap = 0;
-      ClusterRevision = 2;
+  server cluster GroupKeyManagement {
+    callback attribute groupKeyMap;
+    callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
-      label list = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster FlowMeasurement {
-      MeasuredValue = ;
-      MinMeasuredValue = ;
-      MaxMeasuredValue = ;
-      Tolerance = 0;
-      ClusterRevision = 3;
-  }
-
-  server cluster Groups {
-      name support = ;
-      ClusterRevision = 4;
-  }
-
-  server cluster IasZone {
-      zone state = 0x00;
-      zone type = ;
-      zone status = 0x0000;
-      IAS CIE address = ;
-      Zone ID = 0xff;
-      ClusterRevision = 2;
-  }
-
-  server cluster Identify {
-      identify time = 0x0000;
-      identify type = 0x0;
-      ClusterRevision = 4;
-  }
-
-  server cluster IlluminanceMeasurement {
-      MeasuredValue = 0x0000;
-      MinMeasuredValue = 0x01;
-      MaxMeasuredValue = 0xFFFE;
-      Tolerance = ;
-      LightSensorType = 0xFF;
-      ClusterRevision = 3;
-  }
-
-  server cluster KeypadInput {
-      ClusterRevision = 1;
-  }
-
-  server cluster LevelControl {
-      current level = 0xFE;
-      remaining time = 0x0000;
-      min level = 0x00;
-      max level = 0xFE;
-      current frequency = 0x0000;
-      min frequency = 0x0000;
-      max frequency = 0x0000;
-      options = 0x00;
-      on off transition time = 0x0000;
-      on level = 0xFF;
-      on transition time = ;
-      off transition time = ;
-      default move rate = 50;
-      start up current level = 255;
-      FeatureMap = 3;
-      ClusterRevision = 5;
-  }
-
-  server cluster LowPower {
-      ClusterRevision = 1;
-  }
-
-  server cluster MediaInput {
-      InputList = ;
-      CurrentInput = 0x00;
-      ClusterRevision = 1;
-  }
-
-  server cluster MediaPlayback {
-      CurrentState = 0x00;
-      StartTime = 0xFF;
-      Duration = ;
-      PlaybackSpeed = ;
-      SeekRangeEnd = ;
-      SeekRangeStart = ;
-      ClusterRevision = 1;
-  }
-
-  server cluster ModeSelect {
-      Description = Coffee;
-      StandardNamespace = 0;
-      SupportedModes = 0;
-      CurrentMode = 0;
-      StartUpMode = 0;
-      OnMode = 255;
-      GeneratedCommandList = ;
-      AcceptedCommandList = ;
-      AttributeList = ;
-      FeatureMap = 1;
-      ClusterRevision = 1;
-  }
-
-  server cluster OccupancySensing {
-      occupancy = ;
-      occupancy sensor type = ;
-      occupancy sensor type bitmap = ;
-      ClusterRevision = 3;
-  }
-
-  server cluster OnOff {
-      OnOff = 0x00;
-      GlobalSceneControl = 1;
-      OnTime = 0;
-      OffWaitTime = 0;
-      StartUpOnOff = ;
-      FeatureMap = 0x0000;
-      ClusterRevision = 4;
-  }
-
-  server cluster OnOffSwitchConfiguration {
-      switch type = ;
-      switch actions = 0x00;
-      ClusterRevision = 1;
-  }
-
-  server cluster PowerSource {
-      Status = ;
-      Order = ;
-      Description = ;
-      BatteryVoltage = ;
-      BatteryPercentRemaining = ;
-      BatteryTimeRemaining = ;
-      BatteryChargeLevel = ;
-      ActiveBatteryFaults = ;
-      BatteryChargeState = ;
-      FeatureMap = 0;
-      ClusterRevision = 1;
-  }
-
-  server cluster PressureMeasurement {
-      MeasuredValue = 0x0000;
-      MinMeasuredValue = ;
-      MaxMeasuredValue = ;
-      ClusterRevision = 3;
-  }
-
-  server cluster PumpConfigurationAndControl {
-      MaxPressure = ;
-      MaxSpeed = ;
-      MaxFlow = ;
-      MinConstPressure = ;
-      MaxConstPressure = ;
-      MinCompPressure = ;
-      MaxCompPressure = ;
-      MinConstSpeed = ;
-      MaxConstSpeed = ;
-      MinConstFlow = ;
-      MaxConstFlow = ;
-      MinConstTemp = ;
-      MaxConstTemp = ;
-      PumpStatus = ;
-      EffectiveOperationMode = ;
-      EffectiveControlMode = ;
-      Capacity = ;
-      Speed = ;
-      LifetimeRunningHours = 0x000000;
-      Power = ;
-      LifetimeEnergyConsumed = 0x00000000;
-      OperationMode = 0x00;
-      ControlMode = 0x00;
-      AlarmMask = ;
-      FeatureMap = 0;
-      ClusterRevision = 3;
-  }
-
-  server cluster RelativeHumidityMeasurement {
-      measured value = ;
-      min measured value = 0;
-      max measured value = 0x2710;
-      tolerance = ;
-      ClusterRevision = 2;
-  }
-
-  server cluster Scenes {
-      scene count = 0x00;
-      current scene = 0x00;
-      current group = 0x0000;
-      scene valid = 0x00;
-      name support = ;
-      ClusterRevision = 4;
-  }
-
-  server cluster Switch {
-      number of positions = 2;
-      current position = ;
-      multi press max = 2;
-      FeatureMap = 0;
-      ClusterRevision = 1;
-  }
-
-  server cluster TargetNavigator {
-      TargetList = ;
-      CurrentTarget = 0x00;
-      ClusterRevision = 1;
-  }
-
-  server cluster TemperatureMeasurement {
-      MeasuredValue = 0x8000;
-      MinMeasuredValue = 0x8000;
-      MaxMeasuredValue = 0x8000;
-      Tolerance = ;
-      ClusterRevision = 4;
-  }
-
-  server cluster TestCluster {
-      boolean = false;
-      bitmap8 = 0;
-      bitmap16 = 0;
-      bitmap32 = 0;
-      bitmap64 = 0;
-      int8u = 0;
-      int16u = 0;
-      int24u = 0;
-      int32u = 0;
-      int40u = 0;
-      int48u = 0;
-      int56u = 0;
-      int64u = 0;
-      int8s = 0;
-      int16s = 0;
-      int24s = 0;
-      int32s = 0;
-      int40s = 0;
-      int48s = 0;
-      int56s = 0;
-      int64s = 0;
-      enum8 = 0;
-      enum16 = 0;
-      float_single = 0;
-      float_double = 0;
-      octet_string = ;
-      list_int8u = ;
-      list_octet_string = ;
-      list_struct_octet_string = ;
-      long_octet_string = ;
-      char_string = ;
-      long_char_string = ;
-      epoch_us = ;
-      epoch_s = ;
-      vendor_id = ;
-      list_nullables_and_optionals_struct = ;
-      enum_attr = ;
-      struct_attr = ;
-      range_restricted_int8u = 70;
-      range_restricted_int8s = -20;
-      range_restricted_int16u = 200;
-      range_restricted_int16s = -100;
-      list_long_octet_string = ;
-      list_fabric_scoped = ;
-      timed_write_boolean = ;
-      general_error_boolean = ;
-      cluster_error_boolean = ;
-      nullable_boolean = false;
-      nullable_bitmap8 = 0;
-      nullable_bitmap16 = 0;
-      nullable_bitmap32 = 0;
-      nullable_bitmap64 = 0;
-      nullable_int8u = 0;
-      nullable_int16u = 0;
-      nullable_int24u = 0;
-      nullable_int32u = 0;
-      nullable_int40u = 0;
-      nullable_int48u = 0;
-      nullable_int56u = 0;
-      nullable_int64u = 0;
-      nullable_int8s = 0;
-      nullable_int16s = 0;
-      nullable_int24s = 0;
-      nullable_int32s = 0;
-      nullable_int40s = 0;
-      nullable_int48s = 0;
-      nullable_int56s = 0;
-      nullable_int64s = 0;
-      nullable_enum8 = 0;
-      nullable_enum16 = 0;
-      nullable_float_single = 0;
-      nullable_float_double = 0;
-      nullable_octet_string = ;
-      nullable_char_string = ;
-      nullable_enum_attr = ;
-      nullable_struct = ;
-      nullable_range_restricted_int8u = 70;
-      nullable_range_restricted_int8s = -20;
-      nullable_range_restricted_int16u = 200;
-      nullable_range_restricted_int16s = -100;
-      ClusterRevision = 1;
-  }
-
-  server cluster Thermostat {
-      local temperature = ;
-      abs min heat setpoint limit = 0x02BC;
-      abs max heat setpoint limit = 0x0BB8;
-      abs min cool setpoint limit = 0x0640;
-      abs max cool setpoint limit = 0x0C80;
-      occupied cooling setpoint = 0x0A28;
-      occupied heating setpoint = 0x07D0;
-      min heat setpoint limit = 0x02BC;
-      max heat setpoint limit = 0x0BB8;
-      min cool setpoint limit = 0x0640;
-      max cool setpoint limit = 0x0C80;
-      min setpoint dead band = 0x19;
-      control sequence of operation = 0x04;
-      system mode = 0x01;
-      start of week = 0;
-      number of weekly transitions = 7;
-      number of daily transitions = 4;
-      FeatureMap = 0x000b;
-      ClusterRevision = 5;
-  }
-
-  server cluster ThermostatUserInterfaceConfiguration {
-      temperature display mode = 0x00;
-      keypad lockout = 0x00;
-      schedule programming visibility = ;
-      ClusterRevision = 2;
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster UserLabel {
-      label list = ;
-      ClusterRevision = 1;
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
   }
 
-  server cluster WakeOnLan {
-      MACAddress = ;
-      ClusterRevision = 1;
+  server cluster RelativeHumidityMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue default = 0x2710;
+    ram      attribute clusterRevision default = 2;
   }
-
-  server cluster WindowCovering {
-      Type = 0x00;
-      CurrentPositionLift = 0x7FFF;
-      CurrentPositionTilt = 0x7FFF;
-      ConfigStatus = 0x03;
-      CurrentPositionLiftPercentage = 50;
-      CurrentPositionTiltPercentage = 50;
-      OperationalStatus = 0x00;
-      TargetPositionLiftPercent100ths = 500;
-      TargetPositionTiltPercent100ths = 500;
-      EndProductType = 0x00;
-      CurrentPositionLiftPercent100ths = 500;
-      CurrentPositionTiltPercent100ths = 500;
-      InstalledOpenLimitLift = 0x0000;
-      InstalledClosedLimitLift = 0xFFFF;
-      InstalledOpenLimitTilt = 0x0000;
-      InstalledClosedLimitTilt = 0xFFFF;
-      Mode = 0x00;
-      SafetyStatus = 0x00;
-      FeatureMap = 0x17;
-      ClusterRevision = 5;
-  }
-
 }
+endpoint 1 {
 
-endpoint 2 {
-
-  server cluster Descriptor {
-      device list = ;
-      server list = ;
-      client list = ;
-      parts list = ;
-      ClusterRevision = 1;
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute identifyType;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
-      name support = ;
-      ClusterRevision = 4;
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
   }
 
-  server cluster OccupancySensing {
-      occupancy = ;
-      occupancy sensor type = ;
-      occupancy sensor type bitmap = ;
-      ClusterRevision = 3;
+  server cluster Scenes {
+    ram      attribute sceneCount;
+    ram      attribute currentScene;
+    ram      attribute currentGroup;
+    ram      attribute sceneValid;
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster OnOff {
-      OnOff = 0x00;
-      GlobalSceneControl = 1;
-      OnTime = 0;
-      OffWaitTime = 0;
-      StartUpOnOff = ;
-      FeatureMap = 0x0000;
-      ClusterRevision = 4;
+    persist  attribute onOff;
+    ram      attribute globalSceneControl default = 0x01;
+    ram      attribute onTime;
+    ram      attribute offWaitTime;
+    persist  attribute startUpOnOff default = 0xFF;
+    ram      attribute featureMap default = 0x0001;
+    ram      attribute clusterRevision default = 4;
   }
 
-}
+  server cluster OnOffSwitchConfiguration {
+    ram      attribute switchType;
+    ram      attribute switchActions;
+    ram      attribute clusterRevision default = 1;
+  }
 
+  server cluster LevelControl {
+    persist  attribute currentLevel default = 0xFE;
+    ram      attribute remainingTime;
+    ram      attribute minLevel;
+    ram      attribute maxLevel default = 0xFE;
+    ram      attribute currentFrequency;
+    ram      attribute minFrequency;
+    ram      attribute maxFrequency;
+    ram      attribute options;
+    ram      attribute onOffTransitionTime;
+    ram      attribute onLevel default = 0xFF;
+    ram      attribute onTransitionTime;
+    ram      attribute offTransitionTime;
+    ram      attribute defaultMoveRate default = 50;
+    persist  attribute startUpCurrentLevel default = 255;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster BinaryInputBasic {
+    ram      attribute outOfService;
+    ram      attribute presentValue;
+    ram      attribute statusFlags;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster BridgedActions {
+    callback attribute actionList;
+    callback attribute endpointList;
+    callback attribute setupUrl;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order;
+    ram      attribute description;
+    ram      attribute batteryVoltage;
+    ram      attribute batteryPercentRemaining;
+    ram      attribute batteryTimeRemaining;
+    ram      attribute batteryChargeLevel;
+    callback attribute activeBatteryFaults;
+    ram      attribute batteryChargeState;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Switch {
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition;
+    ram      attribute multiPressMax default = 2;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster BooleanState {
+    ram      attribute stateValue;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ModeSelect {
+    ram      attribute description default = "Coffee";
+    ram      attribute standardNamespace;
+    callback attribute supportedModes;
+    persist  attribute currentMode;
+    persist  attribute startUpMode;
+    persist  attribute onMode default = 255;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DoorLock {
+    ram      attribute lockState default = 2;
+    ram      attribute lockType;
+    ram      attribute actuatorEnabled;
+    ram      attribute doorState;
+    ram      attribute doorOpenEvents;
+    ram      attribute doorClosedEvents;
+    ram      attribute openPeriod;
+    ram      attribute numberOfTotalUsersSupported default = 10;
+    ram      attribute numberOfPINUsersSupported default = 10;
+    ram      attribute numberOfRFIDUsersSupported default = 10;
+    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
+    ram      attribute numberOfHolidaySchedulesSupported;
+    ram      attribute maxPINCodeLength default = 6;
+    ram      attribute minPINCodeLength default = 6;
+    ram      attribute maxRFIDCodeLength default = 20;
+    ram      attribute minRFIDCodeLength default = 10;
+    ram      attribute credentialRulesSupport default = 1;
+    ram      attribute language default = "en";
+    ram      attribute autoRelockTime default = 60;
+    ram      attribute soundVolume;
+    ram      attribute operatingMode;
+    ram      attribute supportedOperatingModes default = 0xFFF6;
+    ram      attribute defaultConfigurationRegister;
+    ram      attribute enableOneTouchLocking;
+    ram      attribute enableInsideStatusLED;
+    ram      attribute enablePrivacyModeButton;
+    ram      attribute wrongCodeEntryLimit default = 3;
+    ram      attribute userCodeTemporaryDisableTime default = 10;
+    ram      attribute requirePINforRemoteOperation;
+    ram      attribute featureMap default = 0x113;
+    ram      attribute clusterRevision default = 6;
+  }
+
+  server cluster WindowCovering {
+    ram      attribute type;
+    persist  attribute currentPositionLift default = 0x7FFF;
+    persist  attribute currentPositionTilt default = 0x7FFF;
+    persist  attribute configStatus default = 0x03;
+    persist  attribute currentPositionLiftPercentage default = 50;
+    persist  attribute currentPositionTiltPercentage default = 50;
+    ram      attribute operationalStatus;
+    ram      attribute targetPositionLiftPercent100ths default = 500;
+    ram      attribute targetPositionTiltPercent100ths default = 500;
+    ram      attribute endProductType;
+    persist  attribute currentPositionLiftPercent100ths default = 500;
+    persist  attribute currentPositionTiltPercent100ths default = 500;
+    persist  attribute installedOpenLimitLift;
+    persist  attribute installedClosedLimitLift default = 0xFFFF;
+    persist  attribute installedOpenLimitTilt;
+    persist  attribute installedClosedLimitTilt default = 0xFFFF;
+    persist  attribute mode;
+    ram      attribute safetyStatus;
+    ram      attribute featureMap default = 0x17;
+    ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster BarrierControl {
+    ram      attribute barrierMovingState;
+    ram      attribute barrierSafetyStatus;
+    ram      attribute barrierCapabilities;
+    ram      attribute barrierPosition;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster PumpConfigurationAndControl {
+    ram      attribute maxPressure;
+    ram      attribute maxSpeed;
+    ram      attribute maxFlow;
+    ram      attribute minConstPressure;
+    ram      attribute maxConstPressure;
+    ram      attribute minCompPressure;
+    ram      attribute maxCompPressure;
+    ram      attribute minConstSpeed;
+    ram      attribute maxConstSpeed;
+    ram      attribute minConstFlow;
+    ram      attribute maxConstFlow;
+    ram      attribute minConstTemp;
+    ram      attribute maxConstTemp;
+    ram      attribute pumpStatus;
+    ram      attribute effectiveOperationMode;
+    ram      attribute effectiveControlMode;
+    ram      attribute capacity;
+    ram      attribute speed;
+    ram      attribute lifetimeRunningHours;
+    ram      attribute power;
+    ram      attribute lifetimeEnergyConsumed;
+    ram      attribute operationMode;
+    ram      attribute controlMode;
+    ram      attribute alarmMask;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster Thermostat {
+    ram      attribute localTemperature;
+    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
+    ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
+    ram      attribute absMinCoolSetpointLimit default = 0x0640;
+    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
+    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
+    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    ram      attribute minHeatSetpointLimit default = 0x02BC;
+    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
+    ram      attribute minCoolSetpointLimit default = 0x0640;
+    ram      attribute maxCoolSetpointLimit default = 0x0C80;
+    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute controlSequenceOfOperation default = 0x04;
+    ram      attribute systemMode default = 0x01;
+    ram      attribute startOfWeek;
+    ram      attribute numberOfWeeklyTransitions default = 7;
+    ram      attribute numberOfDailyTransitions default = 4;
+    ram      attribute featureMap default = 0x000b;
+    ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster FanControl {
+    ram      attribute fanMode;
+    ram      attribute fanModeSequence default = 0x02;
+    ram      attribute percentSetting;
+    ram      attribute percentCurrent;
+    ram      attribute speedMax;
+    ram      attribute speedSetting;
+    ram      attribute speedCurrent;
+    ram      attribute rockSupport;
+    ram      attribute rockSetting;
+    ram      attribute windSupport;
+    ram      attribute windSetting;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster ThermostatUserInterfaceConfiguration {
+    ram      attribute temperatureDisplayMode;
+    ram      attribute keypadLockout;
+    ram      attribute scheduleProgrammingVisibility;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster ColorControl {
+    ram      attribute currentHue;
+    ram      attribute currentSaturation;
+    ram      attribute remainingTime;
+    ram      attribute currentX default = 0x616B;
+    ram      attribute currentY default = 0x607D;
+    ram      attribute driftCompensation;
+    ram      attribute compensationText;
+    ram      attribute colorTemperature default = 0x00FA;
+    ram      attribute colorMode default = 0x01;
+    ram      attribute colorControlOptions;
+    ram      attribute numberOfPrimaries;
+    ram      attribute primary1X;
+    ram      attribute primary1Y;
+    ram      attribute primary1Intensity;
+    ram      attribute primary2X;
+    ram      attribute primary2Y;
+    ram      attribute primary2Intensity;
+    ram      attribute primary3X;
+    ram      attribute primary3Y;
+    ram      attribute primary3Intensity;
+    ram      attribute primary4X;
+    ram      attribute primary4Y;
+    ram      attribute primary4Intensity;
+    ram      attribute primary5X;
+    ram      attribute primary5Y;
+    ram      attribute primary5Intensity;
+    ram      attribute primary6X;
+    ram      attribute primary6Y;
+    ram      attribute primary6Intensity;
+    ram      attribute whitePointX;
+    ram      attribute whitePointY;
+    ram      attribute colorPointRX;
+    ram      attribute colorPointRY;
+    ram      attribute colorPointRIntensity;
+    ram      attribute colorPointGX;
+    ram      attribute colorPointGY;
+    ram      attribute colorPointGIntensity;
+    ram      attribute colorPointBX;
+    ram      attribute colorPointBY;
+    ram      attribute colorPointBIntensity;
+    ram      attribute enhancedCurrentHue;
+    ram      attribute enhancedColorMode default = 0x01;
+    ram      attribute colorLoopActive;
+    ram      attribute colorLoopDirection;
+    ram      attribute colorLoopTime default = 0x0019;
+    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
+    ram      attribute colorLoopStoredEnhancedHue;
+    ram      attribute colorCapabilities;
+    ram      attribute colorTempPhysicalMin;
+    ram      attribute colorTempPhysicalMax default = 0xFEFF;
+    ram      attribute coupleColorTempToLevelMinMireds;
+    ram      attribute startUpColorTemperatureMireds;
+    ram      attribute featureMap default = 0x1F;
+    ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster IlluminanceMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue default = 0x01;
+    ram      attribute maxMeasuredValue default = 0xFFFE;
+    ram      attribute tolerance;
+    ram      attribute lightSensorType default = 0xFF;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster TemperatureMeasurement {
+    ram      attribute measuredValue default = 0x8000;
+    ram      attribute minMeasuredValue default = 0x8000;
+    ram      attribute maxMeasuredValue default = 0x8000;
+    ram      attribute tolerance;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster PressureMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster FlowMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
+    ram      attribute tolerance;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster RelativeHumidityMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue default = 0x2710;
+    ram      attribute tolerance;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster OccupancySensing {
+    ram      attribute occupancy;
+    ram      attribute occupancySensorType;
+    ram      attribute occupancySensorTypeBitmap;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster IasZone {
+    ram      attribute zoneState;
+    ram      attribute zoneType;
+    ram      attribute zoneStatus;
+    ram      attribute iasCieAddress;
+    ram      attribute zoneId default = 0xff;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster WakeOnLan {
+    ram      attribute MACAddress;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Channel {
+    callback attribute channelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TargetNavigator {
+    callback attribute targetList;
+    ram      attribute currentTarget;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster MediaPlayback {
+    ram      attribute currentState;
+    ram      attribute startTime default = 0xFF;
+    ram      attribute duration;
+    ram      attribute playbackSpeed;
+    ram      attribute seekRangeEnd;
+    ram      attribute seekRangeStart;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster MediaInput {
+    callback attribute inputList;
+    ram      attribute currentInput;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LowPower {
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster KeypadInput {
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ContentLauncher {
+    callback attribute acceptHeader;
+    ram      attribute supportedStreamingProtocols;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AudioOutput {
+    callback attribute outputList;
+    ram      attribute currentOutput;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ApplicationLauncher {
+    callback attribute catalogList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ApplicationBasic {
+    ram      attribute vendorName;
+    ram      attribute vendorID;
+    ram      attribute applicationName;
+    ram      attribute productID;
+    ram      attribute status;
+    ram      attribute applicationVersion;
+    callback attribute allowedVendorList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AccountLogin {
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TestCluster {
+    ram      attribute boolean;
+    ram      attribute bitmap8;
+    ram      attribute bitmap16;
+    ram      attribute bitmap32;
+    ram      attribute bitmap64;
+    ram      attribute int8u;
+    ram      attribute int16u;
+    ram      attribute int24u;
+    ram      attribute int32u;
+    ram      attribute int40u;
+    ram      attribute int48u;
+    ram      attribute int56u;
+    ram      attribute int64u;
+    ram      attribute int8s;
+    ram      attribute int16s;
+    ram      attribute int24s;
+    ram      attribute int32s;
+    ram      attribute int40s;
+    ram      attribute int48s;
+    ram      attribute int56s;
+    ram      attribute int64s;
+    ram      attribute enum8;
+    ram      attribute enum16;
+    ram      attribute floatSingle;
+    ram      attribute floatDouble;
+    ram      attribute octetString;
+    callback attribute listInt8u;
+    callback attribute listOctetString;
+    callback attribute listStructOctetString;
+    ram      attribute longOctetString;
+    ram      attribute charString;
+    ram      attribute longCharString;
+    ram      attribute epochUs;
+    ram      attribute epochS;
+    ram      attribute vendorId;
+    callback attribute listNullablesAndOptionalsStruct;
+    ram      attribute enumAttr;
+    callback attribute structAttr;
+    ram      attribute rangeRestrictedInt8u default = 70;
+    ram      attribute rangeRestrictedInt8s default = -20;
+    ram      attribute rangeRestrictedInt16u default = 200;
+    ram      attribute rangeRestrictedInt16s default = -100;
+    callback attribute listLongOctetString;
+    callback attribute listFabricScoped;
+    ram      attribute timedWriteBoolean;
+    callback attribute generalErrorBoolean;
+    callback attribute clusterErrorBoolean;
+    ram      attribute nullableBoolean;
+    ram      attribute nullableBitmap8;
+    ram      attribute nullableBitmap16;
+    ram      attribute nullableBitmap32;
+    ram      attribute nullableBitmap64;
+    ram      attribute nullableInt8u;
+    ram      attribute nullableInt16u;
+    ram      attribute nullableInt24u;
+    ram      attribute nullableInt32u;
+    ram      attribute nullableInt40u;
+    ram      attribute nullableInt48u;
+    ram      attribute nullableInt56u;
+    ram      attribute nullableInt64u;
+    ram      attribute nullableInt8s;
+    ram      attribute nullableInt16s;
+    ram      attribute nullableInt24s;
+    ram      attribute nullableInt32s;
+    ram      attribute nullableInt40s;
+    ram      attribute nullableInt48s;
+    ram      attribute nullableInt56s;
+    ram      attribute nullableInt64s;
+    ram      attribute nullableEnum8;
+    ram      attribute nullableEnum16;
+    ram      attribute nullableFloatSingle;
+    ram      attribute nullableFloatDouble;
+    ram      attribute nullableOctetString;
+    ram      attribute nullableCharString;
+    ram      attribute nullableEnumAttr;
+    callback attribute nullableStruct;
+    ram      attribute nullableRangeRestrictedInt8u default = 70;
+    ram      attribute nullableRangeRestrictedInt8s default = -20;
+    ram      attribute nullableRangeRestrictedInt16u default = 200;
+    ram      attribute nullableRangeRestrictedInt16s default = -100;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ElectricalMeasurement {
+    ram      attribute measurementType;
+    ram      attribute totalActivePower;
+    ram      attribute rmsVoltage default = 0xffff;
+    ram      attribute rmsVoltageMin default = 0x8000;
+    ram      attribute rmsVoltageMax default = 0x8000;
+    ram      attribute rmsCurrent default = 0xffff;
+    ram      attribute rmsCurrentMin default = 0xffff;
+    ram      attribute rmsCurrentMax default = 0xffff;
+    ram      attribute activePower default = 0xffff;
+    ram      attribute activePowerMin default = 0xffff;
+    ram      attribute activePowerMax default = 0xffff;
+    ram      attribute clusterRevision default = 3;
+  }
+}
+endpoint 2 {
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster OnOff {
+    ram      attribute onOff;
+    ram      attribute globalSceneControl default = 1;
+    ram      attribute onTime;
+    ram      attribute offWaitTime;
+    ram      attribute startUpOnOff;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster OccupancySensing {
+    ram      attribute occupancy;
+    ram      attribute occupancySensorType;
+    ram      attribute occupancySensorTypeBitmap;
+    ram      attribute clusterRevision default = 3;
+  }
+}
 endpoint 65534 {
 
   server cluster NetworkCommissioning {
-      MaxNetworks = ;
-      Networks = ;
-      ScanMaxTimeSeconds = ;
-      ConnectMaxTimeSeconds = ;
-      InterfaceEnabled = ;
-      LastNetworkingStatus = ;
-      LastNetworkID = ;
-      LastConnectErrorValue = ;
-      FeatureMap = 0;
-      ClusterRevision = 1;
+    callback attribute maxNetworks;
+    callback attribute networks;
+    callback attribute scanMaxTimeSeconds;
+    callback attribute connectMaxTimeSeconds;
+    callback attribute interfaceEnabled;
+    callback attribute lastNetworkingStatus;
+    callback attribute lastNetworkID;
+    callback attribute lastConnectErrorValue;
+    callback attribute featureMap;
+    callback attribute clusterRevision default = 1;
   }
-
 }
+
 

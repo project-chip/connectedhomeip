@@ -1360,37 +1360,332 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 
+
 endpoint 0 {
-  server  cluster AccessControl;
-  server  cluster AdministratorCommissioning;
-  server  cluster Basic;
-  server  cluster Binding;
-  server  cluster Descriptor;
-  server  cluster DiagnosticLogs;
-  server  cluster EthernetNetworkDiagnostics;
-  server  cluster FixedLabel;
-  server  cluster GeneralCommissioning;
-  server  cluster GeneralDiagnostics;
-  server  cluster GroupKeyManagement;
-  server  cluster Identify;
-  server  cluster LocalizationConfiguration;
-  server  cluster NetworkCommissioning;
-  server  cluster OtaSoftwareUpdateProvider;
-  server  cluster OperationalCredentials;
-  server  cluster SoftwareDiagnostics;
-  server  cluster ThreadNetworkDiagnostics;
-  server  cluster TimeFormatLocalization;
-  server  cluster UnitLocalization;
-  server  cluster UserLabel;
-  server  cluster WiFiNetworkDiagnostics;
+
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AccessControl {
+    callback attribute acl;
+    callback attribute extension;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute attributeList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OtaSoftwareUpdateProvider {
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat;
+    persist  attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitLocalization {
+    persist  attribute temperatureUnit;
+    ram      attribute featureMap default = 0x1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GeneralCommissioning {
+    ram      attribute breadcrumb;
+    callback attribute basicCommissioningInfo;
+    ram      attribute regulatoryConfig;
+    ram      attribute locationCapability;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap default = 6;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DiagnosticLogs {
+  }
+
+  server cluster GeneralDiagnostics {
+    callback attribute networkInterfaces;
+    ram      attribute rebootCount;
+    ram      attribute upTime;
+    ram      attribute totalOperationalHours;
+    ram      attribute bootReasons;
+    callback attribute activeHardwareFaults;
+    callback attribute activeRadioFaults;
+    callback attribute activeNetworkFaults;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster SoftwareDiagnostics {
+    callback attribute threadMetrics;
+    ram      attribute currentHeapFree;
+    ram      attribute currentHeapUsed;
+    ram      attribute currentHeapHighWatermark;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ThreadNetworkDiagnostics {
+    ram      attribute channel;
+    ram      attribute routingRole;
+    ram      attribute networkName;
+    ram      attribute panId;
+    ram      attribute extendedPanId;
+    ram      attribute meshLocalPrefix;
+    ram      attribute overrunCount;
+    callback attribute neighborTableList;
+    callback attribute routeTableList;
+    ram      attribute partitionId;
+    ram      attribute weighting;
+    ram      attribute dataVersion;
+    ram      attribute stableDataVersion;
+    ram      attribute leaderRouterId;
+    ram      attribute detachedRoleCount;
+    ram      attribute childRoleCount;
+    ram      attribute routerRoleCount;
+    ram      attribute leaderRoleCount;
+    ram      attribute attachAttemptCount;
+    ram      attribute partitionIdChangeCount;
+    ram      attribute betterPartitionAttachAttemptCount;
+    ram      attribute parentChangeCount;
+    ram      attribute txTotalCount;
+    ram      attribute txUnicastCount;
+    ram      attribute txBroadcastCount;
+    ram      attribute txAckRequestedCount;
+    ram      attribute txAckedCount;
+    ram      attribute txNoAckRequestedCount;
+    ram      attribute txDataCount;
+    ram      attribute txDataPollCount;
+    ram      attribute txBeaconCount;
+    ram      attribute txBeaconRequestCount;
+    ram      attribute txOtherCount;
+    ram      attribute txRetryCount;
+    ram      attribute txDirectMaxRetryExpiryCount;
+    ram      attribute txIndirectMaxRetryExpiryCount;
+    ram      attribute txErrCcaCount;
+    ram      attribute txErrAbortCount;
+    ram      attribute txErrBusyChannelCount;
+    ram      attribute rxTotalCount;
+    ram      attribute rxUnicastCount;
+    ram      attribute rxBroadcastCount;
+    ram      attribute rxDataCount;
+    ram      attribute rxDataPollCount;
+    ram      attribute rxBeaconCount;
+    ram      attribute rxBeaconRequestCount;
+    ram      attribute rxOtherCount;
+    ram      attribute rxAddressFilteredCount;
+    ram      attribute rxDestAddrFilteredCount;
+    ram      attribute rxDuplicatedCount;
+    ram      attribute rxErrNoFrameCount;
+    ram      attribute rxErrUnknownNeighborCount;
+    ram      attribute rxErrInvalidSrcAddrCount;
+    ram      attribute rxErrSecCount;
+    ram      attribute rxErrFcsCount;
+    ram      attribute rxErrOtherCount;
+    ram      attribute activeTimestamp;
+    ram      attribute pendingTimestamp;
+    ram      attribute delay;
+    callback attribute securityPolicy;
+    ram      attribute channelMask;
+    callback attribute operationalDatasetComponents;
+    callback attribute activeNetworkFaultsList;
+    ram      attribute featureMap default = 0x000F;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster WiFiNetworkDiagnostics {
+    ram      attribute bssid;
+    ram      attribute securityType;
+    ram      attribute wiFiVersion;
+    ram      attribute channelNumber;
+    ram      attribute rssi;
+    ram      attribute beaconLostCount;
+    ram      attribute beaconRxCount;
+    ram      attribute packetMulticastRxCount;
+    ram      attribute packetMulticastTxCount;
+    ram      attribute packetUnicastRxCount;
+    ram      attribute packetUnicastTxCount;
+    ram      attribute currentMaxRate;
+    ram      attribute overrunCount;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster EthernetNetworkDiagnostics {
+    callback attribute PHYRate;
+    callback attribute fullDuplex;
+    callback attribute packetRxCount;
+    callback attribute packetTxCount;
+    callback attribute txErrCount;
+    callback attribute collisionCount;
+    callback attribute overrunCount;
+    callback attribute carrierDetect;
+    callback attribute timeSinceReset;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AdministratorCommissioning {
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex default = 1;
+    callback attribute adminVendorId;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalCredentials {
+    callback attribute NOCs;
+    callback attribute fabrics;
+    ram      attribute supportedFabrics;
+    ram      attribute commissionedFabrics;
+    callback attribute trustedRootCertificates;
+    callback attribute currentFabricIndex;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GroupKeyManagement {
+    callback attribute groupKeyMap;
+    callback attribute groupTable;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+}
+endpoint 1 {
+  binding cluster Identify;
+
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute identifyType;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Scenes {
+    ram      attribute sceneCount;
+    ram      attribute currentScene;
+    ram      attribute currentGroup;
+    ram      attribute sceneValid;
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Thermostat {
+    ram      attribute localTemperature;
+    ram      attribute absMinHeatSetpointLimit default = 700;
+    ram      attribute absMaxHeatSetpointLimit default = 3000;
+    ram      attribute absMinCoolSetpointLimit default = 1600;
+    ram      attribute absMaxCoolSetpointLimit default = 3200;
+    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
+    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    ram      attribute minHeatSetpointLimit default = 700;
+    ram      attribute maxHeatSetpointLimit default = 3000;
+    ram      attribute minCoolSetpointLimit default = 1600;
+    ram      attribute maxCoolSetpointLimit default = 3200;
+    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute controlSequenceOfOperation default = 0x04;
+    ram      attribute systemMode default = 0x01;
+    ram      attribute startOfWeek;
+    ram      attribute numberOfWeeklyTransitions default = 7;
+    ram      attribute numberOfDailyTransitions default = 4;
+    ram      attribute featureMap default = 0x000b;
+    ram      attribute clusterRevision default = 5;
+  }
 }
 
-endpoint 1 {
-  server  cluster Basic;
-  server  cluster Groups;
-  binding cluster Identify;
-  server  cluster Identify;
-  server  cluster Scenes;
-  server  cluster Thermostat;
-}
 

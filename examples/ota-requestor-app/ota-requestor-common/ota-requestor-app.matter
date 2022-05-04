@@ -628,18 +628,114 @@ server cluster UserLabel = 65 {
 }
 
 
+
 endpoint 0 {
-  server  cluster AccessControl;
-  server  cluster AdministratorCommissioning;
-  server  cluster Basic;
-  server  cluster FixedLabel;
-  server  cluster GeneralCommissioning;
-  server  cluster LocalizationConfiguration;
-  server  cluster NetworkCommissioning;
   binding cluster OtaSoftwareUpdateProvider;
-  server  cluster OtaSoftwareUpdateRequestor;
-  server  cluster OperationalCredentials;
-  server  cluster TimeFormatLocalization;
-  server  cluster UserLabel;
+
+  server cluster AccessControl {
+    callback attribute acl;
+    callback attribute extension;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute attributeList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OtaSoftwareUpdateRequestor {
+    callback attribute defaultOtaProviders;
+    ram      attribute updatePossible default = 1;
+    ram      attribute updateState;
+    ram      attribute updateStateProgress;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat;
+    persist  attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GeneralCommissioning {
+    ram      attribute breadcrumb;
+    callback attribute basicCommissioningInfo;
+    ram      attribute regulatoryConfig;
+    ram      attribute locationCapability;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AdministratorCommissioning {
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex;
+    callback attribute adminVendorId;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalCredentials {
+    callback attribute NOCs;
+    callback attribute fabrics;
+    ram      attribute supportedFabrics;
+    ram      attribute commissionedFabrics;
+    callback attribute trustedRootCertificates;
+    callback attribute currentFabricIndex;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
 }
+
 
