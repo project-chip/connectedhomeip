@@ -79,6 +79,8 @@ tests:
                 value: 5560
               - name: "kvs"
                 value: "/tmp/chip_kvs_default"
+              - name: "minCommissioningTimeout"
+                value : 10
 
     - label: "Stop the default accessory"
       command: "Stop"
@@ -95,6 +97,8 @@ tests:
                 value: "/tmp/chip_kvs_default"
               - name: "registerKey"
                 value: "default"
+              - name: "minCommissioningTimeout"
+                value : 10
 
     - label: "Start a second accessory with all command line options"
       command: "Start"

@@ -45956,6 +45956,8 @@ private:
             value.port.Value() = 5560U;
             value.kvs.Emplace();
             value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_defaultgarbage: not in length on purpose", 21);
+            value.minCommissioningTimeout.Emplace();
+            value.minCommissioningTimeout.Value() = 10U;
             return Start(kIdentityAlpha, value);
         }
         case 9: {
@@ -45972,6 +45974,8 @@ private:
             value.port.Value() = 5560U;
             value.kvs.Emplace();
             value.kvs.Value() = chip::Span<const char>("/tmp/chip_kvs_defaultgarbage: not in length on purpose", 21);
+            value.minCommissioningTimeout.Emplace();
+            value.minCommissioningTimeout.Value() = 10U;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
             return Start(kIdentityAlpha, value);
