@@ -223,5 +223,4 @@ public:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
-
 };
