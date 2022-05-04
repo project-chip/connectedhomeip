@@ -130,6 +130,11 @@ CHIP_ERROR SystemCommands::CreateCommonCommandArgs(chip::StringBuilderBase & bui
         strncpy(kvs, value.kvs.Value().data(), value.kvs.Value().size());
         builder.Add(kvs);
     }
+    if (value.minCommissioningTimeout.HasValue())
+    {
+        builder.Add(" --min_commissioning_timeout ");
+        builder.Add(value.minCommissioningTimeout.Value());
+    }
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;
