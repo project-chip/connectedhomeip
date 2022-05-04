@@ -1430,7 +1430,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = BarrierControl::Attributes::BarrierMovingState::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -3810,7 +3810,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ColorControl::Attributes::DriftCompensation::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -3864,7 +3864,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ColorControl::Attributes::ColorMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -4242,7 +4242,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ColorControl::Attributes::EnhancedColorMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -10669,12 +10669,16 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo;
             TypeInfo::Type cppValue;
+<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.unsignedCharValue;
             }
+=======
+            cppValue = value.unsignedCharValue;
+>>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11321,6 +11325,7 @@ using namespace chip::app::Clusters;
             using TypeInfo = LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo;
             TypeInfo::Type cppValue;
 <<<<<<< HEAD
+<<<<<<< HEAD
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
                 using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -11350,6 +11355,9 @@ using namespace chip::app::Clusters;
                 nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
 >>>>>>> Changes for cleaner regen
             }
+=======
+            cppValue = value.unsignedCharValue;
+>>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11519,7 +11527,29 @@ using namespace chip::app::Clusters;
 
 - (chip::Controller::ClusterBase *)getCluster
 {
+<<<<<<< HEAD
     return &_cppCluster;
+=======
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+>>>>>>> Cleaning up atomic enum generation
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -13030,7 +13060,7 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedShortValue);
+                nonNullValue_0 = value.unsignedShortValue;
             }
 >>>>>>> Changes for cleaner regen
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -13994,6 +14024,7 @@ using namespace chip::app::Clusters;
             using TypeInfo = OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
             TypeInfo::Type cppValue;
 <<<<<<< HEAD
+<<<<<<< HEAD
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
                 using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -14019,6 +14050,9 @@ using namespace chip::app::Clusters;
 =======
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 >>>>>>> Changes for cleaner regen
+=======
+            cppValue = value.unsignedCharValue;
+>>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14312,7 +14346,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PowerSource::Attributes::WiredCurrentType::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14649,10 +14683,14 @@ using namespace chip::app::Clusters;
             using TypeInfo = PowerSource::Attributes::BatteryANSIDesignation::TypeInfo;
             TypeInfo::Type cppValue;
 <<<<<<< HEAD
+<<<<<<< HEAD
             cppValue = [self asCharSpan:value];
 =======
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 >>>>>>> Changes for cleaner regen
+=======
+            cppValue = value.unsignedCharValue;
+>>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15318,6 +15356,7 @@ using namespace chip::app::Clusters;
             using TypeInfo = PressureMeasurement::Attributes::ScaledValue::TypeInfo;
             TypeInfo::Type cppValue;
 <<<<<<< HEAD
+<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
@@ -15327,6 +15366,9 @@ using namespace chip::app::Clusters;
 =======
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 >>>>>>> Changes for cleaner regen
+=======
+            cppValue = value.unsignedCharValue;
+>>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15470,7 +15512,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PowerSource::Attributes::BatteryChargeState::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -18245,10 +18287,14 @@ using namespace chip::app::Clusters;
             using TypeInfo = Thermostat::Attributes::AcCoilTemperature::TypeInfo;
             TypeInfo::Type cppValue;
 <<<<<<< HEAD
+<<<<<<< HEAD
             cppValue = value.shortValue;
 =======
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 >>>>>>> Changes for cleaner regen
+=======
+            cppValue = value.unsignedCharValue;
+>>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -18616,7 +18662,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::RoutingRole::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

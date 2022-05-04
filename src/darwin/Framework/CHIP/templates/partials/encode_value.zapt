@@ -50,7 +50,15 @@
     {{/zcl_struct_items_by_struct_name}}
   {{else}}
     {{#if_chip_enum type}}
-      {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+      {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
+        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+      {{else}}
+        {{#if_is_atomic type}}
+          {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
+        {{else}}
+          {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
+        {{/if_is_atomic}}
+      {{/if}}
     {{else}}
       {{#if_is_bitmap type}}
         {{#if_is_atomic type}}
