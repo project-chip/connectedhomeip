@@ -567,12 +567,12 @@ EmberAfStatus HandleReadPowerSourceAttribute(DevicePowerSource * dev, chip::Attr
     }
     else if ((attributeId == PowerSource::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
     {
-        auto rev = ZCL_POWER_SOURCE_CLUSTER_REVISION;
+        uint16_t rev = ZCL_POWER_SOURCE_CLUSTER_REVISION;
         memcpy(buffer, &rev, sizeof(rev));
     }
     else if ((attributeId == PowerSource::Attributes::FeatureMap::Id) && (maxReadLength == 4))
     {
-        auto featureMap = dev->GetFeatureMap();
+        uint32_t featureMap = dev->GetFeatureMap();
         memcpy(buffer, &featureMap, sizeof(featureMap));
     }
     else
