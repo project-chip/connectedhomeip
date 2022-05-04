@@ -55,6 +55,7 @@ RUN set -x \
     && : # last line
 
 COPY secret-tool.py $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
+RUN chmod 0755 $TIZEN_SDK_ROOT/tools/certificate-encryptor/secret-tool
 ENV PATH="$TIZEN_SDK_ROOT/tools/ide/bin:$PATH"
 
 # ------------------------------------------------------------------------------
@@ -100,8 +101,6 @@ RUN set -x \
     -A 'aul-0*.armv7l.rpm' \
     -A 'aul-devel-*.armv7l.rpm' \
     -A 'buxton2-*.armv7l.rpm' \
-    -A 'capi-network-nsd-*.armv7l.rpm' \
-    -A 'capi-network-thread-*.armv7l.rpm' \
     -A 'cynara-devel-*.armv7l.rpm' \
     -A 'dbus-1*.armv7l.rpm' \
     -A 'dbus-devel-*.armv7l.rpm' \
@@ -111,10 +110,15 @@ RUN set -x \
     -A 'libcynara-client-*.armv7l.rpm' \
     -A 'libcynara-commons-*.armv7l.rpm' \
     -A 'libdns_sd-*.armv7l.rpm' \
-    -A 'libnsd-dns-sd-*.armv7l.rpm' \
     -A 'libsystemd-*.armv7l.rpm' \
     -A 'vconf-compat-*.armv7l.rpm' \
     -A 'vconf-internal-keys-devel-*.armv7l.rpm' \
+    # Unified packages (snapshots)
+    && wget --progress=dot:mega -r -nd --no-parent \
+    http://download.tizen.org/snapshots/tizen/unified/latest/repos/standard/packages/armv7l/ \
+    -A 'capi-network-nsd-*.armv7l.rpm' \
+    -A 'capi-network-thread-*.armv7l.rpm' \
+    -A 'libnsd-dns-sd-*.armv7l.rpm' \
     # Install base sysroot
     && unzip -o '*.zip' \
     && cp -rf data/* $TIZEN_SDK_ROOT \
