@@ -14,6 +14,27 @@ except:
 
     from matter_idl_types import *
 
+class AddServerClusterToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a server cluster to the given endpoint.
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def apply(self, endpoint):
+        endpoint.server_clusters.append(self.name)
+
+class AddBindingToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a cluster binding to the given endpoint.
+    """
+    def __init__(self, name):
+        self.name = name
+
+    def apply(self, endpoint):
+        endpoint.client_bindings.append(self.name)
+
+
 class MatterIdlTransformer(Transformer):
     """
     A transformer capable to transform data parsed by Lark according to 
@@ -265,26 +286,21 @@ class MatterIdlTransformer(Transformer):
         return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
 
     @v_args(inline=True)
-    def endpoint(self, number, *clusters):
+    def endpoint(self, number, *transforms):
         endpoint = Endpoint(number=number)
 
-        for t, name in clusters:
-            if t == EndpointContentType.CLIENT_BINDING:
-                endpoint.client_bindings.append(name)
-            elif t == EndpointContentType.SERVER_CLUSTER:
-                endpoint.server_clusters.append(name)
-            else:
-                raise Error("Unknown endpoint content: %r" % t)
+        for t in transforms:
+            t.apply(endpoint)
 
         return endpoint
 
     @v_args(inline=True)
     def endpoint_cluster_binding(self, id):
-        return (EndpointContentType.CLIENT_BINDING, id)
+        return AddBindingToEndpointTransform(id)
 
     @v_args(inline=True)
     def endpoint_server_cluster(self, id):
-        return (EndpointContentType.SERVER_CLUSTER, id)
+        return AddServerClusterToEndpointTransform(id)
 
     @v_args(inline=True)
     def cluster(self, side, name, code, *content):
