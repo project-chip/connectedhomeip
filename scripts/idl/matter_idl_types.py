@@ -17,8 +17,6 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
-    CALLBACK = enum.auto()
-    PERSIST = enum.auto()
 
 
 class EventPriority(enum.Enum):
@@ -98,10 +96,6 @@ class Attribute:
     @property
     def is_subscribable(self):
         return AttributeTag.NOSUBSCRIBE not in self.tags
-
-    @property
-    def is_callback(self):
-        return AttributeTag.CALLBACK in self.tags
 
 
 @dataclass
