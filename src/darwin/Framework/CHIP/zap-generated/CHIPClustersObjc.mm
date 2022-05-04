@@ -59653,11 +59653,7 @@ using namespace chip::app::Clusters;
             timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
         }
     }
-    request.liftPercentageValue = params.liftPercentageValue.unsignedCharValue;
-    if (params.liftPercent100thsValue != nil) {
-        auto & definedValue_0 = request.liftPercent100thsValue.Emplace();
-        definedValue_0 = params.liftPercent100thsValue.unsignedShortValue;
-    }
+    request.liftPercent100thsValue = params.liftPercent100thsValue.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -59709,11 +59705,7 @@ using namespace chip::app::Clusters;
             timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
         }
     }
-    request.tiltPercentageValue = params.tiltPercentageValue.unsignedCharValue;
-    if (params.tiltPercent100thsValue != nil) {
-        auto & definedValue_0 = request.tiltPercent100thsValue.Emplace();
-        definedValue_0 = params.tiltPercent100thsValue.unsignedShortValue;
-    }
+    request.tiltPercent100thsValue = params.tiltPercent100thsValue.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,

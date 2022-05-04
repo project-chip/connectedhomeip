@@ -2702,9 +2702,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _liftPercentageValue = nil;
-
-        _liftPercent100thsValue = nil;
+        _liftPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2726,9 +2724,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _tiltPercentageValue = nil;
-
-        _tiltPercent100thsValue = nil;
+        _tiltPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;

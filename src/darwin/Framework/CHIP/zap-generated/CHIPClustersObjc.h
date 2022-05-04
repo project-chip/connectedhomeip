@@ -15309,11 +15309,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)downOrCloseWithParams:(CHIPWindowCoveringClusterDownOrCloseParams * _Nullable)params
             completionHandler:(StatusCompletion)completionHandler;
 - (void)downOrCloseWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)goToLiftPercentageWithParams:(CHIPWindowCoveringClusterGoToLiftPercentageParams * _Nullable)params
+- (void)goToLiftPercentageWithParams:(CHIPWindowCoveringClusterGoToLiftPercentageParams *)params
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)goToLiftValueWithParams:(CHIPWindowCoveringClusterGoToLiftValueParams *)params
               completionHandler:(StatusCompletion)completionHandler;
-- (void)goToTiltPercentageWithParams:(CHIPWindowCoveringClusterGoToTiltPercentageParams * _Nullable)params
+- (void)goToTiltPercentageWithParams:(CHIPWindowCoveringClusterGoToTiltPercentageParams *)params
                    completionHandler:(StatusCompletion)completionHandler;
 - (void)goToTiltValueWithParams:(CHIPWindowCoveringClusterGoToTiltValueParams *)params
               completionHandler:(StatusCompletion)completionHandler;

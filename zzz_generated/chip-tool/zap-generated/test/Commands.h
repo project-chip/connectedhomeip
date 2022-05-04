@@ -31266,10 +31266,7 @@ private:
             LogStep(4, "2a: TH sends GoToLiftPercentage command with 25 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && CR_GOTOLIFTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
-            value.liftPercentageValue.Emplace();
-            value.liftPercentageValue.Value() = 25;
-            value.liftPercent100thsValue.Emplace();
-            value.liftPercent100thsValue.Value() = 2500U;
+            value.liftPercent100thsValue = 2500U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value);
         }
@@ -31298,10 +31295,7 @@ private:
             LogStep(9, "4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && CR_GOTOLIFTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
-            value.liftPercentageValue.Emplace();
-            value.liftPercentageValue.Value() = 75;
-            value.liftPercent100thsValue.Emplace();
-            value.liftPercent100thsValue.Value() = 7520U;
+            value.liftPercent100thsValue = 7520U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value);
         }
@@ -31470,10 +31464,7 @@ private:
             LogStep(4, "2a: TH sends GoToTiltPercentage command with 30 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && CR_GOTOTILTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
-            value.tiltPercentageValue.Emplace();
-            value.tiltPercentageValue.Value() = 30;
-            value.tiltPercent100thsValue.Emplace();
-            value.tiltPercent100thsValue.Value() = 3000U;
+            value.tiltPercent100thsValue = 3000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value);
         }
@@ -31502,10 +31493,7 @@ private:
             LogStep(9, "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && CR_GOTOTILTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
-            value.tiltPercentageValue.Emplace();
-            value.tiltPercentageValue.Value() = 60;
-            value.tiltPercent100thsValue.Emplace();
-            value.tiltPercent100thsValue.Value() = 6005U;
+            value.tiltPercent100thsValue = 6005U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value);
         }
@@ -31621,10 +31609,7 @@ private:
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
-            value.liftPercentageValue.Emplace();
-            value.liftPercentageValue.Value() = 63;
-            value.liftPercent100thsValue.Emplace();
-            value.liftPercent100thsValue.Value() = 12288U;
+            value.liftPercent100thsValue = 12288U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value);
         }
@@ -31633,10 +31618,7 @@ private:
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
-            value.liftPercentageValue.Emplace();
-            value.liftPercentageValue.Value() = 100;
-            value.liftPercent100thsValue.Emplace();
-            value.liftPercent100thsValue.Value() = 10001U;
+            value.liftPercent100thsValue = 10001U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value);
         }
@@ -31645,10 +31627,7 @@ private:
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
-            value.liftPercentageValue.Emplace();
-            value.liftPercentageValue.Value() = 255;
-            value.liftPercent100thsValue.Emplace();
-            value.liftPercent100thsValue.Value() = 65535U;
+            value.liftPercent100thsValue = 65535U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value);
         }
@@ -31767,10 +31746,7 @@ private:
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
-            value.tiltPercentageValue.Emplace();
-            value.tiltPercentageValue.Value() = 63;
-            value.tiltPercent100thsValue.Emplace();
-            value.tiltPercent100thsValue.Value() = 12288U;
+            value.tiltPercent100thsValue = 12288U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value);
         }
@@ -31779,10 +31755,7 @@ private:
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
-            value.tiltPercentageValue.Emplace();
-            value.tiltPercentageValue.Value() = 100;
-            value.tiltPercent100thsValue.Emplace();
-            value.tiltPercent100thsValue.Value() = 10001U;
+            value.tiltPercent100thsValue = 10001U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value);
         }
@@ -31791,10 +31764,7 @@ private:
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
-            value.tiltPercentageValue.Emplace();
-            value.tiltPercentageValue.Value() = 255;
-            value.tiltPercent100thsValue.Emplace();
-            value.tiltPercent100thsValue.Value() = 65535U;
+            value.tiltPercent100thsValue = 65535U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value);
         }
@@ -31968,10 +31938,7 @@ private:
             LogStep(2, "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
-            value.liftPercentageValue.Emplace();
-            value.liftPercentageValue.Value() = 90;
-            value.liftPercent100thsValue.Emplace();
-            value.liftPercent100thsValue.Value() = 9000U;
+            value.liftPercent100thsValue = 9000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value);
         }
@@ -31994,10 +31961,7 @@ private:
             LogStep(6, "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
-            value.tiltPercentageValue.Emplace();
-            value.tiltPercentageValue.Value() = 90;
-            value.tiltPercent100thsValue.Emplace();
-            value.tiltPercent100thsValue.Value() = 9000U;
+            value.tiltPercent100thsValue = 9000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value);
         }
