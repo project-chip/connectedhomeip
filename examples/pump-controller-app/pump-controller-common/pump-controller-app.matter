@@ -1418,10 +1418,10 @@ endpoint 0 {
 
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
-    ram      attribute rebootCount;
-    ram      attribute upTime;
-    ram      attribute totalOperationalHours;
-    ram      attribute bootReasons;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
+    callback attribute bootReasons;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
@@ -1434,9 +1434,9 @@ endpoint 0 {
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    ram      attribute currentHeapFree;
-    ram      attribute currentHeapUsed;
-    ram      attribute currentHeapHighWatermark;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }

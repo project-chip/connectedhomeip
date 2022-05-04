@@ -1466,10 +1466,10 @@ endpoint 0 {
 
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
-    ram      attribute rebootCount;
-    ram      attribute upTime;
-    ram      attribute totalOperationalHours;
-    ram      attribute bootReasons;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
+    callback attribute bootReasons;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
@@ -1478,9 +1478,9 @@ endpoint 0 {
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    ram      attribute currentHeapFree;
-    ram      attribute currentHeapUsed;
-    ram      attribute currentHeapHighWatermark;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
@@ -1554,19 +1554,19 @@ endpoint 0 {
   }
 
   server cluster WiFiNetworkDiagnostics {
-    ram      attribute bssid;
-    ram      attribute securityType;
-    ram      attribute wiFiVersion;
-    ram      attribute channelNumber;
-    ram      attribute rssi;
-    ram      attribute beaconLostCount;
-    ram      attribute beaconRxCount;
-    ram      attribute packetMulticastRxCount;
-    ram      attribute packetMulticastTxCount;
-    ram      attribute packetUnicastRxCount;
-    ram      attribute packetUnicastTxCount;
-    ram      attribute currentMaxRate;
-    ram      attribute overrunCount;
+    callback attribute bssid;
+    callback attribute securityType;
+    callback attribute wiFiVersion;
+    callback attribute channelNumber;
+    callback attribute rssi;
+    callback attribute beaconLostCount;
+    callback attribute beaconRxCount;
+    callback attribute packetMulticastRxCount;
+    callback attribute packetMulticastTxCount;
+    callback attribute packetUnicastRxCount;
+    callback attribute packetUnicastTxCount;
+    callback attribute currentMaxRate;
+    callback attribute overrunCount;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
