@@ -47,9 +47,9 @@ let SimulatedClusters = [];
       if (command.response.arguments.length) {
         command.hasSpecificResponse = true;
       }
-               });
+    });
     return cluster;
-             });
+  });
   return SimulatedClusters;
 })();
 
