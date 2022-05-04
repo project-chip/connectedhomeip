@@ -144,6 +144,7 @@ SequenceNumber_t BtpEngine::GetAndRecordRxAckSeqNum()
     return ret;
 }
 
+#if CHIP_ENABLE_CHIPOBLE_TEST
 bool BtpEngine::IsCommandPacket(const PacketBufferHandle & p)
 {
     if (p.IsNull())
@@ -160,6 +161,7 @@ bool BtpEngine::IsCommandPacket(const PacketBufferHandle & p)
     }
     return rx_flags.Has(HeaderFlags::kCommandMessage);
 }
+#endif // CHIP_ENABLE_CHIPOBLE_TEST
 
 bool BtpEngine::HasUnackedData() const
 {
