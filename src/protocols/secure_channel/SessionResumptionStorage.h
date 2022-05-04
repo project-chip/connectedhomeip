@@ -79,6 +79,14 @@ public:
      */
     virtual CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
                             const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) = 0;
+    /**
+     * Delete session resumption for a given fabric-scoped peer node identity.
+     *
+     * @param node the peer for which to delete local session resumption information
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no session resumption information can be found, else an
+     * appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR Delete(const ScopedNodeId & node) = 0;
 };
 
 } // namespace chip

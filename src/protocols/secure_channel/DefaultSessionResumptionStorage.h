@@ -50,7 +50,7 @@ public:
     CHIP_ERROR FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node);
     CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
                     const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) override;
-    CHIP_ERROR Delete(const ScopedNodeId & node);
+    CHIP_ERROR Delete(const ScopedNodeId & node) override;
 
 protected:
     CHIP_ERROR virtual SaveIndex(const SessionIndex & index) = 0;

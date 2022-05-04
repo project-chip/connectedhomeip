@@ -653,6 +653,7 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
     {
         return CHIP_NO_ERROR;
     }
+    CHIP_ERROR Delete(const ScopedNodeId & node) override { return CHIP_NO_ERROR; }
     CHIP_ERROR mFindMethodReturnCode;
     ScopedNodeId mPeerNodeId;
     ResumptionIdStorage * mResumptionId           = nullptr;
