@@ -335,9 +335,14 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
     VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_NO_MEMORY.AsInteger());
 
+    if (paaTrustStorePath == nullptr)
+    {
+        paaTrustStorePath = "./credentials/development/paa-root-certs";
+    }
+    ChipLogProgress(Support, "Using device attestation PAA trust store path %s.", paaTrustStorePath);
+
     // Initialize device attestation verifier
-    const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(
-        paaTrustStorePath == nullptr ? "./credentials/development/paa-root-certs" : paaTrustStorePath);
+    const chip::Credentials::AttestationTrustStore * testingRootStore = GetTestFileAttestationTrustStore(paaTrustStorePath);
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Crypto::P256Keypair ephemeralKey;
