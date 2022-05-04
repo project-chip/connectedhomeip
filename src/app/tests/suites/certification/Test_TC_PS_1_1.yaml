@@ -86,4 +86,4 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          value: 2
