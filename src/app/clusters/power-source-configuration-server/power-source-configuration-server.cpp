@@ -38,8 +38,7 @@ using namespace chip::app::Clusters::PowerSource;
 
 namespace {
 
-// Can be upto max endpoints count
-constexpr uint8_t kMaxPowerSources = 10;
+constexpr uint8_t kMaxPowerSources = 6;
 
 class PowerSourceConfigurationAttrAccess : public AttributeAccessInterface
 {
@@ -49,11 +48,6 @@ public:
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
-
-int compareOrder(const void * a, const void * b)
-{
-    return (int) ((*(uint16_t *) a - *(uint16_t *) b));
-}
 
 PowerSourceConfigurationAttrAccess gAttrAccess;
 
@@ -70,24 +64,27 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
     {
     case Sources::Id:
         err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-            uint16_t orderEpPair[kMaxPowerSources * 2];
+            std::pair<uint16_t, uint8_t> orderEpPair[kMaxPowerSources];
             uint8_t idx = 0, order = 0;
-            memset(orderEpPair, 0, sizeof(orderEpPair));
             for (auto endpoint : EnabledEndpointsWithServerCluster(PowerSource::Id))
             {
-                if (idx >= sizeof(orderEpPair))
+                if (idx >= kMaxPowerSources)
                     break;
                 PowerSource::Attributes::Order::Get(endpoint, &order);
-                orderEpPair[idx]   = (uint16_t) order;
-                orderEpPair[++idx] = (uint16_t) endpoint;
+                orderEpPair[idx] = std::make_pair(endpoint, order);
                 idx++;
             }
 
-            std::qsort(orderEpPair, idx / 2, sizeof(uint16_t) * 2, compareOrder);
-            uint8_t increment = 2;
-            for (uint8_t i = 0; i < idx; i += increment)
+            uint8_t i, j, k;
+            for (i = 0; i < idx - 1; i++)
             {
-                ReturnErrorOnFailure(encoder.Encode((uint16_t) orderEpPair[i + 1]));
+                for (j = 0; j < idx - i - 1; j++)
+                    if ((orderEpPair[j]).second > (orderEpPair[j + 1]).second)
+                        swap(orderEpPair[j], orderEpPair[j + 1]);
+            }
+            for (k = 0; k < idx; k++)
+            {
+                ReturnErrorOnFailure(encoder.Encode(orderEpPair[k].first));
             }
             return CHIP_NO_ERROR;
         });
