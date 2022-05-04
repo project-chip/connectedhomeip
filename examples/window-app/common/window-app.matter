@@ -1509,8 +1509,7 @@ server cluster WindowCovering = 258 {
   }
 
   request struct GoToLiftPercentageRequest {
-    optional Percent liftPercentageValue = 0;
-    optional Percent100ths liftPercent100thsValue = 1;
+    Percent100ths liftPercent100thsValue = 0;
   }
 
   request struct GoToTiltValueRequest {
@@ -1518,8 +1517,7 @@ server cluster WindowCovering = 258 {
   }
 
   request struct GoToTiltPercentageRequest {
-    optional Percent tiltPercentageValue = 0;
-    optional Percent100ths tiltPercent100thsValue = 1;
+    Percent100ths tiltPercent100thsValue = 0;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;
