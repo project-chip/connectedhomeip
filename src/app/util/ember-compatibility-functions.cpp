@@ -517,7 +517,8 @@ Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAtt
 } // anonymous namespace
 
 template <typename T>
-CHIP_ERROR EncodeDefaultForUnfoundManditoryAttribute(const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports, T value)
+CHIP_ERROR EncodeDefaultForUnfoundManditoryAttribute(const ConcreteReadAttributePath & aPath,
+                                                     AttributeReportIBs::Builder & aAttributeReports, T value)
 {
     ChipLogDetail(DataManagement, "Couldn't find global attribute using basic default");
     TLV::TLVWriter backup;
@@ -543,15 +544,14 @@ CHIP_ERROR EncodeDefaultForUnfoundManditoryAttribute(const ConcreteReadAttribute
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
-    TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
+    TLV::TLVWriter * writer = attributeDataIBBuilder.GetWriter();
 
     bool isNullable = false;
-    TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+    TLV::Tag tag    = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
     VerifyOrReturnError(NumericAttributeTraits<T>::CanRepresentValue(isNullable, value), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(NumericAttributeTraits<T>::Encode(*writer, tag, value));
     return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
 }
-
 
 CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
@@ -603,17 +603,15 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     {
         switch (aPath.mAttributeId)
         {
-        case Clusters::Globals::Attributes::FeatureMap::Id:
-            {
-                uint32_t defaultValue = 0;
-                return EncodeDefaultForUnfoundManditoryAttribute(aPath, aAttributeReports, defaultValue);
-            }
-            break;
-        case Clusters::Globals::Attributes::ClusterRevision::Id:
-            {
-                uint16_t defaultValue = 1;
-                return EncodeDefaultForUnfoundManditoryAttribute(aPath, aAttributeReports, defaultValue);
-            }
+        case Clusters::Globals::Attributes::FeatureMap::Id: {
+            uint32_t defaultValue = 0;
+            return EncodeDefaultForUnfoundManditoryAttribute(aPath, aAttributeReports, defaultValue);
+        }
+        break;
+        case Clusters::Globals::Attributes::ClusterRevision::Id: {
+            uint16_t defaultValue = 1;
+            return EncodeDefaultForUnfoundManditoryAttribute(aPath, aAttributeReports, defaultValue);
+        }
         default:
             break;
         }
