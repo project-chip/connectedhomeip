@@ -70,7 +70,8 @@
         {{~/if~}}
       {{~/if~}}
     {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isArray~}} [] {{~/if}} = {{code}};
+    {{~#if isArray~}} [] {{~/if}} = {{code~}}
+    ;
   {{/chip_server_cluster_attributes}}
   {{~!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
@@ -114,12 +115,40 @@
 
 {{/all_user_clusters}}
 
-{{#chip_endpoints}}
-endpoint {{endpointId}} {
-  {{#chip_endpoint_clusters}}
-  {{#if (isServer side)~}} server  {{else~}} binding {{/if~}}
-  cluster {{asUpperCamelCase name}};
-  {{/chip_endpoint_clusters}}
-}
 
-{{/chip_endpoints}}
+{{#user_endpoints}}
+endpoint {{endpointId}} {
+  // Bindings
+  {{#user_clusters}}
+    {{#if enabled}}
+      {{#unless (isServer side)}}
+  binding cluster {{asUpperCamelCase name}};
+      {{/unless}}
+    {{/if}}
+  {{/user_clusters}}
+
+  // Server cluster instatiations
+  {{#user_clusters}}
+    {{#if enabled}}
+      {{#if (isServer side)}}
+  server cluster {{asUpperCamelCase name}} {
+    {{#user_cluster_attributes}}
+      {{#if included}}
+        {{~#if (is_str_equal storageOption "NVM")}}
+    persist  {{!align~}}
+        {{~else if (is_str_equal storageOption "External")}}
+    callback {{!align~}}
+        {{~else}}
+    ram      {{!align~}}
+        {{~/if~}}
+        attribute {{asLowerCamelCase name}} = {{defaultValue}};
+      {{/if}}
+    {{/user_cluster_attributes}}
+  }
+      {{/if}}
+    {{/if}}
+  {{/user_clusters}}
+}
+{{/user_endpoints}}
+
+
