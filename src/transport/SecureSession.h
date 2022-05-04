@@ -204,6 +204,8 @@ public:
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
+    const CryptoContext & GetCryptoContext() const { return mCryptoContext; }
+
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:

@@ -169,6 +169,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ThreadConnectivityReady = false;
+
     /* Initialize the CHIP BleLayer. */
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
@@ -220,28 +222,22 @@ void BLEManagerImpl::ConnectCallback(uint8_t bleEvent, uint8_t * data, int len)
     ChipDeviceEvent event;
     ble_sts_t status = BLE_SUCCESS;
 
-    PlatformMgr().LockChipStack();
-
     event.Type                             = DeviceEventType::kPlatformTelinkBleConnected;
     event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
     event.Platform.BleConnEvent.HciResult  = BLE_SUCCESS;
 
     PlatformMgr().PostEventOrDie(&event);
-    PlatformMgr().UnlockChipStack();
 }
 
 void BLEManagerImpl::DisconnectCallback(uint8_t bleEvent, uint8_t * data, int len)
 {
     ChipDeviceEvent event;
 
-    PlatformMgr().LockChipStack();
-
     event.Type                             = DeviceEventType::kPlatformTelinkBleDisconnected;
     event.Platform.BleConnEvent.connHandle = BLS_CONN_HANDLE;
     event.Platform.BleConnEvent.HciResult  = *data; // Reason of disconnection stored in first data byte
 
     PlatformMgr().PostEventOrDie(&event);
-    PlatformMgr().UnlockChipStack();
 }
 
 int BLEManagerImpl::TxCccWriteCallback(uint16_t connHandle, void * p)
@@ -791,7 +787,14 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     ble_sts_t status = BLE_SUCCESS;
 
-    status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, pBuf->Start(), pBuf->DataLength());
+    do
+    {
+        if (status != BLE_SUCCESS)
+        {
+            k_msleep(1);
+        }
+        status = blc_gatt_pushHandleValueIndicate(conId, Matter_TX_DP_H, pBuf->Start(), pBuf->DataLength());
+    } while (status == GATT_ERR_DATA_PENDING_DUE_TO_SERVICE_DISCOVERY_BUSY);
     if (status != BLE_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Fail to send indication. Error %d", status);
@@ -967,6 +970,9 @@ CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event
         error = PlatformMgr().PostEvent(&attachEvent);
         VerifyOrExit(error == CHIP_NO_ERROR,
                      ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
+
+        ChipLogDetail(DeviceLayer, "Thread Connectivity Ready");
+        ThreadConnectivityReady = true;
     }
 
 exit:
@@ -976,7 +982,7 @@ exit:
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
     /* It is time to swich to IEEE802154 radio if it is provisioned */
-    if (ConnectivityMgr().IsThreadProvisioned())
+    if (ThreadConnectivityReady)
     {
         SwitchToIeee802154();
     }

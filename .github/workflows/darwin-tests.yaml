@@ -41,8 +41,16 @@ jobs:
         runs-on: macos-latest
 
         steps:
+            - uses: Wandalen/wretry.action@v1.0.11
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
             - name: Checkout submodules
-               run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install openssl pkg-config coreutils
@@ -80,6 +88,7 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target darwin-x64-chip-tool-darwin-${BUILD_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
+                        --target darwin-x64-lock-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -93,6 +102,7 @@ jobs:
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2

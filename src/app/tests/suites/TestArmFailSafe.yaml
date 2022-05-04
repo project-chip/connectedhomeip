@@ -17,21 +17,11 @@ name: ArmFailSafe Tests
 config:
     nodeId: 0x12344321
     endpoint: 0
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
-    payload:
-        type: CHAR_STRING
-        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for the alpha device to be retrieved "
       cluster: "DelayCommands"

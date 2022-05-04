@@ -65,7 +65,6 @@ private:
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
     otUdpSocket mSocket;
-    otInstance * mOTInstance = nullptr;
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;

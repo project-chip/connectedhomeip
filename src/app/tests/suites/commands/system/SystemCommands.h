@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 class SystemCommands
 {
@@ -28,13 +29,14 @@ public:
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
-    CHIP_ERROR Start(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr);
-    CHIP_ERROR Stop();
-    CHIP_ERROR Reboot(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr);
-    CHIP_ERROR FactoryReset();
+    CHIP_ERROR Start(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr,
+                     const char * registerKey = "default");
+    CHIP_ERROR Stop(const char * registerKey = "default");
+    CHIP_ERROR Reboot(const char * registerKey = "default");
+    CHIP_ERROR FactoryReset(const char * registerKey = "default");
 
 private:
     CHIP_ERROR RunInternal(const char * command);
-    CHIP_ERROR CreateCommonCommandArgs(char * commandBuffer, size_t commandBufferSize, const char * scriptDir,
-                                       const char * scriptName, uint16_t discriminator, uint16_t port, const char * kvs);
+    CHIP_ERROR CreateCommonCommandArgs(chip::StringBuilderBase & builder, const char * scriptDir, const char * scriptName,
+                                       const char * registerKey, uint16_t discriminator, uint16_t port, const char * kvs);
 };

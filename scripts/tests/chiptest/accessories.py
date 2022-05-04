@@ -49,6 +49,9 @@ class AppsRegister:
     def removeAll(self):
         self.__accessories = {}
 
+    def get(self, name):
+        return self.__accessories[name]
+
     def kill(self, name):
         accessory = self.__accessories[name]
         if accessory:
@@ -73,13 +76,10 @@ class AppsRegister:
             return accessory.stop()
         return False
 
-    def reboot(self, name, args):
+    def reboot(self, name):
         accessory = self.__accessories[name]
         if accessory:
-            # The args param comes directly from the sys.argv[1:] of Reboot.py and should contain a list of strings in
-            # key-value pair, e.g. [option1, value1, option2, value2, ...]
-            options = self.__createCommandLineOptions(args)
-            return accessory.stop() and accessory.start(options)
+            return accessory.stop() and accessory.start()
         return False
 
     def factoryResetAll(self):

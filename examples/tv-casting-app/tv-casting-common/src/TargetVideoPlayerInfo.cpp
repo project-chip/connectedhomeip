@@ -17,6 +17,8 @@
  */
 #include "TargetVideoPlayerInfo.h"
 
+using namespace chip;
+
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 
 CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex)
@@ -38,25 +40,8 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         return CHIP_ERROR_INVALID_FABRIC_ID;
     }
 
-    chip::DeviceProxyInitParams initParams = {
-        .sessionManager           = &(server->GetSecureSessionManager()),
-        .sessionResumptionStorage = server->GetSessionResumptionStorage(),
-        .exchangeMgr              = &(server->GetExchangeManager()),
-        .fabricTable              = &(server->GetFabricTable()),
-        .clientPool               = &gCASEClientPool,
-    };
-
     PeerId peerID = fabric->GetPeerIdForNode(nodeId);
 
-    //
-    // TODO: The code here is assuming that we can create an OperationalDeviceProxy instance and attach it immediately
-    //       to a CASE session that just got established to us by the tv-app. While this will work most of the time,
-    //       this is a dangerous assumption to make since it is entirely possible for that secure session to have been
-    //       evicted in the time since that session was established to the point here when we desire to interact back
-    //       with that peer. If that is the case, our `OnConnected` callback will not get invoked syncronously and
-    //       mOperationalDeviceProxy will still have a value of null, triggering the check below to fail.
-    //
-    mOperationalDeviceProxy = nullptr;
     CHIP_ERROR err =
         server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)

@@ -30,6 +30,7 @@
 
 #include <dns-sd-internal.h>
 #include <glib.h>
+#include <platform/ThreadStackManager.h>
 
 using namespace chip::Dnssd;
 using namespace chip::DeviceLayer::Internal;
@@ -730,6 +731,22 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
 
     std::string regtype = GetFullType(service->mType, service->mProtocol);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    if (chip::DeviceLayer::ThreadStackMgr().IsThreadEnabled())
+    {
+        if (strcmp(service->mHostName, "") != 0)
+        {
+            chip::DeviceLayer::ThreadStackMgr().SetupSrpHost(service->mHostName);
+        }
+
+        Span<const char * const> subTypes(service->mSubTypes, service->mSubTypeSize);
+        Span<const TextEntry> textEntries(service->mTextEntries, service->mTextEntrySize);
+        return chip::DeviceLayer::ThreadStackMgr().AddSrpService(service->mName, regtype.c_str(), service->mPort, subTypes,
+                                                                 textEntries);
+    }
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     return RegisterService(regtype.c_str(), service->mName, service->mPort, service->mInterface.GetPlatformInterface(),
                            service->mTextEntries, service->mTextEntrySize);

@@ -25,8 +25,10 @@
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
+#include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
+#include <app/server/DefaultAclStorage.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -95,8 +97,14 @@ struct ServerInitParams
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
-    // initialized before being provided
+    // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+    // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
+    // be initialized before being provided.
+    app::AclStorage * aclStorage = nullptr;
+    // Network native params can be injected depending on the
+    // selected Endpoint implementation
+    void * endpointNativeParams = nullptr;
 };
 
 /**
@@ -150,6 +158,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
+        static chip::app::DefaultAclStorage sAclStorage;
 
         // KVS-based persistent storage delegate injection
         chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager = DeviceLayer::PersistedStorage::KeyValueStoreMgr();
@@ -169,7 +178,10 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate(&sKvsPersistenStorageDelegate);
+        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+
+        // Inject ACL storage. (Don't initialize it.)
+        this->aclStorage = &sAclStorage;
 
         return CHIP_NO_ERROR;
     }
@@ -302,7 +314,20 @@ private:
             {
                 groupDataProvider->RemoveFabric(fabricIndex);
             }
-            Access::GetAccessControl().RemoveFabric(fabricIndex);
+
+            {
+                // Remove access control entries in reverse order. (It could be
+                // any order, but reverse order will cause less churn in
+                // persistent storage.)
+                size_t count = 0;
+                if (Access::GetAccessControl().GetEntryCount(fabricIndex, count) == CHIP_NO_ERROR)
+                {
+                    while (count)
+                    {
+                        Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
+                    }
+                }
+            }
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
@@ -340,6 +365,7 @@ private:
     ServerFabricDelegate mFabricDelegate;
 
     Access::AccessControl mAccessControl;
+    app::AclStorage * mAclStorage;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

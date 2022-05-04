@@ -48,12 +48,6 @@ public:
     IPPrefix() = default;
     IPPrefix(const IPAddress & ipAddress, uint8_t length) : IPAddr(ipAddress), Length(length) {}
 
-    /**
-     *  Copy constructor for the IPPrefix class.
-     *
-     */
-    IPPrefix(const IPPrefix & other) = default;
-
     /** An IPv6 or IPv4 address. */
     IPAddress IPAddr;
 
@@ -106,15 +100,6 @@ public:
      * @return  \c false if equivalent, else \c false.
      */
     bool operator!=(const IPPrefix & other) const;
-
-    /**
-     * @brief   Conventional assignment operator.
-     *
-     * @param[in]   other   the prefix to copy.
-     *
-     * @return  a reference to this object.
-     */
-    IPPrefix & operator=(const IPPrefix & other);
 
     /**
      * @brief   Test if an address matches the prefix.
