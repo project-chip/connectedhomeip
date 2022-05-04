@@ -22,13 +22,13 @@ WORKFLOWS_DIR = '.github/workflows/'
 GCB_DIR = 'integrations/cloudbuild/'
 VERSION_FILE = 'integrations/docker/images/chip-build/version'
 
-def get_version(version_file: str) -> None:
+def get_version(version_file: str) -> str:
     """Reads the provided images version file and returns the current images version."""
     with open(version_file) as f:
         l = f.readline()
         return l[:l.index(' ')]
 
-def update_line(version: str, line: str, end_quote=False) -> None:
+def update_line(version: str, line: str, end_quote=False) -> str:
     """Replaces the end of a string after the last colon with the specified version.
     end_quote ends the line with a closing double quote.
     """
