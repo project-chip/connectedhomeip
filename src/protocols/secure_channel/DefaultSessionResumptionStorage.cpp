@@ -145,17 +145,16 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
 
 CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
     CHIP_ERROR stickyErr = CHIP_NO_ERROR;
     size_t found         = 0;
-    size_t initialSize   = 0;
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));
-    initialSize = index.mSize;
+    size_t initialSize = index.mSize;
     for (size_t i = 0; i < initialSize; ++i)
     {
-        size_t cur    = i - found;
-        size_t remain = initialSize - i;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        size_t cur     = i - found;
+        size_t remain  = initialSize - i;
         ResumptionIdStorage resumptionId;
         Crypto::P256ECDHDerivedSecret sharedSecret;
         CATValues peerCATs;
@@ -203,8 +202,8 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
     if (found)
     {
         index.mSize -= found;
-        err       = SaveIndex(index);
-        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+        CHIP_ERROR err = SaveIndex(index);
+        stickyErr      = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(
