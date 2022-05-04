@@ -158,11 +158,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     case HandlerState::AwaitingReportResponse:
         if (IsChunkedReport())
         {
-            MoveToState(HandlerState::GeneratingReports);
             mpExchangeCtx->WillSendMessage();
-
-            // Trigger ReportingEngine run for sending next chunk of data.
-            SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         }
         else if (IsType(InteractionType::Subscribe))
         {
@@ -183,14 +179,19 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             }
             else
             {
-                MoveToState(HandlerState::GeneratingReports);
                 mpExchangeCtx = nullptr;
             }
         }
         else
         {
+            //
+            // We're done processing a read, so let's close out and return.
+            //
             Close();
+            return CHIP_NO_ERROR;
         }
+
+        MoveToState(HandlerState::GeneratingReports);
         break;
 
     case HandlerState::GeneratingReports:
@@ -389,8 +390,6 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
-
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
 
     mpExchangeCtx->WillSendMessage();
 
@@ -617,9 +616,23 @@ const char * ReadHandler::GetStateStr() const
 
 void ReadHandler::MoveToState(const HandlerState aTargetState)
 {
+    if (aTargetState == mState)
+    {
+        return;
+    }
+
     if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
+    //
+    // If we just unblocked sending reports, let's go ahead and schedule the reporting
+    // engine to run to kick that off.
+    //
+    if (aTargetState == HandlerState::GeneratingReports)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 
     mState = aTargetState;
@@ -670,7 +683,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
 
     mIsPrimingReports = false;
-    MoveToState(HandlerState::GeneratingReports);
     return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 
@@ -753,8 +765,6 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
     mpExchangeCtx->WillSendMessage();
 
