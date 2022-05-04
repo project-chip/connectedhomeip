@@ -141,7 +141,11 @@ endpoint {{endpointId}} {
         {{~else}}
     ram      {{!align~}}
         {{~/if~}}
-        attribute {{asLowerCamelCase name}} = {{defaultValue}};
+        attribute {{asLowerCamelCase name}}
+        {{~#if_is_non_zero_default defaultValue~}}
+           {{!need space}} default = {{#if isString}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+        {{~/if_is_non_zero_default~}}
+        ;
       {{/if}}
     {{/user_cluster_attributes}}
   }
