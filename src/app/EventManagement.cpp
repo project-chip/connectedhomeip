@@ -319,7 +319,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
     // The fabricIndex profile tag is internal use only for fabric filtering when retrieving event from circular event buffer,
     // and would not go on the wire.
-    // Revisit RemoveInvalidFabricCB function should the encoding of fabricIndex change in the future.
+    // Revisit FabricRemovedCB function should the encoding of fabricIndex change in the future.
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
@@ -751,7 +751,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext)
+CHIP_ERROR EventManagement::FabricRemovedCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext)
 {
     // the function does not actually remove the event, instead, it sets the fabric index to an invalid value.
     FabricIndex * invalidFabricIndex = static_cast<FabricIndex *>(apContext);
@@ -760,23 +760,25 @@ CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader
     TLVType tlvType;
     TLVType tlvType1;
     event.Init(aReader);
-    ReturnErrorOnFailure(event.EnterContainer(tlvType));
-    ReturnErrorOnFailure(event.Next());
-    ReturnErrorOnFailure(event.EnterContainer(tlvType1));
-    ReturnErrorOnFailure(event.Next());
+    VerifyOrReturnError(event.EnterContainer(tlvType) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.Next(TLV::ContextTag(to_underlying(EventReportIB::Tag::kEventData))) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.EnterContainer(tlvType1) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    uint8_t fabricIndex = 0;
     while (CHIP_NO_ERROR == event.Next())
     {
         if (event.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
         {
-            ReturnErrorOnFailure(event.Get(fabricIndex));
+            uint8_t fabricIndex = 0;
+            VerifyOrReturnError(event.Get(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR);
             if (fabricIndex == *invalidFabricIndex)
             {
-                // fabricIndex is encoded as an integer; the dataPtr will point to a location immediately after its encoding
-                uint8_t * dataPtr                  = const_cast<uint8_t *>(event.GetReadPoint());
                 CHIPCircularTLVBuffer * readBuffer = static_cast<CHIPCircularTLVBuffer *>(event.GetBackingStore());
+                // fabricIndex is encoded as an integer; the dataPtr will point to a location immediately after its encoding
+                uint8_t * dataPtr                  = event.GetReadPoint() - readBuffer->GetQueue() + readBuffer->GetQueue();
+
                 // shift the dataPtr to point to the encoding of the fabric index, accounting for wraparound in backing storage
+                // we cannot get the actual encoding size from current container beginning to the fabric index because of several
+                // optional parameters.
                 if (readBuffer->GetQueue() != dataPtr)
                 {
                     dataPtr = dataPtr - 1;
@@ -785,20 +787,17 @@ CHIP_ERROR EventManagement::RemoveInvalidFabricCB(const TLV::TLVReader & aReader
                 {
                     dataPtr = readBuffer->GetQueue() + readBuffer->GetTotalDataLength() - 1;
                 }
-                // set the value of fabricIndex to 0
-                memset(dataPtr, 0, 1);
-                event.Get(fabricIndex);
+
+                *dataPtr = kUndefinedFabricIndex;
                 return CHIP_NO_ERROR;
             }
         }
     }
-
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::RemoveInvalidFabric(FabricIndex aFabricIndex)
+CHIP_ERROR EventManagement::FabricRemoved(FabricIndex aFabricIndex)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     const bool recurse = false;
     TLVReader reader;
     CircularEventBufferWrapper bufWrapper;
@@ -808,7 +807,7 @@ CHIP_ERROR EventManagement::RemoveInvalidFabric(FabricIndex aFabricIndex)
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     ReturnErrorOnFailure(GetEventReader(reader, PriorityLevel::Critical, &bufWrapper));
-    err = TLV::Utilities::Iterate(reader, RemoveInvalidFabricCB, &aFabricIndex, recurse);
+    CHIP_ERROR err = TLV::Utilities::Iterate(reader, FabricRemovedCB, &aFabricIndex, recurse);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;

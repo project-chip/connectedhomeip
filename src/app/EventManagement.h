@@ -338,9 +338,10 @@ public:
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
     /**
-     * @brief Iterate all events and invalidate the event with obsolete fabric.
+     * @brief brief Iterate all events and invalidate the fabric-sensitive events whose associated fabric has the given fabric
+     * index.
      */
-    CHIP_ERROR RemoveInvalidFabric(FabricIndex aFabricIndex);
+    CHIP_ERROR FabricRemoved(FabricIndex aFabricIndex);
 
     /**
      * @brief
@@ -425,13 +426,13 @@ private:
 
     /**
      * @brief Iterate the event elements inside event tlv and mark the fabric index as 0 if matching with obsolete fabric index
-     * converted from apContext
      *
      * @param[in] aReader  event tlv reader
-     * @param[in] apContext  the obsolete fabric index
+     * @param[in] aDepth   the current depth into the TLV data.
+     * @param[in] apFabricIndex  the obsolete FabricIndex pointer
      *
      */
-    static CHIP_ERROR RemoveInvalidFabricCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
+    static CHIP_ERROR FabricRemovedCB(const TLV::TLVReader & aReader, size_t aDepth, void * apFabricIndex);
 
     /**
      * @brief
