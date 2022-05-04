@@ -114,10 +114,13 @@ public:
 
     void UserPrompt(NSString * _Nonnull message, NSString * _Nullable expectedValue = nil) { NextTest(); }
 
-    void WaitForCommissionee(chip::NodeId nodeId)
+    void WaitForCommissionee(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
     {
-        CHIPDeviceController * controller = CurrentCommissioner();
+        CHIPDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+
+        SetIdentity(identity);
 
         // Disconnect our existing device; otherwise getConnectedDevice will
         // just hand it right back to us without establishing a new CASE
@@ -130,7 +133,7 @@ public:
             mConnectedDevices[mCurrentIdentity] = nil;
         }
 
-        [controller getConnectedDevice:nodeId
+        [controller getConnectedDevice:value.nodeId
                                  queue:mCallbackQueue
                      completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
                          CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
@@ -142,18 +145,21 @@ public:
     }
 
     /////////// CommissionerCommands-like Interface /////////
-    CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
+    CHIP_ERROR PairWithQRCode(
+        const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value)
     {
-        CHIPDeviceController * controller = CurrentCommissioner();
+        CHIPDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         [controller setPairingDelegate:mPairingDelegate queue:mCallbackQueue];
-        [mPairingDelegate setDeviceId:nodeId];
+        [mPairingDelegate setDeviceId:value.nodeId];
         [mPairingDelegate setActive:YES];
 
-        NSString * payloadStr = [[NSString alloc] initWithBytes:payload.data() length:payload.size() encoding:NSUTF8StringEncoding];
+        NSString * payloadStr = [[NSString alloc] initWithBytes:value.payload.data()
+                                                         length:value.payload.size()
+                                                       encoding:NSUTF8StringEncoding];
         NSError * err;
-        BOOL ok = [controller pairDevice:nodeId onboardingPayload:payloadStr error:&err];
+        BOOL ok = [controller pairDevice:value.nodeId onboardingPayload:payloadStr error:&err];
         if (ok == YES) {
             return CHIP_NO_ERROR;
         }

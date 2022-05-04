@@ -88,6 +88,8 @@ void CHIPCommandBridge::SetIdentity(const char * name) { mCurrentController = mC
 
 CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
+CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
+
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
