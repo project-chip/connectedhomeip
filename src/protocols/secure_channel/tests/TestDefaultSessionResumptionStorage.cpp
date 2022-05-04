@@ -74,7 +74,10 @@ void TestSave(nlTestSuite * inSuite, void * inContext)
                                            vectors[last].cats) == CHIP_NO_ERROR);
         // Copy our data to our test vector index 0 to match
         // what is now in storage.
-        memcpy(&vectors[0], &vectors[last], sizeof(vectors[0]));
+        vectors[0].node = vectors[last].node;
+        vectors[0].cats = vectors[last].cats;
+        memcpy(vectors[0].resumptionId.data(), vectors[last].resumptionId.data(), vectors[0].resumptionId.size());
+        memcpy(vectors[0].sharedSecret.Bytes(), vectors[last].sharedSecret.Bytes(), vectors[0].sharedSecret.Length());
     }
 
     // Read back and verify values.
