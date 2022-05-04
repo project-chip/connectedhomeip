@@ -628,7 +628,6 @@ server cluster UserLabel = 65 {
 }
 
 
-
 endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 

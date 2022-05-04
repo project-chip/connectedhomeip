@@ -2172,7 +2172,6 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 
-
 endpoint 0 {
 
   server cluster Descriptor {
@@ -2425,6 +2424,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 1 {
   binding cluster OnOff;
   binding cluster LevelControl;
@@ -2564,6 +2564,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 2 {
 
   server cluster OnOff {

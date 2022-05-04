@@ -114,9 +114,8 @@
 }
 
 {{/all_user_clusters}}
-
-
 {{#user_endpoints}}
+
 endpoint {{endpointId}} {
   {{#user_clusters}}
     {{#if enabled}}

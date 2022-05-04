@@ -1567,7 +1567,6 @@ server cluster UserLabel = 65 {
 }
 
 
-
 endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1826,6 +1825,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 1 {
   binding cluster TemperatureMeasurement;
   binding cluster PressureMeasurement;

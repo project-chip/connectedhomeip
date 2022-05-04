@@ -1994,7 +1994,6 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 
-
 endpoint 0 {
   binding cluster Binding;
   binding cluster GeneralCommissioning;
@@ -2258,6 +2257,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 2;
   }
 }
+
 endpoint 1 {
 
   server cluster OnOff {
@@ -2322,6 +2322,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 2 {
 
   server cluster OnOff {
@@ -2363,6 +2364,7 @@ endpoint 2 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 3 {
 
   server cluster Descriptor {
@@ -2407,6 +2409,7 @@ endpoint 3 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 4 {
 
   server cluster Descriptor {
@@ -2435,6 +2438,7 @@ endpoint 4 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 5 {
 
   server cluster Descriptor {

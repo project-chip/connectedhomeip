@@ -1656,7 +1656,6 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 
-
 endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1912,6 +1911,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 1 {
   binding cluster Identify;
   binding cluster Scenes;

@@ -4261,7 +4261,6 @@ client cluster WindowCovering = 258 {
 }
 
 
-
 endpoint 1 {
   binding cluster Identify;
   binding cluster Groups;

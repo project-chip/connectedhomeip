@@ -1372,7 +1372,6 @@ server cluster WindowCovering = 258 {
 }
 
 
-
 endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -1671,6 +1670,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
 endpoint 1 {
 
   server cluster Identify {
@@ -1710,6 +1710,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 5;
   }
 }
+
 endpoint 2 {
 
   server cluster Descriptor {

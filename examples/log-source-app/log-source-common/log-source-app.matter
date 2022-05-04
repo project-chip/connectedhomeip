@@ -391,7 +391,6 @@ server cluster OperationalCredentials = 62 {
 }
 
 
-
 endpoint 0 {
   binding cluster DiagnosticLogs;
 
