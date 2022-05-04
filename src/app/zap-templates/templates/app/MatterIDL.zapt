@@ -118,7 +118,6 @@
 
 {{#user_endpoints}}
 endpoint {{endpointId}} {
-  // Bindings
   {{#user_clusters}}
     {{#if enabled}}
       {{#unless (isServer side)}}
@@ -126,11 +125,10 @@ endpoint {{endpointId}} {
       {{/unless}}
     {{/if}}
   {{/user_clusters}}
-
-  // Server cluster instatiations
   {{#user_clusters}}
     {{#if enabled}}
       {{#if (isServer side)}}
+
   server cluster {{asUpperCamelCase name}} {
     {{#user_cluster_attributes}}
       {{#if included}}
@@ -143,7 +141,7 @@ endpoint {{endpointId}} {
         {{~/if~}}
         attribute {{asLowerCamelCase name}}
         {{~#if_is_non_zero_default defaultValue~}}
-           {{!need space}} default = {{#if isString}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
         {{~/if_is_non_zero_default~}}
         ;
       {{/if}}
