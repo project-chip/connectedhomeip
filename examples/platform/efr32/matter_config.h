@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2022 Silabs.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +17,17 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 
-#include "efr32_utils.h"
+class EFR32MatterConfig
+{
+public:
+    static CHIP_ERROR InitMatter(const char * appName);
 
-// ---- Lighting Example App Config ----
-
-#define APP_TASK_NAME "Lit"
-
-// Time it takes in ms for the simulated actuator to move from one
-// state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 10
+private:
+    static CHIP_ERROR InitOpenThread(void);
+    static void InitWiFi(void);
+};
