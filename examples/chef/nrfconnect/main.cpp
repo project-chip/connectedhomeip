@@ -84,7 +84,9 @@ CHIP_ERROR main()
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY */
 
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
