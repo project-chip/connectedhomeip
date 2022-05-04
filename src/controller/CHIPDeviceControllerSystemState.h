@@ -82,7 +82,7 @@ struct DeviceControllerSystemStateParams
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
     DeviceTransportMgr * transportMgr                             = nullptr;
-    AbstractSessionResumptionStorage * sessionResumptionStorage   = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage           = nullptr;
     SessionManager * sessionMgr                                   = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;

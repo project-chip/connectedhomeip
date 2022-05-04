@@ -15,22 +15,22 @@
  *    limitations under the License.
  */
 
-#include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <protocols/secure_channel/DefaultSessionResumptionStorage.h>
 
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
 
-CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
-                                                        Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
+CHIP_ERROR DefaultSessionResumptionStorage::FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
+                                                               Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
     ReturnErrorOnFailure(LoadState(node, resumptionId, sharedSecret, peerCATs));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
-                                                        Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
+CHIP_ERROR DefaultSessionResumptionStorage::FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
+                                                               Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
     ReturnErrorOnFailure(FindNodeByResumptionId(resumptionId, node));
     ResumptionIdStorage tmpResumptionId;
@@ -40,14 +40,14 @@ CHIP_ERROR SessionResumptionStorage::FindByResumptionId(ConstResumptionIdView re
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node)
+CHIP_ERROR DefaultSessionResumptionStorage::FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node)
 {
     ReturnErrorOnFailure(LoadLink(resumptionId, node));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
-                                          const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
+CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
+                                                 const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
 {
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));
@@ -68,7 +68,7 @@ CHIP_ERROR SessionResumptionStorage::Save(const ScopedNodeId & node, ConstResump
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::Delete(const ScopedNodeId & node)
+CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
 {
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));

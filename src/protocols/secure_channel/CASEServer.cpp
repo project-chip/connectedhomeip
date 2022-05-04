@@ -30,8 +30,7 @@ using namespace ::chip::Credentials;
 namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
-                                                     FabricTable * fabrics,
-                                                     AbstractSessionResumptionStorage * sessionResumptionStorage,
+                                                     FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
                                                      Credentials::GroupDataProvider * responderGroupDataProvider)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

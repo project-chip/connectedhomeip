@@ -17,54 +17,68 @@
 
 #pragma once
 
-#include <protocols/secure_channel/AbstractSessionResumptionStorage.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CASEAuthTag.h>
+#include <lib/core/ScopedNodeId.h>
 
 namespace chip {
 
 /**
- * @brief Stores assets for session resumption. The resumption data are indexed by 2 indexes: ScopedNodeId and ResumptionId. The
- *   index of ScopedNodeId is used when initiating a CASE session, it will look up the storage and check whether it is able to
- *   resume a previous session. The index of ResumptionId is used when receiving a Sigma1 with ResumptionId.
+ * @brief Interface to store and recover assets for session resumption. The
+ *   resumption data are indexed by 2 parameters: ScopedNodeId and
+ *   ResumptionId. The index on ScopedNodeId is used when initiating a CASE
+ *   session.  It allows the caller to query storage to check whether there is a
+ *   previous session with the given peer for which session resumption may be
+ *   attempted.  The index on ResumptionId is used when receiving a Sigma1 with
+ *   ResumptionId.
  *
- *   The implementation saves 2 maps:
- *     * <FabricIndex, PeerNodeId>   => <ResumptionId, ShareSecret, PeerCATs>
- *     * <ResumptionId>              => <FabricIndex, PeerNodeId>
  */
-class SessionResumptionStorage : public AbstractSessionResumptionStorage
+class SessionResumptionStorage
 {
 public:
-    using ResumptionIdView = FixedSpan<uint8_t, kResumptionIdSize>;
+    static constexpr size_t kResumptionIdSize = 16;
+    using ResumptionIdStorage                 = std::array<uint8_t, kResumptionIdSize>;
+    using ConstResumptionIdView               = FixedSpan<const uint8_t, kResumptionIdSize>;
 
-    struct SessionIndex
-    {
-        size_t mSize;
-        ScopedNodeId mNodes[CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE];
-    };
+    virtual ~SessionResumptionStorage(){};
 
-    virtual ~SessionResumptionStorage() {}
-
-    CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
-                                  Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) override;
-    CHIP_ERROR FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
-                                  Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) override;
-    CHIP_ERROR FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node);
-    CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
-                    const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) override;
-    CHIP_ERROR Delete(const ScopedNodeId & node);
-
-protected:
-    CHIP_ERROR virtual SaveIndex(const SessionIndex & index) = 0;
-    CHIP_ERROR virtual LoadIndex(SessionIndex & index)       = 0;
-
-    CHIP_ERROR virtual SaveLink(ConstResumptionIdView resumptionId, const ScopedNodeId & node) = 0;
-    CHIP_ERROR virtual LoadLink(ConstResumptionIdView resumptionId, ScopedNodeId & node)       = 0;
-    CHIP_ERROR virtual DeleteLink(ConstResumptionIdView resumptionId)                          = 0;
-
-    CHIP_ERROR virtual SaveState(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
-                                 const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) = 0;
-    CHIP_ERROR virtual LoadState(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
-                                 Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)             = 0;
-    CHIP_ERROR virtual DeleteState(const ScopedNodeId & node)                                                    = 0;
+    /**
+     * Recover session resumption ID, shared secret and CAT values for a given
+     * fabric-scoped node identity.
+     *
+     * @param node the node for which to recover session resumption information
+     * @param resumptionId (out) recovered session resumption ID
+     * @param sharedSecret (out) recovered session shared secret
+     * @param peerCATs (out) recovered CATs for the session peer
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no session resumption information can be found, else an
+     * appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
+                                          Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) = 0;
+    /**
+     * Recover session shared secret, fabric-scoped node identity and CAT values
+     * for a given session resumption ID.
+     *
+     * @param resumptionId the session resumption ID for which to recover session resumption information
+     * @param node (out) the peer node associated with the session resumption ID
+     * @param sharedSecret (out) recovered session shared secret
+     * @param peerCATs (out) recovered CATs for the session peer
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no session resumption information can be found, else an
+     * appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
+                                          Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs) = 0;
+    /**
+     * Save session resumption information to storage.
+     *
+     * @param resumptionId the session resumption ID for the current session
+     * @param node the peer node for the session
+     * @param sharedSecret the session shared secret
+     * @param peerCATs the CATs of the session peer
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
+                            const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) = 0;
 };
 
 } // namespace chip

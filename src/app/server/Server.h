@@ -91,7 +91,7 @@ struct ServerInitParams
     PersistentStorageDelegate * persistentStorageDelegate = nullptr;
     // Session resumption storage: Optional. Support session resumption when provided.
     // Must be initialized before being provided.
-    AbstractSessionResumptionStorage * sessionResumptionStorage = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
@@ -217,7 +217,7 @@ public:
 
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
-    AbstractSessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+    SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
@@ -347,7 +347,7 @@ private:
     CommissioningWindowManager mCommissioningWindowManager;
 
     PersistentStorageDelegate * mDeviceStorage;
-    AbstractSessionResumptionStorage * mSessionResumptionStorage;
+    SessionResumptionStorage * mSessionResumptionStorage;
     Credentials::GroupDataProvider * mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;

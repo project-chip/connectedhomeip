@@ -613,7 +613,7 @@ static void CASE_Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
     TestSigma1Parsing(inSuite, mem, bufferSize, Sigma1SessionIdTooBig);
 }
 
-struct SessionResumptionTestStorage : AbstractSessionResumptionStorage
+struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
@@ -659,9 +659,9 @@ struct SessionResumptionTestStorage : AbstractSessionResumptionStorage
     Crypto::P256ECDHDerivedSecret * mSharedSecret = nullptr;
 };
 
-static void CASE_AbstractSessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
+static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
 {
-    // Test the AbstractSessionResumptionStorage external interface.
+    // Test the SessionResumptionStorage external interface.
     //
     // Our build should accept any storage delegate injected that implements
     // this.  And if our delegate provides usable session resumption
@@ -767,7 +767,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
     NL_TEST_DEF("Sigma1Parsing", CASE_Sigma1ParsingTest),
     NL_TEST_DEF("DestinationId", CASE_DestinationIdTest),
-    NL_TEST_DEF("AbstractSessionResumptionStorage", CASE_AbstractSessionResumptionStorage),
+    NL_TEST_DEF("SessionResumptionStorage", CASE_SessionResumptionStorage),
 
     NL_TEST_SENTINEL()
 };

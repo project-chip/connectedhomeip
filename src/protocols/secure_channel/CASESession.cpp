@@ -209,7 +209,7 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
 
 CHIP_ERROR
 CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
-                                           AbstractSessionResumptionStorage * sessionResumptionStorage,
+                                           SessionResumptionStorage * sessionResumptionStorage,
                                            SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
@@ -227,8 +227,7 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
 }
 
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
-                                         ExchangeContext * exchangeCtxt,
-                                         AbstractSessionResumptionStorage * sessionResumptionStorage,
+                                         ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                                          SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
@@ -525,7 +524,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestionationId(const ByteSpan & destina
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR CASESession::TryResumeSession(AbstractSessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
+CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                          ByteSpan initiatorRandom)
 {
     if (mSessionResumptionStorage == nullptr)

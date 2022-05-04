@@ -48,12 +48,12 @@ namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager                             = nullptr;
-    AbstractSessionResumptionStorage * sessionResumptionStorage = nullptr;
-    Messaging::ExchangeManager * exchangeMgr                    = nullptr;
-    FabricTable * fabricTable                                   = nullptr;
-    CASEClientPoolDelegate * clientPool                         = nullptr;
-    Credentials::GroupDataProvider * groupDataProvider          = nullptr;
+    SessionManager * sessionManager                     = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    Messaging::ExchangeManager * exchangeMgr            = nullptr;
+    FabricTable * fabricTable                           = nullptr;
+    CASEClientPoolDelegate * clientPool                 = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider  = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 

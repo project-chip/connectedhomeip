@@ -78,7 +78,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR ListenForSessionEstablishment(
-        SessionManager & sessionManager, FabricTable * fabrics, AbstractSessionResumptionStorage * sessionResumptionStorage,
+        SessionManager & sessionManager, FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
         SessionEstablishmentDelegate * delegate,
         Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
@@ -96,7 +96,7 @@ public:
      */
     CHIP_ERROR
     EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
-                     Messaging::ExchangeContext * exchangeCtxt, AbstractSessionResumptionStorage * sessionResumptionStorage,
+                     Messaging::ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
                      SessionEstablishmentDelegate * delegate,
                      Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
@@ -250,8 +250,8 @@ private:
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
 
-    Messaging::ExchangeContext * mExchangeCtxt                   = nullptr;
-    AbstractSessionResumptionStorage * mSessionResumptionStorage = nullptr;
+    Messaging::ExchangeContext * mExchangeCtxt           = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     FabricTable * mFabricsTable    = nullptr;
     const FabricInfo * mFabricInfo = nullptr;
