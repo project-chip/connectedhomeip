@@ -774,7 +774,7 @@ CHIP_ERROR EventManagement::FabricRemovedCB(const TLV::TLVReader & aReader, size
             {
                 CHIPCircularTLVBuffer * readBuffer = static_cast<CHIPCircularTLVBuffer *>(event.GetBackingStore());
                 // fabricIndex is encoded as an integer; the dataPtr will point to a location immediately after its encoding
-                uint8_t * dataPtr                  = event.GetReadPoint() - readBuffer->GetQueue() + readBuffer->GetQueue();
+                uint8_t * dataPtr = event.GetReadPoint() - readBuffer->GetQueue() + readBuffer->GetQueue();
 
                 // shift the dataPtr to point to the encoding of the fabric index, accounting for wraparound in backing storage
                 // we cannot get the actual encoding size from current container beginning to the fabric index because of several
