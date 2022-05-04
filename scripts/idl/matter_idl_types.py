@@ -19,6 +19,12 @@ class AttributeTag(enum.Enum):
     NOSUBSCRIBE = enum.auto()
 
 
+class AttributeStorage(enum.Enum):
+    RAM = enum.auto()
+    PERSIST = enum.auto()
+    CALLBACK = enum.auto()
+
+
 class EventPriority(enum.Enum):
     DEBUG = enum.auto()
     INFO = enum.auto()
@@ -162,10 +168,23 @@ class Cluster:
     commands: List[Command] = field(default_factory=list)
 
 
+@dataclass 
+class AttributeInstantiation:
+   name: str
+   storage: AttributeStorage
+   default: Optional[Union[str|int|bool]] = None
+
+
+@dataclass
+class ServerClusterInstantiation:
+    name: str
+    attributes: List[AttributeInstantiation] = field(default_factory=list)
+
+
 @dataclass
 class Endpoint:
     number: int
-    server_clusters: List[str] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

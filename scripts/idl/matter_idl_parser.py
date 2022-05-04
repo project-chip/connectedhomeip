@@ -20,11 +20,11 @@ class AddServerClusterToEndpointTransform:
        to add a server cluster to the given endpoint.
     """
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, cluster: ServerClusterInstantiation):
+        self.cluster = cluster
 
     def apply(self, endpoint):
-        endpoint.server_clusters.append(self.name)
+        endpoint.server_clusters.append(self.cluster)
 
 
 class AddBindingToEndpointTransform:
@@ -259,6 +259,19 @@ class MatterIdlTransformer(Transformer):
 
         return (args[-1], acl)
 
+    def ram_attribute(self, _):
+        return AttributeStorage.RAM
+
+    def persist_attribute(self, _):
+        return AttributeStorage.PERSIST
+
+    def callback_attribute(self, _):
+        return AttributeStorage.CALLBACK
+
+    @v_args(inline=True)
+    def endpoint_attribute_instantiation(self, storage, id, default=None):
+        return AttributeInstantiation(name=id, storage=storage, default=default)
+
     def ESCAPED_STRING(self, s):
         # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
@@ -303,8 +316,8 @@ class MatterIdlTransformer(Transformer):
         return AddBindingToEndpointTransform(id)
 
     @v_args(inline=True)
-    def endpoint_server_cluster(self, id):
-        return AddServerClusterToEndpointTransform(id)
+    def endpoint_server_cluster(self, id, *attributes):
+        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(name=id, attributes=list(attributes)))
 
     @v_args(inline=True)
     def cluster(self, side, name, code, *content):
