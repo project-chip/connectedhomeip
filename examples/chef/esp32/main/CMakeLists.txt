@@ -67,6 +67,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
+                      "${CMAKE_SOURCE_DIR}/../common"
 )
 
 if (CONFIG_ENABLE_CHIP_SHELL)
@@ -145,6 +146,17 @@ pw_proto_library(button_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
 pw_proto_library(device_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.proto
@@ -158,9 +170,23 @@ pw_proto_library(device_service
     pw_protobuf.common_protos
 )
 
+pw_proto_library(wifi_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/wifi_service.options
+  PREFIX
+    wifi_service
+  DEPS
+    pw_protobuf.common_protos
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+)
+
 target_link_libraries(${COMPONENT_LIB} PUBLIC
   attributes_service.nanopb_rpc
   button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   pw_checksum
   pw_hdlc
@@ -170,6 +196,7 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_trace_tokenized.trace_buffer
   pw_trace_tokenized.rpc_service
   pw_trace_tokenized.protos.nanopb_rpc
+  wifi_service.nanopb_rpc
 )
 
 target_link_options(${COMPONENT_LIB}
@@ -181,6 +208,8 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
+                       "-DPW_RPC_WIFI_SERVICE=1"
                        "-DPW_RPC_TRACING_SERVICE=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

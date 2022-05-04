@@ -350,6 +350,11 @@ true''')
                 queueCommand(f"rm -rf {paths['rootSampleFolder']}/esp32/build")
                 queueCommand("idf.py fullclean")
             queueCommand("idf.py build")
+            queueCommand("idf.py build flashing_script")
+            queueCommand(
+                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz --files-from=chip-shell.flashbundle.txt)")
+            queueCommand(
+                f"cp build/$(git rev-parse HEAD)-{options.sampleDeviceTypeName}.tar.xz {paths['scriptFolder']}")
         elif options.buildTarget == "nrfconnect":
             queueCommand(f"cd {paths['rootSampleFolder']}/nrfconnect")
             if options.doClean:
@@ -364,6 +369,8 @@ cat > args.gni <<EOF
 import("//build_overrides/chip.gni")
 import("\\${{chip_root}}/config/standalone/args.gni")
 chip_shell_cmd_server = false
+chip_build_libshell = true
+chip_config_network_layer_ble = false
 target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
 EOF
 
@@ -374,7 +381,11 @@ EOF
 true''')
             if options.doClean:
                 queueCommand(f"rm -rf out")
-            queueCommand("gn gen out")
+            if options.doRPC:
+                queueCommand(
+                    "gn gen out --args='import(\"//with_pw_rpc.gni\")'")
+            else:
+                queueCommand("gn gen out --args=''")
             queueCommand("ninja -C out")
 
     #
