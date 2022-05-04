@@ -28,7 +28,7 @@ def get_version(version_file: str) -> str:
         l = f.readline()
         return l[:l.index(' ')]
 
-def update_line(version: str, line: str, end_quote=False) -> str:
+def update_line(version: str, line: str, end_quote: bool = False) -> str:
     """Replaces the end of a string after the last colon with the specified version.
     end_quote ends the line with a closing double quote.
     """
@@ -37,7 +37,7 @@ def update_line(version: str, line: str, end_quote=False) -> str:
     else:
         return line[:line.rindex(':')+1]+version+'"'
 
-def update_file(version: str, file: str, search_term: str, end_quote=False) -> None:
+def update_file(version: str, file: str, search_term: str, end_quote: bool = False) -> None:
     """Reads the specified file and looks for lines containing search_term.
     If a line containts search_term, update it and specify if closing double quotes are needed.
     fileinput.input replaces lines with std out.
