@@ -208,7 +208,7 @@ tests:
     - label: "3a.2: write a value into the RO mandatory attribute: SafetyStatus"
       command: "writeAttribute"
       attribute: "SafetyStatus"
-      PICS: PICS_A_SAFETYSTATUS
+      PICS: A_SAFETYSTATUS
       arguments:
           value: 4096
       response:
@@ -217,7 +217,7 @@ tests:
     - label: "3a.3: reads back the RO mandatory attribute: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
-      PICS: PICS_A_SAFETYSTATUS
+      PICS: A_SAFETYSTATUS
       response:
           constraints:
               type: map16
@@ -251,7 +251,7 @@ tests:
     - label: "3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
-      PICS: PICS_A_CURRENTPOSITIONLIFT
+      PICS: A_CURRENTPOSITIONLIFT
       response:
           constraints:
               type: uint16
