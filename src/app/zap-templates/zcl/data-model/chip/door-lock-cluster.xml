@@ -110,6 +110,8 @@ limitations under the License.
         <attribute side="server" code="26" define="MIN_RFID_CODE_LENGTH" type="INT8U" writable="false" optional="true">MinRFIDCodeLength</attribute>
         <!-- Conformance feature USR - for now optional -->
         <attribute side="server" code="27" define="CREDENTIAL_RULES_SUPPORT" type="DlCredentialRuleMask" min="0x00" max="0xFF" default="1" writable="false" optional="true">CredentialRulesSupport</attribute>
+        <!-- Conformance feature USR - for now optional  -->
+        <attribute side="server" code="28" define="NUM_CREDENTIALS_SUPPORTED_PER_USER" type="INT8U" default="0" writable="false" optional="true">NumberOfCredentialsSupportedPerUser</attribute>
         <!-- Conformance feature LOG - for now optional -->
         <attribute side="server" code="32" define="ENABLE_LOGGING" type="boolean" reportable="true" default="0" writable="true" optional="true">
             <description>EnableLogging</description>
@@ -246,7 +248,6 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
-
 
         <!-- Commands -->
         <command source="client" code="0" name="LockDoor" mustUseTimedInvoke="true">
@@ -589,6 +590,8 @@ limitations under the License.
             <access op="invoke" role="administer" />
             <arg name="credentialExists" type="boolean" />
             <arg name="userIndex" type="INT16U" isNullable="true" />
+            <arg name="creatorFabricIndex" type="fabric_idx" isNullable="true" />
+            <arg name="lastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="nextCredentialIndex" type="INT16U" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
