@@ -550,9 +550,7 @@ async function _zapTypeToPythonClusterObjectType(type, options)
 
     if (await typeChecker('isEnum')) {
       // Catching baseline enums and converting them into 'uint[size]_t'
-      let s = type.toLowerCase().match(/^enum\d+$/g) ? type.match(/\d+$/g).join('') : null
-      if (s)
-      {
+      if (type.toLowerCase().match(/^enum\d+$/g)) {
         return 'uint'
       }
       return ns + '.Enums.' + type;
