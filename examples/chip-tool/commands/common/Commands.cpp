@@ -310,7 +310,6 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
 {
     fprintf(stderr, "Usage:\n");
 
-    std::string arg;
     std::string arguments;
     std::string description;
     arguments += command->GetName();
@@ -318,7 +317,7 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
     size_t argumentsCount = command->GetArgumentsCount();
     for (size_t i = 0; i < argumentsCount; i++)
     {
-        arg             = "";
+        std::string arg;
         bool isOptional = command->GetArgumentIsOptional(i);
         if (isOptional)
         {
@@ -332,12 +331,13 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
         arguments += " ";
         arguments += arg;
 
-        if (strlen(command->GetArgumentDescription(i)) > 0)
+        const char * argDescription = command->GetArgumentDescription(i);
+        if ((argDescription != nullptr) && (strlen(argDescription) > 0))
         {
             description += "\n";
             description += arg;
             description += ":\n  ";
-            description += command->GetArgumentDescription(i);
+            description += argDescription;
             description += "\n";
         }
     }
