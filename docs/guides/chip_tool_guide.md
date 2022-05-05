@@ -675,7 +675,8 @@ rm -fr /tmp/chip_*
 ./out/debug/standalone/chip-tool tests TestCluster --nodeId 1
 ```
 
-Developer details on how the test suite is structured can be found [here](../../src/app/tests/suites/README.md).
+Developer details on how the test suite is structured can be found
+[here](../../src/app/tests/suites/README.md).
 
 ### Parsing the setup payload
 
