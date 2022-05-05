@@ -50,7 +50,7 @@
     }
     ChipLogProgress(chipTool, "Pairing Complete: %s", chip::ErrorStr(err));
     if (!_commissionAfterPairingComplete) {
-      return;
+        return;
     }
     [_commissioner commissionDevice:_deviceID commissioningParams:_params error:&commissionError];
     err = [CHIPError errorToCHIPErrorCode:commissionError];
