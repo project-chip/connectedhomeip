@@ -318,9 +318,13 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 
 void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
-    if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
-        mDiscoveredNodeData.IsValid())
+    if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
     {
+        if (!mDiscoveredNodeData.IsValid())
+        {
+            ChipLogError(Discovery, "Discovered not data is not valid. Commissioning discovery not complete.");
+        }
+
         activeAttempts.Complete(mDiscoveredNodeData);
         if (mCommissioningDelegate != nullptr)
         {
@@ -331,8 +335,19 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
             ChipLogError(Discovery, "No delegate to report commissioning node discovery");
         }
     }
-    else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
+    else if (mDiscoveryType == DiscoveryType::kOperational)
     {
+        if (!mHasIP)
+        {
+            ChipLogError(Discovery, "Operational discovery has no valid ip address. Resolve not complete.");
+            return;
+        }
+
+        if (!mHasNodePort)
+        {
+            ChipLogError(Discovery, "Operational discovery has no valid node/port. Resolve not complete.");
+            return;
+        }
         activeAttempts.Complete(mNodeData.mPeerId);
         mNodeData.LogNodeIdResolved();
 
