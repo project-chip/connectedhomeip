@@ -211,9 +211,9 @@ SECTIONS
 
     _etext = .;
 
-    .heap_controller (COPY):
+    .heap_packet_buffer (COPY):
     {
-        *(.ll_exchange_mem)
+        *(.bss.packet_buffer_matter)
         __HeapBase = .;
          _heap = .;
         KEEP(*(.heap*))
