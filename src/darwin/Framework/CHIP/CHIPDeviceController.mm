@@ -315,7 +315,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
-     discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
@@ -330,13 +329,10 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
 
-        chip::RendezvousParameters params = chip::RendezvousParameters()
-                                                .SetSetupPINCode(setupPINCode)
-                                                .SetDiscriminator(discriminator)
-                                                .SetPeerAddress(peerAddress);
+        chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
+            errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
