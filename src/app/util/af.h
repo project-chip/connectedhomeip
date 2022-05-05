@@ -842,12 +842,6 @@ EmberStatus emberAfNetworkEventControlSetDelay(EmberEventControl * controls, uin
 #endif
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
- * current network, to run "delayQs" quarter seconds in the future.  See
- * ::emberAfEventControlSetDelayQS.
- */
-EmberStatus emberAfNetworkEventControlSetDelayQS(EmberEventControl * controls, uint32_t delayQs);
-/**
- * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayM" minutes in the future.  See
  * ::emberAfEventControlSetDelayMinutes.
  */

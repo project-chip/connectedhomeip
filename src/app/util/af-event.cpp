@@ -184,16 +184,6 @@ void emberEventControlSetActive(EmberEventControl * control)
 #endif
 }
 
-EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t delayQs)
-{
-    if (delayQs <= EMBER_MAX_EVENT_CONTROL_DELAY_QS)
-    {
-        return emberEventControlSetDelayMS(control, delayQs << 8);
-    }
-
-    return EMBER_BAD_ARGUMENT;
-}
-
 EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId, bool isClient, uint32_t delayMs,
                                         EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {
