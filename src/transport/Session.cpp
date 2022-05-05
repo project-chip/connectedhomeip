@@ -46,5 +46,21 @@ OutgoingGroupSession * Session::AsOutgoingGroupSession()
     return static_cast<OutgoingGroupSession *>(this);
 }
 
+void Session::DoShiftToSession(const SessionHandle & session)
+{
+    // Shift to the new session, checks are performed by the subclass implementation which is the caller.
+    IntrusiveList<SessionHolder>::Iterator iter = mHolders.begin();
+    while (iter != mHolders.end())
+    {
+        // The iterator can be invalid once it is migrated to another session. So we store its next before it is happening.
+        IntrusiveList<SessionHolder>::Iterator next = iter;
+        ++next;
+
+        iter->ShiftToSession(session);
+
+        iter = next;
+    }
+}
+
 } // namespace Transport
 } // namespace chip

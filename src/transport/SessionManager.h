@@ -154,6 +154,10 @@ public:
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
                                             uint16_t peerSessionId, FabricIndex fabricIndex,
                                             const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
+    CHIP_ERROR InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, uint16_t peerSessionId,
+                                            NodeId localNodeId, NodeId peerNodeId, FabricIndex fabric,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role,
+                                            const CATValues & cats = CATValues{});
 
     /**
      * @brief
@@ -223,6 +227,9 @@ public:
         } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
         return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
+
+    // Update existing SessionHolders to shift to the given session.
+    void ShiftToSession(const SessionHandle & handle);
 
     //
     // Find an existing secure session given a peer's scoped NodeId and a type of session to match against.

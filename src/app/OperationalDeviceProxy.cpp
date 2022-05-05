@@ -309,6 +309,7 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
         return; // Got an invalid session, do not change any state
 
     MoveToState(State::SecureConnected);
+    mInitParams.sessionManager->ShiftToSession(session);
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
 
     // Do not touch this instance anymore; it might have been destroyed by a callback.
