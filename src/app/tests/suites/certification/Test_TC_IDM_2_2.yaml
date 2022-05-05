@@ -33,7 +33,7 @@ tests:
 
 
 
-          TH side---Verify we are getting right attribute value on TH when we sent  above command 
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
 
           [1650358005665] [85455:1222335] CHIP: [DMG] ReportDataMessage =
           [1650358005665] [85455:1222335] CHIP: [DMG] {
@@ -50,15 +50,15 @@ tests:
           [1650358005665] [85455:1222335] CHIP: [DMG]                                         Cluster = 0x3,
           [1650358005665] [85455:1222335] CHIP: [DMG]                                         Attribute = 0x0000_0000,
           [1650358005665] [85455:1222335] CHIP: [DMG]                                 }
-          [1650358005665] [85455:1222335] CHIP: [DMG]                                         
-          [1650358005665] [85455:1222335] CHIP: [DMG]                                         Data = 0, 
+          [1650358005665] [85455:1222335] CHIP: [DMG]
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                         Data = 0,
           [1650358005665] [85455:1222335] CHIP: [DMG]                         },
-          [1650358005665] [85455:1222335] CHIP: [DMG]                         
+          [1650358005665] [85455:1222335] CHIP: [DMG]
           [1650358005665] [85455:1222335] CHIP: [DMG]                 },
-          [1650358005665] [85455:1222335] CHIP: [DMG]                 
+          [1650358005665] [85455:1222335] CHIP: [DMG]
           [1650358005665] [85455:1222335] CHIP: [DMG]         ],
-          [1650358005665] [85455:1222335] CHIP: [DMG]         
-          [1650358005665] [85455:1222335] CHIP: [DMG]         SuppressResponse = true, 
+          [1650358005665] [85455:1222335] CHIP: [DMG]
+          [1650358005665] [85455:1222335] CHIP: [DMG]         SuppressResponse = true,
           [1650358005665] [85455:1222335] CHIP: [DMG]         InteractionModelRevision = 1
           [1650358005665] [85455:1222335] CHIP: [DMG] }
           [1650358005665] [85455:1222335] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 528075270
@@ -76,7 +76,7 @@ tests:
 
           '' ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
 
-          TH side---Verify we are getting right attribute value on TH when we sent  above command 
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
 
           [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3061827023
           [1650358167494] [85475:1223021] CHIP: [TOO]   identify time: 0
@@ -149,10 +149,10 @@ tests:
           with the right attribute value."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           '' ./chip-tool onoff read on-off 1 1
 
-          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.  
+          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.
 
           [1650360287270] [85704:1230840] CHIP: [DMG] ReportDataMessage =
           [1650360287270] [85704:1230840] CHIP: [DMG] {
@@ -169,15 +169,15 @@ tests:
           [1650360287270] [85704:1230840] CHIP: [DMG]                                         Cluster = 0x6,
           [1650360287270] [85704:1230840] CHIP: [DMG]                                         Attribute = 0x0000_0000,
           [1650360287270] [85704:1230840] CHIP: [DMG]                                 }
-          [1650360287270] [85704:1230840] CHIP: [DMG]                                         
-          [1650360287270] [85704:1230840] CHIP: [DMG]                                         Data = false, 
+          [1650360287270] [85704:1230840] CHIP: [DMG]
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                         Data = false,
           [1650360287270] [85704:1230840] CHIP: [DMG]                         },
-          [1650360287270] [85704:1230840] CHIP: [DMG]                         
+          [1650360287270] [85704:1230840] CHIP: [DMG]
           [1650360287270] [85704:1230840] CHIP: [DMG]                 },
-          [1650360287270] [85704:1230840] CHIP: [DMG]                 
+          [1650360287270] [85704:1230840] CHIP: [DMG]
           [1650360287270] [85704:1230840] CHIP: [DMG]         ],
-          [1650360287270] [85704:1230840] CHIP: [DMG]         
-          [1650360287270] [85704:1230840] CHIP: [DMG]         SuppressResponse = true, 
+          [1650360287270] [85704:1230840] CHIP: [DMG]
+          [1650360287270] [85704:1230840] CHIP: [DMG]         SuppressResponse = true,
           [1650360287270] [85704:1230840] CHIP: [DMG]         InteractionModelRevision = 1
           [1650360287270] [85704:1230840] CHIP: [DMG] }
           [1650360287270] [85704:1230840] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3693141060
@@ -193,7 +193,7 @@ tests:
 
           '' ./chip-tool modeselect read description  1 1
 
-          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.  
+          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.
 
           [1650360466457] [85724:1231451] CHIP: [DMG] ReportDataMessage =
           [1650360466457] [85724:1231451] CHIP: [DMG] {
@@ -210,15 +210,15 @@ tests:
           [1650360466457] [85724:1231451] CHIP: [DMG]                                         Cluster = 0x50,
           [1650360466457] [85724:1231451] CHIP: [DMG]                                         Attribute = 0x0000_0000,
           [1650360466457] [85724:1231451] CHIP: [DMG]                                 }
-          [1650360466457] [85724:1231451] CHIP: [DMG]                                         
-          [1650360466457] [85724:1231451] CHIP: [DMG]                                         Data = "Coffee", 
+          [1650360466457] [85724:1231451] CHIP: [DMG]
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                         Data = "Coffee",
           [1650360466457] [85724:1231451] CHIP: [DMG]                         },
-          [1650360466457] [85724:1231451] CHIP: [DMG]                         
+          [1650360466457] [85724:1231451] CHIP: [DMG]
           [1650360466457] [85724:1231451] CHIP: [DMG]                 },
-          [1650360466457] [85724:1231451] CHIP: [DMG]                 
+          [1650360466457] [85724:1231451] CHIP: [DMG]
           [1650360466457] [85724:1231451] CHIP: [DMG]         ],
-          [1650360466457] [85724:1231451] CHIP: [DMG]         
-          [1650360466457] [85724:1231451] CHIP: [DMG]         SuppressResponse = true, 
+          [1650360466457] [85724:1231451] CHIP: [DMG]
+          [1650360466457] [85724:1231451] CHIP: [DMG]         SuppressResponse = true,
           [1650360466457] [85724:1231451] CHIP: [DMG]         InteractionModelRevision = 1
           [1650360466457] [85724:1231451] CHIP: [DMG] }
           [1650360466457] [85724:1231451] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4235444345
@@ -234,7 +234,7 @@ tests:
 
           '' ./chip-tool any read-by-id 0x3 0x1 1 0
 
-          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.  
+          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.
 
           [1650360573160] [85736:1231972] CHIP: [DMG] ReportDataMessage =
           [1650360573160] [85736:1231972] CHIP: [DMG] {
@@ -251,15 +251,15 @@ tests:
           [1650360573160] [85736:1231972] CHIP: [DMG]                                         Cluster = 0x3,
           [1650360573160] [85736:1231972] CHIP: [DMG]                                         Attribute = 0x0000_0001,
           [1650360573160] [85736:1231972] CHIP: [DMG]                                 }
-          [1650360573160] [85736:1231972] CHIP: [DMG]                                         
-          [1650360573160] [85736:1231972] CHIP: [DMG]                                         Data = 2, 
+          [1650360573160] [85736:1231972] CHIP: [DMG]
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                         Data = 2,
           [1650360573160] [85736:1231972] CHIP: [DMG]                         },
-          [1650360573160] [85736:1231972] CHIP: [DMG]                         
+          [1650360573160] [85736:1231972] CHIP: [DMG]
           [1650360573160] [85736:1231972] CHIP: [DMG]                 },
-          [1650360573160] [85736:1231972] CHIP: [DMG]                 
+          [1650360573160] [85736:1231972] CHIP: [DMG]
           [1650360573160] [85736:1231972] CHIP: [DMG]         ],
-          [1650360573160] [85736:1231972] CHIP: [DMG]         
-          [1650360573160] [85736:1231972] CHIP: [DMG]         SuppressResponse = true, 
+          [1650360573160] [85736:1231972] CHIP: [DMG]
+          [1650360573160] [85736:1231972] CHIP: [DMG]         SuppressResponse = true,
           [1650360573160] [85736:1231972] CHIP: [DMG]         InteractionModelRevision = 1
           [1650360573160] [85736:1231972] CHIP: [DMG] }
           [1650360573160] [85736:1231972] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3061827023
@@ -275,7 +275,7 @@ tests:
 
           '' ./chip-tool pressuremeasurement read measured-value 1 1
 
-          Verify we are getting right attribute value on TH when we sent  above command 
+          Verify we are getting right attribute value on TH when we sent  above command
 
           [1650360637967] [85753:1232470] CHIP: [DMG] ReportDataMessage =
           [1650360637967] [85753:1232470] CHIP: [DMG] {
@@ -292,15 +292,15 @@ tests:
           [1650360637967] [85753:1232470] CHIP: [DMG]                                         Cluster = 0x403,
           [1650360637967] [85753:1232470] CHIP: [DMG]                                         Attribute = 0x0000_0000,
           [1650360637967] [85753:1232470] CHIP: [DMG]                                 }
-          [1650360637967] [85753:1232470] CHIP: [DMG]                                         
-          [1650360637967] [85753:1232470] CHIP: [DMG]                                         Data = 0, 
+          [1650360637967] [85753:1232470] CHIP: [DMG]
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                         Data = 0,
           [1650360637967] [85753:1232470] CHIP: [DMG]                         },
-          [1650360637967] [85753:1232470] CHIP: [DMG]                         
+          [1650360637967] [85753:1232470] CHIP: [DMG]
           [1650360637967] [85753:1232470] CHIP: [DMG]                 },
-          [1650360637967] [85753:1232470] CHIP: [DMG]                 
+          [1650360637967] [85753:1232470] CHIP: [DMG]
           [1650360637967] [85753:1232470] CHIP: [DMG]         ],
-          [1650360637967] [85753:1232470] CHIP: [DMG]         
-          [1650360637967] [85753:1232470] CHIP: [DMG]         SuppressResponse = true, 
+          [1650360637967] [85753:1232470] CHIP: [DMG]
+          [1650360637967] [85753:1232470] CHIP: [DMG]         SuppressResponse = true,
           [1650360637967] [85753:1232470] CHIP: [DMG]         InteractionModelRevision = 1
           [1650360637967] [85753:1232470] CHIP: [DMG] }
           [1650360637967] [85753:1232470] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 1443798417
@@ -324,7 +324,7 @@ tests:
 
           '' ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          TH side--Verify we are getting right attribute value on TH when we sent  above command 
+          TH side--Verify we are getting right attribute value on TH when we sent  above command
 
           [1650360694433] [85761:1232769] CHIP: [DMG] ReportDataMessage =
           [1650360694433] [85761:1232769] CHIP: [DMG] {
@@ -341,14 +341,14 @@ tests:
           [1650360694433] [85761:1232769] CHIP: [DMG]                                         Cluster = 0x3e,
           [1650360694433] [85761:1232769] CHIP: [DMG]                                         Attribute = 0x0000_0004,
           [1650360694433] [85761:1232769] CHIP: [DMG]                                 }
-          [1650360694433] [85761:1232769] CHIP: [DMG]                                         
+          [1650360694433] [85761:1232769] CHIP: [DMG]
           [1650360694433] [85761:1232769] CHIP: [DMG]                                         Data = [
-          [1650360694433] [85761:1232769] CHIP: [DMG]                                                 
+          [1650360694433] [85761:1232769] CHIP: [DMG]
           [1650360694433] [85761:1232769] CHIP: [DMG]                                         ],
           [1650360694433] [85761:1232769] CHIP: [DMG]                         },
-          [1650360694434] [85761:1232769] CHIP: [DMG]                         
+          [1650360694434] [85761:1232769] CHIP: [DMG]
           [1650360694434] [85761:1232769] CHIP: [DMG]                 },
-          [1650360694434] [85761:1232769] CHIP: [DMG]                 
+          [1650360694434] [85761:1232769] CHIP: [DMG]
           [1650360694434] [85761:1232769] CHIP: [DMG]                 AttributeReportIB =
           [1650360694434] [85761:1232769] CHIP: [DMG]                 {
           [1650360694434] [85761:1232769] CHIP: [DMG]                         AttributeDataIB =
@@ -361,17 +361,17 @@ tests:
           [1650360694434] [85761:1232769] CHIP: [DMG]                                         Attribute = 0x0000_0004,
           [1650360694434] [85761:1232769] CHIP: [DMG]                                         ListIndex = Null,
           [1650360694434] [85761:1232769] CHIP: [DMG]                                 }
-          [1650360694434] [85761:1232769] CHIP: [DMG]                                         
+          [1650360694434] [85761:1232769] CHIP: [DMG]
           [1650360694434] [85761:1232769] CHIP: [DMG]                                         Data = [
           [1650360694434] [85761:1232769] CHIP: [DMG]                                                 0x15, 0x30, 0x1, 0x1, 0x0, 0x24, 0x2, 0x1, 0x37, 0x3, 0x24, 0x14, 0x0, 0x18, 0x26, 0x4, 0x80, 0x22, 0x81, 0x27, 0x26, 0x5, 0x80, 0x25, 0x4d, 0x3a, 0x37, 0x6, 0x24, 0x14, 0x0, 0x18, 0x24, 0x7, 0x1, 0x24, 0x
           [1650360694434] [85761:1232769] CHIP: [DMG]                                         ]
           [1650360694434] [85761:1232769] CHIP: [DMG]                         },
-          [1650360694434] [85761:1232769] CHIP: [DMG]                         
+          [1650360694434] [85761:1232769] CHIP: [DMG]
           [1650360694434] [85761:1232769] CHIP: [DMG]                 },
-          [1650360694434] [85761:1232769] CHIP: [DMG]                 
+          [1650360694434] [85761:1232769] CHIP: [DMG]
           [1650360694434] [85761:1232769] CHIP: [DMG]         ],
-          [1650360694434] [85761:1232769] CHIP: [DMG]         
-          [1650360694434] [85761:1232769] CHIP: [DMG]         SuppressResponse = true, 
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]         SuppressResponse = true,
           [1650360694434] [85761:1232769] CHIP: [DMG]         InteractionModelRevision = 1
           [1650360694434] [85761:1232769] CHIP: [DMG] }
           [1650360694435] [85761:1232769] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 3004748672
@@ -395,7 +395,7 @@ tests:
 
           '' ./chip-tool modeselect read  supported-modes 1 1
 
-          TH side---Verify we are getting right attribute value on TH when we sent  above command 
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
 
           [1650362184885] [85960:1238675] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 4235444345
           [1650362184885] [85960:1238675] CHIP: [TOO]   SupportedModes: 3 entries
@@ -425,7 +425,7 @@ tests:
 
           '' ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
 
-          TH side---Verify we are getting right attribute value on TH when we sent  above command 
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
 
 
           [1650362650962] [86020:1240713] CHIP: [DMG] ReportDataMessage =
@@ -443,15 +443,15 @@ tests:
           [1650362650963] [86020:1240713] CHIP: [DMG]                                         Cluster = 0x406,
           [1650362650963] [86020:1240713] CHIP: [DMG]                                         Attribute = 0x0000_0001,
           [1650362650963] [86020:1240713] CHIP: [DMG]                                 }
-          [1650362650963] [86020:1240713] CHIP: [DMG]                                         
-          [1650362650963] [86020:1240713] CHIP: [DMG]                                         Data = 0, 
+          [1650362650963] [86020:1240713] CHIP: [DMG]
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                         Data = 0,
           [1650362650963] [86020:1240713] CHIP: [DMG]                         },
-          [1650362650963] [86020:1240713] CHIP: [DMG]                         
+          [1650362650963] [86020:1240713] CHIP: [DMG]
           [1650362650963] [86020:1240713] CHIP: [DMG]                 },
-          [1650362650963] [86020:1240713] CHIP: [DMG]                 
+          [1650362650963] [86020:1240713] CHIP: [DMG]
           [1650362650963] [86020:1240713] CHIP: [DMG]         ],
-          [1650362650963] [86020:1240713] CHIP: [DMG]         
-          [1650362650963] [86020:1240713] CHIP: [DMG]         SuppressResponse = true, 
+          [1650362650963] [86020:1240713] CHIP: [DMG]
+          [1650362650963] [86020:1240713] CHIP: [DMG]         SuppressResponse = true,
           [1650362650963] [86020:1240713] CHIP: [DMG]         InteractionModelRevision = 1
           [1650362650963] [86020:1240713] CHIP: [DMG] }
           [1650362650963] [86020:1240713] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 2734817158
@@ -467,7 +467,7 @@ tests:
 
           '' ./chip-tool levelcontrol read options 1 1
 
-          TH side---Verify we are getting right attribute value on TH when we sent  above command 
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
 
           [1650362616022] [86014:1240558] CHIP: [DMG] ReportDataMessage =
           [1650362616022] [86014:1240558] CHIP: [DMG] {
@@ -484,15 +484,15 @@ tests:
           [1650362616022] [86014:1240558] CHIP: [DMG]                                         Cluster = 0x8,
           [1650362616022] [86014:1240558] CHIP: [DMG]                                         Attribute = 0x0000_000F,
           [1650362616022] [86014:1240558] CHIP: [DMG]                                 }
-          [1650362616022] [86014:1240558] CHIP: [DMG]                                         
-          [1650362616022] [86014:1240558] CHIP: [DMG]                                         Data = 0, 
+          [1650362616022] [86014:1240558] CHIP: [DMG]
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                         Data = 0,
           [1650362616022] [86014:1240558] CHIP: [DMG]                         },
-          [1650362616022] [86014:1240558] CHIP: [DMG]                         
+          [1650362616022] [86014:1240558] CHIP: [DMG]
           [1650362616022] [86014:1240558] CHIP: [DMG]                 },
-          [1650362616022] [86014:1240558] CHIP: [DMG]                 
+          [1650362616022] [86014:1240558] CHIP: [DMG]
           [1650362616022] [86014:1240558] CHIP: [DMG]         ],
-          [1650362616022] [86014:1240558] CHIP: [DMG]         
-          [1650362616022] [86014:1240558] CHIP: [DMG]         SuppressResponse = true, 
+          [1650362616022] [86014:1240558] CHIP: [DMG]
+          [1650362616022] [86014:1240558] CHIP: [DMG]         SuppressResponse = true,
           [1650362616022] [86014:1240558] CHIP: [DMG]         InteractionModelRevision = 1
           [1650362616022] [86014:1240558] CHIP: [DMG] }
           [1650362616022] [86014:1240558] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_000F DataVersion: 861258604
@@ -514,7 +514,7 @@ tests:
 
           '' ./chip-tool levelcontrol read-by-id 0 1 4
 
-          TH side---Verify we are getting "status = 0x7f (UNSUPPORTED_ENDPOINT)" for above command.  
+          TH side---Verify we are getting "status = 0x7f (UNSUPPORTED_ENDPOINT)" for above command.
 
 
           [1650361252618] [85838:1235112] CHIP: [DMG] ReportDataMessage =
@@ -531,19 +531,19 @@ tests:
           [1650361252618] [85838:1235112] CHIP: [DMG]                                         Cluster = 0x8,
           [1650361252618] [85838:1235112] CHIP: [DMG]                                         Attribute = 0x0000_0000,
           [1650361252618] [85838:1235112] CHIP: [DMG]                                 }
-          [1650361252618] [85838:1235112] CHIP: [DMG]                                         
+          [1650361252618] [85838:1235112] CHIP: [DMG]
           [1650361252618] [85838:1235112] CHIP: [DMG]                                 StatusIB =
           [1650361252618] [85838:1235112] CHIP: [DMG]                                 {
           [1650361252618] [85838:1235112] CHIP: [DMG]                                         status = 0x7f (UNSUPPORTED_ENDPOINT),
           [1650361252618] [85838:1235112] CHIP: [DMG]                                 },
-          [1650361252618] [85838:1235112] CHIP: [DMG]                                 
+          [1650361252618] [85838:1235112] CHIP: [DMG]
           [1650361252618] [85838:1235112] CHIP: [DMG]                         },
-          [1650361252618] [85838:1235112] CHIP: [DMG]                         
+          [1650361252618] [85838:1235112] CHIP: [DMG]
           [1650361252618] [85838:1235112] CHIP: [DMG]                 },
-          [1650361252618] [85838:1235112] CHIP: [DMG]                 
+          [1650361252618] [85838:1235112] CHIP: [DMG]
           [1650361252618] [85838:1235112] CHIP: [DMG]         ],
-          [1650361252618] [85838:1235112] CHIP: [DMG]         
-          [1650361252618] [85838:1235112] CHIP: [DMG]         SuppressResponse = true, 
+          [1650361252618] [85838:1235112] CHIP: [DMG]
+          [1650361252618] [85838:1235112] CHIP: [DMG]         SuppressResponse = true,
           [1650361252618] [85838:1235112] CHIP: [DMG]         InteractionModelRevision = 1
           [1650361252618] [85838:1235112] CHIP: [DMG] }
           [1650361252618] [85838:1235112] CHIP: [TOO] Response Failure: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
@@ -557,11 +557,11 @@ tests:
 
           ./chip-tool any command-by-id 0x0003 0 1 1 2
 
-          TH side---Verify we are getting "  status = 0xc3 (UNSUPPORTED_CLUSTER)"  for above command.  
+          TH side---Verify we are getting "  status = 0xc3 (UNSUPPORTED_CLUSTER)"  for above command.
 
           [1650361310127] [85846:1235360] CHIP: [DMG] InvokeResponseMessage =
           [1650361310127] [85846:1235360] CHIP: [DMG] {
-          [1650361310127] [85846:1235360] CHIP: [DMG]         suppressResponse = false, 
+          [1650361310127] [85846:1235360] CHIP: [DMG]         suppressResponse = false,
           [1650361310127] [85846:1235360] CHIP: [DMG]         InvokeResponseIBs =
           [1650361310127] [85846:1235360] CHIP: [DMG]         [
           [1650361310127] [85846:1235360] CHIP: [DMG]                 InvokeResponseIB =
@@ -574,18 +574,18 @@ tests:
           [1650361310127] [85846:1235360] CHIP: [DMG]                                         ClusterId = 0x3,
           [1650361310128] [85846:1235360] CHIP: [DMG]                                         CommandId = 0x0,
           [1650361310128] [85846:1235360] CHIP: [DMG]                                 },
-          [1650361310128] [85846:1235360] CHIP: [DMG]                                 
+          [1650361310128] [85846:1235360] CHIP: [DMG]
           [1650361310128] [85846:1235360] CHIP: [DMG]                                 StatusIB =
           [1650361310128] [85846:1235360] CHIP: [DMG]                                 {
           [1650361310128] [85846:1235360] CHIP: [DMG]                                         status = 0xc3 (UNSUPPORTED_CLUSTER),
           [1650361310128] [85846:1235360] CHIP: [DMG]                                 },
-          [1650361310128] [85846:1235360] CHIP: [DMG]                                 
+          [1650361310128] [85846:1235360] CHIP: [DMG]
           [1650361310128] [85846:1235360] CHIP: [DMG]                         },
-          [1650361310128] [85846:1235360] CHIP: [DMG]                         
+          [1650361310128] [85846:1235360] CHIP: [DMG]
           [1650361310128] [85846:1235360] CHIP: [DMG]                 },
-          [1650361310128] [85846:1235360] CHIP: [DMG]                 
+          [1650361310128] [85846:1235360] CHIP: [DMG]
           [1650361310128] [85846:1235360] CHIP: [DMG]         ],
-          [1650361310128] [85846:1235360] CHIP: [DMG]         
+          [1650361310128] [85846:1235360] CHIP: [DMG]
           [1650361310128] [85846:1235360] CHIP: [DMG]         InteractionModelRevision = 1
           [1650361310128] [85846:1235360] CHIP: [DMG] },
           [1650361310128] [85846:1235360] CHIP: [DMG] Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
@@ -598,7 +598,7 @@ tests:
       verification: |
           '' ./chip-tool thermostat read outdoor-temperature 1 1
 
-          TH side---Verify we are getting "status = 0x86 (UNSUPPORTED_ATTRIBUTE)"  for above command.  
+          TH side---Verify we are getting "status = 0x86 (UNSUPPORTED_ATTRIBUTE)"  for above command.
 
           [1650361351617] [85853:1235541] CHIP: [DMG] ReportDataMessage =
           [1650361351617] [85853:1235541] CHIP: [DMG] {
@@ -614,19 +614,19 @@ tests:
           [1650361351617] [85853:1235541] CHIP: [DMG]                                         Cluster = 0x201,
           [1650361351617] [85853:1235541] CHIP: [DMG]                                         Attribute = 0x0000_0001,
           [1650361351617] [85853:1235541] CHIP: [DMG]                                 }
-          [1650361351617] [85853:1235541] CHIP: [DMG]                                         
+          [1650361351617] [85853:1235541] CHIP: [DMG]
           [1650361351617] [85853:1235541] CHIP: [DMG]                                 StatusIB =
           [1650361351617] [85853:1235541] CHIP: [DMG]                                 {
           [1650361351617] [85853:1235541] CHIP: [DMG]                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1650361351617] [85853:1235541] CHIP: [DMG]                                 },
-          [1650361351617] [85853:1235541] CHIP: [DMG]                                 
+          [1650361351617] [85853:1235541] CHIP: [DMG]
           [1650361351617] [85853:1235541] CHIP: [DMG]                         },
-          [1650361351617] [85853:1235541] CHIP: [DMG]                         
+          [1650361351617] [85853:1235541] CHIP: [DMG]
           [1650361351617] [85853:1235541] CHIP: [DMG]                 },
-          [1650361351617] [85853:1235541] CHIP: [DMG]                 
+          [1650361351617] [85853:1235541] CHIP: [DMG]
           [1650361351617] [85853:1235541] CHIP: [DMG]         ],
-          [1650361351617] [85853:1235541] CHIP: [DMG]         
-          [1650361351617] [85853:1235541] CHIP: [DMG]         SuppressResponse = true, 
+          [1650361351617] [85853:1235541] CHIP: [DMG]
+          [1650361351617] [85853:1235541] CHIP: [DMG]         SuppressResponse = true,
           [1650361351617] [85853:1235541] CHIP: [DMG]         InteractionModelRevision = 1
           [1650361351617] [85853:1235541] CHIP: [DMG] }
           [1650361351617] [85853:1235541] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
@@ -650,7 +650,7 @@ tests:
       verification: |
           '' ./chip-tool basic read vendor-name  2 0 --commissioner-nodeid 332211
 
-          TH side---Verify we are getting "status = 0x7e (UNSUPPORTED_ACCESS)"  for above command.  
+          TH side---Verify we are getting "status = 0x7e (UNSUPPORTED_ACCESS)"  for above command.
 
           [1650361510244] [85874:1236133] CHIP: [DMG] ReportDataMessage =
           [1650361510244] [85874:1236133] CHIP: [DMG] {
@@ -666,19 +666,19 @@ tests:
           [1650361510244] [85874:1236133] CHIP: [DMG]                                         Cluster = 0x28,
           [1650361510244] [85874:1236133] CHIP: [DMG]                                         Attribute = 0x0000_0001,
           [1650361510244] [85874:1236133] CHIP: [DMG]                                 }
-          [1650361510244] [85874:1236133] CHIP: [DMG]                                         
+          [1650361510244] [85874:1236133] CHIP: [DMG]
           [1650361510244] [85874:1236133] CHIP: [DMG]                                 StatusIB =
           [1650361510244] [85874:1236133] CHIP: [DMG]                                 {
           [1650361510244] [85874:1236133] CHIP: [DMG]                                         status = 0x7e (UNSUPPORTED_ACCESS),
           [1650361510244] [85874:1236133] CHIP: [DMG]                                 },
-          [1650361510244] [85874:1236133] CHIP: [DMG]                                 
+          [1650361510244] [85874:1236133] CHIP: [DMG]
           [1650361510244] [85874:1236133] CHIP: [DMG]                         },
-          [1650361510244] [85874:1236133] CHIP: [DMG]                         
+          [1650361510244] [85874:1236133] CHIP: [DMG]
           [1650361510244] [85874:1236133] CHIP: [DMG]                 },
-          [1650361510244] [85874:1236133] CHIP: [DMG]                 
+          [1650361510244] [85874:1236133] CHIP: [DMG]
           [1650361510244] [85874:1236133] CHIP: [DMG]         ],
-          [1650361510244] [85874:1236133] CHIP: [DMG]         
-          [1650361510244] [85874:1236133] CHIP: [DMG]         SuppressResponse = true, 
+          [1650361510244] [85874:1236133] CHIP: [DMG]
+          [1650361510244] [85874:1236133] CHIP: [DMG]         SuppressResponse = true,
           [1650361510244] [85874:1236133] CHIP: [DMG]         InteractionModelRevision = 1
           [1650361510244] [85874:1236133] CHIP: [DMG] }
           [1650361510244] [85874:1236133] CHIP: [TOO] Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -700,9 +700,9 @@ tests:
 
           '' ./chip-tool  occupancysensing read occupancy    1 1 (send same command 3 times)
 
-          TH side---Verify we are getting ReportData message path and value (EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command 
+          TH side---Verify we are getting ReportData message path and value (EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command
           (verify the values we are getting same when we send same command 3 times)
-            
+
           [1650362704154] [86027:1240909] CHIP: [DMG] ReportDataMessage =
           [1650362704154] [86027:1240909] CHIP: [DMG] {
           [1650362704154] [86027:1240909] CHIP: [DMG]         AttributeReportIBs =
@@ -718,15 +718,15 @@ tests:
           [1650362704154] [86027:1240909] CHIP: [DMG]                                         Cluster = 0x406,
           [1650362704154] [86027:1240909] CHIP: [DMG]                                         Attribute = 0x0000_0000,
           [1650362704154] [86027:1240909] CHIP: [DMG]                                 }
-          [1650362704154] [86027:1240909] CHIP: [DMG]                                         
-          [1650362704154] [86027:1240909] CHIP: [DMG]                                         Data = 0, 
+          [1650362704154] [86027:1240909] CHIP: [DMG]
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                         Data = 0,
           [1650362704154] [86027:1240909] CHIP: [DMG]                         },
-          [1650362704154] [86027:1240909] CHIP: [DMG]                         
+          [1650362704154] [86027:1240909] CHIP: [DMG]
           [1650362704154] [86027:1240909] CHIP: [DMG]                 },
-          [1650362704154] [86027:1240909] CHIP: [DMG]                 
+          [1650362704154] [86027:1240909] CHIP: [DMG]
           [1650362704154] [86027:1240909] CHIP: [DMG]         ],
-          [1650362704154] [86027:1240909] CHIP: [DMG]         
-          [1650362704154] [86027:1240909] CHIP: [DMG]         SuppressResponse = true, 
+          [1650362704154] [86027:1240909] CHIP: [DMG]
+          [1650362704154] [86027:1240909] CHIP: [DMG]         SuppressResponse = true,
           [1650362704154] [86027:1240909] CHIP: [DMG]         InteractionModelRevision = 1
           [1650362704154] [86027:1240909] CHIP: [DMG] }
           [1650362704154] [86027:1240909] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 2734817158
@@ -799,15 +799,15 @@ tests:
           [1650615356.465308][2439:2444] CHIP:DMG:                                         Cluster = 0x3,
           [1650615356.465364][2439:2444] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1650615356.465415][2439:2444] CHIP:DMG:                                 }
-          [1650615356.465471][2439:2444] CHIP:DMG:                                         
-          [1650615356.465523][2439:2444] CHIP:DMG:                                         Data = 0, 
+          [1650615356.465471][2439:2444] CHIP:DMG:
+          [1650615356.465523][2439:2444] CHIP:DMG:                                         Data = 0,
           [1650615356.465576][2439:2444] CHIP:DMG:                         },
-          [1650615356.465661][2439:2444] CHIP:DMG:                         
+          [1650615356.465661][2439:2444] CHIP:DMG:
           [1650615356.465703][2439:2444] CHIP:DMG:                 },
-          [1650615356.465750][2439:2444] CHIP:DMG:                 
+          [1650615356.465750][2439:2444] CHIP:DMG:
           [1650615356.465787][2439:2444] CHIP:DMG:         ],
-          [1650615356.465887][2439:2444] CHIP:DMG:         
-          [1650615356.465928][2439:2444] CHIP:DMG:         SuppressResponse = true, 
+          [1650615356.465887][2439:2444] CHIP:DMG:
+          [1650615356.465928][2439:2444] CHIP:DMG:         SuppressResponse = true,
           [1650615356.465968][2439:2444] CHIP:DMG:         InteractionModelRevision = 1
           [1650615356.466007][2439:2444] CHIP:DMG: }
           [1650615356.470192][2439:2444] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2435166734
@@ -817,7 +817,7 @@ tests:
           '' ./chip-tool identify read  identify-time  1 1 --data-version   0x9125b20e
           [1650615415.501037][2459:2464] CHIP:DMG: ReportDataMessage =
           [1650615415.501075][2459:2464] CHIP:DMG: {
-          [1650615415.501109][2459:2464] CHIP:DMG: 	SuppressResponse = true, 
+          [1650615415.501109][2459:2464] CHIP:DMG: 	SuppressResponse = true,
           [1650615415.501172][2459:2464] CHIP:DMG: 	InteractionModelRevision = 1
           [1650615415.501208][2459:2464] CHIP:DMG: }
       disabled: true
@@ -831,7 +831,7 @@ tests:
           the DataVersionFilter Field set with the dataversion value received
           before."
       verification: |
-          ./chip-tool levelcontrol read  on-level 1 1 
+          ./chip-tool levelcontrol read  on-level 1 1
           [1650615572.769784][2475:2480] CHIP:DMG: ReportDataMessage =
           [1650615572.769821][2475:2480] CHIP:DMG: {
           [1650615572.769849][2475:2480] CHIP:DMG:         AttributeReportIBs =
@@ -847,15 +847,15 @@ tests:
           [1650615572.770247][2475:2480] CHIP:DMG:                                         Cluster = 0x8,
           [1650615572.770296][2475:2480] CHIP:DMG:                                         Attribute = 0x0000_0011,
           [1650615572.770337][2475:2480] CHIP:DMG:                                 }
-          [1650615572.770376][2475:2480] CHIP:DMG:                                         
+          [1650615572.770376][2475:2480] CHIP:DMG:
           [1650615572.770417][2475:2480] CHIP:DMG:                                         Data = NULL
           [1650615572.770458][2475:2480] CHIP:DMG:                         },
-          [1650615572.770496][2475:2480] CHIP:DMG:                         
+          [1650615572.770496][2475:2480] CHIP:DMG:
           [1650615572.770528][2475:2480] CHIP:DMG:                 },
-          [1650615572.770566][2475:2480] CHIP:DMG:                 
+          [1650615572.770566][2475:2480] CHIP:DMG:
           [1650615572.770595][2475:2480] CHIP:DMG:         ],
-          [1650615572.770633][2475:2480] CHIP:DMG:         
-          [1650615572.770664][2475:2480] CHIP:DMG:         SuppressResponse = true, 
+          [1650615572.770633][2475:2480] CHIP:DMG:
+          [1650615572.770664][2475:2480] CHIP:DMG:         SuppressResponse = true,
           [1650615572.770695][2475:2480] CHIP:DMG:         InteractionModelRevision = 1
           [1650615572.770724][2475:2480] CHIP:DMG: }
           [1650615572.770895][2475:2480] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 91265123
@@ -874,16 +874,16 @@ tests:
           [1650615622.935469][2483:2488] CHIP:DMG:                                 Cluster = 0x8,
           [1650615622.935516][2483:2488] CHIP:DMG:                                 Attribute = 0x0000_0011,
           [1650615622.935562][2483:2488] CHIP:DMG:                         }
-          [1650615622.935616][2483:2488] CHIP:DMG:                                 
+          [1650615622.935616][2483:2488] CHIP:DMG:
           [1650615622.935674][2483:2488] CHIP:DMG:                         StatusIB =
           [1650615622.935728][2483:2488] CHIP:DMG:                         {
           [1650615622.935804][2483:2488] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1650615622.935853][2483:2488] CHIP:DMG:                         },
-          [1650615622.935915][2483:2488] CHIP:DMG:                         
+          [1650615622.935915][2483:2488] CHIP:DMG:
           [1650615622.935973][2483:2488] CHIP:DMG:                 },
-          [1650615622.936028][2483:2488] CHIP:DMG:                 
+          [1650615622.936028][2483:2488] CHIP:DMG:
           [1650615622.936081][2483:2488] CHIP:DMG:         ],
-          [1650615622.936132][2483:2488] CHIP:DMG:         
+          [1650615622.936132][2483:2488] CHIP:DMG:
           [1650615622.936185][2483:2488] CHIP:DMG:         InteractionModelRevision = 1
           [1650615622.936224][2483:2488] CHIP:DMG: }
 
@@ -905,15 +905,15 @@ tests:
           [1650615673.320877][2497:2502] CHIP:DMG: 					Cluster = 0x8,
           [1650615673.320946][2497:2502] CHIP:DMG: 					Attribute = 0x0000_0011,
           [1650615673.321005][2497:2502] CHIP:DMG: 				}
-          [1650615673.321062][2497:2502] CHIP:DMG: 					
-          [1650615673.321187][2497:2502] CHIP:DMG: 					Data = 1, 
+          [1650615673.321062][2497:2502] CHIP:DMG:
+          [1650615673.321187][2497:2502] CHIP:DMG: 					Data = 1,
           [1650615673.321249][2497:2502] CHIP:DMG: 			},
-          [1650615673.321306][2497:2502] CHIP:DMG: 			
+          [1650615673.321306][2497:2502] CHIP:DMG:
           [1650615673.321351][2497:2502] CHIP:DMG: 		},
-          [1650615673.321405][2497:2502] CHIP:DMG: 		
+          [1650615673.321405][2497:2502] CHIP:DMG:
           [1650615673.321444][2497:2502] CHIP:DMG: 	],
-          [1650615673.321559][2497:2502] CHIP:DMG: 	
-          [1650615673.321605][2497:2502] CHIP:DMG: 	SuppressResponse = true, 
+          [1650615673.321559][2497:2502] CHIP:DMG:
+          [1650615673.321605][2497:2502] CHIP:DMG: 	SuppressResponse = true,
           [1650615673.321647][2497:2502] CHIP:DMG: 	InteractionModelRevision = 1
           [1650615673.321685][2497:2502] CHIP:DMG: }
           [1650615673.321895][2497:2502] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 91265124
@@ -945,16 +945,16 @@ tests:
           [1650615802.967081][2527:2532] CHIP:DMG: 				Cluster = 0x8,
           [1650615802.967133][2527:2532] CHIP:DMG: 				Attribute = 0x0000_0011,
           [1650615802.967169][2527:2532] CHIP:DMG: 			}
-          [1650615802.967221][2527:2532] CHIP:DMG: 				
+          [1650615802.967221][2527:2532] CHIP:DMG:
           [1650615802.967259][2527:2532] CHIP:DMG: 			StatusIB =
           [1650615802.967304][2527:2532] CHIP:DMG: 			{
           [1650615802.967340][2527:2532] CHIP:DMG: 				status = 0x00 (SUCCESS),
           [1650615802.967378][2527:2532] CHIP:DMG: 			},
-          [1650615802.967424][2527:2532] CHIP:DMG: 			
+          [1650615802.967424][2527:2532] CHIP:DMG:
           [1650615802.967456][2527:2532] CHIP:DMG: 		},
-          [1650615802.967502][2527:2532] CHIP:DMG: 		
+          [1650615802.967502][2527:2532] CHIP:DMG:
           [1650615802.967530][2527:2532] CHIP:DMG: 	],
-          [1650615802.967576][2527:2532] CHIP:DMG: 	
+          [1650615802.967576][2527:2532] CHIP:DMG:
           [1650615802.967613][2527:2532] CHIP:DMG: 	InteractionModelRevision = 1
           [1650615802.967640][2527:2532] CHIP:DMG: }
 
