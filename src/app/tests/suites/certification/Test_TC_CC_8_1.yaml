@@ -52,9 +52,7 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
+    - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "current hue"
       response:
