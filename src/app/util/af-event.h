@@ -53,10 +53,6 @@
  */
 typedef struct EmberEventData EmberEventData;
 
-// A function used to retrieve the proper NCP timer duration and unit based on a given
-// passed number of milliseconds.
-void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration, EmberEventUnits * units);
-
 void emAfInitEvents(void);
 
 /** @brief Sets this ::EmberEventControl as inactive (no pending event).

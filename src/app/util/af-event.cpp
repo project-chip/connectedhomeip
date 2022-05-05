@@ -273,28 +273,3 @@ EmberStatus emberAfDeactivateServerTick(EndpointId endpoint, ClusterId clusterId
 {
     return emberAfDeactivateClusterTick(endpoint, clusterId, EMBER_AF_SERVER_CLUSTER_TICK);
 }
-
-#define MS_TO_QS(ms) ((ms) >> 8)
-#define MS_TO_MIN(ms) ((ms) >> 16)
-#define QS_TO_MS(qs) ((qs) << 8)
-#define MIN_TO_MS(min) ((min) << 16)
-
-// Used to calculate the duration and unit used by the host to set the sleep timer
-void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration, EmberEventUnits * units)
-{
-    if (durationMs <= MAX_TIMER_UNITS_HOST)
-    {
-        *duration = (uint16_t) durationMs;
-        *units    = EMBER_EVENT_MS_TIME;
-    }
-    else if (MS_TO_QS(durationMs) <= MAX_TIMER_UNITS_HOST)
-    {
-        *duration = (uint16_t) (MS_TO_QS(durationMs));
-        *units    = EMBER_EVENT_QS_TIME;
-    }
-    else
-    {
-        *duration = (MS_TO_MIN(durationMs) <= MAX_TIMER_UNITS_HOST ? (uint16_t) (MS_TO_MIN(durationMs)) : MAX_TIMER_UNITS_HOST);
-        *units    = EMBER_EVENT_MINUTE_TIME;
-    }
-}
