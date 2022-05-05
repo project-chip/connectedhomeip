@@ -71,9 +71,7 @@ tests:
               - name: "ms"
                 value: 10
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
+    - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
@@ -105,9 +103,7 @@ tests:
               - name: "ms"
                 value: 10
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
+    - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
