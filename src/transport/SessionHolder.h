@@ -68,10 +68,7 @@ class SessionHolderWithDelegate : public SessionHolder
 {
 public:
     SessionHolderWithDelegate(SessionDelegate & delegate) : mDelegate(delegate) {}
-    SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : mDelegate(delegate)
-    {
-        Grab(handle);
-    }
+    SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : mDelegate(delegate) { Grab(handle); }
     operator bool() const { return SessionHolder::operator bool(); }
 
     void OnSessionReleased() override

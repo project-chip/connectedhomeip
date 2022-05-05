@@ -33,9 +33,11 @@ public:
 
     /**
      * @brief
-     *   Called when a new secure session to the same peer is established, and it is suggested to migrate to the newly created session.
+     *   Called when a new secure session to the same peer is established, and it is suggested to migrate to the newly created
+     * session.
      *
-     * Note: the default implementation move to the new sessoin, it should be fine for all users, unless the SessionHolder object is expected to be sticky to a specified session.
+     * Note: the default implementation move to the new sessoin, it should be fine for all users, unless the SessionHolder object is
+     * expected to be sticky to a specified session.
      */
     virtual SessionUpdated OnSessionUpdated(const SessionHandle & newSession) { return SessionUpdated::Migrate; }
 
