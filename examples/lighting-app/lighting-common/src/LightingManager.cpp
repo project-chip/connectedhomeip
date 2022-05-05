@@ -19,15 +19,14 @@
 
 #include "LightingManager.h"
 
-#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
 LightingManager LightingManager::sLight;
 
-int LightingManager::Init()
+CHIP_ERROR LightingManager::Init()
 {
     mState = kState_On;
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 bool LightingManager::IsTurnedOn()

@@ -34,3 +34,12 @@ source_set("color-format") {
     "src/ColorFormat.cpp",
   ]
 }
+
+source_set("lighting-manager") {
+  deps = [ "${chip_root}/src/lib" ]
+  public_configs = [ ":config" ]
+  sources = [
+    "include/LightingManager.h",
+    "src/LightingManager.cpp",
+  ]
+}
