@@ -414,6 +414,27 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, uint16_t peerSessionId,
+                                                        NodeId localNodeId, NodeId peerNodeId, FabricIndex fabric,
+                                                        const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role,
+                                                        const CATValues & cats)
+{
+    Optional<SessionHandle> session =
+        mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kCASE, localSessionId, localNodeId,
+                                                      peerNodeId, cats, peerSessionId, fabric, GetLocalMRPConfig());
+    VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
+    SecureSession * secureSession = session.Value()->AsSecureSession();
+    secureSession->SetPeerAddress(peerAddress);
+
+    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
+    ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
+        secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
+    secureSession->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(LocalSessionMessageCounter::kInitialSyncValue);
+    sessionHolder.Grab(session.Value());
+    return CHIP_NO_ERROR;
+}
+
 void SessionManager::ScheduleExpiryTimer()
 {
     CHIP_ERROR err = mSystemLayer->StartTimer(System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS),
@@ -783,6 +804,26 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
                                                 System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS));
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
+}
+
+
+void SessionManager::ShiftToSession(const SessionHandle & handle)
+{
+    VerifyOrDie(handle->IsSecureSession());
+    SecureSession * session = handle->AsSecureSession();
+    VerifyOrDie(session->GetSecureSessionType() == SecureSession::Type::kCASE);
+    ScopedNodeId node = session->GetPeer();
+    mSecureSessions.ForEachSession([&](SecureSession * oldSession) {
+        if (session == oldSession)
+            return Loop::Continue;
+
+        if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == node)
+        {
+            oldSession->TryShiftToSession(handle);
+        }
+
+        return Loop::Continue;
+    });
 }
 
 Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId peerNodeId,

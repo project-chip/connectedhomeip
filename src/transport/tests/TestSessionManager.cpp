@@ -709,7 +709,7 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
     }
 }
 
-void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
+static void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestSessionReleaseCallback callback;
@@ -806,6 +806,107 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     sessionManager.Shutdown();
 }
 
+static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    FabricTable fabricTable;
+    SessionManager sessionManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+    chip::TestPersistentStorageDelegate deviceStorage;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
+                                           &fabricTable));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    FabricIndex aliceFabricIndex;
+    FabricInfo aliceFabric;
+    aliceFabric.TestOnlyBuildFabric(
+        ByteSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len),
+        ByteSpan(TestCerts::sTestCert_ICA01_Chip, TestCerts::sTestCert_ICA01_Chip_Len),
+        ByteSpan(TestCerts::sTestCert_Node01_01_Chip, TestCerts::sTestCert_Node01_01_Chip_Len),
+        ByteSpan(TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len),
+        ByteSpan(TestCerts::sTestCert_Node01_01_PrivateKey, TestCerts::sTestCert_Node01_01_PrivateKey_Len));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(aliceFabric, &aliceFabricIndex));
+
+    FabricIndex bobFabricIndex;
+    FabricInfo bobFabric;
+    bobFabric.TestOnlyBuildFabric(
+        ByteSpan(TestCerts::sTestCert_Root02_Chip, TestCerts::sTestCert_Root02_Chip_Len),
+        ByteSpan(TestCerts::sTestCert_ICA02_Chip, TestCerts::sTestCert_ICA02_Chip_Len),
+        ByteSpan(TestCerts::sTestCert_Node02_01_Chip, TestCerts::sTestCert_Node02_01_Chip_Len),
+        ByteSpan(TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len),
+        ByteSpan(TestCerts::sTestCert_Node02_01_PrivateKey, TestCerts::sTestCert_Node02_01_PrivateKey_Len));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
+
+    SessionHolder aliceToBobSession;
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    class StickySessionDelegate : public SessionDelegate
+    {
+    public:
+        NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
+        void OnSessionReleased() override {}
+    } delegate;
+
+    SessionHolderWithDelegate stickyAliceToBobSession(aliceToBobSession.Get(), delegate);
+    NL_TEST_ASSERT(inSuite, aliceToBobSession.Contains(stickyAliceToBobSession.Get()));
+
+    SessionHolder bobToAliceSession;
+    err = sessionManager.InjectCaseSessionWithTestKey(bobToAliceSession, 1, 2,
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
+                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SessionHolder newAliceToBobSession;
+    err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4,
+                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
+                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
+                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Here we got 3 sessions, and 4 holders:
+    // 1. alice -> bob: aliceToBobSession, stickyAliceToBobSession
+    // 2. alice <- bob: bobToAliceSession
+    // 3. alice -> bob: newAliceToBobSession
+
+    SecureSession * session1 = aliceToBobSession->AsSecureSession();
+    SecureSession * session2 = bobToAliceSession->AsSecureSession();
+    SecureSession * session3 = newAliceToBobSession->AsSecureSession();
+
+    NL_TEST_ASSERT(inSuite, session1 != session3);
+    NL_TEST_ASSERT(inSuite, stickyAliceToBobSession->AsSecureSession() == session1);
+
+    // Now shift the 1st session to the 3rd one, after shifting, holders should be:
+    // 1. alice -> bob: stickyAliceToBobSession
+    // 2. alice <- bob: bobToAliceSession
+    // 3. alice -> bob: aliceToBobSession, newAliceToBobSession
+    sessionManager.ShiftToSession(newAliceToBobSession.Get());
+
+    NL_TEST_ASSERT(inSuite, aliceToBobSession);
+    NL_TEST_ASSERT(inSuite, stickyAliceToBobSession);
+    NL_TEST_ASSERT(inSuite, newAliceToBobSession);
+
+    NL_TEST_ASSERT(inSuite, stickyAliceToBobSession->AsSecureSession() == session1);
+    NL_TEST_ASSERT(inSuite, bobToAliceSession->AsSecureSession() == session2);
+    NL_TEST_ASSERT(inSuite, aliceToBobSession->AsSecureSession() == session3);
+    NL_TEST_ASSERT(inSuite, newAliceToBobSession->AsSecureSession() == session3);
+
+    sessionManager.Shutdown();
+}
+
+
 // Test Suite
 
 /**
@@ -821,6 +922,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Old counter Test",               SendPacketWithOldCounterTest),
     NL_TEST_DEF("Too-old counter Test",           SendPacketWithTooOldCounterTest),
     NL_TEST_DEF("Session Allocation Test",        SessionAllocationTest),
+    NL_TEST_DEF("SessionShiftingTest",            SessionShiftingTest),
 
     NL_TEST_SENTINEL()
 };
