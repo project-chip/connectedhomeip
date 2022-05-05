@@ -59,7 +59,7 @@ struct ReportCallback : public app::ReadClient::Callback
 
     void OnDone() override;
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override;
 
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(jobject attributePath, CHIP_ERROR err);

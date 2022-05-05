@@ -1536,7 +1536,7 @@ public:
         mLastError = aError;
     }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
 
     void ClearCounters()
     {

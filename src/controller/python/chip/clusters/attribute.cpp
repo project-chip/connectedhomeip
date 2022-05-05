@@ -69,7 +69,7 @@ using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::
                                          chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
                                          uint8_t timestampType, uint8_t * data, uint32_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
-using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, uint64_t subscriptionId);
+using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, uint32_t subscriptionId);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
@@ -136,7 +136,7 @@ public:
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override
     {
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
     }

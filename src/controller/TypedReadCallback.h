@@ -98,7 +98,7 @@ private:
 
     void OnDone() override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished)
         {
@@ -181,7 +181,7 @@ private:
         chip::Platform::Delete<app::EventPathParams>(aReadPrepareParams.mpEventPathParamsList);
     }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished)
         {

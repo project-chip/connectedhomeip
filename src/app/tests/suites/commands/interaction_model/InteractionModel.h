@@ -166,7 +166,7 @@ public:
                      const chip::app::StatusIB * status) override;
     void OnError(CHIP_ERROR error) override;
     void OnDone() override;
-    void OnSubscriptionEstablished(uint64_t subscriptionId) override;
+    void OnSubscriptionEstablished(uint32_t subscriptionId) override;
 
     /////////// WriteClient Callback Interface /////////
     void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteDataAttributePath & path,

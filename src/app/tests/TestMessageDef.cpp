@@ -1053,7 +1053,7 @@ void ParseReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     ReportDataMessage::Parser reportDataParser;
 
     bool suppressResponse   = false;
-    uint64_t subscriptionId = 0;
+    uint32_t subscriptionId = 0;
     AttributeReportIBs::Parser attributeReportIBsParser;
     EventReportIBs::Parser eventReportsParser;
     bool moreChunkedMessages = false;
@@ -1353,7 +1353,7 @@ void ParseSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader &
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SubscribeResponseMessage::Parser subscribeResponseParser;
-    uint64_t subscriptionId            = 0;
+    uint32_t subscriptionId            = 0;
     uint16_t minIntervalFloorSeconds   = 0;
     uint16_t maxIntervalCeilingSeconds = 0;
     err                                = subscribeResponseParser.Init(aReader);

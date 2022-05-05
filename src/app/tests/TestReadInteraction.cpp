@@ -1542,7 +1542,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
         GenerateEvents(apSuite, apContext);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
@@ -1571,9 +1571,9 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         dirtyPath5.mAttributeId = 4;
 
         // Test report with 2 different path
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
 
         printf("HereHere\n");
 
@@ -1588,10 +1588,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 2 different path, and 1 same path
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
-        err                                 = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
+        err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1604,10 +1604,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, and one path is overlapped with another
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
-        err                                 = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
+        err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1620,10 +1620,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, all are not overlapped, one path is not interested for current subscription
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
-        err                                 = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
+        err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = engine->GetReportingEngine().SetDirty(dirtyPath2);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1636,10 +1636,10 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test empty report
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mpReadHandler->mHoldSync   = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
 
         ctx.DrainAndServiceIO();
 
@@ -1721,7 +1721,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
         GenerateEvents(apSuite, apContext);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty() == true);
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
@@ -1790,9 +1790,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a concrete path dirty
         {
-            delegate.mpReadHandler->mHoldReport = false;
-            delegate.mGotReport                 = false;
-            delegate.mNumAttributeResponse      = 0;
+            delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mGotReport            = false;
+            delegate.mNumAttributeResponse = 0;
 
             AttributePathParams dirtyPath;
             dirtyPath.mEndpointId  = Test::kMockEndpoint2;
@@ -1811,9 +1811,9 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a endpoint dirty
         {
-            delegate.mpReadHandler->mHoldReport = false;
-            delegate.mGotReport                 = false;
-            delegate.mNumAttributeResponse      = 0;
+            delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mGotReport            = false;
+            delegate.mNumAttributeResponse = 0;
 
             AttributePathParams dirtyPath;
             dirtyPath.mEndpointId = Test::kMockEndpoint3;
@@ -1944,7 +1944,7 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        delegate.mpReadHandler->mHoldReport = false;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
 
         ctx.DrainAndServiceIO();
 
@@ -2108,7 +2108,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
         GenerateEvents(apSuite, apContext);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = kTestClusterId;
@@ -2121,9 +2121,9 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         dirtyPath2.mAttributeId = 2;
 
         // Test report with 2 different path
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
 
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -2135,10 +2135,10 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mpReadHandler->mHoldSync   = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
 
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -2427,22 +2427,22 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
         GenerateEvents(apSuite, apContext);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
 
-        err                                 = engine->GetReportingEngine().SetDirty(dirtyPath1);
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mpReadHandler->mHoldSync   = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        err = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
         ctx.DrainAndServiceIO();
         ctx.ExpireSessionAliceToBob();
@@ -2524,22 +2524,22 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
         GenerateEvents(apSuite, apContext);
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         chip::app::AttributePathParams dirtyPath1;
         dirtyPath1.mClusterId   = Test::MockClusterId(2);
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
 
-        err                                 = engine->GetReportingEngine().SetDirty(dirtyPath1);
-        delegate.mpReadHandler->mHoldReport = false;
-        delegate.mpReadHandler->mHoldSync   = false;
-        delegate.mGotReport                 = false;
-        delegate.mNumAttributeResponse      = 0;
+        err = engine->GetReportingEngine().SetDirty(dirtyPath1);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
 
         ctx.DrainAndServiceIO();
         ctx.ExpireSessionBobToAlice();

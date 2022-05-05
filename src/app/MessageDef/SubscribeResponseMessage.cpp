@@ -46,7 +46,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint64_t subscriptionId;
+                uint32_t subscriptionId;
                 ReturnErrorOnFailure(reader.Get(subscriptionId));
                 PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
             }
@@ -108,7 +108,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(uint64_t * const apSubscribeId) const
+CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(uint32_t * const apSubscribeId) const
 {
     return GetUnsignedInteger(to_underlying(Tag::kSubscriptionId), apSubscribeId);
 }
@@ -123,7 +123,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::GetMaxIntervalCeilingSeconds(uint16
     return GetUnsignedInteger(to_underlying(Tag::kMaxIntervalCeilingSeconds), apMaxIntervalCeilingSeconds);
 }
 
-SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const uint64_t aSubscribeId)
+SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const uint32_t aSubscribeId)
 {
     if (mError == CHIP_NO_ERROR)
     {

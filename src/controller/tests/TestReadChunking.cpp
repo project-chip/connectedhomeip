@@ -132,7 +132,7 @@ public:
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount        = 0;
     bool mOnReportEnd               = false;
@@ -301,7 +301,7 @@ public:
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount = 0;
     // We record every dataversion field from every attribute IB.
@@ -803,7 +803,7 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
                     &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
-                                               WriteAttrOp(AttrOnEp5<Attr3>, 2) },
+                                                     WriteAttrOp(AttrOnEp5<Attr3>, 2) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
                                  .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
             }
@@ -869,7 +869,7 @@ void TestCommandInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, vo
             DoTest(&readCallback,
                    Instruction{ .chunksize      = 1,
                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
-                                              WriteAttrOp(AttrOnEp5<Attr3>, 3) },
+                                                    WriteAttrOp(AttrOnEp5<Attr3>, 3) },
                                 .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
 
             // The attribute failed to catch last report will be picked by this report.

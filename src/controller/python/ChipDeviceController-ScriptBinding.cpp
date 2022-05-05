@@ -186,7 +186,7 @@ uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 // CHIP Stack objects
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 
-chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64_t subscriptionId);
+chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint32_t subscriptionId);
 
 //
 // Storage
