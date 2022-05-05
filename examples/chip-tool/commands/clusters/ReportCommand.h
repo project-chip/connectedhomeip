@@ -528,11 +528,11 @@ public:
         ReportCommand("subscribe-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
-        AddArgument("attr-name", eventName);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        AddArgument("attr-name", eventName, 0, "attr-name desc");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0, "min-interval desc");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0, "max-interval desc");
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions, "keepSubscriptions desc");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber, "event-min desc");
         ReportCommand::AddArguments();
     }
 

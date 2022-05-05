@@ -310,23 +310,41 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
 {
     fprintf(stderr, "Usage:\n");
 
+    std::string arg;
     std::string arguments;
+    std::string description;
     arguments += command->GetName();
 
     size_t argumentsCount = command->GetArgumentsCount();
     for (size_t i = 0; i < argumentsCount; i++)
     {
-        arguments += " ";
+        arg = "";
         bool isOptional = command->GetArgumentIsOptional(i);
         if (isOptional)
         {
-            arguments += "[--";
+            arg += "[--";
         }
-        arguments += command->GetArgumentName(i);
+        arg += command->GetArgumentName(i);
         if (isOptional)
         {
-            arguments += "]";
+            arg += "]";
+        }
+        arguments += " ";
+        arguments += arg;
+
+        if(strlen(command->GetArgumentDescription(i)) > 0)
+        {
+            description += "\n";
+            description += arg;
+            description += ":\n  ";
+            description += command->GetArgumentDescription(i);
+            description += "\n";
         }
     }
     fprintf(stderr, "  %s %s %s\n", executable.c_str(), clusterName.c_str(), arguments.c_str());
+
+    if(description.size() > 0)
+    {
+        fprintf(stderr, "%s\n", description.c_str());
+    }
 }
