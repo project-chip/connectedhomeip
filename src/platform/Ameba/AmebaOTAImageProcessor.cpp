@@ -409,7 +409,7 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
 }
 
-void AmebaOTAImageProcessor::HandleRestart(chip::System::Layer *systemLayer, void *appState)
+void AmebaOTAImageProcessor::HandleRestart(chip::System::Layer * systemLayer, void * appState)
 {
     ota_platform_reset();
 }

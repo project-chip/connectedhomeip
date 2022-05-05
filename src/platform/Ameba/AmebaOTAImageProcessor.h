@@ -55,7 +55,7 @@ private:
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
     static void HandleApply(intptr_t context);
-    static void HandleRestart(chip::System::Layer *systemLayer, void *appState);
+    static void HandleRestart(chip::System::Layer * systemLayer, void * appState);
 
     CHIP_ERROR ProcessHeader(ByteSpan & block);
 
