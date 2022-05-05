@@ -189,7 +189,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         // stringstream treats uint8_t as char, which is not what we want here.
         uint16_t tmpValue;
         std::stringstream ss;
-        isHexNotation ? ss << std::hex << argValue : ss << argValue;
+        isHexNotation ? (ss << std::hex << argValue) : (ss << argValue);
         ss >> tmpValue;
         if (chip::CanCastTo<uint8_t>(tmpValue))
         {
@@ -354,13 +354,13 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     case ArgumentType::Bool: {
         isValidArgument = HandleNullableOptional<bool>(arg, argValue, [&](auto * value) {
             // Start with checking for actual boolean values.
-            if (strcmp(argValue, "true") == 0)
+            if (strcasecmp(argValue, "true") == 0)
             {
                 *value = true;
                 return true;
             }
 
-            if (strcmp(argValue, "false") == 0)
+            if (strcasecmp(argValue, "false") == 0)
             {
                 *value = false;
                 return true;
