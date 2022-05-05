@@ -531,7 +531,8 @@ public:
         AddArgument("attr-name", eventName, 0, "Event name.");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0, "The requested minimum interval boundary floor in seconds.");
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0, "The requested maximum interval boundary ceiling in seconds.");
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions, "0 - Terminate existing subscriptions from initiator.\n  1 - Otherwise.");
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
+                    "0 - Terminate existing subscriptions from initiator.\n  1 - Otherwise.");
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }

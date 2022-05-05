@@ -178,7 +178,8 @@ public:
 
     size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value, const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value, const char * desc = "");
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value, const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value,
+                       const char * desc = "");
 
     template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
     size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out, uint8_t flags = 0, const char * desc = "")
@@ -187,7 +188,8 @@ public:
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::BitFlags<T> * out, uint8_t flags = 0, const char * desc = "")
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::BitFlags<T> * out, uint8_t flags = 0,
+                       const char * desc = "")
     {
         // This is a terrible hack that relies on BitFlags only having the one
         // mValue member.
@@ -213,17 +215,20 @@ public:
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::app::DataModel::Nullable<T> * value, uint8_t flags = 0, const char * desc = "")
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::app::DataModel::Nullable<T> * value, uint8_t flags = 0,
+                       const char * desc = "")
     {
         return AddArgument(name, min, max, reinterpret_cast<T *>(value), flags | Argument::kNullable, desc);
     }
 
-    size_t AddArgument(const char * name, float min, float max, chip::app::DataModel::Nullable<float> * value, uint8_t flags = 0, const char * desc = "")
+    size_t AddArgument(const char * name, float min, float max, chip::app::DataModel::Nullable<float> * value, uint8_t flags = 0,
+                       const char * desc = "")
     {
         return AddArgument(name, min, max, reinterpret_cast<float *>(value), flags | Argument::kNullable, desc);
     }
 
-    size_t AddArgument(const char * name, double min, double max, chip::app::DataModel::Nullable<double> * value, uint8_t flags = 0, const char * desc = "")
+    size_t AddArgument(const char * name, double min, double max, chip::app::DataModel::Nullable<double> * value, uint8_t flags = 0,
+                       const char * desc = "")
     {
         return AddArgument(name, min, max, reinterpret_cast<double *>(value), flags | Argument::kNullable, desc);
     }
@@ -242,7 +247,8 @@ public:
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags, const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags,
+                       const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, uint8_t flags, const char * desc = "");
 
     /**

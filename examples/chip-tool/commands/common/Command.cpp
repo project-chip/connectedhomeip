@@ -493,7 +493,7 @@ size_t Command::AddArgument(const char * name, const char * value, uint8_t flags
     arg.name  = name;
     arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -505,7 +505,7 @@ size_t Command::AddArgument(const char * name, char ** value, uint8_t flags, con
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -517,7 +517,7 @@ size_t Command::AddArgument(const char * name, chip::CharSpan * value, uint8_t f
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -529,7 +529,7 @@ size_t Command::AddArgument(const char * name, chip::ByteSpan * value, uint8_t f
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -541,7 +541,7 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out, uint8
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -555,7 +555,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::v
     arg.min   = min;
     arg.max   = max;
     arg.flags = 0;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -569,12 +569,13 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, std::v
     arg.min   = min;
     arg.max   = max;
     arg.flags = 0;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value, const char * desc)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value,
+                            const char * desc)
 {
     Argument arg;
     arg.type  = ArgumentType::Vector32;
@@ -583,7 +584,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::
     arg.min   = min;
     arg.max   = max;
     arg.flags = Argument::kOptional;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -595,7 +596,7 @@ size_t Command::AddArgument(const char * name, ComplexArgument * value, const ch
     arg.name  = name;
     arg.value = static_cast<void *>(value);
     arg.flags = 0;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -607,7 +608,7 @@ size_t Command::AddArgument(const char * name, CustomArgument * value, const cha
     arg.name  = name;
     arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
     arg.flags = 0;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -619,7 +620,7 @@ size_t Command::AddArgument(const char * name, float min, float max, float * out
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
     // Ignore min/max for now; they're always +-Infinity anyway.
 
     return AddArgumentToList(std::move(arg));
@@ -632,13 +633,14 @@ size_t Command::AddArgument(const char * name, double min, double max, double * 
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
     // Ignore min/max for now; they're always +-Infinity anyway.
 
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags,
+                            const char * desc)
 {
     Argument arg;
     arg.type  = type;
@@ -647,7 +649,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.min   = min;
     arg.max   = max;
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
@@ -661,7 +663,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.min   = min;
     arg.max   = max;
     arg.flags = flags;
-    arg.desc = desc;
+    arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
 }
