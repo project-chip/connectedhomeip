@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.3.8. [TC-DD-3.8] Commissioning Flow - Non-concurrent - Negative scenario
+    3.3.8. [TC-DD-3.8] Commissioning Flow - Non-concurrent - Negative Scenario
     [DUT - Commissioner]
 
 config:
@@ -24,8 +24,162 @@ config:
 
 tests:
     - label:
-          "Repeat steps 1.a-1.o from [TC-DD-3.6]. Force exit any step in 1.a and
-          1.o."
+          "Commissioner has regulatory and fabric information available and has
+          accurate date, time and timezone"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner and Commissionee discover each other and connect via the
+          discovery mode applicable for the DUT."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
+          (the autonomously Fail-safe timer length set by Commissionee)"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
+          regulatory information in the Commissionee."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner requests operational CSR from Commissionee with
+          OperationalCSRRequest command"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner configures operational credentials on DUT if not
+          previously installed"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner configures itself as administrator in ACL on TH if
+          needed"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner configures operational network on TH if TH both supports
+          and requires"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner instructs Commissionee to connect to operational network
+          if not already connected"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioning channel between the Commissioner and Commissionee is
+          terminated."
+      verification: |
+
+      disabled: true
+
+    - label: "Reboot TH and prepare for commissioning"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner re-arms Fail-safe timer on Commissionee within 60s (the
+          autonomously Fail-safe timer length set by Commissionee)"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
+          regulatory information in the Commissionee."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner requests operational CSR from Commissionee with
+          OperationalCSRRequest command"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner configures operational credentials on DUT if not
+          previously installed"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner configures itself as administrator in ACL on TH if
+          needed"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner configures operational network on TH if TH both supports
+          and requires"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner instructs Commissionee to connect to operational network
+          if not already connected"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioning channel between the Commissioner and Commissionee is
+          terminated."
+      verification: |
+
+      disabled: true
+
+    - label: "Commissioner starts discovery of TH using Operational Discovery"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Commissioner opens a CASE session with TH over operational network"
+      verification: |
+
+      disabled: true
+
+    - label: "Commissioner sends CommissioningComplete command"
       verification: |
 
       disabled: true

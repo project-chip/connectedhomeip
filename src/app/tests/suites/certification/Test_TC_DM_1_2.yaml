@@ -13,25 +13,86 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 10.1.2. [TC-DM-1.2] Basic Information Cluster Events
+name:
+    10.1.2. [TC-DM-1.2] Global Attributes for Node Operational Credentials
+    Cluster [DUT-Server]
 
 config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
-
 tests:
-    - label: "Reboot the DUT"
+    - label: "Test Step"
+      verification: |
+          chip-tool verification steps
       disabled: true
+    - label: "Commission DUT to TH"
+      verification: |4+
 
-    - label: "Shut down the DUT"
       disabled: true
+    - label: "TH reads the ClusterRevision from DUT"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool operationalcredentials read cluster-revision 1 0
 
-    - label: "Send events/messages to DUT from TH"
+          [1649422711.953376][3312:3317] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFD DataVersion: 698307857
+          [1649422711.953487][3312:3317] CHIP:TOO:   ClusterRevision: 1
+          [1649422711.953574][3312:3317] CHIP:EM: Sending Standalone Ack for MessageCounter:9018855 on exchange 29017i
       disabled: true
+    - label: "TH reads the FeatureMap from DUT"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool operationalcredentials read feature-map 1 0
 
-    - label: "Reboot the DUT"
+          [1649423105.884270][3334:3339] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1649423105.884373][3334:3339] CHIP:EM: Sending Standalone Ack for MessageCounter:5943193 on exchange 30408i
       disabled: true
+    - label: "TH reads AttributeList from DUT"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool operationalcredentials read attribute-list 1 0
 
-    - label: "Factory Reset the DUT"
+          [1649423226.138143][3345:3350] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFB DataVersion: 698307857
+          [1649423226.138237][3345:3350] CHIP:TOO:   AttributeList: 10 entries
+          [1649423226.138287][3345:3350] CHIP:TOO:     [1]: 0
+          [1649423226.138317][3345:3350] CHIP:TOO:     [2]: 1
+          [1649423226.138345][3345:3350] CHIP:TOO:     [3]: 2
+          [1649423226.138373][3345:3350] CHIP:TOO:     [4]: 3
+          [1649423226.138401][3345:3350] CHIP:TOO:     [5]: 4
+          [1649423226.138429][3345:3350] CHIP:TOO:     [6]: 5
+          [1649423226.138457][3345:3350] CHIP:TOO:     [7]: 65528
+          [1649423226.138485][3345:3350] CHIP:TOO:     [8]: 65529
+          [1649423226.138513][3345:3350] CHIP:TOO:     [9]: 65531
+          [1649423226.138541][3345:3350] CHIP:TOO:     [10]: 65533
+          [1649423226.138683][3345:3350] CHIP:EM: Sending Standalone Ack for MessageCounter:185027 on exchange 31246i
+      disabled: true
+    - label: "TH reads EventList from DUT"
+      verification: |
+          No Event-list is on attributes list
+      disabled: true
+    - label: "TH reads AcceptedCommandList from DUT"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool operationalcredentials read  accepted-command-list 1 0
+
+          [1649423499.262187][3365:3370] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFF9 DataVersion: 698307857
+          [1649423499.262316][3365:3370] CHIP:TOO:   AcceptedCommandList: 9 entries
+          [1649423499.262386][3365:3370] CHIP:TOO:     [1]: 0
+          [1649423499.262430][3365:3370] CHIP:TOO:     [2]: 2
+          [1649423499.262472][3365:3370] CHIP:TOO:     [3]: 4
+          [1649423499.262513][3365:3370] CHIP:TOO:     [4]: 6
+          [1649423499.262553][3365:3370] CHIP:TOO:     [5]: 7
+          [1649423499.262593][3365:3370] CHIP:TOO:     [6]: 9
+          [1649423499.262635][3365:3370] CHIP:TOO:     [7]: 10
+          [1649423499.262676][3365:3370] CHIP:TOO:     [8]: 11
+          [1649423499.262717][3365:3370] CHIP:TOO:     [9]: 12
+          [1649423499.262866][3365:3370] CHIP:EM: Sending Standalone Ack for MessageCounter:8288254 on exchange 44255i
+      disabled: true
+    - label: "TH reads GeneratedCommandList from DUT"
+      verification: |
+          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool operationalcredentials read generated-command-list 1 0
+
+          [1649423586.012638][3376:3381] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFF8 DataVersion: 698307857
+          [1649423586.012746][3376:3381] CHIP:TOO:   GeneratedCommandList: 4 entries
+          [1649423586.012809][3376:3381] CHIP:TOO:     [1]: 1
+          [1649423586.012848][3376:3381] CHIP:TOO:     [2]: 3
+          [1649423586.012884][3376:3381] CHIP:TOO:     [3]: 5
+          [1649423586.012919][3376:3381] CHIP:TOO:     [4]: 8
+          [1649423586.013057][3376:3381] CHIP:EM: Sending Standalone Ack for MessageCounter:4917669 on exchange 24524i
       disabled: true
