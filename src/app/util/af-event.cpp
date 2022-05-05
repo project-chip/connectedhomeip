@@ -194,16 +194,6 @@ EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t 
     return EMBER_BAD_ARGUMENT;
 }
 
-EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint16_t delayM)
-{
-    if (delayM <= EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES)
-    {
-        return emberEventControlSetDelayMS(control, static_cast<uint32_t>(delayM) << 16);
-    }
-
-    return EMBER_BAD_ARGUMENT;
-}
-
 EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId, bool isClient, uint32_t delayMs,
                                         EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {

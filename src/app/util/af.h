@@ -809,22 +809,6 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
 EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t delayQs);
 
 /**
- * @brief Sets the ::EmberEventControl to run "delayM" minutes in the future.
- * The 'minutes' are actually 65536 (0x10000) milliseconds long.  This function
- * first verifies that the delay is within the acceptable range before
- * scheduling the event.
- *
- * @param control a pointer to the event control.
- * @param delayM the number of minutes until the next event.
- *
- * @return If delayM is less than or equal to
-           ::EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES, this function will schedule
-           the event and return ::EMBER_SUCCESS.  Otherwise it will return
-           ::EMBER_BAD_ARGUMENT.
- */
-EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint16_t delayM);
-
-/**
  * @brief Sets the ::EmberEventControl for the current network, and only
  * the current network, as inactive.  See ::emberEventControlSetInactive.
  */
