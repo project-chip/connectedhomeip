@@ -29,6 +29,7 @@ class HostApp(Enum):
     ADDRESS_RESOLVE = auto()
     TV_APP = auto()
     TV_CASTING_APP = auto()
+    LIGHT = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -55,6 +56,8 @@ class HostApp(Enum):
             return 'tv-app/linux'
         elif self == HostApp.TV_CASTING_APP:
             return 'tv-casting-app/linux'
+        elif self == HostApp.LIGHT:
+            return 'lighting-app/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -101,6 +104,9 @@ class HostApp(Enum):
         elif self == HostApp.TV_CASTING_APP:
             yield 'chip-tv-casting-app'
             yield 'chip-tv-casting-app.map'
+        elif self == HostApp.LIGHT:
+            yield 'chip-lighting-app'
+            yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
