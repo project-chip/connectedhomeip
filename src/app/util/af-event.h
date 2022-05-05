@@ -57,12 +57,6 @@ typedef struct EmberEventData EmberEventData;
 // passed number of milliseconds.
 void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration, EmberEventUnits * units);
 
-// A function (inverse of the above) to retrieve the number of milliseconds
-// represented by a given timer duration and unit.
-uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits units);
-
-const char * emberAfGetEventString(uint8_t index);
-
 void emAfInitEvents(void);
 
 /** @brief Sets this ::EmberEventControl as inactive (no pending event).

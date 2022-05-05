@@ -128,11 +128,6 @@ const char emAfStackEventString[] = "Stack";
 // A function used to initialize events for idling
 void emAfInitEvents(void) {}
 
-const char * emberAfGetEventString(uint8_t index)
-{
-    return (index == 0XFF ? emAfStackEventString : emAfEventStrings[index]);
-}
-
 static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
 #if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
@@ -294,38 +289,12 @@ void emAfGetTimerDurationAndUnitFromMS(uint32_t durationMs, uint16_t * duration,
     }
     else if (MS_TO_QS(durationMs) <= MAX_TIMER_UNITS_HOST)
     {
-        *duration = (uint16_t)(MS_TO_QS(durationMs));
+        *duration = (uint16_t) (MS_TO_QS(durationMs));
         *units    = EMBER_EVENT_QS_TIME;
     }
     else
     {
-        *duration = (MS_TO_MIN(durationMs) <= MAX_TIMER_UNITS_HOST ? (uint16_t)(MS_TO_MIN(durationMs)) : MAX_TIMER_UNITS_HOST);
+        *duration = (MS_TO_MIN(durationMs) <= MAX_TIMER_UNITS_HOST ? (uint16_t) (MS_TO_MIN(durationMs)) : MAX_TIMER_UNITS_HOST);
         *units    = EMBER_EVENT_MINUTE_TIME;
     }
-}
-
-uint32_t emAfGetMSFromTimerDurationAndUnit(uint16_t duration, EmberEventUnits units)
-{
-    uint32_t ms;
-    if (units == EMBER_EVENT_MS_TIME)
-    {
-        ms = duration;
-    }
-    else if (units == EMBER_EVENT_QS_TIME)
-    {
-        ms = QS_TO_MS(static_cast<uint32_t>(duration));
-    }
-    else if (units == EMBER_EVENT_MINUTE_TIME)
-    {
-        ms = MIN_TO_MS(static_cast<uint32_t>(duration));
-    }
-    else if (units == EMBER_EVENT_ZERO_DELAY)
-    {
-        ms = 0;
-    }
-    else
-    {
-        ms = UINT32_MAX;
-    }
-    return ms;
 }
