@@ -29,6 +29,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
@@ -94,6 +95,10 @@ protected:
     CHIP_ERROR AllocateSecureSession(SessionManager & sessionManager);
 
     CHIP_ERROR ActivateSecureSession(const Transport::PeerAddress & peerAddress);
+
+    void Finish();
+
+    void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     virtual void OnSuccessStatusReport() {}
@@ -168,7 +173,9 @@ protected:
     SessionHolder mSecureSessionHolder;
     // mSessionManager is set if we actually allocate a secure session, so we
     // can clean it up later as needed.
-    SessionManager * mSessionManager = nullptr;
+    SessionManager * mSessionManager           = nullptr;
+    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+    SessionEstablishmentDelegate * mDelegate   = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteMRPConfig is received from other end and set to our session.

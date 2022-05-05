@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <transport/PairingSession.h>
+#include <protocols/secure_channel/PairingSession.h>
 
 #include <lib/core/CHIPTLVTypes.h>
 #include <lib/support/SafeInt.h>
@@ -55,6 +55,37 @@ CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & 
                   ChipLogValueScopedNodeId(GetPeer()), secureSession->GetLocalSessionId(), peerSessionId);
 
     return CHIP_NO_ERROR;
+}
+
+void PairingSession::Finish()
+{
+    Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+
+    // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
+    DiscardExchange();
+
+    CHIP_ERROR err = ActivateSecureSession(address);
+    if (err == CHIP_NO_ERROR)
+    {
+        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
+    }
+    else
+    {
+        mDelegate->OnSessionEstablishmentError(err);
+    }
+}
+
+void PairingSession::DiscardExchange()
+{
+    if (mExchangeCtxt != nullptr)
+    {
+        // Make sure the exchange doesn't try to notify us when it closes,
+        // since we might be dead by then.
+        mExchangeCtxt->SetDelegate(nullptr);
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
+    }
 }
 
 CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
@@ -109,6 +140,19 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
 void PairingSession::Clear()
 {
+    // Clear acts like the destructor if PairingSession, if it is call during
+    // middle of a pairing, means we should terminate the exchange. For normal
+    // path, the exchange should already be discarded before calling Clear.
+    if (mExchangeCtxt != nullptr)
+    {
+        // The only time we reach this is if we are getting destroyed in the
+        // middle of our handshake.  In that case, there is no point trying to
+        // do MRP resends of the last message we sent, so abort the exchange
+        // instead of just closing it.
+        mExchangeCtxt->Abort();
+        mExchangeCtxt = nullptr;
+    }
+
     if (mSessionManager != nullptr)
     {
         if (mSecureSessionHolder && !mSecureSessionHolder->AsSecureSession()->IsActiveSession())
