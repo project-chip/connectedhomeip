@@ -102,8 +102,8 @@ public:
                                          CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
                                          responsesNeeded--;
                                          if (err != CHIP_NO_ERROR) {
-                                            mError = err;
-                                            ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
+                                             mError = err;
+                                             ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
                                          }
                                          if (responsesNeeded == 0) {
                                              SetCommandExitStatus(mError);
