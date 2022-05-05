@@ -137,8 +137,6 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
-    AbortExchange();
-
     mLocalNodeId = kUndefinedNodeId;
     mPeerNodeId  = kUndefinedNodeId;
     mFabricInfo  = nullptr;

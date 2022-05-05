@@ -98,9 +98,7 @@ protected:
 
     void Finish();
 
-    void AbortExchange();
-    void CloseExchange();
-    void DiscardExchange();
+    void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     virtual void OnSuccessStatusReport() {}

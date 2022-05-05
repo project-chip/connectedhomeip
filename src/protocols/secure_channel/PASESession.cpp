@@ -96,7 +96,6 @@ void PASESession::Clear()
     mKeLen           = sizeof(mKe);
     mPairingComplete = false;
     PairingSession::Clear();
-    CloseExchange();
 }
 
 CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate)

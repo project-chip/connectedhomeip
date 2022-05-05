@@ -75,28 +75,6 @@ void PairingSession::Finish()
     }
 }
 
-void PairingSession::AbortExchange()
-{
-    if (mExchangeCtxt != nullptr)
-    {
-        // The only time we reach this is if we are getting destroyed in the
-        // middle of our handshake.  In that case, there is no point trying to
-        // do MRP resends of the last message we sent, so abort the exchange
-        // instead of just closing it.
-        mExchangeCtxt->Abort();
-        mExchangeCtxt = nullptr;
-    }
-}
-
-void PairingSession::CloseExchange()
-{
-    if (mExchangeCtxt != nullptr)
-    {
-        mExchangeCtxt->Close();
-        mExchangeCtxt = nullptr;
-    }
-}
-
 void PairingSession::DiscardExchange()
 {
     if (mExchangeCtxt != nullptr)
@@ -162,6 +140,19 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
 void PairingSession::Clear()
 {
+    // Clear acts like the destructor if PairingSession, if it is call during
+    // middle of a pairing, means we should terminate the exchange. For normal
+    // path, the exchange should already be discarded before calling Clear.
+    if (mExchangeCtxt != nullptr)
+    {
+        // The only time we reach this is if we are getting destroyed in the
+        // middle of our handshake.  In that case, there is no point trying to
+        // do MRP resends of the last message we sent, so abort the exchange
+        // instead of just closing it.
+        mExchangeCtxt->Abort();
+        mExchangeCtxt = nullptr;
+    }
+
     if (mSessionManager != nullptr)
     {
         if (mSecureSessionHolder && !mSecureSessionHolder->AsSecureSession()->IsActiveSession())
