@@ -39,7 +39,7 @@ tests:
           "DUT sends the subscription request message to TH TH sends a report
           data DUT sends the status response back to TH"
       verification: |
-          '' ./chip-tool levelcontrol subscribe  on-level 0 100 0 1 1 
+          '' ./chip-tool levelcontrol subscribe  on-level 0 100 0 1 1
           TH side
           [1650620108.691178][2221:2221] CHIP:DMG: StatusResponseMessage =
           [1650620108.691207][2221:2221] CHIP:DMG: {
@@ -55,7 +55,7 @@ tests:
           should send the modified data to the DUT. Repeat the above steps
           multiple times (3 times)."
       verification: |
-          In case of chip tool, here is an example command to use 
+          In case of chip tool, here is an example command to use
           '' ./chip-tool basic write local-config-disabled 1 1 0
            '' ./chip-tool basic subscribe local-config-disabled 0 100  1 0
 
@@ -65,7 +65,7 @@ tests:
           [1650620484.058669][2221:2221] CHIP:DMG:         InteractionModelRevision = 1
           [1650620484.058703][2221:2221] CHIP:DMG: }
           [1650620484.058738][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
-           
+
 
           Verify the above command multiple times by changing attribute value(3 times)
       disabled: true
@@ -77,7 +77,7 @@ tests:
           multiple times (3 times). 3"
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           '' ./chip-tool basic write  node-label 1 1 0
           '' ./chip-tool basic subscribe node-label 0 100 0  1 0
           [1650620543.500119][2221:2221] CHIP:DMG: StatusResponseMessage =
@@ -99,9 +99,9 @@ tests:
           steps multiple times (3 times)."
       verification: |
           In case of chip tool, here is an example command to use
-           
-          '' ./chip-tool any write-by-id 0x0008 0x0010 1 1 1 
-          '' ./chip-tool any subscribe-by-id 0x0008 0x0010 0 100 0 1 1 
+
+          '' ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
+          '' ./chip-tool any subscribe-by-id 0x0008 0x0010 0 100 0 1 1
           [1650620581.445609][2221:2221] CHIP:DMG: StatusResponseMessage =
           [1650620581.445659][2221:2221] CHIP:DMG: {
           [1650620581.445701][2221:2221] CHIP:DMG: 	Status = 0x0,
@@ -119,8 +119,8 @@ tests:
           TH. TH should send the modified data to the DUT. Repeat the above
           steps multiple times (3 times)."
       verification: |
-          sudo ./chip-tool any write-by-id 0x0008 0x0010 1 1 1 
-          sudo ./chip-tool any write-by-id 0x0008 0x0010 4 1 1 
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 4 1 1
           sudo ./chip-tool any write-by-id 0x0008 0x0010 5 1 1
       disabled: true
 

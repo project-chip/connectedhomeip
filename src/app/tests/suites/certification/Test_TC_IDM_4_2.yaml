@@ -44,14 +44,14 @@ tests:
           [1649154120.826793][16352:16357] CHIP:DMG:                                         Cluster = 0x6,
           [1649154120.826853][16352:16357] CHIP:DMG:                                         Attribute = 0x0000_4001,
           [1649154120.826914][16352:16357] CHIP:DMG:                                 }
-          [1649154120.827058][16352:16357] CHIP:DMG:                                         
-          [1649154120.827124][16352:16357] CHIP:DMG:                                         Data = 0, 
+          [1649154120.827058][16352:16357] CHIP:DMG:
+          [1649154120.827124][16352:16357] CHIP:DMG:                                         Data = 0,
           [1649154120.827190][16352:16357] CHIP:DMG:                         },
-          [1649154120.827258][16352:16357] CHIP:DMG:                         
+          [1649154120.827258][16352:16357] CHIP:DMG:
           [1649154120.827309][16352:16357] CHIP:DMG:                 },
-          [1649154120.827369][16352:16357] CHIP:DMG:                 
+          [1649154120.827369][16352:16357] CHIP:DMG:
           [1649154120.827413][16352:16357] CHIP:DMG:         ],
-          [1649154120.827470][16352:16357] CHIP:DMG:         
+          [1649154120.827470][16352:16357] CHIP:DMG:
           [1649154120.827514][16352:16357] CHIP:DMG:         InteractionModelRevision = 1
           [1649154120.827560][16352:16357] CHIP:DMG: }
       disabled: true
@@ -61,7 +61,7 @@ tests:
           action to the TH TH sends a status response"
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           '' ./chip-tool onoff  subscribe on-time   0 100 0 1 1
           [1649154179.610990][16364:16369] CHIP:DMG: SubscribeResponseMessage =
           [1649154179.611028][16364:16369] CHIP:DMG: {
@@ -123,7 +123,7 @@ tests:
           interval time specified during the subscription activation."
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           '' ./chip-tool basic write  node-label 1 1 0
           '' ./chip-tool basic subscribe node-label 0 100 0  1 0
 
@@ -138,7 +138,7 @@ tests:
           interval time specified during the subscription activation.'
       verification: |
           In case of chip tool, here is an example command to use
-           
+
           '' ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
           '' ./chip-tool any subscribe-by-id  0x0008 0x0010 0 100 0 1  1
           Verify the above command multiple times(3 times)
