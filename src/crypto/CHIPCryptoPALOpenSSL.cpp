@@ -104,10 +104,8 @@ static void _logSSLError()
         const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
         if (err_str_lib)
         {
-            ChipLogError(Crypto, " ssl err  %s %s %s\n",
-               StringOrNullMarker(err_str_lib),
-               StringOrNullMarker(err_str_routine),
-               StringOrNullMarker(err_str_reason));
+            ChipLogError(Crypto, " ssl err  %s %s %s\n", StringOrNullMarker(err_str_lib), StringOrNullMarker(err_str_routine),
+                         StringOrNullMarker(err_str_reason));
         }
 #endif // CHIP_ERROR_LOGGING
         ssl_err_code = ERR_get_error();
