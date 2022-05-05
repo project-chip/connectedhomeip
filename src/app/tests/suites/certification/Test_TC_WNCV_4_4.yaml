@@ -46,7 +46,10 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    - label: "1b 1c: If (PA_LF & LF) TH reads CurrentPositionTiltPercentage from DUT + assert CurrentPositionTiltPercent100ths/100 equals CurrentPositionTiltPercentage"
+    - label:
+          "1b 1c: If (PA_LF & LF) TH reads CurrentPositionTiltPercentage from
+          DUT + assert CurrentPositionTiltPercent100ths/100 equals
+          CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONTILTPERCENTAGE
