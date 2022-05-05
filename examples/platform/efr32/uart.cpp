@@ -62,7 +62,6 @@ extern "C" {
 #define vcom_handle sl_uartdrv_usart_vcom_handle
 #endif // EFR32MG24
 
-
 typedef struct
 {
     // The data buffer
@@ -310,11 +309,10 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
-        CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(vcom_handle, &data, &count, &remaining);
-                            if (count > lastCount) {
-                                WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
-                                lastCount = count;
-                            })
+        CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(vcom_handle, &data, &count, &remaining); if (count > lastCount) {
+            WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
+            lastCount = count;
+        })
     }
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
