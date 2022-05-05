@@ -50,6 +50,7 @@ tests:
                   0x002C, # Time Format Localization
                   0x002D, # Unit Localization
                   0x002E, # Power Source Configuration
+                  0x002F, # Power Source
                   0x0030, # General Commissioning
                   0x0031, # Network Commissioning
                   0x0032, # Diagnostic Logs
