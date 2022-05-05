@@ -259,9 +259,8 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
-    uint8_t location = to_underlying(commandData.newRegulatoryConfig);
 
-    if (location > to_underlying(RegulatoryLocationType::kIndoorOutdoor))
+    if (commandData.newRegulatoryConfig > RegulatoryLocationType::kIndoorOutdoor)
     {
         response.errorCode = CommissioningError::kValueOutsideRange;
         response.debugText = commandData.countryCode;
@@ -269,14 +268,13 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     else
     {
         uint8_t locationCapability;
+        uint8_t location = to_underlying(commandData.newRegulatoryConfig);
 
         CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
 
         // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
         // either the Indoor or Outdoor fixed value in LocationCapability.
-        if ((locationCapability !=
-             to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor)) &&
-            (location != locationCapability))
+        if ((locationCapability != to_underlying(RegulatoryLocationType::kIndoorOutdoor)) && (location != locationCapability))
         {
             response.errorCode = CommissioningError::kValueOutsideRange;
             response.debugText = commandData.countryCode;
