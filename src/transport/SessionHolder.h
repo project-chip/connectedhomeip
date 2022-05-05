@@ -28,19 +28,19 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase
+class SessionHolder : public IntrusiveListNodeBase
 {
 public:
     SessionHolder() {}
-    ~SessionHolder() override;
+    virtual ~SessionHolder();
 
     SessionHolder(const SessionHolder &);
     SessionHolder(SessionHolder && that);
     SessionHolder & operator=(const SessionHolder &);
     SessionHolder & operator=(SessionHolder && that);
 
-    // Implement SessionDelegate
-    void OnSessionReleased() override { Release(); }
+    virtual void SessionReleased() { Release(); }
+    virtual void TryShiftToSession(const SessionHandle & session) { Release(); Grab(session); }
 
     bool Contains(const SessionHandle & session) const
     {
@@ -50,7 +50,7 @@ public:
     void Grab(const SessionHandle & session);
     void Release();
 
-    operator bool() const { return mSession.HasValue(); }
+    explicit operator bool() const { return mSession.HasValue(); }
     SessionHandle Get() const { return SessionHandle{ mSession.Value().Get() }; }
     Optional<SessionHandle> ToOptional() const
     {
@@ -63,7 +63,7 @@ private:
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
 };
 
-// @brief Extends SessionHolder to allow propagate OnSessionReleased event to an extra given destination
+// @brief Extends SessionHolder to allow propagate SessionDelegate event to an extra given destination
 class SessionHolderWithDelegate : public SessionHolder
 {
 public:
@@ -71,12 +71,18 @@ public:
     SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : mDelegate(delegate) { Grab(handle); }
     operator bool() const { return SessionHolder::operator bool(); }
 
-    void OnSessionReleased() override
+    void SessionReleased() override
     {
         Release();
 
         // Note, the session is already cleared during mDelegate.OnSessionReleased
         mDelegate.OnSessionReleased();
+    }
+
+    void TryShiftToSession(const SessionHandle & session) override
+    {
+        if (mDelegate.GetNewSessionHandlingPolicy() == SessionDelegate::NewSessionHandlingPolicy::kShiftToNewSession)
+            SessionHolder::TryShiftToSession(session);
     }
 
 private:

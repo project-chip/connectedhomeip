@@ -208,6 +208,8 @@ public:
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
+    void TryShiftToSession(const SessionHandle & session) { Session::TryShiftToSession(session); }
+
 private:
     Type mSecureSessionType;
     const uint16_t mLocalSessionId;

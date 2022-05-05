@@ -295,6 +295,7 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
 
     mSecureSession.Grab(session);
     MoveToState(State::SecureConnected);
+    mInitParams.sessionManager->ShiftToSession(session);
     DequeueConnectionCallbacks(CHIP_NO_ERROR);
 
     // Do not touch this instance anymore; it might have been destroyed by a callback.
