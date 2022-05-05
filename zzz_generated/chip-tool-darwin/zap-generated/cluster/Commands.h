@@ -43591,6 +43591,575 @@ public:
 };
 
 /*
+ * Attribute WiredAssessedInputVoltage
+ */
+class ReadPowerSourceWiredAssessedInputVoltage : public ReadAttribute {
+public:
+    ReadPowerSourceWiredAssessedInputVoltage()
+        : ReadAttribute("wired-assessed-input-voltage")
+    {
+    }
+
+    ~ReadPowerSourceWiredAssessedInputVoltage() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000003) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeWiredAssessedInputVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.WiredAssessedInputVoltage response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource WiredAssessedInputVoltage read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredAssessedInputVoltage : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredAssessedInputVoltage()
+        : SubscribeAttribute("wired-assessed-input-voltage")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredAssessedInputVoltage() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000003) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeWiredAssessedInputVoltageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:nullptr
+                                                         reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"PowerSource.WiredAssessedInputVoltage response %@",
+                                                                 [value description]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
+                                                         }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute WiredAssessedInputFrequency
+ */
+class ReadPowerSourceWiredAssessedInputFrequency : public ReadAttribute {
+public:
+    ReadPowerSourceWiredAssessedInputFrequency()
+        : ReadAttribute("wired-assessed-input-frequency")
+    {
+    }
+
+    ~ReadPowerSourceWiredAssessedInputFrequency() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000004) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeWiredAssessedInputFrequencyWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.WiredAssessedInputFrequency response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource WiredAssessedInputFrequency read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredAssessedInputFrequency : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredAssessedInputFrequency()
+        : SubscribeAttribute("wired-assessed-input-frequency")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredAssessedInputFrequency() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000004) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeWiredAssessedInputFrequencyWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                  params:params
+                                                 subscriptionEstablished:nullptr
+                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"PowerSource.WiredAssessedInputFrequency response %@",
+                                                                   [value description]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
+                                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute WiredCurrentType
+ */
+class ReadPowerSourceWiredCurrentType : public ReadAttribute {
+public:
+    ReadPowerSourceWiredCurrentType()
+        : ReadAttribute("wired-current-type")
+    {
+    }
+
+    ~ReadPowerSourceWiredCurrentType() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000005) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWiredCurrentTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.WiredCurrentType response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource WiredCurrentType read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredCurrentType : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredCurrentType()
+        : SubscribeAttribute("wired-current-type")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredCurrentType() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000005) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeWiredCurrentTypeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                       maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                            params:params
+                                           subscriptionEstablished:nullptr
+                                                     reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                         NSLog(@"PowerSource.WiredCurrentType response %@", [value description]);
+                                                         if (error || !mWait) {
+                                                             SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                         }
+                                                     }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute WiredAssessedCurrent
+ */
+class ReadPowerSourceWiredAssessedCurrent : public ReadAttribute {
+public:
+    ReadPowerSourceWiredAssessedCurrent()
+        : ReadAttribute("wired-assessed-current")
+    {
+    }
+
+    ~ReadPowerSourceWiredAssessedCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000006) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWiredAssessedCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.WiredAssessedCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource WiredAssessedCurrent read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredAssessedCurrent : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredAssessedCurrent()
+        : SubscribeAttribute("wired-assessed-current")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredAssessedCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000006) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeWiredAssessedCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:nullptr
+                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"PowerSource.WiredAssessedCurrent response %@", [value description]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute WiredNominalVoltage
+ */
+class ReadPowerSourceWiredNominalVoltage : public ReadAttribute {
+public:
+    ReadPowerSourceWiredNominalVoltage()
+        : ReadAttribute("wired-nominal-voltage")
+    {
+    }
+
+    ~ReadPowerSourceWiredNominalVoltage() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000007) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWiredNominalVoltageWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.WiredNominalVoltage response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource WiredNominalVoltage read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredNominalVoltage : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredNominalVoltage()
+        : SubscribeAttribute("wired-nominal-voltage")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredNominalVoltage() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000007) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeWiredNominalVoltageWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"PowerSource.WiredNominalVoltage response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute WiredMaximumCurrent
+ */
+class ReadPowerSourceWiredMaximumCurrent : public ReadAttribute {
+public:
+    ReadPowerSourceWiredMaximumCurrent()
+        : ReadAttribute("wired-maximum-current")
+    {
+    }
+
+    ~ReadPowerSourceWiredMaximumCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000008) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWiredMaximumCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.WiredMaximumCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource WiredMaximumCurrent read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredMaximumCurrent : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredMaximumCurrent()
+        : SubscribeAttribute("wired-maximum-current")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredMaximumCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000008) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeWiredMaximumCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"PowerSource.WiredMaximumCurrent response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute WiredPresent
+ */
+class ReadPowerSourceWiredPresent : public ReadAttribute {
+public:
+    ReadPowerSourceWiredPresent()
+        : ReadAttribute("wired-present")
+    {
+    }
+
+    ~ReadPowerSourceWiredPresent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000009) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeWiredPresentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.WiredPresent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource WiredPresent read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceWiredPresent : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceWiredPresent()
+        : SubscribeAttribute("wired-present")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceWiredPresent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000009) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeWiredPresentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                   maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                        params:params
+                                       subscriptionEstablished:nullptr
+                                                 reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                     NSLog(@"PowerSource.WiredPresent response %@", [value description]);
+                                                     if (error || !mWait) {
+                                                         SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                     }
+                                                 }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute ActiveWiredFaults
+ */
+class ReadPowerSourceActiveWiredFaults : public ReadAttribute {
+public:
+    ReadPowerSourceActiveWiredFaults()
+        : ReadAttribute("active-wired-faults")
+    {
+    }
+
+    ~ReadPowerSourceActiveWiredFaults() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000000A) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeActiveWiredFaultsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.ActiveWiredFaults response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource ActiveWiredFaults read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceActiveWiredFaults : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceActiveWiredFaults()
+        : SubscribeAttribute("active-wired-faults")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceActiveWiredFaults() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000A) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeActiveWiredFaultsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                        maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                             params:params
+                                            subscriptionEstablished:nullptr
+                                                      reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                          NSLog(@"PowerSource.ActiveWiredFaults response %@", [value description]);
+                                                          if (error || !mWait) {
+                                                              SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                          }
+                                                      }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
  * Attribute BatteryVoltage
  */
 class ReadPowerSourceBatteryVoltage : public ReadAttribute {
@@ -43875,6 +44444,220 @@ public:
 };
 
 /*
+ * Attribute BatteryReplacementNeeded
+ */
+class ReadPowerSourceBatteryReplacementNeeded : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryReplacementNeeded()
+        : ReadAttribute("battery-replacement-needed")
+    {
+    }
+
+    ~ReadPowerSourceBatteryReplacementNeeded() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000000F) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeBatteryReplacementNeededWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.BatteryReplacementNeeded response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource BatteryReplacementNeeded read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryReplacementNeeded : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryReplacementNeeded()
+        : SubscribeAttribute("battery-replacement-needed")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryReplacementNeeded() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000000F) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeBatteryReplacementNeededWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:nullptr
+                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PowerSource.BatteryReplacementNeeded response %@",
+                                                                [value description]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
+                                                        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryReplaceability
+ */
+class ReadPowerSourceBatteryReplaceability : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryReplaceability()
+        : ReadAttribute("battery-replaceability")
+    {
+    }
+
+    ~ReadPowerSourceBatteryReplaceability() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000010) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryReplaceabilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryReplaceability response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryReplaceability read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryReplaceability : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryReplaceability()
+        : SubscribeAttribute("battery-replaceability")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryReplaceability() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000010) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryReplaceabilityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                 params:params
+                                                subscriptionEstablished:nullptr
+                                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                              NSLog(@"PowerSource.BatteryReplaceability response %@",
+                                                                  [value description]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
+                                                          }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryPresent
+ */
+class ReadPowerSourceBatteryPresent : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryPresent()
+        : ReadAttribute("battery-present")
+    {
+    }
+
+    ~ReadPowerSourceBatteryPresent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000011) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryPresentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryPresent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryPresent read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryPresent : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryPresent()
+        : SubscribeAttribute("battery-present")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryPresent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000011) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryPresentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                     maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                          params:params
+                                         subscriptionEstablished:nullptr
+                                                   reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                       NSLog(@"PowerSource.BatteryPresent response %@", [value description]);
+                                                       if (error || !mWait) {
+                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                       }
+                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
  * Attribute ActiveBatteryFaults
  */
 class ReadPowerSourceActiveBatteryFaults : public ReadAttribute {
@@ -43946,6 +44729,508 @@ public:
 };
 
 /*
+ * Attribute BatteryReplacementDescription
+ */
+class ReadPowerSourceBatteryReplacementDescription : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryReplacementDescription()
+        : ReadAttribute("battery-replacement-description")
+    {
+    }
+
+    ~ReadPowerSourceBatteryReplacementDescription() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000013) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryReplacementDescriptionWithCompletionHandler:^(
+            NSString * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryReplacementDescription response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryReplacementDescription read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryReplacementDescription : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryReplacementDescription()
+        : SubscribeAttribute("battery-replacement-description")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryReplacementDescription() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000013) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeBatteryReplacementDescriptionWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                               maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                    params:params
+                                                   subscriptionEstablished:nullptr
+                                                             reportHandler:^(
+                                                                 NSString * _Nullable value, NSError * _Nullable error) {
+                                                                 NSLog(@"PowerSource.BatteryReplacementDescription response %@",
+                                                                     [value description]);
+                                                                 if (error || !mWait) {
+                                                                     SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                 }
+                                                             }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryCommonDesignation
+ */
+class ReadPowerSourceBatteryCommonDesignation : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryCommonDesignation()
+        : ReadAttribute("battery-common-designation")
+    {
+    }
+
+    ~ReadPowerSourceBatteryCommonDesignation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000014) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeBatteryCommonDesignationWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.BatteryCommonDesignation response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource BatteryCommonDesignation read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryCommonDesignation : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryCommonDesignation()
+        : SubscribeAttribute("battery-common-designation")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryCommonDesignation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000014) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeBatteryCommonDesignationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:nullptr
+                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PowerSource.BatteryCommonDesignation response %@",
+                                                                [value description]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
+                                                        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryANSIDesignation
+ */
+class ReadPowerSourceBatteryANSIDesignation : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryANSIDesignation()
+        : ReadAttribute("battery-ansidesignation")
+    {
+    }
+
+    ~ReadPowerSourceBatteryANSIDesignation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000015) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryANSIDesignationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryANSIDesignation response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryANSIDesignation read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryANSIDesignation : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryANSIDesignation()
+        : SubscribeAttribute("battery-ansidesignation")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryANSIDesignation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000015) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryANSIDesignationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                  params:params
+                                                 subscriptionEstablished:nullptr
+                                                           reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"PowerSource.BatteryANSIDesignation response %@",
+                                                                   [value description]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
+                                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryIECDesignation
+ */
+class ReadPowerSourceBatteryIECDesignation : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryIECDesignation()
+        : ReadAttribute("battery-iecdesignation")
+    {
+    }
+
+    ~ReadPowerSourceBatteryIECDesignation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000016) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryIECDesignationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryIECDesignation response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryIECDesignation read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryIECDesignation : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryIECDesignation()
+        : SubscribeAttribute("battery-iecdesignation")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryIECDesignation() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000016) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryIECDesignationWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                 params:params
+                                                subscriptionEstablished:nullptr
+                                                          reportHandler:^(NSString * _Nullable value, NSError * _Nullable error) {
+                                                              NSLog(@"PowerSource.BatteryIECDesignation response %@",
+                                                                  [value description]);
+                                                              if (error || !mWait) {
+                                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                              }
+                                                          }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryApprovedChemistry
+ */
+class ReadPowerSourceBatteryApprovedChemistry : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryApprovedChemistry()
+        : ReadAttribute("battery-approved-chemistry")
+    {
+    }
+
+    ~ReadPowerSourceBatteryApprovedChemistry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000017) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeBatteryApprovedChemistryWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.BatteryApprovedChemistry response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource BatteryApprovedChemistry read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryApprovedChemistry : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryApprovedChemistry()
+        : SubscribeAttribute("battery-approved-chemistry")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryApprovedChemistry() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000017) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeBatteryApprovedChemistryWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                          maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                               params:params
+                                              subscriptionEstablished:nullptr
+                                                        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                            NSLog(@"PowerSource.BatteryApprovedChemistry response %@",
+                                                                [value description]);
+                                                            if (error || !mWait) {
+                                                                SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                            }
+                                                        }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryCapacity
+ */
+class ReadPowerSourceBatteryCapacity : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryCapacity()
+        : ReadAttribute("battery-capacity")
+    {
+    }
+
+    ~ReadPowerSourceBatteryCapacity() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000018) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryCapacityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryCapacity response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryCapacity read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryCapacity : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryCapacity()
+        : SubscribeAttribute("battery-capacity")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryCapacity() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000018) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryCapacityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:nullptr
+                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"PowerSource.BatteryCapacity response %@", [value description]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryQuantity
+ */
+class ReadPowerSourceBatteryQuantity : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryQuantity()
+        : ReadAttribute("battery-quantity")
+    {
+    }
+
+    ~ReadPowerSourceBatteryQuantity() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x00000019) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryQuantityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryQuantity response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryQuantity read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryQuantity : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryQuantity()
+        : SubscribeAttribute("battery-quantity")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryQuantity() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x00000019) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryQuantityWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                      maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                           params:params
+                                          subscriptionEstablished:nullptr
+                                                    reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                        NSLog(@"PowerSource.BatteryQuantity response %@", [value description]);
+                                                        if (error || !mWait) {
+                                                            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                        }
+                                                    }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
  * Attribute BatteryChargeState
  */
 class ReadPowerSourceBatteryChargeState : public ReadAttribute {
@@ -44006,6 +45291,296 @@ public:
                                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
                                                       }
                                                   }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryTimeToFullCharge
+ */
+class ReadPowerSourceBatteryTimeToFullCharge : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryTimeToFullCharge()
+        : ReadAttribute("battery-time-to-full-charge")
+    {
+    }
+
+    ~ReadPowerSourceBatteryTimeToFullCharge() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000001B) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeBatteryTimeToFullChargeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.BatteryTimeToFullCharge response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource BatteryTimeToFullCharge read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryTimeToFullCharge : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryTimeToFullCharge()
+        : SubscribeAttribute("battery-time-to-full-charge")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryTimeToFullCharge() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000001B) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryTimeToFullChargeWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                              maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                   params:params
+                                                  subscriptionEstablished:nullptr
+                                                            reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                NSLog(@"PowerSource.BatteryTimeToFullCharge response %@",
+                                                                    [value description]);
+                                                                if (error || !mWait) {
+                                                                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                }
+                                                            }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryFunctionalWhileCharging
+ */
+class ReadPowerSourceBatteryFunctionalWhileCharging : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryFunctionalWhileCharging()
+        : ReadAttribute("battery-functional-while-charging")
+    {
+    }
+
+    ~ReadPowerSourceBatteryFunctionalWhileCharging() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000001C) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryFunctionalWhileChargingWithCompletionHandler:^(
+            NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryFunctionalWhileCharging response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryFunctionalWhileCharging read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryFunctionalWhileCharging : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryFunctionalWhileCharging()
+        : SubscribeAttribute("battery-functional-while-charging")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryFunctionalWhileCharging() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000001C) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeBatteryFunctionalWhileChargingWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                     params:params
+                                                    subscriptionEstablished:nullptr
+                                                              reportHandler:^(
+                                                                  NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                                  NSLog(@"PowerSource.BatteryFunctionalWhileCharging response %@",
+                                                                      [value description]);
+                                                                  if (error || !mWait) {
+                                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                                  }
+                                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute BatteryChargingCurrent
+ */
+class ReadPowerSourceBatteryChargingCurrent : public ReadAttribute {
+public:
+    ReadPowerSourceBatteryChargingCurrent()
+        : ReadAttribute("battery-charging-current")
+    {
+    }
+
+    ~ReadPowerSourceBatteryChargingCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000001D) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeBatteryChargingCurrentWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PowerSource.BatteryChargingCurrent response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PowerSource BatteryChargingCurrent read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceBatteryChargingCurrent : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceBatteryChargingCurrent()
+        : SubscribeAttribute("battery-charging-current")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceBatteryChargingCurrent() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000001D) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeBatteryChargingCurrentWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                             maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                  params:params
+                                                 subscriptionEstablished:nullptr
+                                                           reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                               NSLog(@"PowerSource.BatteryChargingCurrent response %@",
+                                                                   [value description]);
+                                                               if (error || !mWait) {
+                                                                   SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                               }
+                                                           }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute ActiveBatteryChargeFaults
+ */
+class ReadPowerSourceActiveBatteryChargeFaults : public ReadAttribute {
+public:
+    ReadPowerSourceActiveBatteryChargeFaults()
+        : ReadAttribute("active-battery-charge-faults")
+    {
+    }
+
+    ~ReadPowerSourceActiveBatteryChargeFaults() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReadAttribute (0x0000001E) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster
+            readAttributeActiveBatteryChargeFaultsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                NSLog(@"PowerSource.ActiveBatteryChargeFaults response %@", [value description]);
+                err = [CHIPError errorToCHIPErrorCode:error];
+
+                if (error != nil) {
+                    ChipLogError(chipTool, "PowerSource ActiveBatteryChargeFaults read Error: %s", chip::ErrorStr(err));
+                }
+                SetCommandExitStatus(err);
+            }];
+        return err;
+    }
+};
+
+class SubscribeAttributePowerSourceActiveBatteryChargeFaults : public SubscribeAttribute {
+public:
+    SubscribeAttributePowerSourceActiveBatteryChargeFaults()
+        : SubscribeAttribute("active-battery-charge-faults")
+    {
+    }
+
+    ~SubscribeAttributePowerSourceActiveBatteryChargeFaults() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000002F) ReportAttribute (0x0000001E) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeActiveBatteryChargeFaultsWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                           maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                                params:params
+                                               subscriptionEstablished:nullptr
+                                                         reportHandler:^(NSArray * _Nullable value, NSError * _Nullable error) {
+                                                             NSLog(@"PowerSource.ActiveBatteryChargeFaults response %@",
+                                                                 [value description]);
+                                                             if (error || !mWait) {
+                                                                 SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                             }
+                                                         }];
 
         return CHIP_NO_ERROR;
     }
@@ -77052,6 +78627,22 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<SubscribeAttributePowerSourceOrder>(), //
         make_unique<ReadPowerSourceDescription>(), //
         make_unique<SubscribeAttributePowerSourceDescription>(), //
+        make_unique<ReadPowerSourceWiredAssessedInputVoltage>(), //
+        make_unique<SubscribeAttributePowerSourceWiredAssessedInputVoltage>(), //
+        make_unique<ReadPowerSourceWiredAssessedInputFrequency>(), //
+        make_unique<SubscribeAttributePowerSourceWiredAssessedInputFrequency>(), //
+        make_unique<ReadPowerSourceWiredCurrentType>(), //
+        make_unique<SubscribeAttributePowerSourceWiredCurrentType>(), //
+        make_unique<ReadPowerSourceWiredAssessedCurrent>(), //
+        make_unique<SubscribeAttributePowerSourceWiredAssessedCurrent>(), //
+        make_unique<ReadPowerSourceWiredNominalVoltage>(), //
+        make_unique<SubscribeAttributePowerSourceWiredNominalVoltage>(), //
+        make_unique<ReadPowerSourceWiredMaximumCurrent>(), //
+        make_unique<SubscribeAttributePowerSourceWiredMaximumCurrent>(), //
+        make_unique<ReadPowerSourceWiredPresent>(), //
+        make_unique<SubscribeAttributePowerSourceWiredPresent>(), //
+        make_unique<ReadPowerSourceActiveWiredFaults>(), //
+        make_unique<SubscribeAttributePowerSourceActiveWiredFaults>(), //
         make_unique<ReadPowerSourceBatteryVoltage>(), //
         make_unique<SubscribeAttributePowerSourceBatteryVoltage>(), //
         make_unique<ReadPowerSourceBatteryPercentRemaining>(), //
@@ -77060,10 +78651,38 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<SubscribeAttributePowerSourceBatteryTimeRemaining>(), //
         make_unique<ReadPowerSourceBatteryChargeLevel>(), //
         make_unique<SubscribeAttributePowerSourceBatteryChargeLevel>(), //
+        make_unique<ReadPowerSourceBatteryReplacementNeeded>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryReplacementNeeded>(), //
+        make_unique<ReadPowerSourceBatteryReplaceability>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryReplaceability>(), //
+        make_unique<ReadPowerSourceBatteryPresent>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryPresent>(), //
         make_unique<ReadPowerSourceActiveBatteryFaults>(), //
         make_unique<SubscribeAttributePowerSourceActiveBatteryFaults>(), //
+        make_unique<ReadPowerSourceBatteryReplacementDescription>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryReplacementDescription>(), //
+        make_unique<ReadPowerSourceBatteryCommonDesignation>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryCommonDesignation>(), //
+        make_unique<ReadPowerSourceBatteryANSIDesignation>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryANSIDesignation>(), //
+        make_unique<ReadPowerSourceBatteryIECDesignation>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryIECDesignation>(), //
+        make_unique<ReadPowerSourceBatteryApprovedChemistry>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryApprovedChemistry>(), //
+        make_unique<ReadPowerSourceBatteryCapacity>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryCapacity>(), //
+        make_unique<ReadPowerSourceBatteryQuantity>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryQuantity>(), //
         make_unique<ReadPowerSourceBatteryChargeState>(), //
         make_unique<SubscribeAttributePowerSourceBatteryChargeState>(), //
+        make_unique<ReadPowerSourceBatteryTimeToFullCharge>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryTimeToFullCharge>(), //
+        make_unique<ReadPowerSourceBatteryFunctionalWhileCharging>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryFunctionalWhileCharging>(), //
+        make_unique<ReadPowerSourceBatteryChargingCurrent>(), //
+        make_unique<SubscribeAttributePowerSourceBatteryChargingCurrent>(), //
+        make_unique<ReadPowerSourceActiveBatteryChargeFaults>(), //
+        make_unique<SubscribeAttributePowerSourceActiveBatteryChargeFaults>(), //
         make_unique<ReadPowerSourceGeneratedCommandList>(), //
         make_unique<SubscribeAttributePowerSourceGeneratedCommandList>(), //
         make_unique<ReadPowerSourceAcceptedCommandList>(), //
