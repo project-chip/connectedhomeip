@@ -98,8 +98,8 @@ protected:
 
     void Finish();
 
-    void AbortExchange(); // Called when error happens, terminate the pairing.
-    void CloseExchange(); // Called inside `Clear` to guarentee that the exchange is not leaked.
+    void AbortExchange();   // Called when error happens, terminate the pairing.
+    void CloseExchange();   // Called inside `Clear` to guarentee that the exchange is not leaked.
     void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
