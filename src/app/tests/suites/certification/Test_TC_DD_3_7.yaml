@@ -14,25 +14,130 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.3.7. [TC-DD-3.7] Commissioning Flow - Concurrent - Negative scenario [DUT
+    3.3.7. [TC-DD-3.7] Commissioning Flow - Concurrent - Negative Scenario [DUT
     - Commissioner]
-
 config:
-    nodeId: 0x12344321
+    nodeId: "0x12344321"
     cluster: "Basic"
     endpoint: 0
-
 tests:
-    - label:
-          "Repeat steps 1.a-1.o from [TC-DD-3.5]. Force Fail any step between
-          1.a and 1.j."
+    - label: "Test Step"
       verification: |
+          Verification Steps
+      disabled: true
+    - label:
+          "Commissioner has regulatory and fabric information available and has
+          accurate date, time and timezone"
+      verification: |4+
 
       disabled: true
-
     - label:
-          "Repeat steps 1.a-1.o from [TC-DD-3.5]. Force Fail any step between
-          1.k and 1.o"
-      verification: |
+          "Commissioner and Commissionee discover each other and connect via the
+          discovery mode applicable for the DUT."
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
+          (the autonomously Fail-safe timer length set by Commissionee)"
+      verification: |4+
+
+      disabled: true
+    - label: "Reboot TH and prepare for commissioning"
+      verification: |4+
+
+      disabled: true
+    - label: "Commissioner should return to step 2"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Establish encryption keys with Password Authenticated Session
+          Establishment on the commissioning channel"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
+          (the autonomously Fail-safe timer length set by Commissionee)"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
+          regulatory information in the Commissionee."
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner requests operational CSR from Commissionee with
+          OperationalCSRRequest command"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner configures operational credentials on DUT if not
+          previously installed"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner configures itself as administrator in ACL on TH if
+          needed"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner configures operational network on TH if TH both supports
+          and requires"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner instructs Commissionee to connect to operational network
+          if not already connected"
+      verification: |4+
+
+      disabled: true
+    - label: "Reboot TH"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner should return to the same state as step 13 to continue
+          commissioning (i.e. Commissioner configure operational network on TH
+          if TH both supports and requires)"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner instructs Commissionee to connect to operational network
+          if not already connected"
+      verification: |4+
+
+      disabled: true
+    - label: "Commissioner starts discovery of TH using Operational Discovery"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioner opens a CASE session with TH over operational network"
+      verification: |4+
+
+      disabled: true
+    - label: "Commissioner sends CommissioningComplete command"
+      verification: |4+
+
+      disabled: true
+    - label:
+          "Commissioning channel between the Commissioner and Commissionee is
+          terminated."
+      verification: |4+
 
       disabled: true
