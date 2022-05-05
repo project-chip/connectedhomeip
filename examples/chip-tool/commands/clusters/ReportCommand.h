@@ -528,11 +528,11 @@ public:
         ReportCommand("subscribe-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
-        AddArgument("attr-name", eventName, 0, "attr-name desc");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0, "min-interval desc");
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0, "max-interval desc");
-        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions, "keepSubscriptions desc");
-        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber, "event-min desc");
+        AddArgument("attr-name", eventName, 0, "Event name.");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0, "The requested minimum interval boundary floor in seconds.");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0, "The requested maximum interval boundary ceiling in seconds.");
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions, "0 - Terminate existing subscriptions from initiator.\n  1 - Otherwise.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
