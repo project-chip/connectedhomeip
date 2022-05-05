@@ -331,7 +331,8 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
     {
         if (!mDiscoveredNodeData.IsValid())
         {
-            ChipLogError(Discovery, "Discovered not data is not valid. Commissioning discovery not complete.");
+            ChipLogError(Discovery, "Discovered node data is not valid. Commissioning discovery not complete.");
+            return;
         }
 
         activeAttempts.Complete(mDiscoveredNodeData);
