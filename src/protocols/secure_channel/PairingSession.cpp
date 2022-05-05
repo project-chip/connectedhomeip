@@ -61,7 +61,7 @@ void PairingSession::Finish()
 {
     Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
 
-    // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
+    // Discard the exchange so that our subclasses don't try closing it. The exchange will handle that.
     DiscardExchange();
 
     CHIP_ERROR err = ActivateSecureSession(address);
@@ -104,7 +104,7 @@ void PairingSession::DiscardExchange()
         // Make sure the exchange doesn't try to notify us when it closes,
         // since we might be dead by then.
         mExchangeCtxt->SetDelegate(nullptr);
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // Null out mExchangeCtxt so that our subclasses don't try closing it.  The
         // exchange will handle that.
         mExchangeCtxt = nullptr;
     }
