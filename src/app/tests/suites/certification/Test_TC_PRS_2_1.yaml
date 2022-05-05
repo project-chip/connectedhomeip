@@ -34,20 +34,8 @@ tests:
       response:
           constraints:
               type: int16
-
-    - label: "Write the default values to mandatory attribute: MeasuredValue"
-      command: "writeAttribute"
-      attribute: "MeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MeasuredValue"
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          value: 0
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the mandatory attribute constraints: MinMeasuredValue"
       command: "readAttribute"
@@ -55,20 +43,8 @@ tests:
       response:
           constraints:
               type: int16
-
-    - label: "Write the default values to mandatory attribute: MinMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MinMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MinMeasuredValue"
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
-      response:
-          value: 0
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the mandatory attribute constraints: MaxMeasuredValue"
       command: "readAttribute"
@@ -76,157 +52,93 @@ tests:
       response:
           constraints:
               type: int16
+              minValue: -32768
+              maxValue: 32767
 
-    - label: "Write the default values to mandatory attribute: MaxMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MaxMeasuredValue"
+    #Issue 13442 and 15473
+    - label:
+          "Read the optional attribute: Tolerance Verify that the DUT reponds
+          with an uint16 value. Its value should be in the range of 0 and 2048"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Reads back mandatory attribute: MaxMeasuredValue"
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          value: 0
-
-    #disabled due to issue #13442
-    - label: "Read the optional attribute: Tolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: Tolerance"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Tolerance"
+    #Issue 13442 and 15473
+    - label:
+          "Read the optional attribute: ScaledValue Verify that the DUT reponds
+          with an int16 value. Its value should be in the range of -32768 and
+          32767"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Reads back optional attribute: Tolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0
-
-    #Following attributes are based on the value of the extended feature in the cluster feature map
-    - label: "Read the optional attribute: ScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledValue"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: ScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "ScaledValue"
+    #Issue 13442 and 15473
+    - label:
+          "Reads back optional attribute: MinScaledValue Verify that the DUT
+          reponds with an int16 value. Its value should be in the range of
+          -32768 and 32767"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Reads back optional attribute: ScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledValue"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: MinScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MinScaledValue"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: MinScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "MinScaledValue"
+    #Issue 13442 and 15473
+    - label:
+          "Read the optional attribute: MaxScaledValue Verify that the DUT
+          reponds with an int16 value. Its value should be in the range of
+          -32768 and 32767"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Reads back optional attribute: MinScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MinScaledValue"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: MaxScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxScaledValue"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: MaxScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "MaxScaledValue"
+    #Issue 13442 and 15473
+    - label:
+          "Read the optional attribute: ScaledTolerance Verify that the DUT
+          reponds with an uint16 value. Its value should be in the range of 0
+          and 2048"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Reads back optional attribute: MaxScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxScaledValue"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: ScaledTolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledTolerance"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: ScaledTolerance"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "ScaledTolerance"
+    #Issue 13442 and 15473
+    - label:
+          "Read the optional attribute: Scale Verify that the DUT reponds with
+          an int8 value. Its value should be in the range of -127 and 127"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: ScaledTolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledTolerance"
-      response:
-          value: 0
-
-    - label: "Read the optional attribute: Scale"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Scale"
-      response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: Scale"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Scale"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: Scale"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Scale"
-      response:
-          value: 0
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
