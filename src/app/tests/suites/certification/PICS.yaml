@@ -257,14 +257,10 @@ PICS:
           attribute?"
       id: A_CURRENTPOSITIONTILTPERCENTAGE
 
-    - label:
-          "Does the device implement the CurrentPositionLift
-          attribute?"
+    - label: "Does the device implement the CurrentPositionLift attribute?"
       id: A_CURRENTPOSITIONLIFT
 
-    - label:
-          "Does the device implement the CurrentPositionTilt
-          attribute?"
+    - label: "Does the device implement the CurrentPositionTilt attribute?"
       id: A_CURRENTPOSITIONTILT
 
     - label: "Does the device implement the NumberOfActuationsLift attribute?"
