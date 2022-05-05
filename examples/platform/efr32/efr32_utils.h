@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2022 Silabs.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +19,20 @@
 
 #pragma once
 
-#include "efr32_utils.h"
+// EFR Logging
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// ---- Lighting Example App Config ----
+void efr32LogInit(void);
 
-#define APP_TASK_NAME "Lit"
+void efr32Log(const char * aFormat, ...);
+#define EFR32_LOG(...) efr32Log(__VA_ARGS__);
+void appError(int err);
 
-// Time it takes in ms for the simulated actuator to move from one
-// state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 10
+#ifdef __cplusplus
+}
+
+#include <lib/core/CHIPError.h>
+void appError(CHIP_ERROR error);
+#endif

@@ -103,6 +103,8 @@
 extern "C" {
 #endif
 
+#include <CHIPProjectConfig.h>
+
 #include <stdint.h>
 
 #include "RTE_Components.h"
@@ -193,11 +195,14 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
 #define configSUPPORT_STATIC_ALLOCATION (1)
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
+
+#ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #define configTOTAL_HEAP_SIZE ((size_t)(28 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(20 * 1024))
 #endif
+#endif // configTOTAL_HEAP_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet (1)
