@@ -39,10 +39,7 @@ public:
      * Note: the default implementation orders shifting to the new session, it should be fine for all users, unless the
      * SessionHolder object is expected to be sticky to a specified session.
      */
-    virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy()
-    {
-        return NewSessionHandlingPolicy::kShiftToNewSession;
-    }
+    virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy() { return NewSessionHandlingPolicy::kShiftToNewSession; }
 
     /**
      * @brief

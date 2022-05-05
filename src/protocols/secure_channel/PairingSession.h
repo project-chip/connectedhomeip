@@ -50,10 +50,7 @@ public:
     virtual CATValues GetPeerCATs() const                               = 0;
 
     // Implement SessionDelegate
-    NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override
-    {
-        return NewSessionHandlingPolicy::kStayAtOldSession;
-    }
+    NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
 
     Optional<uint16_t> GetLocalSessionId() const
     {
