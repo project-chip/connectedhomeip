@@ -847,9 +847,9 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
 
     SessionHolder aliceToBobSession;
     CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1,
-                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+                                                                 fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
+                                                                 fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
+                                                                 aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     class StickySessionDelegate : public SessionDelegate
@@ -905,7 +905,6 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.Shutdown();
 }
-
 
 // Test Suite
 

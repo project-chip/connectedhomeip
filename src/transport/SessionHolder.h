@@ -40,7 +40,11 @@ public:
     SessionHolder & operator=(SessionHolder && that);
 
     virtual void SessionReleased() { Release(); }
-    virtual void TryShiftToSession(const SessionHandle & session) { Release(); Grab(session); }
+    virtual void TryShiftToSession(const SessionHandle & session)
+    {
+        Release();
+        Grab(session);
+    }
 
     bool Contains(const SessionHandle & session) const
     {
