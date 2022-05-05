@@ -120,8 +120,6 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
     }
 }
 
-const char emAfStackEventString[] = "Stack";
-
 // *****************************************************************************
 // Functions
 
