@@ -115,6 +115,7 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
+    mSessionManager->ShiftToSession(session);
     Cleanup();
 }
 } // namespace chip

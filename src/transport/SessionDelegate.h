@@ -36,8 +36,16 @@ public:
      *   Called when a new secure session to the same peer is established, over the delegate of SessionHolderWithDelegate object. It
      *   is suggested to shift to the newly created session.
      *
+     *   Our security model is built upon Exchanges and Sessions, but not SessionHolders, such that SessionHolders should be able to
+     *   shift to a new sessoin freely. If an application is holding a session which is not intent to be shifted, it can provides
+     *   its shifting policy by override GetNewSessionHandlingPolicy in SessionDelegate. For example SessionHolders inside
+     *   ExchangeContext and PairingSession are not eligible for auto-shifting.
+     *
      * Note: the default implementation orders shifting to the new session, it should be fine for all users, unless the
-     * SessionHolder object is expected to be sticky to a specified session.
+     *       SessionHolder object is expected to be sticky to a specified session.
+     *
+     * Note: the implementation should not modify session pool nor session holders (eg, adding new session, removing old session),
+     *       or else something inconsistent can be happened inside Session::DoShiftToSession.
      */
     virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy() { return NewSessionHandlingPolicy::kShiftToNewSession; }
 

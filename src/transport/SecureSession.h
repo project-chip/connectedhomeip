@@ -184,7 +184,7 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     NodeId GetLocalNodeId() const { return mLocalNodeId; }
 
-    CATValues GetPeerCATs() const { return mPeerCATs; }
+    const CATValues & GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
@@ -227,6 +227,9 @@ public:
     const CryptoContext & GetCryptoContext() const { return mCryptoContext; }
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
+
+    // This should be a private API, only meant to be called by SessionManager
+    void TryShiftToSession(const SessionHandle & session);
 
 private:
     enum class State : uint8_t
