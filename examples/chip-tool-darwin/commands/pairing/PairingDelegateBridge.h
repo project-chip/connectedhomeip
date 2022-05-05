@@ -23,6 +23,7 @@
 @property chip::NodeId deviceID;
 @property CHIPDeviceController * commissioner;
 @property CHIPCommissioningParameters * params;
+@property bool commissionAfterPairingComplete;
 
 - (void)onPairingComplete:(NSError *)error;
 - (void)onPairingDeleted:(NSError *)error;
