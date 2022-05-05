@@ -344,7 +344,7 @@ class TestParser(unittest.TestCase):
 
     def test_multiple_clusters(self):
         actual = parseText("""
-            server cluster A = 1 { /* FIXME */ }
+            server cluster A = 1 { /* Test comment */ }
             client cluster B = 2 { }
             client cluster C = 3 { }
         """)
