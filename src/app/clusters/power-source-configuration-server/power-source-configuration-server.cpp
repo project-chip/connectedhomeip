@@ -65,9 +65,10 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
     case Sources::Id:
         err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             std::pair<uint16_t, uint8_t> orderEpPair[kMaxPowerSources];
-            uint8_t idx = 0, order = 0;
+            uint8_t idx = 0;
             for (auto endpoint : EnabledEndpointsWithServerCluster(PowerSource::Id))
             {
+                uint8_t order = 0;
                 if (idx >= kMaxPowerSources)
                     break;
                 PowerSource::Attributes::Order::Get(endpoint, &order);
@@ -75,14 +76,13 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
                 idx++;
             }
 
-            int i, j, k;
-            for (i = 0; i < idx - 1; i++)
+            for (int i = 0; i < idx - 1; i++)
             {
-                for (j = 0; j < idx - i - 1; j++)
+                for (int j = 0; j < idx - i - 1; j++)
                     if ((orderEpPair[j]).second > (orderEpPair[j + 1]).second)
                         swap(orderEpPair[j], orderEpPair[j + 1]);
             }
-            for (k = 0; k < idx; k++)
+            for (int k = 0; k < idx; k++)
             {
                 ReturnErrorOnFailure(encoder.Encode(orderEpPair[k].first));
             }
