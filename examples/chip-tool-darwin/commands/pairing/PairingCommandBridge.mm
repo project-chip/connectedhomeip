@@ -37,6 +37,11 @@ void PairingCommandBridge::SetUpPairingDelegate()
     CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
 
     [pairing setDeviceID:mNodeId];
+
+    // For Ethernet pairing, commissioning will be handled automatically by the
+    // CHIPDeviceController.
+    [pairing setCommissionAfterPairingComplete:(mNetworkType != PairingNetworkType::Ethernet)];
+
     switch (mNetworkType) {
     case PairingNetworkType::None:
     case PairingNetworkType::Ethernet:
