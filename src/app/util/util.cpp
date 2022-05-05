@@ -771,7 +771,7 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
-    return (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId) != nullptr);
+    return (emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) != UINT16_MAX);
 }
 
 bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
