@@ -414,10 +414,10 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, uint16_t peerSessionId,
-                                                        NodeId localNodeId, NodeId peerNodeId, FabricIndex fabric,
-                                                        const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role,
-                                                        const CATValues & cats)
+CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId,
+                                                        uint16_t peerSessionId, NodeId localNodeId, NodeId peerNodeId,
+                                                        FabricIndex fabric, const Transport::PeerAddress & peerAddress,
+                                                        CryptoContext::SessionRole role, const CATValues & cats)
 {
     Optional<SessionHandle> session =
         mSecureSessions.CreateNewSecureSessionForTest(chip::Transport::SecureSession::Type::kCASE, localSessionId, localNodeId,
@@ -805,7 +805,6 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
-
 
 void SessionManager::ShiftToSession(const SessionHandle & handle)
 {

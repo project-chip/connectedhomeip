@@ -46,7 +46,6 @@ OutgoingGroupSession * Session::AsOutgoingGroupSession()
     return static_cast<OutgoingGroupSession *>(this);
 }
 
-
 void Session::TryShiftToSession(const SessionHandle & session)
 {
     IntrusiveList<SessionHolder>::Iterator iter = mHolders.begin();
@@ -61,7 +60,6 @@ void Session::TryShiftToSession(const SessionHandle & session)
         iter = next;
     }
 }
-
 
 } // namespace Transport
 } // namespace chip

@@ -808,48 +808,23 @@ static void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 
 static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     IPAddress addr;
     IPAddress::FromString("::1", addr);
 
-    FabricTable fabricTable;
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+    FabricIndex bobFabricIndex   = 1;
+
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
-    NL_TEST_ASSERT(inSuite,
-                   CHIP_NO_ERROR ==
-                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
-
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(
-        ByteSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len),
-        ByteSpan(TestCerts::sTestCert_ICA01_Chip, TestCerts::sTestCert_ICA01_Chip_Len),
-        ByteSpan(TestCerts::sTestCert_Node01_01_Chip, TestCerts::sTestCert_Node01_01_Chip_Len),
-        ByteSpan(TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len),
-        ByteSpan(TestCerts::sTestCert_Node01_01_PrivateKey, TestCerts::sTestCert_Node01_01_PrivateKey_Len));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(aliceFabric, &aliceFabricIndex));
-
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(
-        ByteSpan(TestCerts::sTestCert_Root02_Chip, TestCerts::sTestCert_Root02_Chip_Len),
-        ByteSpan(TestCerts::sTestCert_ICA02_Chip, TestCerts::sTestCert_ICA02_Chip_Len),
-        ByteSpan(TestCerts::sTestCert_Node02_01_Chip, TestCerts::sTestCert_Node02_01_Chip_Len),
-        ByteSpan(TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len),
-        ByteSpan(TestCerts::sTestCert_Node02_01_PrivateKey, TestCerts::sTestCert_Node02_01_PrivateKey_Len));
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabric(bobFabric, &bobFabricIndex));
-
     SessionHolder aliceToBobSession;
-    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1,
-                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
+                                                                 peer, CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     class StickySessionDelegate : public SessionDelegate
@@ -863,17 +838,13 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, aliceToBobSession.Contains(stickyAliceToBobSession.Get()));
 
     SessionHolder bobToAliceSession;
-    err = sessionManager.InjectCaseSessionWithTestKey(bobToAliceSession, 1, 2,
-                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                                      bobFabricIndex, peer, CryptoContext::SessionRole::kResponder);
+    err = sessionManager.InjectCaseSessionWithTestKey(bobToAliceSession, 1, 2, bobNodeId, aliceNodeId, bobFabricIndex, peer,
+                                                      CryptoContext::SessionRole::kResponder);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHolder newAliceToBobSession;
-    err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4,
-                                                      fabricTable.FindFabricWithIndex(aliceFabricIndex)->GetNodeId(),
-                                                      fabricTable.FindFabricWithIndex(bobFabricIndex)->GetNodeId(),
-                                                      aliceFabricIndex, peer, CryptoContext::SessionRole::kInitiator);
+    err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                      CryptoContext::SessionRole::kInitiator);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Here we got 3 sessions, and 4 holders:
@@ -905,7 +876,6 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
 
     sessionManager.Shutdown();
 }
-
 
 // Test Suite
 
