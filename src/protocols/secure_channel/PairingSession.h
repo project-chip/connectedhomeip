@@ -38,7 +38,7 @@ namespace chip {
 
 class SessionManager;
 
-class DLL_EXPORT PairingSession : public SessionReleaseDelegate
+class DLL_EXPORT PairingSession : public SessionDelegate
 {
 public:
     PairingSession() : mSecureSessionHolder(*this) {}
@@ -48,6 +48,9 @@ public:
     virtual ScopedNodeId GetPeer() const                                = 0;
     virtual ScopedNodeId GetLocalScopedNodeId() const                   = 0;
     virtual CATValues GetPeerCATs() const                               = 0;
+
+    // Implement SessionDelegate
+    NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
 
     Optional<uint16_t> GetLocalSessionId() const
     {
