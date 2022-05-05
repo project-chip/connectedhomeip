@@ -127,6 +127,13 @@ CASESession::~CASESession()
     Clear();
 }
 
+void CASESession::OnSessionReleased()
+{
+    Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+}
+
 void CASESession::Clear()
 {
     // This function zeroes out and resets the memory used by the object.

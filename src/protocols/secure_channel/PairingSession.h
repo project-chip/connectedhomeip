@@ -38,9 +38,10 @@ namespace chip {
 
 class SessionManager;
 
-class DLL_EXPORT PairingSession
+class DLL_EXPORT PairingSession : public SessionReleaseDelegate
 {
 public:
+    PairingSession() : mSecureSessionHolder(*this) {}
     virtual ~PairingSession() { Clear(); }
 
     virtual Transport::SecureSession::Type GetSecureSessionType() const = 0;
@@ -170,7 +171,7 @@ protected:
 
 protected:
     CryptoContext::SessionRole mRole;
-    SessionHolder mSecureSessionHolder;
+    SessionHolderWithDelegate mSecureSessionHolder;
     // mSessionManager is set if we actually allocate a secure session, so we
     // can clean it up later as needed.
     SessionManager * mSessionManager           = nullptr;
