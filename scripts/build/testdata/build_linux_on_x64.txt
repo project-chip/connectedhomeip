@@ -16,6 +16,16 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false config_use_interactive_mode=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-no-interactive-ipv6only'
 
+# Generating linux-arm64-light
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light'
+
+# Generating linux-arm64-light-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-light-ipv6only'
+
 # Generating linux-arm64-lock
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -105,6 +115,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-chip-tool-no-interactive-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false config_use_interactive_mode=false' {out}/linux-x64-chip-tool-no-interactive-ipv6only
 
+# Generating linux-x64-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux {out}/linux-x64-light
+
+# Generating linux-x64-light-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-light-ipv6only
+
 # Generating linux-x64-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/linux {out}/linux-x64-lock
 
@@ -168,6 +184,12 @@ ninja -C {out}/linux-arm64-all-clusters-ipv6only
 # Building linux-arm64-chip-tool-no-interactive-ipv6only
 ninja -C {out}/linux-arm64-chip-tool-no-interactive-ipv6only
 
+# Building linux-arm64-light
+ninja -C {out}/linux-arm64-light
+
+# Building linux-arm64-light-ipv6only
+ninja -C {out}/linux-arm64-light-ipv6only
+
 # Building linux-arm64-lock
 ninja -C {out}/linux-arm64-lock
 
@@ -230,6 +252,12 @@ ninja -C {out}/linux-x64-chip-tool-ipv6only
 
 # Building linux-x64-chip-tool-no-interactive-ipv6only
 ninja -C {out}/linux-x64-chip-tool-no-interactive-ipv6only
+
+# Building linux-x64-light
+ninja -C {out}/linux-x64-light
+
+# Building linux-x64-light-ipv6only
+ninja -C {out}/linux-x64-light-ipv6only
 
 # Building linux-x64-lock
 ninja -C {out}/linux-x64-lock

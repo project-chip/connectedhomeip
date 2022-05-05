@@ -28,6 +28,7 @@ class HostApp(Enum):
     MIN_MDNS = auto()
     ADDRESS_RESOLVE = auto()
     TV_APP = auto()
+    LIGHT = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -52,6 +53,8 @@ class HostApp(Enum):
             return 'minimal-mdns'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.LIGHT:
+            return 'lighting-app/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -95,6 +98,9 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.LIGHT:
+            yield 'chip-lighting-app'
+            yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
