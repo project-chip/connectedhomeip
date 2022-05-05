@@ -155,4 +155,5 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
                     ChipLogValueScopedNodeId(session->GetPeer()));
     PrepareForSessionEstablishment(session->GetPeer());
 }
+
 } // namespace chip

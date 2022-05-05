@@ -117,5 +117,14 @@ void SecureSession::Release()
     ReferenceCounted<SecureSession, SecureSessionDeleter, 0, uint16_t>::Release();
 }
 
+void SecureSession::TryShiftToSession(const SessionHandle & session)
+{
+    if (GetSecureSessionType() == SecureSession::Type::kCASE && GetPeer() == session->GetPeer() &&
+        GetPeerCATs() == session->AsSecureSession()->GetPeerCATs())
+    {
+        Session::DoShiftToSession(session);
+    }
+}
+
 } // namespace Transport
 } // namespace chip
