@@ -238,6 +238,10 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalSrvRecord(data.GetName(), srv);
             }
+            else
+            {
+                ChipLogError(Discovery, "Invalid operational srv name: no '%s' part found.", kOperationalServiceName);
+            }
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
@@ -245,6 +249,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
             {
                 OnCommissionableNodeSrvRecord(data.GetName(), srv);
+            }
+            else
+            {
+                ChipLogError(Discovery, "Invalid commision srv name: no '%s' or '%s' part found.", kCommissionableServiceName,
+                             kCommissionerServiceName);
             }
         }
         break;
@@ -348,6 +357,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
             ChipLogError(Discovery, "Operational discovery has no valid node/port. Resolve not complete.");
             return;
         }
+
         activeAttempts.Complete(mNodeData.mPeerId);
         mNodeData.LogNodeIdResolved();
 
