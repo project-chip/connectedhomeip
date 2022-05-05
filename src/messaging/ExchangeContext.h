@@ -82,7 +82,7 @@ public:
     bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
     // Implement SessionDelegate
-    SessionUpdated OnSessionUpdated(const SessionHandle & newSession) override { return SessionUpdated::DoNotMigrate; }
+    NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
     void OnSessionReleased() override;
 
     /**
