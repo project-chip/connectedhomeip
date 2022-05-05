@@ -657,6 +657,26 @@ In this command:
 
 -   _<test_name\>_ is the name of the particular test.
 
+#### Example: running TestClusters test
+
+As an example of running one test suite test:
+
+```
+# Clean initialization of state.
+rm -fr /tmp/chip_*
+
+# In a shell window, start the DUT device.
+./out/debug/standalone/chip-all-clusters-app
+
+# In a second shell window, pair the DUT with chip-tool.
+./out/debug/standalone/chip-tool pairing onnetwork 1 20202021
+
+# Now run the test
+./out/debug/standalone/chip-tool tests TestCluster --nodeId 1
+```
+
+Developer details on how the test suite is structured can be found [here](../../src/app/tests/suites/README.md).
+
 ### Parsing the setup payload
 
 The CHIP Tool offers a utility for parsing the Matter onboarding setup payload
