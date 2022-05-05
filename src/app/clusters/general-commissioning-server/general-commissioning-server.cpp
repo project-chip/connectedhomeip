@@ -275,7 +275,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
         // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
         // either the Indoor or Outdoor fixed value in LocationCapability.
         if ((locationCapability !=
-             to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor)) &&
+             to_underlying(RegulatoryLocationType::kIndoorOutdoor)) &&
             (location != locationCapability))
         {
             response.errorCode = CommissioningError::kValueOutsideRange;
