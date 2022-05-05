@@ -178,7 +178,7 @@ public:
 
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
-    //// SessionReleaseDelegate ////
+    //// SessionDelegate ////
     void OnSessionReleased() override;
 
 private:

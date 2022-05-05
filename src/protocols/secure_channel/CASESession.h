@@ -154,7 +154,7 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
-    //// SessionReleaseDelegate ////
+    //// SessionDelegate ////
     void OnSessionReleased() override;
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
