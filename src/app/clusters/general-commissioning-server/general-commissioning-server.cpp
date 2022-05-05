@@ -261,7 +261,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     Commands::SetRegulatoryConfigResponse::Type response;
     uint8_t location = to_underlying(commandData.newRegulatoryConfig);
 
-    if (location > to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor))
+    if (location > to_underlying(RegulatoryLocationType::kIndoorOutdoor))
     {
         response.errorCode = CommissioningError::kValueOutsideRange;
         response.debugText = commandData.countryCode;
