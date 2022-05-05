@@ -93,11 +93,6 @@ static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolu
     return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
-static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
-{
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
-}
-
 static OperationalState ValueToOperationalState(uint8_t value)
 {
     switch (value)
@@ -376,6 +371,11 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
     }
 
     return true;
+}
+
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+{
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)

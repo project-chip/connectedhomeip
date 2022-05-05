@@ -37,18 +37,6 @@ static k_timer sLiftTimer;
 static k_timer sTiltTimer;
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
 
-static constexpr uint32_t FromOneRangeToAnother(uint32_t aInMin, uint32_t aInMax, uint32_t aOutMin, uint32_t aOutMax,
-                                                uint32_t aInput)
-{
-    const auto diffInput  = aInMax - aInMin;
-    const auto diffOutput = aOutMax - aOutMin;
-    if (diffInput > 0)
-    {
-        return static_cast<uint32_t>(aOutMin + static_cast<uint64_t>(aInput - aInMin) * diffOutput / diffInput);
-    }
-    return 0;
-}
-
 WindowCovering::WindowCovering()
 {
     mLiftLED.Init(LIFT_STATE_LED);
@@ -319,9 +307,6 @@ void WindowCovering::SetBrightness(MoveType aMoveType, uint16_t aPosition)
 
 uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveType)
 {
-    static constexpr uint32_t sPercent100thsMin{ 0 };
-    static constexpr uint32_t sPercent100thsMax{ 10000 };
-
     uint8_t pwmMin{};
     uint8_t pwmMax{};
 
@@ -336,5 +321,7 @@ uint8_t WindowCovering::PositionToBrightness(uint16_t aPosition, MoveType aMoveT
         pwmMax = mTiltIndicator.GetMaxLevel();
     }
 
-    return FromOneRangeToAnother(sPercent100thsMin, sPercent100thsMax, pwmMin, pwmMax, aPosition);
+    AbsoluteLimits pwmLimits{ pwmMin, pwmMax };
+
+    return Percent100thsToValue(pwmLimits, aPosition);
 }
