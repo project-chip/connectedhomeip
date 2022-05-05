@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "color_format.h"
+#include "ColorFormat.h"
 
 #include <math.h>
 
@@ -29,41 +29,41 @@ RgbColor_t HsvToRgb(HsvColor_t hsv)
 
     uint16_t i       = hsv.h / 60;
     uint16_t rgb_max = hsv.v;
-    uint16_t rgb_min = (uint16_t)(rgb_max * (100 - hsv.s)) / 100;
+    uint16_t rgb_min = (uint16_t) (rgb_max * (100 - hsv.s)) / 100;
     uint16_t diff    = hsv.h % 60;
-    uint16_t rgb_adj = (uint16_t)((rgb_max - rgb_min) * diff) / 60;
+    uint16_t rgb_adj = (uint16_t) ((rgb_max - rgb_min) * diff) / 60;
 
     switch (i)
     {
     case 0:
         rgb.r = (uint8_t) rgb_max;
-        rgb.g = (uint8_t)(rgb_min + rgb_adj);
+        rgb.g = (uint8_t) (rgb_min + rgb_adj);
         rgb.b = (uint8_t) rgb_min;
         break;
     case 1:
-        rgb.r = (uint8_t)(rgb_max - rgb_adj);
+        rgb.r = (uint8_t) (rgb_max - rgb_adj);
         rgb.g = (uint8_t) rgb_max;
         rgb.b = (uint8_t) rgb_min;
         break;
     case 2:
         rgb.r = (uint8_t) rgb_min;
         rgb.g = (uint8_t) rgb_max;
-        rgb.b = (uint8_t)(rgb_min + rgb_adj);
+        rgb.b = (uint8_t) (rgb_min + rgb_adj);
         break;
     case 3:
         rgb.r = (uint8_t) rgb_min;
-        rgb.g = (uint8_t)(rgb_max - rgb_adj);
+        rgb.g = (uint8_t) (rgb_max - rgb_adj);
         rgb.b = (uint8_t) rgb_max;
         break;
     case 4:
-        rgb.r = (uint8_t)(rgb_min + rgb_adj);
+        rgb.r = (uint8_t) (rgb_min + rgb_adj);
         rgb.g = (uint8_t) rgb_min;
         rgb.b = (uint8_t) rgb_max;
         break;
     default:
         rgb.r = (uint8_t) rgb_max;
         rgb.g = (uint8_t) rgb_min;
-        rgb.b = (uint8_t)(rgb_max - rgb_adj);
+        rgb.b = (uint8_t) (rgb_max - rgb_adj);
         break;
     }
 
@@ -124,9 +124,9 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
     b = clamp(b, 0, 1);
 
     // these rgb values are in  the range of 0 to 1, convert to limit of HW specific LED
-    rgb.r = (uint8_t)(r * 255);
-    rgb.g = (uint8_t)(g * 255);
-    rgb.b = (uint8_t)(b * 255);
+    rgb.r = (uint8_t) (r * 255);
+    rgb.g = (uint8_t) (g * 255);
+    rgb.b = (uint8_t) (b * 255);
 
     return rgb;
 }

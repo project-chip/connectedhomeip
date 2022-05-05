@@ -16,7 +16,7 @@
  */
 
 #include "LEDWidget.h"
-#include "color_format.h"
+#include "ColorFormat.h"
 
 void LEDWidget::Init(void)
 {
