@@ -38,7 +38,7 @@ tests:
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       verification: |
-          Refer to Multi-admin tests on the steps to add 2nd admin on the node. Get another chip-tool instance on a machine connected behind the border router. Make sure IPV4 interface are disabled on the border router. We need to make sure chip-tool on IPV6 network talk to the Wifi device with LWIP stack on the wifi network. 
+          Refer to Multi-admin tests on the steps to add 2nd admin on the node. Get another chip-tool instance on a machine connected behind the border router. Make sure IPV4 interface are disabled on the border router. We need to make sure chip-tool on IPV6 network talk to the Wifi device with LWIP stack on the wifi network.
           ./chip-tool pairing manualcode 1 36177160937
       disabled: true
 

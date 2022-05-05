@@ -35,7 +35,7 @@ tests:
           received. Wait for 5 seconds(Timer has expired) and then send a Write
           Request Message to the DUT."
       verification: |
-          here is the example command you can use 
+          here is the example command you can use
 
           '' ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
 
