@@ -68,7 +68,9 @@ public:
             ^(NSError * _Nullable error) {
         {{/if}}
             chipError = [CHIPError errorToCHIPErrorCode:error];
-            ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+            if (error != nil) {
+              ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+            }
             SetCommandExitStatus(chipError);
             }];
         return chipError;
@@ -133,7 +135,9 @@ public:
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
         err = [CHIPError errorToCHIPErrorCode:error];
 
-        ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %s", chip::ErrorStr(err));
+        if (error != nil) {
+          ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} read Error: %s", chip::ErrorStr(err));
+        }
         SetCommandExitStatus(err);
          }];
         return err;
@@ -188,7 +192,9 @@ public:
 
         [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value params:params completionHandler:^(NSError * _Nullable error) {
             chipError = [CHIPError errorToCHIPErrorCode:error];
-            ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} Error: %s", chip::ErrorStr(chipError));
+            if (error != nil) {
+              ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} write Error: %s", chip::ErrorStr(chipError));
+            }
             SetCommandExitStatus(chipError);
             }];
         return chipError;
