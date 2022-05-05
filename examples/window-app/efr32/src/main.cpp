@@ -17,17 +17,15 @@
  *    limitations under the License.
  */
 
-#include <AppTask.h>
+#include <AppConfig.h>
+#include <WindowApp.h>
 
-#include "AppConfig.h"
 #include "init_efrPlatform.h"
 #include "sl_simple_button_instances.h"
 #include "sl_system_kernel.h"
 #include <matter_config.h>
 
 #define BLE_DEV_NAME "Silabs-Window"
-using namespace ::chip;
-using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
 #define UNUSED_PARAMETER(a) (a = a)

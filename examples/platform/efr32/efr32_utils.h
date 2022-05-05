@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 // EFR Logging
 #ifdef __cplusplus
 extern "C" {
