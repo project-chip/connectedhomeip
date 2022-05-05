@@ -2623,12 +2623,9 @@ server cluster PowerSource = 47 {
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute int32u batteryVoltage = 11;
-  readonly attribute int8u batteryPercentRemaining = 12;
-  readonly attribute int32u batteryTimeRemaining = 13;
   readonly attribute enum8 batteryChargeLevel = 14;
-  readonly attribute ENUM8 activeBatteryFaults[] = 18;
-  readonly attribute enum8 batteryChargeState = 26;
+  readonly attribute boolean batteryReplacementNeeded = 15;
+  readonly attribute enum8 batteryReplaceability = 16;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3850,6 +3847,17 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order default = 3;
+    ram      attribute description default = "B1";
+    ram      attribute batteryChargeLevel;
+    ram      attribute batteryReplacementNeeded;
+    ram      attribute batteryReplaceability;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb;
     callback attribute basicCommissioningInfo;
@@ -4126,15 +4134,12 @@ endpoint 1 {
 
   server cluster PowerSource {
     ram      attribute status;
-    ram      attribute order;
-    ram      attribute description;
-    ram      attribute batteryVoltage;
-    ram      attribute batteryPercentRemaining;
-    ram      attribute batteryTimeRemaining;
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
     ram      attribute batteryChargeLevel;
-    callback attribute activeBatteryFaults;
-    ram      attribute batteryChargeState;
-    ram      attribute featureMap;
+    ram      attribute batteryReplacementNeeded;
+    ram      attribute batteryReplaceability;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4623,6 +4628,17 @@ endpoint 2 {
     callback attribute clientList;
     callback attribute partsList;
     callback attribute clusterRevision default = 1;
+  }
+
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order default = 1;
+    ram      attribute description default = "B3";
+    ram      attribute batteryChargeLevel;
+    ram      attribute batteryReplacementNeeded;
+    ram      attribute batteryReplaceability;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster OccupancySensing {

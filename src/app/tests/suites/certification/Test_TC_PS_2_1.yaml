@@ -125,29 +125,6 @@ tests:
           constraints:
               type: list
 
-    - label: "Test Harness Client reads BatVoltage from Server DUT"
-      command: "readAttribute"
-      attribute: "BatteryVoltage"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
-      command: "readAttribute"
-      attribute: "BatteryPercentRemaining"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 200
-
-    - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
-      command: "readAttribute"
-      attribute: "BatteryTimeRemaining"
-      response:
-          constraints:
-              type: uint32
-
     - label: "Test Harness Client reads BatChargeLevel from Server DUT"
       command: "readAttribute"
       attribute: "BatteryChargeLevel"
@@ -182,13 +159,6 @@ tests:
       response:
           constraints:
               type: bool
-
-    - label: "Test Harness Client reads ActiveBatFaults from Server DUT"
-      command: "readAttribute"
-      attribute: "ActiveBatteryFaults"
-      response:
-          constraints:
-              type: list
 
     - label:
           "Test Harness Client reads BatReplacementDescription from Server DUT"
@@ -253,15 +223,6 @@ tests:
       response:
           constraints:
               type: uint8
-
-    - label: "Test Harness Client reads BatChargeState from Server DUT"
-      command: "readAttribute"
-      attribute: "BatteryChargeState"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 3
 
     - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
       disabled: true

@@ -87,23 +87,23 @@ void TestIndex(nlTestSuite * inSuite, void * inContext)
 
     chip::ScopedNodeId node(node1, fabric1);
 
-    chip::SessionResumptionStorage::SessionIndex index0o;
+    chip::DefaultSessionResumptionStorage::SessionIndex index0o;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index0o));
     NL_TEST_ASSERT(inSuite, index0o.mSize == 0);
 
-    chip::SessionResumptionStorage::SessionIndex index1;
+    chip::DefaultSessionResumptionStorage::SessionIndex index1;
     index1.mSize = 0;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveIndex(index1));
-    chip::SessionResumptionStorage::SessionIndex index1o;
+    chip::DefaultSessionResumptionStorage::SessionIndex index1o;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index1o));
     NL_TEST_ASSERT(inSuite, index1o.mSize == 0);
 
-    chip::SessionResumptionStorage::SessionIndex index2;
+    chip::DefaultSessionResumptionStorage::SessionIndex index2;
     index2.mSize     = 2;
     index2.mNodes[0] = chip::ScopedNodeId(node1, fabric1);
     index2.mNodes[1] = chip::ScopedNodeId(node2, fabric2);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.SaveIndex(index2));
-    chip::SessionResumptionStorage::SessionIndex index2o;
+    chip::DefaultSessionResumptionStorage::SessionIndex index2o;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == sessionStorage.LoadIndex(index2o));
     NL_TEST_ASSERT(inSuite, index2o.mSize == 2);
     NL_TEST_ASSERT(inSuite, index2o.mNodes[0] == chip::ScopedNodeId(node1, fabric1));
