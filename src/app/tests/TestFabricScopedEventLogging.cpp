@@ -268,7 +268,7 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
     logMgmt.FabricRemoved(descriptor.fabricIndex);
     CheckLogReadOut(apSuite, logMgmt, 0, 0, &pathsWithWildcard[1], descriptor);
 
-    // Invalidate 1 event with fabric 1
+    // Invalidate 1 event with fabric 2
     descriptor.fabricIndex = 2;
     logMgmt.FabricRemoved(descriptor.fabricIndex);
     CheckLogReadOut(apSuite, logMgmt, 0, 0, &pathsWithWildcard[1], descriptor);

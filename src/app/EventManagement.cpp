@@ -774,14 +774,13 @@ CHIP_ERROR EventManagement::FabricRemovedCB(const TLV::TLVReader & aReader, size
             {
                 CHIPCircularTLVBuffer * readBuffer = static_cast<CHIPCircularTLVBuffer *>(event.GetBackingStore());
                 // fabricIndex is encoded as an integer; the dataPtr will point to a location immediately after its encoding
-                uint8_t * dataPtr = event.GetReadPoint() - readBuffer->GetQueue() + readBuffer->GetQueue();
-
                 // shift the dataPtr to point to the encoding of the fabric index, accounting for wraparound in backing storage
                 // we cannot get the actual encoding size from current container beginning to the fabric index because of several
-                // optional parameters.
-                if (readBuffer->GetQueue() != dataPtr)
+                // optional parameters, so we are assuming minimal encoding is used and the fabric index is 1 byte.
+                uint8_t * dataPtr;
+                if (event.GetReadPoint() != readBuffer->GetQueue())
                 {
-                    dataPtr = dataPtr - 1;
+                    dataPtr = readBuffer->GetQueue() + (event.GetReadPoint() - readBuffer->GetQueue() - 1);
                 }
                 else
                 {
@@ -789,8 +788,8 @@ CHIP_ERROR EventManagement::FabricRemovedCB(const TLV::TLVReader & aReader, size
                 }
 
                 *dataPtr = kUndefinedFabricIndex;
-                return CHIP_NO_ERROR;
             }
+            return CHIP_NO_ERROR;
         }
     }
     return CHIP_NO_ERROR;
@@ -828,7 +827,7 @@ CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size_t aDepth, void * apContext)
+CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size_t, void * apContext)
 {
     EventEnvelopeContext * const envelope = static_cast<EventEnvelopeContext *>(apContext);
     TLVReader reader;

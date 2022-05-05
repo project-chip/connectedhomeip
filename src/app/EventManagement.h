@@ -425,14 +425,14 @@ private:
     CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
 
     /**
-     * @brief Iterate the event elements inside event tlv and mark the fabric index as 0 if matching with obsolete fabric index
+     * @brief Iterate the event elements inside event tlv and mark the fabric index as kUndefinedFabricIndex if
+     * it matches the FabricIndex apFabricIndex points to.
      *
      * @param[in] aReader  event tlv reader
-     * @param[in] aDepth   the current depth into the TLV data.
-     * @param[in] apFabricIndex  the obsolete FabricIndex pointer
+     * @param[in] apFabricIndex   A FabricIndex* pointing to the fabric index for which we want to effectively evict events.
      *
      */
-    static CHIP_ERROR FabricRemovedCB(const TLV::TLVReader & aReader, size_t aDepth, void * apFabricIndex);
+    static CHIP_ERROR FabricRemovedCB(const TLV::TLVReader & aReader, size_t, void * apFabricIndex);
 
     /**
      * @brief
