@@ -17,6 +17,8 @@
  */
 #include "TargetEndpointInfo.h"
 
+using namespace chip;
+
 void TargetEndpointInfo::Initialize(EndpointId endpointId)
 {
     mEndpointId = endpointId;

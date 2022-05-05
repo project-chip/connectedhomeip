@@ -466,5 +466,8 @@ template("ti_simplelink_sdk") {
         ":${sdk_target_name}_openthread_platform",
       ]
     }
+    if (defined(invoker.public_configs)) {
+      public_configs = invoker.public_configs
+    }
   }
 }

@@ -160,7 +160,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
 {
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
-        PLAT_LOG("Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
+        PLAT_LOG("Server ready at: %s:%d", event->InternetConnectivityChange.ipAddress, CHIP_PORT);
         chip::app::DnssdServer::Instance().StartServer();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)

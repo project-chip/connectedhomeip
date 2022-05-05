@@ -45,7 +45,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     Platform::MemoryInit();
     TestTransportMgr transportMgr;
     SessionManager sessionManager;
-    SessionResumptionStorage sessionResumptionStorage;
+    SimpleSessionResumptionStorage sessionResumptionStorage;
     ExchangeManager exchangeMgr;
     Inet::UDPEndPointManagerImpl udpEndPointManager;
     System::LayerImpl systemLayer;

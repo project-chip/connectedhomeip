@@ -639,6 +639,12 @@ function chip_tests_variables_get_type(name, options)
   return variable.type;
 }
 
+function chip_tests_variables_is_nullable(name, options)
+{
+  const variable = getVariableOrThrow(this, 'tests', name);
+  return variable.isNullable;
+}
+
 function chip_tests_config(options)
 {
   return templateUtil.collectBlocks(this.variables.config, options, this);
@@ -898,6 +904,7 @@ exports.chip_tests_config_get_type          = chip_tests_config_get_type;
 exports.chip_tests_variables                = chip_tests_variables;
 exports.chip_tests_variables_has            = chip_tests_variables_has;
 exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
+exports.chip_tests_variables_is_nullable    = chip_tests_variables_is_nullable;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;

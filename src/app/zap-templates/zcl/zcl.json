@@ -133,6 +133,37 @@
             "TxErrCount",
             "CollisionCount",
             "OverrunCount"
+        ],
+        "General Diagnostics": [
+            "NetworkInterfaces",
+            "ActiveHardwareFaults",
+            "ActiveRadioFaults",
+            "ActiveNetworkFaults",
+            "RebootCount",
+            "UpTime",
+            "TotalOperationalHours",
+            "BootReasons"
+        ],
+        "Software Diagnostics": [
+            "CurrentHeapFree",
+            "CurrentHeapUsed",
+            "CurrentHeapHighWatermark",
+            "ThreadMetrics"
+        ],
+        "WiFi Network Diagnostics": [
+            "bssid",
+            "SecurityType",
+            "WiFiVersion",
+            "ChannelNumber",
+            "Rssi",
+            "BeaconLostCount",
+            "BeaconRxCount",
+            "PacketMulticastRxCount",
+            "PacketMulticastTxCount",
+            "PacketUnicastRxCount",
+            "PacketUnicastTxCount",
+            "CurrentMaxRate",
+            "OverrunCount"
         ]
     },
     "defaultReportingPolicy": "mandatory"

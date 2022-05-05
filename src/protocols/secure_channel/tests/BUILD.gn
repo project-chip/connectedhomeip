@@ -13,6 +13,7 @@ chip_test_suite("tests") {
 
     # TODO - Fix Message Counter Sync to use group key
     #    "TestMessageCounterManager.cpp",
+    "TestDefaultSessionResumptionStorage.cpp",
     "TestPASESession.cpp",
     "TestSimpleSessionResumptionStorage.cpp",
     "TestStatusReport.cpp",

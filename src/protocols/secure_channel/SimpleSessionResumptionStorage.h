@@ -26,14 +26,14 @@
 
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <protocols/secure_channel/DefaultSessionResumptionStorage.h>
 
 namespace chip {
 
 /**
  * An example SessionResumptionStorage using PersistentStorageDelegate as it backend.
  */
-class SimpleSessionResumptionStorage : public SessionResumptionStorage
+class SimpleSessionResumptionStorage : public DefaultSessionResumptionStorage
 {
 public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage)

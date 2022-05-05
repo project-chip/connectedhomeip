@@ -15,29 +15,22 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the CHIP CASE Session object that provides
- *      APIs for constructing a secure session using a certificate from the device's
- *      operational credentials.
- */
-
-#include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <protocols/secure_channel/DefaultSessionResumptionStorage.h>
 
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
 
-CHIP_ERROR SessionResumptionStorage::FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
-                                                        Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
+CHIP_ERROR DefaultSessionResumptionStorage::FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
+                                                               Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
     ReturnErrorOnFailure(LoadState(node, resumptionId, sharedSecret, peerCATs));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
-                                                        Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
+CHIP_ERROR DefaultSessionResumptionStorage::FindByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node,
+                                                               Crypto::P256ECDHDerivedSecret & sharedSecret, CATValues & peerCATs)
 {
     ReturnErrorOnFailure(FindNodeByResumptionId(resumptionId, node));
     ResumptionIdStorage tmpResumptionId;
@@ -47,14 +40,14 @@ CHIP_ERROR SessionResumptionStorage::FindByResumptionId(ConstResumptionIdView re
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node)
+CHIP_ERROR DefaultSessionResumptionStorage::FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node)
 {
     ReturnErrorOnFailure(LoadLink(resumptionId, node));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
-                                          const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
+CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
+                                                 const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs)
 {
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));
@@ -75,7 +68,7 @@ CHIP_ERROR SessionResumptionStorage::Save(const ScopedNodeId & node, ConstResump
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionResumptionStorage::Delete(const ScopedNodeId & node)
+CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
 {
     SessionIndex index;
     ReturnErrorOnFailure(LoadIndex(index));
@@ -148,6 +141,79 @@ CHIP_ERROR SessionResumptionStorage::Delete(const ScopedNodeId & node)
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
+{
+    CHIP_ERROR stickyErr = CHIP_NO_ERROR;
+    size_t found         = 0;
+    SessionIndex index;
+    ReturnErrorOnFailure(LoadIndex(index));
+    size_t initialSize = index.mSize;
+    for (size_t i = 0; i < initialSize; ++i)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        size_t cur     = i - found;
+        size_t remain  = initialSize - i;
+        ResumptionIdStorage resumptionId;
+        Crypto::P256ECDHDerivedSecret sharedSecret;
+        CATValues peerCATs;
+        if (index.mNodes[cur].GetFabricIndex() != fabricIndex)
+        {
+            continue;
+        }
+        err       = LoadState(index.mNodes[cur], resumptionId, sharedSecret, peerCATs);
+        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel,
+                         "Session resumption cache deletion partially failed for fabric index %u, "
+                         "unable to load node state: %" CHIP_ERROR_FORMAT,
+                         fabricIndex, err.Format());
+            continue;
+        }
+        err       = DeleteLink(resumptionId);
+        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel,
+                         "Session resumption cache deletion partially failed for fabric index %u, "
+                         "unable to delete node link: %" CHIP_ERROR_FORMAT,
+                         fabricIndex, err.Format());
+            continue;
+        }
+        err       = DeleteState(index.mNodes[cur]);
+        stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel,
+                         "Session resumption cache is in an inconsistent state!  "
+                         "Unable to delete node state during attempted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
+                         fabricIndex, err.Format());
+            continue;
+        }
+        ++found;
+        --remain;
+        if (remain)
+        {
+            memmove(&index.mNodes[cur], &index.mNodes[cur + 1], remain * sizeof(index.mNodes[0]));
+        }
+    }
+    if (found)
+    {
+        index.mSize -= found;
+        CHIP_ERROR err = SaveIndex(index);
+        stickyErr      = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(
+                SecureChannel,
+                "Session resumption cache is in an inconsistent state!  "
+                "Unable to save session resumption index during atetmpted deletion of fabric index %u: %" CHIP_ERROR_FORMAT,
+                fabricIndex, err.Format());
+        }
+    }
+    return stickyErr;
 }
 
 } // namespace chip

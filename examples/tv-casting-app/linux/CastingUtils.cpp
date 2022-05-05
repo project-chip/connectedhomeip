@@ -18,6 +18,11 @@
 
 #include "CastingUtils.h"
 
+using namespace chip;
+using namespace chip::System;
+using namespace chip::DeviceLayer;
+using namespace chip::Dnssd;
+
 CHIP_ERROR DiscoverCommissioners()
 {
     // Send discover commissioners request
