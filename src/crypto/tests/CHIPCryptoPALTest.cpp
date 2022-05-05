@@ -1901,6 +1901,23 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
                                    leaf_cert.data(), leaf_cert.size(), chainValidationResult);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
     NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
+
+    // Now test with a Root certificate that does not correspond to the chain
+    ByteSpan wrong_root_cert;
+    err = GetTestCert(TestCert::kRoot02, TestCertLoadFlags::kDERForm, wrong_root_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ValidateCertificateChain(wrong_root_cert.data(), wrong_root_cert.size(), ica_cert.data(), ica_cert.size(),
+                                   leaf_cert.data(), leaf_cert.size(), chainValidationResult);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
+    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
+
+    // Now test with a Root certificate that does not correspond to the chain.
+    // Trying to validate ICA (as a leaf) which chains to Root - should fail bacause Root is loaded as untrusted intermediate cert.
+    err = ValidateCertificateChain(wrong_root_cert.data(), wrong_root_cert.size(), root_cert.data(), root_cert.size(),
+                                   ica_cert.data(), ica_cert.size(), chainValidationResult);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
+    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
 }
 
 static void TestX509_IssuingTimestampValidation(nlTestSuite * inSuite, void * inContext)
@@ -2138,15 +2155,12 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
     };
     // clang-format on
 
-    int i = 1;
     for (const auto & testCase : kTestCases)
     {
-        fprintf(stderr, "DEBUG 01 i = %d\n", i);
         AttestationCertVidPid vidpid;
         AttestationCertVidPid vidpidFromCN;
         AttestationCertVidPid vidpidToCheck;
         CHIP_ERROR result = ExtractVIDPIDFromAttributeString(testCase.attrType, testCase.attr, vidpid, vidpidFromCN);
-        fprintf(stderr, "DEBUG 02 i = %d equal = %d\n", i++, (result == testCase.expectedResult));
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
         if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
@@ -2214,13 +2228,10 @@ static void TestVIDPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         { kOpCertNoVID, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
     };
 
-    int i = 1;
     for (const auto & testCase : kTestCases)
     {
-        fprintf(stderr, "DEBUG 01 i = %d\n", i);
         AttestationCertVidPid vidpid;
         CHIP_ERROR result = ExtractVIDPIDFromX509Cert(testCase.cert, vidpid);
-        fprintf(stderr, "DEBUG 02 i = %d equal = %d\n", i++, (result == testCase.expectedResult));
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
         NL_TEST_ASSERT(inSuite, vidpid.mVendorId.HasValue() == testCase.expectedVidPresent);
         NL_TEST_ASSERT(inSuite, vidpid.mProductId.HasValue() == testCase.expectedPidPresent);
