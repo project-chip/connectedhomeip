@@ -130,17 +130,6 @@ int AppTask::StartAppTask()
     return ret;
 }
 
-void AppTask::InitServer(intptr_t context)
-{
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-}
-
 int AppTask::Init()
 {
     LED_Params ledParams;
@@ -167,19 +156,16 @@ int AppTask::Init()
             ;
     }
 
+#ifdef CONFIG_OPENTHREAD_MTD_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#elif CONFIG_OPENTHREAD_MTD
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#endif
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
-            ;
-    }
-
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    ret                           = deviceMgr.Init(&sDeviceCallbacks);
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
         while (1)
             ;
     }
@@ -191,13 +177,6 @@ int AppTask::Init()
         while (1)
             ;
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
-#endif
-
-    // Init ZCL Data Model and start server
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -233,6 +212,18 @@ int AppTask::Init()
 
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+#endif
+
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     ConfigurationMgr().LogDeviceConfig();
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
@@ -241,6 +232,15 @@ int AppTask::Init()
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret                           = deviceMgr.Init(&sDeviceCallbacks);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
+        while (1)
+            ;
+    }
 
     return 0;
 }
