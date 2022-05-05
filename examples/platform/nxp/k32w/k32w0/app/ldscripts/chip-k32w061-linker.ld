@@ -213,7 +213,7 @@ SECTIONS
 
     .heap_controller (COPY):
     {
-        *(.ll_exchange_mem)
+        *(.bss_packet_buffer)
         __HeapBase = .;
          _heap = .;
         KEEP(*(.heap*))

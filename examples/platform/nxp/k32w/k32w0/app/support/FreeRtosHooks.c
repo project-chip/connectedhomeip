@@ -217,6 +217,7 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 
     OSA_InterruptEnable();
 }
+#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */
 
 static void BOARD_ActionOnIdle(void)
 {
@@ -228,9 +229,10 @@ static void BOARD_ActionOnIdle(void)
 #endif
 }
 
+extern void OTAIdleActivities();
+
 void vApplicationIdleHook(void)
 {
+    OTAIdleActivities();
     BOARD_ActionOnIdle();
 }
-
-#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */
