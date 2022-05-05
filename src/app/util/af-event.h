@@ -53,8 +53,6 @@
  */
 typedef struct EmberEventData EmberEventData;
 
-void emAfInitEvents(void);
-
 /** @brief Sets this ::EmberEventControl as inactive (no pending event).
  */
 void emberEventControlSetInactive(EmberEventControl * control);

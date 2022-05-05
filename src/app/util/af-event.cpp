@@ -125,9 +125,6 @@ const char emAfStackEventString[] = "Stack";
 // *****************************************************************************
 // Functions
 
-// A function used to initialize events for idling
-void emAfInitEvents(void) {}
-
 static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
 #if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
