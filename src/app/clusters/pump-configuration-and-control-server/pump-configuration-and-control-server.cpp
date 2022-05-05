@@ -190,7 +190,9 @@ static void updateAttributeLinks(EndpointId endpoint)
         // must set the EffectiveControlMode to something which applies to the current ControlMode in the application.
         // So to keeps things short: the application layer owns the EffetiveControlMode when OperationMode is kLocal.
         Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
+        // Set the current ControlMode for now. Perhaps the application will set the EffectiveControlMode to something else.
         Attributes::EffectiveControlMode::Set(endpoint, controlMode);
+        // Clear out the remote sensors from the PumpStatus flags.
         pumpStatus.Clear(PumpStatus::kRemoteFlow);
         pumpStatus.Clear(PumpStatus::kRemotePressure);
         pumpStatus.Clear(PumpStatus::kRemoteTemperature);
