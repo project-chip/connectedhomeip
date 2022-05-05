@@ -55,7 +55,7 @@ struct ControllerDeviceInitParams
     Messaging::ExchangeManager * exchangeMgr = nullptr;
 };
 
-class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
+class CommissioneeDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
     ~CommissioneeDeviceProxy() override;
