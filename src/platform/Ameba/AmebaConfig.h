@@ -49,7 +49,9 @@ public:
     static const char kConfigNamespace_ChipAttributes[];
     static const char kConfigNamespace_ChipBindingTable[];
     static const char kConfigNamespace_ChipOTA[];
-    static const char kConfigNamespace_ChipDNS[];
+    static const char kConfigNamespace_ChipFailSafe[];
+    static const char kConfigNamespace_ChipSessionResumptionIndex[];
+    static const char kConfigNamespace_ChipSessionResumption[];
     static const char kConfigNamespace_ChipOthers[];
 
     // Key definitions for well-known keys.
