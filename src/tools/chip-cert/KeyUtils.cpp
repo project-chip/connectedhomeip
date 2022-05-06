@@ -315,7 +315,7 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         }
         else
         {
-            keyToWrite    = chipKey.get();
+            keyToWrite    = serializedKeypair.Bytes();
             keyToWriteLen = static_cast<uint32_t>(serializedKeypair.Length());
         }
 
