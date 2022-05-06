@@ -72,13 +72,14 @@ FullQName kCompressedIdSubName2                 = FullQName(kCompressedIdSubPart
 PtrResourceRecord ptrServiceSubCompressedId1    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName1);
 PtrResourceRecord ptrServiceSubCompressedId2    = PtrResourceRecord(kDnsSdQueryName, kCompressedIdSubName2);
 
-OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId1)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetTcpSupported(chip::Optional<bool>(false))
-                                                          .SetMRPConfig(ReliableMessageProtocolConfig(32_ms32, 33_ms32));
+OperationalAdvertisingParameters operationalParams1 =
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId1)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetTcpSupported(chip::Optional<bool>(false))
+        .SetMRPConfig(ReliableMessageProtocolConfig(32_ms32, 30_ms32)); // Match SII, SAI below
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
