@@ -108,7 +108,7 @@ public:
     static const char * OTATargetVersion() { return "g/o/tv"; }
 
     // Event number counter.
-    const char * IMEventNumber() { return Format("g/im/e"); }
+    const char * IMEventNumber() { return Format("g/im/ec"); }
 
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
