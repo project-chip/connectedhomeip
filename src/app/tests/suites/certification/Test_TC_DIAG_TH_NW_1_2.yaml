@@ -173,7 +173,7 @@ tests:
           "read OverrunCount attribute from DUT and verify response value, If
           the Overruncount is greater than zero or not"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 476 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 476 0
 
           [1649824808.714398][3314:3319] CHIP:DMG:        SuppressResponse = true,
           [1649824808.714482][3314:3319] CHIP:DMG:        InteractionModelRevision = 1
@@ -219,7 +219,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read route-table-list 476 0
 
           [1649824896.844773][3329:3334] CHIP:DMG:        SuppressResponse = true,
-          [1649824896.844809][3329:3334] CHIP:DMG:        InteractionModelRevision = 1  
+          [1649824896.844809][3329:3334] CHIP:DMG:        InteractionModelRevision = 1
           [1649824896.844834][3329:3334] CHIP:DMG: }
           [1649824896.845182][3329:3334] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0008 DataVersion: 2758196590
           [1649824896.845283][3329:3334] CHIP:TOO:   RouteTableList: 1 entries
