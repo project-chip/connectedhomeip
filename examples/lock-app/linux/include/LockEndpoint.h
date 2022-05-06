@@ -40,7 +40,7 @@ public:
         mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(numberOfLockUsersSupported))
     {}
 
-    inline chip::EndpointId GetEndpointId() { return mEndpointId; }
+    inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
     bool Lock(const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     bool Unlock(const Optional<chip::ByteSpan> & pin, DlOperationError & err);
@@ -53,8 +53,8 @@ public:
     bool GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
 
-    bool SetCredential(uint16_t credentialIndex, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
-                       const chip::ByteSpan & credentialData);
+    bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                       DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData);
 
     DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
     DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
@@ -95,6 +95,8 @@ struct LockCredentialInfo
 {
     DlCredentialStatus status;
     DlCredentialType credentialType;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex modifiedBy;
     uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
     size_t credentialDataSize;
 };
