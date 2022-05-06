@@ -32,10 +32,7 @@ constexpr const char kIdentityGamma[] = "gamma";
 class CHIPCommandBridge : public Command
 {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName)
-    {
-        AddArgument("commissioner-name", &mCommissionerName);
-    }
+    CHIPCommandBridge(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;

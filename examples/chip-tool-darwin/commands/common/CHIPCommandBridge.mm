@@ -87,10 +87,9 @@ CHIP_ERROR CHIPCommandBridge::Run()
 void CHIPCommandBridge::SetIdentity(const char * identity)
 {
     std::string name = std::string(identity);
-    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0)
-    {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
-                     kIdentityAlpha, kIdentityBeta, kIdentityGamma);
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0) {
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+            kIdentityBeta, kIdentityGamma);
         chipDie();
     }
     mCurrentController = mControllers[name];
