@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/server/Server.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #if CONFIG_DEVICE_LAYER
@@ -57,7 +58,7 @@ CHIP_ERROR BLEAdvertiseHandler(int argc, char ** argv)
         else
         {
             streamer_printf(sout, "Starting BLE advertising\r\n");
-            return ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            return chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
         }
     }
     else if (strcmp(argv[0], "stop") == 0)

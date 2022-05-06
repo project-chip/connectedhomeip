@@ -1,6 +1,5 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2022 Texas Instruments Incorporated
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,12 +24,7 @@
  *
  */
 
-#ifndef CHIP_PROJECT_CONFIG_H
-#define CHIP_PROJECT_CONFIG_H
-
-#if BUILD_RELEASE // release build
-// Note: Default Pairing/PIN/Serial Numbers being used. These should not be enabled for production builds
-#endif // BUILD_RELEASE
+#pragma once
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -80,7 +74,7 @@
  * Enables synchronizing the device's real time clock with a remote CHIP Time service
  * using the CHIP Time Sync protocol.
  */
-// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
+//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
@@ -89,7 +83,7 @@
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
-#define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 1
+#define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 0
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -126,5 +120,3 @@
  * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
  */
 #define CHIP_IM_MAX_NUM_WRITE_HANDLER 2
-
-#endif // CHIP_PROJECT_CONFIG_H
