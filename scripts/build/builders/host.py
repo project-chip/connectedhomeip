@@ -38,6 +38,9 @@ class HostApp(Enum):
     OTA_REQUESTOR = auto()
     PYTHON_BINDINGS = auto()
     NL_TEST_RUNNER = auto()
+    LIGHTING = auto()
+    TV_CASTING_APP = auto()
+    BRIDGE_APP = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -70,6 +73,12 @@ class HostApp(Enum):
             return '../'
         elif self == HostApp.NL_TEST_RUNNER:
             return '../src/test_driver/efr32'
+        elif self == HostApp.LIGHTING:
+            return 'lighting-app/linux'
+        elif self == HostApp.TV_CASTING_APP:
+            return 'tv-casting-app/linux'
+        elif self == HostApp.BRIDGE_APP:
+            return 'bridge-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -128,6 +137,15 @@ class HostApp(Enum):
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.NL_TEST_RUNNER:
             yield 'chip_nl_test_runner_wheels'
+        elif self == HostApp.LIGHTING:
+            yield 'chip-lighting-app'
+            yield 'chip-lighting-app.map'
+        elif self == HostApp.TV_CASTING_APP:
+            yield 'chip-tv-casting-app'
+            yield 'chip-tv-casting-app.map'
+        elif self == HostApp.BRIDGE_APP:
+            yield 'chip-bridge-app'
+            yield 'chip-bridge-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
