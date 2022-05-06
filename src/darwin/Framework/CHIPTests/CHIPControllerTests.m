@@ -23,6 +23,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+#import "CHIPTestKeys.h"
 #import "CHIPTestStorage.h"
 
 static uint16_t kTestVendorId = 0xFFF1u;
@@ -65,12 +66,15 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
+    params.ipk = testKeys.ipk;
 
-    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
-    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -99,12 +103,15 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
+    params.ipk = testKeys.ipk;
 
-    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
-    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
@@ -123,12 +130,15 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
+    params.ipk = testKeys.ipk;
 
-    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
-    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     for (int i = 0; i < 5; i++) {
         [controller shutdown];
@@ -149,12 +159,15 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
+    params.ipk = testKeys.ipk;
 
-    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
-    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertTrue([controller isRunning]);
     [controller shutdown];
 
@@ -179,11 +192,15 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertTrue([factory startup:factoryParams]);
     XCTAssertTrue([factory isRunning]);
 
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
     __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
+    // TODO: Once we require a non-nil keypair, this test will stop
+    // making sense and need to go away.
     CHIPDeviceController * controller1 = [factory startControllerOnExistingFabric:params];
     XCTAssertNotNil(controller1);
     XCTAssertTrue([controller1 isRunning]);
@@ -199,6 +216,117 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     [controller1 shutdown];
     XCTAssertFalse([controller1 isRunning]);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerNewFabricMatchesOldFabric
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+    params.ipk = testKeys.ipk;
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // now try to start a new controller on a new fabric but using the
+    // same params; this should fail.
+    XCTAssertNil([factory startControllerOnNewFabric:params]);
+
+    XCTAssertFalse([controller isRunning]);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerExistingFabricMatchesRunningController
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+    params.ipk = testKeys.ipk;
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Now try to start a new controller on the same fabric.  This should fail.
+    XCTAssertNil([factory startControllerOnExistingFabric:params]);
+
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerStartControllersOnTwoFabricIds
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+    params.ipk = testKeys.ipk;
+
+    CHIPDeviceController * controller1 = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller1);
+    XCTAssertTrue([controller1 isRunning]);
+
+    // Now try to start a new controller with the same root but a
+    // different fabric id.
+    params.fabricId = 2;
+
+    CHIPDeviceController * controller2 = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller2);
+    XCTAssertTrue([controller2 isRunning]);
+
+    XCTAssertNil([factory startControllerOnExistingFabric:params]);
+
+    [controller1 shutdown];
+    XCTAssertFalse([controller1 isRunning]);
+
+    [controller2 shutdown];
+    XCTAssertFalse([controller2 isRunning]);
 
     [factory shutdown];
     XCTAssertFalse([factory isRunning]);
