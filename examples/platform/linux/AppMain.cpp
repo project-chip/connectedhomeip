@@ -109,6 +109,7 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+#if !defined(ENABLE_CHIP_SHELL)
 void OnSignalHandler(int signum)
 {
     ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
@@ -159,6 +160,7 @@ void SetupSignalHandlers()
     signal(SIGIO, OnSignalHandler);
     signal(SIGINT, OnSignalHandler);
 }
+#endif // !defined(ENABLE_CHIP_SHELL)
 
 void Cleanup()
 {
@@ -364,7 +366,9 @@ void ChipLinuxAppMainLoop()
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if !defined(ENABLE_CHIP_SHELL)
     SetupSignalHandlers();
+#endif // !defined(ENABLE_CHIP_SHELL)
 
     ApplicationInit();
 
