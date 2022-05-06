@@ -25,12 +25,17 @@
 
 #pragma once
 
+constexpr const char kIdentityAlpha[] = "alpha";
+constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityGamma[] = "gamma";
+
 class CHIPCommandBridge : public Command
 {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName) {}
-
-    CHIPCommandBridge(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommandBridge(commandName) {}
+    CHIPCommandBridge(const char * commandName) : Command(commandName)
+    {
+        AddArgument("commissioner-name", &mCommissionerName);
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -58,7 +63,7 @@ protected:
     // loop has been stopped.
     virtual void Shutdown() {}
 
-    void SetIdentity(const char * name);
+    void SetIdentity(const char * identity);
 
     // This method returns the commissioner instance to be used for running the command.
     CHIPDeviceController * CurrentCommissioner();
@@ -82,5 +87,6 @@ private:
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
+    chip::Optional<char *> mCommissionerName;
     bool mWaitingForResponse{ true };
 };
