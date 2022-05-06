@@ -333,6 +333,11 @@ CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(const Catalo
         // cert test case passes "exampleid", map this to our test suite app
         Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "1");
     }
+    else if (appId == "exampleString")
+    {
+        // cert test case passes "exampleString", map this to our test suite app
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "65521");
+    }
     else
     {
         // for now, just return the applicationId passed in
