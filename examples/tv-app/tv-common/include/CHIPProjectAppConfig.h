@@ -68,7 +68,7 @@
 #define CHIP_PORT 5640
 
 // Create a dedicated file for storage to make it easy to run against other apps
-#define CHIP_CONFIG_KVS_PATH "/tmp/chip_tv_kvs"
+// #define CHIP_CONFIG_KVS_PATH "/tmp/chip_tv_kvs"
 
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
