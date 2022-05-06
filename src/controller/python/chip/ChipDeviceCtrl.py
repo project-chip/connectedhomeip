@@ -290,6 +290,29 @@ class ChipDeviceController():
     def CheckTestCommissionerPaseConnection(self, nodeid):
         return self._dmLib.pychip_TestPaseConnection(nodeid)
 
+    def CommissionWithCode(self, setupPayload: str, nodeid: int):
+        self.CheckIsActive()
+
+        setupPayload = setupPayload.encode() + b'\0'
+
+        # IP connection will run through full commissioning, so we need to wait
+        # for the commissioning complete event, not just any callback.
+        self.state = DCState.RENDEZVOUS_ONGOING
+
+        self._ChipStack.commissioningCompleteEvent.clear()
+
+        self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
+                self.devCtrl, setupPayload, nodeid)
+        )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
+
     def CommissionIP(self, ipaddr, setupPinCode, nodeid):
         self.CheckIsActive()
 
@@ -998,6 +1021,10 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_ConnectWithCode.argtypes = [
+                c_void_p, c_char_p, c_uint64]
+            self._dmLib.pychip_DeviceController_ConnectWithCode.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
                 c_void_p, c_uint64]
