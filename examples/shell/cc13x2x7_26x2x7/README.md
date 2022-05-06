@@ -1,7 +1,7 @@
 # Matter CC1352 CC2652 Shell Application
 
-A [chip-shell](../README.md) project on the Texas Instruments CC13X2_26X2
-family of Wireless MCUs.
+A [chip-shell](../README.md) project on the Texas Instruments CC13X2_26X2 family
+of Wireless MCUs.
 
 ## Building
 
@@ -144,8 +144,8 @@ Router][ot_border_router_setup].
 For insight into what other components are needed to run this example, please
 refer to our [Matter Getting Started Guide][matter-e2e-faq].
 
-For help with the shell itself, refer to the [shell example
-README](../README.md).
+For help with the shell itself, refer to the
+[shell example README](../README.md).
 
 ## TI Support
 
