@@ -199,8 +199,7 @@ public:
     friend class FabricTable;
 
     // Test-only, build a fabric using given root cert and NOC
-    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                   ByteSpan nodePrivateKey);
+    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey);
 
 private:
     static constexpr size_t MetadataTLVMaxSize()
@@ -368,6 +367,10 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
+    // This is same as AddNewFabric, but skip duplicate fabric check, because we have multiple nodes belongs to the same fabric in
+    // test-cases
+    CHIP_ERROR AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex);
+
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
@@ -412,6 +415,8 @@ private:
      * fabric table accordingly.
      */
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
+
+    CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
