@@ -17,8 +17,12 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
-    CALLBACK = enum.auto()
+
+
+class AttributeStorage(enum.Enum):
+    RAM = enum.auto()
     PERSIST = enum.auto()
+    CALLBACK = enum.auto()
 
 
 class EventPriority(enum.Enum):
@@ -99,10 +103,6 @@ class Attribute:
     def is_subscribable(self):
         return AttributeTag.NOSUBSCRIBE not in self.tags
 
-    @property
-    def is_callback(self):
-        return AttributeTag.CALLBACK in self.tags
-
 
 @dataclass
 class Struct:
@@ -169,9 +169,22 @@ class Cluster:
 
 
 @dataclass
+class AttributeInstantiation:
+    name: str
+    storage: AttributeStorage
+    default: Optional[Union[str, int, bool]] = None
+
+
+@dataclass
+class ServerClusterInstantiation:
+    name: str
+    attributes: List[AttributeInstantiation] = field(default_factory=list)
+
+
+@dataclass
 class Endpoint:
     number: int
-    server_clusters: List[str] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

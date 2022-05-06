@@ -782,6 +782,46 @@ async function if_is_fabric_scoped_struct(type, options)
   return options.inverse(this);
 }
 
+// check if a value is numerically 0 for the purpose of default value
+// interpretation. Note that this does NOT check for data type, so assumes
+// a string of 'false' is 0 because boolean false is 0.
+function isNonZeroValue(value)
+{
+  if (!value) {
+    return false;
+  }
+
+  if (value === '0') {
+    return false;
+  }
+
+  // Hex value usage is inconsistent in XML. It looks we have
+  // all of 0x0, 0x00, 0x0000 so support all here.
+  if (value.match(/^0x0+$/)) {
+    return false;
+  }
+
+  // boolean 0 is false. We do not do a type check here
+  // so if anyone defaults a string to 'false' this will be wrong.
+  if (value === 'false') {
+    return false;
+  }
+
+  return true;
+}
+
+// Check if the default value is non-zero
+// Generally does string checks for empty strings, numeric or hex zeroes or
+// boolean values.
+async function if_is_non_zero_default(value, options)
+{
+  if (isNonZeroValue(value)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+}
+
 //
 // Module exports
 //
@@ -804,4 +844,5 @@ exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;
 exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
 exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;
-exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct
+exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct;
+exports.if_is_non_zero_default                = if_is_non_zero_default;
