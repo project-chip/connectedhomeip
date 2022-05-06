@@ -272,7 +272,7 @@ protected:
 
     bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nullable current, NSNumber * _Nullable expected)
     {
-        if(current == nil && expected == nil) {
+        if (current == nil && expected == nil) {
             Exit(std::string(itemName) + " got unexpected value. Both values are nil."));
             return false;
         }
