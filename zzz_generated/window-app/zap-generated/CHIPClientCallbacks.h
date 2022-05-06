@@ -33,4 +33,3 @@
 // List specific responses
 void ScenesClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ScenesAttributeListListAttributeCallback)(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-
