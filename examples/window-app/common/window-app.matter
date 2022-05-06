@@ -1477,8 +1477,8 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb;
     callback attribute basicCommissioningInfo;
-    ram      attribute regulatoryConfig;
-    ram      attribute locationCapability;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1639,8 +1639,8 @@ endpoint 0 {
   server cluster OperationalCredentials {
     callback attribute NOCs;
     callback attribute fabrics;
-    ram      attribute supportedFabrics;
-    ram      attribute commissionedFabrics;
+    callback attribute supportedFabrics;
+    callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
     callback attribute generatedCommandList;
@@ -1652,8 +1652,8 @@ endpoint 0 {
   server cluster GroupKeyManagement {
     callback attribute groupKeyMap;
     callback attribute groupTable;
-    ram      attribute maxGroupsPerFabric;
-    ram      attribute maxGroupKeysPerFabric;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
