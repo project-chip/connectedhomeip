@@ -182,6 +182,27 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     bool isHexNotation   = strncmp(argValue, "0x", 2) == 0 || strncmp(argValue, "0X", 2) == 0;
 
     Argument arg = mArgs.at(argIndex);
+
+    // We have two places where we handle uint8_t-typed args (actual int8u and
+    // bool args), so declare the handler function here so it can be reused.
+    auto uint8Handler = [&](uint8_t * value) {
+        // stringstream treats uint8_t as char, which is not what we want here.
+        uint16_t tmpValue;
+        std::stringstream ss;
+        isHexNotation ? (ss << std::hex << argValue) : (ss << argValue);
+        ss >> tmpValue;
+        if (chip::CanCastTo<uint8_t>(tmpValue))
+        {
+            *value = static_cast<uint8_t>(tmpValue);
+
+            uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
+            uint64_t max = arg.max;
+            return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+        }
+
+        return false;
+    };
+
     switch (arg.type)
     {
     case ArgumentType::Complex: {
@@ -330,25 +351,38 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
-    case ArgumentType::Bool:
-    case ArgumentType::Number_uint8: {
-        isValidArgument = HandleNullableOptional<uint8_t>(arg, argValue, [&](auto * value) {
-            // stringstream treats uint8_t as char, which is not what we want here.
-            uint16_t tmpValue;
-            std::stringstream ss;
-            isHexNotation ? ss << std::hex << argValue : ss << argValue;
-            ss >> tmpValue;
-            if (chip::CanCastTo<uint8_t>(tmpValue))
+    case ArgumentType::Bool: {
+        isValidArgument = HandleNullableOptional<bool>(arg, argValue, [&](auto * value) {
+            // Start with checking for actual boolean values.
+            if (strcasecmp(argValue, "true") == 0)
             {
-                *value = static_cast<uint8_t>(tmpValue);
-
-                uint64_t min = chip::CanCastTo<uint64_t>(arg.min) ? static_cast<uint64_t>(arg.min) : 0;
-                uint64_t max = arg.max;
-                return (!ss.fail() && ss.eof() && *value >= min && *value <= max);
+                *value = true;
+                return true;
             }
 
-            return false;
+            if (strcasecmp(argValue, "false") == 0)
+            {
+                *value = false;
+                return true;
+            }
+
+            // For backwards compat, keep accepting 0 and 1 for now as synonyms
+            // for false and true.  Since we set our min to 0 and max to 1 for
+            // booleans, calling uint8Handler does the right thing in terms of
+            // only allowing those two values.
+            uint8_t temp = 0;
+            if (!uint8Handler(&temp))
+            {
+                return false;
+            }
+            *value = (temp == 1);
+            return true;
         });
+        break;
+    }
+
+    case ArgumentType::Number_uint8: {
+        isValidArgument = HandleNullableOptional<uint8_t>(arg, argValue, uint8Handler);
         break;
     }
 
