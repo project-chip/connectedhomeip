@@ -71,7 +71,7 @@ class TizenBuilder(GnBuilder):
                  use_tsan: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
+            root=os.path.join(root, 'examples', app.ExampleName(), 'tizen'),
             runner=runner)
 
         self.app = app
