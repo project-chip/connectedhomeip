@@ -17,7 +17,7 @@ name: 48.1.3. [TC-ETHDIAG-2.1] Command received functionality with server as DUT
 config:
     nodeId: 0x12344321
     cluster: "Ethernet Network Diagnostics"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,41 +28,41 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Below steps disabled due to issue #13648
+    #issue #13648
     - label: "Sends ResetCounts command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "ResetCounts"
 
     - label: "Read the PacketRxCount attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
           value: 0
 
     - label: "Read the PacketTxCount attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
           value: 0
 
     - label: "Read the TxErrCount attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
           value: 0
 
     - label: "Read the CollisionCount attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
           value: 0
 
     - label: "Read the OverrunCount attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
