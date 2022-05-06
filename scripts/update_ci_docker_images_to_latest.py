@@ -15,6 +15,14 @@
 # limitations under the License.
 #
 
+"""Updates gcb and workflows configs to use the version currently
+found in the images version file:
+  workflows: lines containing 'image:' are updated.
+  GCB: lines containing 'name: "connectedhomeip' are updated.
+Run this script from the root of the repository.
+WARNING: MAKES IMMEDIATE CHANGES!
+"""
+
 import os
 import fileinput
 
@@ -22,30 +30,30 @@ WORKFLOWS_DIR = '.github/workflows/'
 GCB_DIR = 'integrations/cloudbuild/'
 VERSION_FILE = 'integrations/docker/images/chip-build/version'
 
-def get_version(version_file: str) -> str:
+def get_version(version_file_name: str) -> str:
     """Reads the provided images version file and returns the current images version."""
-    with open(version_file) as f:
-        l = f.readline()
-        return l[:l.index(' ')]
+    with open(version_file_name, encoding='utf-8') as version_file:
+        line = version_file.readline()
+        return line[:line.index(' ')]
 
 def update_line(version: str, line: str, end_quote: bool = False) -> str:
     """Replaces the end of a string after the last colon with the specified version.
     end_quote ends the line with a closing double quote.
     """
-    if not end_quote:
-        return line[:line.rindex(':')+1]+version
-    else:
-        return line[:line.rindex(':')+1]+version+'"'
+    updated_line = line[:line.rindex(':')+1]+version
+    if end_quote:
+        return updated_line+'"'
+    return updated_line
 
-def update_file(version: str, file: str, search_term: str, end_quote: bool = False) -> None:
+def update_file(version: str, file_name: str, search_term: str, end_quote: bool = False) -> None:
     """Reads the specified file and looks for lines containing search_term.
     If a line containts search_term, update it and specify if closing double quotes are needed.
     fileinput.input replaces lines with std out.
     print(update_line... here updates the file.
     print(line, end='') maintains the existing line.
     """
-    with fileinput.input(file, inplace=True) as f:
-        for line in f:
+    with fileinput.input(file_name, inplace=True) as target_file:
+        for line in target_file:
             if search_term in line:
                 print(update_line(version, line, end_quote=end_quote))
             else:
@@ -66,14 +74,16 @@ def update_gcb_configs(version: str, directory: str) -> None:
     """
     for item in os.listdir(directory):
         item_path = os.path.join(directory, item)
-        if str(item_path).endswith('.yaml'):
-            update_file(version, item_path, 'name: "connectedhomeip', end_quote=True)
+        if item_path.endswith('.yaml'):
+            update_file(version,
+                        item_path,
+                        'name: "connectedhomeip',
+                        end_quote=True)
 
 def main() -> None:
     """Update workflow configs in WORKFLOWS_DIR
     and gcb configs in GCB_DIR
     with the version in VERSION_FILE.
-    Run this script from the root of the repository.
     """
     version = get_version(VERSION_FILE)
     update_workflows(version, WORKFLOWS_DIR)
