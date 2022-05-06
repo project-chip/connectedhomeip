@@ -61,12 +61,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read EnhancedCurrentHue attribute from DUT several times"
-      disabled: true
+    - label: "Wait 290ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 290
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 295ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 295
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 300ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 300
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move Hue Stop command"
       command: "EnhancedMoveHue"
@@ -81,12 +131,16 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read EnhancedCurrentHue attribute from DUT several times"
-      disabled: true
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move Hue Down command "
       command: "EnhancedMoveHue"
@@ -101,12 +155,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read EnhancedCurrentHue attribute from DUT several times"
-      disabled: true
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Enhanced Move Hue Stop command"
       command: "EnhancedMoveHue"
@@ -121,12 +225,16 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read EnhancedCurrentHue attribute from DUT several times"
-      disabled: true
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "enhanced current hue"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
