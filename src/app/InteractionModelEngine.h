@@ -87,13 +87,10 @@ public:
      * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
      * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
      */
-    static constexpr size_t kMinSupportedSubscriptionsPerFabric           = 2;
-    static constexpr size_t kMinSupportedPathsPerSubscription             = 2;
+    static constexpr size_t kMinSupportedSubscriptionsPerFabric           = 3;
+    static constexpr size_t kMinSupportedPathsPerSubscription             = 3;
     static constexpr size_t kReservedPathsPerReadRequest                  = 9;
     static constexpr size_t kReservedReadHandlersPerFabricForReadRequests = 1;
-
-    // TODO: Per spec, the above numbers should be 3, 3, 9, 1, however, we use a lower limit to reduce the memory usage and should
-    // fix it when we have reduced the memory footprint of ReadHandlers.
 
     InteractionModelEngine(void);
 
@@ -259,10 +256,7 @@ public:
     //
     // Get direct access to the underlying read handler pool
     //
-    auto & GetReadHandlerPool()
-    {
-        return mReadHandlers;
-    }
+    auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -273,10 +267,7 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetHandlerCapacity(int32_t sz)
-    {
-        mReadHandlerCapacityOverride = sz;
-    }
+    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
 
     //
     // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
@@ -287,10 +278,7 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetPathPoolCapacity(int32_t sz)
-    {
-        mPathPoolCapacityOverride = sz;
-    }
+    void SetPathPoolCapacity(int32_t sz) { mPathPoolCapacityOverride = sz; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -319,10 +307,7 @@ public:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     //
-    void SetForceHandlerQuota(bool forceHandlerQuota)
-    {
-        mForceHandlerQuota = forceHandlerQuota;
-    }
+    void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -358,10 +343,7 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
-    ReadHandler::ApplicationCallback * GetAppCallback() override
-    {
-        return mpReadHandlerApplicationCallback;
-    }
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
