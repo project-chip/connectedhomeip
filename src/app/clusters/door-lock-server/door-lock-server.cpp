@@ -624,8 +624,9 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
     if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, credentialType, credentialInfo))
     {
         emberAfDoorLockClusterPrintln("[GetCredentialStatus] Unable to get the credential: app error "
-                                      "[endpointId=%d,credentialIndex=%d,credentialType=%u]",
-                                      commandPath.mEndpointId, credentialIndex, to_underlying(credentialType));
+                                      "[endpointId=%d,credentialIndex=%d,credentialType=%u,creator=%u,modifier=%u]",
+                                      commandPath.mEndpointId, credentialIndex, to_underlying(credentialType),
+                                      credentialInfo.createdBy, credentialInfo.lastModifiedBy);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return;
     }
@@ -656,9 +657,22 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
     SuccessOrExit(err = commandObj->PrepareCommand(path));
     VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialExists)), credentialExists));
-    if (0 != userIndexWithCredential)
+    if (credentialExists)
     {
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndexWithCredential));
+        if (0 != userIndexWithCredential)
+        {
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndexWithCredential));
+        }
+        if (kUndefinedFabricIndex != credentialInfo.createdBy)
+        {
+            SuccessOrExit(
+                err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), credentialInfo.createdBy));
+        }
+        if (kUndefinedFabricIndex != credentialInfo.lastModifiedBy)
+        {
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)),
+                                            credentialInfo.lastModifiedBy));
+        }
     }
     if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, static_cast<uint16_t>(credentialIndex + 1),
                                      nextCredentialIndex))
@@ -874,7 +888,7 @@ void DoorLockServer::GetWeekDayScheduleCommandHandler(
         return;
     }
 
-    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo;
+    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo{};
     auto status = emberAfPluginDoorLockGetSchedule(endpointId, weekDayIndex, userIndex, scheduleInfo);
     if (DlStatus::kSuccess != status)
     {
@@ -1084,7 +1098,7 @@ void DoorLockServer::GetYearDayScheduleCommandHandler(
         return;
     }
 
-    EmberAfPluginDoorLockYearDaySchedule scheduleInfo;
+    EmberAfPluginDoorLockYearDaySchedule scheduleInfo{};
     auto status = emberAfPluginDoorLockGetSchedule(endpointId, yearDayIndex, userIndex, scheduleInfo);
     if (DlStatus::kSuccess != status)
     {
@@ -1180,7 +1194,7 @@ bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature fea
     uint32_t featureMap = 0;
     bool success        = GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, featureMap);
 
-    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+    return success && ((featureMap & to_underlying(feature)) != 0);
 }
 
 /**********************************************************
@@ -1657,7 +1671,8 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, chip::Fabri
             "[ClearUser] Clearing associated credential [endpointId=%d,userIndex=%d,credentialType=%u,credentialIndex=%d]",
             endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
 
-        if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, DlCredentialStatus::kAvailable,
+        if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, kUndefinedFabricIndex,
+                                                kUndefinedFabricIndex, DlCredentialStatus::kAvailable,
                                                 static_cast<DlCredentialType>(credential.CredentialType), chip::ByteSpan()))
         {
             ChipLogError(Zcl,
@@ -1717,8 +1732,9 @@ DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId,
         return DlStatus::kFailure;
     }
 
-    if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, DlCredentialStatus::kOccupied,
-                                            static_cast<DlCredentialType>(credential.CredentialType), credentialData))
+    if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, creatorFabricIdx, creatorFabricIdx,
+                                            DlCredentialStatus::kOccupied, static_cast<DlCredentialType>(credential.CredentialType),
+                                            credentialData))
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: app error "
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%u,dataLength=%u]",
@@ -1777,8 +1793,9 @@ DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endp
         return status;
     }
 
-    if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, DlCredentialStatus::kOccupied,
-                                            static_cast<DlCredentialType>(credential.CredentialType), credentialData))
+    if (!emberAfPluginDoorLockSetCredential(endpointId, credential.CredentialIndex, modifierFabricIdx, modifierFabricIdx,
+                                            DlCredentialStatus::kOccupied, static_cast<DlCredentialType>(credential.CredentialType),
+                                            credentialData))
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: app error "
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%u,dataLength=%u]",
@@ -1923,7 +1940,7 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
                                           chip::NodeId sourceNodeId, uint16_t credentialIndex, DlCredentialType credentialType,
                                           const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                           const chip::ByteSpan & credentialData, Nullable<uint16_t> userIndex,
-                                          Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
+                                          const Nullable<DlUserStatus> & userStatus, Nullable<DlUserType> userType,
                                           uint16_t & createdUserIndex)
 {
     // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
@@ -1996,8 +2013,8 @@ DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip:
         return DlStatus::kFailure;
     }
 
-    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, existingCredential.status,
-                                            existingCredential.credentialType, credentialData))
+    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, existingCredential.createdBy, modifierFabricIndex,
+                                            existingCredential.status, existingCredential.credentialType, credentialData))
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%u,credentialDataSize=%u]",
@@ -2021,7 +2038,7 @@ DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::Fab
                                           chip::NodeId sourceNodeId, uint16_t credentialIndex, DlCredentialType credentialType,
                                           const EmberAfPluginDoorLockCredentialInfo & existingCredential,
                                           const chip::ByteSpan & credentialData, uint16_t userIndex,
-                                          Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType)
+                                          const Nullable<DlUserStatus> & userStatus, Nullable<DlUserType> userType)
 {
 
     // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
@@ -2038,8 +2055,8 @@ DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::Fab
 
     if (DlStatus::kSuccess == status)
     {
-        if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, existingCredential.status,
-                                                existingCredential.credentialType, credentialData))
+        if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, existingCredential.createdBy, modifierFabricIndex,
+                                                existingCredential.status, existingCredential.credentialType, credentialData))
         {
             emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
                                           "[endpointId=%d,credentialIndex=%d,credentialType=%u,credentialDataSize=%u]",
@@ -2361,8 +2378,8 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
     }
 
     // 3. If the user wasn't deleted, delete the credential and adjust the list of credentials for related user in the storage
-    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, DlCredentialStatus::kAvailable, credentialType,
-                                            chip::ByteSpan()))
+    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, kUndefinedFabricIndex, kUndefinedFabricIndex,
+                                            DlCredentialStatus::kAvailable, credentialType, chip::ByteSpan()))
     {
         ChipLogError(Zcl,
                      "[clearCredential] Unable to clear credential - couldn't write new credential to database "
@@ -2666,8 +2683,8 @@ exit:
 }
 
 void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, DlLockOperationType opType, DlOperationSource opSource,
-                                            DlOperationError opErr, Nullable<uint16_t> userId,
-                                            Nullable<chip::FabricIndex> fabricIdx, Nullable<chip::NodeId> nodeId,
+                                            DlOperationError opErr, const Nullable<uint16_t> & userId,
+                                            const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
                                             LockOpCredentials * credList, size_t credListSize, bool opSuccess)
 {
     Nullable<List<const Structs::DlCredential::Type>> credentials{};
@@ -2806,7 +2823,7 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
         // This command causes the lock device to unlock the door with a timeout parameter. After the time in seconds specified in
         // the timeout field, the lock device will relock itself automatically.
         // field: Timeout, type: uint16_t
-        uint32_t timeout = static_cast<uint32_t>(commandData.timeout);
+        auto timeout = static_cast<uint32_t>(commandData.timeout);
 
         VerifyOrReturnError(0 != timeout, true);
         DoorLockServer::Instance().ScheduleAutoRelock(commandPath.mEndpointId, timeout);
@@ -3170,8 +3187,9 @@ emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credent
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                                   DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
+                                   chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                   const chip::ByteSpan & credentialData)
 {
     return false;
 }
