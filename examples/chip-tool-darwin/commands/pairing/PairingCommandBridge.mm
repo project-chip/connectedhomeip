@@ -96,7 +96,6 @@ void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
     [CurrentCommissioner() pairDevice:mNodeId
                               address:[NSString stringWithUTF8String:ipAddress]
                                  port:mRemotePort
-                        discriminator:mDiscriminator
                          setupPINCode:mSetupPINCode
                                 error:error];
 }
