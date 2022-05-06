@@ -140,7 +140,6 @@ tests:
     - label:
           "2d: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
           from DUT"
-      disabled: true # Step applied conditionnally with an !expected response value
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       PICS: WNCV_TL && WNCV_PA_TL
