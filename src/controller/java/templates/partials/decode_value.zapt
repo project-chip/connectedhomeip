@@ -50,18 +50,10 @@ if ({{source}}.IsNull()) {
       {{/zcl_struct_items_by_struct_name}}
     );
   {{else}}
-    {{#if_chip_enum type}}
+    {{#if_is_weakly_typed_chip_enum type}}
         std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
         std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-      {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
-        chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
-      {{else}}
-        {{#if_is_atomic type}}
-          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
-        {{else}}
-          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
-        {{/if_is_atomic}}
-      {{/if}}
+         chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
     {{else}}
       {{#if (isOctetString type)}}
         jbyteArray {{target}}ByteArray = env->NewByteArray(static_cast<jsize>({{source}}.size()));
@@ -72,16 +64,12 @@ if ({{source}}.IsNull()) {
       {{else}}
         std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
         std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-        {{#if_is_bitmap type}}
-          {{#if_is_atomic type}}
-            chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
-          {{else}}
-            chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}.Raw(), {{target}});
-          {{/if_is_atomic}}
+        {{#if_is_weakly_typed_bitmap type}}
+          chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}.Raw(), {{target}});
         {{else}}
           chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{source}}, {{target}});
-        {{/if_is_bitmap}}
+        {{/if_is_weakly_typed_bitmap}}
       {{/if}}
-    {{/if_chip_enum}}
+    {{/if_is_weakly_typed_chip_enum}}
   {{/if_is_struct}}
 {{/if}}
