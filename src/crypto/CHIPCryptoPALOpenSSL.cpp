@@ -1156,7 +1156,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     csr_length_local = i2d_X509_REQ(x509_req, nullptr);
     VerifyOrExit(csr_length_local >= 0, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<size_t>(csr_length_local), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(CanCastTo<size_t>(csr_length_local), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     VerifyOrExit(static_cast<size_t>(csr_length_local) <= csr_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
     csr_length = static_cast<size_t>(i2d_X509_REQ(x509_req, &out_csr));
 
