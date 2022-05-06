@@ -21,6 +21,7 @@
 #import <Security/Security.h>
 
 #import "CHIPError_Internal.h"
+#import "CHIPKeypair.h"
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 
@@ -60,15 +61,34 @@ public:
 
     const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
 
+    // Generate a root (self-signed) DER-encoded X.509 certificate for the given
+    // CHIPKeypair.  If issuerId is provided, it is used; otherwise a random one
+    // is generated.  If a fabric id is provided it is added to the subject DN
+    // of the certificate.
+    //
+    // The outparam must not be null and is set to nil on errors.
+    static CHIP_ERROR GenerateRootCertificate(id<CHIPKeypair> keypair, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+        NSData * _Nullable __autoreleasing * _Nonnull rootCert);
+
+    // Generate an intermediate DER-encoded X.509 certificate for the given root
+    // and intermediate public key.  If issuerId is provided, it is used;
+    // otherwise a random one is generated.  If a fabric id is provided it is
+    // added to the subject DN of the certificate.
+    //
+    // The outparam must not be null and is set to nil on errors.
+    static CHIP_ERROR GenerateIntermediateCertificate(id<CHIPKeypair> rootKeypair, NSData * rootCertificate,
+        SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+        NSData * _Nullable __autoreleasing * _Nonnull intermediateCert);
+
 private:
-    bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
+    static bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     ChipP256KeypairPtr mIssuerKey;
     uint64_t mIssuerId = 1234;
 
     chip::Crypto::AesCcm128Key mIPK;
 
-    const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
+    static const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
 
     CHIPPersistentStorageDelegateBridge * mStorage;
 
