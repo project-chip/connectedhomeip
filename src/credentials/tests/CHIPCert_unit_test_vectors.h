@@ -54,4 +54,3 @@ UnitTestCertAsset GetNodeB1CertAsset();
 
 } // namespace TestCerts
 } // namespace chip
-
