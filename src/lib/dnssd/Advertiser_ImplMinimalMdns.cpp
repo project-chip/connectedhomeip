@@ -206,8 +206,8 @@ private:
     struct CommonTxtEntryStorage
     {
         // +2 for all to account for '=' and terminating nullchar
-        char mrpRetryIntervalIdleBuf[KeySize(TxtFieldKey::kSleepyIdleInterval) + ValSize(TxtFieldKey::kSleepyIdleInterval) + 2];
-        char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) + ValSize(TxtFieldKey::kSleepyActiveInterval) +
+        char sleepyIdleIntervalBuf[KeySize(TxtFieldKey::kSleepyIdleInterval) + ValSize(TxtFieldKey::kSleepyIdleInterval) + 2];
+        char sleepyActiveIntervalBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) + ValSize(TxtFieldKey::kSleepyActiveInterval) +
                                        2];
         char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
     };
@@ -227,13 +227,13 @@ private:
                                     "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
                     mrp.mIdleRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
+                size_t writtenCharactersNumber = snprintf(storage.sleepyIdleIntervalBuf, sizeof(storage.sleepyIdleIntervalBuf),
                                                           "SII=%" PRIu32, mrp.mIdleRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
-                                        (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
+                                        (writtenCharactersNumber < sizeof(storage.sleepyIdleIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
 
-                txtFields[numTxtFields++] = storage.mrpRetryIntervalIdleBuf;
+                txtFields[numTxtFields++] = storage.sleepyIdleIntervalBuf;
             }
 
             {
@@ -244,12 +244,12 @@ private:
                     mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
                 size_t writtenCharactersNumber =
-                    snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "SAI=%" PRIu32,
+                    snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf), "SAI=%" PRIu32,
                              mrp.mActiveRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
-                                        (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
+                                        (writtenCharactersNumber < sizeof(storage.sleepyActiveIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
-                txtFields[numTxtFields++] = storage.mrpRetryIntervalActiveBuf;
+                txtFields[numTxtFields++] = storage.sleepyActiveIntervalBuf;
             }
         }
         if (params.GetTcpSupported().HasValue())

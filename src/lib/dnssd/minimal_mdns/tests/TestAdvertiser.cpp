@@ -78,7 +78,7 @@ OperationalAdvertisingParameters operationalParams1 = OperationalAdvertisingPara
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
                                                           .SetTcpSupported(chip::Optional<bool>(false))
-                                                          .SetMRPConfig(ReliableMessageProtocolConfig(32_ms32, 33_ms32));
+                                                          .SetMRPConfig(ReliableMessageProtocolConfig(32_ms32, 30_ms32));  // Match SII, SAI below
 OperationalAdvertisingParameters operationalParams2 =
     OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
 OperationalAdvertisingParameters operationalParams3 =
