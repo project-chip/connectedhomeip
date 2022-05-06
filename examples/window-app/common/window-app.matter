@@ -1832,18 +1832,89 @@ endpoint 0 {
 }
 
 endpoint 1 {
-  server  cluster Descriptor;
-  server  cluster Groups;
-  server  cluster Identify;
   binding cluster Scenes;
-  server  cluster WindowCovering;
+
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute identifyType;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster WindowCovering {
+    ram      attribute type;
+    persist  attribute currentPositionLift;
+    persist  attribute currentPositionTilt;
+    persist  attribute configStatus default = 0x03;
+    persist  attribute currentPositionLiftPercentage;
+    persist  attribute currentPositionTiltPercentage;
+    ram      attribute operationalStatus;
+    ram      attribute targetPositionLiftPercent100ths;
+    ram      attribute targetPositionTiltPercent100ths;
+    ram      attribute endProductType;
+    persist  attribute currentPositionLiftPercent100ths;
+    persist  attribute currentPositionTiltPercent100ths;
+    persist  attribute installedOpenLimitLift;
+    persist  attribute installedClosedLimitLift default = 0xFFFF;
+    persist  attribute installedOpenLimitTilt;
+    persist  attribute installedClosedLimitTilt default = 0xFFFF;
+    persist  attribute mode default = 0x14;
+    ram      attribute safetyStatus;
+    ram      attribute featureMap default = 0x0017;
+    ram      attribute clusterRevision default = 5;
+  }
 }
 
 endpoint 2 {
-  server  cluster Descriptor;
-  server  cluster Groups;
   binding cluster Scenes;
-  server  cluster WindowCovering;
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster WindowCovering {
+    ram      attribute type;
+    persist  attribute currentPositionLift;
+    persist  attribute currentPositionTilt;
+    persist  attribute configStatus default = 0x03;
+    persist  attribute currentPositionLiftPercentage;
+    persist  attribute currentPositionTiltPercentage;
+    ram      attribute operationalStatus;
+    ram      attribute targetPositionLiftPercent100ths;
+    ram      attribute targetPositionTiltPercent100ths;
+    ram      attribute endProductType;
+    persist  attribute currentPositionLiftPercent100ths;
+    persist  attribute currentPositionTiltPercent100ths;
+    persist  attribute installedOpenLimitLift;
+    persist  attribute installedClosedLimitLift default = 0xFFFF;
+    persist  attribute installedOpenLimitTilt;
+    persist  attribute installedClosedLimitTilt default = 0xFFFF;
+    persist  attribute mode;
+    ram      attribute safetyStatus;
+    ram      attribute featureMap default = 0x0017;
+    ram      attribute clusterRevision default = 5;
+  }
 }
 
 
