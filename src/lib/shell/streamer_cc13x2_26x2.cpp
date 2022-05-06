@@ -76,7 +76,7 @@ int streamer_cc13x2_26x2_init(streamer_t * streamer)
     // unclear why the UART driver sticks in writing sometimes
     uartParams.writeTimeout = 10000; // ticks
     // Immediate return from the read function
-    //uartParams.readTimeout = 0; // ticks
+    // uartParams.readTimeout = 0; // ticks
 
     sStreamUartHandle = UART_open(CONFIG_UART_STREAMER, &uartParams);
     return 0;
@@ -84,13 +84,13 @@ int streamer_cc13x2_26x2_init(streamer_t * streamer)
 
 ssize_t streamer_cc13x2_26x2_read(streamer_t * streamer, char * buf, size_t len)
 {
-    (void)streamer;
+    (void) streamer;
     return UART_read(sStreamUartHandle, buf, len);
 }
 
 ssize_t streamer_cc13x2_26x2_write(streamer_t * streamer, const char * buf, size_t len)
 {
-    (void)streamer;
+    (void) streamer;
     return UART_write(sStreamUartHandle, buf, len);
 }
 

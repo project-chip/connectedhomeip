@@ -58,7 +58,7 @@ static TaskHandle_t sAppTaskHandle;
 
 // Logging
 extern "C" {
-    int cc13x2_26x2LogInit(void);
+int cc13x2_26x2LogInit(void);
 }
 
 static DefaultOTARequestor sRequestorCore;
