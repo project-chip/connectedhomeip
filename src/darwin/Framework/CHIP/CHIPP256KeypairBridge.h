@@ -48,6 +48,9 @@ public:
 
     const chip::Crypto::P256PublicKey & Pubkey() const override { return mPubkey; };
 
+    // On success, writes to *pubKey.
+    static CHIP_ERROR MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, chip::Crypto::P256PublicKey * matterPubKey);
+
 private:
     id<CHIPKeypair> _Nullable mKeypair;
     chip::Crypto::P256PublicKey mPubkey;
