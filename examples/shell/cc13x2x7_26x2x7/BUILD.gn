@@ -85,8 +85,8 @@ ti_simplelink_executable("shell_app") {
     ":sysconfig",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/shell/shell_common:shell_common",
-    "${chip_root}/src/lib/shell:shell",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell:shell",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -110,7 +110,6 @@ ti_simplelink_executable("shell_app") {
 
   output_dir = root_out_dir
 }
-
 
 group("cc13x2x7_26x2x7") {
   deps = [ ":shell_app" ]
