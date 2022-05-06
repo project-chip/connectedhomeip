@@ -30,11 +30,13 @@ WORKFLOWS_DIR = '.github/workflows/'
 GCB_DIR = 'integrations/cloudbuild/'
 VERSION_FILE = 'integrations/docker/images/chip-build/version'
 
+
 def get_version(version_file_name: str) -> str:
     """Reads the provided images version file and returns the current images version."""
     with open(version_file_name, encoding='utf-8') as version_file:
         line = version_file.readline()
         return line[:line.index(' ')]
+
 
 def update_line(version: str, line: str, end_quote: bool = False) -> str:
     """Replaces the end of a string after the last colon with the specified version.
@@ -44,6 +46,7 @@ def update_line(version: str, line: str, end_quote: bool = False) -> str:
     if end_quote:
         return updated_line+'"'
     return updated_line
+
 
 def update_file(version: str, file_name: str, search_term: str, end_quote: bool = False) -> None:
     """Reads the specified file and looks for lines containing search_term.
@@ -59,14 +62,16 @@ def update_file(version: str, file_name: str, search_term: str, end_quote: bool 
             else:
                 print(line, end='')
 
+
 def update_workflows(version: str, directory: str) -> None:
     """Iterate over workflow configs and update.
     Closing quotes are not needed.
     """
     for workflow in os.listdir(directory):
         update_file(version,
-            os.path.join(directory, workflow),
-            'image:')
+                    os.path.join(directory, workflow),
+                    'image:')
+
 
 def update_gcb_configs(version: str, directory: str) -> None:
     """Iterate over GCB configs and update.
@@ -80,6 +85,7 @@ def update_gcb_configs(version: str, directory: str) -> None:
                         'name: "connectedhomeip',
                         end_quote=True)
 
+
 def main() -> None:
     """Update workflow configs in WORKFLOWS_DIR
     and gcb configs in GCB_DIR
@@ -88,6 +94,7 @@ def main() -> None:
     version = get_version(VERSION_FILE)
     update_workflows(version, WORKFLOWS_DIR)
     update_gcb_configs(version, GCB_DIR)
+
 
 if __name__ == '__main__':
     main()
