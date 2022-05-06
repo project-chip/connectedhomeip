@@ -37,5 +37,12 @@ public:
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
+class DLL_EXPORT ScenesCluster : public ClusterBase
+{
+public:
+    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
+    ~ScenesCluster() {}
+};
+
 } // namespace Controller
 } // namespace chip

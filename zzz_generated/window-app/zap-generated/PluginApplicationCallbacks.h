@@ -31,6 +31,7 @@
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
+    MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
@@ -38,6 +39,7 @@
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPowerSourcePluginServerInitCallback();                                                                                   \
+    MatterScenesPluginClientInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
     MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
