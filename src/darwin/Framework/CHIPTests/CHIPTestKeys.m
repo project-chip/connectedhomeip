@@ -83,12 +83,12 @@
 
 - (void)dealloc
 {
-  if (_publicKey) {
-    CFRelease(_publicKey);
-  }
+    if (_publicKey) {
+        CFRelease(_publicKey);
+    }
 
-  if (_privateKey) {
-    CFRelease(_privateKey);
-  }
+    if (_privateKey) {
+        CFRelease(_privateKey);
+    }
 }
 @end
