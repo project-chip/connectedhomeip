@@ -73,7 +73,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOTA);
     SuccessOrExit(err);
-    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipDNS);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipFailSafe);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipSessionResumptionIndex);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipSessionResumption);
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOthers);
     SuccessOrExit(err);
