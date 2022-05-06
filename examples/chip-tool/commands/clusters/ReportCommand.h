@@ -534,7 +534,7 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0,
                     "The requested maximum interval between reports. Sets MaxIntervalCeiling in the Subscribe Request.");
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
-                    "0 - Terminate existing subscriptions from initiator.\n  1 - Otherwise.");
+                    "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
         AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
