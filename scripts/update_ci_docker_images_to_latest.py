@@ -68,9 +68,10 @@ def update_workflows(version: str, directory: str) -> None:
     Closing quotes are not needed.
     """
     for workflow in os.listdir(directory):
-        update_file(version,
-                    os.path.join(directory, workflow),
-                    'image:')
+        if workflow != 'docker_img.yaml':
+            update_file(version,
+                        os.path.join(directory, workflow),
+                        'image:')
 
 
 def update_gcb_configs(version: str, directory: str) -> None:
