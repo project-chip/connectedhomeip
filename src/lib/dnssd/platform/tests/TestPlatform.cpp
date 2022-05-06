@@ -51,7 +51,7 @@ OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingPara
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPConfig({ 32_ms32, 30_ms32 })   // SII and SAI to match below
+                                                          .SetMRPConfig({ 32_ms32, 30_ms32 }) // SII and SAI to match below
                                                           .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)

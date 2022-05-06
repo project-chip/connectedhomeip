@@ -207,8 +207,7 @@ private:
     {
         // +2 for all to account for '=' and terminating nullchar
         char sleepyIdleIntervalBuf[KeySize(TxtFieldKey::kSleepyIdleInterval) + ValSize(TxtFieldKey::kSleepyIdleInterval) + 2];
-        char sleepyActiveIntervalBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) + ValSize(TxtFieldKey::kSleepyActiveInterval) +
-                                       2];
+        char sleepyActiveIntervalBuf[KeySize(TxtFieldKey::kSleepyActiveInterval) + ValSize(TxtFieldKey::kSleepyActiveInterval) + 2];
         char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
     };
     template <class Derived>
@@ -243,9 +242,8 @@ private:
                                     "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
                     mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber =
-                    snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf), "SAI=%" PRIu32,
-                             mrp.mActiveRetransTimeout.count());
+                size_t writtenCharactersNumber = snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf),
+                                                          "SAI=%" PRIu32, mrp.mActiveRetransTimeout.count());
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.sleepyActiveIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
