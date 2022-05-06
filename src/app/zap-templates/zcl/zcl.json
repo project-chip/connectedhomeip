@@ -134,6 +134,12 @@
             "CollisionCount",
             "OverrunCount"
         ],
+        "General Commissioning": [
+            "RegulatoryConfig",
+            "LocationCapability",
+            "BasicCommissioningInfo",
+            "SupportsConcurrentConnection"
+        ],
         "General Diagnostics": [
             "NetworkInterfaces",
             "ActiveHardwareFaults",
@@ -144,11 +150,27 @@
             "TotalOperationalHours",
             "BootReasons"
         ],
+        "Group Key Management": [
+            "ClusterRevision",
+            "MaxGroupsPerFabric",
+            "MaxGroupKeysPerFabric"
+        ],
+        "Operational Credentials": [
+            "SupportedFabrics",
+            "CommissionedFabrics",
+            "CurrentFabricIndex"
+        ],
         "Software Diagnostics": [
             "CurrentHeapFree",
             "CurrentHeapUsed",
             "CurrentHeapHighWatermark",
             "ThreadMetrics"
+        ],
+        "Test Cluster": [
+            "struct_attr",
+            "nullable_struct",
+            "general_error_boolean",
+            "cluster_error_boolean"
         ],
         "WiFi Network Diagnostics": [
             "bssid",
