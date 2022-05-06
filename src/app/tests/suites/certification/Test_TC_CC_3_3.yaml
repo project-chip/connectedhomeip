@@ -39,14 +39,14 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: 150
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Step hue up command"
       command: "StepHue"
@@ -63,14 +63,23 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    #delay step is necessary to let the attribute value change over time
+    - label: "Wait 25ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 25
+
+    - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Step hue down command"
       command: "StepHue"
@@ -87,14 +96,22 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Wait 25ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 25
+
+    - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
