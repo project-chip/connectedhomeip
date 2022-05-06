@@ -78,6 +78,7 @@ struct FactoryInitParams
     Credentials::GroupDataProvider * groupDataProvider            = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -119,7 +120,7 @@ public:
 
     ~DeviceControllerFactory();
     DeviceControllerFactory(DeviceControllerFactory const &) = delete;
-    void operator=(DeviceControllerFactory const &) = delete;
+    void operator=(DeviceControllerFactory const &)          = delete;
 
     //
     // Some clients do not prefer a complete shutdown of the stack being initiated if

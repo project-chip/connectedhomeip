@@ -128,6 +128,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     factoryParams.groupDataProvider = &gGroupDataProvider;
+    factoryParams.fabricTable       = &Server::GetInstance().GetFabricTable();
 
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 

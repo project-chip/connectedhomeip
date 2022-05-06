@@ -42,7 +42,7 @@ commissioned. Then it allows the user to send CHIP commands to the TV.
 -   Pre-requisite: Build and run the tv-app
 
         $ cd ~/connectedhomeip/examples/tv-app/linux
-        $ out/debug/chip-tv-app
+        $ out/debug/chip-tv-app --secured-device-port 5640 --secured-commissioner-port 5552
 
 -   Run the tv-casting-app (clean start)
 
