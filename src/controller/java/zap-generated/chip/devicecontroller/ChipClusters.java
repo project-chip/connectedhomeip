@@ -14415,6 +14415,30 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface ScaledValueAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface MinScaledValueAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface MaxScaledValueAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -14448,6 +14472,60 @@ public class ChipClusters {
     public void subscribeMaxMeasuredValueAttribute(
         MaxMeasuredValueAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeMaxMeasuredValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readToleranceAttribute(IntegerAttributeCallback callback) {
+      readToleranceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeToleranceAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeToleranceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readScaledValueAttribute(ScaledValueAttributeCallback callback) {
+      readScaledValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeScaledValueAttribute(
+        ScaledValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeScaledValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMinScaledValueAttribute(MinScaledValueAttributeCallback callback) {
+      readMinScaledValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMinScaledValueAttribute(
+        MinScaledValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMinScaledValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readMaxScaledValueAttribute(MaxScaledValueAttributeCallback callback) {
+      readMaxScaledValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeMaxScaledValueAttribute(
+        MaxScaledValueAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeMaxScaledValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readScaledToleranceAttribute(IntegerAttributeCallback callback) {
+      readScaledToleranceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeScaledToleranceAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeScaledToleranceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readScaleAttribute(IntegerAttributeCallback callback) {
+      readScaleAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeScaleAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeScaleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -14494,6 +14572,50 @@ public class ChipClusters {
         MaxMeasuredValueAttributeCallback callback,
         int minInterval,
         int maxInterval);
+
+    private native void readToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readScaledValueAttribute(
+        long chipClusterPtr, ScaledValueAttributeCallback callback);
+
+    private native void subscribeScaledValueAttribute(
+        long chipClusterPtr,
+        ScaledValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMinScaledValueAttribute(
+        long chipClusterPtr, MinScaledValueAttributeCallback callback);
+
+    private native void subscribeMinScaledValueAttribute(
+        long chipClusterPtr,
+        MinScaledValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readMaxScaledValueAttribute(
+        long chipClusterPtr, MaxScaledValueAttributeCallback callback);
+
+    private native void subscribeMaxScaledValueAttribute(
+        long chipClusterPtr,
+        MaxScaledValueAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readScaledToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeScaledToleranceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readScaleAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeScaleAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readAttributeListAttribute(
         long chipClusterPtr, AttributeListAttributeCallback callback);

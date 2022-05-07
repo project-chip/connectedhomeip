@@ -1837,6 +1837,24 @@ public final class ChipIdLookup {
       if (attributeId == 2L) {
         return "MaxMeasuredValue";
       }
+      if (attributeId == 3L) {
+        return "Tolerance";
+      }
+      if (attributeId == 16L) {
+        return "ScaledValue";
+      }
+      if (attributeId == 17L) {
+        return "MinScaledValue";
+      }
+      if (attributeId == 18L) {
+        return "MaxScaledValue";
+      }
+      if (attributeId == 19L) {
+        return "ScaledTolerance";
+      }
+      if (attributeId == 20L) {
+        return "Scale";
+      }
       if (attributeId == 65531L) {
         return "AttributeList";
       }
