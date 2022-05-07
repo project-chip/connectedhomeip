@@ -845,6 +845,13 @@ public:
      * @return the stored backing store.
      */
     TLVBackingStore * GetBackingStore() { return mBackingStore; }
+
+    /**
+     * Return the total number of bytes for the TLV data
+     * @return the total number of bytes for the TLV data
+     */
+    uint32_t GetTotalLength() const { return mMaxLen; }
+
     /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.
      *

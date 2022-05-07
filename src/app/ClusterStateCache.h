@@ -236,7 +236,7 @@ public:
      * current data version for the cluster (which may have no value if we don't have a known data version
      * for it, for example because none of our paths were wildcards that covered the whole cluster).
      */
-    CHIP_ERROR GetVersion(EndpointId mEndpointId, ClusterId mClusterId, Optional<DataVersion> & aVersion);
+    CHIP_ERROR GetVersion(const ConcreteClusterPath & path, Optional<DataVersion> & aVersion);
 
     /*
      * Get highest received event number.
@@ -483,7 +483,7 @@ public:
     }
 
 private:
-    using AttributeState = Variant<System::PacketBufferHandle, StatusIB>;
+    using AttributeState = Variant<Platform::ScopedMemoryBuffer<uint8_t>, StatusIB>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
     //
     // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
