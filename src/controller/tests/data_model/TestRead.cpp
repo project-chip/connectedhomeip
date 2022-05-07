@@ -41,18 +41,18 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 constexpr DataVersion kDataVersion   = 5;
-bool expectedAttribute1          = true;
-int16_t expectedAttribute2       = 42;
-uint64_t expectedAttribute3      = 0xdeadbeef0000cafe;
-uint8_t expectedAttribute4[256]  = {
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+bool expectedAttribute1              = true;
+int16_t expectedAttribute2           = 42;
+uint64_t expectedAttribute3          = 0xdeadbeef0000cafe;
+uint8_t expectedAttribute4[256]      = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
 
 enum ResponseDirective
@@ -698,7 +698,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
-
         {
             app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
             TLV::TLVReader reader;
@@ -777,7 +776,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
-
         {
             app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
             TLV::TLVReader reader;
@@ -844,7 +842,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
 
-
         {
             app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
             TLV::TLVReader reader;
@@ -905,7 +902,6 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
         NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
-
 
         {
             app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
@@ -1226,16 +1222,16 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         readPrepareParams.mEventPathParamsListSize = 0;
     }
 
-    // Read of E3C2 which has a oversized list attribute, MockAttributeId (4). It would use none stored data versions in the cache since previous read does not
-    // cache any committed data version for E3C2, and expect to cache E3C2's version
+    // Read of E3C2 which has a oversized list attribute, MockAttributeId (4). It would use none stored data versions in the cache
+    // since previous read does not cache any committed data version for E3C2, and expect to cache E3C2's version
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
         app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
                                    cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
         chip::app::AttributePathParams attributePathParams1[1];
-        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams1[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[0].mEndpointId = Test::kMockEndpoint3;
+        attributePathParams1[0].mClusterId  = Test::MockClusterId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 1;

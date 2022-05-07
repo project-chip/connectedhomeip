@@ -56,9 +56,9 @@ public:
         if (this != &other)
         {
             mBuffer       = other.mBuffer;
-            mSize       = other.mSize;
+            mSize         = other.mSize;
             other.mBuffer = nullptr;
-            other.mSize = 0;
+            other.mSize   = 0;
         }
         return *this;
     }
@@ -78,7 +78,7 @@ public:
         }
         Impl::MemoryFree(mBuffer);
         mBuffer = nullptr;
-        mSize = 0;
+        mSize   = 0;
     }
 
 protected:
@@ -93,7 +93,7 @@ protected:
     {
         void * buffer = mBuffer;
         mBuffer       = nullptr;
-        mSize = 0;
+        mSize         = 0;
         return buffer;
     }
 
@@ -101,19 +101,19 @@ protected:
     {
         Free();
         mBuffer = Impl::MemoryAlloc(size);
-        mSize = size;
+        mSize   = size;
     }
 
     void Calloc(size_t elementCount, size_t elementSize)
     {
         Free();
         mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
-        mSize = elementCount * elementSize;
+        mSize   = elementCount * elementSize;
     }
 
 private:
     void * mBuffer = nullptr;
-    size_t mSize = 0;
+    size_t mSize   = 0;
 };
 
 /**

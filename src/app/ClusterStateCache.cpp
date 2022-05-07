@@ -204,7 +204,8 @@ CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVRe
         return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
     }
 
-    reader.Init(attributeState->Get<Platform::ScopedMemoryBuffer<uint8_t>>().Get(), attributeState->Get<Platform::ScopedMemoryBuffer<uint8_t>>().GetSize());
+    reader.Init(attributeState->Get<Platform::ScopedMemoryBuffer<uint8_t>>().Get(),
+                attributeState->Get<Platform::ScopedMemoryBuffer<uint8_t>>().GetSize());
     return reader.Next();
 }
 
@@ -322,7 +323,7 @@ void ClusterStateCache::OnAttributeData(const ConcreteDataAttributePath & aPath,
     mCallback.OnAttributeData(aPath, apData ? &dataSnapshot : nullptr, aStatus);
 }
 
-CHIP_ERROR ClusterStateCache::GetVersion(const ConcreteClusterPath & aPath , Optional<DataVersion> & aVersion)
+CHIP_ERROR ClusterStateCache::GetVersion(const ConcreteClusterPath & aPath, Optional<DataVersion> & aVersion)
 {
     VerifyOrReturnError(aPath.IsValidConcreteClusterPath(), CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err;
@@ -405,7 +406,8 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
                 else
                 {
                     TLV::TLVReader bufReader;
-                    bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBuffer<uint8_t>>().Get(), attributeIter.second.Get<Platform::ScopedMemoryBuffer<uint8_t>>().GetSize());
+                    bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBuffer<uint8_t>>().Get(),
+                                   attributeIter.second.Get<Platform::ScopedMemoryBuffer<uint8_t>>().GetSize());
                     ReturnOnFailure(bufReader.Next());
                     // Skip to the end of the element.
                     ReturnOnFailure(bufReader.Skip());
