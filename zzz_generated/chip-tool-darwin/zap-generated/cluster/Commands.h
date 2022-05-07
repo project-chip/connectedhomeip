@@ -3141,7 +3141,9 @@ public:
         params.application.applicationId = [[NSString alloc] initWithBytes:mRequest.application.applicationId.data()
                                                                     length:mRequest.application.applicationId.size()
                                                                   encoding:NSUTF8StringEncoding];
-        params.data = [[NSData alloc] initWithBytes:mData.data() length:mData.size()];
+        if (mData.HasValue()) {
+            params.data = [[NSData alloc] initWithBytes:mData.Value().data() length:mData.Value().size()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -3166,7 +3168,7 @@ public:
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::ApplicationLauncher::Structs::Application::Type> mComplex_Application;
-    chip::ByteSpan mData;
+    chip::Optional<chip::ByteSpan> mData;
 };
 
 /*
@@ -8290,7 +8292,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8312,7 +8316,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -8340,7 +8344,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         params.duration = [NSNumber numberWithUnsignedInt:mDuration];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -8363,7 +8369,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
     uint32_t mDuration;
 };
 
@@ -8391,7 +8397,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8413,7 +8421,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -8441,7 +8449,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         params.duration = [NSNumber numberWithUnsignedInt:mDuration];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -8464,7 +8474,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
     uint32_t mDuration;
 };
 
@@ -8492,7 +8502,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8514,7 +8526,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -8542,7 +8554,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         params.transitionTime = [NSNumber numberWithUnsignedShort:mTransitionTime];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -8565,7 +8579,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
     uint16_t mTransitionTime;
 };
 
@@ -8593,7 +8607,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8615,7 +8631,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -8643,7 +8659,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         params.duration = [NSNumber numberWithUnsignedInt:mDuration];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -8666,7 +8684,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
     uint32_t mDuration;
 };
 
@@ -8694,7 +8712,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8716,7 +8736,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -8743,7 +8763,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8765,7 +8787,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -8793,7 +8815,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         params.duration = [NSNumber numberWithUnsignedInt:mDuration];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -8816,7 +8840,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
     uint32_t mDuration;
 };
 
@@ -8844,7 +8868,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.actionID = [NSNumber numberWithUnsignedShort:mActionID];
-        params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID];
+        if (mInvokeID.HasValue()) {
+            params.invokeID = [NSNumber numberWithUnsignedInt:mInvokeID.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -8866,7 +8892,7 @@ public:
 
 private:
     uint16_t mActionID;
-    uint32_t mInvokeID;
+    chip::Optional<uint32_t> mInvokeID;
 };
 
 /*
@@ -17232,7 +17258,11 @@ public:
             params.search.parameterList = array_1;
         }
         params.autoPlay = [NSNumber numberWithBool:mAutoPlay];
-        params.data = [[NSString alloc] initWithBytes:mData.data() length:mData.size() encoding:NSUTF8StringEncoding];
+        if (mData.HasValue()) {
+            params.data = [[NSString alloc] initWithBytes:mData.Value().data()
+                                                   length:mData.Value().size()
+                                                 encoding:NSUTF8StringEncoding];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -17258,7 +17288,7 @@ private:
     chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type> mComplex_Search;
     bool mAutoPlay;
-    chip::ByteSpan mData;
+    chip::Optional<chip::ByteSpan> mData;
 };
 
 /*
@@ -17289,9 +17319,11 @@ public:
         params.contentURL = [[NSString alloc] initWithBytes:mContentURL.data()
                                                      length:mContentURL.size()
                                                    encoding:NSUTF8StringEncoding];
-        params.displayString = [[NSString alloc] initWithBytes:mDisplayString.data()
-                                                        length:mDisplayString.size()
-                                                      encoding:NSUTF8StringEncoding];
+        if (mDisplayString.HasValue()) {
+            params.displayString = [[NSString alloc] initWithBytes:mDisplayString.Value().data()
+                                                            length:mDisplayString.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
+        }
         if (mRequest.brandingInformation.HasValue()) {
             params.brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
             params.brandingInformation.providerName =
@@ -17489,7 +17521,7 @@ public:
 
 private:
     chip::ByteSpan mContentURL;
-    chip::ByteSpan mDisplayString;
+    chip::Optional<chip::ByteSpan> mDisplayString;
     chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type mRequest;
     TypedComplexArgument<chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>>
         mComplex_BrandingInformation;
@@ -19439,7 +19471,9 @@ public:
         __auto_type * params = [[CHIPDoorLockClusterLockDoorParams alloc] init];
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        params.pinCode = [[NSData alloc] initWithBytes:mPinCode.data() length:mPinCode.size()];
+        if (mPinCode.HasValue()) {
+            params.pinCode = [[NSData alloc] initWithBytes:mPinCode.Value().data() length:mPinCode.Value().size()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -19460,7 +19494,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mPinCode;
+    chip::Optional<chip::ByteSpan> mPinCode;
 };
 
 /*
@@ -19791,7 +19825,9 @@ public:
         __auto_type * params = [[CHIPDoorLockClusterUnlockDoorParams alloc] init];
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        params.pinCode = [[NSData alloc] initWithBytes:mPinCode.data() length:mPinCode.size()];
+        if (mPinCode.HasValue()) {
+            params.pinCode = [[NSData alloc] initWithBytes:mPinCode.Value().data() length:mPinCode.Value().size()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -19812,7 +19848,7 @@ public:
     }
 
 private:
-    chip::ByteSpan mPinCode;
+    chip::Optional<chip::ByteSpan> mPinCode;
 };
 
 /*
@@ -19839,7 +19875,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.timeout = [NSNumber numberWithUnsignedShort:mTimeout];
-        params.pinCode = [[NSData alloc] initWithBytes:mPinCode.data() length:mPinCode.size()];
+        if (mPinCode.HasValue()) {
+            params.pinCode = [[NSData alloc] initWithBytes:mPinCode.Value().data() length:mPinCode.Value().size()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -19861,7 +19899,7 @@ public:
 
 private:
     uint16_t mTimeout;
-    chip::ByteSpan mPinCode;
+    chip::Optional<chip::ByteSpan> mPinCode;
 };
 
 /*
@@ -37726,7 +37764,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.operationalDataset = [[NSData alloc] initWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()];
-        params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
+        if (mBreadcrumb.HasValue()) {
+            params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -37751,7 +37791,7 @@ public:
 
 private:
     chip::ByteSpan mOperationalDataset;
-    uint64_t mBreadcrumb;
+    chip::Optional<uint64_t> mBreadcrumb;
 };
 
 /*
@@ -37782,7 +37822,9 @@ public:
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.ssid = [[NSData alloc] initWithBytes:mSsid.data() length:mSsid.size()];
         params.credentials = [[NSData alloc] initWithBytes:mCredentials.data() length:mCredentials.size()];
-        params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
+        if (mBreadcrumb.HasValue()) {
+            params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -37808,7 +37850,7 @@ public:
 private:
     chip::ByteSpan mSsid;
     chip::ByteSpan mCredentials;
-    uint64_t mBreadcrumb;
+    chip::Optional<uint64_t> mBreadcrumb;
 };
 
 /*
@@ -37837,7 +37879,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.networkID = [[NSData alloc] initWithBytes:mNetworkID.data() length:mNetworkID.size()];
-        params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
+        if (mBreadcrumb.HasValue()) {
+            params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -37861,7 +37905,7 @@ public:
 
 private:
     chip::ByteSpan mNetworkID;
-    uint64_t mBreadcrumb;
+    chip::Optional<uint64_t> mBreadcrumb;
 };
 
 /*
@@ -37890,7 +37934,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.networkID = [[NSData alloc] initWithBytes:mNetworkID.data() length:mNetworkID.size()];
-        params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
+        if (mBreadcrumb.HasValue()) {
+            params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -37914,7 +37960,7 @@ public:
 
 private:
     chip::ByteSpan mNetworkID;
-    uint64_t mBreadcrumb;
+    chip::Optional<uint64_t> mBreadcrumb;
 };
 
 /*
@@ -37945,7 +37991,9 @@ public:
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.networkID = [[NSData alloc] initWithBytes:mNetworkID.data() length:mNetworkID.size()];
         params.networkIndex = [NSNumber numberWithUnsignedChar:mNetworkIndex];
-        params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
+        if (mBreadcrumb.HasValue()) {
+            params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -37970,7 +38018,7 @@ public:
 private:
     chip::ByteSpan mNetworkID;
     uint8_t mNetworkIndex;
-    uint64_t mBreadcrumb;
+    chip::Optional<uint64_t> mBreadcrumb;
 };
 
 /*
@@ -37998,8 +38046,12 @@ public:
         __auto_type * params = [[CHIPNetworkCommissioningClusterScanNetworksParams alloc] init];
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        params.ssid = [[NSData alloc] initWithBytes:mSsid.data() length:mSsid.size()];
-        params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb];
+        if (mSsid.HasValue()) {
+            params.ssid = [[NSData alloc] initWithBytes:mSsid.Value().data() length:mSsid.Value().size()];
+        }
+        if (mBreadcrumb.HasValue()) {
+            params.breadcrumb = [NSNumber numberWithUnsignedLongLong:mBreadcrumb.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -38022,8 +38074,8 @@ public:
     }
 
 private:
-    chip::ByteSpan mSsid;
-    uint64_t mBreadcrumb;
+    chip::Optional<chip::ByteSpan> mSsid;
+    chip::Optional<uint64_t> mBreadcrumb;
 };
 
 /*
@@ -39131,10 +39183,21 @@ public:
             }
             params.protocolsSupported = array_0;
         }
-        params.hardwareVersion = [NSNumber numberWithUnsignedShort:mHardwareVersion];
-        params.location = [[NSString alloc] initWithBytes:mLocation.data() length:mLocation.size() encoding:NSUTF8StringEncoding];
-        params.requestorCanConsent = [NSNumber numberWithBool:mRequestorCanConsent];
-        params.metadataForProvider = [[NSData alloc] initWithBytes:mMetadataForProvider.data() length:mMetadataForProvider.size()];
+        if (mHardwareVersion.HasValue()) {
+            params.hardwareVersion = [NSNumber numberWithUnsignedShort:mHardwareVersion.Value()];
+        }
+        if (mLocation.HasValue()) {
+            params.location = [[NSString alloc] initWithBytes:mLocation.Value().data()
+                                                       length:mLocation.Value().size()
+                                                     encoding:NSUTF8StringEncoding];
+        }
+        if (mRequestorCanConsent.HasValue()) {
+            params.requestorCanConsent = [NSNumber numberWithBool:mRequestorCanConsent.Value()];
+        }
+        if (mMetadataForProvider.HasValue()) {
+            params.metadataForProvider = [[NSData alloc] initWithBytes:mMetadataForProvider.Value().data()
+                                                                length:mMetadataForProvider.Value().size()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -39163,10 +39226,10 @@ private:
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type mRequest;
     TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol>>
         mComplex_ProtocolsSupported;
-    uint16_t mHardwareVersion;
-    chip::ByteSpan mLocation;
-    bool mRequestorCanConsent;
-    chip::ByteSpan mMetadataForProvider;
+    chip::Optional<uint16_t> mHardwareVersion;
+    chip::Optional<chip::ByteSpan> mLocation;
+    chip::Optional<bool> mRequestorCanConsent;
+    chip::Optional<chip::ByteSpan> mMetadataForProvider;
 };
 
 /*
@@ -39373,7 +39436,10 @@ public:
         params.providerNodeId = [NSNumber numberWithUnsignedLongLong:mProviderNodeId];
         params.vendorId = [NSNumber numberWithUnsignedShort:mVendorId];
         params.announcementReason = [NSNumber numberWithUnsignedChar:mAnnouncementReason];
-        params.metadataForNode = [[NSData alloc] initWithBytes:mMetadataForNode.data() length:mMetadataForNode.size()];
+        if (mMetadataForNode.HasValue()) {
+            params.metadataForNode = [[NSData alloc] initWithBytes:mMetadataForNode.Value().data()
+                                                            length:mMetadataForNode.Value().size()];
+        }
         params.endpoint = [NSNumber numberWithUnsignedShort:mEndpoint];
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -39398,7 +39464,7 @@ private:
     chip::NodeId mProviderNodeId;
     chip::VendorId mVendorId;
     uint8_t mAnnouncementReason;
-    chip::ByteSpan mMetadataForNode;
+    chip::Optional<chip::ByteSpan> mMetadataForNode;
     chip::EndpointId mEndpoint;
 };
 
@@ -42146,7 +42212,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.nocValue = [[NSData alloc] initWithBytes:mNOCValue.data() length:mNOCValue.size()];
-        params.icacValue = [[NSData alloc] initWithBytes:mICACValue.data() length:mICACValue.size()];
+        if (mICACValue.HasValue()) {
+            params.icacValue = [[NSData alloc] initWithBytes:mICACValue.Value().data() length:mICACValue.Value().size()];
+        }
         params.ipkValue = [[NSData alloc] initWithBytes:mIPKValue.data() length:mIPKValue.size()];
         params.caseAdminNode = [NSNumber numberWithUnsignedLongLong:mCaseAdminNode];
         params.adminVendorId = [NSNumber numberWithUnsignedShort:mAdminVendorId];
@@ -42173,7 +42241,7 @@ public:
 
 private:
     chip::ByteSpan mNOCValue;
-    chip::ByteSpan mICACValue;
+    chip::Optional<chip::ByteSpan> mICACValue;
     chip::ByteSpan mIPKValue;
     chip::NodeId mCaseAdminNode;
     uint16_t mAdminVendorId;
@@ -42553,7 +42621,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.nocValue = [[NSData alloc] initWithBytes:mNOCValue.data() length:mNOCValue.size()];
-        params.icacValue = [[NSData alloc] initWithBytes:mICACValue.data() length:mICACValue.size()];
+        if (mICACValue.HasValue()) {
+            params.icacValue = [[NSData alloc] initWithBytes:mICACValue.Value().data() length:mICACValue.Value().size()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -42577,7 +42647,7 @@ public:
 
 private:
     chip::ByteSpan mNOCValue;
-    chip::ByteSpan mICACValue;
+    chip::Optional<chip::ByteSpan> mICACValue;
 };
 
 /*
@@ -50572,7 +50642,11 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.target = [NSNumber numberWithUnsignedChar:mTarget];
-        params.data = [[NSString alloc] initWithBytes:mData.data() length:mData.size() encoding:NSUTF8StringEncoding];
+        if (mData.HasValue()) {
+            params.data = [[NSString alloc] initWithBytes:mData.Value().data()
+                                                   length:mData.Value().size()
+                                                 encoding:NSUTF8StringEncoding];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -50596,7 +50670,7 @@ public:
 
 private:
     uint8_t mTarget;
-    chip::ByteSpan mData;
+    chip::Optional<chip::ByteSpan> mData;
 };
 
 /*
@@ -52408,7 +52482,9 @@ public:
         __auto_type * params = [[CHIPTestClusterClusterTestNullableOptionalRequestParams alloc] init];
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        params.arg1 = [NSNumber numberWithUnsignedChar:mArg1];
+        if (mArg1.HasValue()) {
+            params.arg1 = [NSNumber numberWithUnsignedChar:mArg1.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -52432,7 +52508,7 @@ public:
     }
 
 private:
-    uint8_t mArg1;
+    chip::Optional<uint8_t> mArg1;
 };
 
 /*
@@ -52457,7 +52533,9 @@ public:
         __auto_type * params = [[CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        params.arg1 = [NSNumber numberWithBool:mArg1];
+        if (mArg1.HasValue()) {
+            params.arg1 = [NSNumber numberWithBool:mArg1.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -52478,7 +52556,7 @@ public:
     }
 
 private:
-    bool mArg1;
+    chip::Optional<bool> mArg1;
 };
 
 /*
@@ -73345,7 +73423,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.liftPercentageValue = [NSNumber numberWithUnsignedChar:mLiftPercentageValue];
-        params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:mLiftPercent100thsValue];
+        if (mLiftPercent100thsValue.HasValue()) {
+            params.liftPercent100thsValue = [NSNumber numberWithUnsignedShort:mLiftPercent100thsValue.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -73367,7 +73447,7 @@ public:
 
 private:
     chip::Percent mLiftPercentageValue;
-    chip::Percent100ths mLiftPercent100thsValue;
+    chip::Optional<chip::Percent100ths> mLiftPercent100thsValue;
 };
 
 /*
@@ -73440,7 +73520,9 @@ public:
         params.timedInvokeTimeoutMs
             = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.tiltPercentageValue = [NSNumber numberWithUnsignedChar:mTiltPercentageValue];
-        params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:mTiltPercent100thsValue];
+        if (mTiltPercent100thsValue.HasValue()) {
+            params.tiltPercent100thsValue = [NSNumber numberWithUnsignedShort:mTiltPercent100thsValue.Value()];
+        }
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--) {
@@ -73462,7 +73544,7 @@ public:
 
 private:
     chip::Percent mTiltPercentageValue;
-    chip::Percent100ths mTiltPercent100thsValue;
+    chip::Optional<chip::Percent100ths> mTiltPercent100thsValue;
 };
 
 /*

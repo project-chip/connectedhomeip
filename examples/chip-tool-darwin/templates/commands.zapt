@@ -54,12 +54,30 @@ public:
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
         {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asStructPropertyName label)) cluster=parent.clusterName type=type depth=0}}
-        {{else if (isOctetString type)}}
-        params.{{asStructPropertyName label}} = [[NSData alloc] initWithBytes:m{{asUpperCamelCase label}}.data() length:m{{asUpperCamelCase label}}.size()];
+        {{else if (isOctetString type)}} 
+            {{#if isOptional}}
+                if (m{{asUpperCamelCase label}}.HasValue()) {
+            {{/if}}
+                params.{{asStructPropertyName label}} = [[NSData alloc] initWithBytes:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.data() length:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.size()];
+            {{#if isOptional}}
+            } 
+            {{/if}}
         {{else if (isString type)}}
-        params.{{asStructPropertyName label}} = [[NSString alloc] initWithBytes:m{{asUpperCamelCase label}}.data() length:m{{asUpperCamelCase label}}.size() encoding:NSUTF8StringEncoding];
+            {{#if isOptional}}
+                if (m{{asUpperCamelCase label}}.HasValue()) {
+            {{/if}}
+                 params.{{asStructPropertyName label}} = [[NSString alloc] initWithBytes:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.data() length:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.size() encoding:NSUTF8StringEncoding];
+            {{#if isOptional}}
+                } 
+            {{/if}}
         {{else}}
-        params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:m{{asUpperCamelCase label}}];
+            {{#if isOptional}}
+                 if (m{{asUpperCamelCase label}}.HasValue()) {
+            {{/if}}
+                 params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}];
+            {{#if isOptional}}
+                } 
+            {{/if}}
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
@@ -92,12 +110,10 @@ private:
     {{#if_chip_complex}}
     chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::Commands::{{asUpperCamelCase parent.name}}::Type mRequest;
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
-    {{else if (isOctetString type)}}
-    chip::ByteSpan m{{asUpperCamelCase label}};
-    {{else if (isCharString type)}}
-    chip::ByteSpan m{{asUpperCamelCase label}};
+    {{else if (isString type)}}
+    {{#if isOptional}}chip::Optional<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} m{{asUpperCamelCase label}};
     {{else}}
-    {{chipType}} m{{asUpperCamelCase label}};
+    {{#if isOptional}}chip::Optional<{{chipType}}>{{else}}{{chipType}}{{/if}} m{{asUpperCamelCase label}};
     {{/if_chip_complex}}
     {{/chip_cluster_command_arguments}}
 };
