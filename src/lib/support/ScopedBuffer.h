@@ -25,7 +25,6 @@
 #pragma once
 
 #include <lib/support/CHIPMem.h>
-
 #include <type_traits>
 #include <utility>
 
@@ -57,7 +56,9 @@ public:
         if (this != &other)
         {
             mBuffer       = other.mBuffer;
+            mSize         = other.mSize;
             other.mBuffer = nullptr;
+            other.mSize   = 0;
         }
         return *this;
     }
@@ -77,12 +78,13 @@ public:
         }
         Impl::MemoryFree(mBuffer);
         mBuffer = nullptr;
+        mSize   = 0;
     }
 
 protected:
     void * Ptr() { return mBuffer; }
     const void * Ptr() const { return mBuffer; }
-
+    size_t GetSize() const { return mSize; }
     /**
      * Releases the undelying buffer. Buffer stops being managed and will not be
      * auto-freed.
@@ -91,6 +93,7 @@ protected:
     {
         void * buffer = mBuffer;
         mBuffer       = nullptr;
+        mSize         = 0;
         return buffer;
     }
 
@@ -98,16 +101,19 @@ protected:
     {
         Free();
         mBuffer = Impl::MemoryAlloc(size);
+        mSize   = size;
     }
 
     void Calloc(size_t elementCount, size_t elementSize)
     {
         Free();
         mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
+        mSize   = elementCount * elementSize;
     }
 
 private:
     void * mBuffer = nullptr;
+    size_t mSize   = 0;
 };
 
 /**
@@ -146,6 +152,8 @@ public:
     inline const T & operator[](size_t index) const { return Get()[index]; }
 
     inline T * Release() { return static_cast<T *>(Base::Release()); }
+
+    inline size_t GetSize() const { return Base::GetSize(); }
 
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
