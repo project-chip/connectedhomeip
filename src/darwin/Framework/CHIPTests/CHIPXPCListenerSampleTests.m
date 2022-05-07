@@ -524,10 +524,9 @@ static CHIPDevice * GetConnectedDevice(void)
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys ipk:testKeys.ipk];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
-    params.ipk = testKeys.ipk;
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
