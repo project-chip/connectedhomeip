@@ -186,12 +186,14 @@ exit:
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    if (HasFeature(endpoint, AudioOutputFeature::kNameUpdates)) {
+    if (HasFeature(endpoint, AudioOutputFeature::kNameUpdates))
+    {
         bool success         = delegate->HandleRenameOutput(index, name);
         EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
         emberAfSendImmediateDefaultResponse(status);
-
-    } else {
+    }
+    else
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         ChipLogError(Zcl, "AudioOutput no name updates feature");
     }

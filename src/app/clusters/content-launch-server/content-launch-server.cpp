@@ -220,8 +220,8 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
 
     Delegate * delegate = GetDelegate(endpoint);
 
-
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kContentSearch), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kContentSearch),
+                 err = CHIP_ERROR_INCORRECT_STATE);
     {
 
         delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
@@ -255,7 +255,8 @@ bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj,
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kURLPlayback), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kURLPlayback),
+                 err = CHIP_ERROR_INCORRECT_STATE);
     {
         delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
                                   brandingInformation.HasValue() ? brandingInformation.Value()
