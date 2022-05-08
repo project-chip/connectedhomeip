@@ -27,8 +27,8 @@
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
