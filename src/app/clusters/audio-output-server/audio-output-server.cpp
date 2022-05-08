@@ -195,7 +195,7 @@ exit:
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         ChipLogError(Zcl, "AudioOutput no name updates feature");
     }
-    
+
     return true;
 }
 
