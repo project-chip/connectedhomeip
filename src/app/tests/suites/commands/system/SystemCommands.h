@@ -21,6 +21,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/StringBuilder.h>
 
+#include <app-common/zap-generated/tests/simulated-cluster-objects.h>
+
 class SystemCommands
 {
 public:
@@ -29,14 +31,12 @@ public:
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
-    CHIP_ERROR Start(uint16_t discriminator = 0xFFFF, uint16_t port = CHIP_PORT, const char * kvs = nullptr,
-                     const char * registerKey = "default");
-    CHIP_ERROR Stop(const char * registerKey = "default");
-    CHIP_ERROR Reboot(const char * registerKey = "default");
-    CHIP_ERROR FactoryReset(const char * registerKey = "default");
+    CHIP_ERROR Start(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Start::Type & value);
+    CHIP_ERROR Stop(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Stop::Type & value);
+    CHIP_ERROR Reboot(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Reboot::Type & value);
+    CHIP_ERROR FactoryReset(const char * identity, const chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type & value);
 
 private:
+    CHIP_ERROR RunInternal(const char * scriptName, const chip::Optional<chip::CharSpan> registerKey);
     CHIP_ERROR RunInternal(const char * command);
-    CHIP_ERROR CreateCommonCommandArgs(chip::StringBuilderBase & builder, const char * scriptDir, const char * scriptName,
-                                       const char * registerKey, uint16_t discriminator, uint16_t port, const char * kvs);
 };
