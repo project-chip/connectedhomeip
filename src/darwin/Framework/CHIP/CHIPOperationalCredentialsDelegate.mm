@@ -40,282 +40,22 @@ using namespace TLV;
 using namespace Credentials;
 using namespace Crypto;
 
-static BOOL isRunningTests(void)
-{
-    NSDictionary * environment = [[NSProcessInfo processInfo] environment];
-    return (environment[@"XCTestConfigurationFilePath"] != nil);
-}
-
-static void ClearSecretData(NSMutableData * data)
-{
-    Crypto::ClearSecretData(static_cast<uint8_t *>([data mutableBytes]), [data length]);
-}
-
 CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
-    CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * _Nullable ipk)
+    CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk)
 {
-    if (storage == nil) {
+    if (storage == nil || nocSigner == nullptr || ipk == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     mStorage = storage;
 
-    if (!nocSigner) {
-        CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate: No NOC Signer provided, using self managed keys");
+    mIssuerKey = std::move(nocSigner);
 
-        mIssuerKey.reset(new chip::Crypto::P256Keypair());
-        CHIP_ERROR err = LoadRootCertKeysFromKeyChain();
-
-        if (err != CHIP_NO_ERROR) {
-            // Generate keys if keys could not be loaded.  Delete keys first, in
-            // case we have already-stored data that could not be loaded as
-            // keys; otherwise key generation will fail due to not being able to
-            // store in the keychain.
-            DeleteRootCertKeysFromKeychain();
-
-            err = GenerateRootCertKeys();
-        }
-
-        if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init failed to set up CA keypair: %s", err.AsString());
-            return err;
-        }
-    } else {
-        mIssuerKey = std::move(nocSigner);
-    }
-
-    if (ipk) {
-        if ([ipk length] != mIPK.Length()) {
-            CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init provided IPK is wrong size");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        memcpy(mIPK.Bytes(), [ipk bytes], [ipk length]);
-    } else {
-        CHIP_ERROR err = LoadIPKFromKeyChain();
-
-        if (err != CHIP_NO_ERROR) {
-            // Generate an IPK if an IPK could not be loaded.  Delete the existing
-            // IPK first, in case we have already-stored data that could not be
-            // loaded as an IPK; otherwise IPK generation will fail due to not being
-            // able to store in the keychain.
-            DeleteIPKFromKeyChain();
-
-            err = GenerateIPK();
-        }
-
-        if (err != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init failed to set up IPK: %s", err.AsString());
-            return err;
-        }
-    }
-
-    // If keys were loaded, or generated, let's get the certificate issuer ID
-
-    // TODO - enable generating a random issuer ID and saving it in persistent storage
-    // err = SetIssuerID(storage);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorageDelegateBridge * storage)
-{
-    static const char * const CHIP_COMMISSIONER_CA_ISSUER_ID = "com.zigbee.chip.commissioner.ca.issuer.id";
-    if (storage == nil) {
+    if ([ipk length] != mIPK.Length()) {
+        CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init provided IPK is wrong size");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    uint16_t issuerIdLen = sizeof(mIssuerId);
-    if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, issuerIdLen)) {
-        mIssuerId = arc4random();
-        mIssuerId = mIssuerId << 32 | arc4random();
-        CHIP_LOG_ERROR("Assigned %llx certificate issuer ID to the commissioner", mIssuerId);
-        storage->SyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, sizeof(mIssuerId));
-    } else {
-        CHIP_LOG_ERROR("Found %llx certificate issuer ID for the commissioner", mIssuerId);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadRootCertKeysFromKeyChain()
-{
-    const NSDictionary * query = @{
-        (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyChainLabel,
-        (id) kSecAttrSynchronizable : @YES,
-        (id) kSecReturnData : @YES,
-    };
-
-    // The CFDataRef we get from SecItemCopyMatching allocates its
-    // buffer in a way that zeroes it when deallocated.
-    CFDataRef keyDataRef;
-    OSStatus status = SecItemCopyMatching((CFDictionaryRef) query, (CFTypeRef *) &keyDataRef);
-    if (status == errSecItemNotFound || keyDataRef == nil) {
-        CHIP_LOG_ERROR("Did not find self managed keys in the keychain");
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
-
-    CHIP_LOG_ERROR("Found an existing self managed keypair in the keychain");
-    NSData * keyData = CFBridgingRelease(keyDataRef);
-
-    NSMutableData * keypairData = [[NSMutableData alloc] initWithBase64EncodedData:keyData options:0];
-
-    chip::Crypto::P256SerializedKeypair serialized;
-    if ([keypairData length] != serialized.Capacity()) {
-        NSLog(@"Keypair length %u does not match expected length %u", static_cast<unsigned int>([keypairData length]),
-            static_cast<unsigned int>(serialized.Capacity()));
-        ClearSecretData(keypairData);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    std::memmove((uint8_t *) serialized, [keypairData bytes], [keypairData length]);
-    serialized.SetLength([keypairData length]);
-
-    ClearSecretData(keypairData);
-
-    CHIP_LOG_ERROR("Deserializing the key");
-    return mIssuerKey->Deserialize(serialized);
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadIPKFromKeyChain()
-{
-    const NSDictionary * query = @{
-        (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPIPKKeyChainLabel,
-        (id) kSecAttrSynchronizable : @YES,
-        (id) kSecReturnData : @YES,
-    };
-
-    // The CFDataRef we get from SecItemCopyMatching allocates its
-    // buffer in a way that zeroes it when deallocated.
-    CFDataRef keyDataRef;
-    OSStatus status = SecItemCopyMatching((CFDictionaryRef) query, (CFTypeRef *) &keyDataRef);
-    if (status == errSecItemNotFound || keyDataRef == nil) {
-        CHIP_LOG_ERROR("Did not find IPK in the keychain");
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
-
-    CHIP_LOG_ERROR("Found an existing IPK in the keychain");
-    NSData * keyData = CFBridgingRelease(keyDataRef);
-
-    NSMutableData * ipkData = [[NSMutableData alloc] initWithBase64EncodedData:keyData options:0];
-    if ([ipkData length] != mIPK.Length()) {
-        NSLog(@"IPK length %u does not match expected length %u", static_cast<unsigned int>([ipkData length]),
-            static_cast<unsigned int>(mIPK.Length()));
-        ClearSecretData(ipkData);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    memcpy(mIPK.Bytes(), [ipkData bytes], [ipkData length]);
-    ClearSecretData(ipkData);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertKeys()
-{
-    CHIP_LOG_ERROR("Generating self managed keys for the CA");
-    CHIP_ERROR errorCode = mIssuerKey->Initialize();
-    if (errorCode != CHIP_NO_ERROR) {
-        return errorCode;
-    }
-
-    chip::Crypto::P256SerializedKeypair serializedKey;
-    errorCode = mIssuerKey->Serialize(serializedKey);
-    if (errorCode != CHIP_NO_ERROR) {
-        return errorCode;
-    }
-
-    NSMutableData * keypairData = [NSMutableData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
-
-    const NSDictionary * addParams = @{
-        (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyChainLabel,
-        (id) kSecAttrSynchronizable : @YES,
-        // TODO: Figure out how to ClearSecretData on the base-64 encoded data?
-        (id) kSecValueData : [keypairData base64EncodedDataWithOptions:0],
-    };
-
-    ClearSecretData(keypairData);
-
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, nullptr);
-    // TODO: Enable SecItemAdd for Darwin unit tests
-    if (status != errSecSuccess && !isRunningTests()) {
-        NSLog(@"Failed in storing key : %d", status);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    NSLog(@"Stored the keys");
-    mForceRootCertRegeneration = true;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIPK()
-{
-    CHIP_ERROR errorCode = DRBG_get_bytes(mIPK.Bytes(), mIPK.Length());
-    if (errorCode != CHIP_NO_ERROR) {
-        return errorCode;
-    }
-
-    NSMutableData * ipkData = [NSMutableData dataWithBytes:mIPK.Bytes() length:mIPK.Length()];
-
-    const NSDictionary * addParams = @{
-        (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPIPKKeyChainLabel,
-        (id) kSecAttrSynchronizable : @YES,
-        // TODO: Figure out how to ClearSecretData on the base-64 encoded data?
-        (id) kSecValueData : [ipkData base64EncodedDataWithOptions:0],
-    };
-
-    ClearSecretData(ipkData);
-
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef) addParams, nullptr);
-    // TODO: Enable SecItemAdd for Darwin unit tests
-    if (status != errSecSuccess && !isRunningTests()) {
-        NSLog(@"Failed in storing IPK : %d", status);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    NSLog(@"Stored IPK");
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteRootCertKeysFromKeychain()
-{
-    CHIP_LOG_ERROR("Deleting self managed CA keys");
-    OSStatus status = noErr;
-
-    const NSDictionary * deleteParams = @{
-        (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyChainLabel,
-        (id) kSecAttrSynchronizable : @YES,
-    };
-
-    status = SecItemDelete((__bridge CFDictionaryRef) deleteParams);
-    if (status != errSecSuccess) {
-        NSLog(@"Failed in deleting key : %d", status);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    NSLog(@"Deleted the key");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteIPKFromKeyChain()
-{
-    const NSDictionary * deleteParams = @{
-        (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPIPKKeyChainLabel,
-        (id) kSecAttrSynchronizable : @YES,
-    };
-
-    OSStatus status = SecItemDelete((__bridge CFDictionaryRef) deleteParams);
-    if (status != errSecSuccess) {
-        NSLog(@"Failed in deleting IPK : %d", status);
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    NSLog(@"Deleted the IPK");
+    memcpy(mIPK.Bytes(), [ipk bytes], [ipk length]);
 
     return CHIP_NO_ERROR;
 }
@@ -338,19 +78,16 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     }
 
     ChipDN rcac_dn;
-    if (!mForceRootCertRegeneration) {
-        uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
-        if (haveRootCert) {
-            uint64_t rcacId;
-            rcac.reduce_size(rcacBufLen);
-            ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
-            ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
-            VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
-        }
-    }
-    if (!haveRootCert) {
+    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+        haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
+    if (haveRootCert) {
+        uint64_t rcacId;
+        rcac.reduce_size(rcacBufLen);
+        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
+        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
+    } else {
         ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
         ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabricId));
 
@@ -361,8 +98,6 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
         PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
             ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
-
-        mForceRootCertRegeneration = false;
     }
 
     icac.reduce_size(0);
