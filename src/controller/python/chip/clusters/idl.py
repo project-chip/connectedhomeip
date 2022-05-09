@@ -84,7 +84,8 @@ def _make_attribute_class(cluster: matter_idl_types.Cluster, attribute: matter_i
     attribute_type = _make_pythong_typing_hint_from_idl_field(
         t=attribute.definition, namespace_types=namespace_types)
 
-    res = dataclasses.make_dataclass(cls_name=attribute.definition.name, fields=[('value', attribute_type, None)])
+    res = dataclasses.make_dataclass(cls_name=attribute.definition.name, bases=(
+        ClusterObjects.ClusterAttributeDescriptor,), fields=[('value', attribute_type, None)])
     res.cluster_id = cluster.code
     res.attribute_id = attribute.definition.code
     res.attribute_type = ClusterObjects.ClusterObjectFieldDescriptor(Type=attribute_type)

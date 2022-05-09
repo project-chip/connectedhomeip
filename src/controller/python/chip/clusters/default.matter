@@ -64,9 +64,9 @@ server cluster PowerConfiguration = 1 {
   readonly nosubscribe attribute int8u battery3PercentageThreshold2 = 124;
   readonly nosubscribe attribute int8u battery3PercentageThreshold3 = 125;
   readonly nosubscribe attribute bitmap32 battery3AlarmState = 126;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -82,9 +82,9 @@ server cluster DeviceTemperatureConfiguration = 2 {
   readonly nosubscribe attribute int16s highTempThreshold = 18;
   readonly nosubscribe attribute int24u lowTempDwellTripPoint = 19;
   readonly nosubscribe attribute int24u highTempDwellTripPoint = 20;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -115,9 +115,9 @@ server cluster Identify = 3 {
 
   readonly nosubscribe attribute int16u identifyTime = 0;
   readonly nosubscribe attribute enum8 identifyType = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -142,9 +142,9 @@ server cluster Identify = 3 {
 
 server cluster Groups = 4 {
   readonly nosubscribe attribute bitmap8 nameSupport = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -217,9 +217,9 @@ server cluster Scenes = 5 {
   readonly nosubscribe attribute boolean sceneValid = 3;
   readonly nosubscribe attribute bitmap8 nameSupport = 4;
   readonly nosubscribe attribute node_id lastConfiguredBy = 5;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -390,9 +390,9 @@ server cluster OnOff = 6 {
   readonly nosubscribe attribute int16u onTime = 16385;
   readonly nosubscribe attribute int16u offWaitTime = 16386;
   readonly nosubscribe attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -419,9 +419,9 @@ server cluster OnOff = 6 {
 server cluster OnOffSwitchConfiguration = 7 {
   readonly nosubscribe attribute enum8 switchType = 0;
   readonly nosubscribe attribute enum8 switchActions = 16;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -458,9 +458,9 @@ server cluster LevelControl = 8 {
   readonly nosubscribe attribute nullable int16u offTransitionTime = 19;
   readonly nosubscribe attribute nullable int8u defaultMoveRate = 20;
   readonly nosubscribe attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -520,9 +520,9 @@ server cluster LevelControl = 8 {
 
 server cluster Alarms = 9 {
   readonly nosubscribe attribute int16u alarmCount = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -561,9 +561,9 @@ server cluster Time = 10 {
   readonly nosubscribe attribute int32u localTime = 7;
   readonly nosubscribe attribute epoch_s lastSetTime = 8;
   readonly nosubscribe attribute epoch_s validUntilTime = 9;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -579,9 +579,9 @@ server cluster BinaryInputBasic = 15 {
   readonly nosubscribe attribute enum8 reliability = 103;
   readonly nosubscribe attribute bitmap8 statusFlags = 111;
   readonly nosubscribe attribute int32u applicationType = 256;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -614,9 +614,9 @@ server cluster PowerProfile = 26 {
   readonly nosubscribe attribute bitmap8 energyFormatting = 2;
   readonly nosubscribe attribute boolean energyRemote = 3;
   readonly nosubscribe attribute bitmap8 scheduleMode = 4;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -790,9 +790,9 @@ server cluster ApplianceControl = 27 {
   readonly nosubscribe attribute int16u startTime = 0;
   readonly nosubscribe attribute int16u finishTime = 1;
   readonly nosubscribe attribute int16u remainingTime = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -832,9 +832,9 @@ server cluster ApplianceControl = 27 {
 }
 
 server cluster PulseWidthModulation = 28 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -846,13 +846,13 @@ server cluster Descriptor = 29 {
     INT16U revision = 1;
   }
 
-  readonly nosubscribe attribute array deviceList = 0;
-  readonly nosubscribe attribute array serverList = 1;
-  readonly nosubscribe attribute array clientList = 2;
-  readonly nosubscribe attribute array partsList = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute DeviceType deviceList[] = 0;
+  readonly nosubscribe attribute CLUSTER_ID serverList[] = 1;
+  readonly nosubscribe attribute CLUSTER_ID clientList[] = 2;
+  readonly nosubscribe attribute ENDPOINT_NO partsList[] = 3;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -867,10 +867,10 @@ server cluster Binding = 30 {
     FABRIC_IDX fabricIndex = 254;
   }
 
-  readonly nosubscribe attribute array binding = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute TargetStruct binding[] = 0;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -932,14 +932,14 @@ server cluster AccessControl = 31 {
     fabric_idx adminFabricIndex = 254;
   }
 
-  readonly nosubscribe attribute access(read: administer, write: administer) array acl = 0;
-  readonly nosubscribe attribute access(read: administer, write: administer) array extension = 1;
+  readonly nosubscribe attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
+  readonly nosubscribe attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
   readonly nosubscribe attribute int16u subjectsPerAccessControlEntry = 2;
   readonly nosubscribe attribute int16u targetsPerAccessControlEntry = 3;
   readonly nosubscribe attribute int16u accessControlEntriesPerFabric = 4;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -953,9 +953,9 @@ server cluster PollControl = 32 {
   readonly nosubscribe attribute int32u checkInIntervalMin = 4;
   readonly nosubscribe attribute int32u longPollIntervalMin = 5;
   readonly nosubscribe attribute int16u fastPollTimeoutMax = 6;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1054,12 +1054,12 @@ server cluster BridgedActions = 37 {
     ActionErrorEnum error = 3;
   }
 
-  readonly nosubscribe attribute array actionList = 0;
-  readonly nosubscribe attribute array endpointList = 1;
+  readonly nosubscribe attribute ActionStruct actionList[] = 0;
+  readonly nosubscribe attribute EndpointListStruct endpointList[] = 1;
   readonly nosubscribe attribute long_char_string<512> setupUrl = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1183,9 +1183,9 @@ server cluster Basic = 40 {
   readonly nosubscribe attribute boolean reachable = 17;
   readonly nosubscribe attribute char_string<32> uniqueID = 18;
   readonly nosubscribe attribute CapabilityMinimaStruct capabilityMinima = 19;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1214,9 +1214,9 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1315,13 +1315,13 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     nullable INT64S platformCode = 3;
   }
 
-  readonly nosubscribe attribute array defaultOtaProviders = 0;
+  readonly nosubscribe attribute ProviderLocation defaultOtaProviders[] = 0;
   readonly nosubscribe attribute boolean updatePossible = 1;
   readonly nosubscribe attribute OTAUpdateStateEnum updateState = 2;
   readonly nosubscribe attribute nullable int8u updateStateProgress = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1339,10 +1339,10 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
 server cluster LocalizationConfiguration = 43 {
   readonly nosubscribe attribute char_string<35> activeLocale = 1;
-  readonly nosubscribe attribute array supportedLocales = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute CHAR_STRING supportedLocales[] = 2;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1371,10 +1371,10 @@ server cluster TimeFormatLocalization = 44 {
 
   readonly nosubscribe attribute HourFormat hourFormat = 0;
   readonly nosubscribe attribute CalendarType activeCalendarType = 1;
-  readonly nosubscribe attribute array supportedCalendarTypes = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1392,19 +1392,19 @@ server cluster UnitLocalization = 45 {
   }
 
   readonly nosubscribe attribute TempUnit temperatureUnit = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
 }
 
 server cluster PowerSourceConfiguration = 46 {
-  readonly nosubscribe attribute array sources = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute INT8U sources[] = 0;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1501,7 +1501,7 @@ server cluster PowerSource = 47 {
   readonly nosubscribe attribute int32u wiredNominalVoltage = 7;
   readonly nosubscribe attribute int32u wiredMaximumCurrent = 8;
   readonly nosubscribe attribute boolean wiredPresent = 9;
-  readonly nosubscribe attribute array activeWiredFaults = 10;
+  readonly nosubscribe attribute ENUM8 activeWiredFaults[] = 10;
   readonly nosubscribe attribute int32u batteryVoltage = 11;
   readonly nosubscribe attribute int8u batteryPercentRemaining = 12;
   readonly nosubscribe attribute int32u batteryTimeRemaining = 13;
@@ -1509,7 +1509,7 @@ server cluster PowerSource = 47 {
   readonly nosubscribe attribute boolean batteryReplacementNeeded = 15;
   readonly nosubscribe attribute enum8 batteryReplaceability = 16;
   readonly nosubscribe attribute boolean batteryPresent = 17;
-  readonly nosubscribe attribute array activeBatteryFaults = 18;
+  readonly nosubscribe attribute ENUM8 activeBatteryFaults[] = 18;
   readonly nosubscribe attribute char_string<60> batteryReplacementDescription = 19;
   readonly nosubscribe attribute int32u batteryCommonDesignation = 20;
   readonly nosubscribe attribute char_string<20> batteryANSIDesignation = 21;
@@ -1521,10 +1521,10 @@ server cluster PowerSource = 47 {
   readonly nosubscribe attribute int32u batteryTimeToFullCharge = 27;
   readonly nosubscribe attribute boolean batteryFunctionalWhileCharging = 28;
   readonly nosubscribe attribute int32u batteryChargingCurrent = 29;
-  readonly nosubscribe attribute array activeBatteryChargeFaults = 30;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute ENUM8 activeBatteryChargeFaults[] = 30;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1554,9 +1554,9 @@ server cluster GeneralCommissioning = 48 {
   readonly nosubscribe attribute RegulatoryLocationType regulatoryConfig = 2;
   readonly nosubscribe attribute RegulatoryLocationType locationCapability = 3;
   readonly nosubscribe attribute boolean supportsConcurrentConnection = 4;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1657,16 +1657,16 @@ server cluster NetworkCommissioning = 49 {
   }
 
   readonly nosubscribe attribute access(read: administer) int8u maxNetworks = 0;
-  readonly nosubscribe attribute access(read: administer) array networks = 1;
+  readonly nosubscribe attribute access(read: administer) NetworkInfo networks[] = 1;
   readonly nosubscribe attribute int8u scanMaxTimeSeconds = 2;
   readonly nosubscribe attribute int8u connectMaxTimeSeconds = 3;
   readonly nosubscribe attribute access(write: administer) boolean interfaceEnabled = 4;
   readonly nosubscribe attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
   readonly nosubscribe attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly nosubscribe attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1750,9 +1750,9 @@ server cluster DiagnosticLogs = 50 {
     kBdx = 1;
   }
 
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1853,17 +1853,17 @@ server cluster GeneralDiagnostics = 51 {
     BootReasonType bootReason = 0;
   }
 
-  readonly nosubscribe attribute array networkInterfaces = 0;
+  readonly nosubscribe attribute NetworkInterfaceType networkInterfaces[] = 0;
   readonly nosubscribe attribute int16u rebootCount = 1;
   readonly nosubscribe attribute int64u upTime = 2;
   readonly nosubscribe attribute int32u totalOperationalHours = 3;
   readonly nosubscribe attribute enum8 bootReasons = 4;
-  readonly nosubscribe attribute array activeHardwareFaults = 5;
-  readonly nosubscribe attribute array activeRadioFaults = 6;
-  readonly nosubscribe attribute array activeNetworkFaults = 7;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute ENUM8 activeHardwareFaults[] = 5;
+  readonly nosubscribe attribute ENUM8 activeRadioFaults[] = 6;
+  readonly nosubscribe attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1888,13 +1888,13 @@ server cluster SoftwareDiagnostics = 52 {
     SoftwareFaultStruct softwareFault = 0;
   }
 
-  readonly nosubscribe attribute array threadMetrics = 0;
+  readonly nosubscribe attribute ThreadMetrics threadMetrics[] = 0;
   readonly nosubscribe attribute int64u currentHeapFree = 1;
   readonly nosubscribe attribute int64u currentHeapUsed = 2;
   readonly nosubscribe attribute int64u currentHeapHighWatermark = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -1993,8 +1993,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly nosubscribe attribute int64u extendedPanId = 4;
   readonly nosubscribe attribute octet_string<17> meshLocalPrefix = 5;
   readonly nosubscribe attribute int64u overrunCount = 6;
-  readonly nosubscribe attribute array neighborTableList = 7;
-  readonly nosubscribe attribute array routeTableList = 8;
+  readonly nosubscribe attribute NeighborTable neighborTableList[] = 7;
+  readonly nosubscribe attribute RouteTable routeTableList[] = 8;
   readonly nosubscribe attribute int32u partitionId = 9;
   readonly nosubscribe attribute int8u weighting = 10;
   readonly nosubscribe attribute int8u dataVersion = 11;
@@ -2045,13 +2045,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly nosubscribe attribute int64u activeTimestamp = 56;
   readonly nosubscribe attribute int64u pendingTimestamp = 57;
   readonly nosubscribe attribute int32u delay = 58;
-  readonly nosubscribe attribute array securityPolicy = 59;
+  readonly nosubscribe attribute SecurityPolicy securityPolicy[] = 59;
   readonly nosubscribe attribute octet_string<4> channelMask = 60;
-  readonly nosubscribe attribute array operationalDatasetComponents = 61;
-  readonly nosubscribe attribute array activeNetworkFaultsList = 62;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  readonly nosubscribe attribute NetworkFault activeNetworkFaultsList[] = 62;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2116,9 +2116,9 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly nosubscribe attribute int32u packetUnicastTxCount = 10;
   readonly nosubscribe attribute int64u currentMaxRate = 11;
   readonly nosubscribe attribute int64u overrunCount = 12;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2149,9 +2149,9 @@ server cluster EthernetNetworkDiagnostics = 55 {
   readonly nosubscribe attribute int64u overrunCount = 6;
   readonly nosubscribe attribute nullable boolean carrierDetect = 7;
   readonly nosubscribe attribute int64u timeSinceReset = 8;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2160,9 +2160,9 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster TimeSynchronization = 56 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2198,9 +2198,9 @@ server cluster BridgedDeviceBasic = 57 {
   readonly nosubscribe attribute char_string<32> serialNumber = 15;
   readonly nosubscribe attribute boolean reachable = 17;
   readonly nosubscribe attribute char_string<32> uniqueID = 18;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2240,9 +2240,9 @@ server cluster Switch = 59 {
   readonly nosubscribe attribute int8u numberOfPositions = 0;
   readonly nosubscribe attribute int8u currentPosition = 1;
   readonly nosubscribe attribute int8u multiPressMax = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2264,9 +2264,9 @@ server cluster AdministratorCommissioning = 60 {
   readonly nosubscribe attribute int8u windowStatus = 0;
   readonly nosubscribe attribute fabric_idx adminFabricIndex = 1;
   readonly nosubscribe attribute int16u adminVendorId = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2317,15 +2317,15 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly nosubscribe attribute access(read: administer) array NOCs = 0;
-  readonly nosubscribe attribute array fabrics = 1;
+  readonly nosubscribe attribute access(read: administer) NOCStruct NOCs[] = 0;
+  readonly nosubscribe attribute FabricDescriptor fabrics[] = 1;
   readonly nosubscribe attribute int8u supportedFabrics = 2;
   readonly nosubscribe attribute int8u commissionedFabrics = 3;
-  readonly nosubscribe attribute array trustedRootCertificates = 4;
+  readonly nosubscribe attribute OCTET_STRING trustedRootCertificates[] = 4;
   readonly nosubscribe attribute fabric_idx currentFabricIndex = 5;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2432,13 +2432,13 @@ server cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  readonly nosubscribe attribute access(write: manage) array groupKeyMap = 0;
-  readonly nosubscribe attribute array groupTable = 1;
+  readonly nosubscribe attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly nosubscribe attribute GroupInfoMapStruct groupTable[] = 1;
   readonly nosubscribe attribute int16u maxGroupsPerFabric = 2;
   readonly nosubscribe attribute int16u maxGroupKeysPerFabric = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2479,10 +2479,10 @@ server cluster FixedLabel = 64 {
     CHAR_STRING<16> value = 1;
   }
 
-  readonly nosubscribe attribute array labelList = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute LabelStruct labelList[] = 0;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2494,37 +2494,37 @@ server cluster UserLabel = 65 {
     CHAR_STRING<16> value = 1;
   }
 
-  readonly nosubscribe attribute access(write: manage) array labelList = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
 }
 
 server cluster ProxyConfiguration = 66 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
 }
 
 server cluster ProxyDiscovery = 67 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
 }
 
 server cluster ProxyValid = 68 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2536,9 +2536,9 @@ server cluster BooleanState = 69 {
   }
 
   readonly nosubscribe attribute boolean stateValue = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2562,13 +2562,13 @@ server cluster ModeSelect = 80 {
 
   readonly nosubscribe attribute char_string<32> description = 0;
   readonly nosubscribe attribute nullable enum16 standardNamespace = 1;
-  readonly nosubscribe attribute array supportedModes = 2;
+  readonly nosubscribe attribute ModeOptionStruct supportedModes[] = 2;
   readonly nosubscribe attribute int8u currentMode = 3;
   readonly nosubscribe attribute nullable int8u startUpMode = 4;
   readonly nosubscribe attribute nullable int8u onMode = 5;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -2586,9 +2586,9 @@ server cluster ShadeConfiguration = 256 {
   readonly nosubscribe attribute bitmap8 status = 2;
   readonly nosubscribe attribute int16u closedLimit = 16;
   readonly nosubscribe attribute enum8 mode = 17;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3018,9 +3018,9 @@ server cluster DoorLock = 257 {
   readonly nosubscribe attribute access(write: administer) DlKeypadOperationEventMask keypadProgrammingEventMask = 69;
   readonly nosubscribe attribute access(write: administer) DlRemoteProgrammingEventMask remoteProgrammingEventMask = 70;
   readonly nosubscribe attribute access(write: administer) DlRFIDProgrammingEventMask RFIDProgrammingEventMask = 71;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3427,9 +3427,9 @@ server cluster WindowCovering = 258 {
   readonly nosubscribe attribute int16u installedClosedLimitTilt = 19;
   readonly nosubscribe attribute access(write: manage) Mode mode = 23;
   readonly nosubscribe attribute bitmap16 safetyStatus = 26;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3472,9 +3472,9 @@ server cluster BarrierControl = 259 {
   readonly nosubscribe attribute int16u barrierOpenPeriod = 8;
   readonly nosubscribe attribute int16u barrierClosePeriod = 9;
   readonly nosubscribe attribute int8u barrierPosition = 10;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3591,9 +3591,9 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly nosubscribe attribute access(write: manage) PumpOperationMode operationMode = 32;
   readonly nosubscribe attribute access(write: manage) PumpControlMode controlMode = 33;
   readonly nosubscribe attribute bitmap16 alarmMask = 34;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3699,9 +3699,9 @@ server cluster Thermostat = 513 {
   readonly nosubscribe attribute access(write: manage) enum8 acLouverPosition = 69;
   readonly nosubscribe attribute int16s acCoilTemperature = 70;
   readonly nosubscribe attribute access(write: manage) enum8 acCapacityFormat = 71;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3800,9 +3800,9 @@ server cluster FanControl = 514 {
   readonly nosubscribe attribute bitmap8 rockSetting = 8;
   readonly nosubscribe attribute bitmap8 windSupport = 9;
   readonly nosubscribe attribute bitmap8 windSetting = 10;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3817,9 +3817,9 @@ server cluster DehumidificationControl = 515 {
   readonly nosubscribe attribute int8u dehumidificationHysteresis = 19;
   readonly nosubscribe attribute int8u dehumidificationMaxCool = 20;
   readonly nosubscribe attribute enum8 relativeHumidityDisplay = 21;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3829,9 +3829,9 @@ server cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly nosubscribe attribute enum8 temperatureDisplayMode = 0;
   readonly nosubscribe attribute access(write: manage) enum8 keypadLockout = 1;
   readonly nosubscribe attribute access(write: manage) enum8 scheduleProgrammingVisibility = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -3959,9 +3959,9 @@ server cluster ColorControl = 768 {
   readonly nosubscribe attribute int16u colorTempPhysicalMax = 16396;
   readonly nosubscribe attribute int16u coupleColorTempToLevelMinMireds = 16397;
   readonly nosubscribe attribute access(write: manage) int16u startUpColorTemperatureMireds = 16400;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4152,9 +4152,9 @@ server cluster BallastConfiguration = 769 {
   readonly nosubscribe attribute int24u lampBurnHours = 51;
   readonly nosubscribe attribute bitmap8 lampAlarmMode = 52;
   readonly nosubscribe attribute int24u lampBurnHoursTripPoint = 53;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4171,9 +4171,9 @@ server cluster IlluminanceMeasurement = 1024 {
   readonly nosubscribe attribute nullable int16u maxMeasuredValue = 2;
   readonly nosubscribe attribute int16u tolerance = 3;
   readonly nosubscribe attribute nullable enum8 lightSensorType = 4;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4184,9 +4184,9 @@ server cluster TemperatureMeasurement = 1026 {
   readonly nosubscribe attribute nullable int16s minMeasuredValue = 1;
   readonly nosubscribe attribute nullable int16s maxMeasuredValue = 2;
   readonly nosubscribe attribute int16u tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4206,9 +4206,9 @@ server cluster PressureMeasurement = 1027 {
   readonly nosubscribe attribute nullable int16s maxScaledValue = 18;
   readonly nosubscribe attribute int16u scaledTolerance = 19;
   readonly nosubscribe attribute int8s scale = 20;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4219,9 +4219,9 @@ server cluster FlowMeasurement = 1028 {
   readonly nosubscribe attribute nullable int16u minMeasuredValue = 1;
   readonly nosubscribe attribute nullable int16u maxMeasuredValue = 2;
   readonly nosubscribe attribute int16u tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4232,9 +4232,9 @@ server cluster RelativeHumidityMeasurement = 1029 {
   readonly nosubscribe attribute nullable int16u minMeasuredValue = 1;
   readonly nosubscribe attribute nullable int16u maxMeasuredValue = 2;
   readonly nosubscribe attribute int16u tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4253,9 +4253,9 @@ server cluster OccupancySensing = 1030 {
   readonly nosubscribe attribute access(write: manage) int16u physicalContactOccupiedToUnoccupiedDelay = 48;
   readonly nosubscribe attribute access(write: manage) int16u physicalContactUnoccupiedToOccupiedDelay = 49;
   readonly nosubscribe attribute access(write: manage) int8u physicalContactUnoccupiedToOccupiedThreshold = 50;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4266,9 +4266,9 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4279,9 +4279,9 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4292,9 +4292,9 @@ server cluster EthyleneConcentrationMeasurement = 1038 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4305,9 +4305,9 @@ server cluster EthyleneOxideConcentrationMeasurement = 1039 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4318,9 +4318,9 @@ server cluster HydrogenConcentrationMeasurement = 1040 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4331,9 +4331,9 @@ server cluster HydrogenSulphideConcentrationMeasurement = 1041 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4344,9 +4344,9 @@ server cluster NitricOxideConcentrationMeasurement = 1042 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4357,9 +4357,9 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4370,9 +4370,9 @@ server cluster OxygenConcentrationMeasurement = 1044 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4383,9 +4383,9 @@ server cluster OzoneConcentrationMeasurement = 1045 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4396,9 +4396,9 @@ server cluster SulfurDioxideConcentrationMeasurement = 1046 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4409,9 +4409,9 @@ server cluster DissolvedOxygenConcentrationMeasurement = 1047 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4422,9 +4422,9 @@ server cluster BromateConcentrationMeasurement = 1048 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4435,9 +4435,9 @@ server cluster ChloraminesConcentrationMeasurement = 1049 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4448,9 +4448,9 @@ server cluster ChlorineConcentrationMeasurement = 1050 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4461,9 +4461,9 @@ server cluster FecalColiformAndEColiConcentrationMeasurement = 1051 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4474,9 +4474,9 @@ server cluster FluorideConcentrationMeasurement = 1052 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4487,9 +4487,9 @@ server cluster HaloaceticAcidsConcentrationMeasurement = 1053 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4500,9 +4500,9 @@ server cluster TotalTrihalomethanesConcentrationMeasurement = 1054 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4513,9 +4513,9 @@ server cluster TotalColiformBacteriaConcentrationMeasurement = 1055 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4526,9 +4526,9 @@ server cluster TurbidityConcentrationMeasurement = 1056 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4539,9 +4539,9 @@ server cluster CopperConcentrationMeasurement = 1057 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4552,9 +4552,9 @@ server cluster LeadConcentrationMeasurement = 1058 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4565,9 +4565,9 @@ server cluster ManganeseConcentrationMeasurement = 1059 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4578,9 +4578,9 @@ server cluster SulfateConcentrationMeasurement = 1060 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4591,9 +4591,9 @@ server cluster BromodichloromethaneConcentrationMeasurement = 1061 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4604,9 +4604,9 @@ server cluster BromoformConcentrationMeasurement = 1062 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4617,9 +4617,9 @@ server cluster ChlorodibromomethaneConcentrationMeasurement = 1063 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4630,9 +4630,9 @@ server cluster ChloroformConcentrationMeasurement = 1064 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4643,9 +4643,9 @@ server cluster SodiumConcentrationMeasurement = 1065 {
   readonly nosubscribe attribute single minMeasuredValue = 1;
   readonly nosubscribe attribute single maxMeasuredValue = 2;
   readonly nosubscribe attribute single tolerance = 3;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4698,9 +4698,9 @@ server cluster IasZone = 1280 {
   readonly nosubscribe attribute int8u zoneId = 17;
   readonly nosubscribe attribute int8u numberOfZoneSensitivityLevelsSupported = 18;
   readonly nosubscribe attribute int8u currentZoneSensitivityLevel = 19;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4831,9 +4831,9 @@ server cluster IasAce = 1281 {
     IasZoneStatus zoneStatus = 1;
   }
 
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4954,9 +4954,9 @@ server cluster IasWd = 1282 {
   }
 
   readonly nosubscribe attribute int16u maxDuration = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -4978,9 +4978,9 @@ server cluster IasWd = 1282 {
 
 server cluster WakeOnLan = 1283 {
   readonly nosubscribe attribute char_string<32> MACAddress = 0;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5017,12 +5017,12 @@ server cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly nosubscribe attribute array channelList = 0;
+  readonly nosubscribe attribute ChannelInfo channelList[] = 0;
   readonly nosubscribe attribute nullable LineupInfo lineup = 1;
   readonly nosubscribe attribute nullable ChannelInfo currentChannel = 2;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5062,11 +5062,11 @@ server cluster TargetNavigator = 1285 {
     CHAR_STRING<32> name = 1;
   }
 
-  readonly nosubscribe attribute array targetList = 0;
+  readonly nosubscribe attribute TargetInfo targetList[] = 0;
   readonly nosubscribe attribute int8u currentTarget = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5113,9 +5113,9 @@ server cluster MediaPlayback = 1286 {
   readonly nosubscribe attribute single playbackSpeed = 4;
   readonly nosubscribe attribute nullable int64u seekRangeEnd = 5;
   readonly nosubscribe attribute nullable int64u seekRangeStart = 6;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5177,11 +5177,11 @@ server cluster MediaInput = 1287 {
     CHAR_STRING<32> description = 3;
   }
 
-  readonly nosubscribe attribute array inputList = 0;
+  readonly nosubscribe attribute InputInfo inputList[] = 0;
   readonly nosubscribe attribute int8u currentInput = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5202,9 +5202,9 @@ server cluster MediaInput = 1287 {
 }
 
 server cluster LowPower = 1288 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5314,9 +5314,9 @@ server cluster KeypadInput = 1289 {
     kNumberKeys = 0x4;
   }
 
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5406,11 +5406,11 @@ server cluster ContentLauncher = 1290 {
     optional StyleInformation waterMark = 5;
   }
 
-  readonly nosubscribe attribute array acceptHeader = 0;
+  readonly nosubscribe attribute CHAR_STRING acceptHeader[] = 0;
   readonly nosubscribe attribute bitmap32 supportedStreamingProtocols = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5456,11 +5456,11 @@ server cluster AudioOutput = 1291 {
     CHAR_STRING<32> name = 2;
   }
 
-  readonly nosubscribe attribute array outputList = 0;
+  readonly nosubscribe attribute OutputInfo outputList[] = 0;
   readonly nosubscribe attribute int8u currentOutput = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5499,11 +5499,11 @@ server cluster ApplicationLauncher = 1292 {
     optional ENDPOINT_NO endpoint = 1;
   }
 
-  readonly nosubscribe attribute array catalogList = 0;
+  readonly nosubscribe attribute INT16U catalogList[] = 0;
   readonly nosubscribe attribute nullable ApplicationEP currentApp = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5551,19 +5551,19 @@ server cluster ApplicationBasic = 1293 {
   readonly nosubscribe attribute ApplicationBasicApplication application = 4;
   readonly nosubscribe attribute ApplicationStatusEnum status = 5;
   readonly nosubscribe attribute char_string<32> applicationVersion = 6;
-  readonly nosubscribe attribute array allowedVendorList = 7;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute vendor_id allowedVendorList[] = 7;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
 }
 
 server cluster AccountLogin = 1294 {
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -5729,24 +5729,24 @@ server cluster TestCluster = 1295 {
   readonly nosubscribe attribute single floatSingle = 23;
   readonly nosubscribe attribute double floatDouble = 24;
   readonly nosubscribe attribute octet_string<10> octetString = 25;
-  readonly nosubscribe attribute array listInt8u = 26;
-  readonly nosubscribe attribute array listOctetString = 27;
-  readonly nosubscribe attribute array listStructOctetString = 28;
+  readonly nosubscribe attribute INT8U listInt8u[] = 26;
+  readonly nosubscribe attribute OCTET_STRING listOctetString[] = 27;
+  readonly nosubscribe attribute TestListStructOctet listStructOctetString[] = 28;
   readonly nosubscribe attribute long_octet_string<1000> longOctetString = 29;
   readonly nosubscribe attribute char_string<10> charString = 30;
   readonly nosubscribe attribute long_char_string<1000> longCharString = 31;
   readonly nosubscribe attribute epoch_us epochUs = 32;
   readonly nosubscribe attribute epoch_s epochS = 33;
   readonly nosubscribe attribute vendor_id vendorId = 34;
-  readonly nosubscribe attribute array listNullablesAndOptionalsStruct = 35;
+  readonly nosubscribe attribute NullablesAndOptionalsStruct listNullablesAndOptionalsStruct[] = 35;
   readonly nosubscribe attribute SimpleEnum enumAttr = 36;
   readonly nosubscribe attribute SimpleStruct structAttr = 37;
   readonly nosubscribe attribute int8u rangeRestrictedInt8u = 38;
   readonly nosubscribe attribute int8s rangeRestrictedInt8s = 39;
   readonly nosubscribe attribute int16u rangeRestrictedInt16u = 40;
   readonly nosubscribe attribute int16s rangeRestrictedInt16s = 41;
-  readonly nosubscribe attribute array listLongOctetString = 42;
-  readonly nosubscribe attribute array listFabricScoped = 43;
+  readonly nosubscribe attribute LONG_OCTET_STRING listLongOctetString[] = 42;
+  readonly nosubscribe attribute TestFabricScoped listFabricScoped[] = 43;
   readonly nosubscribe attribute boolean timedWriteBoolean = 48;
   readonly nosubscribe attribute boolean generalErrorBoolean = 49;
   readonly nosubscribe attribute boolean clusterErrorBoolean = 50;
@@ -5784,9 +5784,9 @@ server cluster TestCluster = 1295 {
   readonly nosubscribe attribute nullable int8s nullableRangeRestrictedInt8s = 16423;
   readonly nosubscribe attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   readonly nosubscribe attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -6112,9 +6112,9 @@ server cluster Messaging = 1795 {
     kMessageConfirmationStatus = 0x1;
   }
 
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -6174,9 +6174,9 @@ server cluster ApplianceIdentification = 2816 {
   readonly nosubscribe attribute octet_string<2> productTypeName = 24;
   readonly nosubscribe attribute int16u productTypeId = 25;
   readonly nosubscribe attribute int8u cecedSpecificationVersion = 26;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -6195,9 +6195,9 @@ server cluster MeterIdentification = 2817 {
   readonly nosubscribe attribute char_string<16> pod = 12;
   readonly nosubscribe attribute int24s availablePower = 13;
   readonly nosubscribe attribute int24s powerThreshold = 14;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -6223,9 +6223,9 @@ server cluster ApplianceEventsAndAlert = 2818 {
     kPresenceRecovery = 0x3000;
   }
 
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -6251,9 +6251,9 @@ server cluster ApplianceEventsAndAlert = 2818 {
 server cluster ApplianceStatistics = 2819 {
   readonly nosubscribe attribute int32u logMaxSize = 0;
   readonly nosubscribe attribute int8u logQueueMaxSize = 1;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 
@@ -6418,9 +6418,9 @@ server cluster ElectricalMeasurement = 2820 {
   readonly nosubscribe attribute int16u rmsExtremeUnderVoltagePeriodPhaseC = 2581;
   readonly nosubscribe attribute int16u rmsVoltageSagPeriodPhaseC = 2582;
   readonly nosubscribe attribute int16u rmsVoltageSwellPeriodPhaseC = 2583;
-  readonly nosubscribe attribute array generatedCommandList = 65528;
-  readonly nosubscribe attribute array acceptedCommandList = 65529;
-  readonly nosubscribe attribute array attributeList = 65531;
+  readonly nosubscribe attribute command_id generatedCommandList[] = 65528;
+  readonly nosubscribe attribute command_id acceptedCommandList[] = 65529;
+  readonly nosubscribe attribute attrib_id attributeList[] = 65531;
   readonly nosubscribe attribute bitmap32 featureMap = 65532;
   readonly nosubscribe attribute int16u clusterRevision = 65533;
 

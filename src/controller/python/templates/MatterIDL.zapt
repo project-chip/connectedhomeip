@@ -66,15 +66,15 @@ server cluster {{asUpperCamelCase name}} = {{code}} {
     {{~/chip_access_elements~}}
     {{~#if isNullable~}}
       nullable {{!marker to place a space even with whitespace removal~}}
-    {{~/if~}} {{type}}
-    {{~#unless isArray~}}
+    {{~/if~}} {{#if entryType }}{{entryType}}{{else}}{{type}}{{/if}}
+    {{~#unless entryType~}}
       {{~#if (isString type)~}}
         {{~#if maxLength~}} 
           <{{maxLength}}> 
         {{~/if~}}
       {{~/if~}}
     {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isArray~}} [] {{~/if}} = {{code}};
+    {{~#if entryType~}} [] {{~/if}} = {{code}};
   {{/zcl_attributes_server}}
   {{#zcl_commands}}
     {{~!--For requests, we only generate structs for commands that with at least one arguments--~}}
