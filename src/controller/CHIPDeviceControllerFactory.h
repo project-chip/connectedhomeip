@@ -119,7 +119,7 @@ public:
 
     ~DeviceControllerFactory();
     DeviceControllerFactory(DeviceControllerFactory const &) = delete;
-    void operator=(DeviceControllerFactory const &)          = delete;
+    void operator=(DeviceControllerFactory const &) = delete;
 
     //
     // Some clients do not prefer a complete shutdown of the stack being initiated if
