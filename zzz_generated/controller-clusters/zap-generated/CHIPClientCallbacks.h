@@ -803,11 +803,21 @@ void OperationalCredentialsClusterAttributeListListAttributeFilter(chip::TLV::TL
                                                                    chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void PowerSourceClusterActiveWiredFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                            chip::Callback::Cancelable * onSuccessCallback,
+                                                            chip::Callback::Cancelable * onFailureCallback);
+typedef void (*PowerSourceActiveWiredFaultsListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<uint8_t> & data);
 void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVReader * data,
                                                               chip::Callback::Cancelable * onSuccessCallback,
                                                               chip::Callback::Cancelable * onFailureCallback);
 typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context,
                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
+void PowerSourceClusterActiveBatteryChargeFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                    chip::Callback::Cancelable * onSuccessCallback,
+                                                                    chip::Callback::Cancelable * onFailureCallback);
+typedef void (*PowerSourceActiveBatteryChargeFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
 void PowerSourceClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                chip::Callback::Cancelable * onSuccessCallback,
                                                                chip::Callback::Cancelable * onFailureCallback);

@@ -197,7 +197,7 @@ private:
             ReturnErrorOnFailure(err);
         }
 
-        if (size > sizeof(valueLE))
+        if (size != sizeof(valueLE))
         {
             // TODO: Again, figure out whether this could lead to bootloops.
             return CHIP_ERROR_INCORRECT_STATE;

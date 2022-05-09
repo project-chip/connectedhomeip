@@ -213,9 +213,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // Set up client API buffer.
     emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
 
-    // initialize event management system
-    emAfInitEvents();
-
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
