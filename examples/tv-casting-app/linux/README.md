@@ -71,11 +71,15 @@ printed list.
 
 -   Initiate UDC for the discovered video player with index 0
 
-        > cast request 0
+        tv-casting-app> cast request 0
+
+-   After sending UDC command to tv-app, you should be able to enter into tv-app shell:
+
+        tv-app> controller ux ok
 
 -   Re-run commissioner discovery
 
-        > cast discover
+        tv-casting-app> cast discover
 
 ### Re-Running the Example on Linux with Cached Fabrics
 
@@ -88,20 +92,20 @@ valid cached fabric will be used.
 
 -   Print all shell commands
 
-        > help
-        > cast help
+        tv-casting-app> help
+        tv-casting-app> cast help
 
 -   Print all fabrics
 
-        > cast print-fabrics
+        tv-casting-app> cast print-fabrics
 
 -   Delete fabric with index 1
 
-        > cast delete-fabric 1
+        tv-casting-app> cast delete-fabric 1
 
 -   Switch to fabric index 
 
-        > cast set-fabric 1
+        tv-casting-app> cast set-fabric 1
 
 ### Sending Arbitrary Cluster commands
 
@@ -144,9 +148,9 @@ during commissioning.
 -   Run the tv-casting-app and invoke a cluster command from the shell using
     default fabric, video player nodeId for that fabric
 
-        > cast cluster keypadinput send-key 1 0 1
+        tv-casting-app> cast cluster keypadinput send-key 1 0 1
 
 -   Run the tv-casting-app and invoke a cluster command from the shell using 
     default fabric, target video player nodeId 0xFFFFFFEFFFFFFFFF
 
-        > cast cluster keypadinput send-key 1 0xFFFFFFEFFFFFFFFF 1
+        tv-casting-app> cast cluster keypadinput send-key 1 0xFFFFFFEFFFFFFFFF 1

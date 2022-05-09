@@ -109,6 +109,8 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+// when the shell is enabled, don't intercept signals since it prevents the user from
+// using expected commands like CTRL-C to quit the application. (see issue #17845)
 #if !defined(ENABLE_CHIP_SHELL)
 void OnSignalHandler(int signum)
 {

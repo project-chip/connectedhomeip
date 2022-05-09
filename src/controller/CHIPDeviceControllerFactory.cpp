@@ -147,8 +147,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable = (params.fabricTable == nullptr) ? chip::Platform::New<FabricTable>() : params.fabricTable;
-
+    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;

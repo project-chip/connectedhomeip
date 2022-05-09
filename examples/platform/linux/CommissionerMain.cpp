@@ -22,6 +22,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -128,7 +129,6 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
     factoryParams.groupDataProvider = &gGroupDataProvider;
-    factoryParams.fabricTable       = &Server::GetInstance().GetFabricTable();
 
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
@@ -187,6 +187,12 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
+
+    // re-init fabric table in case the commisisoner one was added
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Init(&Server::GetInstance().GetPersistentStorage()));
+
+    // advertise operational since we are an admin
+    app::DnssdServer::Instance().AdvertiseOperational();
 
     ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
                     ChipLogValueX64(gCommissioner.GetNodeId()), fabricInfo->GetFabricIndex());
