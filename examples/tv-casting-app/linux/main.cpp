@@ -16,6 +16,11 @@
  *    limitations under the License.
  */
 
+#include "commands/clusters/SubscriptionsCommands.h"
+#include "commands/common/Commands.h"
+#include "commands/example/ExampleCredentialIssuerCommands.h"
+#include <zap-generated/cluster/Commands.h>
+
 #include "CastingServer.h"
 #include "CastingUtils.h"
 #if defined(ENABLE_CHIP_SHELL)
@@ -41,89 +46,6 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
 #endif
-struct TVExampleDeviceType
-{
-    const char * name;
-    uint16_t id;
-};
-
-Dnssd::DiscoveryFilter gDiscoveryFilter           = Dnssd::DiscoveryFilter();
-constexpr TVExampleDeviceType kKnownDeviceTypes[] = { { "video-player", 35 }, { "dimmable-light", 257 } };
-constexpr int kKnownDeviceTypesCount              = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
-constexpr uint16_t kOptionDeviceType              = 't';
-
-// TODO: Accept these values over CLI
-const char * kContentUrl        = "https://www.test.com/videoid";
-const char * kContentDisplayStr = "Test video";
-
-CommissionableNodeController gCommissionableNodeController;
-chip::System::SocketWatchToken gToken;
-bool gInited = false;
-
-bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
-{
-    switch (aIdentifier)
-    {
-    case kOptionDeviceType: {
-        char * endPtr;
-        long deviceType = strtol(aValue, &endPtr, 10);
-        if (*endPtr == '\0' && deviceType > 0 && CanCastTo<uint16_t>(deviceType))
-        {
-            gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, static_cast<uint16_t>(deviceType));
-            return true;
-        }
-
-        for (int i = 0; i < kKnownDeviceTypesCount; i++)
-        {
-            if (strcasecmp(aValue, kKnownDeviceTypes[i].name) == 0)
-            {
-                gDiscoveryFilter = Dnssd::DiscoveryFilter(Dnssd::DiscoveryFilterType::kDeviceType, kKnownDeviceTypes[i].id);
-                return true;
-            }
-        }
-
-        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option value: %s %s", aProgram, aName, aValue);
-        return false;
-    }
-    default:
-        ChipLogError(AppServer, "%s: INTERNAL ERROR: Unhandled option: %s", aProgram, aName);
-        return false;
-    }
-}
-
-OptionDef cmdLineOptionsDef[] = {
-    { "device-type", chip::ArgParser::kArgumentRequired, kOptionDeviceType },
-    {},
-};
-
-OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
-                             "  -t <commissioner device type>\n"
-                             "  --device-type <commissioner device type>\n"
-                             "        Device type of the commissioner to discover and request commissioning from. Specify value as "
-                             "a decimal integer or a known text representation. Defaults to all device types\n" };
-
-HelpOptions helpOptions("tv-casting-app", "Usage: tv-casting-app [options]", "1.0");
-
-OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
-
-void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
-{
-    if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
-    {
-        if (CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
-        {
-            CastingServer::GetInstance()->ReadServerClustersForNode(
-                CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->GetNodeId());
-        }
-    }
-    else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
-    {
-        ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
-            event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex));
-
-        CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
-    }
-}
 
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
 {
@@ -169,6 +91,20 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 
+// For shell and command line processing of commands
+ExampleCredentialIssuerCommands gCredIssuerCommands;
+Commands gCommands;
+
+CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
+{
+    if (!CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
+    {
+        CastingServer::GetInstance()->SetDefaultFabricIndex();
+    }
+    gCommands.Run(argc, argv);
+    return CHIP_NO_ERROR;
+}
+
 int main(int argc, char * argv[])
 {
     VerifyOrDie(CHIP_NO_ERROR == chip::Platform::MemoryInit());
@@ -181,6 +117,8 @@ int main(int argc, char * argv[])
 #endif
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.
     err = InitCommissionableDataProvider(gCommissionableDataProvider, LinuxDeviceOptions::GetInstance());
@@ -188,18 +126,13 @@ int main(int argc, char * argv[])
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     // Initialize device attestation verifier from a constant version
     {
         // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
-    }
-
-    if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
-    {
-        return 1;
     }
 
     // Send discover commissioners request
@@ -210,8 +143,14 @@ int main(int argc, char * argv[])
         chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
-    // Add callback to send Content casting commands after commissioning completes
-    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0);
+    registerClusters(gCommands, &gCredIssuerCommands);
+    registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
+
+    if (argc > 1)
+    {
+        // if there are command-line arguments, then automatically start server
+        ProcessClusterCommand(argc, argv);
+    }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 exit:

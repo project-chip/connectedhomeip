@@ -349,9 +349,9 @@ void emberAfClusterMessageSentCallback(const MessageSendDestination & destinatio
 }
 
 // This function is used to call the per-cluster attribute changed callback
-void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask)
+void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, CLUSTER_MASK_SERVER);
     if (cluster != nullptr)
     {
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION);
@@ -363,10 +363,10 @@ void emAfClusterAttributeChangedCallback(const app::ConcreteAttributePath & attr
 }
 
 // This function is used to call the per-cluster pre-attribute changed callback
-EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath, uint8_t clientServerMask,
+EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, clientServerMask);
+    const EmberAfCluster * cluster = emberAfFindCluster(attributePath.mEndpointId, attributePath.mClusterId, CLUSTER_MASK_SERVER);
     if (cluster == nullptr)
     {
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
@@ -650,10 +650,6 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
             // Dynamic endpoints are external and don't factor into storage size
             if (!isDynamicEndpoint)
             {
-                if (emAfEndpoints[ep].endpointType == nullptr)
-                {
-                    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
-                }
                 attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
             }
         }

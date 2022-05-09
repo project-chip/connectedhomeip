@@ -27,14 +27,62 @@
  * See documentation for your RTOS.
  ****************************************************************/
 
-void mbedtls_entropy_lock(void) {}
+#include <kernel.h>
 
-void mbedtls_entropy_unlock(void) {}
+K_MUTEX_DEFINE(mbedtls_entropy_mutex);
+K_MUTEX_DEFINE(mbedtls_ecp_mutex);
+K_MUTEX_DEFINE(mbedtls_aes_mutex);
 
-void mbedtls_ecp_lock(void) {}
+void mbedtls_entropy_lock(void)
+{
 
-void mbedtls_ecp_unlock(void) {}
+    if (k_mutex_lock(&mbedtls_entropy_mutex, K_FOREVER) != 0)
+    {
+        printk("mbedtls_entropy_lock fail\n");
+    }
+}
 
-void mbedtls_aes_lock(void) {}
+void mbedtls_entropy_unlock(void)
+{
 
-void mbedtls_aes_unlock(void) {}
+    if (k_mutex_unlock(&mbedtls_entropy_mutex) != 0)
+    {
+        printk("mbedtls_entropy_unlock fail\n");
+    }
+}
+
+void mbedtls_ecp_lock(void)
+{
+
+    if (k_mutex_lock(&mbedtls_ecp_mutex, K_FOREVER) != 0)
+    {
+        printk("mbedtls_ecp_lock fail\n");
+    }
+}
+
+void mbedtls_ecp_unlock(void)
+{
+
+    if (k_mutex_unlock(&mbedtls_ecp_mutex) != 0)
+    {
+        printk("mbedtls_ecp_unlock fail\n");
+    }
+}
+
+void mbedtls_aes_lock(void)
+{
+
+    if (k_mutex_lock(&mbedtls_aes_mutex, K_FOREVER) != 0)
+    {
+        printk("mbedtls_aes_lock fail\n");
+    }
+}
+
+void mbedtls_aes_unlock(void)
+{
+
+    if (k_mutex_unlock(&mbedtls_aes_mutex) != 0)
+    {
+        printk("mbedtls_aes_unlock fail\n");
+    }
+}

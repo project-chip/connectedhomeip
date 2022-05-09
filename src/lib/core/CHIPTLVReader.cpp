@@ -397,6 +397,12 @@ CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
+    if (GetLength() == 0)
+    {
+        data = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
     err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
     if (err != CHIP_NO_ERROR)
         return err;

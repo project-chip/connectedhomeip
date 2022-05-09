@@ -42,6 +42,8 @@ static_library("server") {
     "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
+    "DefaultAclStorage.cpp",
+    "DefaultAclStorage.h",
     "Dnssd.cpp",
     "Dnssd.h",
     "EchoHandler.cpp",

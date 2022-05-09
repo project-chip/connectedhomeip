@@ -28,7 +28,7 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionReleaseDelegate, public IntrusiveListNodeBase
+class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase
 {
 public:
     SessionHolder() {}
@@ -39,7 +39,7 @@ public:
     SessionHolder & operator=(const SessionHolder &);
     SessionHolder & operator=(SessionHolder && that);
 
-    // Implement SessionReleaseDelegate
+    // Implement SessionDelegate
     void OnSessionReleased() override { Release(); }
 
     bool Contains(const SessionHandle & session) const
@@ -67,11 +67,8 @@ private:
 class SessionHolderWithDelegate : public SessionHolder
 {
 public:
-    SessionHolderWithDelegate(SessionReleaseDelegate & delegate) : mDelegate(delegate) {}
-    SessionHolderWithDelegate(const SessionHandle & handle, SessionReleaseDelegate & delegate) : mDelegate(delegate)
-    {
-        Grab(handle);
-    }
+    SessionHolderWithDelegate(SessionDelegate & delegate) : mDelegate(delegate) {}
+    SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : mDelegate(delegate) { Grab(handle); }
     operator bool() const { return SessionHolder::operator bool(); }
 
     void OnSessionReleased() override
@@ -83,7 +80,7 @@ public:
     }
 
 private:
-    SessionReleaseDelegate & mDelegate;
+    SessionDelegate & mDelegate;
 };
 
 } // namespace chip

@@ -950,28 +950,28 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Generating tizen-arm-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
 
 # Generating tizen-arm-light-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-asan
 
 # Generating tizen-arm-light-no-ble
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble
 
 # Generating tizen-arm-light-no-ble-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-asan
 
 # Generating tizen-arm-light-no-ble-no-wifi
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi
 
 # Generating tizen-arm-light-no-ble-no-wifi-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-ble-no-wifi-asan
 
 # Generating tizen-arm-light-no-wifi
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi
 
 # Generating tizen-arm-light-no-wifi-asan
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light-no-wifi-asan
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
@@ -1021,8 +1021,6 @@ ninja -C {out}/android-arm-chip-tv-casting-app
 # Prepare Native libs android-arm-chip-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a
 
-cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libCHIPController.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libCHIPController.so
-
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
 cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvCastingApp.so
@@ -1030,8 +1028,6 @@ cp {out}/android-arm-chip-tv-casting-app/lib/jni/armeabi-v7a/libTvCastingApp.so 
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
-
-cp {out}/android-arm-chip-tv-casting-app/lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPController.jar
 
 cp {out}/android-arm-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 
@@ -1112,8 +1108,6 @@ ninja -C {out}/android-arm64-chip-tv-casting-app
 # Prepare Native libs android-arm64-chip-tv-casting-app
 mkdir -p {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a
 
-cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libCHIPController.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libCHIPController.so
-
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so {root}/examples/tv-casting-app/android/App/app/libs/jniLibs/arm64-v8a/libTvCastingApp.so
@@ -1121,8 +1115,6 @@ cp {out}/android-arm64-chip-tv-casting-app/lib/jni/arm64-v8a/libTvCastingApp.so 
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar {root}/examples/tv-casting-app/android/App/app/libs/AndroidPlatform.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPAppServer.jar
-
-cp {out}/android-arm64-chip-tv-casting-app/lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar {root}/examples/tv-casting-app/android/App/app/libs/CHIPController.jar
 
 cp {out}/android-arm64-chip-tv-casting-app/lib/TvCastingApp.jar {root}/examples/tv-casting-app/android/App/app/libs/TvCastingApp.jar
 

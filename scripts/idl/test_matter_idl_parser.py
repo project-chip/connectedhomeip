@@ -344,9 +344,9 @@ class TestParser(unittest.TestCase):
 
     def test_multiple_clusters(self):
         actual = parseText("""
-            server cluster A = 1 {}
-            client cluster B = 2 {}
-            client cluster C = 3 {}
+            server cluster A = 1 { /* Test comment */ }
+            client cluster B = 2 { }
+            client cluster C = 3 { }
         """)
 
         expected = Idl(clusters=[
@@ -359,16 +359,52 @@ class TestParser(unittest.TestCase):
     def test_endpoints(self):
         actual = parseText("""
             endpoint 12 {
-                server cluster Foo;
-                server cluster Bar;
+                server cluster Foo { }
+                server cluster Bar { }
                 binding cluster Bar;
                 binding cluster Test;
             }
         """)
 
         expected = Idl(endpoints=[Endpoint(number=12,
-                                           server_clusters=["Foo", "Bar"],
+                                           server_clusters=[
+                                               ServerClusterInstantiation(name="Foo"),
+                                               ServerClusterInstantiation(name="Bar"),
+                                           ],
                                            client_bindings=["Bar", "Test"],)
+                                  ])
+        self.assertEqual(actual, expected)
+
+    def test_cluster_instantiation(self):
+        actual = parseText("""
+            endpoint 3 {
+                server cluster Example {
+                    ram attribute inRamZero;
+                    ram attribute inRamWithDefault default=123;
+                    persist attribute inNVMNoDef;
+                    persist attribute inNVMStr default="abc";
+                    persist attribute inNVMWithDefault default = -33;
+                    callback attribute hasCallbackBool default = true;
+                }
+            }
+        """)
+
+        expected = Idl(endpoints=[Endpoint(number=3,
+                                           server_clusters=[
+                                               ServerClusterInstantiation(name="Example", attributes=[
+                                                   AttributeInstantiation(name='inRamZero', storage=AttributeStorage.RAM),
+                                                   AttributeInstantiation(name='inRamWithDefault',
+                                                                          storage=AttributeStorage.RAM, default=123),
+                                                   AttributeInstantiation(name='inNVMNoDef', storage=AttributeStorage.PERSIST),
+                                                   AttributeInstantiation(
+                                                       name='inNVMStr', storage=AttributeStorage.PERSIST, default="abc"),
+                                                   AttributeInstantiation(name='inNVMWithDefault',
+                                                                          storage=AttributeStorage.PERSIST, default=-33),
+                                                   AttributeInstantiation(name='hasCallbackBool',
+                                                                          storage=AttributeStorage.CALLBACK, default=True),
+                                               ]),
+                                           ],
+                                           client_bindings=[],)
                                   ])
         self.assertEqual(actual, expected)
 

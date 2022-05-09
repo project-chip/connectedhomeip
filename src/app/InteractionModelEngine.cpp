@@ -29,8 +29,7 @@
 
 #include <lib/core/CHIPTLVUtilities.hpp>
 
-extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                     bool asServer);
+extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 namespace chip {
 namespace app {
@@ -135,6 +134,22 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::Interacti
 
     mReadHandlers.ForEachActiveObject([aType, &count](const ReadHandler * handler) {
         if (handler->IsType(aType))
+        {
+            count++;
+        }
+
+        return Loop::Continue;
+    });
+
+    return count;
+}
+
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::InteractionType aType, FabricIndex aFabricIndex) const
+{
+    uint32_t count = 0;
+
+    mReadHandlers.ForEachActiveObject([aType, aFabricIndex, &count](const ReadHandler * handler) {
+        if (handler->IsType(aType) && handler->GetAccessingFabricIndex() == aFabricIndex)
         {
             count++;
         }
@@ -866,7 +881,7 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(ObjectList<Att
         bool duplicate = false;
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId, true))
+            !emberAfContainsAttribute(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
         {
             prev  = path1;
             path1 = path1->mpNext;

@@ -24,10 +24,33 @@
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/ValueChecker.h>
 #include <lib/support/UnitTestUtils.h>
+#include <map>
+#include <string>
 #include <zap-generated/cluster/CHIPTestClustersObjc.h>
 
+#import <CHIP/CHIP.h>
 #import <CHIP/CHIPDevice_Internal.h>
-#import <CHIP/CHIPError.h>
+#import <CHIP/CHIPError_Internal.h>
+
+class TestCommandBridge;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface TestPairingDelegate : NSObject <CHIPDevicePairingDelegate>
+@property TestCommandBridge * commandBridge;
+@property chip::NodeId deviceId;
+@property BOOL active; // Whether to pass on notifications to the commandBridge
+
+- (void)onStatusUpdate:(CHIPPairingStatus)status;
+- (void)onPairingComplete:(NSError * _Nullable)error;
+- (void)onPairingDeleted:(NSError * _Nullable)error;
+- (void)onCommissioningComplete:(NSError * _Nullable)error;
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithTestCommandBridge:(TestCommandBridge *)commandBridge;
+@end
+
+NS_ASSUME_NONNULL_END
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
@@ -39,6 +62,7 @@ class TestCommandBridge : public CHIPCommandBridge,
 public:
     TestCommandBridge(const char * _Nonnull commandName)
         : CHIPCommandBridge(commandName)
+        , mPairingDelegate([[TestPairingDelegate alloc] initWithTestCommandBridge:this])
     {
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
@@ -62,6 +86,11 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(kTimeoutInSeconds); }
 
     virtual void NextTest() = 0;
+
+    // Support for tests that asynchronously come up with a status of some
+    // sort.  Subclasses are expected to compare the provided status to the
+    // expected status for the test.
+    virtual void OnStatusUpdate(const chip::app::StatusIB & status) = 0;
 
     void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) override
     {
@@ -93,12 +122,12 @@ public:
         // Disconnect our existing device; otherwise getConnectedDevice will
         // just hand it right back to us without establishing a new CASE
         // session.
-        if (mConnectedDevice != nil) {
-            auto device = [mConnectedDevice internalDevice];
+        if (GetConnectedDevice() != nil) {
+            auto device = [GetConnectedDevice() internalDevice];
             if (device != nullptr) {
                 device->Disconnect();
             }
-            mConnectedDevice = nil;
+            mConnectedDevices[mCurrentIdentity] = nil;
         }
 
         [controller getConnectedDevice:nodeId
@@ -107,9 +136,29 @@ public:
                          CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
                          VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
 
-                         mConnectedDevice = device;
+                         mConnectedDevices[mCurrentIdentity] = device;
                          NextTest();
                      }];
+    }
+
+    /////////// CommissionerCommands-like Interface /////////
+    CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
+    {
+        CHIPDeviceController * controller = CurrentCommissioner();
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        [controller setPairingDelegate:mPairingDelegate queue:mCallbackQueue];
+        [mPairingDelegate setDeviceId:nodeId];
+        [mPairingDelegate setActive:YES];
+
+        NSString * payloadStr = [[NSString alloc] initWithBytes:payload.data() length:payload.size() encoding:NSUTF8StringEncoding];
+        NSError * err;
+        BOOL ok = [controller pairDevice:nodeId onboardingPayload:payloadStr error:&err];
+        if (ok == YES) {
+            return CHIP_NO_ERROR;
+        }
+
+        return [CHIPError errorToCHIPErrorCode:err];
     }
 
     /////////// SystemCommands Interface /////////
@@ -124,11 +173,44 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIPDevice * _Nullable GetConnectedDevice(void) { return mConnectedDevice; }
+    CHIPDevice * _Nullable GetConnectedDevice(void) { return mConnectedDevices[mCurrentIdentity]; }
+
+    // PairingDeleted and PairingComplete need to be public so our pairing
+    // delegate can call them.
+    void PairingDeleted()
+    {
+        // This should not happen!
+        Exit("Unexpected deletion of pairing");
+    }
+
+    void PairingComplete(chip::NodeId nodeId, NSError * _Nullable error)
+    {
+        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+        if (err != CHIP_NO_ERROR) {
+            Exit("Pairing completed with error", err);
+            return;
+        }
+
+        CHIPDeviceController * controller = CurrentCommissioner();
+        VerifyOrReturn(controller != nil, Exit("No current commissioner"));
+
+        NSError * commissionError = nil;
+        [controller commissionDevice:nodeId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
+        err = [CHIPError errorToCHIPErrorCode:commissionError];
+        if (err != CHIP_NO_ERROR) {
+            Exit("Failed to kick off commissioning", err);
+            return;
+        }
+    }
+
+    void SetIdentity(const char * _Nonnull name)
+    {
+        mCurrentIdentity = name;
+        CHIPCommandBridge::SetIdentity(name);
+    }
 
 protected:
     dispatch_queue_t _Nullable mCallbackQueue;
-    CHIPDevice * _Nullable mConnectedDevice;
 
     void Wait()
     {
@@ -286,4 +368,92 @@ protected:
         Exit(std::string(itemName) + " expected to be null but isn't");
         return false;
     }
+
+private:
+    TestPairingDelegate * _Nonnull mPairingDelegate;
+
+    // Currently selected identity ("alpha", "beta", "gamma").
+    std::string mCurrentIdentity;
+
+    // Set of our connected devices, keyed by identity.
+    std::map<std::string, CHIPDevice *> mConnectedDevices;
 };
+
+NS_ASSUME_NONNULL_BEGIN
+
+@implementation TestPairingDelegate
+- (void)onStatusUpdate:(CHIPPairingStatus)status
+{
+    if (_active) {
+        if (status == kSecurePairingSuccess) {
+            NSLog(@"Secure pairing success");
+        } else if (status == kSecurePairingFailed) {
+            _active = NO;
+            NSLog(@"Secure pairing failed");
+            _commandBridge->OnStatusUpdate(chip::app::StatusIB(chip::Protocols::InteractionModel::Status::Failure));
+        }
+    }
+}
+
+- (void)onPairingComplete:(NSError * _Nullable)error
+{
+    if (_active) {
+        _commandBridge->PairingComplete(_deviceId, error);
+    }
+}
+
+- (void)onPairingDeleted:(NSError * _Nullable)error
+{
+    if (_active) {
+        _commandBridge->PairingDeleted();
+    }
+}
+
+- (void)onCommissioningComplete:(NSError * _Nullable)error
+{
+    if (_active) {
+        _active = NO;
+        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+        _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
+    }
+}
+
+- (chip::app::StatusIB)convertToStatusIB:(CHIP_ERROR)err
+{
+    using chip::app::StatusIB;
+    using namespace chip;
+    using namespace chip::Protocols::InteractionModel;
+    using namespace chip::app::Clusters::OperationalCredentials;
+
+    if (CHIP_ERROR_INVALID_PUBLIC_KEY == err) {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+    }
+    if (CHIP_ERROR_WRONG_NODE_ID == err) {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+    }
+    if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err) {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+    }
+    if (CHIP_ERROR_FABRIC_EXISTS == err) {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+    }
+    if (CHIP_ERROR_INVALID_FABRIC_ID == err) {
+        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+    }
+
+    return StatusIB(err);
+}
+
+- (instancetype)initWithTestCommandBridge:(TestCommandBridge *)commandBridge
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _commandBridge = commandBridge;
+    _active = NO;
+    return self;
+}
+@end
+
+NS_ASSUME_NONNULL_END

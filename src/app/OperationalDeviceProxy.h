@@ -85,7 +85,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          public SessionReleaseDelegate,
+                                          public SessionDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {

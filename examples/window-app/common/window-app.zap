@@ -1,5 +1,5 @@
 {
-  "featureLevel": 67,
+  "featureLevel": 70,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -956,7 +956,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "10",
@@ -2878,7 +2878,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
@@ -2893,7 +2893,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -2908,7 +2908,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -2923,7 +2923,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -3119,7 +3119,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -3134,7 +3134,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -3149,7 +3149,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4327,7 +4327,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -4342,7 +4342,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
@@ -4357,7 +4357,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -4372,7 +4372,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -4387,7 +4387,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -4402,7 +4402,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -4417,7 +4417,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -4432,7 +4432,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -4447,7 +4447,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
@@ -4462,7 +4462,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4477,7 +4477,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4568,7 +4568,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -4583,7 +4583,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -4598,7 +4598,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4613,7 +4613,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4628,7 +4628,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4643,7 +4643,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4658,7 +4658,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -4673,7 +4673,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -4688,7 +4688,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
@@ -5908,7 +5908,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "ViewGroup",
@@ -5916,7 +5916,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "GetGroupMembership",
@@ -5924,7 +5924,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveGroup",
@@ -5932,7 +5932,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveAllGroups",
@@ -5940,7 +5940,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "AddGroupIfIdentifying",
@@ -5948,10 +5948,25 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -5975,7 +5990,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -6027,6 +6042,66 @@
               "reportableChange": 0
             },
             {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -6049,7 +6124,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddScene",
@@ -6057,7 +6132,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "ViewScene",
@@ -6065,7 +6140,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveScene",
@@ -6073,7 +6148,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveAllScenes",
@@ -6081,7 +6156,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "StoreScene",
@@ -6089,7 +6164,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RecallScene",
@@ -6097,7 +6172,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "GetSceneMembership",
@@ -6105,10 +6180,49 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "EnhancedAddScene",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "EnhancedViewScene",
+              "code": 65,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "CopyScene",
+              "code": 66,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
               "outgoing": 0
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -6139,7 +6253,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6147,7 +6261,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6155,7 +6269,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6163,7 +6277,7 @@
               "code": 3,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6171,7 +6285,7 @@
               "code": 4,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -6179,7 +6293,7 @@
               "code": 6,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -6257,6 +6371,51 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "last configured by",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -6429,7 +6588,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "10",
@@ -8349,7 +8508,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "ViewGroup",
@@ -8357,7 +8516,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "GetGroupMembership",
@@ -8365,7 +8524,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveGroup",
@@ -8373,7 +8532,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveAllGroups",
@@ -8381,7 +8540,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "AddGroupIfIdentifying",
@@ -8389,10 +8548,25 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -8416,7 +8590,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -8468,6 +8642,66 @@
               "reportableChange": 0
             },
             {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -8490,7 +8724,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddScene",
@@ -8498,7 +8732,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "ViewScene",
@@ -8506,7 +8740,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveScene",
@@ -8514,7 +8748,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RemoveAllScenes",
@@ -8522,7 +8756,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "StoreScene",
@@ -8530,7 +8764,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "RecallScene",
@@ -8538,7 +8772,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "GetSceneMembership",
@@ -8546,10 +8780,49 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "EnhancedAddScene",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "EnhancedViewScene",
+              "code": 65,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "CopyScene",
+              "code": 66,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
               "outgoing": 0
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -8580,7 +8853,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -8588,7 +8861,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -8596,7 +8869,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -8604,7 +8877,7 @@
               "code": 3,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -8612,7 +8885,7 @@
               "code": 4,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             },
             {
@@ -8620,7 +8893,7 @@
               "code": 6,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -8661,7 +8934,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "NVM",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
@@ -8698,6 +8971,51 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "last configured by",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -8870,7 +9188,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "10",

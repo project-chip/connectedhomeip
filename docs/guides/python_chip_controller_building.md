@@ -77,7 +77,7 @@ To build and run the Python CHIP controller:
 5. Build and install the Python CHIP controller:
 
     ```
-    scripts/build_python.sh -m platform
+    scripts/build_python.sh -m platform -i separate
     ```
 
     > Note: To get more details about available build configurations, run the

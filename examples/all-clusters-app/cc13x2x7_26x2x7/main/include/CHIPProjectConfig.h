@@ -48,20 +48,6 @@
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
- *
- * 0xFFF1: Test vendor
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
- *
- * 0x8006: example lock app
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
  * The hardware version number assigned to device or product by the device vendor.  This
@@ -72,15 +58,13 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
+ * Values set by args.gni:
+ * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+ * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
- *
- * A string identifying the software version running on the device.
- * CHIP currently expects the software version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0d1"
-#endif
+
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *

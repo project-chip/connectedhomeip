@@ -1,0 +1,104 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    10.4.20. [TC-DM-4.20][WiFi] Verification for commands check
+    [DUT-Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT sends the ScanNetwork command to the TH"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning scan-networks 1 0
+
+          [1650388358.049099][44522:44527] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0000 Status=0x85
+          [1650388358.049146][44522:44527] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
+          [1650388358.049196][44522:44527] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650388358.049270][44522:44527] CHIP:EM: Sending Standalone Ack for MessageCounter:9254237 on exchange 22295i
+      disabled: true
+
+    - label: "DUT sends the ArmFailSafe command to the TH"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+
+          [1650371269.889246][42481:42486] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1650371269.889331][42481:42486] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1650371269.889471][42481:42486] CHIP:TOO:   ArmFailSafeResponse: {
+          [1650371269.889556][42481:42486] CHIP:TOO:     errorCode: 0
+          [1650371269.889607][42481:42486] CHIP:TOO:     debugText:
+          [1650371269.889657][42481:42486] CHIP:TOO:    }
+          [1650371269.889733][42481:42486] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650371269.889821][42481:42486] CHIP:EM: Sending Standalone Ack for MessageCounter:2428907 on exchange 60841i
+      disabled: true
+
+    - label: "DUT sends the AddOrUpdateWiFiNetwork command to the TH"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+
+          [1650371276.622265][42488:42493] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650371276.622332][42488:42493] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650371276.622445][42488:42493] CHIP:TOO:   NetworkConfigResponse: {
+          [1650371276.622515][42488:42493] CHIP:TOO:     networkingStatus: 0
+          [1650371276.622557][42488:42493] CHIP:TOO:     networkIndex: 0
+          [1650371276.622595][42488:42493] CHIP:TOO:    }
+          [1650371276.622655][42488:42493] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650371276.622728][42488:42493] CHIP:EM: Sending Standalone Ack for MessageCounter:9593846 on exchange 33754i
+      disabled: true
+
+    - label: "DUT sends the RemoveNetwork command to the TH"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+
+          [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650373300.704957][42697:42702] CHIP:TOO:   NetworkConfigResponse: {
+          [1650373300.705012][42697:42702] CHIP:TOO:     networkingStatus: 0
+          [1650373300.705044][42697:42702] CHIP:TOO:     networkIndex: 0
+          [1650373300.705073][42697:42702] CHIP:TOO:    }
+          [1650373300.705120][42697:42702] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650373300.705181][42697:42702] CHIP:EM: Sending Standalone Ack for MessageCounter:9924068 on exchange 3557i
+      disabled: true
+
+    - label: "DUT sends the ConnectNetwork command to the TH"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+
+          [1650376217.124606][42876:42881] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1650376217.124707][42876:42881] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1650376217.124870][42876:42881] CHIP:TOO:   ConnectNetworkResponse: {
+          [1650376217.124968][42876:42881] CHIP:TOO:     networkingStatus: 0
+          [1650376217.125030][42876:42881] CHIP:TOO:     errorValue: null
+          [1650376217.125087][42876:42881] CHIP:TOO:    }
+          [1650376217.125179][42876:42881] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650376217.125282][42876:42881] CHIP:EM: Sending Standalone Ack for MessageCounter:7901929 on exchange 1050i
+      disabled: true
+
+    - label: "DUT sends the ReorderNetwork command to the TH"
+      verification: |
+          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
+
+          [1650381494.820649][44087:44092] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650381494.820749][44087:44092] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650381494.820860][44087:44092] CHIP:TOO:   NetworkConfigResponse: {
+          [1650381494.820940][44087:44092] CHIP:TOO:     networkingStatus: 0
+          [1650381494.820979][44087:44092] CHIP:TOO:     networkIndex: 3
+          [1650381494.821016][44087:44092] CHIP:TOO:    }
+          [1650381494.821087][44087:44092] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650381494.821174][44087:44092] CHIP:EM: Sending Standalone Ack for MessageCounter:5656346 on exchange 4849i
+      disabled: true

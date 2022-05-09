@@ -113,13 +113,13 @@ for arg; do
     user_args+=" $arg"
 done
 
-# Android prebuilt JAR setup
-python3 third_party/android_deps/set_up_android_deps.py
-
 # Android SDK setup
 android_sdk_args=""
 
 if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; then
+    # Android prebuilt JAR setup
+    python3 third_party/android_deps/set_up_android_deps.py
+
     android_sdk_args+="android_sdk_root=\"$ANDROID_HOME\" android_ndk_root=\"$ANDROID_NDK_HOME\""
     extra_args+=" $android_sdk_args enable_android_builds=true"
 else

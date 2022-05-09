@@ -35,6 +35,8 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <inet/EndPointStateOpenThread.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -72,6 +74,16 @@ AppTask AppTask::sAppTask;
 
 namespace {
 constexpr int extDiscTimeoutSecs = 20;
+}
+
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
 }
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -119,6 +131,11 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
     // Init OTA engine
@@ -518,8 +535,8 @@ void AppTask::UpdateClusterState(void)
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status =
+        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating on/off %x", status);

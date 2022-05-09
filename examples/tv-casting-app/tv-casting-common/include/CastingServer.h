@@ -25,13 +25,8 @@
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
 
-using namespace chip;
-using namespace chip::Controller;
-using namespace chip::Credentials;
-using namespace chip::app::Clusters::ContentLauncher::Commands;
-
-constexpr System::Clock::Seconds16 kCommissioningWindowTimeout = System::Clock::Seconds16(3 * 60);
-constexpr EndpointId kTvEndpoint                               = 1;
+constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
+constexpr chip::EndpointId kTvEndpoint                               = 1;
 
 /**
  * @brief Represents a TV Casting server that can get the casting app commissioned
@@ -48,7 +43,7 @@ public:
     void InitServer();
 
     CHIP_ERROR DiscoverCommissioners();
-    const Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
+    const chip::Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
     CHIP_ERROR OpenBasicCommissioningWindow();
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
@@ -57,13 +52,22 @@ public:
     CHIP_ERROR InitBindingHandlers();
     TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
     CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
-    void ReadServerClusters(EndpointId endpointId);
+    void ReadServerClusters(chip::EndpointId endpointId);
     void ReadServerClustersForNode(chip::NodeId nodeId);
-    static void OnDescriptorReadSuccessResponse(void * context, const app::DataModel::DecodableList<ClusterId> & responseList);
+    static void OnDescriptorReadSuccessResponse(void * context,
+                                                const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
     CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr);
-    static void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response);
+    static void OnContentLauncherSuccessResponse(
+        void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & response);
     static void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error);
+    static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+    chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
+    chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
+    void PrintBindings();
+    chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
+    void SetDefaultFabricIndex();
 
 private:
     static CastingServer * castingServer_;
@@ -71,5 +75,5 @@ private:
 
     bool mInited = false;
     TargetVideoPlayerInfo mTargetVideoPlayerInfo;
-    CommissionableNodeController mCommissionableNodeController;
+    chip::Controller::CommissionableNodeController mCommissionableNodeController;
 };

@@ -125,6 +125,8 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 bool IsPercent100thsValid(Percent100ths percent100ths);
 bool IsPercent100thsValid(NPercent100ths npercent100ths);
 
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
+
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);

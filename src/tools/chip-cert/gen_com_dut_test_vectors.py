@@ -12,6 +12,9 @@ import glob
 from binascii import hexlify, unhexlify
 from enum import Enum
 
+VID_NOT_PRESENT = 0xFFFF
+PID_NOT_PRESENT = 0x0000
+
 
 class CertType(Enum):
     PAA = 1
@@ -195,6 +198,119 @@ CERT_STRUCT_TEST_CASES = [
     },
 ]
 
+VIDPID_FALLBACK_ENCODING_TEST_CASES = [
+    # Valid/Invalid encoding examples from the spec:
+    {
+        "description": 'Fallback VID and PID encoding example from spec: valid and recommended since easily human-readable',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:00B1',
+        "test_folder": 'vidpid_fallback_encoding_01',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: valid and recommended since easily human-readable',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mpid:00B1 Mvid:FFF1',
+        "test_folder": 'vidpid_fallback_encoding_02',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: valid example showing that order or separators are not considered at all for the overall validity of the embedded fields',
+        "common_name": 'Mpid:00B1,ACME Matter Devel DAC 5CDA9899,Mvid:FFF1',
+        "test_folder": 'vidpid_fallback_encoding_03',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: valid, but less readable',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1Mpid:00B1',
+        "test_folder": 'vidpid_fallback_encoding_04',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: valid, but highly discouraged, since embedding of substrings within other substrings may be confusing to human readers',
+        "common_name": 'Mvid:FFF1ACME Matter Devel DAC 5CDAMpid:00B19899',
+        "test_folder": 'vidpid_fallback_encoding_05',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mvid: is not exactly 4 uppercase hexadecimal digits',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FF1 Mpid:00B1',
+        "test_folder": 'vidpid_fallback_encoding_06',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mvid: is not exactly 4 uppercase hexadecimal digits',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:fff1 Mpid:00B1',
+        "test_folder": 'vidpid_fallback_encoding_07',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:B1',
+        "test_folder": 'vidpid_fallback_encoding_08',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mpid: Mvid:FFF1',
+        "test_folder": 'vidpid_fallback_encoding_09',
+        "is_success_case": 'true',
+    },
+    # More valid/invalid fallback encoding examples:
+    {
+        "description": 'Fallback VID and PID encoding example: invalid VID encoding',
+        "common_name": 'Mvid:FFF Mpid:00B10x',
+        "test_folder": 'vidpid_fallback_encoding_10',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example: valid, but less human-readable',
+        "common_name": 'MpidMvid:FFF10 Matter Test Mpid:00B1',
+        "test_folder": 'vidpid_fallback_encoding_11',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example: invalid, PID not present and VID not upper case',
+        "common_name": 'Matter Devel DAC Mpid:Mvid:Fff1',
+        "test_folder": 'vidpid_fallback_encoding_12',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example: invalid VID prefix',
+        "common_name": 'Matter Devel DAC Mpid:00B1 MVID:FFF1',
+        "test_folder": 'vidpid_fallback_encoding_13',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Fallback VID and PID encoding example: invalid PID and VID prefixes',
+        "common_name": 'Matter Devel DAC Mpid_00B1 Mvid_FFF1',
+        "test_folder": 'vidpid_fallback_encoding_14',
+        "is_success_case": 'false',
+    },
+    # Examples with both fallback encoding in the common name and using Matter specific OIDs
+    {
+        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: valid, Matter OIDs are used and wrong values in the common-name are ignored',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF2 Mpid:00B2',
+        "vid": 0xFFF1,
+        "pid": 0x00B1,
+        "test_folder": 'vidpid_fallback_encoding_15',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: wrong, Correct values encoded in the common-name are ignored',
+        "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:00B1',
+        "vid": 0xFFF2,
+        "pid": 0x00B2,
+        "test_folder": 'vidpid_fallback_encoding_16',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: invalid, PID is using Matter OID then VID must also use Matter OID',
+        "common_name": 'Mvid:FFF1',
+        "pid": 0x00B1,
+        "test_folder": 'vidpid_fallback_encoding_17',
+        "is_success_case": 'false',
+    },
+]
+
 
 class Names:
     def __init__(self, cert_type: CertType, paa_path, test_case_out_dir):
@@ -210,12 +326,13 @@ class Names:
 
 
 class DevCertBuilder:
-    def __init__(self, cert_type: CertType, error_type: str, paa_path: str, test_case_out_dir: str, chip_cert: str, vid: int, pid: int):
+    def __init__(self, cert_type: CertType, error_type: str, paa_path: str, test_case_out_dir: str, chip_cert: str, vid: int, pid: int, custom_cn_attribute: str):
         self.vid = vid
         self.pid = pid
         self.cert_type = cert_type
         self.error_type = error_type
         self.chipcert = chip_cert
+        self.custom_cn_attribute = custom_cn_attribute
 
         if not os.path.exists(self.chipcert):
             raise Exception('Path not found: %s' % self.chipcert)
@@ -236,16 +353,17 @@ class DevCertBuilder:
     def make_certs_and_keys(self) -> None:
         """Creates the PEM and DER certs and keyfiles"""
         error_type_flag = ' -i -e' + self.error_type
+        subject_name = self.custom_cn_attribute
+        vid_flag = ' -V 0x{:X}'.format(self.vid)
+        pid_flag = ' -P 0x{:X}'.format(self.pid)
 
         if self.cert_type == CertType.PAI:
-            subject_name = 'Matter Test PAI'
-            vid_flag = ' -V 0x{:X}'.format(self.vid)
-            pid_flag = ''
+            if (len(subject_name) == 0):
+                subject_name = 'Matter Test PAI'
             type_flag = '-t i'
         elif self.cert_type == CertType.DAC:
-            subject_name = 'Matter Test DAC'
-            vid_flag = ' -V 0x{:X}'.format(self.vid)
-            pid_flag = ' -P 0x{:X}'.format(self.pid)
+            if (len(subject_name) == 0):
+                subject_name = 'Matter Test DAC'
             type_flag = '-t d'
         else:
             return
@@ -363,7 +481,7 @@ def main():
 
             # Generate PAI Cert/Key
             builder = DevCertBuilder(CertType.PAI, error_type_pai, args.paapath, test_case_out_dir,
-                                     chipcert, vid, pid)
+                                     chipcert, vid, PID_NOT_PRESENT, '')
             builder.make_certs_and_keys()
 
             if test_cert == 'pai':
@@ -374,7 +492,7 @@ def main():
 
             # Generate DAC Cert/Key
             builder = DevCertBuilder(CertType.DAC, error_type_dac, args.paapath, test_case_out_dir,
-                                     chipcert, vid, pid)
+                                     chipcert, vid, pid, '')
             builder.make_certs_and_keys()
 
             # Generate Certification Declaration (CD)
@@ -382,6 +500,55 @@ def main():
             pid_flag = ' -p 0x{:X}'.format(pid)
             cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
                 ' -f 1 ' + vid_flag + pid_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+            subprocess.run(cmd, shell=True)
+
+            # Generate Test Case Data Container in JSON Format
+            generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
+
+    for test_cert in ['dac', 'pai']:
+        for test_case in VIDPID_FALLBACK_ENCODING_TEST_CASES:
+            test_case_out_dir = args.outdir + '/struct_' + test_cert + '_' + test_case["test_folder"]
+            if test_cert == 'dac':
+                common_name_dac = test_case["common_name"]
+                common_name_pai = ''
+                if "vid" in test_case:
+                    vid_dac = test_case["vid"]
+                else:
+                    vid_dac = VID_NOT_PRESENT
+                if "pid" in test_case:
+                    pid_dac = test_case["pid"]
+                else:
+                    pid_dac = PID_NOT_PRESENT
+                vid_pai = 0xFFF1
+                pid_pai = 0x00B1
+            else:
+                common_name_dac = ''
+                common_name_pai = test_case["common_name"]
+                common_name_pai = common_name_pai.replace('DAC', 'PAI')
+                vid_dac = 0xFFF1
+                pid_dac = 0x00B1
+                if "vid" in test_case:
+                    vid_pai = test_case["vid"]
+                else:
+                    vid_pai = VID_NOT_PRESENT
+                if "pid" in test_case:
+                    pid_pai = test_case["pid"]
+                else:
+                    pid_pai = PID_NOT_PRESENT
+
+            # Generate PAI Cert/Key
+            builder = DevCertBuilder(CertType.PAI, 'no-error', args.paapath, test_case_out_dir,
+                                     chipcert, vid_pai, pid_pai, common_name_pai)
+            builder.make_certs_and_keys()
+
+            # Generate DAC Cert/Key
+            builder = DevCertBuilder(CertType.DAC, 'no-error', args.paapath, test_case_out_dir,
+                                     chipcert, vid_dac, pid_dac, common_name_dac)
+            builder.make_certs_and_keys()
+
+            # Generate Certification Declaration (CD)
+            cmd = chipcert + ' gen-cd -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
+                ' -f 1  -V 0xFFF1  -p 0x00B1 -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
             subprocess.run(cmd, shell=True)
 
             # Generate Test Case Data Container in JSON Format

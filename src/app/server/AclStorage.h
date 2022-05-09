@@ -138,12 +138,19 @@ public:
         mutable StagingTarget mStagingTargets[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY];
     };
 
+    virtual ~AclStorage() = default;
+
     /**
-     * Initialize must be called. It loads ACL entries for all fabrics from persistent storage,
-     * then installs a listener for the access control system module to maintain ACL entries in
-     * persistent storage so they remain in sync with entries in the access control system module.
+     * Initialize should be called after chip::Access::AccessControl is initialized.
+     *
+     * Implementations should take this opportunity to populate AccessControl with ACL entries
+     * loaded from persistent storage. A half-open range of fabrics [first, last) is provided
+     * so this can be done on a per-fabric basis.
+     *
+     * Implementations should also install an entry change listener on AccessControl to maintain
+     * ACL entries in persistent storage as they are changed.
      */
-    CHIP_ERROR Init(PersistentStorageDelegate & persistentStorage, const FabricTable & fabricTable);
+    virtual CHIP_ERROR Init(PersistentStorageDelegate & persistentStorage, ConstFabricIterator first, ConstFabricIterator last) = 0;
 };
 
 } // namespace app

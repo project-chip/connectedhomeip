@@ -333,6 +333,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
+    // Currently, subject descriptor is only PASE if this node is the responder (aka commissionee);
+    // if this node is the initiator (aka commissioner) then the subject descriptor remains blank.
     if (subjectDescriptor.authMode == AuthMode::kPase)
     {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1

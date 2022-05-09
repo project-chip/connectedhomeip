@@ -430,7 +430,6 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static const uint16_t kDiscriminator = 3840;
 static const uint32_t kSetupPINCode = 20202021;
 static const uint16_t kRemotePort = 5540;
 static const uint16_t kLocalPort = 5541;
@@ -465,8 +464,11 @@ static CHIPDevice * GetConnectedDevice(void)
 - (void)onPairingComplete:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
+    NSError * commissionError = nil;
+    [sController commissionDevice:kDeviceId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
+    XCTAssertNil(commissionError);
+
+    // Keep waiting for onCommissioningComplete
 }
 
 - (void)onCommissioningComplete:(NSError *)error
@@ -535,12 +537,7 @@ static CHIPDevice * GetConnectedDevice(void)
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
     NSError * error;
-    [controller pairDevice:kDeviceId
-                   address:kAddress
-                      port:kRemotePort
-             discriminator:kDiscriminator
-              setupPINCode:kSetupPINCode
-                     error:&error];
+    [controller pairDevice:kDeviceId address:kAddress port:kRemotePort setupPINCode:kSetupPINCode error:&error];
     XCTAssertEqual(error.code, 0);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];

@@ -100,7 +100,7 @@ public:
     }
 
 private:
-    chip::MonotonicallyIncreasingCounter mEventCounter;
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 TestContext sContext;
@@ -1821,6 +1821,12 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+            ctx.DrainAndServiceIO();
+
+            //
+            // Not sure why I had to add this, and didn't have cycles to figure out why.
+            // Tracked in Issue #17528.
+            //
             ctx.DrainAndServiceIO();
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);

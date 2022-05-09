@@ -195,7 +195,8 @@ public:
      *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources, MonotonicallyIncreasingCounter * apEventNumberCounter);
+              const LogStorageResources * const apLogStorageResources,
+              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static EventManagement & GetInstance();
 
@@ -224,7 +225,7 @@ public:
     static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources,
-                                      MonotonicallyIncreasingCounter * apEventNumberCounter);
+                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static void DestroyEventManagement();
 
@@ -336,6 +337,11 @@ public:
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
+    /**
+     * @brief brief Iterate all events and invalidate the fabric-sensitive events whose associated fabric has the given fabric
+     * index.
+     */
+    CHIP_ERROR FabricRemoved(FabricIndex aFabricIndex);
 
     /**
      * @brief
@@ -377,7 +383,7 @@ private:
         EndpointId mEndpointId   = 0;
         EventId mEventId         = 0;
         EventNumber mEventNumber = 0;
-        FabricIndex mFabricIndex = kUndefinedFabricIndex;
+        Optional<FabricIndex> mFabricIndex;
     };
 
     void VendEventNumber();
@@ -417,6 +423,16 @@ private:
      *
      */
     CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
+
+    /**
+     * @brief Iterate the event elements inside event tlv and mark the fabric index as kUndefinedFabricIndex if
+     * it matches the FabricIndex apFabricIndex points to.
+     *
+     * @param[in] aReader  event tlv reader
+     * @param[in] apFabricIndex   A FabricIndex* pointing to the fabric index for which we want to effectively evict events.
+     *
+     */
+    static CHIP_ERROR FabricRemovedCB(const TLV::TLVReader & aReader, size_t, void * apFabricIndex);
 
     /**
      * @brief
@@ -512,7 +528,7 @@ private:
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     // The counter we're going to use for event numbers.
-    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
+    MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer

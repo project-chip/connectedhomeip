@@ -153,7 +153,23 @@ endpoint 0 {
   // A server cluster is a server that gets exposed to the world.
   //
   // As an example, a light bulb may expose a OnOff cluster.
-  server  cluster OtaSoftwareUpdateRequestor;
+  server  cluster OtaSoftwareUpdateRequestor {
+
+    // Each endpoint server cluster instantiations will have individual
+    // attributes chosen for storage/defaults
+    //
+    // If no storage default is given, the value is initialized with 0/false/empty
+    //
+    // Defaults are currently only supported for primitive types (i.e. not
+    // list/struct/array, but supports strings)
+
+    ram attribute zeroInit;                    // initialized with 0.
+    ram attribute stringDefault default="abc"; // Strings can have defaults.
+    ram attribute boolDefault   default=true;  // bools can have defaults.
+    ram attribute inRam default=123;           // stored in RAM, lost on reboot.
+    persist attribute persist;                 // persisted in NVM across reboot.
+    callback attribute usesCallback;           // the zap/ember 'EXTERNAL' callback.
+  }
 }
 
 ```

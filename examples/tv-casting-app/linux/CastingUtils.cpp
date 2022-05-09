@@ -18,6 +18,11 @@
 
 #include "CastingUtils.h"
 
+using namespace chip;
+using namespace chip::System;
+using namespace chip::DeviceLayer;
+using namespace chip::Dnssd;
+
 CHIP_ERROR DiscoverCommissioners()
 {
     // Send discover commissioners request
@@ -110,3 +115,22 @@ void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
         selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId)));
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+void PrintFabrics()
+{
+    // set fabric to be the first in the list
+    for (const auto & fb : chip::Server::GetInstance().GetFabricTable())
+    {
+        FabricIndex fabricIndex = fb.GetFabricIndex();
+        ChipLogError(AppServer, "Next Fabric index=%d", fabricIndex);
+        if (!fb.IsInitialized())
+        {
+            ChipLogError(AppServer, " -- Not initialized");
+            continue;
+        }
+        NodeId myNodeId = fb.GetNodeId();
+        ChipLogProgress(NotSpecified,
+                        "---- Current Fabric nodeId=0x" ChipLogFormatX64 " fabricId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                        ChipLogValueX64(myNodeId), ChipLogValueX64(fb.GetFabricId()), fabricIndex);
+    }
+}

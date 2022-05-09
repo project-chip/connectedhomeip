@@ -164,7 +164,7 @@ uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, 
     return UINT16_MAX;
 }
 
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer)
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
     return !(emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) == UINT16_MAX);
 }

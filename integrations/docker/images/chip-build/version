@@ -1,1 +1,1 @@
-0.5.68 Version bump reason: [Tizen] Add Tizen Studio CLI to Tizen docker image
+0.5.71 Version bump reason: [Tizen] Fix permission bits for secret-tool

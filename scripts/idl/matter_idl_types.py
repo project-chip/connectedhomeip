@@ -1,7 +1,7 @@
 import enum
 
 from dataclasses import dataclass, field
-from typing import List, Set, Optional
+from typing import List, Set, Optional, Union
 
 
 class FieldAttribute(enum.Enum):
@@ -17,6 +17,12 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
+
+
+class AttributeStorage(enum.Enum):
+    RAM = enum.auto()
+    PERSIST = enum.auto()
+    CALLBACK = enum.auto()
 
 
 class EventPriority(enum.Enum):
@@ -83,6 +89,7 @@ class Attribute:
     tags: Set[AttributeTag] = field(default_factory=set)
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
+    default: Optional[Union[str, int]] = None
 
     @property
     def is_readable(self):
@@ -162,9 +169,22 @@ class Cluster:
 
 
 @dataclass
+class AttributeInstantiation:
+    name: str
+    storage: AttributeStorage
+    default: Optional[Union[str, int, bool]] = None
+
+
+@dataclass
+class ServerClusterInstantiation:
+    name: str
+    attributes: List[AttributeInstantiation] = field(default_factory=list)
+
+
+@dataclass
 class Endpoint:
     number: int
-    server_clusters: List[str] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

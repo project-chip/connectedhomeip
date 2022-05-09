@@ -682,6 +682,29 @@ inline void chipDie(void)
  */
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
 
+/**
+ * @brief Ensures that if `str` is NULL, a non-null `default_str_value` is provided
+ *
+ * @param str - null-terminated string pointer or nullptr
+ * @param default_str_value - replacement value if `str` is nullptr
+ * @return `str` if not null, otherwise `default_str_value`
+ */
+inline const char * DefaultStringWhenNull(const char * str, const char * default_str_value)
+{
+    return (str != nullptr) ? str : default_str_value;
+}
+
+/**
+ * @brief Ensure that a string for a %s specifier is shown as "(null)" if null
+ *
+ * @param str - null-terminated string pointer or nullptr
+ * @return `str` if not null, otherwise literal "(null)"
+ */
+inline const char * StringOrNullMarker(const char * str)
+{
+    return DefaultStringWhenNull(str, "(null)");
+}
+
 namespace chip {
 
 /**

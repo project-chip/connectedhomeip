@@ -15,6 +15,30 @@ except:
     from matter_idl_types import *
 
 
+class AddServerClusterToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a server cluster to the given endpoint.
+    """
+
+    def __init__(self, cluster: ServerClusterInstantiation):
+        self.cluster = cluster
+
+    def apply(self, endpoint):
+        endpoint.server_clusters.append(self.cluster)
+
+
+class AddBindingToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a cluster binding to the given endpoint.
+    """
+
+    def __init__(self, name):
+        self.name = name
+
+    def apply(self, endpoint):
+        endpoint.client_bindings.append(self.name)
+
+
 class MatterIdlTransformer(Transformer):
     """
     A transformer capable to transform data parsed by Lark according to 
@@ -41,7 +65,7 @@ class MatterIdlTransformer(Transformer):
 
     """
 
-    def number(self, tokens):
+    def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
@@ -52,6 +76,20 @@ class MatterIdlTransformer(Transformer):
             return int(n[2:], 16)
         else:
             return int(n)
+
+    @v_args(inline=True)
+    def negative_integer(self, value):
+        return -value
+
+    @v_args(inline=True)
+    def integer(self, value):
+        return value
+
+    def bool_default_true(self, _):
+        return True
+
+    def bool_default_false(self, _):
+        return False
 
     def id(self, tokens):
         """An id is a string containing an identifier
@@ -115,12 +153,6 @@ class MatterIdlTransformer(Transformer):
 
     def debug_priority(self, _):
         return EventPriority.DEBUG
-
-    def endpoint_server_cluster(self, _):
-        return EndpointContentType.SERVER_CLUSTER
-
-    def endpoint_binding_to_cluster(self, _):
-        return EndpointContentType.CLIENT_BINDING
 
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
@@ -227,10 +259,24 @@ class MatterIdlTransformer(Transformer):
 
         return (args[-1], acl)
 
+    def ram_attribute(self, _):
+        return AttributeStorage.RAM
+
+    def persist_attribute(self, _):
+        return AttributeStorage.PERSIST
+
+    def callback_attribute(self, _):
+        return AttributeStorage.CALLBACK
+
+    @v_args(inline=True)
+    def endpoint_attribute_instantiation(self, storage, id, default=None):
+        return AttributeInstantiation(name=id, storage=storage, default=default)
+
+    def ESCAPED_STRING(self, s):
+        # handle escapes, skip the start and end quotes
+        return s.value[1:-1].encode('utf-8').decode('unicode-escape')
+
     def attribute(self, args):
-        # Input arguments are:
-        #   -  tags (0 or more)
-        #   -  attribute_with_access (i.e. pair of definition and acl arguments)
         tags = set(args[:-1])
         (definition, acl) = args[-1]
 
@@ -257,22 +303,21 @@ class MatterIdlTransformer(Transformer):
         return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
 
     @v_args(inline=True)
-    def endpoint(self, number, *clusters):
+    def endpoint(self, number, *transforms):
         endpoint = Endpoint(number=number)
 
-        for t, name in clusters:
-            if t == EndpointContentType.CLIENT_BINDING:
-                endpoint.client_bindings.append(name)
-            elif t == EndpointContentType.SERVER_CLUSTER:
-                endpoint.server_clusters.append(name)
-            else:
-                raise Error("Unknown endpoint content: %r" % t)
+        for t in transforms:
+            t.apply(endpoint)
 
         return endpoint
 
     @v_args(inline=True)
-    def endpoint_cluster(self, t, id):
-        return (t, id)
+    def endpoint_cluster_binding(self, id):
+        return AddBindingToEndpointTransform(id)
+
+    @v_args(inline=True)
+    def endpoint_server_cluster(self, id, *attributes):
+        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(name=id, attributes=list(attributes)))
 
     @v_args(inline=True)
     def cluster(self, side, name, code, *content):
@@ -326,6 +371,7 @@ if __name__ == '__main__':
     # The ability to run is for debug and to print out the parsed AST.
     import click
     import coloredlogs
+    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -352,6 +398,6 @@ if __name__ == '__main__':
         logging.info("Parse completed")
 
         logging.info("Data:")
-        print(data)
+        pprint.pp(data)
 
     main()

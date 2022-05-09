@@ -288,8 +288,8 @@ private:
     enum class HandlerState
     {
         Idle,                   ///< The handler has been initialized and is ready
-        GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
-                                ///< report.
+        GeneratingReports,      ///< The handler has is now capable of generating reports and may generate one immediately
+                                ///< or later when other criteria are satisfied (e.g hold-off for min reporting interval).
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };

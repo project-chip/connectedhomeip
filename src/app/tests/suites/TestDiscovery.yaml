@@ -31,9 +31,15 @@ config:
         defaultValue: 5
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -291,9 +297,15 @@ tests:
                 constraints:
                     minValue: 1
 
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"

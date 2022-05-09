@@ -35,6 +35,8 @@ CHIP_ERROR ModelCommand::RunCommand()
                                 CHIP_ERROR err = CHIP_NO_ERROR;
                                 if (error) {
                                     err = [CHIPError errorToCHIPErrorCode:error];
+                                } else if (device == nil) {
+                                    err = CHIP_ERROR_INTERNAL;
                                 } else {
                                     err = SendCommand(device, mEndPointId);
                                 }

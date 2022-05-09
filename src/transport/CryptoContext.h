@@ -136,6 +136,10 @@ public:
      */
     size_t EncryptionOverhead();
 
+    bool IsInitiator() const { return mKeyAvailable && mSessionRole == SessionRole::kInitiator; }
+
+    bool IsResponder() const { return mKeyAvailable && mSessionRole == SessionRole::kResponder; }
+
 private:
     typedef uint8_t CryptoKey[Crypto::kAES_CCM128_Key_Length];
 
