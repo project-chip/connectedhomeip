@@ -43,6 +43,15 @@ public:
     Delegate() : Delegate(false){};
     Delegate(bool featureMapContentPlatform) { mFeatureMapContentPlatform = featureMapContentPlatform; };
 
+    inline bool HasFeature(ApplicationLauncherFeature feature)
+    {
+        if (feature == ApplicationLauncherFeature::kApplicationPlatform)
+        {
+            return mFeatureMapContentPlatform;
+        }
+        return false;
+    }
+
     // this attribute should only be enabled for app platform instance (endpoint 1)
     CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
 
