@@ -46,7 +46,7 @@ tests:
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2, 5, 11, 12, 13, 14, 15, 16, 19, 26, 28, 25]
+          value: [0, 1, 2, 14, 15, 16, 65528, 65529, 65531, 65532, 65533]
           constraints:
               type: list
 
@@ -86,4 +86,4 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          value: 2

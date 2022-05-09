@@ -2623,12 +2623,9 @@ server cluster PowerSource = 47 {
   readonly attribute enum8 status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute int32u batteryVoltage = 11;
-  readonly attribute int8u batteryPercentRemaining = 12;
-  readonly attribute int32u batteryTimeRemaining = 13;
   readonly attribute enum8 batteryChargeLevel = 14;
-  readonly attribute ENUM8 activeBatteryFaults[] = 18;
-  readonly attribute enum8 batteryChargeState = 26;
+  readonly attribute boolean batteryReplacementNeeded = 15;
+  readonly attribute enum8 batteryReplaceability = 16;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3776,6 +3773,7 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
   server  cluster OtaSoftwareUpdateRequestor;
   server  cluster OperationalCredentials;
+  server  cluster PowerSource;
   server  cluster PowerSourceConfiguration;
   server  cluster RelativeHumidityMeasurement;
   server  cluster SoftwareDiagnostics;
@@ -3839,6 +3837,7 @@ endpoint 2 {
   server  cluster Groups;
   server  cluster OccupancySensing;
   server  cluster OnOff;
+  server  cluster PowerSource;
 }
 
 endpoint 65534 {
