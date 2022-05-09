@@ -15,8 +15,8 @@
 #    limitations under the License.
 #
 
+import argparse
 import json
-import sys
 from typing import List
 
 _DEFAULT_CLUSTER_REVISION_ATTRIBUTE = {
@@ -144,16 +144,29 @@ def mutateZapbody(body: object, mutators: List[Mutator]):
                 work_list.append(item)
 
 
-def main():
-    zap_filenames = sys.argv[1:]
-    for zap_filename in zap_filenames:
-        body = loadZapfile(zap_filename)
+def setupArgumentsParser():
+    parser = argparse.ArgumentParser(description='Mutate ZAP files')
+    parser.add_argument('zap_filenames', metavar='zap-filename', type=str, nargs='+',
+                    help='zapfiles that need mutating')
+    parser.add_argument('--add-manditory-attributes', default=False, action='store_true',
+                        help="Add missing manditory attributes to server clusters (default: False)")
+    return parser.parse_args()
 
-        print("==== Processing %s ====" % zap_filename)
+def main():
+    args = setupArgumentsParser()
+
+    mutators = []
+    if args.add_manditory_attributes:
         add_missing_cluster_revision = AddMissingManditoryServerClusterAttributes(
             _DEFAULT_CLUSTER_REVISION_ATTRIBUTE)
         add_missing_feature_map = AddMissingManditoryServerClusterAttributes(
             _DEFAULT_FEATURE_MAP_ATTRIBUTE)
+        mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
+
+    for zap_filename in args.zap_filenames:
+        body = loadZapfile(zap_filename)
+
+        print("==== Processing %s ====" % zap_filename)
         mutateZapbody(
             body, mutators=[add_missing_cluster_revision, add_missing_feature_map])
         saveZapfile(body, zap_filename)
