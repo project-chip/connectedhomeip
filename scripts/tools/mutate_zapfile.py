@@ -147,10 +147,11 @@ def mutateZapbody(body: object, mutators: List[Mutator]):
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(description='Mutate ZAP files')
     parser.add_argument('zap_filenames', metavar='zap-filename', type=str, nargs='+',
-                    help='zapfiles that need mutating')
+                        help='zapfiles that need mutating')
     parser.add_argument('--add-manditory-attributes', default=False, action='store_true',
                         help="Add missing manditory attributes to server clusters (default: False)")
     return parser.parse_args()
+
 
 def main():
     args = setupArgumentsParser()
