@@ -164,12 +164,16 @@ def main():
             _DEFAULT_FEATURE_MAP_ATTRIBUTE)
         mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
 
+    if not mutators:
+        print("No mutators selected")
+        return
+
     for zap_filename in args.zap_filenames:
         body = loadZapfile(zap_filename)
 
         print("==== Processing %s ====" % zap_filename)
         mutateZapbody(
-            body, mutators=[add_missing_cluster_revision, add_missing_feature_map])
+            body, mutators=mutators)
         saveZapfile(body, zap_filename)
 
 
