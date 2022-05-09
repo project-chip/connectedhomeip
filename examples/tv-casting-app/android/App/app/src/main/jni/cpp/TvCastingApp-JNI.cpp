@@ -115,7 +115,7 @@ JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv *env, jobject,
     ChipLogProgress(AppServer, "JNI_METHOD sendUserDirectedCommissioningRequest called with port %d", port);
     Inet::IPAddress addressInet;
     JniUtfString addressJniString(env, addressJStr);
-    if(Inet::IPAddress::FromString(addressJniString.c_str(), addressInet) == false) 
+    if(Inet::IPAddress::FromString(addressJniString.c_str(), addressInet) == false)
     {
         ChipLogError(AppServer, "Failed to parse IP address");
         return false;
