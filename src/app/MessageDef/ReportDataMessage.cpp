@@ -77,7 +77,7 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint32_t subscriptionId;
+                SubscriptionId subscriptionId;
                 ReturnErrorOnFailure(reader.Get(subscriptionId));
                 PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
             }
@@ -185,7 +185,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::SuppressResponse(const 
     return *this;
 }
 
-ReportDataMessage::Builder & ReportDataMessage::Builder::SubscriptionId(const uint32_t aSubscriptionId)
+ReportDataMessage::Builder & ReportDataMessage::Builder::SubscriptionId(const chip::SubscriptionId aSubscriptionId)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)

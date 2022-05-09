@@ -145,7 +145,7 @@ public:
      *
      *  @return A reference to *this
      */
-    ReportDataMessage::Builder & SubscriptionId(const uint32_t aSubscriptionId);
+    ReportDataMessage::Builder & SubscriptionId(const SubscriptionId aSubscriptionId);
 
     /**
      *  @brief Initialize a AttributeReportIBs::Builder for writing into the TLV stream
