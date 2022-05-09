@@ -21,6 +21,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js');
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
 const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 const queryAccess  = require(zapPath + 'db/query-access')
+const queryZcl     = require(zapPath + 'db/query-zcl')
 
 const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
 const StringHelper                 = require('../../common/StringHelper.js');
@@ -446,6 +447,127 @@ async function chip_endpoint_clusters(options)
 }
 
 /**
+ * If helper that checks if a type is a bitmap which is non-atomic.
+ * Non-atomic bitmaps are bitmaps which are not bitmap8/16/32(generally defined
+ * in types.xml)
+ * example:
+ * {{#if_is_weakly_typed_bitmap type}}
+ * type is non atomic bitmap
+ * {{else}}
+ * type is not a non-atomic bitmap
+ * {{/if_is_weakly_typed_bitmap}}
+ *
+ * @param {*} type
+ * @returns Promise of content.
+ */
+async function if_is_weakly_typed_bitmap(type, options)
+{
+  let packageId = await templateUtil.ensureZclPackageId(this)
+  let bitmap
+  if (type && typeof type === 'string')
+  {
+    bitmap = await queryZcl.selectBitmapByName(this.global.db, packageId, type)
+  }
+  else
+  {
+    bitmap = await queryZcl.selectBitmapById(this.global.db, type)
+  }
+
+  if (bitmap) {
+    let a = await queryZcl.selectAtomicType(this.global.db, packageId, bitmap.name)
+    if (a)
+    {
+      return options.inverse(this)
+    }
+    else
+    {
+      return options.fn(this)
+    }
+  }
+  return options.inverse(this)
+}
+
+/**
+ * An helper function to a handlebar-helper that checks if a type is an enum
+ * which is non-atomic. Non-atomic enums are enums which are not
+ * enum8/16/32(generally defined in types.xml)
+ *
+ * * example for if_is_weakly_typed_enum:
+ * {{#if_is_weakly_typed_enum type}}
+ * type is non atomic enum
+ * {{else}}
+ * type is not a non-atomic enum
+ * {{/if_is_weakly_typed_enum}}
+ *
+ * @param {*} type
+ * @param {*} options
+ * @param {*} context
+ * @returns Promise of content.
+ */
+async function if_is_weakly_typed_enum_common(type, options, context)
+{
+  let packageId = await templateUtil.ensureZclPackageId(context)
+  let enumRes
+  if (type && typeof type === 'string')
+  {
+    enumRes = await queryZcl.selectEnumByName(context.global.db, type, packageId)
+  }
+  else
+  {
+    enumRes = await queryZcl.selectEnumById(context.global.db, type)
+  }
+
+  if (enumRes) {
+    let a = await queryZcl.selectAtomicType(context.global.db, packageId, enumRes.name)
+    if (a)
+    {
+      return options.inverse(context)
+    }
+    else
+    {
+      return options.fn(context)
+    }
+  }
+  return options.inverse(context)
+}
+
+/**
+ * If helper that checks if a type is an enum which is non-atomic.
+ * Non-atomic enums are enums which are not enum8/16/32(generally defined
+ * in types.xml)
+ *
+ * * example:
+ * {{#if_is_weakly_typed_enum type}}
+ * type is non atomic enum
+ * {{else}}
+ * type is not a non-atomic enum
+ * {{/if_is_weakly_typed_enum}}
+ *
+ * @param {*} type
+ * @returns Promise of content.
+ */
+async function if_is_weakly_typed_enum(type, options)
+{
+  return if_is_weakly_typed_enum_common(type, options, this)
+}
+
+/**
+ *
+ * @param {*} type
+ * @param {*} options
+ * @returns The same as if_is_weakly_typed_enum apart from some special use
+ * cases.
+ */
+async function if_is_weakly_typed_chip_enum(type, options)
+{
+  if (type.toLowerCase() == 'vendor_id') {
+    return options.fn(this)
+  } else {
+    return if_is_weakly_typed_enum_common(type, options, this)
+  }
+}
+
+/**
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
  */
@@ -589,3 +711,6 @@ exports.if_basic_global_response                             = if_basic_global_r
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
 exports.chip_access_elements                                 = chip_access_elements
+exports.if_is_weakly_typed_enum                              = if_is_weakly_typed_enum
+exports.if_is_weakly_typed_chip_enum                         = if_is_weakly_typed_chip_enum
+exports.if_is_weakly_typed_bitmap                            = if_is_weakly_typed_bitmap
