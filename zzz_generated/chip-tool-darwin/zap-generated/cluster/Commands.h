@@ -46652,6 +46652,453 @@ public:
 };
 
 /*
+ * Attribute Tolerance
+ */
+class ReadPressureMeasurementTolerance : public ReadAttribute {
+public:
+    ReadPressureMeasurementTolerance()
+        : ReadAttribute("tolerance")
+    {
+    }
+
+    ~ReadPressureMeasurementTolerance() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000003) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PressureMeasurement.Tolerance response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PressureMeasurement Tolerance read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePressureMeasurementTolerance : public SubscribeAttribute {
+public:
+    SubscribeAttributePressureMeasurementTolerance()
+        : SubscribeAttribute("tolerance")
+    {
+    }
+
+    ~SubscribeAttributePressureMeasurementTolerance() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000003) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeToleranceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                     params:params
+                                    subscriptionEstablished:nullptr
+                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                  NSLog(@"PressureMeasurement.Tolerance response %@", [value description]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
+                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute ScaledValue
+ */
+class ReadPressureMeasurementScaledValue : public ReadAttribute {
+public:
+    ReadPressureMeasurementScaledValue()
+        : ReadAttribute("scaled-value")
+    {
+    }
+
+    ~ReadPressureMeasurementScaledValue() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000010) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeScaledValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PressureMeasurement.ScaledValue response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PressureMeasurement ScaledValue read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePressureMeasurementScaledValue : public SubscribeAttribute {
+public:
+    SubscribeAttributePressureMeasurementScaledValue()
+        : SubscribeAttribute("scaled-value")
+    {
+    }
+
+    ~SubscribeAttributePressureMeasurementScaledValue() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000010) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeScaledValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                  maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                       params:params
+                                      subscriptionEstablished:nullptr
+                                                reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                    NSLog(@"PressureMeasurement.ScaledValue response %@", [value description]);
+                                                    if (error || !mWait) {
+                                                        SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                    }
+                                                }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute MinScaledValue
+ */
+class ReadPressureMeasurementMinScaledValue : public ReadAttribute {
+public:
+    ReadPressureMeasurementMinScaledValue()
+        : ReadAttribute("min-scaled-value")
+    {
+    }
+
+    ~ReadPressureMeasurementMinScaledValue() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000011) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeMinScaledValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PressureMeasurement.MinScaledValue response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PressureMeasurement MinScaledValue read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePressureMeasurementMinScaledValue : public SubscribeAttribute {
+public:
+    SubscribeAttributePressureMeasurementMinScaledValue()
+        : SubscribeAttribute("min-scaled-value")
+    {
+    }
+
+    ~SubscribeAttributePressureMeasurementMinScaledValue() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000011) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeMinScaledValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                     params:params
+                                    subscriptionEstablished:nullptr
+                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                  NSLog(@"PressureMeasurement.MinScaledValue response %@", [value description]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
+                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute MaxScaledValue
+ */
+class ReadPressureMeasurementMaxScaledValue : public ReadAttribute {
+public:
+    ReadPressureMeasurementMaxScaledValue()
+        : ReadAttribute("max-scaled-value")
+    {
+    }
+
+    ~ReadPressureMeasurementMaxScaledValue() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000012) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeMaxScaledValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PressureMeasurement.MaxScaledValue response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PressureMeasurement MaxScaledValue read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePressureMeasurementMaxScaledValue : public SubscribeAttribute {
+public:
+    SubscribeAttributePressureMeasurementMaxScaledValue()
+        : SubscribeAttribute("max-scaled-value")
+    {
+    }
+
+    ~SubscribeAttributePressureMeasurementMaxScaledValue() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000012) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeMaxScaledValueWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                     params:params
+                                    subscriptionEstablished:nullptr
+                                              reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                  NSLog(@"PressureMeasurement.MaxScaledValue response %@", [value description]);
+                                                  if (error || !mWait) {
+                                                      SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                  }
+                                              }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute ScaledTolerance
+ */
+class ReadPressureMeasurementScaledTolerance : public ReadAttribute {
+public:
+    ReadPressureMeasurementScaledTolerance()
+        : ReadAttribute("scaled-tolerance")
+    {
+    }
+
+    ~ReadPressureMeasurementScaledTolerance() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000013) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeScaledToleranceWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PressureMeasurement.ScaledTolerance response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PressureMeasurement ScaledTolerance read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePressureMeasurementScaledTolerance : public SubscribeAttribute {
+public:
+    SubscribeAttributePressureMeasurementScaledTolerance()
+        : SubscribeAttribute("scaled-tolerance")
+    {
+    }
+
+    ~SubscribeAttributePressureMeasurementScaledTolerance() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000013) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster
+            subscribeAttributeScaledToleranceWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                                 maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                      params:params
+                                     subscriptionEstablished:nullptr
+                                               reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                                   NSLog(@"PressureMeasurement.ScaledTolerance response %@", [value description]);
+                                                   if (error || !mWait) {
+                                                       SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                                   }
+                                               }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
+ * Attribute Scale
+ */
+class ReadPressureMeasurementScale : public ReadAttribute {
+public:
+    ReadPressureMeasurementScale()
+        : ReadAttribute("scale")
+    {
+    }
+
+    ~ReadPressureMeasurementScale() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReadAttribute (0x00000014) on endpoint %u", endpointId);
+
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIP_ERROR __block err = CHIP_NO_ERROR;
+        [cluster readAttributeScaleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            NSLog(@"PressureMeasurement.Scale response %@", [value description]);
+            err = [CHIPError errorToCHIPErrorCode:error];
+
+            if (error != nil) {
+                ChipLogError(chipTool, "PressureMeasurement Scale read Error: %s", chip::ErrorStr(err));
+            }
+            SetCommandExitStatus(err);
+        }];
+        return err;
+    }
+};
+
+class SubscribeAttributePressureMeasurementScale : public SubscribeAttribute {
+public:
+    SubscribeAttributePressureMeasurementScale()
+        : SubscribeAttribute("scale")
+    {
+    }
+
+    ~SubscribeAttributePressureMeasurementScale() {}
+
+    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000403) ReportAttribute (0x00000014) on endpoint %u", endpointId);
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        CHIPPressureMeasurement * cluster = [[CHIPPressureMeasurement alloc] initWithDevice:device
+                                                                                   endpoint:endpointId
+                                                                                      queue:callbackQueue];
+        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        params.keepPreviousSubscriptions
+            = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
+        params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+        [cluster subscribeAttributeScaleWithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval]
+                                            maxInterval:[NSNumber numberWithUnsignedInt:mMaxInterval]
+                                                 params:params
+                                subscriptionEstablished:nullptr
+                                          reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                                              NSLog(@"PressureMeasurement.Scale response %@", [value description]);
+                                              if (error || !mWait) {
+                                                  SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                              }
+                                          }];
+
+        return CHIP_NO_ERROR;
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+};
+
+/*
  * Attribute AttributeList
  */
 class ReadPressureMeasurementAttributeList : public ReadAttribute {
@@ -78821,6 +79268,18 @@ void registerClusterPressureMeasurement(Commands & commands)
         make_unique<SubscribeAttributePressureMeasurementMinMeasuredValue>(), //
         make_unique<ReadPressureMeasurementMaxMeasuredValue>(), //
         make_unique<SubscribeAttributePressureMeasurementMaxMeasuredValue>(), //
+        make_unique<ReadPressureMeasurementTolerance>(), //
+        make_unique<SubscribeAttributePressureMeasurementTolerance>(), //
+        make_unique<ReadPressureMeasurementScaledValue>(), //
+        make_unique<SubscribeAttributePressureMeasurementScaledValue>(), //
+        make_unique<ReadPressureMeasurementMinScaledValue>(), //
+        make_unique<SubscribeAttributePressureMeasurementMinScaledValue>(), //
+        make_unique<ReadPressureMeasurementMaxScaledValue>(), //
+        make_unique<SubscribeAttributePressureMeasurementMaxScaledValue>(), //
+        make_unique<ReadPressureMeasurementScaledTolerance>(), //
+        make_unique<SubscribeAttributePressureMeasurementScaledTolerance>(), //
+        make_unique<ReadPressureMeasurementScale>(), //
+        make_unique<SubscribeAttributePressureMeasurementScale>(), //
         make_unique<ReadPressureMeasurementAttributeList>(), //
         make_unique<SubscribeAttributePressureMeasurementAttributeList>(), //
         make_unique<ReadPressureMeasurementClusterRevision>(), //

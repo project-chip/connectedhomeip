@@ -3079,6 +3079,12 @@ client cluster PressureMeasurement = 1027 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
+  readonly attribute nullable int16s scaledValue = 16;
+  readonly attribute nullable int16s minScaledValue = 17;
+  readonly attribute nullable int16s maxScaledValue = 18;
+  readonly attribute int16u scaledTolerance = 19;
+  readonly attribute int8s scale = 20;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute int16u clusterRevision = 65533;
 }

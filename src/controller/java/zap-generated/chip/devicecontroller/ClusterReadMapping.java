@@ -6898,6 +6898,87 @@ public class ClusterReadMapping {
     readPressureMeasurementInteractionInfo.put(
         "readMaxMeasuredValueAttribute",
         readPressureMeasurementMaxMeasuredValueAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementToleranceCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementToleranceAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPressureMeasurementToleranceCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readToleranceAttribute", readPressureMeasurementToleranceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementScaledValueCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementScaledValueAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readScaledValueAttribute(
+                      (ChipClusters.PressureMeasurementCluster.ScaledValueAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPressureMeasurementScaledValueCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readScaledValueAttribute", readPressureMeasurementScaledValueAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementMinScaledValueCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementMinScaledValueAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readMinScaledValueAttribute(
+                      (ChipClusters.PressureMeasurementCluster.MinScaledValueAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPressureMeasurementMinScaledValueCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readMinScaledValueAttribute",
+        readPressureMeasurementMinScaledValueAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementMaxScaledValueCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementMaxScaledValueAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readMaxScaledValueAttribute(
+                      (ChipClusters.PressureMeasurementCluster.MaxScaledValueAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPressureMeasurementMaxScaledValueCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readMaxScaledValueAttribute",
+        readPressureMeasurementMaxScaledValueAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementScaledToleranceCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementScaledToleranceAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readScaledToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPressureMeasurementScaledToleranceCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readScaledToleranceAttribute",
+        readPressureMeasurementScaledToleranceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPressureMeasurementScaleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPressureMeasurementScaleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PressureMeasurementCluster) cluster)
+                  .readScaleAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPressureMeasurementScaleCommandParams);
+    readPressureMeasurementInteractionInfo.put(
+        "readScaleAttribute", readPressureMeasurementScaleAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readPressureMeasurementAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readPressureMeasurementAttributeListAttributeInteractionInfo =

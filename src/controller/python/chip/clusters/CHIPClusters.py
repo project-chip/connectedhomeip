@@ -4535,6 +4535,42 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000003: {
+                    "attributeName": "Tolerance",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000010: {
+                    "attributeName": "ScaledValue",
+                    "attributeId": 0x00000010,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000011: {
+                    "attributeName": "MinScaledValue",
+                    "attributeId": 0x00000011,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000012: {
+                    "attributeName": "MaxScaledValue",
+                    "attributeId": 0x00000012,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000013: {
+                    "attributeName": "ScaledTolerance",
+                    "attributeId": 0x00000013,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000014: {
+                    "attributeName": "Scale",
+                    "attributeId": 0x00000014,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,

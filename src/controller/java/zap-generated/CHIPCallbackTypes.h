@@ -1115,6 +1115,18 @@ typedef void (*CHIPPressureMeasurementClusterMinMeasuredValueAttributeCallbackTy
     void *, chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterMaxMeasuredValueAttributeCallbackType)(
     void *, chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterToleranceAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::Tolerance::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterScaledValueAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::ScaledValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterMinScaledValueAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::MinScaledValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterMaxScaledValueAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::MaxScaledValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterScaledToleranceAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::ScaledTolerance::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterScaleAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::Scale::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPPressureMeasurementClusterClusterRevisionAttributeCallbackType)(
