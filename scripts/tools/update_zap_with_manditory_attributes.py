@@ -55,110 +55,110 @@ _DEFAULT_FEATURE_MAP_ATTRIBUTE = {
 
 
 class Mutator:
-  def __init__(self):
-    pass
+    def __init__(self):
+        pass
 
-  def handle(self, candidate: object):
-    pass
+    def handle(self, candidate: object):
+        pass
 
 
 class AddMissingManditoryServerClusterAttributes(Mutator):
-  def __init__(self, attribute_entry):
-    self._attribute_entry = attribute_entry
-    super().__init__()
+    def __init__(self, attribute_entry):
+        self._attribute_entry = attribute_entry
+        super().__init__()
 
-  def handle(self, candidate: object):
-    if not isinstance(candidate, dict):
-      return
+    def handle(self, candidate: object):
+        if not isinstance(candidate, dict):
+            return
 
-    # We only care about attributes
-    if "attributes" not in candidate:
-      return
+        # We only care about attributes
+        if "attributes" not in candidate:
+            return
 
-    # If the cluster is not a server or is not enabled we do not enforce adding manidory field
-    if (("enabled" not in candidate) or ("side" not in candidate)):
-      return
+        # If the cluster is not a server or is not enabled we do not enforce adding manidory field
+        if (("enabled" not in candidate) or ("side" not in candidate)):
+            return
 
-    if (not candidate.get("enabled")) or ("server"
-                                          not in candidate.get("side")):
-      return
+        if (not candidate.get("enabled")) or ("server"
+                                              not in candidate.get("side")):
+            return
 
-    attributes = candidate.get("attributes", [])
+        attributes = candidate.get("attributes", [])
 
-    for attribute in attributes:
-      if attribute["code"] == self._attribute_entry["code"]:
-        if attribute["name"] != self._attribute_entry["name"]:
-          print(
-              "WARNING: attribute 0x%X has mismatching name %s (should be %s)" %
-              (self._attribute_entry["code"], attribute["name"],
-               self._attribute_entry["name"]))
-          # TODO what do we want to do here?
-          continue
+        for attribute in attributes:
+            if attribute["code"] == self._attribute_entry["code"]:
+                if attribute["name"] != self._attribute_entry["name"]:
+                    print(
+                        "WARNING: attribute 0x%X has mismatching name %s (should be %s)" %
+                        (self._attribute_entry["code"], attribute["name"],
+                         self._attribute_entry["name"]))
+                    # TODO what do we want to do here?
+                    continue
+                else:
+                    break
         else:
-          break
-    else:
-      print(
-          "WARNING: Did not find mandatory attribute %s in cluster %s (0x%X)" %
-          (self._attribute_entry["name"], candidate["name"], candidate["code"]))
-      insert_index = 0
-      for attribute in attributes:
-        attribute_code = attribute.get("code")
+            print(
+                "WARNING: Did not find mandatory attribute %s in cluster %s (0x%X)" %
+                (self._attribute_entry["name"], candidate["name"], candidate["code"]))
+            insert_index = 0
+            for attribute in attributes:
+                attribute_code = attribute.get("code")
 
-        if attribute_code is not None and attribute_code > self._attribute_entry[
-            "code"]:
-          break
+                if attribute_code is not None and attribute_code > self._attribute_entry[
+                        "code"]:
+                    break
 
-        insert_index += 1
+                insert_index += 1
 
-      # Insert the new attribute in the right place, WITH NO RENUMBERING
-      new_attrib_list = attributes[0:insert_index]
-      new_attrib_list.append(self._attribute_entry)
-      new_attrib_list.extend(attributes[insert_index:])
+            # Insert the new attribute in the right place, WITH NO RENUMBERING
+            new_attrib_list = attributes[0:insert_index]
+            new_attrib_list.append(self._attribute_entry)
+            new_attrib_list.extend(attributes[insert_index:])
 
-      # Replace the attribute list with the augmented item
-      candidate["attributes"] = new_attrib_list
+            # Replace the attribute list with the augmented item
+            candidate["attributes"] = new_attrib_list
 
 
 def loadZapfile(filename: str):
-  with open(filename, "rt") as infile:
-    return json.load(infile)
+    with open(filename, "rt") as infile:
+        return json.load(infile)
 
 
 def saveZapfile(body: object, filename: str):
-  with open(filename, "wt+") as outfile:
-    return json.dump(body, outfile, indent=2)
+    with open(filename, "wt+") as outfile:
+        return json.dump(body, outfile, indent=2)
 
 
 def mutateZapbody(body: object, mutators: List[Mutator]):
-  work_list = [body]
-  while len(work_list):
-    current_item = work_list.pop()
+    work_list = [body]
+    while len(work_list):
+        current_item = work_list.pop()
 
-    for mutator in mutators:
-      mutator.handle(current_item)
+        for mutator in mutators:
+            mutator.handle(current_item)
 
-    if isinstance(current_item, list):
-      for item in current_item:
-        work_list.append(item)
-    elif isinstance(current_item, dict):
-      for item in current_item.values():
-        work_list.append(item)
+        if isinstance(current_item, list):
+            for item in current_item:
+                work_list.append(item)
+        elif isinstance(current_item, dict):
+            for item in current_item.values():
+                work_list.append(item)
 
 
 def main():
-  zap_filenames = sys.argv[1:]
-  for zap_filename in zap_filenames:
-    body = loadZapfile(zap_filename)
+    zap_filenames = sys.argv[1:]
+    for zap_filename in zap_filenames:
+        body = loadZapfile(zap_filename)
 
-    print("==== Processing %s ====" % zap_filename)
-    add_missing_cluster_revision = AddMissingManditoryServerClusterAttributes(
-        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE)
-    add_missing_feature_map = AddMissingManditoryServerClusterAttributes(
-        _DEFAULT_FEATURE_MAP_ATTRIBUTE)
-    mutateZapbody(
-        body, mutators=[add_missing_cluster_revision, add_missing_feature_map])
-    saveZapfile(body, zap_filename)
+        print("==== Processing %s ====" % zap_filename)
+        add_missing_cluster_revision = AddMissingManditoryServerClusterAttributes(
+            _DEFAULT_CLUSTER_REVISION_ATTRIBUTE)
+        add_missing_feature_map = AddMissingManditoryServerClusterAttributes(
+            _DEFAULT_FEATURE_MAP_ATTRIBUTE)
+        mutateZapbody(
+            body, mutators=[add_missing_cluster_revision, add_missing_feature_map])
+        saveZapfile(body, zap_filename)
 
 
 if __name__ == "__main__":
-  main()
+    main()
