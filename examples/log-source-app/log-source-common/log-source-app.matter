@@ -316,7 +316,7 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     OCTET_STRING<65> rootPublicKey = 1;
-    INT16U vendorId = 2;
+    VENDOR_ID vendorId = 2;
     FABRIC_ID fabricId = 3;
     NODE_ID nodeId = 4;
     CHAR_STRING<32> label = 5;
@@ -346,7 +346,7 @@ server cluster OperationalCredentials = 62 {
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
     NODE_ID caseAdminNode = 3;
-    INT16U adminVendorId = 4;
+    VENDOR_ID adminVendorId = 4;
   }
 
   request struct UpdateFabricLabelRequest {

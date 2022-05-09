@@ -266,7 +266,7 @@ typedef struct _ExtensionEntry
 typedef struct _FabricDescriptor
 {
     chip::ByteSpan RootPublicKey;
-    uint16_t VendorId;
+    chip::VendorId VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::CharSpan Label;
