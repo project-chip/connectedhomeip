@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/NodeId.h>
@@ -35,11 +37,11 @@ static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_
 
 struct CATValues
 {
-    CASEAuthTag values[kMaxSubjectCATAttributeCount] = { kUndefinedCAT };
+    std::array<CASEAuthTag, kMaxSubjectCATAttributeCount> values = { kUndefinedCAT };
 
     /* @brief Returns size of the CAT values array.
      */
-    static constexpr size_t size() { return ArraySize(values); }
+    static constexpr size_t size() { return std::tuple_size<decltype(values)>::value; }
 
     /* @brief Returns true if subject input checks against one of the CATs in the values array.
      */
@@ -57,6 +59,8 @@ struct CATValues
         }
         return false;
     }
+
+    bool operator==(const CATValues & that) const { return values == that.values; }
 
     static constexpr size_t kSerializedLength = kMaxSubjectCATAttributeCount * sizeof(CASEAuthTag);
     typedef uint8_t Serialized[kSerializedLength];

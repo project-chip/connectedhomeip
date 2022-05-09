@@ -46,8 +46,9 @@ OutgoingGroupSession * Session::AsOutgoingGroupSession()
     return static_cast<OutgoingGroupSession *>(this);
 }
 
-void Session::TryShiftToSession(const SessionHandle & session)
+void Session::DoShiftToSession(const SessionHandle & session)
 {
+    // Shift to the new session, checks are performed by the subclass implementation which is the caller.
     IntrusiveList<SessionHolder>::Iterator iter = mHolders.begin();
     while (iter != mHolders.end())
     {
@@ -55,7 +56,7 @@ void Session::TryShiftToSession(const SessionHandle & session)
         IntrusiveList<SessionHolder>::Iterator next = iter;
         ++next;
 
-        iter->TryShiftToSession(session);
+        iter->ShiftToSession(session);
 
         iter = next;
     }

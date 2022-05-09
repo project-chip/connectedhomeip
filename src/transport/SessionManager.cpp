@@ -809,18 +809,16 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 void SessionManager::ShiftToSession(const SessionHandle & handle)
 {
     VerifyOrDie(handle->IsSecureSession());
-    SecureSession * session = handle->AsSecureSession();
-    VerifyOrDie(session->GetSecureSessionType() == SecureSession::Type::kCASE);
-    ScopedNodeId node = session->GetPeer();
+    VerifyOrDie(handle->AsSecureSession()->GetSecureSessionType() == SecureSession::Type::kCASE);
     mSecureSessions.ForEachSession([&](SecureSession * oldSession) {
-        if (session == oldSession)
+        if (handle->AsSecureSession() == oldSession)
             return Loop::Continue;
 
-        if (oldSession->GetSecureSessionType() == SecureSession::Type::kCASE && oldSession->GetPeer() == node)
-        {
-            oldSession->TryShiftToSession(handle);
-        }
-
+        // This will update all SessionHolder pointing to oldSession, to the provided handle.
+        //
+        // See comment of SessionDelegate::GetNewSessionHandlingPolicy about how session auto-shifting works, and how to disable it
+        // for specific SessionHolder in specific scenario.
+        oldSession->TryShiftToSession(handle);
         return Loop::Continue;
     });
 }

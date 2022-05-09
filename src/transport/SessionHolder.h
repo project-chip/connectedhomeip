@@ -40,7 +40,7 @@ public:
     SessionHolder & operator=(SessionHolder && that);
 
     virtual void SessionReleased() { Release(); }
-    virtual void TryShiftToSession(const SessionHandle & session)
+    virtual void ShiftToSession(const SessionHandle & session)
     {
         Release();
         Grab(session);
@@ -83,10 +83,10 @@ public:
         mDelegate.OnSessionReleased();
     }
 
-    void TryShiftToSession(const SessionHandle & session) override
+    void ShiftToSession(const SessionHandle & session) override
     {
         if (mDelegate.GetNewSessionHandlingPolicy() == SessionDelegate::NewSessionHandlingPolicy::kShiftToNewSession)
-            SessionHolder::TryShiftToSession(session);
+            SessionHolder::ShiftToSession(session);
     }
 
 private:

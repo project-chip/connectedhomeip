@@ -164,7 +164,7 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     NodeId GetLocalNodeId() const { return mLocalNodeId; }
 
-    CATValues GetPeerCATs() const { return mPeerCATs; }
+    const CATValues & GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
@@ -208,7 +208,8 @@ public:
 
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
-    void TryShiftToSession(const SessionHandle & session) { Session::TryShiftToSession(session); }
+    // This should be a private API, only meant to be called by SessionManager
+    void TryShiftToSession(const SessionHandle & session);
 
 private:
     Type mSecureSessionType;

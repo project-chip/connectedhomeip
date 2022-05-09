@@ -48,5 +48,13 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     return subjectDescriptor;
 }
 
+void SecureSession::TryShiftToSession(const SessionHandle & session)
+{
+    if (GetSecureSessionType() == SecureSession::Type::kCASE && GetPeer() == session->GetPeer() && GetPeerCATs() == session->AsSecureSession()->GetPeerCATs())
+    {
+        Session::DoShiftToSession(session);
+    }
+}
+
 } // namespace Transport
 } // namespace chip

@@ -105,7 +105,7 @@ protected:
 
     void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
 
-    void TryShiftToSession(const SessionHandle & session);
+    void DoShiftToSession(const SessionHandle & session);
 
 private:
     IntrusiveList<SessionHolder> mHolders;
