@@ -50,7 +50,8 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
 
 void SecureSession::TryShiftToSession(const SessionHandle & session)
 {
-    if (GetSecureSessionType() == SecureSession::Type::kCASE && GetPeer() == session->GetPeer() && GetPeerCATs() == session->AsSecureSession()->GetPeerCATs())
+    if (GetSecureSessionType() == SecureSession::Type::kCASE && GetPeer() == session->GetPeer() &&
+        GetPeerCATs() == session->AsSecureSession()->GetPeerCATs())
     {
         Session::DoShiftToSession(session);
     }
