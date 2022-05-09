@@ -59,7 +59,11 @@ public class CommissioningFragment extends Fragment {
       String ipAddress = selectedCommissioner.getIpAddresses().get(0).getHostAddress();
       if (selectedCommissioner != null && selectedCommissioner.getNumIPs() > 0) {
         Log.d(
-            TAG, "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest with IP: " + selectedCommissioner.getIpAddresses().get(0).getHostAddress() + " port: " + selectedCommissioner.getPort());
+            TAG,
+            "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest with IP: "
+                + selectedCommissioner.getIpAddresses().get(0).getHostAddress()
+                + " port: "
+                + selectedCommissioner.getPort());
         if (tvCastingApp.sendUserDirectedCommissioningRequest(
             ipAddress, selectedCommissioner.getPort())) {
           commissioningWindowStatus =
