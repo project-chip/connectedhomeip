@@ -61,7 +61,9 @@ public class CommissioningFragment extends Fragment {
         Log.d(
             TAG,
             "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest with IP: "
-                + ipAddress + " port: " + selectedCommissioner.getPort());
+                + ipAddress
+                + " port: "
+                + selectedCommissioner.getPort());
         if (tvCastingApp.sendUserDirectedCommissioningRequest(
             ipAddress, selectedCommissioner.getPort())) {
           commissioningWindowStatus =
