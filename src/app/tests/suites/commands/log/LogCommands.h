@@ -20,6 +20,8 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include <app-common/zap-generated/tests/simulated-cluster-objects.h>
+
 class LogCommands
 {
 public:
@@ -28,6 +30,6 @@ public:
 
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) = 0;
 
-    CHIP_ERROR Log(const char * message);
-    CHIP_ERROR UserPrompt(const char * message, const char * expectedValue = nullptr);
+    CHIP_ERROR Log(const char * identity, const chip::app::Clusters::LogCommands::Commands::Log::Type & value);
+    CHIP_ERROR UserPrompt(const char * identity, const chip::app::Clusters::LogCommands::Commands::UserPrompt::Type & value);
 };

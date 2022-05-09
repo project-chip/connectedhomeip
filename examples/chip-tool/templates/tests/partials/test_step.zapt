@@ -14,9 +14,7 @@
 
 {{~#*inline "maybePrepareArguments"}}
 {{#unless isWait}}
-{{#if (isTestOnlyCluster cluster)}}
-    SetIdentity({{>kIdentity}});
-{{else if hasSpecificArguments}}
+{{#if hasSpecificArguments}}
     {{#if (chip_tests_item_has_list)}}ListFreer listFreer;{{/if~}}
     {{asEncodableType}} value;
     {{#chip_tests_item_parameters}}
@@ -25,20 +23,6 @@
 {{/if}}
 {{/unless}}
 {{/inline~}}
-
-{{~#*inline "testOnlyClusterArguments"}}
-{{#chip_tests_item_parameters}}{{#not_first}},{{/not_first}}
-    {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
-    {{~#if (chip_tests_config_has definedValue)~}}
-        m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
-    {{~else if (isString type)}}
-        "{{definedValue}}"
-    {{else}}
-        {{definedValue}}
-    {{~/if~}}
-{{/chip_tests_item_parameters}}
-{{/inline~}}
-
 
 {{~#*inline "maybeFabricFiltered"}}
 {{#unless isWait}}
@@ -66,6 +50,7 @@
 {{~#*inline "eventId"}}{{>clusterName}}::Events::{{asUpperCamelCase event}}::Id{{/inline~}}
 {{~#*inline "commandId"}}{{>clusterName}}::Commands::{{asUpperCamelCase command}}::Id{{/inline~}}
 
+{{~#*inline "testOnlyClusterArguments"}}{{>kIdentity}}{{/inline~}}
 {{~#*inline "attributeArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>attributeId}}{{/inline~}}
 {{~#*inline "eventArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>eventId}}{{/inline~}}
 {{~#*inline "commandArguments"}}{{>kIdentity}}, {{>endpointId}}, {{>clusterId}}, {{>commandId}}{{/inline~}}
@@ -86,7 +71,7 @@
 {{/inline~}}
 
 {{~#*inline "arguments"}}
-{{#if (isTestOnlyCluster cluster)}}{{>testOnlyClusterArguments}}
+{{#if (isTestOnlyCluster cluster)}}{{>testOnlyClusterArguments}}, value
 {{else if isWait}}                 {{>waitArguments}}
 {{else if isReadAttribute}}        {{>attributeArguments}}{{>maybeFabricFiltered~}}
 {{else if isSubscribeAttribute}}   {{>attributeArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered~}}

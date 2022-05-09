@@ -24,6 +24,7 @@ assert(chip_build_tools)
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
   ]

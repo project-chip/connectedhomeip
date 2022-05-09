@@ -30,20 +30,23 @@ CHIP_ERROR TestCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
+CHIP_ERROR TestCommand::WaitForCommissionee(const char * identity,
+                                            const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
 {
     chip::FabricIndex fabricIndex;
 
-    ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+    ReturnErrorOnFailure(GetCommissioner(identity).GetFabricIndex(&fabricIndex));
 
     //
     // There's a chance the commissionee may have rebooted before this call here as part of a test flow
     // or is just starting out fresh outright. Let's make sure we're not re-using any cached CASE sessions
     // that will now be stale and mismatched with the peer, causing subsequent interactions to fail.
     //
-    CurrentCommissioner().SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(nodeId, fabricIndex));
+    GetCommissioner(identity).SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(value.nodeId, fabricIndex));
 
-    return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    SetIdentity(identity);
+    return GetCommissioner(identity).GetConnectedDevice(value.nodeId, &mOnDeviceConnectedCallback,
+                                                        &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
@@ -99,7 +102,9 @@ CHIP_ERROR TestCommand::ContinueOnChipMainThread(CHIP_ERROR err)
 
     if (CHIP_NO_ERROR == err)
     {
-        return WaitForMs(0);
+        chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+        value.ms = 0;
+        return WaitForMs(GetIdentity().c_str(), value);
     }
 
     Exit(chip::ErrorStr(err), err);
