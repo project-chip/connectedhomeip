@@ -115,9 +115,10 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Return the Node Id assigned to the controller.
+ * Return the Node Id assigned to the controller.  Will return nil if the
+ * controller is not running (and hence does not know its node id).
  */
-- (NSNumber *)getControllerNodeId;
+- (nullable NSNumber *)getControllerNodeId;
 
 /**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered

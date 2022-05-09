@@ -107,4 +107,43 @@ struct AutoPlatformMemory {
     return certKeySpan.data_equal(keypairKeySpan);
 }
 
++ (BOOL)isEquivalent:(NSData *)certificate1 to:(NSData *)certificate2
+{
+    P256PublicKey pubKey1;
+    CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate1), pubKey1);
+    if (err != CHIP_NO_ERROR) {
+        NSLog(@"Can't extract public key from first certificate: %s", ErrorStr(err));
+        return NO;
+    }
+    P256PublicKeySpan keySpan1(pubKey1.ConstBytes());
+
+    P256PublicKey pubKey2;
+    err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate2), pubKey2);
+    if (err != CHIP_NO_ERROR) {
+        NSLog(@"Can't extract public key from second certificate: %s", ErrorStr(err));
+        return NO;
+    }
+    P256PublicKeySpan keySpan2(pubKey1.ConstBytes());
+
+    if (!keySpan1.data_equal(keySpan2)) {
+        return NO;
+    }
+
+    ChipDN subject1;
+    err = ExtractSubjectDNFromX509Cert(AsByteSpan(certificate1), subject1);
+    if (err != CHIP_NO_ERROR) {
+        NSLog(@"Can't extract subject DN from first certificate: %s", ErrorStr(err));
+        return NO;
+    }
+
+    ChipDN subject2;
+    err = ExtractSubjectDNFromX509Cert(AsByteSpan(certificate2), subject2);
+    if (err != CHIP_NO_ERROR) {
+        NSLog(@"Can't extract subject DN from second certificate: %s", ErrorStr(err));
+        return NO;
+    }
+
+    return subject1.IsEqual(subject2);
+}
+
 @end

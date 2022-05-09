@@ -68,11 +68,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Check whether the given keypair's public key matches the given certificate's
- * public key.
+ * public key.  The certificate is epected to be an X.509 DER encoded
+ * certificate.
  *
  * Will return NO on failures to extract public keys from the objects.
  */
 + (BOOL)keypairMatchesCertificate:(NSData *)certificate keypair:(id<CHIPKeypair>)keypair;
+
+/**
+ * Check whether two X.509 DER encoded certificates are equivalent, in the sense
+ * of having the same public key and the same subject DN.  Returns NO if public
+ * keys or subject DNs cannot be extracted from the certificates.
+ */
++ (BOOL)isEquivalent:(NSData *)certificate1 to:(NSData *)certificate2;
 
 @end
 
