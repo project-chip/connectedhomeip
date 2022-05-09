@@ -11,8 +11,9 @@ RUN mkdir /app
 
 WORKDIR /app
 
-# TODO: Use multi stage build for smaller image size.
+RUN apt-cache policy
 
+# TODO: Use multi stage build for smaller image size.
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   avahi-daemon=0.7-4ubuntu7.1 \
@@ -24,7 +25,7 @@ RUN apt-get update \
   iproute2=5.5.0-1ubuntu1 \
   libavahi-client3=0.7-4ubuntu7.1 \
   libcairo2-dev=1.16.0-4ubuntu1 \
-  libdbus-1-dev=1.12.16-2ubuntu2.1 \
+  libdbus-1-dev=1.12.16-2ubuntu2.2 \
   libgif-dev=5.1.9-1 \
   libgirepository1.0-dev=1.64.1-1~ubuntu20.04.1 \
   libglib2.0-dev=2.64.6-1~ubuntu20.04.4 \
