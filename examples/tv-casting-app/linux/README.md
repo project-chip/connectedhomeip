@@ -73,7 +73,8 @@ printed list.
 
         tv-casting-app> cast request 0
 
--   After sending UDC command to tv-app, you should be able to enter into tv-app shell:
+-   After sending UDC command to tv-app, you should be able to enter into tv-app
+    shell:
 
         tv-app> controller ux ok
 
