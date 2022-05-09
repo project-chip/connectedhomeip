@@ -71,14 +71,13 @@ class AddMissingManditoryServerClusterAttributes(Mutator):
         if not isinstance(candidate, dict):
             return
 
-        # We only care about attributes
+        # We only care about adding manditory attributes.
         if "attributes" not in candidate:
             return
 
-        # If the cluster is not a server or is not enabled we do not enforce adding manidory field
+        # If the cluster is not a server or is not enabled we do not enforce adding manidory attribute.
         if (("enabled" not in candidate) or ("side" not in candidate)):
             return
-
         if (not candidate.get("enabled")) or ("server"
                                               not in candidate.get("side")):
             return
