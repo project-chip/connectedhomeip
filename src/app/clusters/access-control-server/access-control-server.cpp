@@ -206,7 +206,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         size_t newCount;
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
 
-        VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
 
         auto iterator = list.begin();
         size_t i      = 0;
@@ -234,7 +234,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        VerifyOrReturnError((oldCount + 1) <= maxCount, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError((oldCount + 1) <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
 
         AclStorage::DecodableEntry decodableEntry;
         ReturnErrorOnFailure(aDecoder.Decode(decodableEntry));

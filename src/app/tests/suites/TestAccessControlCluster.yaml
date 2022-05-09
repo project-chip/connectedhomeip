@@ -478,7 +478,7 @@ tests:
                   },
               ]
       response:
-          error: 0x87
+          error: RESOURCE_EXHAUSTED
 
     - label: "Verify"
       command: "readAttribute"
