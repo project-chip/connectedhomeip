@@ -14,8 +14,8 @@ import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.chip.casting.DACProviderStub;
-import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
+import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 
 public class MainActivity extends AppCompatActivity

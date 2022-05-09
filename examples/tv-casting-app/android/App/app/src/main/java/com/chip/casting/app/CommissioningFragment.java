@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
+import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 
 /** A {@link Fragment} to get the TV Casting App commissioned. */
@@ -33,7 +32,8 @@ public class CommissioningFragment extends Fragment {
    * @return A new instance of fragment CommissioningFragment.
    */
   // TODO: Rename and change types and number of parameters
-  public static CommissioningFragment newInstance(TvCastingApp tvCastingApp, DiscoveredNodeData selectedCommissioner) {
+  public static CommissioningFragment newInstance(
+      TvCastingApp tvCastingApp, DiscoveredNodeData selectedCommissioner) {
     return new CommissioningFragment(tvCastingApp, selectedCommissioner);
   }
 
@@ -53,13 +53,18 @@ public class CommissioningFragment extends Fragment {
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     String commissioningWindowStatus = "Failed to open commissioning window";
-    if (tvCastingApp.openBasicCommissioningWindow(GlobalCastingConstants.CommissioningWindowDurationSecs)) {
+    if (tvCastingApp.openBasicCommissioningWindow(
+        GlobalCastingConstants.CommissioningWindowDurationSecs)) {
       commissioningWindowStatus = "Commissioning window has been opened. Commission manually.";
       String ipAddress = selectedCommissioner.getIpAddresses().get(0).getHostAddress();
-      if(selectedCommissioner != null && selectedCommissioner.getNumIPs() > 0) {
-        Log.d(TAG, "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest");
-        if(tvCastingApp.sendUserDirectedCommissioningRequest(ipAddress, selectedCommissioner.getPort())) {
-          commissioningWindowStatus = "Commissioning window has been opened. Commissioning requested from " + selectedCommissioner.getDeviceName();
+      if (selectedCommissioner != null && selectedCommissioner.getNumIPs() > 0) {
+        Log.d(
+            TAG, "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest");
+        if (tvCastingApp.sendUserDirectedCommissioningRequest(
+            ipAddress, selectedCommissioner.getPort())) {
+          commissioningWindowStatus =
+              "Commissioning window has been opened. Commissioning requested from "
+                  + selectedCommissioner.getDeviceName();
         }
       }
       TextView onboardingPayloadView = getView().findViewById(R.id.onboardingPayload);

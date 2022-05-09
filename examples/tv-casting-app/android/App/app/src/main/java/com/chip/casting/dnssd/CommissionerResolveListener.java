@@ -10,7 +10,6 @@ import android.widget.Button;
 import androidx.annotation.VisibleForTesting;
 import com.chip.casting.app.CastingContext;
 import com.chip.casting.app.CommissionerDiscoveryFragment;
-
 import java.util.List;
 
 public class CommissionerResolveListener implements NsdManager.ResolveListener {
@@ -35,14 +34,19 @@ public class CommissionerResolveListener implements NsdManager.ResolveListener {
     if (!buttonText.isEmpty()) {
       Button commissionerButton = new Button(castingContext.getApplicationContext());
       commissionerButton.setText(buttonText);
-      CommissionerDiscoveryFragment.Callback callback = (CommissionerDiscoveryFragment.Callback) castingContext.getFragmentActivity();
-      commissionerButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          Log.d(TAG, "CommissionerResolveListener.onServiceResolved.OnClickListener.onClick called for " + commissioner);
-          callback.handleCommissioningButtonClicked(commissioner);
-        }
-      });
+      CommissionerDiscoveryFragment.Callback callback =
+          (CommissionerDiscoveryFragment.Callback) castingContext.getFragmentActivity();
+      commissionerButton.setOnClickListener(
+          new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              Log.d(
+                  TAG,
+                  "CommissionerResolveListener.onServiceResolved.OnClickListener.onClick called for "
+                      + commissioner);
+              callback.handleCommissioningButtonClicked(commissioner);
+            }
+          });
       new Handler(Looper.getMainLooper())
           .post(() -> castingContext.getCommissionersLayout().addView(commissionerButton));
     } else Log.e(TAG, "Skipped displaying " + commissioner);

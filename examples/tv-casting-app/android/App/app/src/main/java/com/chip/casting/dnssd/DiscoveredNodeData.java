@@ -1,7 +1,6 @@
 package com.chip.casting.dnssd;
 
 import android.net.nsd.NsdServiceInfo;
-
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
