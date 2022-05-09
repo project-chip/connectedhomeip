@@ -20,7 +20,6 @@
 '''
 
 import ctypes
-from chip.ChipStack import *
 from chip.exceptions import *
 
 __all__ = ["ChipClusters"]
