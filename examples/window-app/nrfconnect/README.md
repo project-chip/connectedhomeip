@@ -377,8 +377,8 @@ Semiconductor's kit you own.
 ### Building with low-power configuration
 
 You can build the example using the low-power configuration, which enables
-Thread's Synchronized Sleepy End Device mode and disables debug features,
-such as the UART console or the **LED 1** usage.
+Thread's Synchronized Sleepy End Device mode and disables debug features, such
+as the UART console or the **LED 1** usage.
 
 To build for the low-power configuration, run the following command with
 _build-target_ replaced with the build target name of the Nordic Semiconductor's
