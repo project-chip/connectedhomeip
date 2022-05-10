@@ -356,11 +356,6 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
         activeAttempts.Complete(mNodeData.operationalData.peerId);
         mNodeData.LogNodeIdResolved();
 
-        //
-        // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
-        //
-        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-
         if (mOperationalDelegate != nullptr)
         {
             mOperationalDelegate->OnOperationalNodeResolved(mNodeData);
