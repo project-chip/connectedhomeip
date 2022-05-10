@@ -62,10 +62,31 @@ class Mutator:
         pass
 
 
-class AddMissingManditoryServerClusterAttributes(Mutator):
-    def __init__(self, attribute_entry):
+class ValidateManditoryServerClusterAttributes(Mutator):
+    def __init__(self, attribute_entry, add_if_missing):
         self._attribute_entry = attribute_entry
+        self._add_if_missing = add_if_missing
         super().__init__()
+
+    def _addManditoryAttribute(self, candidate: object):
+        attributes = candidate.get("attributes", [])
+        insert_index = 0
+        for attribute in attributes:
+            attribute_code = attribute.get("code")
+
+            if attribute_code is not None and attribute_code > self._attribute_entry[
+                    "code"]:
+                break
+
+            insert_index += 1
+
+        # Insert the new attribute in the right place, WITH NO RENUMBERING
+        new_attrib_list = attributes[0:insert_index]
+        new_attrib_list.append(self._attribute_entry)
+        new_attrib_list.extend(attributes[insert_index:])
+
+        # Replace the attribute list with the augmented item
+        candidate["attributes"] = new_attrib_list
 
     def handle(self, candidate: object):
         if not isinstance(candidate, dict):
@@ -82,9 +103,7 @@ class AddMissingManditoryServerClusterAttributes(Mutator):
                                               not in candidate.get("side")):
             return
 
-        attributes = candidate.get("attributes", [])
-
-        for attribute in attributes:
+        for attribute in candidate.get("attributes", []):
             if attribute["code"] == self._attribute_entry["code"]:
                 if attribute["name"] != self._attribute_entry["name"]:
                     print(
@@ -99,23 +118,8 @@ class AddMissingManditoryServerClusterAttributes(Mutator):
             print(
                 "WARNING: Did not find mandatory attribute %s in cluster %s (0x%X)" %
                 (self._attribute_entry["name"], candidate["name"], candidate["code"]))
-            insert_index = 0
-            for attribute in attributes:
-                attribute_code = attribute.get("code")
-
-                if attribute_code is not None and attribute_code > self._attribute_entry[
-                        "code"]:
-                    break
-
-                insert_index += 1
-
-            # Insert the new attribute in the right place, WITH NO RENUMBERING
-            new_attrib_list = attributes[0:insert_index]
-            new_attrib_list.append(self._attribute_entry)
-            new_attrib_list.extend(attributes[insert_index:])
-
-            # Replace the attribute list with the augmented item
-            candidate["attributes"] = new_attrib_list
+            if self._add_if_missing:
+                self._addManditoryAttribute(candidate)
 
 
 def loadZapfile(filename: str):
@@ -148,7 +152,7 @@ def setupArgumentsParser():
     parser = argparse.ArgumentParser(description='Mutate ZAP files')
     parser.add_argument('zap_filenames', metavar='zap-filename', type=str, nargs='+',
                         help='zapfiles that need mutating')
-    parser.add_argument('--add-manditory-attributes', default=False, action='store_true',
+    parser.add_argument('--add-missing-manditory-attributes', default=False, action='store_true',
                         help="Add missing manditory attributes to server clusters (default: False)")
     return parser.parse_args()
 
@@ -157,16 +161,12 @@ def main():
     args = setupArgumentsParser()
 
     mutators = []
-    if args.add_manditory_attributes:
-        add_missing_cluster_revision = AddMissingManditoryServerClusterAttributes(
-            _DEFAULT_CLUSTER_REVISION_ATTRIBUTE)
-        add_missing_feature_map = AddMissingManditoryServerClusterAttributes(
-            _DEFAULT_FEATURE_MAP_ATTRIBUTE)
-        mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
+    add_missing_cluster_revision = ValidateManditoryServerClusterAttributes(
+        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.add_missing_manditory_attributes)
+    add_missing_feature_map = ValidateManditoryServerClusterAttributes(
+        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.add_missing_manditory_attributes)
 
-    if not mutators:
-        print("No mutators selected")
-        return
+    mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
 
     for zap_filename in args.zap_filenames:
         body = loadZapfile(zap_filename)
