@@ -68,30 +68,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
-    // Overide with dummy value to pass CI
-    currentHeapFree = 0;
-    return CHIP_NO_ERROR;
-}
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+    // On Darwin, overide with non-op to pass CI.
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    // Overide with dummy value to pass CI
-    currentHeapUsed = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    // Overide with dummy value to pass CI
-    currentHeapHighWatermark = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticDataProviderImpl::SetCurrentHeapHighWatermark(uint64_t heapHighWatermark)
-{
-    // Overide to pass CI
     return CHIP_NO_ERROR;
 }
 
