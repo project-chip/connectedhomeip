@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ameba:0.5.70
+            image: connectedhomeip/chip-build-ameba:0.5.72
             options: --user root
 
         steps:

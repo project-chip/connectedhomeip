@@ -31,7 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.70
+            image: connectedhomeip/chip-build:0.5.72
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
