@@ -41,7 +41,7 @@
       {{definedValue}};
     {{else if (chip_tests_config_has definedValue)}}
       m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() :
-      {{~#if_chip_enum type~}}
+      {{~#if_is_strongly_typed_chip_enum type~}}
         static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{chip_tests_config_get_default_value definedValue}});
       {{else if (isCharString type)}}
         chip::Span<const char>("{{chip_tests_config_get_default_value definedValue}}", {{utf8StringLength (chip_tests_config_get_default_value definedValue)}});
@@ -53,9 +53,9 @@
         {{else}}
           {{asTypedExpression (chip_tests_config_get_default_value definedValue) type}};
         {{/if_is_strongly_typed_bitmap}}
-      {{/if_chip_enum~}}
+      {{/if_is_strongly_typed_chip_enum~}}
     {{else~}}
-      {{~#if_chip_enum type~}}
+      {{~#if_is_strongly_typed_chip_enum type~}}
         static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
       {{else if (isCharString type)}}
         chip::Span<const char>("{{definedValue}}garbage: not in length on purpose", {{utf8StringLength definedValue}});
@@ -67,7 +67,7 @@
         {{else}}
           {{asTypedExpression definedValue type}};
         {{/if_is_strongly_typed_bitmap}}
-      {{/if_chip_enum~}}
+      {{/if_is_strongly_typed_chip_enum~}}
     {{~/if~}}
     
   {{/if_is_struct}}

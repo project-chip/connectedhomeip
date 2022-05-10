@@ -4407,7 +4407,7 @@ private:
         case 56: {
             LogStep(56, "Write the default values to optional attribute: DriftCompensation");
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::DriftCompensation::Id,
                                   value);
         }
@@ -22598,7 +22598,7 @@ private:
         case 5: {
             LogStep(5, "Writes the respective default value to mandatory attribute: OccupancySensorType");
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::OccupancySensorType::Id, value);
         }
@@ -30081,7 +30081,7 @@ private:
             LogStep(1, "Writes a value of 0 to TemperatureDisplayMode attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, value);
         }
@@ -30089,7 +30089,7 @@ private:
             LogStep(2, "Writes a value of 1 to TemperatureDisplayMode attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(1);
+            value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, value);
         }
@@ -30097,7 +30097,7 @@ private:
             LogStep(3, "Writes a value of greater than 1 to TemperatureDisplayMode attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(2);
+            value = 2;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, value);
         }
@@ -30105,7 +30105,7 @@ private:
             LogStep(4, "Writes a value of 0 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30113,7 +30113,7 @@ private:
             LogStep(5, "Writes a value of 1 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(1);
+            value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30121,7 +30121,7 @@ private:
             LogStep(6, "Writes a value of 2 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(2);
+            value = 2;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30129,7 +30129,7 @@ private:
             LogStep(7, "Writes a value of 3 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(3);
+            value = 3;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30137,7 +30137,7 @@ private:
             LogStep(8, "Writes a value of 4 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(4);
+            value = 4;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30145,7 +30145,7 @@ private:
             LogStep(9, "Writes a value of 5 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(5);
+            value = 5;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30153,7 +30153,7 @@ private:
             LogStep(10, "Writes a value of greater than 5 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(6);
+            value = 6;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, value);
         }
@@ -30161,7 +30161,7 @@ private:
             LogStep(11, "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id, value);
         }
@@ -30169,7 +30169,7 @@ private:
             LogStep(12, "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(1);
+            value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id, value);
         }
@@ -30177,7 +30177,7 @@ private:
             LogStep(13, "Writes a value of greater than 1 to ScheduleProgrammingVisibility attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             uint8_t value;
-            value = static_cast<uint8_t>(2);
+            value = 2;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
                                   ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id, value);
         }
@@ -41371,7 +41371,7 @@ private:
         case 98: {
             LogStep(98, "Write attribute ENUM8 Max Value");
             uint8_t value;
-            value = static_cast<uint8_t>(255);
+            value = 255;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value);
         }
         case 99: {
@@ -41381,7 +41381,7 @@ private:
         case 100: {
             LogStep(100, "Write attribute ENUM8 Min Value");
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value);
         }
         case 101: {
@@ -41395,7 +41395,7 @@ private:
         case 103: {
             LogStep(103, "Write attribute ENUM16 Max Value");
             uint16_t value;
-            value = static_cast<uint16_t>(65535);
+            value = 65535U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value);
         }
         case 104: {
@@ -41405,7 +41405,7 @@ private:
         case 105: {
             LogStep(105, "Write attribute ENUM16 Min Value");
             uint16_t value;
-            value = static_cast<uint16_t>(0);
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value);
         }
         case 106: {
@@ -43206,7 +43206,7 @@ private:
             LogStep(324, "Write attribute NULLABLE_ENUM8 Min Value");
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = static_cast<uint8_t>(0);
+            value.Value() = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value);
         }
@@ -43218,7 +43218,7 @@ private:
             LogStep(326, "Write attribute NULLABLE_ENUM8 Max Value");
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = static_cast<uint8_t>(254);
+            value.Value() = 254;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value);
         }
@@ -43230,7 +43230,7 @@ private:
             LogStep(328, "Write attribute NULLABLE_ENUM8 Invalid Value");
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
-            value.Value() = static_cast<uint8_t>(255);
+            value.Value() = 255;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value);
         }
@@ -43253,7 +43253,7 @@ private:
             LogStep(332, "Write attribute NULLABLE_ENUM16 Min Value");
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
-            value.Value() = static_cast<uint16_t>(0);
+            value.Value() = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value);
         }
@@ -43265,7 +43265,7 @@ private:
             LogStep(334, "Write attribute NULLABLE_ENUM16 Max Value");
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
-            value.Value() = static_cast<uint16_t>(65534);
+            value.Value() = 65534U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value);
         }
@@ -43277,7 +43277,7 @@ private:
             LogStep(336, "Write attribute NULLABLE_ENUM16 Invalid Value");
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
-            value.Value() = static_cast<uint16_t>(65535);
+            value.Value() = 65535U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value);
         }
@@ -46847,7 +46847,7 @@ private:
         case 70: {
             LogStep(70, "Write attribute ENUM8 Not Default Value");
             uint8_t value;
-            value = static_cast<uint8_t>(1);
+            value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value);
         }
         case 71: {
@@ -46871,7 +46871,7 @@ private:
         case 75: {
             LogStep(75, "Write attribute ENUM16 Not Default Value");
             uint16_t value;
-            value = static_cast<uint16_t>(1);
+            value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value);
         }
         case 76: {
