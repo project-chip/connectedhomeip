@@ -68,12 +68,11 @@ class ValidateManditoryServerClusterAttributes(Mutator):
         self._add_if_missing = add_if_missing
         super().__init__()
 
-    def _addManditoryAttribute(self, candidate: object):
+    def _addMissingManditoryAttribute(self, candidate: object):
         attributes = candidate.get("attributes", [])
         insert_index = 0
         for attribute in attributes:
             attribute_code = attribute.get("code")
-
             if attribute_code is not None and attribute_code > self._attribute_entry[
                     "code"]:
                 break
@@ -104,22 +103,27 @@ class ValidateManditoryServerClusterAttributes(Mutator):
             return
 
         for attribute in candidate.get("attributes", []):
-            if attribute["code"] == self._attribute_entry["code"]:
-                if attribute["name"] != self._attribute_entry["name"]:
-                    print(
-                        "WARNING: attribute 0x%X has mismatching name %s (should be %s)" %
-                        (self._attribute_entry["code"], attribute["name"],
-                         self._attribute_entry["name"]))
+            if attribute["code"] != self._attribute_entry["code"]:
+                continue
+            if attribute["name"] != self._attribute_entry["name"]:
+                print(
+                    "WARNING: attribute 0x%X has mismatching name %s (should be %s)" %
+                    (self._attribute_entry["code"], attribute["name"],
+                     self._attribute_entry["name"]))
+                # TODO what do we want to do here?
+                continue
+            else:
+                if not attribute["included"]:
+                    print("WARNING: attribute 0x%X(%s) found, but included is false" %
+                        (self._attribute_entry["code"], self._attribute_entry["name"]))
                     # TODO what do we want to do here?
-                    continue
-                else:
-                    break
+                break
         else:
             print(
                 "WARNING: Did not find mandatory attribute %s in cluster %s (0x%X)" %
                 (self._attribute_entry["name"], candidate["name"], candidate["code"]))
             if self._add_if_missing:
-                self._addManditoryAttribute(candidate)
+                self._addMissingManditoryAttribute(candidate)
 
 
 def loadZapfile(filename: str):
