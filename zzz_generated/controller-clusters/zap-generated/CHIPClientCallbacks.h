@@ -482,18 +482,7 @@ typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttribute
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & data);
 typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(
-<<<<<<< HEAD
-<<<<<<< HEAD
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
-=======
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
-=======
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & data);
->>>>>>> Reverting the changes to helper.js such that baseline/atomic enums and bitmaps return uint and non-atomic/not-baseline enums and bitmaps return like they used to before
-void ThreadNetworkDiagnosticsClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                            chip::Callback::Cancelable * onSuccessCallback,
-                                                                            chip::Callback::Cancelable * onFailureCallback);
->>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 typedef void (*ThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
@@ -501,18 +490,7 @@ typedef void (*ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback)
 typedef void (*ThreadNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback)(
-<<<<<<< HEAD
-<<<<<<< HEAD
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & data);
-=======
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
-=======
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & data);
->>>>>>> Reverting the changes to helper.js such that baseline/atomic enums and bitmaps return uint and non-atomic/not-baseline enums and bitmaps return like they used to before
-void TimeFormatLocalizationClusterGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                          chip::Callback::Cancelable * onSuccessCallback,
-                                                                          chip::Callback::Cancelable * onFailureCallback);
->>>>>>> Returning the right c type when the data type is an enum or bitmap in src/app/zap-templates/templates/app/helper.js#zapTypeToClusterObjectType
 typedef void (*TimeFormatLocalizationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TimeFormatLocalizationAcceptedCommandListListAttributeCallback)(
