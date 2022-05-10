@@ -15,19 +15,16 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_log.h"
 #include "esp_spi_flash.h"
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/InitServerHelpers.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <OTAProviderCommands.h>
 #include <app/clusters/ota-provider/ota-provider.h>
@@ -39,9 +36,7 @@ using chip::Callback::Callback;
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
-using namespace chip::Credentials;
 using namespace chip::DeviceManager;
-using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 
 CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & blockBuf, size_t & size, bool & isEof, uint32_t offset);
@@ -51,7 +46,7 @@ void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 namespace {
 const char * TAG               = "ota-provider-app";
 const uint8_t kMaxImagePathlen = 35;
-static DeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacks EchoCallbacks;
 
 // TODO: this should probably be done dynamically
 constexpr chip::EndpointId kOtaProviderEndpoint = 0;
@@ -65,20 +60,8 @@ chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nul
 chip::Callback::Callback<OnBdxTransferComplete> onTransferCompleteCallback(OnTransferComplete, nullptr);
 chip::Callback::Callback<OnBdxTransferFailed> onTransferFailedCallback(OnTransferFailed, nullptr);
 
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-
-static void InitServer(intptr_t context)
+static void PostInitServerCallback()
 {
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    sWiFiNetworkCommissioningInstance.Init();
-
     BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
     VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));
 
@@ -138,6 +121,12 @@ static void InitServer(intptr_t context)
     OTAProviderCommands & otaProviderCommands = OTAProviderCommands::GetInstance();
     otaProviderCommands.SetExampleOTAProvider(&otaProvider);
     otaProviderCommands.Register();
+}
+
+static void InitServer(intptr_t context)
+{
+    InitServerHelper::Init(
+        PostInitServerCallback); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 } // namespace
