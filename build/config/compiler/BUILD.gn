@@ -439,6 +439,18 @@ config("fuzzing_default") {
   }
 }
 
+config("coverage") {
+  cflags = [ "--coverage" ]
+  ldflags = cflags
+}
+
+config("coverage_default") {
+  configs = []
+  if (use_coverage) {
+    configs += [ ":coverage" ]
+  }
+}
+
 declare_args() {
   # Enable Runtime Type Information (RTTI)
   enable_rtti = false

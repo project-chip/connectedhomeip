@@ -20,31 +20,38 @@
 
 constexpr uint16_t kPayloadMaxSize = 64;
 
-CHIP_ERROR CommissionerCommands::PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
+CHIP_ERROR
+CommissionerCommands::PairWithQRCode(const char * identity,
+                                     const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value)
 {
-    VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value.payload.size() > 0 && value.payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
 
-    GetCurrentCommissioner().RegisterPairingDelegate(this);
+    GetCommissioner(identity).RegisterPairingDelegate(this);
 
     char qrCode[kPayloadMaxSize];
-    memcpy(qrCode, payload.data(), payload.size());
-    return GetCurrentCommissioner().PairDevice(nodeId, qrCode);
+    memset(qrCode, '\0', sizeof(qrCode));
+    memcpy(qrCode, value.payload.data(), value.payload.size());
+    ChipLogError(chipTool, "QRCode is %s", qrCode);
+    return GetCommissioner(identity).PairDevice(value.nodeId, qrCode);
 }
 
-CHIP_ERROR CommissionerCommands::PairWithManualCode(chip::NodeId nodeId, const chip::CharSpan payload)
+CHIP_ERROR CommissionerCommands::PairWithManualCode(
+    const char * identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithManualCode::Type & value)
 {
-    VerifyOrReturnError(payload.size() > 0 && payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(value.payload.size() > 0 && value.payload.size() < kPayloadMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
 
-    GetCurrentCommissioner().RegisterPairingDelegate(this);
+    GetCommissioner(identity).RegisterPairingDelegate(this);
 
     char manualCode[kPayloadMaxSize];
-    memcpy(manualCode, payload.data(), payload.size());
-    return GetCurrentCommissioner().PairDevice(nodeId, manualCode);
+    memset(manualCode, '\0', sizeof(manualCode));
+    memcpy(manualCode, value.payload.data(), value.payload.size());
+    return GetCommissioner(identity).PairDevice(value.nodeId, manualCode);
 }
 
-CHIP_ERROR CommissionerCommands::Unpair(chip::NodeId nodeId)
+CHIP_ERROR CommissionerCommands::Unpair(const char * identity,
+                                        const chip::app::Clusters::CommissionerCommands::Commands::Unpair::Type & value)
 {
-    return GetCurrentCommissioner().UnpairDevice(nodeId);
+    return GetCommissioner(identity).UnpairDevice(value.nodeId);
 }
 
 chip::app::StatusIB ConvertToStatusIB(CHIP_ERROR err)

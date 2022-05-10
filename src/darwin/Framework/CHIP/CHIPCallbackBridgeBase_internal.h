@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 
 #import "CHIPError_Internal.h"
-#import "zap-generated/CHIPClientCallbacks.h"
 #import "zap-generated/CHIPClustersObjc.h"
 
 #include <app/data-model/NullObject.h>
