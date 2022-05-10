@@ -144,6 +144,14 @@ struct ResolvedNodeData : public ResolutionData
 
     PeerId mPeerId;
     System::Clock::Timestamp mExpiryTime;
+
+    void Reset()
+    {
+        ResolutionData::Reset();
+
+        mPeerId     = PeerId();
+        mExpiryTime = System::Clock::Timestamp::zero();
+    }
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;
