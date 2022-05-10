@@ -26,7 +26,7 @@ _DEFAULT_CLUSTER_REVISION_ATTRIBUTE = {
     "side": "server",
     "type": "int16u",
     "included": 1,
-    "storageOption": "NVM",
+    "storageOption": "RAM",
     "singleton": 0,
     "bounded": 0,
     "defaultValue": "1",
@@ -43,7 +43,7 @@ _DEFAULT_FEATURE_MAP_ATTRIBUTE = {
     "side": "server",
     "type": "bitmap32",
     "included": 1,
-    "storageOption": "NVM",
+    "storageOption": "RAM",
     "singleton": 0,
     "bounded": 0,
     "defaultValue": "0",
@@ -63,9 +63,11 @@ class Mutator:
 
 
 class ValidateManditoryServerClusterAttributes(Mutator):
-    def __init__(self, attribute_entry, add_if_missing):
+    def __init__(self, attribute_entry, add_if_missing, forces_include, force_storage_default):
         self._attribute_entry = attribute_entry
         self._add_if_missing = add_if_missing
+        self._forces_include = forces_include
+        self._force_storage_default = force_storage_default
         super().__init__()
 
     def _addMissingManditoryAttribute(self, candidate: object):
@@ -114,9 +116,15 @@ class ValidateManditoryServerClusterAttributes(Mutator):
                 continue
             else:
                 if not attribute["included"]:
-                    print("WARNING: attribute 0x%X(%s) found, but included is false" %
-                          (self._attribute_entry["code"], self._attribute_entry["name"]))
-                    # TODO what do we want to do here?
+                    print("WARNING: attribute 0x%X(%s) in cluster %s found, but included is false" %
+                          (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
+                    if self._forces_include:
+                        attribute["included"] = self._attribute_entry["included"]
+                if attribute["storageOption"] != self._attribute_entry["storageOption"]:
+                    print("WARNING: attribute 0x%X(%s) in cluster %s found, but storageOption isn't expected value of %s" %
+                          (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"], self._attribute_entry["storageOption"]))
+                    if self._force_storage_default:
+                        attribute["storageOption"] = self._attribute_entry["storageOption"]
                 break
         else:
             print(
@@ -156,8 +164,12 @@ def setupArgumentsParser():
     parser = argparse.ArgumentParser(description='Mutate ZAP files')
     parser.add_argument('zap_filenames', metavar='zap-filename', type=str, nargs='+',
                         help='zapfiles that need mutating')
-    parser.add_argument('--add-missing-manditory-attributes', default=False, action='store_true',
+    parser.add_argument('--manditory-attributes-add-missing', default=False, action='store_true',
                         help="Add missing manditory attributes to server clusters (default: False)")
+    parser.add_argument('--manditory-attributes-force-included', default=False, action='store_true',
+                        help="If manditory attribute is not included, include it (default: False)")
+    parser.add_argument('--manditory-attributes-force-storage-default', default=False, action='store_true',
+                        help="Enforce manditory attribute use default storage type (default: False)")
     return parser.parse_args()
 
 
@@ -166,9 +178,9 @@ def main():
 
     mutators = []
     add_missing_cluster_revision = ValidateManditoryServerClusterAttributes(
-        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.add_missing_manditory_attributes)
+        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.manditory_attributes_add_missing, args.manditory_attributes_force_included, args.manditory_attributes_force_storage_default)
     add_missing_feature_map = ValidateManditoryServerClusterAttributes(
-        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.add_missing_manditory_attributes)
+        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.manditory_attributes_add_missing, args.manditory_attributes_force_included, args.manditory_attributes_force_storage_default)
 
     mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
 

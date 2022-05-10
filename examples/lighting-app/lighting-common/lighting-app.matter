@@ -1164,6 +1164,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
@@ -1666,7 +1667,7 @@ endpoint 0 {
 
   server cluster Groups {
     ram      attribute nameSupport;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -1675,7 +1676,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
 
@@ -1686,7 +1687,7 @@ endpoint 0 {
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 3;
     callback attribute attributeList;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1711,7 +1712,7 @@ endpoint 0 {
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1720,13 +1721,14 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
     ram      attribute updateStateProgress;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1734,7 +1736,7 @@ endpoint 0 {
     persist  attribute hourFormat;
     persist  attribute activeCalendarType;
     callback attribute supportedCalendarTypes;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1762,8 +1764,8 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    persist  attribute featureMap;
-    persist  attribute clusterRevision default = 1;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralDiagnostics {
@@ -1775,7 +1777,7 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1889,15 +1891,15 @@ endpoint 0 {
   }
 
   server cluster Switch {
-    persist  attribute featureMap;
-    persist  attribute clusterRevision default = 1;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
     callback attribute adminVendorId;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1908,7 +1910,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1917,19 +1919,19 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
     callback attribute labelList;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UserLabel {
     callback attribute labelList;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -1939,13 +1941,13 @@ endpoint 1 {
   server cluster Identify {
     ram      attribute identifyTime;
     ram      attribute identifyType;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -1983,7 +1985,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
 
@@ -2017,7 +2019,7 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    persist  attribute featureMap;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 }
