@@ -63,11 +63,11 @@ class Mutator:
 
 
 class ValidateManditoryServerClusterAttributes(Mutator):
-    def __init__(self, attribute_entry, add_if_missing, forces_include, force_storage_default):
+    def __init__(self, attribute_entry, add_if_missing, forces_include, replace_if_storage_nvm):
         self._attribute_entry = attribute_entry
         self._add_if_missing = add_if_missing
         self._forces_include = forces_include
-        self._force_storage_default = force_storage_default
+        self._replace_if_storage_nvm = replace_if_storage_nvm
         super().__init__()
 
     def _addMissingManditoryAttribute(self, candidate: object):
@@ -120,10 +120,10 @@ class ValidateManditoryServerClusterAttributes(Mutator):
                           (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
                     if self._forces_include:
                         attribute["included"] = self._attribute_entry["included"]
-                if attribute["storageOption"] != self._attribute_entry["storageOption"]:
-                    print("WARNING: attribute 0x%X(%s) in cluster %s found, but storageOption isn't expected value of %s" %
-                          (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"], self._attribute_entry["storageOption"]))
-                    if self._force_storage_default:
+                if attribute["storageOption"] == "NVM":
+                    print("WARNING: attribute 0x%X(%s) in cluster %s found, but storageOption was NVM" %
+                          (self._attribute_entry["code"], self._attribute_entry["name"], candidate["name"]))
+                    if self._replace_if_storage_nvm:
                         attribute["storageOption"] = self._attribute_entry["storageOption"]
                 break
         else:
@@ -168,7 +168,7 @@ def setupArgumentsParser():
                         help="Add missing manditory attributes to server clusters (default: False)")
     parser.add_argument('--manditory-attributes-force-included', default=False, action='store_true',
                         help="If manditory attribute is not included, include it (default: False)")
-    parser.add_argument('--manditory-attributes-force-storage-default', default=False, action='store_true',
+    parser.add_argument('--manditory-attributes-replace-if-storage-nvm', default=False, action='store_true',
                         help="Enforce manditory attribute use default storage type (default: False)")
     return parser.parse_args()
 
@@ -178,9 +178,11 @@ def main():
 
     mutators = []
     add_missing_cluster_revision = ValidateManditoryServerClusterAttributes(
-        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.manditory_attributes_add_missing, args.manditory_attributes_force_included, args.manditory_attributes_force_storage_default)
+        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.manditory_attributes_add_missing,
+        args.manditory_attributes_force_included, args.manditory_attributes_replace_if_storage_nvm)
     add_missing_feature_map = ValidateManditoryServerClusterAttributes(
-        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.manditory_attributes_add_missing, args.manditory_attributes_force_included, args.manditory_attributes_force_storage_default)
+        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.manditory_attributes_add_missing,
+        args.manditory_attributes_force_included, args.manditory_attributes_replace_if_storage_nvm)
 
     mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
 
