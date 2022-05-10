@@ -103,8 +103,11 @@ private:
     void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
     void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
 
-    void OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr);
-    void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
+    /// Handle processing of a newly received IP address
+    ///
+    /// Will place the given [addr] into the address list of [resolutionData] assuming that
+    /// there is enough space for that.
+    void OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr);
 };
 
 void PacketDataReporter::OnQuery(const QueryData & data)
@@ -171,7 +174,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     mHasNodePort                            = true;
 }
 
-void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
+void PacketDataReporter::OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr)
 {
     // TODO: should validate that the IP address we receive belongs to the
     // server associated with the SRV record.
@@ -179,24 +182,14 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    if (mNodeData.resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
+    if (resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
     {
+        ChipLogDetail(Discovery, "Number of IP addresses overflow. Discarding extra addresses.");
         return;
     }
-    mNodeData.resolutionData.ipAddress[mNodeData.resolutionData.numIPs++] = addr;
-    mNodeData.resolutionData.interfaceId                                  = mInterfaceId;
-    mHasIP                                                                = true;
-}
-
-void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
-{
-    if (mDiscoveredNodeData.resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
-    {
-        return;
-    }
-    mDiscoveredNodeData.resolutionData.ipAddress[mDiscoveredNodeData.resolutionData.numIPs] = addr;
-    mDiscoveredNodeData.resolutionData.interfaceId                                          = mInterfaceId;
-    mDiscoveredNodeData.resolutionData.numIPs++;
+    resolutionData.ipAddress[mNodeData.resolutionData.numIPs++] = addr;
+    resolutionData.interfaceId                                  = mInterfaceId;
+    mHasIP                                                      = true;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -293,11 +286,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         {
             if (mDiscoveryType == DiscoveryType::kOperational)
             {
-                OnOperationalIPAddress(addr);
+                OnNodeIPAddress(mNodeData.resolutionData, addr);
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnDiscoveredNodeIPAddress(addr);
+                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
             }
         }
         break;
@@ -312,11 +305,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         {
             if (mDiscoveryType == DiscoveryType::kOperational)
             {
-                OnOperationalIPAddress(addr);
+                OnNodeIPAddress(mNodeData.resolutionData, addr);
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnDiscoveredNodeIPAddress(addr);
+                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
             }
         }
         break;
