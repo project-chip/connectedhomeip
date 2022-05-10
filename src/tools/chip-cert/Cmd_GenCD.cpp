@@ -132,7 +132,7 @@ const char * const gCmdOptionHelp =
     "       for a product carrying this CD. This field is optional and if present, only specified\n"
     "       PAAs will be authorized to sign device's PAI for the lifetime of the generated CD.\n"
     "       Maximum 10 authorized PAA certificates can be specified.\n"
-    "       Each PAA should have it's own -a (--authorized-paa-cert) option selector.\n"
+    "       Each PAA should have its own -a (--authorized-paa-cert) option selector.\n"
     "       The certificate can be in DER or PEM Form.\n"
     "       Note that only the Subject Key Identifier (SKID) value will be extracted\n"
     "       from the PAA certificate and put into CD Structure.\n"
