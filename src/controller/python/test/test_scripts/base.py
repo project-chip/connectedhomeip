@@ -267,6 +267,15 @@ class BaseTestHelper:
         self.logger.info("Device finished key exchange.")
         return True
 
+    def TestKeyExchangeWithSetupPayload(self, setupPayload: str, nodeid: int):
+        self.logger.info("Conducting key exchange with setup payload {}".format(setupPayload))
+        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid):
+            self.logger.info(
+                "Failed to finish key exchange with device {}".format(setupPayload))
+            return False
+        self.logger.info("Device finished key exchange.")
+        return True
+
     def TestUsedTestCommissioner(self):
         return self.devCtrl.GetTestCommissionerUsed()
 
