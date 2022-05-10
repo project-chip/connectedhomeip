@@ -190,6 +190,13 @@ bool DoorLockServer::GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointI
                         Attributes::NumberOfYearDaySchedulesSupportedPerUser::Get, numberOfYearDaySchedulesPerUser);
 }
 
+bool DoorLockServer::GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId,
+                                                            uint8_t & numberOfCredentialsSupportedPerUser)
+{
+    return GetAttribute(endpointId, Attributes::NumberOfCredentialsSupportedPerUser::Id,
+                        Attributes::NumberOfCredentialsSupportedPerUser::Get, numberOfCredentialsSupportedPerUser);
+}
+
 void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
@@ -1820,19 +1827,8 @@ DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpointId, chip::
     }
 
     // TODO: Do we need to check the modifier fabric here? Discuss with Spec team and add it if necessary.
-
     for (size_t i = 0; i < user.credentials.size(); ++i)
     {
-        // appclusters, 5.2.4.40: If user already contains the credential of the same type we should return INVALID_COMMAND
-        if (user.credentials.data()[i].CredentialType == credential.CredentialType)
-        {
-            emberAfDoorLockClusterPrintln(
-                "[AddCredentialToUser] Unable to add credential to user: credential with this type already exists "
-                "[endpointId=%d,userIndex=%d,credentialType=%d]",
-                endpointId, userIndex, credential.CredentialType);
-            return DlStatus::kOccupied;
-        }
-
         // appclusters, 5.2.4.40: user should not be already associated with given credentialIndex
         if (user.credentials.data()[i].CredentialIndex == credential.CredentialIndex)
         {
@@ -1844,21 +1840,40 @@ DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpointId, chip::
         }
     }
 
-    // appclusters: spec defines up to 5 credentials per user
-    if (user.credentials.size() + 1 > DOOR_LOCK_MAX_CREDENTIALS_PER_USER)
+    uint8_t maxCredentialsPerUser;
+    if (!GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "[AddCredentialToUser] Unable to get the number of available credentials per user: internal error "
+                     "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d]",
+                     endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
+        return DlStatus::kFailure;
+    }
+
+    // appclusters: spec defines up to NumberOfCredentialsSupportedPerUser credentials per user
+    if (user.credentials.size() + 1 > maxCredentialsPerUser)
     {
         emberAfDoorLockClusterPrintln("[AddCredentialToUser] Unable to add credentials to user: too many credentials "
                                       "[endpointId=%d,userIndex=%d,userTotalCredentials=%u]",
                                       endpointId, userIndex, static_cast<unsigned int>(user.credentials.size()));
-        return DlStatus::kInvalidField;
+        return DlStatus::kResourceExhausted;
     }
 
-    DlCredential newCredentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
-    memcpy(newCredentials, user.credentials.data(), sizeof(DlCredential) * user.credentials.size());
+    chip::Platform::ScopedMemoryBuffer<DlCredential> newCredentials;
+    if (!newCredentials.Alloc(user.credentials.size() + 1))
+    {
+        ChipLogError(Zcl,
+                     "[AddCredentialToUser] Unable to allocate the buffer for credentials "
+                     "[endpointId=%d,userIndex=%d,userTotalCredentials=%u]",
+                     endpointId, userIndex, static_cast<unsigned int>(user.credentials.size()));
+        return DlStatus::kFailure;
+    }
+
+    memcpy(newCredentials.Get(), user.credentials.data(), sizeof(DlCredential) * user.credentials.size());
     newCredentials[user.credentials.size()] = credential;
 
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIdx, user.userName, user.userUniqueId,
-                                      user.userStatus, user.userType, user.credentialRule, newCredentials,
+                                      user.userStatus, user.userType, user.credentialRule, newCredentials.Get(),
                                       user.credentials.size() + 1))
     {
         emberAfDoorLockClusterPrintln(
@@ -1896,8 +1911,17 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         // appclusters, 5.2.4.40: user should already be associated with given credentialIndex
         if (user.credentials.data()[i].CredentialIndex == credential.CredentialIndex)
         {
-            DlCredential newCredentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
-            memcpy(newCredentials, user.credentials.data(), sizeof(DlCredential) * user.credentials.size());
+            chip::Platform::ScopedMemoryBuffer<DlCredential> newCredentials;
+            if (!newCredentials.Alloc(user.credentials.size()))
+            {
+                ChipLogError(Zcl,
+                             "[ModifyUserCredential] Unable to allocate the buffer for credentials "
+                             "[endpointId=%d,userIndex=%d,userTotalCredentials=%u,credentialType=%d,credentialIndex=%d]",
+                             endpointId, userIndex, static_cast<unsigned int>(user.credentials.size()), credential.CredentialType,
+                             credential.CredentialIndex);
+                return DlStatus::kFailure;
+            }
+            memcpy(newCredentials.Get(), user.credentials.data(), sizeof(DlCredential) * user.credentials.size());
             newCredentials[i] = credential;
 
             emberAfDoorLockClusterPrintln(
@@ -1907,7 +1931,7 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
 
             if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIdx, user.userName,
                                               user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
-                                              newCredentials, user.credentials.size()))
+                                              newCredentials.Get(), user.credentials.size()))
             {
                 emberAfDoorLockClusterPrintln(
                     "[ModifyUserCredential] Unable to modify user credential: credential with this index is already associated "
@@ -2388,8 +2412,18 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
+    uint8_t maxCredentialsPerUser;
+    if (!GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "[clearCredential] Unable to get the number of available credentials per user: internal error "
+                     "[endpointId=%d,credentialType=%d,credentialIndex=%d]",
+                     endpointId, to_underlying(credentialType), credentialIndex);
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
     // Should never happen, only possible if the implementation of application is incorrect
-    if (relatedUser.credentials.size() > DOOR_LOCK_MAX_CREDENTIALS_PER_USER)
+    if (relatedUser.credentials.size() > maxCredentialsPerUser)
     {
         ChipLogError(Zcl,
                      "[clearCredential] Unable to clear credential for related user - user has too many credentials associated"
@@ -2400,7 +2434,17 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    DlCredential newCredentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
+    chip::Platform::ScopedMemoryBuffer<DlCredential> newCredentials;
+    if (!newCredentials.Alloc(relatedUser.credentials.size()))
+    {
+        ChipLogError(Zcl,
+                     "[clearCredential] Unable to allocate the buffer for credentials "
+                     "[endpointId=%d,credentialType=%u,credentialIndex=%d,modifier=%d,userIndex=%d,credentialsCount=%u]",
+                     endpointId, to_underlying(credentialType), credentialIndex, modifier, relatedUserIndex,
+                     static_cast<unsigned int>(relatedUser.credentials.size()));
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
     size_t newCredentialsCount = 0;
     for (const auto & c : relatedUser.credentials)
     {
@@ -2413,7 +2457,7 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
 
     if (!emberAfPluginDoorLockSetUser(endpointId, relatedUserIndex, relatedUser.createdBy, modifier, relatedUser.userName,
                                       relatedUser.userUniqueId, relatedUser.userStatus, relatedUser.userType,
-                                      relatedUser.credentialRule, newCredentials, newCredentialsCount))
+                                      relatedUser.credentialRule, newCredentials.Get(), newCredentialsCount))
     {
         ChipLogError(Zcl,
                      "[clearCredential] Unable to clear credential for related user - unable to update database "

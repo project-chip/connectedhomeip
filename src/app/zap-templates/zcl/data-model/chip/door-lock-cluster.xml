@@ -957,6 +957,7 @@ limitations under the License.
         <item value="0x02" name="Duplicate" />
         <item value="0x03" name="Occupied" />
         <item value="0x85" name="InvalidField" />
+        <item value="0x89" name="ResourceExhausted" />
         <item value="0x8B" name="NotFound" />
     </enum>
 

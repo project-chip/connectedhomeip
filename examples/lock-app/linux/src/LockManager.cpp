@@ -59,6 +59,16 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
         numberOfSupportedCredentials = std::max(numberOfPINCredentialsSupported, numberOfRFIDCredentialsSupported);
     }
 
+    uint8_t numberOfCredentialsSupportedPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsSupportedPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        numberOfCredentialsSupportedPerUser = 5;
+    }
+
     uint8_t numberOfWeekDaySchedulesPerUser = 0;
     if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekDaySchedulesPerUser))
     {
@@ -80,13 +90,14 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     }
 
     mEndpoints.emplace_back(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
-                            numberOfYearDaySchedulesPerUser);
+                            numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser);
 
-    ChipLogProgress(
-        Zcl,
-        "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d,yearDaySchedulesPerUser=%d]",
-        endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
-        numberOfYearDaySchedulesPerUser);
+    ChipLogProgress(Zcl,
+                    "Initialized new lock door endpoint "
+                    "[id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d,yearDaySchedulesPerUser=%d,"
+                    "numberOfCredentialsSupportedPerUser=%d]",
+                    endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
+                    numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser);
 
     return true;
 }

@@ -60,8 +60,6 @@ static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of 
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
     DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
 
-static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5; /**< Maximum number of supported credentials by a single user. */
-
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
 
@@ -92,6 +90,7 @@ public:
     bool GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials);
     bool GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfWeekDaySchedulesPerUser);
     bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
+    bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
 
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
@@ -209,8 +208,8 @@ private:
     DlStatus createCredential(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                               uint16_t credentialIndex, DlCredentialType credentialType,
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              Nullable<uint16_t> userIndex, const Nullable<DlUserStatus>& userStatus, Nullable<DlUserType> userType,
-                              uint16_t & createdUserIndex);
+                              Nullable<uint16_t> userIndex, const Nullable<DlUserStatus> & userStatus,
+                              Nullable<DlUserType> userType, uint16_t & createdUserIndex);
     DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                                   uint16_t credentialIndex, DlCredentialType credentialType,
                                   const EmberAfPluginDoorLockCredentialInfo & existingCredential,
@@ -218,7 +217,7 @@ private:
     DlStatus modifyCredential(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                               uint16_t credentialIndex, DlCredentialType credentialType,
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              uint16_t userIndex, const Nullable<DlUserStatus>& userStatus, Nullable<DlUserType> userType);
+                              uint16_t userIndex, const Nullable<DlUserStatus> & userStatus, Nullable<DlUserType> userType);
 
     EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
                                   DlCredentialType credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
@@ -288,9 +287,9 @@ private:
      * @param opSuccess     flags if operation was successfull or not
      */
     void SendLockOperationEvent(chip::EndpointId endpointId, DlLockOperationType opType, DlOperationSource opSource,
-                                DlOperationError opErr, const Nullable<uint16_t>& userId, const Nullable<chip::FabricIndex>& fabricIdx,
-                                const Nullable<chip::NodeId>& nodeId, LockOpCredentials * credList, size_t credListSize,
-                                bool opSuccess = true);
+                                DlOperationError opErr, const Nullable<uint16_t> & userId,
+                                const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                                LockOpCredentials * credList, size_t credListSize, bool opSuccess = true);
 
     /**
      * @brief Schedule auto relocking with a given timeout
