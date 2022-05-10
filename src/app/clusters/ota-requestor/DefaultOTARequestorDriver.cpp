@@ -49,6 +49,12 @@ constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
 
+//is:
+uint32_t debug_watchdog_start_cnt = 0;
+uint32_t debug_watchdog_stop_cnt = 0;
+uint32_t debug_periodic_start_cnt = 0;
+uint32_t debug_periodic_stop_cnt = 0;
+
 DefaultOTARequestorDriver * ToDriver(void * context)
 {
     return static_cast<DefaultOTARequestorDriver *>(context);
@@ -319,18 +325,20 @@ void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
 {
     ChipLogProgress(SoftwareUpdate, "Default Provider timer handler is invoked");
 
+    DefaultOTARequestorDriver * driver = reinterpret_cast<DefaultOTARequestorDriver *>(appState);
+
     // Determine which provider to query next
     ProviderLocationType providerLocation;
     bool listExhausted = false;
-    if (GetNextProviderLocation(providerLocation, listExhausted) != true)
+    if (driver->GetNextProviderLocation(providerLocation, listExhausted) != true)
     {
-        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
+        driver->StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         return;
     }
 
-    mRequestor->SetCurrentProviderLocation(providerLocation);
+    driver->mRequestor->SetCurrentProviderLocation(providerLocation);
 
-    SendQueryImage();
+    driver->SendQueryImage();
 }
 
 void DefaultOTARequestorDriver::StartPeriodicQueryTimer()
@@ -338,41 +346,65 @@ void DefaultOTARequestorDriver::StartPeriodicQueryTimer()
     ChipLogProgress(SoftwareUpdate, "Starting the periodic query timer, timeout: %u seconds",
                     (unsigned int) mPeriodicQueryTimeInterval);
     ScheduleDelayedAction(
-        System::Clock::Seconds32(mPeriodicQueryTimeInterval),
-        [](System::Layer *, void * context) { (ToDriver(context))->PeriodicQueryTimerHandler(nullptr, context); }, this);
+        System::Clock::Seconds32(mPeriodicQueryTimeInterval), PeriodicQueryTimerHandler, this);
+
+    debug_periodic_start_cnt++;
+    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
+                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
+                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Periodic Query timer");
-    CancelDelayedAction([](System::Layer *, void * context) { (ToDriver(context))->PeriodicQueryTimerHandler(nullptr, context); },
-                        this);
+    CancelDelayedAction(PeriodicQueryTimerHandler, this);
+        
+    debug_periodic_stop_cnt++;
+    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
+                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
+                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
+    DefaultOTARequestorDriver * driver = reinterpret_cast<DefaultOTARequestorDriver *>(appState);
+
     ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
-                 to_underlying(mRequestor->GetCurrentUpdateState()));
+                 to_underlying(driver->mRequestor->GetCurrentUpdateState()));
 
     // Something went wrong and OTA requestor is stuck in a non-idle state for too long.
     // Let's just cancel download, reset state, and re-start periodic query timer.
-    UpdateDiscontinued();
-    mRequestor->CancelImageUpdate();
-    StartPeriodicQueryTimer();
+    driver->UpdateDiscontinued();
+    driver->mRequestor->CancelImageUpdate();
+
+    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
+                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
+                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
+
+    driver->StartPeriodicQueryTimer();    
 }
 
 void DefaultOTARequestorDriver::StartWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds", (unsigned int) mWatchdogTimeInterval);
     ScheduleDelayedAction(
-        System::Clock::Seconds32(mWatchdogTimeInterval),
-        [](System::Layer *, void * context) { (ToDriver(context))->WatchdogTimerHandler(nullptr, context); }, this);
+        System::Clock::Seconds32(mWatchdogTimeInterval), WatchdogTimerHandler, this);
+
+    debug_watchdog_start_cnt++;
+    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
+                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
+                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::StopWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the watchdog timer");
-    CancelDelayedAction([](System::Layer *, void * context) { (ToDriver(context))->WatchdogTimerHandler(nullptr, context); }, this);
+    CancelDelayedAction(WatchdogTimerHandler, this);
+
+    debug_watchdog_stop_cnt++;
+    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
+                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
+                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
@@ -388,6 +420,9 @@ void DefaultOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
         StartWatchdogTimer();
         break;
     }
+    ChipLogProgress(SoftwareUpdate, "//is: StartSelectedTimer periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
+                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
+                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 /**
