@@ -21,7 +21,7 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
 {
     switch (aPath.mClusterId)
     {
-    {{#chip_client_clusters}}
+    {{#chip_client_clusters includeAll=true}}
     case Clusters::{{asUpperCamelCase name}}::Id: {
         using namespace Clusters::{{asUpperCamelCase name}};
         switch (aPath.mEventId)

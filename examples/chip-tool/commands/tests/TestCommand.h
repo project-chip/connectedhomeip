@@ -29,7 +29,7 @@
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
-#include <zap-generated/tests/CHIPClustersTest.h>
+#include <zap-generated/tests/simulated-cluster-objects.h>
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
@@ -61,7 +61,8 @@ public:
 
 protected:
     /////////// DelayCommands Interface /////////
-    CHIP_ERROR WaitForCommissionee(chip::NodeId nodeId) override;
+    CHIP_ERROR WaitForCommissionee(const char * identity,
+                                   const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override;
     void OnWaitForMs() override { NextTest(); };
 
     /////////// Interaction Model Interface /////////
@@ -73,7 +74,10 @@ protected:
 
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
 
-    chip::Controller::DeviceCommissioner & GetCurrentCommissioner() override { return CurrentCommissioner(); };
+    chip::Controller::DeviceCommissioner & GetCommissioner(const char * identity) override
+    {
+        return CHIPCommand::GetCommissioner(identity);
+    };
 
     static void ExitAsync(intptr_t context);
     void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) override;

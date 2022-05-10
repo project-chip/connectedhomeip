@@ -107,6 +107,8 @@ protected:
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 
+    ChipDeviceCommissioner & GetCommissioner(const char * identity);
+
 private:
     CHIP_ERROR MaybeSetUpStack();
     CHIP_ERROR MaybeTearDownStack();

@@ -16,6 +16,7 @@
  */
 
 #import "DefaultsUtils.h"
+#import "FabricKeys.h"
 
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
@@ -81,7 +82,12 @@ CHIPDeviceController * InitializeCHIP(void)
             return;
         }
 
-        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+        __auto_type * keys = [[FabricKeys alloc] init];
+        if (keys == nil) {
+            return;
+        }
+
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys ipk:keys.ipk];
         params.vendorId = kTestVendorId;
         params.fabricId = 1;
 
@@ -98,11 +104,17 @@ CHIPDeviceController * InitializeCHIP(void)
 
 CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
 {
+    __auto_type * keys = [[FabricKeys alloc] init];
+    if (keys == nil) {
+        NSLog(@"No keys, can't restart controller");
+        return controller;
+    }
+
     NSLog(@"Shutting down the stack");
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys ipk:keys.ipk];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
