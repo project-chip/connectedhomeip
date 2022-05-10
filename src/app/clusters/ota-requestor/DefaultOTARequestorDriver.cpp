@@ -339,8 +339,7 @@ void DefaultOTARequestorDriver::StartPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the periodic query timer, timeout: %u seconds",
                     (unsigned int) mPeriodicQueryTimeInterval);
-    ScheduleDelayedAction(
-        System::Clock::Seconds32(mPeriodicQueryTimeInterval), PeriodicQueryTimerHandler, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(mPeriodicQueryTimeInterval), PeriodicQueryTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
@@ -360,14 +359,13 @@ void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     // Let's just cancel download, reset state, and re-start periodic query timer.
     driver->UpdateDiscontinued();
     driver->mRequestor->CancelImageUpdate();
-    driver->StartPeriodicQueryTimer();    
+    driver->StartPeriodicQueryTimer();
 }
 
 void DefaultOTARequestorDriver::StartWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds", (unsigned int) mWatchdogTimeInterval);
-    ScheduleDelayedAction(
-        System::Clock::Seconds32(mWatchdogTimeInterval), WatchdogTimerHandler, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(mWatchdogTimeInterval), WatchdogTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::StopWatchdogTimer()
