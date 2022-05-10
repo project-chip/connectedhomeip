@@ -172,7 +172,7 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
             event = _make_struct_class(cluster, e, namespace_types, base_classes=(ClusterObjects.ClusterEvent,))
             event.event_id = e.code
             event.cluster_id = cluster.code
-            events[e.name] = e
+            events[e.name] = event
         except Exception as ex:
             error_messages.append(f"Failed to process cluster {cluster.name} event {e.name}: {ex}")
 
