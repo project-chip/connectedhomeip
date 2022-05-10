@@ -49,12 +49,6 @@ constexpr uint32_t kDelayQueryUponCommissioningSec = 30; // Delay before sending
 constexpr uint32_t kImmediateStartDelaySec         = 1;  // Delay before sending a query in response to UrgentUpdateAvailable
 constexpr System::Clock::Seconds32 kDefaultDelayedActionTime = System::Clock::Seconds32(120);
 
-//is:
-uint32_t debug_watchdog_start_cnt = 0;
-uint32_t debug_watchdog_stop_cnt = 0;
-uint32_t debug_periodic_start_cnt = 0;
-uint32_t debug_periodic_stop_cnt = 0;
-
 DefaultOTARequestorDriver * ToDriver(void * context)
 {
     return static_cast<DefaultOTARequestorDriver *>(context);
@@ -347,22 +341,12 @@ void DefaultOTARequestorDriver::StartPeriodicQueryTimer()
                     (unsigned int) mPeriodicQueryTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mPeriodicQueryTimeInterval), PeriodicQueryTimerHandler, this);
-
-    debug_periodic_start_cnt++;
-    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
-                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
-                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Periodic Query timer");
     CancelDelayedAction(PeriodicQueryTimerHandler, this);
-        
-    debug_periodic_stop_cnt++;
-    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
-                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
-                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
@@ -376,11 +360,6 @@ void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     // Let's just cancel download, reset state, and re-start periodic query timer.
     driver->UpdateDiscontinued();
     driver->mRequestor->CancelImageUpdate();
-
-    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
-                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
-                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
-
     driver->StartPeriodicQueryTimer();    
 }
 
@@ -389,22 +368,12 @@ void DefaultOTARequestorDriver::StartWatchdogTimer()
     ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds", (unsigned int) mWatchdogTimeInterval);
     ScheduleDelayedAction(
         System::Clock::Seconds32(mWatchdogTimeInterval), WatchdogTimerHandler, this);
-
-    debug_watchdog_start_cnt++;
-    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
-                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
-                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::StopWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the watchdog timer");
     CancelDelayedAction(WatchdogTimerHandler, this);
-
-    debug_watchdog_stop_cnt++;
-    ChipLogProgress(SoftwareUpdate, "//is: periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
-                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
-                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 void DefaultOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
@@ -420,9 +389,6 @@ void DefaultOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
         StartWatchdogTimer();
         break;
     }
-    ChipLogProgress(SoftwareUpdate, "//is: StartSelectedTimer periodic_start_cnt=%u, periodic_stop_cnt=%u, watchdog_start_cnt=%u, watchdog_stop_cnt=%u",
-                    (unsigned int)debug_periodic_start_cnt, (unsigned int)debug_periodic_stop_cnt, 
-                    (unsigned int)debug_watchdog_start_cnt, (unsigned int)debug_watchdog_stop_cnt);
 }
 
 /**

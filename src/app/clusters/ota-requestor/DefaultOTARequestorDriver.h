@@ -99,9 +99,9 @@ protected:
     OTAImageProcessorInterface * mImageProcessor = nullptr;
     uint32_t mOtaStartDelaySec                   = 0;
     // Timeout (in seconds) for querying providers from the default OTA provider list
-    uint32_t mPeriodicQueryTimeInterval = (2 * 60); //is: (24 * 60 * 60);
+    uint32_t mPeriodicQueryTimeInterval = (24 * 60 * 60);
     // Timeout (in seconds) for checking if current OTA download is stuck and requires a reset
-    uint32_t mWatchdogTimeInterval = (2 * 60); //is: (6 * 60 * 60);
+    uint32_t mWatchdogTimeInterval = (6 * 60 * 60);
     uint16_t maxDownloadBlockSize  = 1024;
     // Maximum number of times to retry a BUSY OTA provider before moving to the next available one
     static constexpr uint8_t kMaxBusyProviderRetryCount = 3;
