@@ -180,7 +180,7 @@ private:
     CASEClientPool * mCASEClientPool                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
 
-    // if tempFabricTable is not null, it was created during
+    // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be
     // freed during shutdown
     FabricTable * mTempFabricTable = nullptr;
