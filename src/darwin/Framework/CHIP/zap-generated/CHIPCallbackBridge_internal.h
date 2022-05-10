@@ -2143,32 +2143,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPAccessControlFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlFeatureMapAttributeCallback>
-{
-public:
-    CHIPAccessControlFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<AccessControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPAccessControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPAccessControlFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPAccessControlFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccessControlFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPAccountLoginGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<AccountLoginGeneratedCommandListListAttributeCallback>
 {
@@ -2244,32 +2218,6 @@ public:
                                                                          CHIPActionBlock action,
                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPAccountLoginAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAccountLoginFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<AccountLoginFeatureMapAttributeCallback>
-{
-public:
-    CHIPAccountLoginFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPAccountLoginFeatureMapAttributeCallbackSubscriptionBridge : public CHIPAccountLoginFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPAccountLoginFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAccountLoginFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -2357,34 +2305,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPAdministratorCommissioningFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<AdministratorCommissioningFeatureMapAttributeCallback>
-{
-public:
-    CHIPAdministratorCommissioningFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AdministratorCommissioningFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPAdministratorCommissioningFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPAdministratorCommissioningFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPAdministratorCommissioningFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAdministratorCommissioningFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -2539,33 +2459,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPApplicationBasicFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ApplicationBasicFeatureMapAttributeCallback>
-{
-public:
-    CHIPApplicationBasicFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPApplicationBasicFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationBasicFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPApplicationBasicFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationBasicFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPApplicationLauncherCatalogListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationLauncherCatalogListListAttributeCallback>
 {
@@ -2711,34 +2604,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPApplicationLauncherFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherFeatureMapAttributeCallback>
-{
-public:
-    CHIPApplicationLauncherFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPApplicationLauncherFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPApplicationLauncherFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPApplicationLauncherFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPApplicationLauncherFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPAudioOutputOutputListListAttributeCallbackBridge : public CHIPCallbackBridge<AudioOutputOutputListListAttributeCallback>
 {
 public:
@@ -2851,88 +2716,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPAudioOutputFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<AudioOutputFeatureMapAttributeCallback>
-{
-public:
-    CHIPAudioOutputFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<AudioOutputFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPAudioOutputFeatureMapAttributeCallbackSubscriptionBridge : public CHIPAudioOutputFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPAudioOutputFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPAudioOutputFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<BarrierControlBarrierSafetyStatusAttributeCallback>
-{
-public:
-    CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BarrierControlBarrierSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPBarrierControlBarrierSafetyStatusAttributeCallbackSubscriptionBridge
-    : public CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge
-{
-public:
-    CHIPBarrierControlBarrierSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBarrierControlBarrierSafetyStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge
-    : public CHIPCallbackBridge<BarrierControlBarrierCapabilitiesAttributeCallback>
-{
-public:
-    CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<BarrierControlBarrierCapabilitiesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPBarrierControlBarrierCapabilitiesAttributeCallbackSubscriptionBridge
-    : public CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge
-{
-public:
-    CHIPBarrierControlBarrierCapabilitiesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action,
-                                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBarrierControlBarrierCapabilitiesAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPBarrierControlGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<BarrierControlGeneratedCommandListListAttributeCallback>
 {
@@ -3010,32 +2793,6 @@ public:
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPBarrierControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBarrierControlFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<BarrierControlFeatureMapAttributeCallback>
-{
-public:
-    CHIPBarrierControlFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<BarrierControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBarrierControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPBarrierControlFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBarrierControlFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBarrierControlFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3156,59 +2913,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPBasicFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<BasicFeatureMapAttributeCallback>
-{
-public:
-    CHIPBasicFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                               bool keepAlive = false) :
-        CHIPCallbackBridge<BasicFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBasicFeatureMapAttributeCallbackSubscriptionBridge : public CHIPBasicFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBasicFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBasicFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge
-    : public CHIPCallbackBridge<BinaryInputBasicStatusFlagsAttributeCallback>
-{
-public:
-    CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<BinaryInputBasicStatusFlagsAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPBinaryInputBasicStatusFlagsAttributeCallbackSubscriptionBridge
-    : public CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge
-{
-public:
-    CHIPBinaryInputBasicStatusFlagsAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action,
-                                                                       SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBinaryInputBasicStatusFlagsAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<BinaryInputBasicGeneratedCommandListListAttributeCallback>
 {
@@ -3286,33 +2990,6 @@ public:
                                                                              CHIPActionBlock action,
                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPBinaryInputBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBinaryInputBasicFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<BinaryInputBasicFeatureMapAttributeCallback>
-{
-public:
-    CHIPBinaryInputBasicFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<BinaryInputBasicFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBinaryInputBasicFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPBinaryInputBasicFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBinaryInputBasicFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBinaryInputBasicFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3432,32 +3109,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPBindingFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<BindingFeatureMapAttributeCallback>
-{
-public:
-    CHIPBindingFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                 bool keepAlive = false) :
-        CHIPCallbackBridge<BindingFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBindingFeatureMapAttributeCallbackSubscriptionBridge : public CHIPBindingFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBindingFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBindingFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPBooleanStateGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<BooleanStateGeneratedCommandListListAttributeCallback>
 {
@@ -3533,32 +3184,6 @@ public:
                                                                          CHIPActionBlock action,
                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPBooleanStateAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBooleanStateFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<BooleanStateFeatureMapAttributeCallback>
-{
-public:
-    CHIPBooleanStateFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<BooleanStateFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBooleanStateFeatureMapAttributeCallbackSubscriptionBridge : public CHIPBooleanStateFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBooleanStateFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBooleanStateFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3716,32 +3341,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPBridgedActionsFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<BridgedActionsFeatureMapAttributeCallback>
-{
-public:
-    CHIPBridgedActionsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedActionsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBridgedActionsFeatureMapAttributeCallbackSubscriptionBridge : public CHIPBridgedActionsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBridgedActionsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedActionsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<BridgedDeviceBasicGeneratedCommandListListAttributeCallback>
 {
@@ -3819,34 +3418,6 @@ public:
                                                                                CHIPActionBlock action,
                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPBridgedDeviceBasicFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<BridgedDeviceBasicFeatureMapAttributeCallback>
-{
-public:
-    CHIPBridgedDeviceBasicFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<BridgedDeviceBasicFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPBridgedDeviceBasicFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPBridgedDeviceBasicFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPBridgedDeviceBasicFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPBridgedDeviceBasicFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4024,88 +3595,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPChannelFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ChannelFeatureMapAttributeCallback>
-{
-public:
-    CHIPChannelFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                 bool keepAlive = false) :
-        CHIPCallbackBridge<ChannelFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPChannelFeatureMapAttributeCallbackSubscriptionBridge : public CHIPChannelFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPChannelFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPChannelFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPColorControlColorControlOptionsAttributeCallbackBridge
-    : public CHIPCallbackBridge<ColorControlColorControlOptionsAttributeCallback>
-{
-public:
-    CHIPColorControlColorControlOptionsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlColorControlOptionsAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPColorControlColorControlOptionsAttributeCallbackSubscriptionBridge
-    : public CHIPColorControlColorControlOptionsAttributeCallbackBridge
-{
-public:
-    CHIPColorControlColorControlOptionsAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPColorControlColorControlOptionsAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPColorControlColorCapabilitiesAttributeCallbackBridge
-    : public CHIPCallbackBridge<ColorControlColorCapabilitiesAttributeCallback>
-{
-public:
-    CHIPColorControlColorCapabilitiesAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlColorCapabilitiesAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPColorControlColorCapabilitiesAttributeCallbackSubscriptionBridge
-    : public CHIPColorControlColorCapabilitiesAttributeCallbackBridge
-{
-public:
-    CHIPColorControlColorCapabilitiesAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPColorControlColorCapabilitiesAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPColorControlGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ColorControlGeneratedCommandListListAttributeCallback>
 {
@@ -4190,32 +3679,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPColorControlFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ColorControlFeatureMapAttributeCallback>
-{
-public:
-    CHIPColorControlFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<ColorControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPColorControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPColorControlFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPColorControlFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPColorControlFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge
     : public CHIPCallbackBridge<ContentLauncherAcceptHeaderListAttributeCallback>
 {
@@ -4235,35 +3698,6 @@ public:
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPContentLauncherAcceptHeaderListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherSupportedStreamingProtocolsAttributeCallback>
-{
-public:
-    CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherSupportedStreamingProtocolsAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherSupportedStreamingProtocolsAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4350,32 +3784,6 @@ public:
                                                                             CHIPActionBlock action,
                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPContentLauncherAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ContentLauncherFeatureMapAttributeCallback>
-{
-public:
-    CHIPContentLauncherFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPContentLauncherFeatureMapAttributeCallbackSubscriptionBridge : public CHIPContentLauncherFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4575,32 +3983,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPDescriptorFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorFeatureMapAttributeCallback>
-{
-public:
-    CHIPDescriptorFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<DescriptorFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPDescriptorFeatureMapAttributeCallbackSubscriptionBridge : public CHIPDescriptorFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPDescriptorFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDescriptorFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<DiagnosticLogsGeneratedCommandListListAttributeCallback>
 {
@@ -4678,32 +4060,6 @@ public:
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPDiagnosticLogsFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<DiagnosticLogsFeatureMapAttributeCallback>
-{
-public:
-    CHIPDiagnosticLogsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<DiagnosticLogsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPDiagnosticLogsFeatureMapAttributeCallbackSubscriptionBridge : public CHIPDiagnosticLogsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPDiagnosticLogsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDiagnosticLogsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -5129,118 +4485,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPDoorLockFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<DoorLockFeatureMapAttributeCallback>
-{
-public:
-    CHIPDoorLockFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPDoorLockFeatureMapAttributeCallbackSubscriptionBridge : public CHIPDoorLockFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPDoorLockFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPDoorLockFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementMeasurementTypeAttributeCallback>
-{
-public:
-    CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementMeasurementTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPElectricalMeasurementMeasurementTypeAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementMeasurementTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementMeasurementTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPElectricalMeasurementOverloadAlarmsMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementOverloadAlarmsMaskAttributeCallback>
-{
-public:
-    CHIPElectricalMeasurementOverloadAlarmsMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementOverloadAlarmsMaskAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPElectricalMeasurementOverloadAlarmsMaskAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementOverloadAlarmsMaskAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementOverloadAlarmsMaskAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementOverloadAlarmsMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPElectricalMeasurementAcOverloadAlarmsMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementAcOverloadAlarmsMaskAttributeCallback>
-{
-public:
-    CHIPElectricalMeasurementAcOverloadAlarmsMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementAcOverloadAlarmsMaskAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPElectricalMeasurementAcOverloadAlarmsMaskAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementAcOverloadAlarmsMaskAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementAcOverloadAlarmsMaskAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementAcOverloadAlarmsMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ElectricalMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -5319,34 +4563,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPElectricalMeasurementFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<ElectricalMeasurementFeatureMapAttributeCallback>
-{
-public:
-    CHIPElectricalMeasurementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ElectricalMeasurementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPElectricalMeasurementFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPElectricalMeasurementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPElectricalMeasurementFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPElectricalMeasurementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -5443,138 +4659,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<EthernetNetworkDiagnosticsFeatureMapAttributeCallback>
-{
-public:
-    CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<EthernetNetworkDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPEthernetNetworkDiagnosticsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlRockSupportAttributeCallbackBridge : public CHIPCallbackBridge<FanControlRockSupportAttributeCallback>
-{
-public:
-    CHIPFanControlRockSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlRockSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPFanControlRockSupportAttributeCallbackSubscriptionBridge : public CHIPFanControlRockSupportAttributeCallbackBridge
-{
-public:
-    CHIPFanControlRockSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlRockSupportAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlRockSettingAttributeCallbackBridge : public CHIPCallbackBridge<FanControlRockSettingAttributeCallback>
-{
-public:
-    CHIPFanControlRockSettingAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlRockSettingAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPFanControlRockSettingAttributeCallbackSubscriptionBridge : public CHIPFanControlRockSettingAttributeCallbackBridge
-{
-public:
-    CHIPFanControlRockSettingAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlRockSettingAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlWindSupportAttributeCallbackBridge : public CHIPCallbackBridge<FanControlWindSupportAttributeCallback>
-{
-public:
-    CHIPFanControlWindSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlWindSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPFanControlWindSupportAttributeCallbackSubscriptionBridge : public CHIPFanControlWindSupportAttributeCallbackBridge
-{
-public:
-    CHIPFanControlWindSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlWindSupportAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlWindSettingAttributeCallbackBridge : public CHIPCallbackBridge<FanControlWindSettingAttributeCallback>
-{
-public:
-    CHIPFanControlWindSettingAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlWindSettingAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPFanControlWindSettingAttributeCallbackSubscriptionBridge : public CHIPFanControlWindSettingAttributeCallbackBridge
-{
-public:
-    CHIPFanControlWindSettingAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlWindSettingAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPFanControlGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<FanControlGeneratedCommandListListAttributeCallback>
 {
@@ -5650,32 +4734,6 @@ public:
                                                                        CHIPActionBlock action,
                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPFanControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFanControlFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<FanControlFeatureMapAttributeCallback>
-{
-public:
-    CHIPFanControlFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<FanControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPFanControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPFanControlFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPFanControlFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFanControlFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -5797,32 +4855,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPFixedLabelFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<FixedLabelFeatureMapAttributeCallback>
-{
-public:
-    CHIPFixedLabelFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<FixedLabelFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPFixedLabelFeatureMapAttributeCallbackSubscriptionBridge : public CHIPFixedLabelFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPFixedLabelFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFixedLabelFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPFlowMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<FlowMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -5900,32 +4932,6 @@ public:
                                                                             CHIPActionBlock action,
                                                                             SubscriptionEstablishedHandler establishedHandler) :
         CHIPFlowMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPFlowMeasurementFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<FlowMeasurementFeatureMapAttributeCallback>
-{
-public:
-    CHIPFlowMeasurementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<FlowMeasurementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPFlowMeasurementFeatureMapAttributeCallbackSubscriptionBridge : public CHIPFlowMeasurementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPFlowMeasurementFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPFlowMeasurementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6044,34 +5050,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGeneralCommissioningFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningFeatureMapAttributeCallback>
-{
-public:
-    CHIPGeneralCommissioningFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPGeneralCommissioningFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralCommissioningFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPGeneralCommissioningFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralCommissioningFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6285,34 +5263,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPGeneralDiagnosticsFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<GeneralDiagnosticsFeatureMapAttributeCallback>
-{
-public:
-    CHIPGeneralDiagnosticsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPGeneralDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPGeneralDiagnosticsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPGeneralDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGeneralDiagnosticsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
     : public CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>
 {
@@ -6459,60 +5409,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPGroupKeyManagementFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementFeatureMapAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPGroupKeyManagementFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPGroupKeyManagementFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPGroupsNameSupportAttributeCallbackBridge : public CHIPCallbackBridge<GroupsNameSupportAttributeCallback>
-{
-public:
-    CHIPGroupsNameSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                 bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsNameSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPGroupsNameSupportAttributeCallbackSubscriptionBridge : public CHIPGroupsNameSupportAttributeCallbackBridge
-{
-public:
-    CHIPGroupsNameSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupsNameSupportAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPGroupsGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<GroupsGeneratedCommandListListAttributeCallback>
 {
@@ -6595,31 +5491,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPGroupsFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<GroupsFeatureMapAttributeCallback>
-{
-public:
-    CHIPGroupsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPGroupsFeatureMapAttributeCallbackSubscriptionBridge : public CHIPGroupsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPGroupsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPIdentifyGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<IdentifyGeneratedCommandListListAttributeCallback>
 {
@@ -6693,32 +5564,6 @@ public:
                                                                      CHIPActionBlock action,
                                                                      SubscriptionEstablishedHandler establishedHandler) :
         CHIPIdentifyAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPIdentifyFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<IdentifyFeatureMapAttributeCallback>
-{
-public:
-    CHIPIdentifyFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPIdentifyFeatureMapAttributeCallbackSubscriptionBridge : public CHIPIdentifyFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPIdentifyFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIdentifyFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6815,34 +5660,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPIlluminanceMeasurementFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<IlluminanceMeasurementFeatureMapAttributeCallback>
-{
-public:
-    CHIPIlluminanceMeasurementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<IlluminanceMeasurementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPIlluminanceMeasurementFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPIlluminanceMeasurementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPIlluminanceMeasurementFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPIlluminanceMeasurementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPKeypadInputGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<KeypadInputGeneratedCommandListListAttributeCallback>
 {
@@ -6927,58 +5744,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPKeypadInputFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<KeypadInputFeatureMapAttributeCallback>
-{
-public:
-    CHIPKeypadInputFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPKeypadInputFeatureMapAttributeCallbackSubscriptionBridge : public CHIPKeypadInputFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPKeypadInputFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPKeypadInputFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLevelControlOptionsAttributeCallbackBridge : public CHIPCallbackBridge<LevelControlOptionsAttributeCallback>
-{
-public:
-    CHIPLevelControlOptionsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                   bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlOptionsAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPLevelControlOptionsAttributeCallbackSubscriptionBridge : public CHIPLevelControlOptionsAttributeCallbackBridge
-{
-public:
-    CHIPLevelControlOptionsAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLevelControlOptionsAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPLevelControlGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<LevelControlGeneratedCommandListListAttributeCallback>
 {
@@ -7054,32 +5819,6 @@ public:
                                                                          CHIPActionBlock action,
                                                                          SubscriptionEstablishedHandler establishedHandler) :
         CHIPLevelControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLevelControlFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<LevelControlFeatureMapAttributeCallback>
-{
-public:
-    CHIPLevelControlFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<LevelControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPLevelControlFeatureMapAttributeCallbackSubscriptionBridge : public CHIPLevelControlFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPLevelControlFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLevelControlFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7205,34 +5944,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPLocalizationConfigurationFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<LocalizationConfigurationFeatureMapAttributeCallback>
-{
-public:
-    CHIPLocalizationConfigurationFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<LocalizationConfigurationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPLocalizationConfigurationFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPLocalizationConfigurationFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPLocalizationConfigurationFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLocalizationConfigurationFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPLowPowerGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<LowPowerGeneratedCommandListListAttributeCallback>
 {
@@ -7306,32 +6017,6 @@ public:
                                                                      CHIPActionBlock action,
                                                                      SubscriptionEstablishedHandler establishedHandler) :
         CHIPLowPowerAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPLowPowerFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<LowPowerFeatureMapAttributeCallback>
-{
-public:
-    CHIPLowPowerFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                  bool keepAlive = false) :
-        CHIPCallbackBridge<LowPowerFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPLowPowerFeatureMapAttributeCallbackSubscriptionBridge : public CHIPLowPowerFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPLowPowerFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action,
-                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPLowPowerFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7444,32 +6129,6 @@ public:
                                                                        CHIPActionBlock action,
                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPMediaInputAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPMediaInputFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<MediaInputFeatureMapAttributeCallback>
-{
-public:
-    CHIPMediaInputFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<MediaInputFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPMediaInputFeatureMapAttributeCallbackSubscriptionBridge : public CHIPMediaInputFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPMediaInputFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaInputFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7594,32 +6253,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPMediaPlaybackFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<MediaPlaybackFeatureMapAttributeCallback>
-{
-public:
-    CHIPMediaPlaybackFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPMediaPlaybackFeatureMapAttributeCallbackSubscriptionBridge : public CHIPMediaPlaybackFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPMediaPlaybackFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPMediaPlaybackFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPModeSelectSupportedModesListAttributeCallbackBridge
     : public CHIPCallbackBridge<ModeSelectSupportedModesListAttributeCallback>
 {
@@ -7726,32 +6359,6 @@ public:
                                                                        CHIPActionBlock action,
                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPModeSelectFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ModeSelectFeatureMapAttributeCallback>
-{
-public:
-    CHIPModeSelectFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<ModeSelectFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPModeSelectFeatureMapAttributeCallbackSubscriptionBridge : public CHIPModeSelectFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPModeSelectFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPModeSelectFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -7879,34 +6486,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningFeatureMapAttributeCallback>
-{
-public:
-    CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPNetworkCommissioningFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPNetworkCommissioningFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPOtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback>
 {
@@ -7985,34 +6564,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOtaSoftwareUpdateProviderFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<OtaSoftwareUpdateProviderFeatureMapAttributeCallback>
-{
-public:
-    CHIPOtaSoftwareUpdateProviderFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OtaSoftwareUpdateProviderFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPOtaSoftwareUpdateProviderFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPOtaSoftwareUpdateProviderFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPOtaSoftwareUpdateProviderFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action,
-                                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOtaSoftwareUpdateProviderFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -8140,89 +6691,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOtaSoftwareUpdateRequestorFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<OtaSoftwareUpdateRequestorFeatureMapAttributeCallback>
-{
-public:
-    CHIPOtaSoftwareUpdateRequestorFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OtaSoftwareUpdateRequestorFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPOtaSoftwareUpdateRequestorFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPOtaSoftwareUpdateRequestorFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPOtaSoftwareUpdateRequestorFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOtaSoftwareUpdateRequestorFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOccupancySensingOccupancyAttributeCallbackBridge : public CHIPCallbackBridge<OccupancySensingOccupancyAttributeCallback>
-{
-public:
-    CHIPOccupancySensingOccupancyAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<OccupancySensingOccupancyAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPOccupancySensingOccupancyAttributeCallbackSubscriptionBridge : public CHIPOccupancySensingOccupancyAttributeCallbackBridge
-{
-public:
-    CHIPOccupancySensingOccupancyAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOccupancySensingOccupancyAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge
-    : public CHIPCallbackBridge<OccupancySensingOccupancySensorTypeBitmapAttributeCallback>
-{
-public:
-    CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OccupancySensingOccupancySensorTypeBitmapAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBridge
-    : public CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge
-{
-public:
-    CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPOccupancySensingGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OccupancySensingGeneratedCommandListListAttributeCallback>
 {
@@ -8300,33 +6768,6 @@ public:
                                                                              CHIPActionBlock action,
                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPOccupancySensingAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOccupancySensingFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<OccupancySensingFeatureMapAttributeCallback>
-{
-public:
-    CHIPOccupancySensingFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<OccupancySensingFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPOccupancySensingFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPOccupancySensingFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPOccupancySensingFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOccupancySensingFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -8418,31 +6859,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOnOffFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<OnOffFeatureMapAttributeCallback>
-{
-public:
-    CHIPOnOffFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                               bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPOnOffFeatureMapAttributeCallbackSubscriptionBridge : public CHIPOnOffFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPOnOffFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPOnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback>
 {
@@ -8521,34 +6937,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPOnOffSwitchConfigurationFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<OnOffSwitchConfigurationFeatureMapAttributeCallback>
-{
-public:
-    CHIPOnOffSwitchConfigurationFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OnOffSwitchConfigurationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPOnOffSwitchConfigurationFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPOnOffSwitchConfigurationFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPOnOffSwitchConfigurationFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOnOffSwitchConfigurationFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -8735,34 +7123,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPOperationalCredentialsFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsFeatureMapAttributeCallback>
-{
-public:
-    CHIPOperationalCredentialsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPOperationalCredentialsFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPOperationalCredentialsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPOperationalCredentialsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPOperationalCredentialsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge
     : public CHIPCallbackBridge<PowerSourceActiveWiredFaultsListAttributeCallback>
 {
@@ -8932,32 +7292,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPPowerSourceFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<PowerSourceFeatureMapAttributeCallback>
-{
-public:
-    CHIPPowerSourceFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPPowerSourceFeatureMapAttributeCallbackSubscriptionBridge : public CHIPPowerSourceFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
     : public CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>
 {
@@ -9073,34 +7407,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPPowerSourceConfigurationFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<PowerSourceConfigurationFeatureMapAttributeCallback>
-{
-public:
-    CHIPPowerSourceConfigurationFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PowerSourceConfigurationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPPowerSourceConfigurationFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPPowerSourceConfigurationFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPPowerSourceConfigurationFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPowerSourceConfigurationFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPPressureMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<PressureMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -9178,91 +7484,6 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPPressureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPressureMeasurementFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<PressureMeasurementFeatureMapAttributeCallback>
-{
-public:
-    CHIPPressureMeasurementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PressureMeasurementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPPressureMeasurementFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPPressureMeasurementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPPressureMeasurementFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPressureMeasurementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>
-{
-public:
-    CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
-    : public CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge
-{
-public:
-    CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPumpConfigurationAndControlPumpStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge
-    : public CHIPCallbackBridge<PumpConfigurationAndControlAlarmMaskAttributeCallback>
-{
-public:
-    CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PumpConfigurationAndControlAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackSubscriptionBridge
-    : public CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge
-{
-public:
-    CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action,
-                                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPumpConfigurationAndControlAlarmMaskAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -9359,35 +7580,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<PumpConfigurationAndControlFeatureMapAttributeCallback>
-{
-public:
-    CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<PumpConfigurationAndControlFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPPumpConfigurationAndControlFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -9475,61 +7667,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPRelativeHumidityMeasurementFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<RelativeHumidityMeasurementFeatureMapAttributeCallback>
-{
-public:
-    CHIPRelativeHumidityMeasurementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<RelativeHumidityMeasurementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPRelativeHumidityMeasurementFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPRelativeHumidityMeasurementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPRelativeHumidityMeasurementFeatureMapAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPRelativeHumidityMeasurementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPScenesNameSupportAttributeCallbackBridge : public CHIPCallbackBridge<ScenesNameSupportAttributeCallback>
-{
-public:
-    CHIPScenesNameSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                 bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesNameSupportAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPScenesNameSupportAttributeCallbackSubscriptionBridge : public CHIPScenesNameSupportAttributeCallbackBridge
-{
-public:
-    CHIPScenesNameSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action,
-                                                             SubscriptionEstablishedHandler establishedHandler) :
-        CHIPScenesNameSupportAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPScenesGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ScenesGeneratedCommandListListAttributeCallback>
 {
@@ -9603,31 +7740,6 @@ public:
                                                                    CHIPActionBlock action,
                                                                    SubscriptionEstablishedHandler establishedHandler) :
         CHIPScenesAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPScenesFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ScenesFeatureMapAttributeCallback>
-{
-public:
-    CHIPScenesFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPScenesFeatureMapAttributeCallbackSubscriptionBridge : public CHIPScenesFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPScenesFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPScenesFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -9754,34 +7866,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<SoftwareDiagnosticsFeatureMapAttributeCallback>
-{
-public:
-    CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<SoftwareDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         CHIPActionBlock action,
-                                                                         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSoftwareDiagnosticsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPSwitchGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<SwitchGeneratedCommandListListAttributeCallback>
 {
@@ -9855,31 +7939,6 @@ public:
                                                                    CHIPActionBlock action,
                                                                    SubscriptionEstablishedHandler establishedHandler) :
         CHIPSwitchAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPSwitchFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<SwitchFeatureMapAttributeCallback>
-{
-public:
-    CHIPSwitchFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                bool keepAlive = false) :
-        CHIPCallbackBridge<SwitchFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPSwitchFeatureMapAttributeCallbackSubscriptionBridge : public CHIPSwitchFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPSwitchFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPSwitchFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10006,32 +8065,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTargetNavigatorFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<TargetNavigatorFeatureMapAttributeCallback>
-{
-public:
-    CHIPTargetNavigatorFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<TargetNavigatorFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPTargetNavigatorFeatureMapAttributeCallbackSubscriptionBridge : public CHIPTargetNavigatorFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPTargetNavigatorFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action,
-                                                                     SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTargetNavigatorFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<TemperatureMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -10110,34 +8143,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPTemperatureMeasurementFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<TemperatureMeasurementFeatureMapAttributeCallback>
-{
-public:
-    CHIPTemperatureMeasurementFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TemperatureMeasurementFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPTemperatureMeasurementFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPTemperatureMeasurementFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPTemperatureMeasurementFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTemperatureMeasurementFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10687,222 +8692,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTestClusterFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<TestClusterFeatureMapAttributeCallback>
-{
-public:
-    CHIPTestClusterFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPTestClusterFeatureMapAttributeCallbackSubscriptionBridge : public CHIPTestClusterFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPTestClusterFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTestClusterFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatOccupancyAttributeCallbackBridge : public CHIPCallbackBridge<ThermostatOccupancyAttributeCallback>
-{
-public:
-    CHIPThermostatOccupancyAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                   bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatOccupancyAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPThermostatOccupancyAttributeCallbackSubscriptionBridge : public CHIPThermostatOccupancyAttributeCallbackBridge
-{
-public:
-    CHIPThermostatOccupancyAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatOccupancyAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatHvacSystemTypeConfigurationAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatHvacSystemTypeConfigurationAttributeCallback>
-{
-public:
-    CHIPThermostatHvacSystemTypeConfigurationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatHvacSystemTypeConfigurationAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPThermostatHvacSystemTypeConfigurationAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatHvacSystemTypeConfigurationAttributeCallbackBridge
-{
-public:
-    CHIPThermostatHvacSystemTypeConfigurationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatHvacSystemTypeConfigurationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatRemoteSensingAttributeCallbackBridge : public CHIPCallbackBridge<ThermostatRemoteSensingAttributeCallback>
-{
-public:
-    CHIPThermostatRemoteSensingAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatRemoteSensingAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPThermostatRemoteSensingAttributeCallbackSubscriptionBridge : public CHIPThermostatRemoteSensingAttributeCallbackBridge
-{
-public:
-    CHIPThermostatRemoteSensingAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   CHIPActionBlock action,
-                                                                   SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatRemoteSensingAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatAlarmMaskAttributeCallbackBridge : public CHIPCallbackBridge<ThermostatAlarmMaskAttributeCallback>
-{
-public:
-    CHIPThermostatAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                   bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPThermostatAlarmMaskAttributeCallbackSubscriptionBridge : public CHIPThermostatAlarmMaskAttributeCallbackBridge
-{
-public:
-    CHIPThermostatAlarmMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatAlarmMaskAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatThermostatProgrammingOperationModeAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatThermostatProgrammingOperationModeAttributeCallback>
-{
-public:
-    CHIPThermostatThermostatProgrammingOperationModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatThermostatProgrammingOperationModeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPThermostatThermostatProgrammingOperationModeAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatThermostatProgrammingOperationModeAttributeCallbackBridge
-{
-public:
-    CHIPThermostatThermostatProgrammingOperationModeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatThermostatProgrammingOperationModeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatThermostatRunningStateAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatThermostatRunningStateAttributeCallback>
-{
-public:
-    CHIPThermostatThermostatRunningStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatThermostatRunningStateAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPThermostatThermostatRunningStateAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatThermostatRunningStateAttributeCallbackBridge
-{
-public:
-    CHIPThermostatThermostatRunningStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatThermostatRunningStateAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatAcErrorCodeAttributeCallbackBridge : public CHIPCallbackBridge<ThermostatAcErrorCodeAttributeCallback>
-{
-public:
-    CHIPThermostatAcErrorCodeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatAcErrorCodeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPThermostatAcErrorCodeAttributeCallbackSubscriptionBridge : public CHIPThermostatAcErrorCodeAttributeCallbackBridge
-{
-public:
-    CHIPThermostatAcErrorCodeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 CHIPActionBlock action,
-                                                                 SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatAcErrorCodeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPThermostatGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ThermostatGeneratedCommandListListAttributeCallback>
 {
@@ -10978,32 +8767,6 @@ public:
                                                                        CHIPActionBlock action,
                                                                        SubscriptionEstablishedHandler establishedHandler) :
         CHIPThermostatAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<ThermostatFeatureMapAttributeCallback>
-{
-public:
-    CHIPThermostatFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPThermostatFeatureMapAttributeCallbackSubscriptionBridge : public CHIPThermostatFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPThermostatFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action,
-                                                                SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -11097,35 +8860,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPThermostatUserInterfaceConfigurationFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThermostatUserInterfaceConfigurationFeatureMapAttributeCallback>
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThermostatUserInterfaceConfigurationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                            keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPThermostatUserInterfaceConfigurationFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPThermostatUserInterfaceConfigurationFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPThermostatUserInterfaceConfigurationFeatureMapAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThermostatUserInterfaceConfigurationFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -11380,34 +9114,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<ThreadNetworkDiagnosticsFeatureMapAttributeCallback>
-{
-public:
-    CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ThreadNetworkDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPThreadNetworkDiagnosticsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge
     : public CHIPCallbackBridge<TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback>
 {
@@ -11526,34 +9232,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTimeFormatLocalizationFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<TimeFormatLocalizationFeatureMapAttributeCallback>
-{
-public:
-    CHIPTimeFormatLocalizationFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TimeFormatLocalizationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPTimeFormatLocalizationFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPTimeFormatLocalizationFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPTimeFormatLocalizationFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTimeFormatLocalizationFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPUnitLocalizationGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<UnitLocalizationGeneratedCommandListListAttributeCallback>
 {
@@ -11631,33 +9309,6 @@ public:
                                                                              CHIPActionBlock action,
                                                                              SubscriptionEstablishedHandler establishedHandler) :
         CHIPUnitLocalizationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPUnitLocalizationFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<UnitLocalizationFeatureMapAttributeCallback>
-{
-public:
-    CHIPUnitLocalizationFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<UnitLocalizationFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPUnitLocalizationFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPUnitLocalizationFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPUnitLocalizationFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUnitLocalizationFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -11778,32 +9429,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPUserLabelFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<UserLabelFeatureMapAttributeCallback>
-{
-public:
-    CHIPUserLabelFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                   bool keepAlive = false) :
-        CHIPCallbackBridge<UserLabelFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPUserLabelFeatureMapAttributeCallbackSubscriptionBridge : public CHIPUserLabelFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPUserLabelFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPUserLabelFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPWakeOnLanGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<WakeOnLanGeneratedCommandListListAttributeCallback>
 {
@@ -11878,32 +9503,6 @@ public:
                                                                       CHIPActionBlock action,
                                                                       SubscriptionEstablishedHandler establishedHandler) :
         CHIPWakeOnLanAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWakeOnLanFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<WakeOnLanFeatureMapAttributeCallback>
-{
-public:
-    CHIPWakeOnLanFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                   bool keepAlive = false) :
-        CHIPCallbackBridge<WakeOnLanFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPWakeOnLanFeatureMapAttributeCallbackSubscriptionBridge : public CHIPWakeOnLanFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPWakeOnLanFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action,
-                                                               SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWakeOnLanFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -12000,34 +9599,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge
-    : public CHIPCallbackBridge<WiFiNetworkDiagnosticsFeatureMapAttributeCallback>
-{
-public:
-    CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WiFiNetworkDiagnosticsFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge
-    : public CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            CHIPActionBlock action,
-                                                                            SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWiFiNetworkDiagnosticsFeatureMapAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPWindowCoveringConfigStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringConfigStatusAttributeCallback>
 {
 public:
@@ -12055,34 +9626,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
-    : public CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>
-{
-public:
-    CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringOperationalStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t value);
-};
-
-class CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringOperationalStatusAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringOperationalStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPWindowCoveringModeAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringModeAttributeCallback>
 {
 public:
@@ -12100,33 +9643,6 @@ public:
                                                               CHIPActionBlock action,
                                                               SubscriptionEstablishedHandler establishedHandler) :
         CHIPWindowCoveringModeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringSafetyStatusAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>
-{
-public:
-    CHIPWindowCoveringSafetyStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringSafetyStatusAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint16_t value);
-};
-
-class CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge
-    : public CHIPWindowCoveringSafetyStatusAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringSafetyStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -12213,32 +9729,6 @@ public:
                                                                            CHIPActionBlock action,
                                                                            SubscriptionEstablishedHandler establishedHandler) :
         CHIPWindowCoveringAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPWindowCoveringFeatureMapAttributeCallbackBridge : public CHIPCallbackBridge<WindowCoveringFeatureMapAttributeCallback>
-{
-public:
-    CHIPWindowCoveringFeatureMapAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<WindowCoveringFeatureMapAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint32_t value);
-};
-
-class CHIPWindowCoveringFeatureMapAttributeCallbackSubscriptionBridge : public CHIPWindowCoveringFeatureMapAttributeCallbackBridge
-{
-public:
-    CHIPWindowCoveringFeatureMapAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPWindowCoveringFeatureMapAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
