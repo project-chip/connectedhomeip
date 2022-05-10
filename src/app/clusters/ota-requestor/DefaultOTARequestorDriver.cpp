@@ -319,7 +319,7 @@ void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
 {
     ChipLogProgress(SoftwareUpdate, "Default Provider timer handler is invoked");
 
-    DefaultOTARequestorDriver * driver = reinterpret_cast<DefaultOTARequestorDriver *>(appState);
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
 
     // Determine which provider to query next
     ProviderLocationType providerLocation;
