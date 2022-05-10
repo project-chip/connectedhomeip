@@ -41,7 +41,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Verify device temperature displayed in °"
+                value: "Verify device temperature displayed in °C"
 
     - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"
       command: "writeAttribute"

@@ -55,90 +55,63 @@ tests:
               minValue: -32768
               maxValue: 32767
 
-    #Issue 13442 and 15473
-    - label:
-          "Read the optional attribute: Tolerance Verify that the DUT reponds
-          with an uint16 value. Its value should be in the range of 0 and 2048"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    #Issue 18243
+    - label: "Read the optional attribute: Tolerance"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "Tolerance"
+      response:
+          constraints:
+              type: int16
+              minValue: 0
+              maxValue: 2048
 
-    #Issue 13442 and 15473
-    - label:
-          "Read the optional attribute: ScaledValue Verify that the DUT reponds
-          with an int16 value. Its value should be in the range of -32768 and
-          32767"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the optional attribute: ScaledValue"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "ScaledValue"
+      response:
+          constraints:
+              type: int16
+              minValue: -32768
+              maxValue: 32767
 
-    #Issue 13442 and 15473
-    - label:
-          "Reads back optional attribute: MinScaledValue Verify that the DUT
-          reponds with an int16 value. Its value should be in the range of
-          -32768 and 32767"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the optional attribute: MinScaledValue"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MinScaledValue"
+      response:
+          constraints:
+              type: int16
+              minValue: -32768
+              maxValue: 32767
 
-    #Issue 13442 and 15473
-    - label:
-          "Read the optional attribute: MaxScaledValue Verify that the DUT
-          reponds with an int16 value. Its value should be in the range of
-          -32768 and 32767"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the optional attribute: MaxScaledValue"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "MaxScaledValue"
+      response:
+          constraints:
+              type: int16
+              minValue: -32768
+              maxValue: 32767
 
-    #Issue 13442 and 15473
-    - label:
-          "Read the optional attribute: ScaledTolerance Verify that the DUT
-          reponds with an uint16 value. Its value should be in the range of 0
-          and 2048"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the optional attribute: ScaledTolerance"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "ScaledTolerance"
+      response:
+          constraints:
+              type: int16
+              minValue: 0
+              maxValue: 2048
 
-    #Issue 13442 and 15473
-    - label:
-          "Read the optional attribute: Scale Verify that the DUT reponds with
-          an int8 value. Its value should be in the range of -127 and 127"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label: "Read the optional attribute: Scale"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "Scale"
+      response:
+          constraints:
+              type: int8
+              minValue: -127
+              maxValue: 127
