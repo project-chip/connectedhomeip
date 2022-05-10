@@ -128,12 +128,27 @@ public:
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
     // TODO - Optimize persistent storage of NOC and Root Cert in FabricInfo.
-    CHIP_ERROR SetRootCert(const chip::ByteSpan & cert) { return SetCert(mRootCert, cert); }
-    CHIP_ERROR SetICACert(const chip::ByteSpan & cert) { return SetCert(mICACert, cert); }
-    CHIP_ERROR SetICACert(const Optional<ByteSpan> & cert) { return SetICACert(cert.ValueOr(ByteSpan())); }
-    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
+    CHIP_ERROR SetRootCert(const chip::ByteSpan & cert)
+    {
+        return SetCert(mRootCert, cert);
+    }
+    CHIP_ERROR SetICACert(const chip::ByteSpan & cert)
+    {
+        return SetCert(mICACert, cert);
+    }
+    CHIP_ERROR SetICACert(const Optional<ByteSpan> & cert)
+    {
+        return SetICACert(cert.ValueOr(ByteSpan()));
+    }
+    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert)
+    {
+        return SetCert(mNOCCert, cert);
+    }
 
-    bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
+    bool IsInitialized() const
+    {
+        return IsOperationalNodeId(mOperationalId.GetNodeId());
+    }
 
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
@@ -297,7 +312,7 @@ public:
             Advance();
         }
     }
-    ConstFabricIterator(const ConstFabricIterator &) = default;
+    ConstFabricIterator(const ConstFabricIterator &)             = default;
     ConstFabricIterator & operator=(const ConstFabricIterator &) = default;
 
     ConstFabricIterator & operator++() { return Advance(); }
@@ -368,11 +383,18 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
+    /**
+     * Obtain a pointer to the FabricInfo. Note that its possible for fabrics to be added
+     * and removed, and for the FabricTable to be re-inited from storage. As a result
+     * clients should use FindFabric when a FabricInfo is needed and avoid holding a
+     * reference since the underlying Fabric may change.
+     */
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR ReInitFromStorage();
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }

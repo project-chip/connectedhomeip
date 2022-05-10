@@ -188,8 +188,9 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
 
-    // re-init server's fabric table since the CommissionerDiscoveryController will add its fabric if not already there.
-    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Init(&Server::GetInstance().GetPersistentStorage()));
+    // re-init server's fabric table since DeviceControllerFactory::InitSystemState will add
+    // its Fabric if it is not already there.
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().ReInitFromStorage());
 
     // advertise operational since we are an admin
     app::DnssdServer::Instance().AdvertiseOperational();
