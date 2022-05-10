@@ -35,27 +35,26 @@
 namespace chip {
 namespace Dnssd {
 
-struct ResolvedNodeData
+// Data common to both operational and commisionable discovery
+struct ResolutionData
 {
-    // TODO: use pool to allow dynamic
+    // TODO: is this count OK? Sufficient space for IPv6 LL, GUA, ULA (and maybe IPv4 if enabled)
     static constexpr unsigned kMaxIPAddresses = 5;
 
-    void LogNodeIdResolved() const
-    {
-#if CHIP_PROGRESS_LOGGING
-        char addrBuffer[Inet::IPAddress::kMaxStringLength];
+    Inet::InterfaceId interfaceId;
 
-        // Would be nice to log the interface id, but sorting out how to do so
-        // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
-                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
-        for (unsigned i = 0; i < mNumIPs; ++i)
-        {
-            mAddress[i].ToString(addrBuffer);
-            ChipLogProgress(Discovery, "    Addr %u: [%s]:%u", i, addrBuffer, mPort);
-        }
-#endif // CHIP_PROGRESS_LOGGING
-    }
+    size_t numIPs = 0; // number of valid IP addresses
+    Inet::IPAddress ipAddress[kMaxIPAddresses];
+
+    uint16_t port                         = 0;
+    char hostName[kHostNameMaxLength + 1] = {};
+    bool supportsTcp                      = false;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
+
+    ResolutionData() { Reset(); }
+
+    bool IsValid() const { return !IsHost("") && (numIPs > 0) && (ipAddress[0] != chip::Inet::IPAddress::Any); }
 
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
@@ -63,27 +62,87 @@ struct ResolvedNodeData
         return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(defaultConfig.mIdleRetransTimeout),
                                              GetMrpRetryIntervalActive().ValueOr(defaultConfig.mActiveRetransTimeout));
     }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
 
     bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
         // If either sleepy interval (Idle - SII, Active - SAI) has a value and that value is greater
         // than the value passed to this function, then the peer device will be treated as if it is
         // a Sleepy End Device (SED)
-        return (mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mMrpRetryIntervalActive.HasValue() && (mMrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
+        return (mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
+            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
+    }
+
+    bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
+
+    void Reset()
+    {
+        memset(hostName, 0, sizeof(hostName));
+        mrpRetryIntervalIdle   = NullOptional;
+        mrpRetryIntervalActive = NullOptional;
+        numIPs                 = 0;
+        port                   = 0;
+        supportsTcp            = false;
+        interfaceId            = Inet::InterfaceId::Null();
+        for (unsigned i = 0; i < kMaxIPAddresses; ++i)
+        {
+            ipAddress[i] = chip::Inet::IPAddress::Any;
+        }
+    }
+
+    void LogDetail() const
+    {
+        if (!IsHost(""))
+        {
+            ChipLogDetail(Discovery, "\tHostname: %s", hostName);
+        }
+#if CHIP_DETAIL_LOGGING
+        for (unsigned j = 0; j < numIPs; j++)
+        {
+            char buf[Inet::IPAddress::kMaxStringLength];
+            char * ipAddressOut = ipAddress[j].ToString(buf);
+            ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
+            (void) ipAddressOut;
+        }
+#endif // CHIP_DETAIL_LOGGING
+        if (port > 0)
+        {
+            ChipLogDetail(Discovery, "\tPort: %u", port);
+        }
+        if (mrpRetryIntervalIdle.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
+        }
+        if (mrpRetryIntervalActive.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
+        }
+    }
+};
+
+struct ResolvedNodeData : public ResolutionData
+{
+    void LogNodeIdResolved() const
+    {
+#if CHIP_PROGRESS_LOGGING
+        // Would be nice to log the interface id, but sorting out how to do so
+        // across our differnet InterfaceId implementations is a pain.
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
+                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+        ResolutionData::LogDetail();
+#endif // CHIP_PROGRESS_LOGGING
     }
 
     PeerId mPeerId;
-    size_t mNumIPs = 0;
-    Inet::InterfaceId mInterfaceId;
-    Inet::IPAddress mAddress[kMaxIPAddresses];
-    uint16_t mPort                         = 0;
-    char mHostName[kHostNameMaxLength + 1] = {};
-    bool mSupportsTcp                      = false;
-    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
-    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
     System::Clock::Timestamp mExpiryTime;
 };
 
@@ -91,11 +150,8 @@ constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
 
-struct DiscoveredNodeData
+struct DiscoveredNodeData : public ResolutionData
 {
-    // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
-    static constexpr unsigned kMaxIPAddresses = 5;
-    char hostName[kHostNameMaxLength + 1];
     char instanceName[Commission::kInstanceNameMaxLength + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
@@ -108,17 +164,11 @@ struct DiscoveredNodeData
     size_t rotatingIdLen;
     uint16_t pairingHint;
     char pairingInstruction[kMaxPairingInstructionLen + 1];
-    bool supportsTcp;
-    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
-    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
-    uint16_t port;
-    unsigned numIPs;
-    Inet::InterfaceId interfaceId; // interface ID for the packet processed
-    Inet::IPAddress ipAddress[kMaxIPAddresses];
 
     void Reset()
     {
-        memset(hostName, 0, sizeof(hostName));
+        ResolutionData::Reset();
+
         memset(instanceName, 0, sizeof(instanceName));
         longDiscriminator = 0;
         vendorId          = 0;
@@ -129,32 +179,10 @@ struct DiscoveredNodeData
         memset(rotatingId, 0, sizeof(rotatingId));
         rotatingIdLen = 0;
         memset(pairingInstruction, 0, sizeof(pairingInstruction));
-        pairingHint            = 0;
-        supportsTcp            = false;
-        mrpRetryIntervalIdle   = NullOptional;
-        mrpRetryIntervalActive = NullOptional;
-        numIPs                 = 0;
-        port                   = 0;
-        for (unsigned i = 0; i < kMaxIPAddresses; ++i)
-        {
-            ipAddress[i] = chip::Inet::IPAddress::Any;
-        }
+        pairingHint = 0;
     }
     DiscoveredNodeData() { Reset(); }
-    bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
-    bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
-    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
-
-    bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
-    {
-        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
-        // than the value passed to this function, then the peer device will be treated as if it is
-        // a Sleepy End Device (SED)
-        return (mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
-            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout));
-    }
 
     void LogDetail() const
     {
@@ -192,44 +220,13 @@ struct DiscoveredNodeData
         {
             ChipLogDetail(Discovery, "\tPairing Hint: %u", pairingHint);
         }
-        if (!IsHost(""))
-        {
-            ChipLogDetail(Discovery, "\tHostname: %s", hostName);
-        }
         if (!IsInstanceName(""))
         {
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
-        for (unsigned j = 0; j < numIPs; j++)
-        {
-#if CHIP_DETAIL_LOGGING
-            char buf[Inet::IPAddress::kMaxStringLength];
-            char * ipAddressOut = ipAddress[j].ToString(buf);
-            ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
-            (void) ipAddressOut;
-#endif // CHIP_DETAIL_LOGGING
-        }
-        if (port > 0)
-        {
-            ChipLogDetail(Discovery, "\tPort: %u", port);
-        }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
-        if (mrpRetryIntervalIdle.HasValue())
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
-        }
-        else
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
-        }
-        else
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
-        }
+
+        ResolutionData::LogDetail();
     }
 };
 

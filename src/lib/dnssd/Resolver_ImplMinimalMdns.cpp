@@ -134,7 +134,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mNodeData.mHostName, it.Value());
+        Platform::CopyString(mNodeData.hostName, it.Value());
     }
 
     if (!name.Next())
@@ -151,8 +151,8 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
         return;
     }
 
-    mNodeData.mPort = srv.GetPort();
-    mHasNodePort    = true;
+    mNodeData.port = srv.GetPort();
+    mHasNodePort   = true;
 }
 
 void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
@@ -178,18 +178,18 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    if (mNodeData.mNumIPs >= ResolvedNodeData::kMaxIPAddresses)
+    if (mNodeData.numIPs >= ResolutionData::kMaxIPAddresses)
     {
         return;
     }
-    mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
-    mNodeData.mInterfaceId                  = mInterfaceId;
+    mNodeData.ipAddress[mNodeData.numIPs++] = addr;
+    mNodeData.interfaceId                   = mInterfaceId;
     mHasIP                                  = true;
 }
 
 void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
 {
-    if (mDiscoveredNodeData.numIPs >= DiscoveredNodeData::kMaxIPAddresses)
+    if (mDiscoveredNodeData.numIPs >= ResolutionData::kMaxIPAddresses)
     {
         return;
     }

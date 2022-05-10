@@ -244,13 +244,13 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedN
     switch (Internal::GetTxtFieldKey(key))
     {
     case TxtFieldKey::kSleepyIdleInterval:
-        nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
     case TxtFieldKey::kSleepyActiveInterval:
-        nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
     case TxtFieldKey::kTcpSupported:
-        nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:
         break;

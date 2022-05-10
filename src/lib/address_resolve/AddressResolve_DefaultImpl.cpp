@@ -257,21 +257,21 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
 
         ResolveResult result;
 
-        result.address.SetPort(nodeData.mPort);
-        result.address.SetInterface(nodeData.mInterfaceId);
+        result.address.SetPort(nodeData.port);
+        result.address.SetInterface(nodeData.interfaceId);
         result.mrpConfig   = nodeData.GetMRPConfig();
-        result.supportsTcp = nodeData.mSupportsTcp;
+        result.supportsTcp = nodeData.supportsTcp;
 
-        for (size_t i = 0; i < nodeData.mNumIPs; i++)
+        for (size_t i = 0; i < nodeData.numIPs; i++)
         {
 #if !INET_CONFIG_ENABLE_IPV4
-            if (!nodeData.mAddress[i].IsIPv6())
+            if (!nodeData.ipAddress[i].IsIPv6())
             {
                 ChipLogError(Discovery, "Skipping IPv4 address during operational resolve.");
                 continue;
             }
 #endif
-            result.address.SetIPAddress(nodeData.mAddress[i]);
+            result.address.SetIPAddress(nodeData.ipAddress[i]);
             current->LookupResult(result);
         }
 

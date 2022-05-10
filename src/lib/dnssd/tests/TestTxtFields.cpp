@@ -380,8 +380,8 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
-    return nodeData.mPeerId == PeerId{} && nodeData.mNumIPs == 0 && nodeData.mPort == 0 &&
-        !nodeData.mMrpRetryIntervalIdle.HasValue() && !nodeData.mMrpRetryIntervalActive.HasValue() && !nodeData.mSupportsTcp;
+    return nodeData.mPeerId == PeerId{} && nodeData.numIPs == 0 && nodeData.port == 0 &&
+        !nodeData.mMrpRetryIntervalIdle.HasValue() && !nodeData.mMrpRetryIntervalActive.HasValue() && !nodeData.supportsTcp;
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
@@ -391,7 +391,7 @@ void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
 
 void ResetRetryIntervalIdle(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalIdle.ClearValue();
+    nodeData.mrpRetryIntervalIdle.ClearValue();
 }
 
 void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
@@ -401,7 +401,7 @@ void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
 
 void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 {
-    nodeData.mMrpRetryIntervalActive.ClearValue();
+    nodeData.mrpRetryIntervalActive.ClearValue();
 }
 
 // Test SAI (formally CRI)
@@ -633,7 +633,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyActive", TestIsDeviceSleepyActive<DiscoveredNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldSleepyIdleInterval<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldSleepyActiveInterval<ResolvedNodeData>),
-    NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData, &ResolvedNodeData::mSupportsTcp>) ),
+    NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData, &ResolvedNodeData::supportsTcp>) ),
     NL_TEST_DEF("TxtResolvedIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedIsDeviceSleepyActive", TestIsDeviceSleepyActive<ResolvedNodeData>),
     NL_TEST_SENTINEL()

@@ -45,12 +45,12 @@ public:
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
                         ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.mHostName);
-        for (size_t i = 0; i < nodeData.mNumIPs; ++i)
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
+        for (size_t i = 0; i < nodeData.numIPs; ++i)
         {
-            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.mAddress[i].ToString(ipAddressBuf));
+            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
         }
-        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.port);
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
@@ -62,7 +62,7 @@ public:
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.mSupportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
     }
 
     void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}

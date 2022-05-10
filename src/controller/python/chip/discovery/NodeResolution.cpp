@@ -47,9 +47,9 @@ public:
             mSuccessCallback(                                                            //
                 nodeData.mPeerId.GetCompressedFabricId(),                                //
                 nodeData.mPeerId.GetNodeId(),                                            //
-                nodeData.mInterfaceId.GetPlatformInterface(),                            //
-                nodeData.mAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
-                nodeData.mPort                                                           //
+                nodeData.interfaceId.GetPlatformInterface(),                            //
+                nodeData.ipAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
+                nodeData.port                                                           //
             );
         }
         else

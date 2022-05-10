@@ -120,10 +120,10 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     VerifyOrDie(proxy != nullptr);
 
     ResolvedNodeData nodeData;
-    Platform::CopyString(nodeData.mHostName, result->mHostName);
-    nodeData.mInterfaceId = result->mInterface;
-    nodeData.mPort        = result->mPort;
-    nodeData.mPeerId      = peerId;
+    Platform::CopyString(nodeData.hostName, result->mHostName);
+    nodeData.interfaceId = result->mInterface;
+    nodeData.port        = result->mPort;
+    nodeData.mPeerId     = peerId;
     // TODO: Use seconds?
     const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -132,21 +132,21 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     size_t addressesFound = 0;
     if (result->mAddress.HasValue())
     {
-        nodeData.mAddress[addressesFound] = result->mAddress.Value();
+        nodeData.ipAddress[addressesFound] = result->mAddress.Value();
         ++addressesFound;
     }
     for (auto & ip : extraIPs)
     {
-        if (addressesFound == ArraySize(nodeData.mAddress))
+        if (addressesFound == ArraySize(nodeData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
             break;
         }
-        nodeData.mAddress[addressesFound] = ip;
+        nodeData.ipAddress[addressesFound] = ip;
         ++addressesFound;
     }
-    nodeData.mNumIPs = addressesFound;
+    nodeData.numIPs = addressesFound;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
