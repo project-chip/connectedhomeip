@@ -361,10 +361,10 @@
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/ota-requestor/chip-ota-requestor-app",
+            "program": "${workspaceFolder}/out/apps/ota-requestor/chip-ota-requestor-app",
             "args": [
                 "--discriminator",
-                "18",
+                "30",
                 "--secured-device-port",
                 "5560",
                 "--KVS",
