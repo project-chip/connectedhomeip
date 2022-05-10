@@ -121,7 +121,7 @@ class TestCommissioner(CHIPVirtualHome):
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid".format(
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 --paa-trust-store-path {} --discriminator {} --setup-payload {} --nodeid {}".format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),

@@ -115,7 +115,7 @@ def main():
         nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
-    FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
+    FailIfNot(test.TestDiscovery(discriminator=options.discriminator),
               "Failed to discover any devices.")
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
@@ -128,9 +128,9 @@ def main():
                                        nodeid=options.nodeid),
                   "Failed to finish key exchange")
     elif options.setupPayload:
-        logger.info("Testing key exchange (Setup Payload)")
-        FailIfNot(test.TestKeyExchange(ip=options.setupPayload,
-                                       nodeid=options.nodeid),
+        logger.info("Testing key exchange (w/ Setup Payload)")
+        FailIfNot(test.TestKeyExchangeWithSetupPayload(setupPayload=options.setupPayload,
+                                                       nodeid=options.nodeid),
                   "Failed to finish key exchange")
     else:
         TestFail("Must provide device address or setup payload to commissioning the device")
