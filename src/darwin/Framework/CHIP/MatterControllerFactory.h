@@ -68,24 +68,24 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) uint16_t vendorId;
 /*
- * Root CA keypair that identifies (via its public key) the fabric.  Nullable
- * for now, but that will change.
+ * Root CA keypair that scopes (via its public key) the fabric id.  To use
+ * startControllerOnExistingFabric successfully, both the public key of
+ * rootCAKeypair and the fabricId must match an existing fabric.
  */
-@property (strong, nonatomic, nullable) id<CHIPKeypair> rootCAKeypair;
+@property (strong, nonatomic) id<CHIPKeypair> rootCAKeypair;
 /*
  * Fabric id for the controller.  Must be set to a nonzero value.
  */
 @property (nonatomic) uint64_t fabricId;
 /*
- * IPK to use for the controller's fabric.  Allowed to be null when
- * starting a controller on an existing fabric.
+ * IPK to use for the controller's fabric.  Allowed to change from the last time
+ * a controller was started on this fabric if a new IPK has been distributed to
+ * all the devices the controller wants to interact with.
  */
-@property (strong, nonatomic, nullable) NSData * ipk;
+@property (strong, nonatomic) NSData * ipk;
 
 - (instancetype)init NS_UNAVAILABLE;
-// TODO The keypair should not be nullable, but we need to sort out
-// CHIPClustersTests and CHIPTool use of these APIs first.
-- (instancetype)initWithKeypair:(_Nullable id<CHIPKeypair>)rootCAKeypair;
+- (instancetype)initWithKeypair:(id<CHIPKeypair>)rootCAKeypair ipk:(NSData *)ipk;
 
 @end
 

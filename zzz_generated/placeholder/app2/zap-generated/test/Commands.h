@@ -77,13 +77,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissioning();
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Log OnOff Test Startup");
-            SetIdentity(kIdentityAlpha);
-            return Log("*** Basic Cluster Tests Ready");
+            chip::app::Clusters::LogCommands::Commands::Log::Type value;
+            value.message = chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
+            return Log(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Query Data Model Revision");
@@ -218,8 +219,8 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
-            SetIdentity(kIdentityAlpha);
-            return WaitForCommissioning();
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Wait for Scan Network Command");
@@ -343,8 +344,9 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 3000ms");
-            SetIdentity(kIdentityAlpha);
-            return WaitForMs(3000);
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;

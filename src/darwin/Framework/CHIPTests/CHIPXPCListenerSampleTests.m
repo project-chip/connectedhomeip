@@ -23,6 +23,7 @@
 #import <CHIP/CHIPDevice.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestKeys.h"
 #import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
@@ -520,12 +521,14 @@ static CHIPDevice * GetConnectedDevice(void)
     BOOL ok = [factory startup:factoryParams];
     XCTAssertTrue(ok);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys ipk:testKeys.ipk];
     params.vendorId = kTestVendorId;
     params.fabricId = 1;
 
-    // TODO: Once we have a non-nil keypair, use startControllerOnNewFabric.
-    CHIPDeviceController * controller = [factory startControllerOnExistingFabric:params];
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
 
     sController = controller;
