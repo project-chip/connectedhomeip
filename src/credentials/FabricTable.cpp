@@ -708,7 +708,6 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
 void FabricTable::DeleteAllFabrics()
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-
     for (auto & fabric : *this)
     {
         Delete(fabric.GetFabricIndex());
@@ -721,7 +720,7 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 
     mStorage = storage;
 
-    ChipLogDetail(Discovery, "ReInit fabric pairing table with server storage");
+    ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
 
     // Load the current fabrics from the storage. This is done here, since ConstFabricIterator
     // iterator doesn't have mechanism to load fabric info from storage on demand.
