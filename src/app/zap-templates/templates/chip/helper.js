@@ -447,20 +447,20 @@ async function chip_endpoint_clusters(options)
 }
 
 /**
- * If helper that checks if a type is a bitmap which is non-atomic.
- * Non-atomic bitmaps are bitmaps which are not bitmap8/16/32(generally defined
- * in types.xml)
+ * Helper checks if the type for the bitmap is Bitflags. This generally includes
+ * all inherited bitmaps i.e. all bitmaps apart from
+ * bitmap8/16/32(generally defined in types.xml)
  * example:
- * {{#if_is_weakly_typed_bitmap type}}
- * type is non atomic bitmap
+ * {{#if_is_strongly_typed_bitmap type}}
+ * strongly typed bitmap
  * {{else}}
- * type is not a non-atomic bitmap
- * {{/if_is_weakly_typed_bitmap}}
+ * not a strongly typed bitmap
+ * {{/if_is_strongly_typed_bitmap}}
  *
  * @param {*} type
  * @returns Promise of content.
  */
-async function if_is_weakly_typed_bitmap(type, options)
+async function if_is_strongly_typed_bitmap(type, options)
 {
   let packageId = await templateUtil.ensureZclPackageId(this)
   let bitmap
@@ -488,23 +488,23 @@ async function if_is_weakly_typed_bitmap(type, options)
 }
 
 /**
- * An helper function to a handlebar-helper that checks if a type is an enum
- * which is non-atomic. Non-atomic enums are enums which are not
+ * This function retrieves all the strongly typed enums from the database. This
+ * generally includes all inherited enums i.e. all enums apart from
  * enum8/16/32(generally defined in types.xml)
  *
- * * example for if_is_weakly_typed_enum:
- * {{#if_is_weakly_typed_enum type}}
- * type is non atomic enum
+ * * example for if_is_strongly_typed_enum:
+ * {{#if_is_strongly_typed_enum type}}
+ * strongly typed enum
  * {{else}}
- * type is not a non-atomic enum
- * {{/if_is_weakly_typed_enum}}
+ * not a strongly typed enum
+ * {{/if_is_strongly_typed_enum}}
  *
  * @param {*} type
  * @param {*} options
  * @param {*} context
  * @returns Promise of content.
  */
-async function if_is_weakly_typed_enum_common(type, options, context)
+async function if_is_strongly_typed_enum_common(type, options, context)
 {
   let packageId = await templateUtil.ensureZclPackageId(context)
   let enumRes
@@ -532,38 +532,38 @@ async function if_is_weakly_typed_enum_common(type, options, context)
 }
 
 /**
- * If helper that checks if a type is an enum which is non-atomic.
- * Non-atomic enums are enums which are not enum8/16/32(generally defined
- * in types.xml)
+ * Helper that checks if an enum is a strongly typed enum or not
+ * This generally includes all inherited enums i.e. all enums apart from
+ * enum8/16/32(generally defined in types.xml)
  *
  * * example:
- * {{#if_is_weakly_typed_enum type}}
- * type is non atomic enum
+ * {{#if_is_strongly_typed_enum type}}
+ * strongly typed enum
  * {{else}}
- * type is not a non-atomic enum
- * {{/if_is_weakly_typed_enum}}
+ * not a strongly typed enum
+ * {{/if_is_strongly_typed_enum}}
  *
  * @param {*} type
  * @returns Promise of content.
  */
-async function if_is_weakly_typed_enum(type, options)
+async function if_is_strongly_typed_enum(type, options)
 {
-  return if_is_weakly_typed_enum_common(type, options, this)
+  return if_is_strongly_typed_enum_common(type, options, this)
 }
 
 /**
  *
  * @param {*} type
  * @param {*} options
- * @returns The same as if_is_weakly_typed_enum apart from some special use
+ * @returns The same as if_is_strongly_typed_enum apart from some special use
  * cases.
  */
-async function if_is_weakly_typed_chip_enum(type, options)
+async function if_is_strongly_typed_chip_enum(type, options)
 {
   if (type.toLowerCase() == 'vendor_id') {
     return options.fn(this)
   } else {
-    return if_is_weakly_typed_enum_common(type, options, this)
+    return if_is_strongly_typed_enum_common(type, options, this)
   }
 }
 
@@ -711,6 +711,6 @@ exports.if_basic_global_response                             = if_basic_global_r
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
 exports.chip_access_elements                                 = chip_access_elements
-exports.if_is_weakly_typed_enum                              = if_is_weakly_typed_enum
-exports.if_is_weakly_typed_chip_enum                         = if_is_weakly_typed_chip_enum
-exports.if_is_weakly_typed_bitmap                            = if_is_weakly_typed_bitmap
+exports.if_is_strongly_typed_enum                            = if_is_strongly_typed_enum
+exports.if_is_strongly_typed_chip_enum                       = if_is_strongly_typed_chip_enum
+exports.if_is_strongly_typed_bitmap                          = if_is_strongly_typed_bitmap

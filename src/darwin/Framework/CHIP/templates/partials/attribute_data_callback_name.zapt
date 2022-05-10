@@ -6,13 +6,13 @@
          less code to generate the callbacks on a per-attribute basis
          than a per-struct-type basis. ~}}
     {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Struct
-  {{~else if_is_weakly_typed_bitmap type~}}
+  {{~else if_is_strongly_typed_bitmap type~}}
       {{~asUpperCamelCase parent.name}}{{asUpperCamelCase name~}}
   {{~else~}}
     {{~#if isNullable}}Nullable{{/if~}}
     {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
       VendorId
-    {{~else if_is_weakly_typed_enum type~}}
+    {{~else if_is_strongly_typed_enum type~}}
         {{~asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase type~}}
     {{~else~}}
       {{chipCallback.name}}
