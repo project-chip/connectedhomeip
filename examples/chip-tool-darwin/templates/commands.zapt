@@ -18,7 +18,7 @@
 
 {{> clusters_header}}
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
@@ -30,6 +30,7 @@ class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterC
 public:
     {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
+        (void)mRequest; // Might not be used if we have no complex args
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
@@ -106,9 +107,9 @@ public:
     }
 
 private:
+    chip::app::Clusters::{{asUpperCamelCase clusterName}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
     {{#chip_cluster_command_arguments}}
     {{#if_chip_complex}}
-    chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::Commands::{{asUpperCamelCase parent.name}}::Type mRequest;
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
     {{else if (isString type)}}
     {{#if isOptional}}chip::Optional<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} m{{asUpperCamelCase label}};
@@ -281,7 +282,7 @@ public:
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 {
     using namespace chip::app::Clusters::{{asUpperCamelCase name}};
@@ -335,7 +336,7 @@ void registerClusterAny(Commands & commands)
 void registerClusters(Commands & commands)
 {
     registerClusterAny(commands);
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
     registerCluster{{asUpperCamelCase name}}(commands);
 {{/chip_client_clusters}}
 }
