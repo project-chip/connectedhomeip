@@ -279,7 +279,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gCertElements.DACOriginVIDandPIDPresent = true;
         break;
     case 'a':
-        if (gCertElements.AuthorizedPAAListCount == ArraySize(gCertElements.AuthorizedPAAList))
+        if (gCertElements.AuthorizedPAAListCount >= ArraySize(gCertElements.AuthorizedPAAList))
         {
             PrintArgError("%s: Too many Authorized PAA Certificates are specified: %s\n", progName, arg);
             return false;
