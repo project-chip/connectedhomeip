@@ -360,7 +360,7 @@ void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer
     // Let's just cancel download, reset state, and re-start periodic query timer.
     driver->UpdateDiscontinued();
     driver->mRequestor->CancelImageUpdate();
-    driver->StartPeriodicQueryTimer();    
+    driver->StartPeriodicQueryTimer();
 }
 
 void DefaultOTARequestorDriver::StartWatchdogTimer()
