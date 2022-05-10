@@ -15497,6 +15497,7 @@ using namespace chip::app::Clusters;
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 =======
 <<<<<<< HEAD
@@ -15520,6 +15521,8 @@ using namespace chip::app::Clusters;
 }
 
 >>>>>>> Changes for cleaner regen
+=======
+>>>>>>> Regening after rebase
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 >>>>>>> Changes for cleaner regen
 {

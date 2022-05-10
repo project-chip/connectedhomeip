@@ -1019,9 +1019,9 @@ client cluster Scenes = 5 {
   }
 
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
-    INT8U length = 1;
-    INT8U value = 2;
+    cluster_id clusterId = 0;
+    int8u length = 1;
+    int8u value = 2;
   }
 
   readonly attribute int8u sceneCount = 0;
