@@ -2113,7 +2113,7 @@ private:
         case 10: {
             LogStep(10, "Write the default values to mandatory non-global attribute: StatusFlags");
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), BinaryInputBasic::Id,
                                   BinaryInputBasic::Attributes::StatusFlags::Id, value);
         }
@@ -4191,7 +4191,7 @@ private:
         case 16: {
             LogStep(16, "Write the default values to mandatory attribute: Options");
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                   ColorControl::Attributes::ColorControlOptions::Id, value);
         }
@@ -4309,7 +4309,7 @@ private:
         case 38: {
             LogStep(38, "Write the default values to mandatory attribute: ColorCapabilities");
             uint16_t value;
-            value = static_cast<uint16_t>(0U);
+            value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id,
                                   value);
         }
@@ -22582,7 +22582,7 @@ private:
         case 2: {
             LogStep(2, "Writes the respective default value to mandatory attribute: Occupancy");
             uint8_t value;
-            value = static_cast<uint8_t>(0);
+            value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::Occupancy::Id,
                                   value);
         }
@@ -22615,7 +22615,7 @@ private:
         case 8: {
             LogStep(8, "Writes the respective default value to mandatory attribute: OccupancySensorTypeBitmap");
             uint8_t value;
-            value = static_cast<uint8_t>(1);
+            value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
                                   OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id, value);
         }
@@ -25079,7 +25079,7 @@ private:
         case 8: {
             LogStep(8, "write the default values to optional global attribute: FeatureMap");
             uint32_t value;
-            value = static_cast<uint32_t>(0UL);
+            value = 0UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
                                   PumpConfigurationAndControl::Attributes::FeatureMap::Id, value);
         }
@@ -32092,7 +32092,7 @@ private:
         case 6: {
             LogStep(6, "3a: write the default value to optional global attribute: FeatureMap");
             uint32_t value;
-            value = static_cast<uint32_t>(32769UL);
+            value = 32769UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::FeatureMap::Id,
                                   value);
         }
@@ -32604,7 +32604,7 @@ private:
         case 8: {
             LogStep(8, "3a: write a value into the RO mandatory attribute: OperationalStatus");
             uint8_t value;
-            value = static_cast<uint8_t>(128);
+            value = 128;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
                                   WindowCovering::Attributes::OperationalStatus::Id, value);
         }
@@ -32791,7 +32791,7 @@ private:
         case 41: {
             LogStep(41, "5a: write a value into the RO mandatory attribute: SafetyStatus");
             uint16_t value;
-            value = static_cast<uint16_t>(4096U);
+            value = 4096U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::SafetyStatus::Id,
                                   value);
         }

@@ -48,11 +48,11 @@
       {{else if (isOctetString type)}}
         {{!-- TODO Extract the length of the default value for ByteSpan--}}
       {{else}}
-        {{#if_is_bitmap type}}
+        {{#if_is_strongly_typed_bitmap type}}
           static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral (chip_tests_config_get_default_value definedValue) type}});
         {{else}}
           {{asTypedExpression (chip_tests_config_get_default_value definedValue) type}};
-        {{/if_is_bitmap}}
+        {{/if_is_strongly_typed_bitmap}}
       {{/if_chip_enum~}}
     {{else~}}
       {{~#if_chip_enum type~}}
@@ -62,11 +62,11 @@
       {{else if (isOctetString type)}}
         chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral definedValue}}garbage: not in length on purpose"), {{definedValue.length}});
       {{else}}
-        {{#if_is_bitmap type}}
+        {{#if_is_strongly_typed_bitmap type}}
           static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{asTypedLiteral definedValue type}});
         {{else}}
           {{asTypedExpression definedValue type}};
-        {{/if_is_bitmap}}
+        {{/if_is_strongly_typed_bitmap}}
       {{/if_chip_enum~}}
     {{~/if~}}
     
