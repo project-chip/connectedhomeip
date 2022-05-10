@@ -207,7 +207,7 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
     )
     cluster_namespace.descriptor = ClusterObjects.ClusterObjectDescriptor(
         Fields=[
-            f.attribute_type for f in attributes.values()
+            ClusterObjects.ClusterObjectFieldDescriptor(Label=k, Tag=v.attribute_id, Type=v.attribute_type.Type) for (k, v) in attributes.items()
         ]
     )
     cluster_namespace.id = cluster.code
@@ -229,6 +229,9 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
 
     if len(attributes) != 0:
         set_namespace_items(cluster_namespace, 'Attributes', attributes)
+
+    if len(attributes) != 0:
+        set_namespace_items(cluster_namespace, 'Events', events)
 
     if len(structs) != 0:
         set_namespace_items(cluster_namespace, 'Structs', structs)

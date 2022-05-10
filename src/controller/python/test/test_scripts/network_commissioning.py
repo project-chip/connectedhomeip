@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-import chip.clusters as Clusters
+import chip.clusters
 import logging
 from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure
 from chip.clusters.Types import NullValue
@@ -26,6 +26,8 @@ import base
 
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)
+
+Clusters = chip.clusters.Objects
 
 TEST_THREAD_NETWORK_DATASET_TLVS = [bytes.fromhex("0e080000000000010000" +
                                                   "000300000c" +
@@ -375,4 +377,5 @@ class NetworkCommissioningTests:
             await self.Test()
             return True
         except Exception as ex:
+            logger.exception(ex)
             return False
