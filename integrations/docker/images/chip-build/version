@@ -1,1 +1,1 @@
-0.5.71 Version bump reason: [Tizen] Fix permission bits for secret-tool
+0.5.72 Version bump reason: [Ameba] Migrate mbedtls cmake file to Matter SDK
