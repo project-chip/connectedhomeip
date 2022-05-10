@@ -254,8 +254,8 @@ def HostTargets():
         app_targets.append(target.Extend('python-bindings', app=HostApp.PYTHON_BINDINGS))
         app_targets.append(target.Extend('tv-app', app=HostApp.TV_APP))
         app_targets.append(target.Extend('lighting', app=HostApp.LIGHTING))
-        app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING_APP))
-        app_targets.append(target.Extend('bridge-app', app=HostApp.BRIDGE_APP))
+        app_targets.append(target.Extend('tv-casting', app=HostApp.TV_CASTING))
+        app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
     builder = VariantBuilder()
 
