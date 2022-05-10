@@ -12128,11 +12128,12 @@ private:
 class Test_TC_DM_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_DM_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", 5, credsIssuerConfig)
+    Test_TC_DM_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DM_2_2", 13, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -12147,7 +12148,10 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mTimeout;
+
+    uint32_t SoftwareVersionValue;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
@@ -12168,43 +12172,66 @@ private:
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                {
-                    auto iter_0 = value.begin();
-                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("fabrics", iter_0, 0));
-                    VerifyOrReturn(CheckValueAsString("fabrics[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("fabrics", iter_0, 1));
-                }
-                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                SoftwareVersionValue = value;
             }
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                bool value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("supportedFabrics", value, 16));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
             }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint8_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("commissionedFabrics", value, 1));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-            }
+            shouldContinue = true;
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+                uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckValue("softwareVersion", value, SoftwareVersionValue));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
             }
             break;
         default:
@@ -12230,24 +12257,76 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Query fabrics list");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
-                                 OperationalCredentials::Attributes::Fabrics::Id, true, chip::NullOptional);
+            LogStep(1, "Query SoftwareVersion");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
+                                 chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Query Supported Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
-                                 OperationalCredentials::Attributes::SupportedFabrics::Id, true, chip::NullOptional);
+            LogStep(2, "Query Reachable Fabrics");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
+                                 chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Query Commissioned Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
-                                 OperationalCredentials::Attributes::CommissionedFabrics::Id, true, chip::NullOptional);
+            LogStep(3, "Reboot target device");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
         }
         case 4: {
-            LogStep(4, "Query User Trusted Root Certificates");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
-                                 OperationalCredentials::Attributes::TrustedRootCertificates::Id, true, chip::NullOptional);
+            LogStep(4, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 5: {
+            LogStep(5, "Query SoftwareVersion");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Reboot target device");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "Factory Reset the accessory");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
+            return FactoryReset(kIdentityAlpha, value);
+        }
+        case 9: {
+            LogStep(9, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 10: {
+            LogStep(10, "Reboot target device");
+            ListFreer listFreer;
+            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
+            return Reboot(kIdentityAlpha, value);
+        }
+        case 11: {
+            LogStep(11, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 12: {
+            LogStep(12, "Query Reachable Fabrics");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
+                                 chip::NullOptional);
         }
         }
         return CHIP_NO_ERROR;
@@ -12389,7 +12468,7 @@ class Test_TC_ETHDIAG_1_1Suite : public TestCommand
 {
 public:
     Test_TC_ETHDIAG_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_ETHDIAG_1_1", 10, credsIssuerConfig)
+        TestCommand("Test_TC_ETHDIAG_1_1", 17, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -12454,11 +12533,7 @@ private:
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint64_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
-            }
+            shouldContinue = true;
             break;
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -12470,11 +12545,7 @@ private:
             break;
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint64_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
-            }
+            shouldContinue = true;
             break;
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -12486,11 +12557,7 @@ private:
             break;
         case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<bool> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
+            shouldContinue = true;
             break;
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -12499,6 +12566,46 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
             }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<bool> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
+            }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+            }
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -12538,34 +12645,112 @@ private:
                                  EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id, true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read PacketTxCount attribute constraints");
+            LogStep(4, "Read PacketRxCount value from DUT and verify the number of packets received on ethernet network interface");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 5: {
+            LogStep(5, "Read PacketTxCount attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                  EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read TxErrCount attribute constraints");
+        case 6: {
+            LogStep(6, "Read PacketTxCount value from DUT and verify the number of packets received on ethernet network interface");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7, "Read TxErrCount attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                  EthernetNetworkDiagnostics::Attributes::TxErrCount::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6, "Read CollisionCount attribute constraints");
+        case 8: {
+            LogStep(8,
+                    "Read TxErrCount value from DUT and verify value indicates the number of failed packet transmission on "
+                    "ethernet network interface");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 9: {
+            LogStep(9, "Read CollisionCount attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                  EthernetNetworkDiagnostics::Attributes::CollisionCount::Id, true, chip::NullOptional);
         }
-        case 7: {
-            LogStep(7, "Read OverrunCount attribute constraints");
+        case 10: {
+            LogStep(10,
+                    "Read CollisionCount value from DUT and verify value indicates the number of collision occurred while "
+                    "transmitting packets on ethernet network interface");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 11: {
+            LogStep(11, "Read OverrunCount attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                  EthernetNetworkDiagnostics::Attributes::OverrunCount::Id, true, chip::NullOptional);
         }
-        case 8: {
-            LogStep(8, "Read CarrierDetect attribute constraints");
+        case 12: {
+            LogStep(12,
+                    "Read OverrunCount value from DUT and verify value indicates the number of packets dropped due to lack of "
+                    "buffer memory on ethernet network interface");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 13: {
+            LogStep(13, "Read CarrierDetect attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                  EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, true, chip::NullOptional);
         }
-        case 9: {
-            LogStep(9, "Read TimeSinceReset attribute constraints");
+        case 14: {
+            LogStep(14,
+                    "Read CarrierDetect value from DUT and verify value indicates the presence of carrier detect control signal on "
+                    "ethernet network interface");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 15: {
+            LogStep(15, "Read TimeSinceReset attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                  EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id, true, chip::NullOptional);
+        }
+        case 16: {
+            LogStep(16, "Read TimeSinceReset value from DUT and verify the value indicates the duration of time, in minutes");
+            VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -18731,7 +18916,7 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Put the device into low power mode");
+            LogStep(1, "TH sends Sleep command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::LowPower::Commands::Sleep::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
@@ -21151,11 +21336,13 @@ private:
 class Test_TC_MC_8_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_8_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", 3, credsIssuerConfig)
+    Test_TC_MC_8_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("targetvalue1", 0, UINT8_MAX, &mTargetvalue1);
+        AddArgument("targetvalue2", 0, UINT8_MAX, &mTargetvalue2);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -21170,7 +21357,11 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint8_t> mTargetvalue1;
+    chip::Optional<uint8_t> mTargetvalue2;
     chip::Optional<uint16_t> mTimeout;
+
+    chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> TargetListValues;
 
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
@@ -21202,6 +21393,47 @@ private:
                 chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                TargetListValues = value;
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("currentTarget", value, mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("currentTarget", value, mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2));
             }
             break;
         default:
@@ -21235,6 +21467,45 @@ private:
             LogStep(2, "Reads the TargetList attribute");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Attributes::TargetList::Id,
                                  true, chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "Sends a NavigateTarget command");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
+            value.target = mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
+                               value, chip::NullOptional
+
+            );
+        }
+        case 4: {
+            LogStep(4, "Reads the CurrentTarget attribute");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
+                                 TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Reads the TargetList attribute");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Attributes::TargetList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Sends a NavigateTarget command");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
+            value.target = mTargetvalue2.HasValue() ? mTargetvalue2.Value() : 2;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
+                               value, chip::NullOptional
+
+            );
+        }
+        case 7: {
+            LogStep(7, "Reads the CurrentTarget attribute");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
+                                 TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
         }
         return CHIP_NO_ERROR;
@@ -34802,7 +35073,7 @@ class Test_TC_WIFIDIAG_1_1Suite : public TestCommand
 {
 public:
     Test_TC_WIFIDIAG_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_WIFIDIAG_1_1", 7, credsIssuerConfig)
+        TestCommand("Test_TC_WIFIDIAG_1_1", 14, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -34854,18 +35125,10 @@ private:
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNull("securityType", value));
-            }
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum"));
             }
             break;
-        case 4:
+        case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> value;
@@ -34875,7 +35138,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 5));
             }
             break;
-        case 5:
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -34883,7 +35146,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
-        case 6:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -34891,6 +35154,70 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "int8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, -120));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 0));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint64_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
             }
             break;
         default:
@@ -34921,29 +35248,71 @@ private:
                                  GeneralDiagnostics::Attributes::NetworkInterfaces::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Reads SecurityType attribute from DUT");
+            LogStep(2, "Reads SecurityType attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::SecurityType::Id, true, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Reads SecurityType attribute constraints");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::SecurityType::Id, true, chip::NullOptional);
-        }
-        case 4: {
-            LogStep(4, "Reads WiFiVersion attribute constraints");
+            LogStep(3, "Reads WiFiVersion attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Reads ChannelNumber attribute constraints");
+        case 4: {
+            LogStep(4, "Reads ChannelNumber attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6, "Reads RSSI attribute constraints");
+        case 5: {
+            LogStep(5, "Reads RSSI attribute constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::Rssi::Id, true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Reads BeaconLostCount attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id, true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Reads BeaconRxCount attribute constraints");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id, true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Reads PacketMulticastRxCount attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, true, chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Reads PacketMulticastTxCount attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, true, chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Reads PacketUnicastRxCount attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id, true, chip::NullOptional);
+        }
+        case 11: {
+            LogStep(11, "Reads PacketUnicastTxCount attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id, true, chip::NullOptional);
+        }
+        case 12: {
+            LogStep(12, "Reads CurrentMaxRate attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id, true, chip::NullOptional);
+        }
+        case 13: {
+            LogStep(13, "Reads OverrunCount attribute constraints");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::OverrunCount::Id, true, chip::NullOptional);
         }
         }
         return CHIP_NO_ERROR;
@@ -35311,7 +35680,7 @@ private:
 class Test_TC_WNCV_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_WNCV_2_1", 55, credsIssuerConfig)
+    Test_TC_WNCV_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_WNCV_2_1", 19, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -35359,62 +35728,26 @@ private:
             }
             break;
         case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63));
+            }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::WindowCovering::Type value;
+                uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 250));
+                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63));
             }
             break;
         case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63));
-            }
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 128));
-            }
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint8_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 63));
-            }
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint8_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 128));
-            }
-            break;
-        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::WindowCovering::EndProductType value;
@@ -35424,19 +35757,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 23));
             }
             break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::WindowCovering::EndProductType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 250));
-            }
-            break;
-        case 13:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
@@ -35446,198 +35767,87 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 15));
             }
             break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::Percent100ths> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::Percent100ths> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::Percent100ths> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::Percent100ths> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
+            }
+            break;
         case 14:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("mode", value, 8));
-            }
-            break;
-        case 16:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
-            }
-            break;
-        case 17:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 18:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 20000U));
-            }
-            break;
-        case 19:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
-            }
-            break;
-        case 20:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 21:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 20000U));
-            }
-            break;
-        case 22:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
-            }
-            break;
-        case 23:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 24:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 20000U));
-            }
-            break;
-        case 25:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 10000U));
-            }
-            break;
-        case 26:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 27:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent100ths> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent100ths"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 20000U));
-            }
-            break;
-        case 28:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 29:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 30:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 31:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 32:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 33:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 34:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 35:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 36:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 37:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 38:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 39:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 40:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -35647,19 +35857,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 2047U));
             }
             break;
-        case 41:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 42:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "map16"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 4096U));
-            }
-            break;
-        case 43:
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -35669,10 +35867,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
             }
             break;
-        case 44:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 45:
+        case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -35682,30 +35877,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
             }
             break;
-        case 46:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint16_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 47:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 48:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint16_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65535U));
-            }
-            break;
-        case 49:
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::Percent> value;
@@ -35715,19 +35887,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
             }
             break;
-        case 50:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 51:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 200));
-            }
-            break;
-        case 52:
+        case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::Percent> value;
@@ -35735,18 +35895,6 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "Percent"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 100));
-            }
-            break;
-        case 53:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-            break;
-        case 54:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::Percent> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "Percent"));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, 200));
             }
             break;
         default:
@@ -35777,341 +35925,87 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "3a: write a value into the RO mandatory attribute: Type");
-            ListFreer listFreer;
-            chip::app::Clusters::WindowCovering::Type value;
-            value = static_cast<chip::app::Clusters::WindowCovering::Type>(250);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Type::Id, value,
-                                  chip::NullOptional, chip::NullOptional);
+            LogStep(2, "2: read the RO mandatory attribute default: ConfigStatus");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id,
+                                 true, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "3b: reads back the RO mandatory attribute: Type");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Type::Id, true,
-                                 chip::NullOptional);
+            LogStep(3, "2: read the RO mandatory attribute default: OperationalStatus");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::OperationalStatus::Id, true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "2: read the RO mandatory attribute default: ConfigStatus");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id,
+            LogStep(4, "2: read the RO mandatory attribute default: EndProductType");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::EndProductType::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
-            LogStep(5, "3a: write a value into the RO mandatory attribute: ConfigStatus");
-            ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>>(128);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id,
-                                  value, chip::NullOptional, chip::NullOptional);
+            LogStep(5, "2: read the RW mandatory attribute default: Mode");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, true,
+                                 chip::NullOptional);
         }
         case 6: {
-            LogStep(6, "3b: reads back the RO mandatory attribute: ConfigStatus");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id,
-                                 true, chip::NullOptional);
+            LogStep(6, "2: read the RO optional attribute default: TargetPositionLiftPercent100ths");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id, true, chip::NullOptional);
         }
         case 7: {
-            LogStep(7, "2: read the RO mandatory attribute default: OperationalStatus");
+            LogStep(7, "2: read the RO optional attribute default: TargetPositionTiltPercent100ths");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::OperationalStatus::Id, true, chip::NullOptional);
+                                 WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, true, chip::NullOptional);
         }
         case 8: {
-            LogStep(8, "3a: write a value into the RO mandatory attribute: OperationalStatus");
-            ListFreer listFreer;
-            uint8_t value;
-            value = 128;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::OperationalStatus::Id, value, chip::NullOptional, chip::NullOptional);
+            LogStep(8, "2: read the RO optional attribute default: CurrentPositionLiftPercent100ths");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id, true, chip::NullOptional);
         }
         case 9: {
-            LogStep(9, "3b: reads back the RO mandatory attribute: OperationalStatus");
+            LogStep(9, "2: read the RO optional attribute default: CurrentPositionTiltPercent100ths");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::OperationalStatus::Id, true, chip::NullOptional);
+                                 WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id, true, chip::NullOptional);
         }
         case 10: {
-            LogStep(10, "2: read the RO mandatory attribute default: EndProductType");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::EndProductType::Id,
-                                 true, chip::NullOptional);
+            LogStep(10, "2: read the RO optional attribute default: InstalledOpenLimitLift");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::InstalledOpenLimitLift::Id, true, chip::NullOptional);
         }
         case 11: {
-            LogStep(11, "3a: write a value into the RO mandatory attribute: EndProductType");
-            ListFreer listFreer;
-            chip::app::Clusters::WindowCovering::EndProductType value;
-            value = static_cast<chip::app::Clusters::WindowCovering::EndProductType>(250);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::EndProductType::Id, value, chip::NullOptional, chip::NullOptional);
+            LogStep(11, "2: read the RO optional attribute default: InstalledClosedLimitLift");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::InstalledClosedLimitLift::Id, true, chip::NullOptional);
         }
         case 12: {
-            LogStep(12, "3b: reads back the RO mandatory attribute: EndProductType");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::EndProductType::Id,
-                                 true, chip::NullOptional);
+            LogStep(12, "2: read the RO optional attribute default: InstalledOpenLimitTilt");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::InstalledOpenLimitTilt::Id, true, chip::NullOptional);
         }
         case 13: {
-            LogStep(13, "2: read the RW mandatory attribute default: Mode");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, true,
-                                 chip::NullOptional);
+            LogStep(13, "2: read the RO optional attribute default: InstalledClosedLimitTilt");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::InstalledClosedLimitTilt::Id, true, chip::NullOptional);
         }
         case 14: {
-            LogStep(14, "3a: write a value into the RW mandatory attribute:: Mode");
-            ListFreer listFreer;
-            chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
-            value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(8);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
-                                  chip::NullOptional, chip::NullOptional);
+            LogStep(14, "4: read the RO mandatory attribute default: SafetyStatus");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::SafetyStatus::Id,
+                                 true, chip::NullOptional);
         }
         case 15: {
-            LogStep(15, "3b: reads back the RW mandatory attribute: Mode");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, true,
-                                 chip::NullOptional);
+            LogStep(15, "4: read the RO optional attribute default: CurrentPositionLift");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::CurrentPositionLift::Id, true, chip::NullOptional);
         }
         case 16: {
-            LogStep(16, "2: read the RO optional attribute default: TargetPositionLiftPercent100ths");
+            LogStep(16, "4: read the RO optional attribute default: CurrentPositionTilt");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id, true, chip::NullOptional);
+                                 WindowCovering::Attributes::CurrentPositionTilt::Id, true, chip::NullOptional);
         }
         case 17: {
-            LogStep(17, "3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::Percent100ths> value;
-            value.SetNonNull();
-            value.Value() = 20000U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
+            LogStep(17, "4: read the RO optional attribute default: CurrentPositionLiftPercentage");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
+                                 WindowCovering::Attributes::CurrentPositionLiftPercentage::Id, true, chip::NullOptional);
         }
         case 18: {
-            LogStep(18, "3b: reads back the RO optional attribute: TargetPositionLiftPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 19: {
-            LogStep(19, "2: read the RO optional attribute default: TargetPositionTiltPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 20: {
-            LogStep(20, "3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::Percent100ths> value;
-            value.SetNonNull();
-            value.Value() = 20000U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 21: {
-            LogStep(21, "3b: reads back the RO optional attribute: TargetPositionTiltPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 22: {
-            LogStep(22, "2: read the RO optional attribute default: CurrentPositionLiftPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 23: {
-            LogStep(23, "3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::Percent100ths> value;
-            value.SetNonNull();
-            value.Value() = 20000U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 24: {
-            LogStep(24, "3b: reads back the RO optional attribute: CurrentPositionLiftPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 25: {
-            LogStep(25, "2: read the RO optional attribute default: CurrentPositionTiltPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 26: {
-            LogStep(26, "3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::Percent100ths> value;
-            value.SetNonNull();
-            value.Value() = 20000U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 27: {
-            LogStep(27, "3b: reads back the RO optional attribute: CurrentPositionTiltPercent100ths");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id, true, chip::NullOptional);
-        }
-        case 28: {
-            LogStep(28, "2: read the RO optional attribute default: InstalledOpenLimitLift");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledOpenLimitLift::Id, true, chip::NullOptional);
-        }
-        case 29: {
-            LogStep(29, "3a: write a value into the RO optional attribute: InstalledOpenLimitLift");
-            ListFreer listFreer;
-            uint16_t value;
-            value = 255U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::InstalledOpenLimitLift::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 30: {
-            LogStep(30, "3b: reads back the RO optional attribute: InstalledOpenLimitLift");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledOpenLimitLift::Id, true, chip::NullOptional);
-        }
-        case 31: {
-            LogStep(31, "2: read the RO optional attribute default: InstalledClosedLimitLift");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledClosedLimitLift::Id, true, chip::NullOptional);
-        }
-        case 32: {
-            LogStep(32, "3a: write a value into the RO optional attribute: InstalledClosedLimitLift");
-            ListFreer listFreer;
-            uint16_t value;
-            value = 255U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::InstalledClosedLimitLift::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 33: {
-            LogStep(33, "3b: reads back the RO optional attribute: InstalledClosedLimitLift");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledClosedLimitLift::Id, true, chip::NullOptional);
-        }
-        case 34: {
-            LogStep(34, "2: read the RO optional attribute default: InstalledOpenLimitTilt");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledOpenLimitTilt::Id, true, chip::NullOptional);
-        }
-        case 35: {
-            LogStep(35, "3a: write a value into the RO optional attribute: InstalledOpenLimitTilt");
-            ListFreer listFreer;
-            uint16_t value;
-            value = 255U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::InstalledOpenLimitTilt::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 36: {
-            LogStep(36, "3b: reads back the RO optional attribute: InstalledOpenLimitTilt");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledOpenLimitTilt::Id, true, chip::NullOptional);
-        }
-        case 37: {
-            LogStep(37, "2: read the RO optional attribute default: InstalledClosedLimitTilt");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledClosedLimitTilt::Id, true, chip::NullOptional);
-        }
-        case 38: {
-            LogStep(38, "3a: write a value into the RO optional attribute: InstalledClosedLimitTilt");
-            ListFreer listFreer;
-            uint16_t value;
-            value = 255U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::InstalledClosedLimitTilt::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 39: {
-            LogStep(39, "3b: reads back the RO optional attribute: InstalledClosedLimitTilt");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::InstalledClosedLimitTilt::Id, true, chip::NullOptional);
-        }
-        case 40: {
-            LogStep(40, "4: read the RO mandatory attribute default: SafetyStatus");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::SafetyStatus::Id,
-                                 true, chip::NullOptional);
-        }
-        case 41: {
-            LogStep(41, "5a: write a value into the RO mandatory attribute: SafetyStatus");
-            ListFreer listFreer;
-            uint16_t value;
-            value = 4096U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::SafetyStatus::Id,
-                                  value, chip::NullOptional, chip::NullOptional);
-        }
-        case 42: {
-            LogStep(42, "5b: reads back the RO mandatory attribute: SafetyStatus");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::SafetyStatus::Id,
-                                 true, chip::NullOptional);
-        }
-        case 43: {
-            LogStep(43, "4: read the RO optional attribute default: CurrentPositionLift");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionLift::Id, true, chip::NullOptional);
-        }
-        case 44: {
-            LogStep(44, "5a: write a value into the RO optional attribute: CurrentPositionLift");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<uint16_t> value;
-            value.SetNonNull();
-            value.Value() = 255U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::CurrentPositionLift::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 45: {
-            LogStep(45, "5b: reads back the RO optional attribute: CurrentPositionLift");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionLift::Id, true, chip::NullOptional);
-        }
-        case 46: {
-            LogStep(46, "4: read the RO optional attribute default: CurrentPositionTilt");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionTilt::Id, true, chip::NullOptional);
-        }
-        case 47: {
-            LogStep(47, "5a: write a value into the RO optional attribute: CurrentPositionTilt");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<uint16_t> value;
-            value.SetNonNull();
-            value.Value() = 255U;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::CurrentPositionTilt::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 48: {
-            LogStep(48, "5b: reads back the RO optional attribute: CurrentPositionTilt");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionTilt::Id, true, chip::NullOptional);
-        }
-        case 49: {
-            LogStep(49, "4: read the RO optional attribute default: CurrentPositionLiftPercentage");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionLiftPercentage::Id, true, chip::NullOptional);
-        }
-        case 50: {
-            LogStep(50, "5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::Percent> value;
-            value.SetNonNull();
-            value.Value() = 200;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::CurrentPositionLiftPercentage::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 51: {
-            LogStep(51, "5b: reads back the RO optional attribute: CurrentPositionLiftPercentage");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionLiftPercentage::Id, true, chip::NullOptional);
-        }
-        case 52: {
-            LogStep(52, "4: read the RO optional attribute default: CurrentPositionTiltPercentage");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                 WindowCovering::Attributes::CurrentPositionTiltPercentage::Id, true, chip::NullOptional);
-        }
-        case 53: {
-            LogStep(53, "5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage");
-            ListFreer listFreer;
-            chip::app::DataModel::Nullable<chip::Percent> value;
-            value.SetNonNull();
-            value.Value() = 200;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
-                                  WindowCovering::Attributes::CurrentPositionTiltPercentage::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 54: {
-            LogStep(54, "5b: reads back the RO optional attribute: CurrentPositionTiltPercentage");
+            LogStep(18, "4: read the RO optional attribute default: CurrentPositionTiltPercentage");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
                                  WindowCovering::Attributes::CurrentPositionTiltPercentage::Id, true, chip::NullOptional);
         }
