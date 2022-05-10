@@ -41,22 +41,6 @@ tests:
               minValue: 0
               maxValue: 9
 
-    - label: "3a: write a value into the RO mandatory attribute: Type"
-      command: "writeAttribute"
-      attribute: "Type"
-      arguments:
-          value: 250
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: Type"
-      command: "readAttribute"
-      attribute: "Type"
-      response:
-          constraints:
-              type: enum8
-              notValue: 250
-
     ### Attribute[  7]: ConfigStatus  ===============================
     - label: "2: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
@@ -66,22 +50,6 @@ tests:
               type: map8
               minValue: 0
               maxValue: 63
-
-    - label: "3a: write a value into the RO mandatory attribute: ConfigStatus"
-      command: "writeAttribute"
-      attribute: "ConfigStatus"
-      arguments:
-          value: 128
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: ConfigStatus"
-      command: "readAttribute"
-      attribute: "ConfigStatus"
-      response:
-          constraints:
-              type: map8
-              notValue: 128
 
     ### Attribute[ 10]: OperationalStatus  ==========================
     - label: "2: read the RO mandatory attribute default: OperationalStatus"
@@ -93,23 +61,6 @@ tests:
               minValue: 0
               maxValue: 63
 
-    - label:
-          "3a: write a value into the RO mandatory attribute: OperationalStatus"
-      command: "writeAttribute"
-      attribute: "OperationalStatus"
-      arguments:
-          value: 128
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: OperationalStatus"
-      command: "readAttribute"
-      attribute: "OperationalStatus"
-      response:
-          constraints:
-              type: map8
-              notValue: 128
-
     ### Attribute[ 13]: EndProductType ==============================
     - label: "2: read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
@@ -120,22 +71,6 @@ tests:
               minValue: 0
               maxValue: 23
 
-    - label: "3a: write a value into the RO mandatory attribute: EndProductType"
-      command: "writeAttribute"
-      attribute: "EndProductType"
-      arguments:
-          value: 250
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO mandatory attribute: EndProductType"
-      command: "readAttribute"
-      attribute: "EndProductType"
-      response:
-          constraints:
-              type: enum8
-              notValue: 250
-
     ### Attribute[ 23]: Mode ========================================
     - label: "2: read the RW mandatory attribute default: Mode"
       command: "readAttribute"
@@ -145,18 +80,6 @@ tests:
               type: map8
               minValue: 0
               maxValue: 15
-
-    - label: "3a: write a value into the RW mandatory attribute:: Mode"
-      command: "writeAttribute"
-      attribute: "Mode"
-      arguments:
-          value: 8
-
-    - label: "3b: reads back the RW mandatory attribute: Mode"
-      command: "readAttribute"
-      attribute: "Mode"
-      response:
-          value: 8
 
     ### CONDITIONALLY MANDATORY Attributes
     ### Attribute[ 11]: TargetPositionLiftPercent100ths  ====================
@@ -171,26 +94,6 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          TargetPositionLiftPercent100ths"
-      command: "writeAttribute"
-      attribute: "TargetPositionLiftPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          TargetPositionLiftPercent100ths"
-      command: "readAttribute"
-      attribute: "TargetPositionLiftPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
-
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
     - label:
           "2: read the RO optional attribute default:
@@ -202,26 +105,6 @@ tests:
               type: Percent100ths
               minValue: 0
               maxValue: 10000
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          TargetPositionTiltPercent100ths"
-      command: "writeAttribute"
-      attribute: "TargetPositionTiltPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          TargetPositionTiltPercent100ths"
-      command: "readAttribute"
-      attribute: "TargetPositionTiltPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
     - label:
@@ -235,26 +118,6 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          CurrentPositionLiftPercent100ths"
-      command: "writeAttribute"
-      attribute: "CurrentPositionLiftPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          CurrentPositionLiftPercent100ths"
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
-
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
     - label:
           "2: read the RO optional attribute default:
@@ -267,47 +130,8 @@ tests:
               minValue: 0
               maxValue: 10000
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          CurrentPositionTiltPercent100ths"
-      command: "writeAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
-      arguments:
-          value: 20000
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute:
-          CurrentPositionTiltPercent100ths"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercent100ths"
-      response:
-          constraints:
-              type: Percent100ths
-              notValue: 20000
-
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
     - label: "2: read the RO optional attribute default: InstalledOpenLimitLift"
-      command: "readAttribute"
-      attribute: "InstalledOpenLimitLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledOpenLimitLift"
-      command: "writeAttribute"
-      attribute: "InstalledOpenLimitLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO optional attribute: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
       response:
@@ -327,47 +151,8 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledClosedLimitLift"
-      command: "writeAttribute"
-      attribute: "InstalledClosedLimitLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute: InstalledClosedLimitLift"
-      command: "readAttribute"
-      attribute: "InstalledClosedLimitLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     ### Attribute[ 18]: InstalledOpenLimitTilt  ====================
     - label: "2: read the RO optional attribute default: InstalledOpenLimitTilt"
-      command: "readAttribute"
-      attribute: "InstalledOpenLimitTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledOpenLimitTilt"
-      command: "writeAttribute"
-      attribute: "InstalledOpenLimitTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "3b: reads back the RO optional attribute: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
       response:
@@ -387,26 +172,6 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label:
-          "3a: write a value into the RO optional attribute:
-          InstalledClosedLimitTilt"
-      command: "writeAttribute"
-      attribute: "InstalledClosedLimitTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "3b: reads back the RO optional attribute: InstalledClosedLimitTilt"
-      command: "readAttribute"
-      attribute: "InstalledClosedLimitTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     ### CONDITIONALLY and PURELY OPTIONAL Attributes
     ### Attribute[ 26]: SafetyStatus  ==========================
     - label: "4: read the RO mandatory attribute default: SafetyStatus"
@@ -418,46 +183,9 @@ tests:
               minValue: 0
               maxValue: 2047
 
-    - label: "5a: write a value into the RO mandatory attribute: SafetyStatus"
-      command: "writeAttribute"
-      attribute: "SafetyStatus"
-      arguments:
-          value: 4096
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO mandatory attribute: SafetyStatus"
-      command: "readAttribute"
-      attribute: "SafetyStatus"
-      response:
-          constraints:
-              type: map16
-              notValue: 4096
-
     ### Attribute[  1]: PhysicalClosedLimitLift  ====================
     - label:
           "4: read the RO optional attribute default: PhysicalClosedLimitLift"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalClosedLimitLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          PhysicalClosedLimitLift"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalClosedLimitLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitLift"
       disabled: true
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
@@ -479,27 +207,6 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label:
-          "5a: write a value into the RO optional attribute:
-          PhysicalClosedLimitTilt"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "PhysicalClosedLimitTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitTilt"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PhysicalClosedLimitTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     ### Attribute[  3]: CurrentPositionLift  ====================
     - label: "4: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
@@ -510,44 +217,8 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label:
-          "5a: write a value into the RO optional attribute: CurrentPositionLift"
-      command: "writeAttribute"
-      attribute: "CurrentPositionLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: CurrentPositionLift"
-      command: "readAttribute"
-      attribute: "CurrentPositionLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     ### Attribute[  4]: CurrentPositionTilt  ====================
     - label: "4: read the RO optional attribute default: CurrentPositionTilt"
-      command: "readAttribute"
-      attribute: "CurrentPositionTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "5a: write a value into the RO optional attribute: CurrentPositionTilt"
-      command: "writeAttribute"
-      attribute: "CurrentPositionTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
       response:
@@ -567,50 +238,8 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label:
-          "5a: write a value into the RO optional attribute:
-          NumberOfActuationsLift"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "NumberOfActuationsLift"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: NumberOfActuationsLift"
-      disabled: true
-      command: "readAttribute"
-      attribute: "NumberOfActuationsLift"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
     ### Attribute[  6]: NumberOfActuationsTilt  ====================
     - label: "4: read the RO optional attribute default: NumberOfActuationsTilt"
-      disabled: true
-      command: "readAttribute"
-      attribute: "NumberOfActuationsTilt"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65535
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          NumberOfActuationsTilt"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "NumberOfActuationsTilt"
-      arguments:
-          value: 255
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "5b: reads back the RO optional attribute: NumberOfActuationsTilt"
       disabled: true
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
@@ -632,26 +261,6 @@ tests:
               minValue: 0
               maxValue: 100
 
-    - label:
-          "5a: write a value into the RO optional attribute:
-          CurrentPositionLiftPercentage"
-      command: "writeAttribute"
-      attribute: "CurrentPositionLiftPercentage"
-      arguments:
-          value: 200
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "5b: reads back the RO optional attribute:
-          CurrentPositionLiftPercentage"
-      command: "readAttribute"
-      attribute: "CurrentPositionLiftPercentage"
-      response:
-          constraints:
-              type: Percent
-              notValue: 200
-
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
     - label:
           "4: read the RO optional attribute default:
@@ -663,26 +272,6 @@ tests:
               type: Percent
               minValue: 0
               maxValue: 100
-
-    - label:
-          "5a: write a value into the RO optional attribute:
-          CurrentPositionTiltPercentage"
-      command: "writeAttribute"
-      attribute: "CurrentPositionTiltPercentage"
-      arguments:
-          value: 200
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label:
-          "5b: reads back the RO optional attribute:
-          CurrentPositionTiltPercentage"
-      command: "readAttribute"
-      attribute: "CurrentPositionTiltPercentage"
-      response:
-          constraints:
-              type: Percent
-              notValue: 200
     ###################################################
     # FYI Non Tested deprecated attributes
     # 20 VelocityLift
