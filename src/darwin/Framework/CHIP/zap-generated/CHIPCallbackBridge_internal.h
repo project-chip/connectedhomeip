@@ -615,21 +615,18 @@ typedef void (*AccessControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AccessControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AccessControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*AccountLoginGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AccountLoginAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AccountLoginAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AccountLoginFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*AdministratorCommissioningGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AdministratorCommissioningAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AdministratorCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AdministratorCommissioningFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ApplicationBasicApplicationStructAttributeCallback)(
     void *, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &);
 typedef void (*ApplicationBasicAllowedVendorListListAttributeCallback)(
@@ -640,7 +637,6 @@ typedef void (*ApplicationBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ApplicationBasicAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ApplicationBasicFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ApplicationLauncherCatalogListListAttributeCallback)(void * context,
                                                                     const chip::app::DataModel::DecodableList<uint16_t> & data);
 typedef void (*ApplicationLauncherCurrentAppStructAttributeCallback)(
@@ -652,7 +648,6 @@ typedef void (*ApplicationLauncherAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ApplicationLauncherAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ApplicationLauncherFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*AudioOutputOutputListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & data);
@@ -662,16 +657,12 @@ typedef void (*AudioOutputAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AudioOutputAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*AudioOutputFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*BarrierControlBarrierSafetyStatusAttributeCallback)(void *, uint16_t);
-typedef void (*BarrierControlBarrierCapabilitiesAttributeCallback)(void *, uint8_t);
 typedef void (*BarrierControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BarrierControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BarrierControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BarrierControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
     void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
 typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
@@ -680,15 +671,12 @@ typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BasicAttributeListListAttributeCallback)(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BasicFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*BinaryInputBasicStatusFlagsAttributeCallback)(void *, uint8_t);
 typedef void (*BinaryInputBasicGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BinaryInputBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BinaryInputBasicAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BinaryInputBasicFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*BindingBindingListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
@@ -698,14 +686,12 @@ typedef void (*BindingAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BindingAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BindingFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*BooleanStateGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BooleanStateAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BooleanStateAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BooleanStateFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*BridgedActionsActionListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & data);
@@ -719,14 +705,12 @@ typedef void (*BridgedActionsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BridgedActionsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedActionsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*BridgedDeviceBasicGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BridgedDeviceBasicAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BridgedDeviceBasicAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BridgedDeviceBasicFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ChannelChannelListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & data);
@@ -740,26 +724,20 @@ typedef void (*ChannelAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ChannelAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ChannelFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*ColorControlColorControlOptionsAttributeCallback)(void *, uint8_t);
-typedef void (*ColorControlColorCapabilitiesAttributeCallback)(void *, uint16_t);
 typedef void (*ColorControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ColorControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ColorControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ContentLauncherAcceptHeaderListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
-typedef void (*ContentLauncherSupportedStreamingProtocolsAttributeCallback)(void *, uint32_t);
 typedef void (*ContentLauncherGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ContentLauncherAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ContentLauncherAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ContentLauncherFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*DescriptorDeviceListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & data);
@@ -775,14 +753,12 @@ typedef void (*DescriptorAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DescriptorAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DescriptorFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*DiagnosticLogsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DiagnosticLogsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DiagnosticLogsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DiagnosticLogsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*DoorLockCredentialRulesSupportAttributeCallback)(
     void *, chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>);
 typedef void (*DoorLockSupportedOperatingModesAttributeCallback)(
@@ -812,35 +788,24 @@ typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAttributeListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DoorLockFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*ElectricalMeasurementMeasurementTypeAttributeCallback)(void *, uint32_t);
-typedef void (*ElectricalMeasurementOverloadAlarmsMaskAttributeCallback)(void *, uint8_t);
-typedef void (*ElectricalMeasurementAcOverloadAlarmsMaskAttributeCallback)(void *, uint16_t);
 typedef void (*ElectricalMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ElectricalMeasurementFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*EthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*EthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*EthernetNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*EthernetNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*FanControlRockSupportAttributeCallback)(void *, uint8_t);
-typedef void (*FanControlRockSettingAttributeCallback)(void *, uint8_t);
-typedef void (*FanControlWindSupportAttributeCallback)(void *, uint8_t);
-typedef void (*FanControlWindSettingAttributeCallback)(void *, uint8_t);
 typedef void (*FanControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*FanControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*FanControlAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FanControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*FixedLabelLabelListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & data);
@@ -850,14 +815,12 @@ typedef void (*FixedLabelAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*FixedLabelAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FixedLabelFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*FlowMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*FlowMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*FlowMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*FlowMeasurementFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*GeneralCommissioningBasicCommissioningInfoStructAttributeCallback)(
     void *, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType &);
 typedef void (*GeneralCommissioningGeneratedCommandListListAttributeCallback)(
@@ -866,7 +829,6 @@ typedef void (*GeneralCommissioningAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*GeneralCommissioningFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -883,7 +845,6 @@ typedef void (*GeneralDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*GeneralDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*GroupKeyManagementGroupKeyMapListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
@@ -898,44 +859,36 @@ typedef void (*GroupKeyManagementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GroupKeyManagementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*GroupKeyManagementFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*GroupsNameSupportAttributeCallback)(void *, uint8_t);
 typedef void (*GroupsGeneratedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GroupsAcceptedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GroupsAttributeListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*GroupsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*IdentifyGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IdentifyAcceptedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IdentifyAttributeListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*IdentifyFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*IlluminanceMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IlluminanceMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IlluminanceMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*IlluminanceMeasurementFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*KeypadInputGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*KeypadInputAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*KeypadInputAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*KeypadInputFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*LevelControlOptionsAttributeCallback)(void *, uint8_t);
 typedef void (*LevelControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LevelControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LevelControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LevelControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*LocalizationConfigurationSupportedLocalesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*LocalizationConfigurationGeneratedCommandListListAttributeCallback)(
@@ -944,14 +897,12 @@ typedef void (*LocalizationConfigurationAcceptedCommandListListAttributeCallback
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LocalizationConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LocalizationConfigurationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*LowPowerGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LowPowerAcceptedCommandListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LowPowerAttributeListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LowPowerFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*MediaInputInputListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & data);
@@ -961,7 +912,6 @@ typedef void (*MediaInputAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MediaInputAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*MediaInputFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*MediaPlaybackSampledPositionStructAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> &);
 typedef void (*MediaPlaybackGeneratedCommandListListAttributeCallback)(
@@ -970,7 +920,6 @@ typedef void (*MediaPlaybackAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MediaPlaybackAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*MediaPlaybackFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
@@ -980,7 +929,6 @@ typedef void (*ModeSelectAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ModeSelectFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
@@ -991,14 +939,12 @@ typedef void (*NetworkCommissioningAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*NetworkCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*NetworkCommissioningFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*OtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OtaSoftwareUpdateProviderFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -1009,30 +955,24 @@ typedef void (*OtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbac
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OtaSoftwareUpdateRequestorAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OtaSoftwareUpdateRequestorFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*OccupancySensingOccupancyAttributeCallback)(void *, uint8_t);
-typedef void (*OccupancySensingOccupancySensorTypeBitmapAttributeCallback)(void *, uint8_t);
 typedef void (*OccupancySensingGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OccupancySensingAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OccupancySensingAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OccupancySensingFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*OnOffGeneratedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffAcceptedCommandListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffAttributeListListAttributeCallback)(void * context,
                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OnOffFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*OnOffSwitchConfigurationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffSwitchConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OnOffSwitchConfigurationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
@@ -1049,7 +989,6 @@ typedef void (*OperationalCredentialsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OperationalCredentialsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OperationalCredentialsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*PowerSourceActiveWiredFaultsListAttributeCallback)(void * context,
                                                                   const chip::app::DataModel::DecodableList<uint8_t> & data);
 typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context,
@@ -1062,7 +1001,6 @@ typedef void (*PowerSourceAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PowerSourceAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PowerSourceFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*PowerSourceConfigurationSourcesListAttributeCallback)(void * context,
                                                                      const chip::app::DataModel::DecodableList<uint8_t> & data);
 typedef void (*PowerSourceConfigurationGeneratedCommandListListAttributeCallback)(
@@ -1071,38 +1009,30 @@ typedef void (*PowerSourceConfigurationAcceptedCommandListListAttributeCallback)
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PowerSourceConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PowerSourceConfigurationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*PressureMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PressureMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PressureMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PressureMeasurementFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*PumpConfigurationAndControlPumpStatusAttributeCallback)(void *, uint16_t);
-typedef void (*PumpConfigurationAndControlAlarmMaskAttributeCallback)(void *, uint16_t);
 typedef void (*PumpConfigurationAndControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PumpConfigurationAndControlFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*RelativeHumidityMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*RelativeHumidityMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*RelativeHumidityMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*RelativeHumidityMeasurementFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*ScenesNameSupportAttributeCallback)(void *, uint8_t);
 typedef void (*ScenesGeneratedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ScenesAcceptedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ScenesFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
@@ -1113,14 +1043,12 @@ typedef void (*SoftwareDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*SoftwareDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*SoftwareDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*SwitchGeneratedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*SwitchAcceptedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*SwitchAttributeListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*SwitchFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*TargetNavigatorTargetListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & data);
@@ -1130,14 +1058,12 @@ typedef void (*TargetNavigatorAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TargetNavigatorAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TargetNavigatorFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*TemperatureMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TemperatureMeasurementFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*TestClusterBitmap8AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>);
 typedef void (*TestClusterBitmap16AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>);
 typedef void (*TestClusterBitmap32AttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>);
@@ -1177,28 +1103,18 @@ typedef void (*TestClusterAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TestClusterFeatureMapAttributeCallback)(void *, uint32_t);
-typedef void (*ThermostatOccupancyAttributeCallback)(void *, uint8_t);
-typedef void (*ThermostatHvacSystemTypeConfigurationAttributeCallback)(void *, uint8_t);
-typedef void (*ThermostatRemoteSensingAttributeCallback)(void *, uint8_t);
-typedef void (*ThermostatAlarmMaskAttributeCallback)(void *, uint8_t);
-typedef void (*ThermostatThermostatProgrammingOperationModeAttributeCallback)(void *, uint8_t);
-typedef void (*ThermostatThermostatRunningStateAttributeCallback)(void *, uint16_t);
-typedef void (*ThermostatAcErrorCodeAttributeCallback)(void *, uint32_t);
 typedef void (*ThermostatGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThermostatFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatUserInterfaceConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThermostatUserInterfaceConfigurationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -1223,7 +1139,6 @@ typedef void (*ThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallback)
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThreadNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThreadNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*TimeFormatLocalizationSupportedCalendarTypesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & data);
 typedef void (*TimeFormatLocalizationGeneratedCommandListListAttributeCallback)(
@@ -1232,14 +1147,12 @@ typedef void (*TimeFormatLocalizationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TimeFormatLocalizationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TimeFormatLocalizationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*UnitLocalizationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*UnitLocalizationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*UnitLocalizationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*UnitLocalizationFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*UserLabelLabelListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & data);
@@ -1249,33 +1162,27 @@ typedef void (*UserLabelAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*UserLabelAttributeListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*UserLabelFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*WakeOnLanGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WakeOnLanAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WakeOnLanAttributeListListAttributeCallback)(void * context,
                                                             const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WakeOnLanFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*WiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WiFiNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WiFiNetworkDiagnosticsFeatureMapAttributeCallback)(void *, uint32_t);
 typedef void (*WindowCoveringConfigStatusAttributeCallback)(void *,
                                                             chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>);
-typedef void (*WindowCoveringOperationalStatusAttributeCallback)(void *, uint8_t);
 typedef void (*WindowCoveringModeAttributeCallback)(void *, chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>);
-typedef void (*WindowCoveringSafetyStatusAttributeCallback)(void *, uint16_t);
 typedef void (*WindowCoveringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WindowCoveringAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WindowCoveringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WindowCoveringFeatureMapAttributeCallback)(void *, uint32_t);
 
 class CHIPDefaultSuccessCallbackBridge : public CHIPCallbackBridge<DefaultSuccessCallback>
 {
