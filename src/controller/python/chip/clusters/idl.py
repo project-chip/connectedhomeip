@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+from distutils.log import error
 from multiprocessing.sharedctypes import Value
 import os
 
@@ -38,9 +39,9 @@ def CreateParser():
 
 def _convert_idl_types(idl_type: str, namespace_types: typing.Mapping[str, type] = None, namespace_enums: typing.Mapping[str, type] = None) -> type:
     idl_type_upper = idl_type.upper()
-    if idl_type_upper in ['INT8S', 'INT16S', 'INT24S', 'INT32S', 'INT48S', 'INT56S', 'INT64S']:
+    if idl_type_upper in ['INT8S', 'INT16S', 'INT24S', 'INT32S', 'INT40S', 'INT48S', 'INT56S', 'INT64S']:
         return int
-    elif idl_type_upper in ['INT8U', 'INT16U', 'INT24U', 'INT32U', 'INT48U', 'INT56U', 'INT64U']:
+    elif idl_type_upper in ['INT8U', 'INT16U', 'INT24U', 'INT32U', 'INT40U', 'INT48U', 'INT56U', 'INT64U']:
         return tlv.uint
     elif idl_type_upper == 'BOOLEAN':
         return bool
@@ -52,7 +53,7 @@ def _convert_idl_types(idl_type: str, namespace_types: typing.Mapping[str, type]
         return bytes
     elif idl_type_upper in ['BITMAP8', 'BITMAP16', 'BITMAP32', 'BITMAP64', 'ENUM8', 'ENUM16', 'ENUM32', 'ENUM64']:
         return tlv.uint
-    elif idl_type_upper in ['FABRIC_IDX', 'FABRIC_ID', 'NODE_ID', 'VENDOR_ID', 'GROUP_ID', 'EPOCH_S', 'EPOCH_US', 'DEVTYPE_ID', 'CLUSTER_ID', 'ENDPOINT_NO', 'PERCENT', 'PERCENT100THS']:
+    elif idl_type_upper in ['FABRIC_IDX', 'FABRIC_ID', 'NODE_ID', 'ATTRIB_ID', 'COMMAND_ID', 'VENDOR_ID', 'GROUP_ID', 'EPOCH_S', 'EPOCH_US', 'DEVTYPE_ID', 'CLUSTER_ID', 'ENDPOINT_NO', 'PERCENT', 'PERCENT100THS']:
         return tlv.uint
     else:
         namespace_type = namespace_types.get(idl_type, None)
@@ -98,18 +99,19 @@ def _make_structs_descriptor(cluster: matter_idl_types.Cluster, struct: matter_i
     ]
 
 
-def _make_struct_class(cluster: matter_idl_types.Cluster, struct: matter_idl_types.Struct, namespace_types: typing.Mapping[str, type]):
-    struct_fields = _make_structs_descriptor(cluster, struct, namespace_types=namespace_types)
-    res = dataclasses.make_dataclass(cls_name=struct.name, fields=[
-        (f.Label, f.Type, None) for f in struct_fields], bases=(ClusterObjects.ClusterObject, ))
-    res.descriptor = ClusterObjects.ClusterObjectDescriptor(Fields=struct_fields)
+def _make_cluster_object_class(name: str, fields: typing.List[ClusterObjects.ClusterObjectFieldDescriptor], base_classes: typing.Tuple[type] = (ClusterObjects.ClusterObject, )):
+    res = dataclasses.make_dataclass(cls_name=name, fields=[(f.Label, f.Type, None) for f in fields], bases=base_classes)
+    res.descriptor = ClusterObjects.ClusterObjectDescriptor(Fields=fields)
     return res
 
 
+def _make_struct_class(cluster: matter_idl_types.Cluster, struct: matter_idl_types.Struct, namespace_types: typing.Mapping[str, type], base_classes: typing.Tuple[type] = (ClusterObjects.ClusterObject, )):
+    struct_fields = _make_structs_descriptor(cluster, struct, namespace_types=namespace_types)
+    return _make_cluster_object_class(name=struct.name, fields=struct_fields, base_classes=base_classes)
+
+
 def _make_request_command_class(cluster: matter_idl_types.Cluster, command: matter_idl_types.Command, fields: typing.List[ClusterObjects.ClusterObjectFieldDescriptor]):
-    res = dataclasses.make_dataclass(cls_name=command.name, fields=[
-        (f.Label, f.Type) for f in fields], bases=(ClusterObjects.ClusterCommand, ))
-    res.descriptor = ClusterObjects.ClusterObjectDescriptor(Fields=fields)
+    res = _make_cluster_object_class(name=command.name, fields=fields, base_classes=(ClusterObjects.ClusterCommand,))
     res.cluster_id = cluster.code
     res.command_id = command.code
     if command.is_timed_invoke:
@@ -119,9 +121,7 @@ def _make_request_command_class(cluster: matter_idl_types.Cluster, command: matt
 
 
 def _make_response_command_class(cluster: matter_idl_types.Cluster, struct: matter_idl_types.Struct, fields: typing.List[ClusterObjects.ClusterObjectFieldDescriptor]):
-    res = dataclasses.make_dataclass(cls_name=struct.name, fields=[
-        (f.Label, f.Type) for f in fields], bases=(ClusterObjects.ClusterCommand, ))
-    res.descriptor = ClusterObjects.ClusterObjectDescriptor(Fields=fields)
+    res = _make_cluster_object_class(name=struct.name, fields=fields, base_classes=(ClusterObjects.ClusterCommand,))
     res.cluster_id = cluster.code
     res.command_id = struct.code
     res.is_client = True
@@ -137,6 +137,9 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
     namespace_types.update(bitmaps)
     command_fields = {}
     remaining_structs = cluster.structs[:]
+
+    error_messages = []
+
     while remaining_structs:
         next_remaining_structs = []
         processed_structs = 0
@@ -151,6 +154,8 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
             except ValueError as e:
                 next_remaining_structs.append(s)
         if processed_structs == 0:
+            if next_remaining_structs:
+                error_messages.append(f"Failed to parse some structs for cluster {cluster.name}: {next_remaining_structs}")
             break
         remaining_structs = next_remaining_structs
 
@@ -158,18 +163,18 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
     for a in cluster.attributes:
         try:
             attributes[a.definition.name] = _make_attribute_class(cluster, a, namespace_types=namespace_types)
-        except:
-            pass
+        except Exception as ex:
+            error_messages.append(f"Failed to process cluster {cluster.name} attribute {a.definition.name}: {ex}")
 
     events = {}
     for e in cluster.events:
         try:
-            event = _make_struct_class(cluster, event, namespace_types)
+            event = _make_struct_class(cluster, e, namespace_types, base_classes=(ClusterObjects.ClusterEvent,))
             event.event_id = e.code
             event.cluster_id = cluster.code
             events[e.name] = e
-        except:
-            pass
+        except Exception as ex:
+            error_messages.append(f"Failed to process cluster {cluster.name} event {e.name}: {ex}")
 
     commands = {}
     for s in cluster.structs:
@@ -181,8 +186,8 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
                 commands[s.name] = _make_response_command_class(cluster, s, fields)
             else:
                 command_fields[s.name] = fields
-        except ValueError:
-            pass
+        except Exception as ex:
+            error_messages.append(f"Failed to process cluster {cluster.name} command {s.name}: {ex}")
 
     for c in cluster.commands:
         try:
@@ -195,8 +200,8 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
             command = _make_request_command_class(cluster, c, req)
             command.response_type = res
             commands[c.name] = command
-        except Exception:
-            pass
+        except Exception as ex:
+            error_messages.append(f"Failed to process cluster {cluster.name} command {c.name}: {ex}")
 
     cluster_namespace = dataclasses.make_dataclass(
         cls_name=cluster.name,
@@ -236,14 +241,19 @@ def _parse_single_cluster(cluster: matter_idl_types.Cluster):
     if len(structs) != 0:
         set_namespace_items(cluster_namespace, 'Structs', structs)
 
-    return cluster_namespace
+    return cluster_namespace, error_messages
 
 
-def LoadIDL(file: str):
+def LoadIDL(file: str, strict: bool = True):
     with open(file) as fp:
         loaded_clusters = type('Clusters', (), {})
+        error_messages = []
         for c in CreateParser().parse(fp.read()).clusters:
-            type.__setattr__(loaded_clusters, c.name, _parse_single_cluster(c))
+            cluster, errors = _parse_single_cluster(c)
+            type.__setattr__(loaded_clusters, c.name, cluster)
+            error_messages.extend(errors)
+        if error_messages and strict:
+            raise ValueError(f"Failed to parse given file: {error_messages}")
         Attribute.UpdateIndex(loaded_clusters)
         return loaded_clusters
 
