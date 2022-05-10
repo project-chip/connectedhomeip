@@ -34761,6 +34761,508 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)readAttributeWiredAssessedInputVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredAssessedInputVoltage::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredAssessedInputVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
+                                           subscriptionEstablished:
+                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                     reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredAssessedInputVoltage::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredAssessedInputVoltageWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                        endpoint:(NSNumber *)endpoint
+                                                           queue:(dispatch_queue_t)queue
+                                               completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredAssessedInputVoltage::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeWiredAssessedInputFrequencyWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredAssessedInputFrequency::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredAssessedInputFrequencyWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                              params:(CHIPSubscribeParams * _Nullable)params
+                                             subscriptionEstablished:
+                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))reportHandler
+{
+    new CHIPInt16uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredAssessedInputFrequency::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredAssessedInputFrequencyWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                          endpoint:(NSNumber *)endpoint
+                                                             queue:(dispatch_queue_t)queue
+                                                 completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredAssessedInputFrequency::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeWiredCurrentTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredCurrentType::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredCurrentTypeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(CHIPSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredCurrentType::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredCurrentTypeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                      completionHandler:
+                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredCurrentType::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeWiredAssessedCurrentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredAssessedCurrent::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredAssessedCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(CHIPSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredAssessedCurrent::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredAssessedCurrentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredAssessedCurrent::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeWiredNominalVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredNominalVoltage::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredNominalVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredNominalVoltage::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredNominalVoltageWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredNominalVoltage::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeWiredMaximumCurrentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredMaximumCurrent::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredMaximumCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredMaximumCurrent::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredMaximumCurrentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredMaximumCurrent::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeWiredPresentWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::WiredPresent::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeWiredPresentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                          maxInterval:(NSNumber * _Nonnull)maxInterval
+                                               params:(CHIPSubscribeParams * _Nullable)params
+                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPBooleanAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::WiredPresent::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeWiredPresentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                           endpoint:(NSNumber *)endpoint
+                                              queue:(dispatch_queue_t)queue
+                                  completionHandler:
+                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::WiredPresent::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeActiveWiredFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler
+{
+    new CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PowerSource::Attributes::ActiveWiredFaults::TypeInfo;
+            auto successFn = Callback<PowerSourceActiveWiredFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeActiveWiredFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(CHIPSubscribeParams * _Nullable)params
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::ActiveWiredFaults::TypeInfo;
+            auto successFn = Callback<PowerSourceActiveWiredFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeActiveWiredFaultsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                       completionHandler:
+                                           (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPPowerSourceActiveWiredFaultsListAttributeCallbackBridge(
+        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            if (attributeCacheContainer.cppAttributeCache) {
+                chip::app::ConcreteAttributePath path;
+                using TypeInfo = PowerSource::Attributes::ActiveWiredFaults::TypeInfo;
+                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+                path.mClusterId = TypeInfo::GetClusterId();
+                path.mAttributeId = TypeInfo::GetAttributeId();
+                TypeInfo::DecodableType value;
+                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+                auto successFn = Callback<PowerSourceActiveWiredFaultsListAttributeCallback>::FromCancelable(success);
+                if (err == CHIP_NO_ERROR) {
+                    successFn->mCall(successFn->mContext, value);
+                }
+                return err;
+            }
+            return CHIP_ERROR_NOT_FOUND;
+        });
+}
+
 - (void)readAttributeBatteryVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler
 {
@@ -35011,6 +35513,194 @@ using namespace chip::app::Clusters;
     });
 }
 
+- (void)readAttributeBatteryReplacementNeededWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryReplacementNeeded::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryReplacementNeededWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))reportHandler
+{
+    new CHIPBooleanAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryReplacementNeeded::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryReplacementNeededWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:
+                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryReplacementNeeded::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryReplaceabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryReplaceability::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryReplaceabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
+                                       subscriptionEstablished:
+                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                 reportHandler:
+                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryReplaceability::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryReplaceabilityWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                    endpoint:(NSNumber *)endpoint
+                                                       queue:(dispatch_queue_t)queue
+                                           completionHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryReplaceability::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryPresentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryPresent::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryPresentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPBooleanAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryPresent::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryPresentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryPresent::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
 - (void)readAttributeActiveBatteryFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler
 {
@@ -35076,6 +35766,445 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeBatteryReplacementDescriptionWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryReplacementDescription::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryReplacementDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                params:(CHIPSubscribeParams * _Nullable)params
+                                               subscriptionEstablished:
+                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                         reportHandler:(void (^)(NSString * _Nullable value,
+                                                                           NSError * _Nullable error))reportHandler
+{
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryReplacementDescription::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryReplacementDescriptionWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                            endpoint:(NSNumber *)endpoint
+                                                               queue:(dispatch_queue_t)queue
+                                                   completionHandler:(void (^)(NSString * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryReplacementDescription::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryCommonDesignationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryCommonDesignation::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryCommonDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryCommonDesignation::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryCommonDesignationWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:
+                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryCommonDesignation::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryANSIDesignationWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryANSIDesignation::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryANSIDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
+                                        subscriptionEstablished:
+                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                  reportHandler:
+                                                      (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryANSIDesignation::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryANSIDesignationWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                            completionHandler:
+                                                (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryANSIDesignation::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryIECDesignationWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryIECDesignation::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryIECDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(CHIPSubscribeParams * _Nullable)params
+                                       subscriptionEstablished:
+                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                 reportHandler:
+                                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryIECDesignation::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryIECDesignationWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                    endpoint:(NSNumber *)endpoint
+                                                       queue:(dispatch_queue_t)queue
+                                           completionHandler:
+                                               (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryIECDesignation::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryApprovedChemistryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                       NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryApprovedChemistry::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryApprovedChemistryWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                           params:(CHIPSubscribeParams * _Nullable)params
+                                          subscriptionEstablished:
+                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryApprovedChemistry::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryApprovedChemistryWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                       endpoint:(NSNumber *)endpoint
+                                                          queue:(dispatch_queue_t)queue
+                                              completionHandler:
+                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryApprovedChemistry::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryCapacityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryCapacity::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryCapacityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryCapacity::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryCapacityWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                              endpoint:(NSNumber *)endpoint
+                                                 queue:(dispatch_queue_t)queue
+                                     completionHandler:
+                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryCapacity::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryQuantityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryQuantity::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryQuantityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryQuantity::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryQuantityWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                              endpoint:(NSNumber *)endpoint
+                                                 queue:(dispatch_queue_t)queue
+                                     completionHandler:
+                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryQuantity::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
 - (void)readAttributeBatteryChargeStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler
 {
@@ -35136,6 +36265,260 @@ using namespace chip::app::Clusters;
         }
         return CHIP_ERROR_NOT_FOUND;
     });
+}
+
+- (void)readAttributeBatteryTimeToFullChargeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryTimeToFullCharge::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryTimeToFullChargeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                          params:(CHIPSubscribeParams * _Nullable)params
+                                         subscriptionEstablished:
+                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryTimeToFullCharge::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryTimeToFullChargeWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                      endpoint:(NSNumber *)endpoint
+                                                         queue:(dispatch_queue_t)queue
+                                             completionHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryTimeToFullCharge::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryFunctionalWhileChargingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                             NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryFunctionalWhileCharging::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryFunctionalWhileChargingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                 params:(CHIPSubscribeParams * _Nullable)params
+                                                subscriptionEstablished:
+                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))reportHandler
+{
+    new CHIPBooleanAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryFunctionalWhileCharging::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryFunctionalWhileChargingWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                             endpoint:(NSNumber *)endpoint
+                                                                queue:(dispatch_queue_t)queue
+                                                    completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryFunctionalWhileCharging::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeBatteryChargingCurrentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PowerSource::Attributes::BatteryChargingCurrent::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeBatteryChargingCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                         params:(CHIPSubscribeParams * _Nullable)params
+                                        subscriptionEstablished:
+                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                  reportHandler:
+                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::BatteryChargingCurrent::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeBatteryChargingCurrentWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                            completionHandler:
+                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PowerSource::Attributes::BatteryChargingCurrent::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeActiveBatteryChargeFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler
+{
+    new CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PowerSource::Attributes::ActiveBatteryChargeFaults::TypeInfo;
+            auto successFn = Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeActiveBatteryChargeFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                            params:(CHIPSubscribeParams * _Nullable)params
+                                           subscriptionEstablished:
+                                               (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                     reportHandler:(void (^)(NSArray * _Nullable value,
+                                                                       NSError * _Nullable error))reportHandler
+{
+    new CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PowerSource::Attributes::ActiveBatteryChargeFaults::TypeInfo;
+            auto successFn = Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeActiveBatteryChargeFaultsWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                        endpoint:(NSNumber *)endpoint
+                                                           queue:(dispatch_queue_t)queue
+                                               completionHandler:
+                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge(
+        queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            if (attributeCacheContainer.cppAttributeCache) {
+                chip::app::ConcreteAttributePath path;
+                using TypeInfo = PowerSource::Attributes::ActiveBatteryChargeFaults::TypeInfo;
+                path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+                path.mClusterId = TypeInfo::GetClusterId();
+                path.mAttributeId = TypeInfo::GetAttributeId();
+                TypeInfo::DecodableType value;
+                CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+                auto successFn = Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>::FromCancelable(success);
+                if (err == CHIP_NO_ERROR) {
+                    successFn->mCall(successFn->mContext, value);
+                }
+                return err;
+            }
+            return CHIP_ERROR_NOT_FOUND;
+        });
 }
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
@@ -35969,6 +37352,375 @@ using namespace chip::app::Clusters;
             TypeInfo::DecodableType value;
             CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
             auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeToleranceWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PressureMeasurement::Attributes::Tolerance::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                       maxInterval:(NSNumber * _Nonnull)maxInterval
+                                            params:(CHIPSubscribeParams * _Nullable)params
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt16uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PressureMeasurement::Attributes::Tolerance::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeToleranceWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                        endpoint:(NSNumber *)endpoint
+                                           queue:(dispatch_queue_t)queue
+                               completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PressureMeasurement::Attributes::Tolerance::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeScaledValueWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PressureMeasurement::Attributes::ScaledValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeScaledValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(CHIPSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPNullableInt16sAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PressureMeasurement::Attributes::ScaledValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeScaledValueWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableInt16sAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PressureMeasurement::Attributes::ScaledValue::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeMinScaledValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PressureMeasurement::Attributes::MinScaledValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeMinScaledValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPNullableInt16sAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PressureMeasurement::Attributes::MinScaledValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeMinScaledValueWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableInt16sAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PressureMeasurement::Attributes::MinScaledValue::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeMaxScaledValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableInt16sAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = PressureMeasurement::Attributes::MaxScaledValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeMaxScaledValueWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(CHIPSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPNullableInt16sAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PressureMeasurement::Attributes::MaxScaledValue::TypeInfo;
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeMaxScaledValueWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableInt16sAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PressureMeasurement::Attributes::MaxScaledValue::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<NullableInt16sAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeScaledToleranceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PressureMeasurement::Attributes::ScaledTolerance::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeScaledToleranceWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                             maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                  params:(CHIPSubscribeParams * _Nullable)params
+                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                           reportHandler:
+                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt16uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PressureMeasurement::Attributes::ScaledTolerance::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeScaledToleranceWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                              endpoint:(NSNumber *)endpoint
+                                                 queue:(dispatch_queue_t)queue
+                                     completionHandler:
+                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PressureMeasurement::Attributes::ScaledTolerance::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            if (err == CHIP_NO_ERROR) {
+                successFn->mCall(successFn->mContext, value);
+            }
+            return err;
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    });
+}
+
+- (void)readAttributeScaleWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = PressureMeasurement::Attributes::Scale::TypeInfo;
+        auto successFn = Callback<Int8sAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeScaleWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                        params:(CHIPSubscribeParams * _Nullable)params
+                       subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8sAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            if (params != nil && params.autoResubscribe != nil && ![params.autoResubscribe boolValue]) {
+                // We don't support disabling auto-resubscribe.
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            using TypeInfo = PressureMeasurement::Attributes::Scale::TypeInfo;
+            auto successFn = Callback<Int8sAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                [minInterval unsignedShortValue], [maxInterval unsignedShortValue],
+                CHIPInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished,
+                params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue],
+                params != nil && params.keepPreviousSubscriptions != nil && [params.keepPreviousSubscriptions boolValue]);
+        },
+        subscriptionEstablishedHandler);
+}
+
++ (void)readAttributeScaleWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                    endpoint:(NSNumber *)endpoint
+                                       queue:(dispatch_queue_t)queue
+                           completionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8sAttributeCallbackBridge(queue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        if (attributeCacheContainer.cppAttributeCache) {
+            chip::app::ConcreteAttributePath path;
+            using TypeInfo = PressureMeasurement::Attributes::Scale::TypeInfo;
+            path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
+            path.mClusterId = TypeInfo::GetClusterId();
+            path.mAttributeId = TypeInfo::GetAttributeId();
+            TypeInfo::DecodableType value;
+            CHIP_ERROR err = attributeCacheContainer.cppAttributeCache->Get<TypeInfo>(path, value);
+            auto successFn = Callback<Int8sAttributeCallback>::FromCancelable(success);
             if (err == CHIP_NO_ERROR) {
                 successFn->mCall(successFn->mContext, value);
             }

@@ -39,14 +39,14 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Reads CurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: 150
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move hue up command"
       command: "MoveHue"
@@ -61,14 +61,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 140ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 140
+
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 145ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 145
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 150ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 150
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move hue stop command"
       command: "MoveHue"
@@ -83,14 +131,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 140ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 140
+
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 145ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 145
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 150ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 150
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move hue down command"
       command: "MoveHue"
@@ -105,14 +201,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 140ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 140
+
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 145ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 145
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 150ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 150
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move hue stop command"
       command: "MoveHue"
@@ -127,14 +271,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 140ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 140
+
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current hue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 145ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 145
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 150ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 150
+
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

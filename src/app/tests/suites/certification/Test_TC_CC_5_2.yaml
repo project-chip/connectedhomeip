@@ -39,23 +39,23 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Check current x attribute value  matched before any change"
       command: "readAttribute"
       attribute: "current x"
       response:
-          value: 200
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Check current y attribute value matched before any change"
       command: "readAttribute"
       attribute: "current y"
       response:
-          value: 300
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Move Color command"
       command: "MoveColor"
@@ -70,23 +70,35 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 150ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 150
+
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current x"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label:
           "Check current y attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current y"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Stop Move Step command"
       command: "StopMoveStep"
@@ -100,20 +112,24 @@ tests:
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current x"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label:
           "Check current y attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current y"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

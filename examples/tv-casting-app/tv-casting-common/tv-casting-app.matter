@@ -2173,61 +2173,412 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
-  server  cluster AccessControl;
-  server  cluster AdministratorCommissioning;
-  server  cluster Basic;
-  server  cluster Binding;
-  server  cluster Descriptor;
-  server  cluster DiagnosticLogs;
-  server  cluster EthernetNetworkDiagnostics;
-  server  cluster FixedLabel;
-  server  cluster GeneralCommissioning;
-  server  cluster GeneralDiagnostics;
-  server  cluster GroupKeyManagement;
-  server  cluster LocalizationConfiguration;
-  server  cluster NetworkCommissioning;
-  server  cluster OtaSoftwareUpdateProvider;
-  server  cluster OperationalCredentials;
-  server  cluster SoftwareDiagnostics;
-  server  cluster ThreadNetworkDiagnostics;
-  server  cluster TimeFormatLocalization;
-  server  cluster UnitLocalization;
-  server  cluster UserLabel;
-  server  cluster WiFiNetworkDiagnostics;
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AccessControl {
+    callback attribute acl;
+    callback attribute extension;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute attributeList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OtaSoftwareUpdateProvider {
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat;
+    persist  attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitLocalization {
+    persist  attribute temperatureUnit;
+    ram      attribute featureMap default = 0x1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GeneralCommissioning {
+    ram      attribute breadcrumb;
+    callback attribute basicCommissioningInfo;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap default = 6;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DiagnosticLogs {
+  }
+
+  server cluster GeneralDiagnostics {
+    callback attribute networkInterfaces;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
+    callback attribute bootReasons;
+    callback attribute activeHardwareFaults;
+    callback attribute activeRadioFaults;
+    callback attribute activeNetworkFaults;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster SoftwareDiagnostics {
+    callback attribute threadMetrics;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ThreadNetworkDiagnostics {
+    ram      attribute channel;
+    ram      attribute routingRole;
+    ram      attribute networkName;
+    ram      attribute panId;
+    ram      attribute extendedPanId;
+    ram      attribute meshLocalPrefix;
+    ram      attribute overrunCount;
+    callback attribute neighborTableList;
+    callback attribute routeTableList;
+    ram      attribute partitionId;
+    ram      attribute weighting;
+    ram      attribute dataVersion;
+    ram      attribute stableDataVersion;
+    ram      attribute leaderRouterId;
+    ram      attribute detachedRoleCount;
+    ram      attribute childRoleCount;
+    ram      attribute routerRoleCount;
+    ram      attribute leaderRoleCount;
+    ram      attribute attachAttemptCount;
+    ram      attribute partitionIdChangeCount;
+    ram      attribute betterPartitionAttachAttemptCount;
+    ram      attribute parentChangeCount;
+    ram      attribute txTotalCount;
+    ram      attribute txUnicastCount;
+    ram      attribute txBroadcastCount;
+    ram      attribute txAckRequestedCount;
+    ram      attribute txAckedCount;
+    ram      attribute txNoAckRequestedCount;
+    ram      attribute txDataCount;
+    ram      attribute txDataPollCount;
+    ram      attribute txBeaconCount;
+    ram      attribute txBeaconRequestCount;
+    ram      attribute txOtherCount;
+    ram      attribute txRetryCount;
+    ram      attribute txDirectMaxRetryExpiryCount;
+    ram      attribute txIndirectMaxRetryExpiryCount;
+    ram      attribute txErrCcaCount;
+    ram      attribute txErrAbortCount;
+    ram      attribute txErrBusyChannelCount;
+    ram      attribute rxTotalCount;
+    ram      attribute rxUnicastCount;
+    ram      attribute rxBroadcastCount;
+    ram      attribute rxDataCount;
+    ram      attribute rxDataPollCount;
+    ram      attribute rxBeaconCount;
+    ram      attribute rxBeaconRequestCount;
+    ram      attribute rxOtherCount;
+    ram      attribute rxAddressFilteredCount;
+    ram      attribute rxDestAddrFilteredCount;
+    ram      attribute rxDuplicatedCount;
+    ram      attribute rxErrNoFrameCount;
+    ram      attribute rxErrUnknownNeighborCount;
+    ram      attribute rxErrInvalidSrcAddrCount;
+    ram      attribute rxErrSecCount;
+    ram      attribute rxErrFcsCount;
+    ram      attribute rxErrOtherCount;
+    ram      attribute activeTimestamp;
+    ram      attribute pendingTimestamp;
+    ram      attribute delay;
+    callback attribute securityPolicy;
+    ram      attribute channelMask;
+    callback attribute operationalDatasetComponents;
+    callback attribute activeNetworkFaultsList;
+    ram      attribute featureMap default = 0x000F;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster WiFiNetworkDiagnostics {
+    callback attribute bssid;
+    callback attribute securityType;
+    callback attribute wiFiVersion;
+    callback attribute channelNumber;
+    callback attribute rssi;
+    callback attribute beaconLostCount;
+    callback attribute beaconRxCount;
+    callback attribute packetMulticastRxCount;
+    callback attribute packetMulticastTxCount;
+    callback attribute packetUnicastRxCount;
+    callback attribute packetUnicastTxCount;
+    callback attribute currentMaxRate;
+    callback attribute overrunCount;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster EthernetNetworkDiagnostics {
+    callback attribute PHYRate;
+    callback attribute fullDuplex;
+    callback attribute packetRxCount;
+    callback attribute packetTxCount;
+    callback attribute txErrCount;
+    callback attribute collisionCount;
+    callback attribute overrunCount;
+    callback attribute carrierDetect;
+    callback attribute timeSinceReset;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AdministratorCommissioning {
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex default = 1;
+    callback attribute adminVendorId;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalCredentials {
+    callback attribute NOCs;
+    callback attribute fabrics;
+    callback attribute supportedFabrics;
+    callback attribute commissionedFabrics;
+    callback attribute trustedRootCertificates;
+    callback attribute currentFabricIndex;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GroupKeyManagement {
+    callback attribute groupKeyMap;
+    callback attribute groupTable;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
 }
 
 endpoint 1 {
-  binding cluster AccountLogin;
-  binding cluster ApplicationBasic;
-  binding cluster ApplicationLauncher;
-  binding cluster AudioOutput;
-  server  cluster BarrierControl;
-  server  cluster BinaryInputBasic;
-  server  cluster Binding;
-  binding cluster Channel;
-  binding cluster ContentLauncher;
-  binding cluster Descriptor;
-  server  cluster Descriptor;
-  server  cluster FixedLabel;
-  server  cluster Groups;
-  server  cluster IasZone;
-  server  cluster Identify;
-  binding cluster KeypadInput;
-  binding cluster LevelControl;
-  server  cluster LevelControl;
-  binding cluster MediaInput;
-  binding cluster MediaPlayback;
   binding cluster OnOff;
-  server  cluster OnOff;
-  server  cluster Scenes;
-  server  cluster Switch;
+  binding cluster LevelControl;
+  binding cluster Descriptor;
+  binding cluster Channel;
   binding cluster TargetNavigator;
-  server  cluster TestCluster;
-  server  cluster WakeOnLan;
+  binding cluster MediaPlayback;
+  binding cluster MediaInput;
+  binding cluster KeypadInput;
+  binding cluster ContentLauncher;
+  binding cluster AudioOutput;
+  binding cluster ApplicationLauncher;
+  binding cluster ApplicationBasic;
+  binding cluster AccountLogin;
+
+  server cluster Identify {
+    ram      attribute identifyTime;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Scenes {
+    ram      attribute sceneCount;
+    ram      attribute currentScene;
+    ram      attribute currentGroup;
+    ram      attribute sceneValid;
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster OnOff {
+    ram      attribute onOff;
+    ram      attribute globalSceneControl default = 0x01;
+    ram      attribute onTime;
+    ram      attribute offWaitTime;
+    ram      attribute startUpOnOff;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster LevelControl {
+    persist  attribute currentLevel;
+    ram      attribute remainingTime;
+    ram      attribute minLevel;
+    ram      attribute maxLevel default = 0xFF;
+    ram      attribute currentFrequency;
+    ram      attribute minFrequency;
+    ram      attribute maxFrequency;
+    ram      attribute options;
+    ram      attribute onOffTransitionTime;
+    ram      attribute onLevel default = 0xFE;
+    ram      attribute onTransitionTime;
+    ram      attribute offTransitionTime;
+    ram      attribute defaultMoveRate;
+    persist  attribute startUpCurrentLevel default = 255;
+    ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster BinaryInputBasic {
+    ram      attribute outOfService;
+    ram      attribute presentValue;
+    ram      attribute statusFlags;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Switch {
+    ram      attribute numberOfPositions default = 2;
+    ram      attribute currentPosition;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster BarrierControl {
+    ram      attribute barrierMovingState;
+    ram      attribute barrierSafetyStatus;
+    ram      attribute barrierCapabilities;
+    ram      attribute barrierPosition;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster IasZone {
+    ram      attribute zoneState;
+    ram      attribute zoneType;
+    ram      attribute zoneStatus;
+    ram      attribute iasCieAddress;
+    ram      attribute zoneId default = 0xff;
+    ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster WakeOnLan {
+    ram      attribute MACAddress;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TestCluster {
+    ram      attribute boolean;
+    ram      attribute bitmap8;
+    ram      attribute bitmap16;
+    ram      attribute bitmap32;
+    ram      attribute bitmap64;
+    ram      attribute int8u;
+    ram      attribute int16u;
+    ram      attribute int32u;
+    ram      attribute int64u;
+    ram      attribute int8s;
+    ram      attribute int16s;
+    ram      attribute int32s;
+    ram      attribute int64s;
+    ram      attribute enum8;
+    ram      attribute enum16;
+    ram      attribute octetString;
+    callback attribute listInt8u;
+    callback attribute listOctetString;
+    callback attribute listStructOctetString;
+    ram      attribute longOctetString;
+    ram      attribute clusterRevision default = 1;
+  }
 }
 
 endpoint 2 {
-  server  cluster Descriptor;
-  server  cluster OnOff;
+
+  server cluster OnOff {
+    ram      attribute onOff;
+    ram      attribute clusterRevision default = 4;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
 }
+
 

@@ -42,11 +42,13 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
-      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 90
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move saturation up command"
       command: "MoveSaturation"
@@ -60,15 +62,63 @@ tests:
                 value: 0
               - name: "optionsOverride"
                 value: 0
+
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
 
     - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      disabled: true
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move saturation down command"
       command: "MoveSaturation"
@@ -83,12 +133,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read CurrentSaturation attribute from DUT several times"
-      disabled: true
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move saturation up command"
       command: "MoveSaturation"
@@ -103,12 +203,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read CurrentSaturation attribute from DUT"
-      disabled: true
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move saturation stop command"
       command: "MoveSaturation"
@@ -123,12 +273,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read CurrentSaturation attribute from DUT"
-      disabled: true
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move saturation down command"
       command: "MoveSaturation"
@@ -143,12 +343,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read CurrentSaturation attribute from DUT several times"
-      disabled: true
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Move saturation stop command"
       command: "MoveSaturation"
@@ -163,12 +413,62 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read CurrentSaturation attribute from DUT"
-      disabled: true
+    - label: "Wait 40ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
       command: "readAttribute"
       attribute: "current saturation"
       response:
-          value: 0
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 45ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 45
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Wait 50ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 50
+
+    - label:
+          "Check current saturation attribute value matched the value sent by
+          the last command"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

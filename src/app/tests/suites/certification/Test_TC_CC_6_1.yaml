@@ -42,11 +42,13 @@ tests:
           value: 1
 
     - label: "Read current color temprature"
-      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
       response:
-          value: 100
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Move To Color Temperature command"
       command: "MoveToColorTemperature"
@@ -61,12 +63,22 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
     - label: "Read current color temprature"
-      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
       response:
-          value: 100
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

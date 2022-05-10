@@ -82,6 +82,7 @@ struct Argument
     uint64_t max;
     void * value;
     uint8_t flags;
+    const char * desc;
 
     enum
     {
@@ -109,119 +110,127 @@ public:
     const char * GetAttribute(void) const;
     const char * GetEvent(void) const;
     const char * GetArgumentName(size_t index) const;
+    const char * GetArgumentDescription(size_t index) const;
     bool GetArgumentIsOptional(size_t index) const { return mArgs[index].isOptional(); }
     size_t GetArgumentsCount(void) const { return mArgs.size(); }
 
     bool InitArguments(int argc, char ** argv);
-    size_t AddArgument(const char * name, const char * value, uint8_t flags = 0);
+    size_t AddArgument(const char * name, const char * value, uint8_t flags = 0, const char * desc = "");
     /**
      * @brief
      *   Add a char string command argument
      *
      * @param name  The name that will be displayed in the command help
      * @param value A pointer to a `char *` where the argv value will be stored
+     * @param flags
+     * @param desc The description of the argument that will be displayed in the command help
      * @returns The number of arguments currently added to the command
      */
-    size_t AddArgument(const char * name, char ** value, uint8_t flags = 0);
+    size_t AddArgument(const char * name, char ** value, uint8_t flags = 0, const char * desc = "");
 
     /**
      * Add an octet string command argument
      */
-    size_t AddArgument(const char * name, chip::ByteSpan * value, uint8_t flags = 0);
-    size_t AddArgument(const char * name, chip::Span<const char> * value, uint8_t flags = 0);
-    size_t AddArgument(const char * name, AddressWithInterface * out, uint8_t flags = 0);
-    size_t AddArgument(const char * name, ComplexArgument * value);
-    size_t AddArgument(const char * name, CustomArgument * value);
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, chip::ByteSpan * value, uint8_t flags = 0, const char * desc = "");
+    size_t AddArgument(const char * name, chip::Span<const char> * value, uint8_t flags = 0, const char * desc = "");
+    size_t AddArgument(const char * name, AddressWithInterface * out, uint8_t flags = 0, const char * desc = "");
+    size_t AddArgument(const char * name, ComplexArgument * value, const char * desc = "");
+    size_t AddArgument(const char * name, CustomArgument * value, const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Bool, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Bool, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int8, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int8, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, int16_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int16_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int16, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int16, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, int32_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int32_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int32, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int32, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, int64_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int64_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int64, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int64, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint8_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint8_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint8, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint8, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint16_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint16_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint16, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint16, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint32_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint32_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint32, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint32, flags, desc);
     }
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint64_t * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint64_t * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64, flags);
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64, flags, desc);
     }
 
-    size_t AddArgument(const char * name, float min, float max, float * out, uint8_t flags = 0);
-    size_t AddArgument(const char * name, double min, double max, double * out, uint8_t flags = 0);
+    size_t AddArgument(const char * name, float min, float max, float * out, uint8_t flags = 0, const char * desc = "");
+    size_t AddArgument(const char * name, double min, double max, double * out, uint8_t flags = 0, const char * desc = "");
 
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value);
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value);
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint16_t> * value, const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, std::vector<uint32_t> * value, const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<std::vector<uint32_t>> * value,
+                       const char * desc = "");
 
     template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<std::underlying_type_t<T> *>(out), flags);
+        return AddArgument(name, min, max, reinterpret_cast<std::underlying_type_t<T> *>(out), flags, desc);
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::BitFlags<T> * out, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::BitFlags<T> * out, uint8_t flags = 0,
+                       const char * desc = "")
     {
         // This is a terrible hack that relies on BitFlags only having the one
         // mValue member.
-        return AddArgument(name, min, max, reinterpret_cast<T *>(out), flags);
+        return AddArgument(name, min, max, reinterpret_cast<T *>(out), flags, desc);
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, chip::Optional<T> * value)
+    size_t AddArgument(const char * name, chip::Optional<T> * value, const char * desc = "")
     {
-        return AddArgument(name, reinterpret_cast<T *>(value), Argument::kOptional);
+        return AddArgument(name, reinterpret_cast<T *>(value), Argument::kOptional, desc);
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<T> * value)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<T> * value, const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<T *>(value), Argument::kOptional);
+        return AddArgument(name, min, max, reinterpret_cast<T *>(value), Argument::kOptional, desc);
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, chip::app::DataModel::Nullable<T> * value, uint8_t flags = 0)
+    size_t AddArgument(const char * name, chip::app::DataModel::Nullable<T> * value, uint8_t flags = 0, const char * desc = "")
     {
-        return AddArgument(name, reinterpret_cast<T *>(value), flags | Argument::kNullable);
+        return AddArgument(name, reinterpret_cast<T *>(value), flags | Argument::kNullable, desc);
     }
 
     template <typename T>
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::app::DataModel::Nullable<T> * value, uint8_t flags = 0)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::app::DataModel::Nullable<T> * value, uint8_t flags = 0,
+                       const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<T *>(value), flags | Argument::kNullable);
+        return AddArgument(name, min, max, reinterpret_cast<T *>(value), flags | Argument::kNullable, desc);
     }
 
-    size_t AddArgument(const char * name, float min, float max, chip::app::DataModel::Nullable<float> * value, uint8_t flags = 0)
+    size_t AddArgument(const char * name, float min, float max, chip::app::DataModel::Nullable<float> * value, uint8_t flags = 0,
+                       const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<float *>(value), flags | Argument::kNullable);
+        return AddArgument(name, min, max, reinterpret_cast<float *>(value), flags | Argument::kNullable, desc);
     }
 
-    size_t AddArgument(const char * name, double min, double max, chip::app::DataModel::Nullable<double> * value, uint8_t flags = 0)
+    size_t AddArgument(const char * name, double min, double max, chip::app::DataModel::Nullable<double> * value, uint8_t flags = 0,
+                       const char * desc = "")
     {
-        return AddArgument(name, min, max, reinterpret_cast<double *>(value), flags | Argument::kNullable);
+        return AddArgument(name, min, max, reinterpret_cast<double *>(value), flags | Argument::kNullable, desc);
     }
 
     void ResetArguments();
@@ -238,8 +247,9 @@ public:
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags);
-    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, uint8_t flags);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags,
+                       const char * desc = "");
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, uint8_t flags, const char * desc = "");
 
     /**
      * Add the Argument to our list.  This preserves the property that all
