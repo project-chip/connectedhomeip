@@ -735,6 +735,7 @@ function getTests()
     'TestBinding',
     'TestUserLabelCluster',
     'TestArmFailSafe',
+    'TestFanControl',
   ];
 
   const MultiAdmin = [

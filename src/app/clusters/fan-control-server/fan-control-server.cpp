@@ -20,6 +20,7 @@
  * @brief Implementation for the Fan Control Server Cluster
  ***************************************************************************/
 
+#include <assert.h>
 #include <math.h>
 
 #include <app-common/zap-generated/af-structs.h>
@@ -38,6 +39,26 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FanControl;
 using namespace chip::app::Clusters::FanControl::Attributes;
 
+namespace {
+
+bool gWriteNullFromInernal = false;
+
+EmberAfStatus ClearFanModeAttribute(const ConcreteAttributePath & attributePath)
+{
+    FanModeType currentFanMode;
+    EmberAfStatus status = FanMode::Get(attributePath.mEndpointId, &currentFanMode);
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+
+    if (currentFanMode != FanModeType::kOff)
+    {
+        status = FanMode::Set(attributePath.mEndpointId, FanModeType::kOff);
+    }
+
+    return status;
+}
+
+} // anonymous namespace
+
 // =============================================================================
 // Pre-change callbacks for cluster attributes
 // =============================================================================
@@ -52,18 +73,54 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
 
     switch (attributePath.mAttributeId)
     {
-    case SpeedSetting::Id: {
-        uint8_t speedMax;
-        EmberAfStatus status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidValue);
-
-        if (*value <= speedMax)
+    case SpeedSetting::Id:
+        // Check if the SpeedSetting is null.
+        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
         {
-            res = Status::Success;
+
+            if (gWriteNullFromInernal)
+            {
+                res                   = Status::Success;
+                gWriteNullFromInernal = false;
+            }
+            else
+            {
+                res = Status::WriteIgnored;
+            }
         }
         else
         {
-            res = Status::InvalidValue;
+            uint8_t speedMax;
+            EmberAfStatus status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidValue);
+
+            if (*value <= speedMax)
+            {
+                res = Status::Success;
+            }
+            else
+            {
+                res = Status::InvalidValue;
+            }
+        }
+        break;
+    case PercentSetting::Id: {
+        // Check if the PercentSetting is null.
+        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        {
+            if (gWriteNullFromInernal)
+            {
+                res                   = Status::Success;
+                gWriteNullFromInernal = false;
+            }
+            else
+            {
+                res = Status::WriteIgnored;
+            }
+        }
+        else
+        {
+            res = Status::Success;
         }
         break;
     }
@@ -77,6 +134,15 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
 
 void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
+    uint32_t ourFeatureMap;
+    bool multiSpeedSupported = false;
+
+    if (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        if (ourFeatureMap & to_underlying(FanControlFeature::kMultiSpeed))
+            multiSpeedSupported = true;
+    }
+
     switch (attributePath.mAttributeId)
     {
     case FanMode::Id: {
@@ -85,7 +151,7 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status);
 
         // Setting the FanMode value to Off SHALL set the values of PercentSetting, PercentCurrent,
-        // SpeedSetting, SpeedCurrent attributes to 0 (zero):.
+        // SpeedSetting, SpeedCurrent attributes to 0 (zero).
         if (mode == FanModeType::kOff)
         {
             status = PercentSetting::Set(attributePath.mEndpointId, 0);
@@ -96,78 +162,92 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                            ChipLogError(Zcl, "Failed to write PercentCurrent with error: 0x%02x", status));
 
-            status = SpeedSetting::Set(attributePath.mEndpointId, 0);
-            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to write SpeedSetting with error: 0x%02x", status));
+            if (multiSpeedSupported)
+            {
+                status = SpeedSetting::Set(attributePath.mEndpointId, 0);
+                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                               ChipLogError(Zcl, "Failed to write SpeedSetting with error: 0x%02x", status));
 
-            status = SpeedCurrent::Set(attributePath.mEndpointId, 0);
+                status = SpeedCurrent::Set(attributePath.mEndpointId, 0);
+                if (EMBER_ZCL_STATUS_SUCCESS != status)
+                    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                                   ChipLogError(Zcl, "Failed to write SpeedCurrent with error: 0x%02x", status));
+            }
+        }
+
+        // Setting the attribute value to Auto SHALL set the values of PercentSetting, SpeedSetting (if present)
+        // to null.
+        if (mode == FanModeType::kAuto)
+        {
+            gWriteNullFromInernal = true;
+            status                = PercentSetting::SetNull(attributePath.mEndpointId);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to write SpeedCurrent with error: 0x%02x", status));
+                           ChipLogError(Zcl, "Failed to write PercentSetting with error: 0x%02x", status));
+
+            if (multiSpeedSupported)
+            {
+                gWriteNullFromInernal = true;
+                status                = SpeedSetting::SetNull(attributePath.mEndpointId);
+                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                               ChipLogError(Zcl, "Failed to write SpeedSetting with error: 0x%02x", status));
+            }
         }
         break;
     }
     case PercentSetting::Id: {
-        uint8_t percentSetting;
-        EmberAfStatus status = PercentSetting::Get(attributePath.mEndpointId, &percentSetting);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status);
+        DataModel::Nullable<uint8_t> percentSetting;
+        EmberAfStatus status = PercentSetting::Get(attributePath.mEndpointId, percentSetting);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status && !percentSetting.IsNull());
 
         // If PercentSetting is set to 0, the server SHALL set the FanMode attribute value to Off.
-        if (percentSetting == 0)
+        if (percentSetting.Value() == 0)
         {
-            FanModeType currentFanMode;
-            status = FanMode::Get(attributePath.mEndpointId, &currentFanMode);
+            status = ClearFanModeAttribute(attributePath);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to get FanMode with error: 0x%02x", status));
-
-            if (currentFanMode != FanModeType::kOff)
-            {
-                status = FanMode::Set(attributePath.mEndpointId, FanModeType::kOff);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to write FanMode with error: 0x%02x", status));
-            }
+                           ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", status));
         }
 
-        // Adjust SpeedSetting from a percent value change for PercentSetting
-        // speed = ceil( SpeedMax * (percent * 0.01) )
-        uint8_t speedMax;
-        status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", status));
-
-        uint8_t currentSpeedSetting;
-        status = SpeedSetting::Get(attributePath.mEndpointId, &currentSpeedSetting);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Failed to get SpeedSetting with error: 0x%02x", status));
-
-        float precent        = percentSetting;
-        uint8_t speedSetting = static_cast<uint8_t>(ceil(speedMax * (precent * 0.01)));
-
-        if (speedSetting != currentSpeedSetting)
+        if (multiSpeedSupported)
         {
-            status = SpeedSetting::Set(attributePath.mEndpointId, speedSetting);
+            // Adjust SpeedSetting from a percent value change for PercentSetting
+            // speed = ceil( SpeedMax * (percent * 0.01) )
+            uint8_t speedMax;
+            status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to set SpeedSetting with error: 0x%02x", status));
+                           ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", status));
+
+            DataModel::Nullable<uint8_t> currentSpeedSetting;
+            status = SpeedSetting::Get(attributePath.mEndpointId, currentSpeedSetting);
+            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                           ChipLogError(Zcl, "Failed to get SpeedSetting with error: 0x%02x", status));
+
+            float percent        = percentSetting.Value();
+            uint8_t speedSetting = static_cast<uint8_t>(ceil(speedMax * (percent * 0.01)));
+
+            if (currentSpeedSetting.IsNull() || speedSetting != currentSpeedSetting.Value())
+            {
+                status = SpeedSetting::Set(attributePath.mEndpointId, speedSetting);
+                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                               ChipLogError(Zcl, "Failed to set SpeedSetting with error: 0x%02x", status));
+            }
+
+            status = SpeedCurrent::Set(attributePath.mEndpointId, speedSetting);
+            VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                           ChipLogError(Zcl, "Failed to set SpeedCurrent with error: 0x%02x", status));
         }
         break;
     }
     case SpeedSetting::Id: {
-        uint8_t speedSetting;
-        EmberAfStatus status = SpeedSetting::Get(attributePath.mEndpointId, &speedSetting);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status);
+        DataModel::Nullable<uint8_t> speedSetting;
+        EmberAfStatus status = SpeedSetting::Get(attributePath.mEndpointId, speedSetting);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status && !speedSetting.IsNull());
 
         // If SpeedSetting is set to 0, the server SHALL set the FanMode attribute value to Off.
-        if (speedSetting == 0)
+        if (speedSetting.Value() == 0)
         {
-            FanModeType currentFanMode;
-            status = FanMode::Get(attributePath.mEndpointId, &currentFanMode);
+            status = ClearFanModeAttribute(attributePath);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                           ChipLogError(Zcl, "Failed to get FanMode with error: 0x%02x", status));
-
-            if (currentFanMode != FanModeType::kOff)
-            {
-                status = FanMode::Set(attributePath.mEndpointId, FanModeType::kOff);
-                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                               ChipLogError(Zcl, "Failed to write FanMode with error: 0x%02x", status));
-            }
+                           ChipLogError(Zcl, "Failed to set FanMode to off with error: 0x%02x", status));
         }
 
         // Adjust PercentSetting from a speed value change for SpeedSetting
@@ -176,20 +256,24 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
         status = SpeedMax::Get(attributePath.mEndpointId, &speedMax);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", status));
 
-        uint8_t currentPercentSetting;
-        status = PercentSetting::Get(attributePath.mEndpointId, &currentPercentSetting);
+        DataModel::Nullable<uint8_t> currentPercentSetting;
+        status = PercentSetting::Get(attributePath.mEndpointId, currentPercentSetting);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(Zcl, "Failed to get PercentSetting with error: 0x%02x", status));
 
-        float speed            = speedSetting;
+        float speed            = speedSetting.Value();
         uint8_t percentSetting = static_cast<uint8_t>(speed / speedMax * 100);
 
-        if (percentSetting != currentPercentSetting)
+        if (currentPercentSetting.IsNull() || percentSetting != currentPercentSetting.Value())
         {
             status = PercentSetting::Set(attributePath.mEndpointId, percentSetting);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                            ChipLogError(Zcl, "Failed to set PercentSetting with error: 0x%02x", status));
         }
+
+        status = PercentCurrent::Set(attributePath.mEndpointId, percentSetting);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Failed to set PercentCurrent with error: 0x%02x", status));
         break;
     }
     default:
