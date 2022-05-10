@@ -40522,12 +40522,14 @@ private:
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 4));
                     VerifyOrReturn(CheckValue("generatedCommandList[4]", iter_0.GetValue(), 6UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 5));
-                    VerifyOrReturn(CheckValue("generatedCommandList[5]", iter_0.GetValue(), 9UL));
+                    VerifyOrReturn(CheckValue("generatedCommandList[5]", iter_0.GetValue(), 8UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 6));
-                    VerifyOrReturn(CheckValue("generatedCommandList[6]", iter_0.GetValue(), 10UL));
+                    VerifyOrReturn(CheckValue("generatedCommandList[6]", iter_0.GetValue(), 9UL));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 7));
-                    VerifyOrReturn(CheckValue("generatedCommandList[7]", iter_0.GetValue(), 11UL));
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 8));
+                    VerifyOrReturn(CheckValue("generatedCommandList[7]", iter_0.GetValue(), 10UL));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 8));
+                    VerifyOrReturn(CheckValue("generatedCommandList[8]", iter_0.GetValue(), 11UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 9));
                 }
             }
             break;
