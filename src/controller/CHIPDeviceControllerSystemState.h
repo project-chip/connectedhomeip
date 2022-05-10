@@ -74,6 +74,7 @@ struct DeviceControllerSystemStateParams
     System::Layer * systemLayer                                   = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -86,7 +87,6 @@ struct DeviceControllerSystemStateParams
     SessionManager * sessionMgr                                   = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
-    FabricTable * fabricTable                                     = nullptr;
     CASEServer * caseServer                                       = nullptr;
     CASESessionManager * caseSessionManager                       = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
@@ -145,19 +145,56 @@ public:
             mOperationalDevicePool != nullptr && mCASEClientPool != nullptr && mGroupDataProvider != nullptr;
     };
 
-    System::Layer * SystemLayer() const { return mSystemLayer; };
-    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const { return mTCPEndPointManager; };
-    Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() const { return mUDPEndPointManager; };
-    DeviceTransportMgr * TransportMgr() const { return mTransportMgr; };
-    SessionManager * SessionMgr() const { return mSessionMgr; };
-    Messaging::ExchangeManager * ExchangeMgr() const { return mExchangeMgr; }
-    secure_channel::MessageCounterManager * MessageCounterManager() const { return mMessageCounterManager; };
-    FabricTable * Fabrics() const { return mFabrics; };
+    System::Layer * SystemLayer() const
+    {
+        return mSystemLayer;
+    };
+    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() const
+    {
+        return mTCPEndPointManager;
+    };
+    Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() const
+    {
+        return mUDPEndPointManager;
+    };
+    DeviceTransportMgr * TransportMgr() const
+    {
+        return mTransportMgr;
+    };
+    SessionManager * SessionMgr() const
+    {
+        return mSessionMgr;
+    };
+    Messaging::ExchangeManager * ExchangeMgr() const
+    {
+        return mExchangeMgr;
+    }
+    secure_channel::MessageCounterManager * MessageCounterManager() const
+    {
+        return mMessageCounterManager;
+    };
+    FabricTable * Fabrics() const
+    {
+        return mFabrics;
+    };
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * BleLayer() const { return mBleLayer; };
+    Ble::BleLayer * BleLayer() const
+    {
+        return mBleLayer;
+    };
 #endif
-    CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
-    Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
+    CASESessionManager * CASESessionMgr() const
+    {
+        return mCASESessionManager;
+    }
+    Credentials::GroupDataProvider * GetGroupDataProvider() const
+    {
+        return mGroupDataProvider;
+    }
+    void SetTempFabricTable(FabricTable * tempFabricTable)
+    {
+        mTempFabricTable = tempFabricTable;
+    }
 
 private:
     DeviceControllerSystemState(){};
@@ -178,6 +215,11 @@ private:
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
+
+    // if tempFabricTable is not null, it was created during
+    // DeviceControllerFactory::InitSystemState and needs to be
+    // freed during shutdown
+    FabricTable * mTempFabricTable = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

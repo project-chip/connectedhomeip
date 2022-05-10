@@ -719,7 +719,6 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorage = storage;
-
     ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
 
     // Load the current fabrics from the storage. This is done here, since ConstFabricIterator
