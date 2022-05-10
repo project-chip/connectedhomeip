@@ -34,7 +34,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
 {
     ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
 
-    uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
+    auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
     {
         ChipLogError(Zcl, "Cannot get user - index out of range [endpoint=%d,index=%hu,adjustedIndex=%d]", mEndpointId, userIndex,
@@ -51,7 +51,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     }
 
     user.userName       = chip::CharSpan(userInDb.userName, strlen(userInDb.userName));
-    user.credentials    = chip::Span<const DlCredential>(userInDb.credentials, userInDb.totalCredentials);
+    user.credentials    = chip::Span<const DlCredential>(userInDb.credentials.data(), userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
@@ -82,7 +82,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
                     static_cast<unsigned int>(totalCredentials));
 
-    uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
+    auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
     {
         ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
@@ -91,7 +91,6 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     }
 
     auto & userInStorage = mLockUsers[adjustedUserIndex];
-
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
         ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
@@ -99,12 +98,13 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         return false;
     }
 
-    if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
+    if (totalCredentials > userInStorage.credentials.capacity())
     {
         ChipLogError(Zcl,
                      "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%u"
-                     ",totalCredentials=%u]",
-                     mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int>(totalCredentials));
+                     ",totalCredentials=%u,maxNumberOfCredentials=%zu]",
+                     mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int>(totalCredentials),
+                     userInStorage.credentials.capacity());
         return false;
     }
 
@@ -117,10 +117,10 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     userInStorage.lastModifiedBy            = modifier;
     userInStorage.createdBy                 = creator;
 
-    userInStorage.totalCredentials = totalCredentials;
+    userInStorage.credentials.clear();
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        userInStorage.credentials[i] = credentials[i];
+        userInStorage.credentials.push_back(credentials[i]);
     }
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d,adjustedIndex=%d]", mEndpointId, userIndex,
