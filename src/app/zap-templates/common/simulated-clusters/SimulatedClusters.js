@@ -60,7 +60,7 @@ function getSimulatedCluster(clusterName)
 
 function getClusters(context)
 {
-  return ensureClusters(context).getClusters().then(clusters => clusters.concat(SimulatedClusters).flat(1));
+  return ensureClusters(context, true).getClusters().then(clusters => clusters.concat(SimulatedClusters).flat(1));
 }
 
 function getCommands(context, clusterName)
