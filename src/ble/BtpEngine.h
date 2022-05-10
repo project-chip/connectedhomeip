@@ -130,10 +130,7 @@ public:
     inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); }
     inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
     inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
-    inline bool IsCommandPacket(const PacketBufferHandle & p)
-    {
-        return BitFlags<HeaderFlags>(*(p->Start())).Has(HeaderFlags::kCommandMessage);
-    }
+    static bool IsCommandPacket(const PacketBufferHandle & p);
     inline void PushPacketTag(const PacketBufferHandle & p, PacketType_t type)
     {
         p->SetStart(p->Start() - sizeof(type));

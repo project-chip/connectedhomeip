@@ -53,8 +53,6 @@
 
 namespace chip {
 
-class PairingSession;
-
 /**
  * @brief
  *  Tracks ownership of a encrypted packet buffer.

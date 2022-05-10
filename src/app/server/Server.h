@@ -328,6 +328,7 @@ private:
                     }
                 }
             }
+            app::EventManagement::GetInstance().FabricRemoved(fabricIndex);
         };
         void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 

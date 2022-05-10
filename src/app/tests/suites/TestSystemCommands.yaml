@@ -69,16 +69,12 @@ tests:
     - label: "Stop the default accessory"
       command: "Stop"
 
-    - label: "Start the default accessory with all command line options"
+    - label: "Start the default accessory with minCommissioningTimeout only"
       command: "Start"
       arguments:
           values:
-              - name: "discriminator"
-                value: 1111
-              - name: "port"
-                value: 5560
-              - name: "kvs"
-                value: "/tmp/chip_kvs_default"
+              - name: "minCommissioningTimeout"
+                value: 10
 
     - label: "Stop the default accessory"
       command: "Stop"
@@ -95,6 +91,8 @@ tests:
                 value: "/tmp/chip_kvs_default"
               - name: "registerKey"
                 value: "default"
+              - name: "minCommissioningTimeout"
+                value: 10
 
     - label: "Start a second accessory with all command line options"
       command: "Start"

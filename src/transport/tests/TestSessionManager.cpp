@@ -59,7 +59,7 @@ const char PAYLOAD[] = "Hello!";
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 
-class TestSessionReleaseCallback : public SessionReleaseDelegate
+class TestSessionReleaseCallback : public SessionDelegate
 {
 public:
     void OnSessionReleased() override { mOldConnectionDropped = true; }

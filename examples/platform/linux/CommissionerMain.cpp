@@ -22,6 +22,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -124,6 +125,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = commissionerPort;
     factoryParams.fabricIndependentStorage = &gServerStorage;
+    factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
@@ -186,6 +188,9 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
+
+    // advertise operational since we are an admin
+    app::DnssdServer::Instance().AdvertiseOperational();
 
     ChipLogProgress(Support, "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
                     ChipLogValueX64(gCommissioner.GetNodeId()), fabricInfo->GetFabricIndex());

@@ -506,7 +506,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
         }
     }
 
-    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, entry, nullptr));
+    // TODO: add a subject description on the ACL
+    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, targetDeviceProxy->GetFabricIndex(), nullptr, entry));
 
     ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());

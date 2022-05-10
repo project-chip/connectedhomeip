@@ -287,9 +287,9 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     {
     case TxtFieldKey::kTcpSupported:
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kMrpRetryIntervalIdle);
+    case TxtFieldKey::kSleepyIdleInterval:
+    case TxtFieldKey::kSleepyActiveInterval:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -537,8 +537,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 {
     PREPARE_RECORDS(Operational);
 
-    ADD_TXT_RECORD(MrpRetryIntervalIdle);
-    ADD_TXT_RECORD(MrpRetryIntervalActive);
+    ADD_TXT_RECORD(SleepyIdleInterval);
+    ADD_TXT_RECORD(SleepyActiveInterval);
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(CompressedFabricId);
@@ -555,8 +555,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_TXT_RECORD(VendorProduct);
     ADD_TXT_RECORD(DeviceType);
     ADD_TXT_RECORD(DeviceName);
-    ADD_TXT_RECORD(MrpRetryIntervalIdle);
-    ADD_TXT_RECORD(MrpRetryIntervalActive);
+    ADD_TXT_RECORD(SleepyIdleInterval);
+    ADD_TXT_RECORD(SleepyActiveInterval);
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(VendorId);

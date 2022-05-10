@@ -769,6 +769,7 @@ ManufacturingDate
 masterkey
 matterBuildSrcDir
 matterc
+MatterCustomTrace
 matterd
 MatterLock
 matterSdkSourceBuild
@@ -1347,6 +1348,7 @@ UTF
 util
 utils
 UUID
+ux
 VCP
 Vectorcall
 VendorID

@@ -37,11 +37,11 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
+#include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <trace/trace.h>
-#include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
@@ -127,22 +127,11 @@ CASESession::~CASESession()
     Clear();
 }
 
-void CASESession::Finish()
+void CASESession::OnSessionReleased()
 {
-    Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
-
-    // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
-    DiscardExchange();
-
-    CHIP_ERROR err = ActivateSecureSession(address);
-    if (err == CHIP_NO_ERROR)
-    {
-        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
-    }
-    else
-    {
-        mDelegate->OnSessionEstablishmentError(err);
-    }
+    Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
 }
 
 void CASESession::Clear()
@@ -155,37 +144,9 @@ void CASESession::Clear()
     mState = State::kInitialized;
     Crypto::ClearSecretData(mIPK);
 
-    AbortExchange();
-
     mLocalNodeId = kUndefinedNodeId;
     mPeerNodeId  = kUndefinedNodeId;
     mFabricInfo  = nullptr;
-}
-
-void CASESession::AbortExchange()
-{
-    if (mExchangeCtxt != nullptr)
-    {
-        // The only time we reach this is if we are getting destroyed in the
-        // middle of our handshake.  In that case, there is no point trying to
-        // do MRP resends of the last message we sent, so abort the exchange
-        // instead of just closing it.
-        mExchangeCtxt->Abort();
-        mExchangeCtxt = nullptr;
-    }
-}
-
-void CASESession::DiscardExchange()
-{
-    if (mExchangeCtxt != nullptr)
-    {
-        // Make sure the exchange doesn't try to notify us when it closes,
-        // since we might be dead by then.
-        mExchangeCtxt->SetDelegate(nullptr);
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
-        // exchange will handle that.
-        mExchangeCtxt = nullptr;
-    }
 }
 
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)

@@ -18,7 +18,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
 {
     switch (aPath.mClusterId)
     {
-    {{#chip_client_clusters}}
+    {{#chip_client_clusters includeAll=true}}
     case Clusters::{{asUpperCamelCase name}}::Id: {
         using namespace Clusters::{{asUpperCamelCase name}};
         switch (aPath.mAttributeId)

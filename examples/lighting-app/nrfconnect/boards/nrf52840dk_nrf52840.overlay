@@ -48,6 +48,8 @@
 };
 
 &pwm0 {
+	/delete-property/ ch0-pin;
+	/delete-property/ ch0-inverted;
 	ch1-pin = < 0xe >;
 	ch1-inverted;
 };

@@ -29,7 +29,6 @@
 #include <app/CASEClient.h>
 #include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
-#include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
@@ -85,7 +84,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          public SessionReleaseDelegate,
+                                          public SessionDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {

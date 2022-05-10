@@ -423,6 +423,107 @@ tests:
                   },
               ]
 
+    - label: "Write too many entries"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [4, 5, 6, 7],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [12, 13, 14, 15],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [20, 21, 22, 23],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 24, DeviceType: null },
+                              { Cluster: 25, Endpoint: null, DeviceType: null },
+                              { Cluster: 26, Endpoint: 27, DeviceType: null },
+                          ],
+                  },
+              ]
+      response:
+          error: RESOURCE_EXHAUSTED
+
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 0, DeviceType: null },
+                              { Cluster: 1, Endpoint: null, DeviceType: null },
+                              { Cluster: 2, Endpoint: 3, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: [4, 5, 6, 7],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 8, DeviceType: null },
+                              { Cluster: 9, Endpoint: null, DeviceType: null },
+                              { Cluster: 10, Endpoint: 11, DeviceType: null },
+                          ],
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 3, # group
+                      Subjects: [12, 13, 14, 15],
+                      Targets:
+                          [
+                              { Cluster: null, Endpoint: 16, DeviceType: null },
+                              { Cluster: 17, Endpoint: null, DeviceType: null },
+                              { Cluster: 18, Endpoint: 19, DeviceType: null },
+                          ],
+                  },
+              ]
+
+    # note missing last entry
     - label: "Restore ACL"
       command: "writeAttribute"
       attribute: "ACL"

@@ -178,6 +178,7 @@ def getSpecificTemplatesTargets():
     # Mapping of required template and output directory
     templates = {
         'src/app/common/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
+        'src/app/tests/suites/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
         'examples/chip-tool/templates/templates.json': 'zzz_generated/chip-tool/zap-generated',
         'examples/chip-tool-darwin/templates/templates.json': 'zzz_generated/chip-tool-darwin/zap-generated',
         'src/controller/python/templates/templates.json': None,
