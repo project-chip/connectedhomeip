@@ -165,7 +165,7 @@ struct CommissionNodeData
     void Reset()
     {
         // NOTE that this assumes 0-fill is ok for this class
-        memset(this, 0, sizeof(this));
+        memset(this, 0, sizeof(*this));
     }
     CommissionNodeData() { Reset(); }
 

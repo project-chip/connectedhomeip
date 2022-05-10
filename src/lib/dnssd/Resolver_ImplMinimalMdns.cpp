@@ -151,8 +151,8 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
         return;
     }
 
-    mNodeData.port = srv.GetPort();
-    mHasNodePort   = true;
+    mNodeData.resolutionData.port = srv.GetPort();
+    mHasNodePort                  = true;
 }
 
 void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
@@ -161,13 +161,14 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mDiscoveredNodeData.hostName, it.Value());
+        Platform::CopyString(mDiscoveredNodeData.resolutionData.hostName, it.Value());
     }
     if (name.Next())
     {
-        strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
+        strncpy(mDiscoveredNodeData.commissionData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
     }
-    mDiscoveredNodeData.port = srv.GetPort();
+    mDiscoveredNodeData.resolutionData.port = srv.GetPort();
+    mHasNodePort                            = true;
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -178,24 +179,24 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    if (mNodeData.numIPs >= ResolutionData::kMaxIPAddresses)
+    if (mNodeData.resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
     {
         return;
     }
-    mNodeData.ipAddress[mNodeData.numIPs++] = addr;
-    mNodeData.interfaceId                   = mInterfaceId;
-    mHasIP                                  = true;
+    mNodeData.resolutionData.ipAddress[mNodeData.ResolutionData.numIPs++] = addr;
+    mNodeData.resolutionData.interfaceId                                  = mInterfaceId;
+    mHasIP                                                                = true;
 }
 
 void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
 {
-    if (mDiscoveredNodeData.numIPs >= ResolutionData::kMaxIPAddresses)
+    if (mDiscoveredNodeData.resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
-    mDiscoveredNodeData.interfaceId                           = mInterfaceId;
-    mDiscoveredNodeData.numIPs++;
+    mDiscoveredNodeData.resolutionData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
+    mDiscoveredNodeData.resolutionData.interfaceId                           = mInterfaceId;
+    mDiscoveredNodeData.resolutionData.numIPs++;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -265,7 +266,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             ParsePtrRecord(data.GetData(), mPacketRange, &qname);
             if (qname.Next())
             {
-                strncpy(mDiscoveredNodeData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
+                strncpy(mDiscoveredNodeData.commissionData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
             }
         }
         break;
@@ -329,7 +330,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
     if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
     {
-        if (!mDiscoveredNodeData.IsValid())
+        if (!mDiscoveredNodeData.resolutionData.IsValid())
         {
             ChipLogError(Discovery, "Discovered node data is not valid. Commissioning discovery not complete.");
             return;

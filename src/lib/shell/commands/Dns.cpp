@@ -44,25 +44,26 @@ public:
     void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
-                        ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
-        for (size_t i = 0; i < nodeData.numIPs; ++i)
+                        ChipLogValueX64(nodeData.operationalData.peerId.GetCompressedFabricId()),
+                        ChipLogValueX64(nodeData.operationalData.peerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.resolutionData.hostName);
+        for (size_t i = 0; i < nodeData.resolutionData.numIPs; ++i)
         {
-            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
+            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
         }
-        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.port);
+        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.resolutionData.port);
 
-        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+        auto retryInterval = nodeData.resolutionData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        retryInterval = nodeData.GetMrpRetryIntervalActive();
+        retryInterval = nodeData.resolutionData.GetMrpRetryIntervalActive();
 
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
     }
 
     void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}

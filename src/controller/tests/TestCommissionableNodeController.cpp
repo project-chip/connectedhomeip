@@ -56,16 +56,16 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData inNodeData;
-    strncpy(inNodeData.hostName, "mockHostName", sizeof inNodeData.hostName);
-    Inet::IPAddress::FromString("192.168.1.10", inNodeData.ipAddress[0]);
-    inNodeData.numIPs++;
-    inNodeData.port = 5540;
+    strncpy(inNodeData.resolutionData.hostName, "mockHostName", sizeof(inNodeData.resolutionData.hostName));
+    Inet::IPAddress::FromString("192.168.1.10", inNodeData.resolutionData.ipAddress[0]);
+    inNodeData.resolutionData.numIPs++;
+    inNodeData.resolutionData.port = 5540;
 
     controller.OnNodeDiscovered(inNodeData);
 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0) != nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(inNodeData.hostName, controller.GetDiscoveredCommissioner(0)->hostName) == 0);
-    NL_TEST_ASSERT(inSuite, inNodeData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->ipAddress[0]);
+    NL_TEST_ASSERT(inSuite, strcmp(inNodeData.resolutionDAta.hostName, controller.GetDiscoveredCommissioner(0)->hostName) == 0);
+    NL_TEST_ASSERT(inSuite, inNodeData.resolutionData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->ipAddress[0]);
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->port == 5540);
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->numIPs == 1);
 }
@@ -75,9 +75,9 @@ void TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr(nlTestSu
     MockResolver resolver;
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData inNodeData;
-    Inet::IPAddress::FromString("192.168.1.10", inNodeData.ipAddress[0]);
-    inNodeData.numIPs++;
-    inNodeData.port = 5540;
+    Inet::IPAddress::FromString("192.168.1.10", inNodeData.resolutionData.ipAddress[0]);
+    inNodeData.resolutionData.numIPs++;
+    inNodeData.resolutionData.port = 5540;
 
     controller.OnNodeDiscovered(inNodeData);
 

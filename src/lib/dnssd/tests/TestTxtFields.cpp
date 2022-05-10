@@ -416,15 +416,15 @@ void TxtFieldSleepyIdleInterval(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SII");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
 
     // Maximum
     strcpy(key, "SII");
     strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
 
     // Test no other fields were populated
     ResetRetryIntervalIdle(nodeData);
@@ -434,37 +434,37 @@ void TxtFieldSleepyIdleInterval(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SII");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - greater than maximum
     strcpy(key, "SII");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - much greater than maximum
     strcpy(key, "SII");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - hexadecimal value
     strcpy(key, "SII");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - leading zeros
     strcpy(key, "SII");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid SII - text at the end
     strcpy(key, "SII");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
 }
 
 // Test SAI (formerly CRA)
@@ -479,15 +479,15 @@ void TxtFieldSleepyActiveInterval(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SAI");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1_ms32);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().Value() == 1_ms32);
 
     // Maximum
     strcpy(key, "SAI");
     strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000_ms32);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().Value() == 3600000_ms32);
 
     // Test no other fields were populated
     ResetRetryIntervalActive(nodeData);
@@ -497,37 +497,37 @@ void TxtFieldSleepyActiveInterval(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "SAI");
     strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - much greater than maximum
     strcpy(key, "SAI");
     strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - hexadecimal value
     strcpy(key, "SAI");
     strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - leading zeros
     strcpy(key, "SAI");
     strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid SAI - text at the end
     strcpy(key, "SAI");
     strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
 }
 
 // Test T (TCP support)
@@ -542,7 +542,7 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "T");
     strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp);
 
     // Test no other fields were populated
     nodeData.*supportsTcp = false;
@@ -552,13 +552,13 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "T");
     strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
 
     // Invalid value, stil false
     strcpy(key, "T");
     strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRI
@@ -572,19 +572,19 @@ void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
                                                          CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     strcpy(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "SII");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRA
@@ -598,19 +598,19 @@ void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
                                                          CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     strcpy(key, "SAI");
     sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
 const nlTest sTests[] = {

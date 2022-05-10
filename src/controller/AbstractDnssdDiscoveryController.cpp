@@ -30,11 +30,12 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.IsValid())
+        if (!discoveredNode.resolutionData.IsValid())
         {
             continue;
         }
-        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port)
+        if (strcmp(discoveredNode.hostName, nodeData.resolutionData.hostName) == 0 &&
+            discoveredNode.port == nodeData.resolutionData.port)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
