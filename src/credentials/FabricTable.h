@@ -383,18 +383,11 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
-    /**
-     * Obtain a pointer to the FabricInfo. Note that its possible for fabrics to be added
-     * and removed, and for the FabricTable to be re-inited from storage. As a result
-     * clients should use FindFabric when a FabricInfo is needed and avoid holding a
-     * reference since the underlying Fabric may change.
-     */
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
-    CHIP_ERROR ReInitFromStorage();
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }

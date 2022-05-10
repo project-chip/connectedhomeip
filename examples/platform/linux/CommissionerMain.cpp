@@ -125,6 +125,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     // use a different listen port for the commissioner than the default used by chip-tool.
     factoryParams.listenPort               = commissionerPort;
     factoryParams.fabricIndependentStorage = &gServerStorage;
+    factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     ReturnErrorOnFailure(gGroupDataProvider.Init());
@@ -187,10 +188,6 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
 
     gCommissionerDiscoveryController.SetUserDirectedCommissioningServer(gCommissioner.GetUserDirectedCommissioningServer());
     gCommissionerDiscoveryController.SetCommissionerCallback(&gCommissionerCallback);
-
-    // re-init server's fabric table since DeviceControllerFactory::InitSystemState will add
-    // its Fabric if it is not already there.
-    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().ReInitFromStorage());
 
     // advertise operational since we are an admin
     app::DnssdServer::Instance().AdvertiseOperational();

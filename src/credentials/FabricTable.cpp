@@ -292,7 +292,6 @@ CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId *
 
 CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex)
 {
-    ChipLogProgress(Discovery, "   ------   FabricTable::DeleteFromStorage()");
     DefaultStorageKeyAllocator keyAlloc;
 
     // Try to delete all the state even if one of the deletes fails.
@@ -631,8 +630,6 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
             err = StoreFabricIndexInfo();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogProgress(Discovery, "   ------   FabricTable::AddNewFabric() rolling back");
-
                 // Roll everything back.
                 mNextAvailableFabricIndex.SetValue(newFabricIndex);
                 fabric.Reset();
@@ -653,8 +650,6 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
 CHIP_ERROR FabricTable::Delete(FabricIndex index)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    ChipLogProgress(Discovery, "   ------   Deleted fabric at index: 0x%x", static_cast<unsigned>(index));
 
     FabricInfo * fabric      = FindFabricWithIndex(index);
     bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
@@ -714,7 +709,6 @@ void FabricTable::DeleteAllFabrics()
 {
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
 
-    ChipLogProgress(Discovery, "   ------   FabricTable::DeleteAllFabrics()");
     for (auto & fabric : *this)
     {
         Delete(fabric.GetFabricIndex());
@@ -725,15 +719,8 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(Discovery, "   ------   FabricTable::Init()");
-
     mStorage = storage;
 
-    return ReInitFromStorage();
-}
-
-CHIP_ERROR FabricTable::ReInitFromStorage()
-{
     ChipLogDetail(Discovery, "ReInit fabric pairing table with server storage");
 
     // Load the current fabrics from the storage. This is done here, since ConstFabricIterator
@@ -800,13 +787,10 @@ FabricIndex NextFabricIndex(FabricIndex index)
 
 void FabricTable::UpdateNextAvailableFabricIndex()
 {
-    ChipLogProgress(Discovery, "   ------   FabricTable::UpdateNextAvailableFabricIndex()");
     // Only called when mNextAvailableFabricIndex.HasValue()
     for (FabricIndex candidate = NextFabricIndex(mNextAvailableFabricIndex.Value()); candidate != mNextAvailableFabricIndex.Value();
          candidate             = NextFabricIndex(candidate))
     {
-        ChipLogProgress(Discovery, "   ------   FabricTable::UpdateNextAvailableFabricIndex() (0x%x)",
-                        static_cast<unsigned>(candidate));
         if (!FindFabricWithIndex(candidate))
         {
             mNextAvailableFabricIndex.SetValue(candidate);
@@ -814,7 +798,6 @@ void FabricTable::UpdateNextAvailableFabricIndex()
         }
     }
 
-    ChipLogProgress(Discovery, "   ------   FabricTable::UpdateNextAvailableFabricIndex() - clearing");
     mNextAvailableFabricIndex.ClearValue();
 }
 
@@ -858,7 +841,6 @@ CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
 
 CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
 {
-    ChipLogProgress(Discovery, "   ------   FabricTable::ReadFabricInfo()");
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     TLV::TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));

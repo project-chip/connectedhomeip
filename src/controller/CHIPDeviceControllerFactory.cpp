@@ -147,7 +147,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
@@ -155,23 +154,29 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    // if no fabricTable was provided, create one and track it in stateParams for cleanup
+    FabricTable * fabricTable = params.fabricTable;
+    if (fabricTable == nullptr)
+    {
+        stateParams.fabricTable = fabricTable = chip::Platform::New<FabricTable>();
+        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    }
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
-    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.get()));
+    ReturnErrorOnFailure(fabricTable->AddFabricDelegate(delegate.get()));
     delegate.release();
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
                                                       stateParams.messageCounterManager, params.fabricIndependentStorage,
-                                                      stateParams.fabricTable));
+                                                      fabricTable));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
     InitDataModelHandler(stateParams.exchangeMgr);
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, fabricTable));
 
     ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
 
@@ -181,7 +186,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
         // Enable listening for session establishment messages.
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage,
+            stateParams.exchangeMgr, stateParams.sessionMgr, fabricTable, stateParams.sessionResumptionStorage,
             stateParams.groupDataProvider));
 
         //
@@ -200,7 +205,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         //
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
-        app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
+        app::DnssdServer::Instance().SetFabricTable(fabricTable);
 
         //
         // Start up the DNS-SD server.  We are not giving it a
@@ -217,7 +222,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .sessionManager           = stateParams.sessionMgr,
         .sessionResumptionStorage = stateParams.sessionResumptionStorage,
         .exchangeMgr              = stateParams.exchangeMgr,
-        .fabricTable              = stateParams.fabricTable,
+        .fabricTable              = fabricTable,
         .clientPool               = stateParams.caseClientPool,
         .groupDataProvider        = stateParams.groupDataProvider,
         .mrpLocalConfig           = Optional<ReliableMessageProtocolConfig>::Value(GetLocalMRPConfig()),
