@@ -35,8 +35,8 @@
 namespace chip {
 namespace Dnssd {
 
-// Data common to both operational and commisionable discovery
-struct ResolutionData
+/// Node resolution data common to both operational and commissionable discovery
+struct CommonResolutionData
 {
     // TODO: is this count OK? Sufficient space for IPv6 LL, GUA, ULA (and maybe IPv4 if enabled)
     static constexpr unsigned kMaxIPAddresses = 5;
@@ -52,7 +52,7 @@ struct ResolutionData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
 
-    ResolutionData() { Reset(); }
+    CommonResolutionData() { Reset(); }
 
     bool IsValid() const { return !IsHost("") && (numIPs > 0) && (ipAddress[0] != chip::Inet::IPAddress::Any); }
 
@@ -129,27 +129,15 @@ struct ResolutionData
     }
 };
 
-struct ResolvedNodeData : public ResolutionData
+/// Data that is specific to Operational Discovery of nodes
+struct OperationalNodeData
 {
-    void LogNodeIdResolved() const
-    {
-#if CHIP_PROGRESS_LOGGING
-        // Would be nice to log the interface id, but sorting out how to do so
-        // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
-                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
-        ResolutionData::LogDetail();
-#endif // CHIP_PROGRESS_LOGGING
-    }
-
-    PeerId mPeerId;
+    PeerId peerId;
     System::Clock::Timestamp mExpiryTime;
 
     void Reset()
     {
-        ResolutionData::Reset();
-
-        mPeerId     = PeerId();
+        peerId      = PeerId();
         mExpiryTime = System::Clock::Timestamp::zero();
     }
 };
@@ -158,7 +146,8 @@ constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
 
-struct DiscoveredNodeData : public ResolutionData
+/// Data that is specific to commisionable/commissioning node discovery
+struct CommissionNodeData
 {
     char instanceName[Commission::kInstanceNameMaxLength + 1];
     uint16_t longDiscriminator;
@@ -175,21 +164,11 @@ struct DiscoveredNodeData : public ResolutionData
 
     void Reset()
     {
-        ResolutionData::Reset();
-
-        memset(instanceName, 0, sizeof(instanceName));
-        longDiscriminator = 0;
-        vendorId          = 0;
-        productId         = 0;
-        commissioningMode = 0;
-        deviceType        = 0;
-        memset(deviceName, 0, sizeof(deviceName));
-        memset(rotatingId, 0, sizeof(rotatingId));
-        rotatingIdLen = 0;
-        memset(pairingInstruction, 0, sizeof(pairingInstruction));
-        pairingHint = 0;
+        // NOTE that this assumes 0-fill is ok for this class
+        memset(this, 0, sizeof(this));
     }
-    DiscoveredNodeData() { Reset(); }
+    CommissionNodeData() { Reset(); }
+
     bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
 
     void LogDetail() const
@@ -233,8 +212,43 @@ struct DiscoveredNodeData : public ResolutionData
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+    }
+};
 
-        ResolutionData::LogDetail();
+struct ResolvedNodeData
+{
+    CommonResolutionData resolutionData;
+    OperationalNodeData operationalData;
+
+    void LogNodeIdResolved() const
+    {
+#if CHIP_PROGRESS_LOGGING
+        // Would be nice to log the interface id, but sorting out how to do so
+        // across our differnet InterfaceId implementations is a pain.
+        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
+                        ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
+                        ChipLogValueX64(operationalData.peerId.GetNodeId()));
+        resolutionData.LogDetail();
+#endif // CHIP_PROGRESS_LOGGING
+    }
+};
+
+struct DiscoveredNodeData
+{
+    CommonResolutionData resolutionData;
+    CommissionNodeData commissionData;
+
+    void Reset()
+    {
+        resolutionData.Reset();
+        commissionData.Reset();
+    }
+    DiscoveredNodeData() { Reset(); }
+
+    void LogDetail() const
+    {
+        resolutionData.LogDetail();
+        commissionData.LogDetail();
     }
 };
 

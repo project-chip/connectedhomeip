@@ -154,7 +154,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mRemoteMRPConfig = nodeResolutionData.GetMRPConfig();
+        mRemoteMRPConfig = nodeResolutionData.resolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -196,12 +196,12 @@ public:
         // For all other addresses, we should rely on the device's routing table to route messages sent.
         // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
         // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        if (nodeData.ipAddress[0].IsIPv6LinkLocal())
+        if (nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal())
         {
-            interfaceId = nodeData.interfaceId;
+            interfaceId = nodeData.resolutionData.interfaceId;
         }
 
-        return Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port, interfaceId);
+        return Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port, interfaceId);
     }
 
     /**
