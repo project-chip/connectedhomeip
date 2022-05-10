@@ -133,13 +133,8 @@ struct CommonResolutionData
 struct OperationalNodeData
 {
     PeerId peerId;
-    System::Clock::Timestamp mExpiryTime;
 
-    void Reset()
-    {
-        peerId      = PeerId();
-        mExpiryTime = System::Clock::Timestamp::zero();
-    }
+    void Reset() { peerId = PeerId(); }
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;

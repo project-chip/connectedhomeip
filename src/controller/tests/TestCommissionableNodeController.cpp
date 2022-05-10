@@ -64,10 +64,12 @@ void TestGetDiscoveredCommissioner_HappyCase(nlTestSuite * inSuite, void * inCon
     controller.OnNodeDiscovered(inNodeData);
 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0) != nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(inNodeData.resolutionDAta.hostName, controller.GetDiscoveredCommissioner(0)->hostName) == 0);
-    NL_TEST_ASSERT(inSuite, inNodeData.resolutionData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->ipAddress[0]);
-    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->port == 5540);
-    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->numIPs == 1);
+    NL_TEST_ASSERT(
+        inSuite, strcmp(inNodeData.resolutionData.hostName, controller.GetDiscoveredCommissioner(0)->resolutionData.hostName) == 0);
+    NL_TEST_ASSERT(inSuite,
+                   inNodeData.resolutionData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->resolutionData.ipAddress[0]);
+    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->resolutionData.port == 5540);
+    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->resolutionData.numIPs == 1);
 }
 
 void TestGetDiscoveredCommissioner_InvalidNodeDiscovered_ReturnsNullptr(nlTestSuite * inSuite, void * inContext)
@@ -93,23 +95,26 @@ void TestGetDiscoveredCommissioner_HappyCase_OneValidOneInvalidNode(nlTestSuite 
     CommissionableNodeController controller(&resolver);
     chip::Dnssd::DiscoveredNodeData invalidNodeData, validNodeData;
     // strncpy(inNodeData1.hostName, "mockHostName1", sizeof inNodeData1.hostName);
-    Inet::IPAddress::FromString("192.168.1.10", invalidNodeData.ipAddress[0]);
-    invalidNodeData.numIPs++;
-    invalidNodeData.port = 5540;
+    Inet::IPAddress::FromString("192.168.1.10", invalidNodeData.resolutionData.ipAddress[0]);
+    invalidNodeData.resolutionData.numIPs++;
+    invalidNodeData.resolutionData.port = 5540;
 
-    strncpy(validNodeData.hostName, "mockHostName2", sizeof validNodeData.hostName);
-    Inet::IPAddress::FromString("192.168.1.11", validNodeData.ipAddress[0]);
-    validNodeData.numIPs++;
-    validNodeData.port = 5540;
+    strncpy(validNodeData.resolutionData.hostName, "mockHostName2", sizeof validNodeData.resolutionData.hostName);
+    Inet::IPAddress::FromString("192.168.1.11", validNodeData.resolutionData.ipAddress[0]);
+    validNodeData.resolutionData.numIPs++;
+    validNodeData.resolutionData.port = 5540;
 
     controller.OnNodeDiscovered(validNodeData);
     controller.OnNodeDiscovered(invalidNodeData);
 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0) != nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(validNodeData.hostName, controller.GetDiscoveredCommissioner(0)->hostName) == 0);
-    NL_TEST_ASSERT(inSuite, validNodeData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->ipAddress[0]);
-    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->port == 5540);
-    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->numIPs == 1);
+    NL_TEST_ASSERT(
+        inSuite,
+        strcmp(validNodeData.resolutionData.hostName, controller.GetDiscoveredCommissioner(0)->resolutionData.hostName) == 0);
+    NL_TEST_ASSERT(
+        inSuite, validNodeData.resolutionData.ipAddress[0] == controller.GetDiscoveredCommissioner(0)->resolutionData.ipAddress[0]);
+    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->resolutionData.port == 5540);
+    NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(0)->resolutionData.numIPs == 1);
 
     NL_TEST_ASSERT(inSuite, controller.GetDiscoveredCommissioner(1) == nullptr);
 }

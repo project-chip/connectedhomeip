@@ -134,7 +134,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mNodeData.hostName, it.Value());
+        Platform::CopyString(mNodeData.resolutionData.hostName, it.Value());
     }
 
     if (!name.Next())
@@ -145,7 +145,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
         return;
     }
 
-    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
+    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.operationalData.peerId) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
         return;
@@ -165,7 +165,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     }
     if (name.Next())
     {
-        strncpy(mDiscoveredNodeData.commissionData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
+        strncpy(mDiscoveredNodeData.commissionData.instanceName, name.Value(), sizeof(CommissionNodeData::instanceName));
     }
     mDiscoveredNodeData.resolutionData.port = srv.GetPort();
     mHasNodePort                            = true;
@@ -183,7 +183,7 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     {
         return;
     }
-    mNodeData.resolutionData.ipAddress[mNodeData.ResolutionData.numIPs++] = addr;
+    mNodeData.resolutionData.ipAddress[mNodeData.resolutionData.numIPs++] = addr;
     mNodeData.resolutionData.interfaceId                                  = mInterfaceId;
     mHasIP                                                                = true;
 }
@@ -194,8 +194,8 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.resolutionData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
-    mDiscoveredNodeData.resolutionData.interfaceId                           = mInterfaceId;
+    mDiscoveredNodeData.resolutionData.ipAddress[mDiscoveredNodeData.resolutionData.numIPs] = addr;
+    mDiscoveredNodeData.resolutionData.interfaceId                                          = mInterfaceId;
     mDiscoveredNodeData.resolutionData.numIPs++;
 }
 
@@ -266,7 +266,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             ParsePtrRecord(data.GetData(), mPacketRange, &qname);
             if (qname.Next())
             {
-                strncpy(mDiscoveredNodeData.commissionData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
+                strncpy(mDiscoveredNodeData.commissionData.instanceName, qname.Value(), sizeof(CommissionNodeData::instanceName));
             }
         }
         break;
@@ -360,14 +360,13 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
             return;
         }
 
-        activeAttempts.Complete(mNodeData.mPeerId);
+        activeAttempts.Complete(mNodeData.operationalData.peerId);
         mNodeData.LogNodeIdResolved();
 
         //
         // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
         //
         const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-        mNodeData.mExpiryTime                      = currentTime + System::Clock::Seconds16(kDefaultTtlSeconds);
 
         if (mOperationalDelegate != nullptr)
         {

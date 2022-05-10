@@ -109,12 +109,14 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 {
     if (nodeData.resolutionData.numIPs == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s", nodeData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s",
+                     nodeData.commissionData.instanceName);
         return;
     }
     if (nodeData.resolutionData.port == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s", nodeData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s",
+                     nodeData.commissionData.instanceName);
         return;
     }
 
@@ -167,12 +169,12 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        client->SetDeviceName(nodeData.resolutionData.deviceName);
-        client->SetLongDiscriminator(nodeData.resolutionData.longDiscriminator);
-        client->SetVendorId(nodeData.resolutionData.vendorId);
-        client->SetProductId(nodeData.resolutionData.productId);
-        client->SetDeviceName(nodeData.resolutionData.deviceName);
-        client->SetRotatingId(nodeData.resolutionData.rotatingId, nodeData.resolutionData.rotatingIdLen);
+        client->SetDeviceName(nodeData.commissionData.deviceName);
+        client->SetLongDiscriminator(nodeData.commissionData.longDiscriminator);
+        client->SetVendorId(nodeData.commissionData.vendorId);
+        client->SetProductId(nodeData.commissionData.productId);
+        client->SetDeviceName(nodeData.commissionData.deviceName);
+        client->SetRotatingId(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)
