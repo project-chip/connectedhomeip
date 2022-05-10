@@ -60,9 +60,8 @@ private:
     NodeData & mNodeData;
 };
 
-constexpr size_t kMdnsMaxPacketSize   = 1024;
-constexpr uint16_t kMdnsPort          = 5353;
-constexpr uint16_t kDefaultTtlSeconds = 120;
+constexpr size_t kMdnsMaxPacketSize = 1024;
+constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
 
