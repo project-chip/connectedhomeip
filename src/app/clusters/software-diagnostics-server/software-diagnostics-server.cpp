@@ -156,23 +156,11 @@ bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandle
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    uint64_t currentHeapUsed;
-    CHIP_ERROR err = DeviceLayer::GetDiagnosticDataProvider().GetCurrentHeapUsed(currentHeapUsed);
-
-    // Skip SetCurrentHeapHighWatermark if GetCurrentHeapUsed is not implemented
-    if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE && err != CHIP_ERROR_NOT_IMPLEMENTED)
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+    if (DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks() != CHIP_NO_ERROR)
     {
-        if (err == CHIP_NO_ERROR)
-        {
-            if (CHIP_NO_ERROR != DeviceLayer::GetDiagnosticDataProvider().SetCurrentHeapHighWatermark(currentHeapUsed))
-            {
-                status = EMBER_ZCL_STATUS_FAILURE;
-            }
-        }
-        else
-        {
-            status = EMBER_ZCL_STATUS_FAILURE;
-        }
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
 
     emberAfSendImmediateDefaultResponse(status);
