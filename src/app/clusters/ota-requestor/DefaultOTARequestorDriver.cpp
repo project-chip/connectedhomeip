@@ -351,7 +351,7 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    DefaultOTARequestorDriver * driver = reinterpret_cast<DefaultOTARequestorDriver *>(appState);
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
 
     ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
                  to_underlying(driver->mRequestor->GetCurrentUpdateState()));
