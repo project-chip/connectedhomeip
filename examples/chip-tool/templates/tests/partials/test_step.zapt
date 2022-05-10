@@ -77,8 +77,8 @@
 {{else if isSubscribeAttribute}}   {{>attributeArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered~}}
 {{else if isWriteGroupAttribute}}  {{>groupAttributeArguments}}, value{{>maybeTimedInteractionTimeout~}}
 {{else if isWriteAttribute}}       {{>attributeArguments}}, value{{>maybeTimedInteractionTimeout~}}
-{{else if isReadEvent}}            {{>eventArguments}}{{>maybeFabricFiltered}}
-{{else if isSubscribeEvent}}       {{>eventArguments}}, {{minInterval}}, {{maxInterval}}{{>maybeFabricFiltered~}}
+{{else if isReadEvent}}            {{>eventArguments~}}
+{{else if isSubscribeEvent}}       {{>eventArguments}}, {{minInterval}}, {{maxInterval~}}
 {{else if isGroupCommand}}         {{>groupCommandArguments}}, value{{>maybeTimedInteractionTimeout~}}
 {{else if isCommand}}              {{>commandArguments}}, value{{>maybeTimedInteractionTimeout~}}
 {{/if}}
