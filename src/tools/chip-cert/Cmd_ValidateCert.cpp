@@ -25,6 +25,7 @@
  */
 
 #include "chip-cert.h"
+#include <credentials/CHIPCertificateSet.h>
 
 #include "vector"
 
@@ -182,7 +183,9 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     certToBeValidated = certSet.GetLastCert();
 
     context.Reset();
-    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), context.mEffectiveTime);
+    uint32_t currentTime;
+    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), currentTime);
+    context.mEffectiveTime.Set<CurrentChipEpochTime>(currentTime);
     VerifyTrueOrExit(res);
 
     err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);

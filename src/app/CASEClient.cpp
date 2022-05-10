@@ -45,8 +45,8 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
 
     mCASESession.SetGroupDataProvider(mInitParams.groupDataProvider);
     ReturnErrorOnFailure(mCASESession.EstablishSession(*mInitParams.sessionManager, mInitParams.fabricInfo, peer.GetNodeId(),
-                                                       exchange, mInitParams.sessionResumptionStorage, delegate,
-                                                       mInitParams.mrpLocalConfig));
+                                                       exchange, mInitParams.sessionResumptionStorage, mInitParams.validityPolicy,
+                                                       delegate, mInitParams.mrpLocalConfig));
 
     return CHIP_NO_ERROR;
 }

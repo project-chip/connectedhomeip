@@ -51,6 +51,7 @@
 
 #include <CHIPVersion.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/CHIPCertificateSet.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPConfig.h>

@@ -39,6 +39,7 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/BuildTime.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -470,6 +471,40 @@ template <class ConfigClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVersion(uint32_t softwareVer)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildDate(const char ** date)
+{
+    VerifyOrReturnError(date != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert(!BUILD_DATE_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE));
+    *date = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_DATE;
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildTimeOfDay(const char ** time)
+{
+    VerifyOrReturnError(time != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert(!BUILD_TIME_IS_BAD(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME));
+    *time = CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME;
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
+{
+    const char * date;
+    const char * time;
+    ReturnErrorOnFailure(GetFirmwareBuildDate(&date));
+    ReturnErrorOnFailure(GetFirmwareBuildTimeOfDay(&time));
+    uint32_t seconds;
+    auto good = CalendarToChipEpochTime(COMPUTE_BUILD_YEAR(date), COMPUTE_BUILD_MONTH(date), COMPUTE_BUILD_DAY(date), COMPUTE_BUILD_HOUR(time), COMPUTE_BUILD_MIN(time), COMPUTE_BUILD_SEC(time), seconds);
+    if (good)
+    {
+        chipEpochTime = chip::System::Clock::Seconds32(seconds);
+    }
+    return good ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 template <class ConfigClass>

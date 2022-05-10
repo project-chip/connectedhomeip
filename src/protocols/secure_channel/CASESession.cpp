@@ -149,7 +149,8 @@ void CASESession::Clear()
     mFabricInfo  = nullptr;
 }
 
-CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
+                             SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -164,6 +165,7 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     mValidContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
+    mValidContext.mValidityPolicy = policy;
 
     return CHIP_NO_ERROR;
 }
@@ -171,11 +173,11 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, SessionEstablishme
 CHIP_ERROR
 CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, FabricTable * fabrics,
                                            SessionResumptionStorage * sessionResumptionStorage,
-                                           SessionEstablishmentDelegate * delegate,
+                                           Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                                            Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(Init(sessionManager, delegate));
+    ReturnErrorOnFailure(Init(sessionManager, policy, delegate));
 
     mRole                     = CryptoContext::SessionRole::kResponder;
     mFabricsTable             = fabrics;
@@ -189,7 +191,8 @@ CASESession::ListenForSessionEstablishment(SessionManager & sessionManager, Fabr
 
 CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, FabricInfo * fabric, NodeId peerNodeId,
                                          ExchangeContext * exchangeCtxt, SessionResumptionStorage * sessionResumptionStorage,
-                                         SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
+                                         Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
+                                         Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -198,7 +201,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(sessionManager, delegate);
+    err = Init(sessionManager, policy, delegate);
 
     mRole = CryptoContext::SessionRole::kInitiator;
 
@@ -1441,40 +1444,41 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::GetHardcodedTime()
-{
-    using namespace ASN1;
-    ASN1UniversalTime effectiveTime;
-
-    effectiveTime.Year   = 2022;
-    effectiveTime.Month  = 1;
-    effectiveTime.Day    = 1;
-    effectiveTime.Hour   = 10;
-    effectiveTime.Minute = 10;
-    effectiveTime.Second = 10;
-
-    return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
-}
-
 CHIP_ERROR CASESession::SetEffectiveTime()
 {
-    System::Clock::Milliseconds64 currentTimeMS;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
+    System::Clock::Milliseconds64 currentUnixTimeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
 
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        ChipLogError(SecureChannel,
-                     "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup "
-                     "failures. API error: %" CHIP_ERROR_FORMAT,
-                     err.Format());
-        // TODO: Remove use of hardcoded time during CASE setup
-        return GetHardcodedTime();
+        // If the system has given us a wall clock time, we must use it or
+        // fail.  Conversion failures here are therefore always an error.
+        System::Clock::Seconds32 currentUnixTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentUnixTimeMS);
+        return mValidContext.SetEffectiveTimeFromUnixTime<CurrentChipEpochTime>(currentUnixTime);
     }
-
-    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
-    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
-
-    return CHIP_NO_ERROR;
+    else
+    {
+        // If we don't have wall clock time, the spec dictates that we should
+        // fall back to Last Known Good Time.  Ultimately, the calling application's
+        // validity policy will determine whether this is permissible.
+        System::Clock::Seconds32 lastKnownGoodChipEpochTime;
+        ChipLogError(SecureChannel,
+                     "The device does not support GetClock_RealTimeMS() API: %" CHIP_ERROR_FORMAT
+                     ".  Falling back to Last Known Good UTC Time",
+                     err.Format());
+        err = mFabricsTable->GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            // If we have no time available, the Validity Policy will
+            // determine what to do.
+            ChipLogError(SecureChannel, "Failed to retrieve Last Known Good UTC Time");
+        }
+        else
+        {
+            mValidContext.SetEffectiveTime<LastKnownGoodChipEpochTime>(lastKnownGoodChipEpochTime);
+        }
+        return CHIP_NO_ERROR;
+    }
 }
 
 void CASESession::OnSuccessStatusReport()
