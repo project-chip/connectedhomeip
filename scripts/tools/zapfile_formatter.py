@@ -115,7 +115,7 @@ class ValidateManditoryServerClusterAttributes(Mutator):
             else:
                 if not attribute["included"]:
                     print("WARNING: attribute 0x%X(%s) found, but included is false" %
-                        (self._attribute_entry["code"], self._attribute_entry["name"]))
+                          (self._attribute_entry["code"], self._attribute_entry["name"]))
                     # TODO what do we want to do here?
                 break
         else:
