@@ -3778,7 +3778,7 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [0, 1, 4, 5, 6, 9, 10, 11]
+          value: [0, 1, 4, 5, 6, 8, 9, 10, 11]
 
     # Struct-typed attribute
     - label: "Write struct-typed attribute"

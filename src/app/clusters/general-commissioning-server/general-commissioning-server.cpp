@@ -258,12 +258,35 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 {
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-
-    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.newRegulatoryConfig), commandData.countryCode), Failure);
-    Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
-
     Commands::SetRegulatoryConfigResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
+
+    if (commandData.newRegulatoryConfig > RegulatoryLocationType::kIndoorOutdoor)
+    {
+        response.errorCode = CommissioningError::kValueOutsideRange;
+        response.debugText = commandData.countryCode;
+    }
+    else
+    {
+        uint8_t locationCapability;
+        uint8_t location = to_underlying(commandData.newRegulatoryConfig);
+
+        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
+
+        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
+        // either the Indoor or Outdoor fixed value in LocationCapability.
+        if ((locationCapability != to_underlying(RegulatoryLocationType::kIndoorOutdoor)) && (location != locationCapability))
+        {
+            response.errorCode = CommissioningError::kValueOutsideRange;
+            response.debugText = commandData.countryCode;
+        }
+        else
+        {
+            CheckSuccess(server->SetRegulatoryConfig(location, commandData.countryCode), Failure);
+            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
+            response.errorCode = CommissioningError::kOk;
+        }
+    }
+
     commandObj->AddResponse(commandPath, response);
 
     return true;

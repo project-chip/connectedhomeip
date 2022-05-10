@@ -21,6 +21,8 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/support/CodeUtils.h>
 
+#include <app-common/zap-generated/tests/simulated-cluster-objects.h>
+
 class CommissionerCommands : public chip::Controller::DevicePairingDelegate
 {
 public:
@@ -29,11 +31,13 @@ public:
 
     virtual void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) = 0;
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
-    virtual chip::Controller::DeviceCommissioner & GetCurrentCommissioner()                  = 0;
+    virtual chip::Controller::DeviceCommissioner & GetCommissioner(const char * identity)    = 0;
 
-    CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload);
-    CHIP_ERROR PairWithManualCode(chip::NodeId nodeId, const chip::CharSpan payload);
-    CHIP_ERROR Unpair(chip::NodeId nodeId);
+    CHIP_ERROR PairWithQRCode(const char * identity,
+                              const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value);
+    CHIP_ERROR PairWithManualCode(const char * identity,
+                                  const chip::app::Clusters::CommissionerCommands::Commands::PairWithManualCode::Type & value);
+    CHIP_ERROR Unpair(const char * identity, const chip::app::Clusters::CommissionerCommands::Commands::Unpair::Type & value);
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;

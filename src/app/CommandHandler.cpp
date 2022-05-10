@@ -439,43 +439,32 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aCommandPath,
-                                             const Protocols::InteractionModel::Status aStatus,
-                                             const Optional<ClusterStatus> & aClusterStatus)
+CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus)
 {
-    StatusIB statusIB;
     ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
     StatusIB::Builder & statusIBBuilder      = commandStatus.CreateErrorStatus();
     ReturnErrorOnFailure(commandStatus.GetError());
-    //
-    // TODO: Most of the callers are incorrectly passing SecureChannel as the protocol ID, when in fact, the status code provided
-    // above is always an IM code. Instead of fixing all the callers (which is a fairly sizeable change), we'll embark on fixing
-    // this more completely when we fix #9530.
-    //
-    statusIB.mStatus        = aStatus;
-    statusIB.mClusterStatus = aClusterStatus;
-    statusIBBuilder.EncodeStatusIB(statusIB);
+    statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
     return FinishStatus();
 }
 
 CHIP_ERROR CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus)
 {
-    Optional<ClusterStatus> clusterStatus = Optional<ClusterStatus>::Missing();
-    return AddStatusInternal(aCommandPath, aStatus, clusterStatus);
+    return AddStatusInternal(aCommandPath, StatusIB(aStatus));
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
 {
-    Optional<ClusterStatus> clusterStatus(aClusterStatus);
-    return AddStatusInternal(aCommandPath, Protocols::InteractionModel::Status::Success, clusterStatus);
+    using Protocols::InteractionModel::Status;
+    return AddStatusInternal(aCommandPath, StatusIB(Status::Success, aClusterStatus));
 }
 
 CHIP_ERROR CommandHandler::AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus)
 {
-    Optional<ClusterStatus> clusterStatus(aClusterStatus);
-    return AddStatusInternal(aCommandPath, Protocols::InteractionModel::Status::Failure, clusterStatus);
+    using Protocols::InteractionModel::Status;
+    return AddStatusInternal(aCommandPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
 CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct)

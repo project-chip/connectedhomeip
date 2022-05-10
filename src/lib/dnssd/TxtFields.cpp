@@ -225,10 +225,10 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
-    case TxtFieldKey::kMrpRetryIntervalIdle:
+    case TxtFieldKey::kSleepyIdleInterval:
         nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
         break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
+    case TxtFieldKey::kSleepyActiveInterval:
         nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
         break;
     case TxtFieldKey::kTcpSupported:
@@ -243,10 +243,10 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedN
 {
     switch (Internal::GetTxtFieldKey(key))
     {
-    case TxtFieldKey::kMrpRetryIntervalIdle:
+    case TxtFieldKey::kSleepyIdleInterval:
         nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
+    case TxtFieldKey::kSleepyActiveInterval:
         nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
     case TxtFieldKey::kTcpSupported:

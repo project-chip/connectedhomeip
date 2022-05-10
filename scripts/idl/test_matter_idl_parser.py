@@ -180,42 +180,6 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
-    def test_attribute_storage_info(self):
-        actual = parseText("""
-            server cluster MyCluster = 1 {
-                attribute char_string<11> attr1 = 1 [callback];
-                attribute char_string<33> attr2 = 2 [default="abc\\n with escapes: \\""];
-                attribute int32u withDefault = 3 [default=11];
-                attribute int32u intWithCallback = 4 [callback];
-                attribute int32u persisted = 5 [persist];
-                attribute int32u persisted_with_default = 6 [persist, default=55];
-                readonly attribute int32u readonlyDefault = 7 [default=321];
-            }
-        """)
-
-        expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
-                    code=1,
-                    attributes=[
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.CALLBACK]), definition=Field(
-                            data_type=DataType(name="char_string", max_length=11), code=1, name="attr1")),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
-                            data_type=DataType(name="char_string", max_length=33), code=2, name="attr2"), default='abc\n with escapes: "'),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE]), definition=Field(
-                            data_type=DataType(name="int32u"), code=3, name="withDefault"), default=11),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.CALLBACK]), definition=Field(
-                            data_type=DataType(name="int32u"), code=4, name="intWithCallback")),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.PERSIST]), definition=Field(
-                            data_type=DataType(name="int32u"), code=5, name="persisted")),
-                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.WRITABLE, AttributeTag.PERSIST]), definition=Field(
-                            data_type=DataType(name="int32u"), code=6, name="persisted_with_default"), default=55),
-                        Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
-                            data_type=DataType(name="int32u"), code=7, name="readonlyDefault"), default=321),
-                    ]
-                    )])
-        self.assertEqual(actual, expected)
-
     def test_cluster_commands(self):
         actual = parseText("""
             server cluster WithCommands = 1 {
@@ -380,9 +344,9 @@ class TestParser(unittest.TestCase):
 
     def test_multiple_clusters(self):
         actual = parseText("""
-            server cluster A = 1 {}
-            client cluster B = 2 {}
-            client cluster C = 3 {}
+            server cluster A = 1 { /* Test comment */ }
+            client cluster B = 2 { }
+            client cluster C = 3 { }
         """)
 
         expected = Idl(clusters=[
@@ -395,16 +359,52 @@ class TestParser(unittest.TestCase):
     def test_endpoints(self):
         actual = parseText("""
             endpoint 12 {
-                server cluster Foo;
-                server cluster Bar;
+                server cluster Foo { }
+                server cluster Bar { }
                 binding cluster Bar;
                 binding cluster Test;
             }
         """)
 
         expected = Idl(endpoints=[Endpoint(number=12,
-                                           server_clusters=["Foo", "Bar"],
+                                           server_clusters=[
+                                               ServerClusterInstantiation(name="Foo"),
+                                               ServerClusterInstantiation(name="Bar"),
+                                           ],
                                            client_bindings=["Bar", "Test"],)
+                                  ])
+        self.assertEqual(actual, expected)
+
+    def test_cluster_instantiation(self):
+        actual = parseText("""
+            endpoint 3 {
+                server cluster Example {
+                    ram attribute inRamZero;
+                    ram attribute inRamWithDefault default=123;
+                    persist attribute inNVMNoDef;
+                    persist attribute inNVMStr default="abc";
+                    persist attribute inNVMWithDefault default = -33;
+                    callback attribute hasCallbackBool default = true;
+                }
+            }
+        """)
+
+        expected = Idl(endpoints=[Endpoint(number=3,
+                                           server_clusters=[
+                                               ServerClusterInstantiation(name="Example", attributes=[
+                                                   AttributeInstantiation(name='inRamZero', storage=AttributeStorage.RAM),
+                                                   AttributeInstantiation(name='inRamWithDefault',
+                                                                          storage=AttributeStorage.RAM, default=123),
+                                                   AttributeInstantiation(name='inNVMNoDef', storage=AttributeStorage.PERSIST),
+                                                   AttributeInstantiation(
+                                                       name='inNVMStr', storage=AttributeStorage.PERSIST, default="abc"),
+                                                   AttributeInstantiation(name='inNVMWithDefault',
+                                                                          storage=AttributeStorage.PERSIST, default=-33),
+                                                   AttributeInstantiation(name='hasCallbackBool',
+                                                                          storage=AttributeStorage.CALLBACK, default=True),
+                                               ]),
+                                           ],
+                                           client_bindings=[],)
                                   ])
         self.assertEqual(actual, expected)
 

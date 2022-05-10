@@ -57,7 +57,7 @@ public:
  */
 class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
                                    public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
-                                   public SessionReleaseDelegate
+                                   public SessionDelegate
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -81,7 +81,8 @@ public:
 
     bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
-    // Implement SessionReleaseDelegate
+    // Implement SessionDelegate
+    NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }
     void OnSessionReleased() override;
 
     /**

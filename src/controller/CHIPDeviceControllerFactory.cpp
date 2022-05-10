@@ -147,7 +147,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
@@ -155,7 +154,14 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    // if no fabricTable was provided, create one and track it in stateParams for cleanup
+    FabricTable * tempFabricTable = nullptr;
+    stateParams.fabricTable       = params.fabricTable;
+    if (stateParams.fabricTable == nullptr)
+    {
+        stateParams.fabricTable = tempFabricTable = chip::Platform::New<FabricTable>();
+        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    }
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
@@ -234,6 +240,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
+    mSystemState->SetTempFabricTable(tempFabricTable);
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
 }
@@ -403,10 +410,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr = nullptr;
     }
 
-    if (mFabrics != nullptr)
+    if (mTempFabricTable != nullptr)
     {
-        chip::Platform::Delete(mFabrics);
-        mFabrics = nullptr;
+        chip::Platform::Delete(mTempFabricTable);
+        mTempFabricTable = nullptr;
     }
 
     return CHIP_NO_ERROR;

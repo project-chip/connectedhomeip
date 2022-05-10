@@ -104,7 +104,7 @@ function getResponses(methodName)
  */
 function chip_server_clusters(options)
 {
-  return asBlocks.call(this, ensureClusters(this).getServerClusters(), options);
+  return asBlocks.call(this, ensureClusters(this, options.hash.includeAll).getServerClusters(), options);
 }
 
 /**
@@ -123,7 +123,7 @@ function chip_has_server_clusters(options)
  */
 function chip_client_clusters(options)
 {
-  return asBlocks.call(this, ensureClusters(this).getClientClusters(), options);
+  return asBlocks.call(this, ensureClusters(this, options.hash.includeAll).getClientClusters(), options);
 }
 
 /**
@@ -142,7 +142,7 @@ function chip_has_client_clusters(options)
  */
 function chip_clusters(options)
 {
-  return asBlocks.call(this, ensureClusters(this).getClusters(), options);
+  return asBlocks.call(this, ensureClusters(this, options.hash.includeAll).getClusters(), options);
 }
 
 /**

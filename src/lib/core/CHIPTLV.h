@@ -840,6 +840,12 @@ public:
     uint32_t GetRemainingLength() const { return mMaxLen - mLenRead; }
 
     /**
+     * Returns the stored backing store.
+     *
+     * @return the stored backing store.
+     */
+    TLVBackingStore * GetBackingStore() { return mBackingStore; }
+    /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.
      *
      * @note Depending on the type of the current element, GetReadPoint() will return a pointer that

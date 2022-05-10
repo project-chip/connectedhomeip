@@ -141,7 +141,8 @@ function chip_endpoint_generated_functions()
 
 function chip_endpoint_generated_commands_list(options)
 {
-  let ret = [];
+  let ret   = [];
+  let index = 0;
   this.clusterList.forEach((c) => {
     let acceptedCommands  = [];
     let generatedCommands = [];
@@ -149,22 +150,26 @@ function chip_endpoint_generated_commands_list(options)
     c.commands.forEach((cmd) => {
       if (cmd.mask.includes('incoming_server')) {
         acceptedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
-      }
-      if (cmd.mask.includes('incoming_client')) {
-        generatedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
+        if (cmd.responseId !== null) {
+          generatedCommands.push(`${cmd.responseId} /* ${cmd.responseName} */`);
+        }
       }
     });
+
+    generatedCommands = [...new Set(generatedCommands) ].sort();
 
     if (acceptedCommands.length > 0 || generatedCommands.length > 0) {
       ret.push({ text : `  /* ${c.comment} */\\` });
     }
     if (acceptedCommands.length > 0) {
       acceptedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text : `  /*   client_generated */ \\\n  ${acceptedCommands.join(', \\\n  ')}, \\` });
+      ret.push({ text : `  /*   AcceptedCommandList (index=${index}) */ \\\n  ${acceptedCommands.join(', \\\n  ')}, \\` });
+      index += acceptedCommands.length;
     }
     if (generatedCommands.length > 0) {
       generatedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text : `  /*   server_generated */ \\\n  ${generatedCommands.join(', \\\n  ')}, \\` });
+      ret.push({ text : `  /*   GeneratedCommandList (index=${index})*/ \\\n  ${generatedCommands.join(', \\\n  ')}, \\` });
+      index += generatedCommands.length;
     }
   })
   return templateUtil.collectBlocks(ret, options, this);
@@ -217,8 +222,17 @@ function chip_endpoint_cluster_list()
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
 
-    let acceptedCommands  = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
-    let generatedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
+    let acceptedCommands     = 0;
+    let generatedCommandList = [];
+    c.commands.forEach((cmd) => {
+      if (cmd.mask.includes('incoming_server')) {
+        acceptedCommands++;
+        if (cmd.responseId !== null) {
+          generatedCommandList.push(cmd.responseId);
+        }
+      }
+    });
+    let generatedCommands = new Set(generatedCommandList).size;
 
     let acceptedCommandsListVal  = "nullptr";
     let generatedCommandsListVal = "nullptr";
@@ -782,6 +796,46 @@ async function if_is_fabric_scoped_struct(type, options)
   return options.inverse(this);
 }
 
+// check if a value is numerically 0 for the purpose of default value
+// interpretation. Note that this does NOT check for data type, so assumes
+// a string of 'false' is 0 because boolean false is 0.
+function isNonZeroValue(value)
+{
+  if (!value) {
+    return false;
+  }
+
+  if (value === '0') {
+    return false;
+  }
+
+  // Hex value usage is inconsistent in XML. It looks we have
+  // all of 0x0, 0x00, 0x0000 so support all here.
+  if (value.match(/^0x0+$/)) {
+    return false;
+  }
+
+  // boolean 0 is false. We do not do a type check here
+  // so if anyone defaults a string to 'false' this will be wrong.
+  if (value === 'false') {
+    return false;
+  }
+
+  return true;
+}
+
+// Check if the default value is non-zero
+// Generally does string checks for empty strings, numeric or hex zeroes or
+// boolean values.
+async function if_is_non_zero_default(value, options)
+{
+  if (isNonZeroValue(value)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+}
+
 //
 // Module exports
 //
@@ -804,4 +858,5 @@ exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;
 exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
 exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;
-exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct
+exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct;
+exports.if_is_non_zero_default                = if_is_non_zero_default;

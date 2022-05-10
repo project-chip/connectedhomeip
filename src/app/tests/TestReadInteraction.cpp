@@ -1823,6 +1823,12 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
             ctx.DrainAndServiceIO();
 
+            //
+            // Not sure why I had to add this, and didn't have cycles to figure out why.
+            // Tracked in Issue #17528.
+            //
+            ctx.DrainAndServiceIO();
+
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.
             // And attribute 3/2/4 is a list with 6 elements and list chunking is applied to it, thus we should receive ( 13 + 6 ) *

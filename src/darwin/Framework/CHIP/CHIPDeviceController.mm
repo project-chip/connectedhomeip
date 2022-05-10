@@ -168,11 +168,9 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
-        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
-        if (startupParams.rootCAKeypair != nil) {
-            _keypairBridge.Init(startupParams.rootCAKeypair);
-            nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
-        }
+        _keypairBridge.Init(startupParams.rootCAKeypair);
+        auto nativeBridge = std::make_unique<chip::Crypto::CHIPP256KeypairNativeBridge>(_keypairBridge);
+
         errorCode
             = _operationalCredentialsDelegate->init(_factory.storageDelegateBridge, std::move(nativeBridge), startupParams.ipk);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
@@ -315,7 +313,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
-     discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
@@ -330,13 +327,10 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
 
-        chip::RendezvousParameters params = chip::RendezvousParameters()
-                                                .SetSetupPINCode(setupPINCode)
-                                                .SetDiscriminator(discriminator)
-                                                .SetPeerAddress(peerAddress);
+        chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
+            errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -727,18 +721,18 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
 @implementation CHIPDeviceControllerStartupParams
 
-- (instancetype)initWithKeypair:(_Nullable id<CHIPKeypair>)rootCAKeypair
+- (instancetype)initWithKeypair:(id<CHIPKeypair>)rootCAKeypair ipk:(NSData *)ipk
 {
     if (!(self = [super init])) {
         return nil;
     }
 
     _rootCAKeypair = rootCAKeypair;
+    _ipk = ipk;
 
     // Set various invalid values.
     _vendorId = chip::VendorId::Common;
     _fabricId = chip::kUndefinedFabricId;
-    _ipk = nil;
 
     return self;
 }

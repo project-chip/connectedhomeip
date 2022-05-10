@@ -38,12 +38,11 @@
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
+#include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
-#include <transport/PairingSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -155,6 +154,9 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
+    //// SessionDelegate ////
+    void OnSessionReleased() override;
+
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
@@ -216,25 +218,12 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    // TODO: pull up Finish to PairingSession class
-    void Finish();
-
-    void AbortExchange();
-
-    /**
-     * Clear our reference to our exchange context pointer so that it can close
-     * itself at some later time.
-     */
-    void DiscardExchange();
-
     CHIP_ERROR GetHardcodedTime();
 
     CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        const System::PacketBufferHandle & msg);
-
-    SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
@@ -250,7 +239,6 @@ private:
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
 
-    Messaging::ExchangeContext * mExchangeCtxt           = nullptr;
     SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     FabricTable * mFabricsTable    = nullptr;

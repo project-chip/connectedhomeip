@@ -64,6 +64,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/driver/memlcd/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
       "${efr32_sdk_root}/matter/efr32",
+      "${efr32_sdk_root}/matter/efr32/${efr32_family}/",
       "${efr32_sdk_root}/matter/efr32/${efr32_family}/${efr32_board}",
       "${efr32_sdk_root}/platform/bootloader",
       "${efr32_sdk_root}/platform/CMSIS/Include",
@@ -198,8 +199,8 @@ template("efr32_sdk") {
         ]
       } else if (efr32_family == "efr32mg24") {
         _include_dirs += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_eusart",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_eusart",
+          "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
+          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart",
         ]
       }
     }
@@ -485,7 +486,7 @@ template("efr32_sdk") {
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code)) {
       sources += [
-        "${efr32_sdk_root}/matter/efr32/sl_uartdrv_init.c",
+        "${efr32_sdk_root}/matter/efr32/${efr32_family}/sl_uartdrv_init.c",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
@@ -504,8 +505,8 @@ template("efr32_sdk") {
         ]
       } else if (efr32_family == "efr32mg24") {
         sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_eusart/sl_memlcd_spi.c",
-          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_eusart/sl_mx25_flash_shutdown.c",
+          "${efr32_sdk_root}/hardware/driver/memlcd/src/memlcd_usart/sl_memlcd_spi.c",
+          "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
         ]
       }
     }

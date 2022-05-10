@@ -53,12 +53,11 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     ipk = [nocSigner getIPK];
 
-    constexpr const char * identities[] = { "alpha", "beta", "gamma" };
+    constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner];
+        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner ipk:ipk];
         controllerParams.vendorId = chip::VendorId::TestVendor1;
         controllerParams.fabricId = i + 1;
-        controllerParams.ipk = ipk;
 
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
@@ -75,8 +74,8 @@ CHIP_ERROR CHIPCommandBridge::Run()
         mControllers[identities[i]] = controller;
     }
 
-    // Default to alpha.
-    SetIdentity("alpha");
+    // If no commissioner name passed in, default to alpha.
+    SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
 
     ReturnLogErrorOnFailure(RunCommand());
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -84,9 +83,20 @@ CHIP_ERROR CHIPCommandBridge::Run()
     return CHIP_NO_ERROR;
 }
 
-void CHIPCommandBridge::SetIdentity(const char * name) { mCurrentController = mControllers[name]; }
+void CHIPCommandBridge::SetIdentity(const char * identity)
+{
+    std::string name = std::string(identity);
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0) {
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+            kIdentityBeta, kIdentityGamma);
+        chipDie();
+    }
+    mCurrentController = mControllers[name];
+}
 
 CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
+
+CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {

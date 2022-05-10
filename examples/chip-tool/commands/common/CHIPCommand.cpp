@@ -287,6 +287,12 @@ chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
     return *item->second;
 }
 
+chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(const char * identity)
+{
+    auto item = mCommissioners.find(identity);
+    return *item->second;
+}
+
 CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
 {
     return mCommissioners[key].get()->Shutdown();

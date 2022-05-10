@@ -74,13 +74,17 @@ class TizenBuilder(GnBuilder):
             raise Exception("TSAN sanitizer not supported by Tizen toolchain")
 
     def GnBuildArgs(self):
-        if 'TIZEN_HOME' not in os.environ:
-            raise Exception(
-                "Environment TIZEN_HOME missing, cannot build Tizen target")
+        # Make sure that required ENV variables are defined
+        for env in ('TIZEN_SDK_ROOT', 'TIZEN_SDK_SYSROOT'):
+            if env not in os.environ:
+                raise Exception(
+                    "Environment %s missing, cannot build Tizen target" % env)
+
         return self.extra_gn_options + [
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.TargetCpuName(),
-            'sysroot="%s"' % os.environ['TIZEN_HOME'],
+            'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
+            'sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
         ]
 
     def build_outputs(self):

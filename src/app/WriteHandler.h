@@ -82,17 +82,10 @@ public:
     CHIP_ERROR ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader);
 
     CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus);
-    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
 
-    CHIP_ERROR AddClusterSpecificSuccess(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, uint8_t aClusterStatus);
 
-    CHIP_ERROR AddClusterSpecificFailure(const AttributePathParams & aAttributePathParams, uint8_t aClusterStatus)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, uint8_t aClusterStatus);
 
     FabricIndex GetAccessingFabricIndex() const;
 
@@ -156,6 +149,8 @@ private:
     // process the group write request (usually due to malformed messages). This function should only be called by
     // ProcessGroupAttributeDataIBs.
     CHIP_ERROR DeliverFinalListWriteEndForGroupWrite(bool writeWasSuccessful);
+
+    CHIP_ERROR AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus);
 
 private:
     // ExchangeDelegate

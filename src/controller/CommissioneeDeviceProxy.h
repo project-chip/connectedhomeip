@@ -28,7 +28,6 @@
 
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
-#include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/OperationalCredentialsDelegate.h>
@@ -55,7 +54,7 @@ struct ControllerDeviceInitParams
     Messaging::ExchangeManager * exchangeMgr = nullptr;
 };
 
-class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegate
+class CommissioneeDeviceProxy : public DeviceProxy, public SessionDelegate
 {
 public:
     ~CommissioneeDeviceProxy() override;

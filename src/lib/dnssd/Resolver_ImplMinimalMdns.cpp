@@ -116,7 +116,9 @@ void PacketDataReporter::OnQuery(const QueryData & data)
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
 {
-    mValid = header.GetFlags().IsResponse();
+    mValid       = header.GetFlags().IsResponse();
+    mHasIP       = false; // will need to get at least one valid IP eventually
+    mHasNodePort = false; // also need node-port which we do not have yet
 
     if (header.GetFlags().IsTruncated())
     {
@@ -140,14 +142,12 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
         ChipLogError(Discovery, "mDNS packet is missing a valid server name");
 #endif
-        mHasNodePort = false;
         return;
     }
 
     if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
-        mHasNodePort = false;
         return;
     }
 
@@ -229,7 +229,6 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         if (!srv.Parse(data.GetData(), mPacketRange))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
-            mHasNodePort = false;
         }
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
@@ -239,6 +238,10 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalSrvRecord(data.GetName(), srv);
             }
+            else
+            {
+                ChipLogError(Discovery, "Invalid operational srv name: no '%s' part found.", kOperationalServiceName);
+            }
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
@@ -246,6 +249,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
             {
                 OnCommissionableNodeSrvRecord(data.GetName(), srv);
+            }
+            else
+            {
+                ChipLogError(Discovery, "Invalid commision srv name: no '%s' or '%s' part found.", kCommissionableServiceName,
+                             kCommissionerServiceName);
             }
         }
         break;
@@ -279,7 +287,6 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         if (!ParseARecord(data.GetData(), &addr))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse A record");
-            mHasIP = false;
         }
         else
         {
@@ -299,7 +306,6 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         if (!ParseAAAARecord(data.GetData(), &addr))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse AAAA record");
-            mHasIP = false;
         }
         else
         {
@@ -321,9 +327,14 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 
 void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
-    if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
-        mDiscoveredNodeData.IsValid())
+    if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
     {
+        if (!mDiscoveredNodeData.IsValid())
+        {
+            ChipLogError(Discovery, "Discovered node data is not valid. Commissioning discovery not complete.");
+            return;
+        }
+
         activeAttempts.Complete(mDiscoveredNodeData);
         if (mCommissioningDelegate != nullptr)
         {
@@ -334,8 +345,20 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
             ChipLogError(Discovery, "No delegate to report commissioning node discovery");
         }
     }
-    else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
+    else if (mDiscoveryType == DiscoveryType::kOperational)
     {
+        if (!mHasIP)
+        {
+            ChipLogError(Discovery, "Operational discovery has no valid ip address. Resolve not complete.");
+            return;
+        }
+
+        if (!mHasNodePort)
+        {
+            ChipLogError(Discovery, "Operational discovery has no valid node/port. Resolve not complete.");
+            return;
+        }
+
         activeAttempts.Complete(mNodeData.mPeerId);
         mNodeData.LogNodeIdResolved();
 
