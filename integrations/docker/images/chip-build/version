@@ -1,1 +1,1 @@
-0.5.71 Version bump reason: [Tizen] Fix permission bits for secret-tool
+0.5.73 Version bump reason: Add TIZEN_SDK_SYSROOT to vscode dockerfile and sort env variables

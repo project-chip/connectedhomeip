@@ -104,20 +104,20 @@ CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath,
         return ReadAcl(aEncoder);
     case AccessControlCluster::Attributes::Extension::Id:
         return ReadExtension(aEncoder);
-    // TODO(#14455): use API to get actual capabilities
     case AccessControlCluster::Attributes::SubjectsPerAccessControlEntry::Id: {
-        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
-        return aEncoder.Encode(value);
+        size_t value = 0;
+        ReturnErrorOnFailure(GetAccessControl().GetMaxSubjectsPerEntry(value));
+        return aEncoder.Encode(static_cast<uint16_t>(value));
     }
-    // TODO(#14455): use API to get actual capabilities
     case AccessControlCluster::Attributes::TargetsPerAccessControlEntry::Id: {
-        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
-        return aEncoder.Encode(value);
+        size_t value = 0;
+        ReturnErrorOnFailure(GetAccessControl().GetMaxTargetsPerEntry(value));
+        return aEncoder.Encode(static_cast<uint16_t>(value));
     }
-    // TODO(#14455): use API to get actual capabilities
     case AccessControlCluster::Attributes::AccessControlEntriesPerFabric::Id: {
-        uint16_t value = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
-        return aEncoder.Encode(value);
+        size_t value = 0;
+        ReturnErrorOnFailure(GetAccessControl().GetMaxEntriesPerFabric(value));
+        return aEncoder.Encode(static_cast<uint16_t>(value));
     }
     case AccessControlCluster::Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kClusterRevision);
@@ -193,23 +193,20 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 {
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
+    size_t oldCount;
+    ReturnErrorOnFailure(GetAccessControl().GetEntryCount(accessingFabricIndex, oldCount));
+    size_t maxCount;
+    ReturnErrorOnFailure(GetAccessControl().GetMaxEntriesPerFabric(maxCount));
+
     if (!aPath.IsListItemOperation())
     {
         DataModel::DecodableList<AclStorage::DecodableEntry> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        size_t allCount;
-        size_t oldCount;
         size_t newCount;
-        size_t maxCount;
-
-        ReturnErrorOnFailure(GetAccessControl().GetEntryCount(allCount));
-        ReturnErrorOnFailure(GetAccessControl().GetEntryCount(accessingFabricIndex, oldCount));
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
-        ReturnErrorOnFailure(GetAccessControl().GetMaxEntryCount(maxCount));
-        VerifyOrReturnError(allCount >= oldCount, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(static_cast<size_t>(allCount - oldCount + newCount) <= maxCount,
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
 
         auto iterator = list.begin();
         size_t i      = 0;
@@ -237,6 +234,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
     }
     else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
+        VerifyOrReturnError((oldCount + 1) <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+
         AclStorage::DecodableEntry decodableEntry;
         ReturnErrorOnFailure(aDecoder.Decode(decodableEntry));
 

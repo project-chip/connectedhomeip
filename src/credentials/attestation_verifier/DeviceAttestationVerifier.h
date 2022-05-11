@@ -68,6 +68,7 @@ enum class AttestationVerificationResult : uint16_t
     kCertificationDeclarationInvalidFormat      = 603,
     kCertificationDeclarationInvalidVendorId    = 604,
     kCertificationDeclarationInvalidProductId   = 605,
+    kCertificationDeclarationInvalidPAA         = 606,
 
     kNoMemory = 700,
 
@@ -93,7 +94,7 @@ struct DeviceInfoForAttestation
     uint16_t vendorId = VendorId::NotSpecified;
     // Product ID reported by device in Basic Information cluster
     uint16_t productId = 0;
-    // Vendor ID from  DAC
+    // Vendor ID from DAC
     uint16_t dacVendorId = VendorId::NotSpecified;
     // Product ID from DAC
     uint16_t dacProductId = 0;
@@ -101,8 +102,10 @@ struct DeviceInfoForAttestation
     uint16_t paiVendorId = VendorId::NotSpecified;
     // Product ID from PAI cert (0 if absent)
     uint16_t paiProductId = 0;
-    // Vendor ID from  PAA cert
+    // Vendor ID from PAA cert
     uint16_t paaVendorId = VendorId::NotSpecified;
+    // Subject Key Identifier (SKID) from PAA cert
+    uint8_t paaSKID[Crypto::kSubjectKeyIdentifierLength] = { 0 };
 };
 
 typedef void (*OnAttestationInformationVerification)(void * context, AttestationVerificationResult result);

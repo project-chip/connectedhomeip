@@ -57,24 +57,26 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
-ENV IDF_PATH=/opt/espressif/esp-idf/
-ENV IDF_TOOLS_PATH=/opt/espressif/tools
-ENV QEMU_ESP32_DIR=/opt/espressif/qemu
-ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
-ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
-ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-ENV EFR32_BOARD=BRD4161A
+ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
+ENV EFR32_BOARD=BRD4161A
+ENV IDF_PATH=/opt/espressif/esp-idf/
+ENV IDF_TOOLS_PATH=/opt/espressif/tools
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott/
+ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
+ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
+ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
+ENV QEMU_ESP32_DIR=/opt/espressif/qemu
+ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
-ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
-ENV TIZEN_SDK_ROOT /opt/tizen-sdk
-ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
-ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
-ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks
-ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.10-hardknott/
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.11.0
+ENV TIZEN_SDK_ROOT /opt/tizen-sdk
+ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
+ENV TIZEN_VERSION 6.0
+ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
+ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
