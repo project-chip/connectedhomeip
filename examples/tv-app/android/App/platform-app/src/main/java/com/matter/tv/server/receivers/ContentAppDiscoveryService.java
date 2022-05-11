@@ -134,7 +134,8 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   private Set<String> getMatterApps(Context context) {
     PackageManager pm = context.getPackageManager();
     List<ResolveInfo> receivers =
-        pm.queryBroadcastReceivers(new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND), PackageManager.MATCH_ALL);
+        pm.queryBroadcastReceivers(
+            new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND), PackageManager.MATCH_ALL);
 
     Set<String> matterApps = new HashSet<>();
     if (receivers.isEmpty()) {

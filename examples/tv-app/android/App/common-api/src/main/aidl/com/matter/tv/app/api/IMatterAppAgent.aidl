@@ -5,9 +5,9 @@ import com.matter.tv.app.api.SetSupportedClustersRequest;
 import com.matter.tv.app.api.ReportAttributeChangeRequest;
 
 /*
- * To use this interface, partners should query for and bind to a service that handles the "com.amazon.matter.app_agent_api.IMatterAppAgent" Action.
- * They should verify the host process  holds the "com.matter.app_agent_api.permission.SEND_DATA" permission
- * To bind to this service the client app itself must hold "com.matter.app_agent_api.permission.BIND_SERVICE_PERMISSION".
+ * To use this interface, partners should query for and bind to a service that handles the "com.matter.tv.app.api.action.MatterAppAgent" Action.
+ * They should verify the host process  holds the "com.matter.tv.app.api.permission.SEND_DATA" permission
+ * To bind to this service the client app itself must hold "com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION".
  */
 interface IMatterAppAgent {
     /**
