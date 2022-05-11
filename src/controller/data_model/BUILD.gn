@@ -25,7 +25,6 @@ chip_data_model("data_model") {
   zap_pregenerated_dir =
       "${chip_root}/zzz_generated/controller-clusters/zap-generated"
 
-  use_tests_apis = true
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
 

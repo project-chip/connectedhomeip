@@ -7,7 +7,6 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 
-#import "zap-generated/tests/CHIPClustersTest.h"
 #import "zap-generated/cluster/CHIPTestClustersObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -20,7 +19,7 @@ using namespace chip::app::Clusters;
 {{#chip_client_clusters includeAll=true}}
 
 @interface CHIPTest{{asUpperCamelCase name}} ()
-@property (readonly) chip::Controller::{{asUpperCamelCase name}}ClusterTest cppCluster;
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
 @implementation CHIPTest{{asUpperCamelCase name}}
