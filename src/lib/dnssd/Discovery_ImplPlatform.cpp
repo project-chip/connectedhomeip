@@ -124,8 +124,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     nodeData.resolutionData.interfaceId = result->mInterface;
     nodeData.resolutionData.port        = result->mPort;
     nodeData.operationalData.peerId     = peerId;
-    // TODO: Use seconds?
-    const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
 
     size_t addressesFound = 0;
     if (result->mAddress.HasValue())
