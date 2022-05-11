@@ -1774,6 +1774,28 @@ void AttributeReportIBsTest(nlTestSuite * apSuite, void * apContext)
     ParseAttributeReportIBs(apSuite, reader);
 }
 
+void EmptyAttributeReportIBsTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    AttributeReportIBs::Builder attributeReportIBsBuilder;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    attributeReportIBsBuilder.Init(&writer);
+    attributeReportIBsBuilder.EndOfAttributeReportIBs();
+    NL_TEST_ASSERT(apSuite, attributeReportIBsBuilder.GetError() == CHIP_NO_ERROR);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseAttributeReportIBs(apSuite, reader);
+}
+
 void StatusIBTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2301,6 +2323,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("AttributeDataIBsTest", AttributeDataIBsTest),
                 NL_TEST_DEF("AttributeReportIBTest", AttributeReportIBTest),
                 NL_TEST_DEF("AttributeReportIBsTest", AttributeReportIBsTest),
+                NL_TEST_DEF("EmptyAttributeReportIBsTest", EmptyAttributeReportIBsTest),
                 NL_TEST_DEF("EventPathTest", EventPathTest),
                 NL_TEST_DEF("EventPathsTest", EventPathsTest),
                 NL_TEST_DEF("EventDataIBTest", EventDataIBTest),
