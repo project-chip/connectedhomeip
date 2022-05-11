@@ -266,13 +266,16 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            TxtRecordDelegateImpl<DiscoveredNodeData> textRecordDelegate(mDiscoveredNodeData);
-            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+            TxtRecordDelegateImpl<CommonResolutionData> commonDelegate(mDiscoveredNodeData.resolutionData);
+            ParseTxtRecord(data.GetData(), &commonDelegate);
+
+            TxtRecordDelegateImpl<CommissionNodeData> commissionDelegate(mDiscoveredNodeData.commissionData);
+            ParseTxtRecord(data.GetData(), &commissionDelegate);
         }
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
-            TxtRecordDelegateImpl<ResolvedNodeData> textRecordDelegate(mNodeData);
-            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+            TxtRecordDelegateImpl<CommonResolutionData> commonDelegate(mNodeData.resolutionData);
+            ParseTxtRecord(data.GetData(), &commonDelegate);
         }
         break;
     case QType::A: {

@@ -80,7 +80,8 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData);
+        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
+        FillNodeDataFromTxt(key, val, nodeData.commissionData);
     }
 
     proxy->OnNodeDiscovered(nodeData);
@@ -148,7 +149,7 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData);
+        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
     }
 
     nodeData.LogNodeIdResolved();

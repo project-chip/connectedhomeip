@@ -184,8 +184,8 @@ constexpr size_t ValSize(TxtFieldKey key)
     return Internal::txtFieldInfo[static_cast<int>(key)].valMaxSize;
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DiscoveredNodeData & nodeData);
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionNodeData & nodeData);
 
 } // namespace Dnssd
 } // namespace chip
