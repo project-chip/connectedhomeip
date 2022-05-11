@@ -319,7 +319,7 @@ void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
 {
     ChipLogProgress(SoftwareUpdate, "Default Provider timer handler is invoked");
 
-    DefaultOTARequestorDriver * driver = reinterpret_cast<DefaultOTARequestorDriver *>(appState);
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
 
     // Determine which provider to query next
     ProviderLocationType providerLocation;
@@ -350,7 +350,7 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
-    DefaultOTARequestorDriver * driver = reinterpret_cast<DefaultOTARequestorDriver *>(appState);
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
 
     ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
                  to_underlying(driver->mRequestor->GetCurrentUpdateState()));
