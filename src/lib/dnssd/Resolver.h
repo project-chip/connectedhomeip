@@ -396,4 +396,4 @@ struct CommonResolutionData
     };
 
 } // namespace Dnssd
-} // namespace chip
+} // namespace Dnssd
