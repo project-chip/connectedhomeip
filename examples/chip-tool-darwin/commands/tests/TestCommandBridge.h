@@ -282,8 +282,15 @@ protected:
         return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
     }
 
-    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nonnull current, NSNumber * _Nonnull expected)
+    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nullable current, NSNumber * _Nullable expected)
     {
+        if (current == nil && expected == nil) {
+            Exit(std::string(itemName) + " got unexpected value. Both values are nil.");
+            return false;
+        }
+        if ((current == nil) != (expected == nil)) {
+            return true;
+        }
         if ([current isEqualToNumber:expected]) {
             Exit(std::string(itemName) + " got unexpected value: " + std::string([[current stringValue] UTF8String]));
             return false;
