@@ -82,6 +82,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.fabricIndependentStorage = mFabricIndependentStorage;
         params.enableServerInteractions = mEnableServerInteractions;
         params.groupDataProvider        = mSystemState->GetGroupDataProvider();
+        params.fabricTable              = mSystemState->Fabrics();
     }
 
     return InitSystemState(params);
@@ -414,6 +415,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mTempFabricTable);
         mTempFabricTable = nullptr;
+        // if we created a temp fabric table, then mFabrics points to it.
+        // if we did not create a temp fabric table, then keep the reference
+        // so that SetupController/Commissioner can use it
+        mFabrics = nullptr;
     }
 
     return CHIP_NO_ERROR;
