@@ -186,9 +186,9 @@ void PacketDataReporter::OnNodeIPAddress(CommonResolutionData & resolutionData, 
         ChipLogDetail(Discovery, "Number of IP addresses overflow. Discarding extra addresses.");
         return;
     }
-    resolutionData.ipAddress[mNodeData.resolutionData.numIPs++] = addr;
-    resolutionData.interfaceId                                  = mInterfaceId;
-    mHasIP                                                      = true;
+    resolutionData.ipAddress[resolutionData.numIPs++] = addr;
+    resolutionData.interfaceId                        = mInterfaceId;
+    mHasIP                                            = true;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
