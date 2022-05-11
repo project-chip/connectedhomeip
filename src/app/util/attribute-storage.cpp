@@ -72,6 +72,10 @@ uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 
 namespace {
 
+#if (!defined(EMBER_AF_DEFAULT_VALUE_SIZE)) || (EMBER_AF_DEFAULT_VALUE_SIZE == 0)
+#define EMBER_AF_DEFAULT_VALUE_SIZE 2
+#endif
+
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
 #define ACTUAL_SINGLETONS_SIZE 1
 #else
@@ -81,8 +85,8 @@ uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
 
 uint16_t emberEndpointCount = 0;
 
-// If we have attributes that are more than 2 bytes, then
-// we need this data block for the defaults
+// If we have attributes that are more than bytes EMBER_AF_DEFAULT_VALUE_SIZE,
+// then we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #endif // GENERATED_DEFAULTS
@@ -468,7 +472,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
-        if (bufferSize < 2)
+        if (bufferSize < 2)  // TODO confirm is this should still be 2
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
@@ -476,13 +480,13 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     }
     else if (emberAfIsThisDataTypeAListType(attributeType))
     {
-        if (bufferSize < 2)
+        if (bufferSize < 2)   // TODO confirm is this should still be 2
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
 
         // Just copy the length.
-        memmove(dest, src, 2);
+        memmove(dest, src, 2);  // TODO confirm is this should still be 2
     }
     else
     {
@@ -1258,7 +1262,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         }
                         else
                         {
-                            if (emberAfAttributeSize(am) <= 2)
+                            if (emberAfAttributeSize(am) <= EMBER_AF_DEFAULT_VALUE_SIZE)
                             {
                                 ptr = (uint8_t *) &(am->defaultValue.defaultValue);
                             }
@@ -1277,6 +1281,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // cases, nudge the pointer forward so it points to the correct byte.
                         if (emberAfAttributeSize(am) == 1 && ptr != NULL)
                         {
+                            // TODO I need to think about this a little more to make sure I am doing the right thing for
+                            // BIGENDIAN CPUs, now that we are changing to uint32_t. I also will need to update the comment
                             *ptr++;
                         }
 #endif // BIGENDIAN
