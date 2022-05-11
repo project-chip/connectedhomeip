@@ -62,7 +62,7 @@ public:
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ClusterCommand::SendCommand(device, endpointIds.at(0), mClusterId, mCommandId, mPayload);
     }
@@ -126,8 +126,8 @@ public:
     }
 
     template <class T>
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
-                           const T & value)
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId, const T & value)
     {
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         while (repeatCount--)

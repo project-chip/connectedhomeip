@@ -16,11 +16,6 @@
     ],
     "templates": [
         {
-            "path": "../../../zap-templates/templates/app/tests/CHIPClustersTest.zapt",
-            "name": "Tests C++ API Header",
-            "output": "tests/CHIPClustersTest.h"
-        },
-        {
             "path": "simulated-cluster-objects.zapt",
             "name": "Simulated Cluster Objects Commands header",
             "output": "tests/simulated-cluster-objects.h"

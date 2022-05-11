@@ -25,8 +25,6 @@
 class ModelCommand : public CHIPCommand
 {
 public:
-    using ChipDevice = ::chip::OperationalDeviceProxy;
-
     ModelCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         CHIPCommand(commandName, credsIssuerConfig), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
@@ -43,7 +41,7 @@ public:
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(10)); }
 
-    virtual CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endPointIds) = 0;
+    virtual CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endPointIds) = 0;
 
     virtual CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) { return CHIP_ERROR_BAD_REQUEST; };
 
@@ -56,7 +54,7 @@ private:
     chip::NodeId mNodeId;
     std::vector<chip::EndpointId> mEndPointId;
 
-    static void OnDeviceConnectedFn(void * context, ChipDevice * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;

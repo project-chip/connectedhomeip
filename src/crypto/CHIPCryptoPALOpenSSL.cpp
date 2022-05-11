@@ -1530,6 +1530,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     int status                 = 0;
     X509_STORE_CTX * verifyCtx = nullptr;
     X509_STORE * store         = nullptr;
+    STACK_OF(X509) * chain     = nullptr;
     X509 * x509RootCertificate = nullptr;
     X509 * x509CACertificate   = nullptr;
     X509 * x509LeafCertificate = nullptr;
@@ -1549,6 +1550,9 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     verifyCtx = X509_STORE_CTX_new();
     VerifyOrExit(verifyCtx != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
+    chain = sk_X509_new_null();
+    VerifyOrExit(chain != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
+
     x509RootCertificate = d2i_X509(nullptr, &rootCertificate, static_cast<long>(rootCertificateLen));
     VerifyOrExit(x509RootCertificate != nullptr,
                  (result = CertificateChainValidationResult::kRootFormatInvalid, err = CHIP_ERROR_INTERNAL));
@@ -1560,14 +1564,14 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     VerifyOrExit(x509CACertificate != nullptr,
                  (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-    status = X509_STORE_add_cert(store, x509CACertificate);
+    status = sk_X509_push(chain, x509CACertificate);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
     x509LeafCertificate = d2i_X509(nullptr, &leafCertificate, static_cast<long>(leafCertificateLen));
     VerifyOrExit(x509LeafCertificate != nullptr,
                  (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-    status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, nullptr);
+    status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, chain);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
     status = X509_verify_cert(verifyCtx);
@@ -1580,6 +1584,7 @@ exit:
     X509_free(x509LeafCertificate);
     X509_free(x509CACertificate);
     X509_free(x509RootCertificate);
+    sk_X509_free(chain);
     X509_STORE_CTX_free(verifyCtx);
     X509_STORE_free(store);
 

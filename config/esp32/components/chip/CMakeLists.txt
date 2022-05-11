@@ -130,7 +130,7 @@ endif()
 
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
-    chip_gn_arg_append("chip_platform_target"   "\"${CONFIG_CHIP_EXTERNAL_PLATFORM_TARGET}\"")
+    chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
 endif()
 
 if (CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER)
@@ -226,6 +226,8 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CMAKE_CURRENT_BINARY_DIR}/src/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
     "${CMAKE_CURRENT_BINARY_DIR}/gen/include"
+    "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}"
+    "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)

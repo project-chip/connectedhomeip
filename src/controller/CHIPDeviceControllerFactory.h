@@ -51,7 +51,7 @@ struct SetupParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    uint16_t controllerVendorId;
+    chip::VendorId controllerVendorId;
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
@@ -78,6 +78,7 @@ struct FactoryInitParams
     Credentials::GroupDataProvider * groupDataProvider            = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif

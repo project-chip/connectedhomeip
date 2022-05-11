@@ -215,7 +215,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         commissionerParams.controllerRCAC = rcac;
         commissionerParams.controllerICAC = icac;
         commissionerParams.controllerNOC = noc;
-        commissionerParams.controllerVendorId = startupParams.vendorId;
+        commissionerParams.controllerVendorId = static_cast<chip::VendorId>(startupParams.vendorId);
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
