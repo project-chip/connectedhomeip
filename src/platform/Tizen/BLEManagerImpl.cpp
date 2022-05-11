@@ -45,8 +45,8 @@ struct BLEConnection
     char * peerAddr;
     uint16_t mtu;
     bool subscribed;
-    void * gattCharC1Handle;
-    void * gattCharC2Handle;
+    bt_gatt_h gattCharC1Handle;
+    bt_gatt_h gattCharC2Handle;
     bool isChipDevice;
 };
 
