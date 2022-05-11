@@ -85,313 +85,315 @@ struct CommonResolutionData
         port                   = 0;
         supportsTcp            = false;
         interfaceId            = Inet::InterfaceId::Null();
-        for (unsigned i = 0; i < kMaxIPAddresses; ++i)
+        for (auto & addr : ipAddress)
         {
-            ipAddress[i] = chip::Inet::IPAddress::Any;
+            {
+                addr = chip::Inet::IPAddress::Any;
+            }
         }
-    }
 
-    void LogDetail() const
-    {
-        if (!IsHost(""))
+        void LogDetail() const
         {
-            ChipLogDetail(Discovery, "\tHostname: %s", hostName);
-        }
+            if (!IsHost(""))
+            {
+                ChipLogDetail(Discovery, "\tHostname: %s", hostName);
+            }
 #if CHIP_DETAIL_LOGGING
-        for (unsigned j = 0; j < numIPs; j++)
-        {
-            char buf[Inet::IPAddress::kMaxStringLength];
-            char * ipAddressOut = ipAddress[j].ToString(buf);
-            ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
-            (void) ipAddressOut;
-        }
+            for (unsigned j = 0; j < numIPs; j++)
+            {
+                char buf[Inet::IPAddress::kMaxStringLength];
+                char * ipAddressOut = ipAddress[j].ToString(buf);
+                ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
+            }
 #endif // CHIP_DETAIL_LOGGING
-        if (port > 0)
-        {
-            ChipLogDetail(Discovery, "\tPort: %u", port);
+            if (port > 0)
+            {
+                ChipLogDetail(Discovery, "\tPort: %u", port);
+            }
+            if (mrpRetryIntervalIdle.HasValue())
+            {
+                ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
+            }
+            else
+            {
+                ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
+            }
+            if (mrpRetryIntervalActive.HasValue())
+            {
+                ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
+            }
+            else
+            {
+                ChipLogDetail(Discovery, "\tMrp Interval active: not present");
+            }
         }
-        if (mrpRetryIntervalIdle.HasValue())
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: %" PRIu32 " ms", mrpRetryIntervalIdle.Value().count());
-        }
-        else
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval idle: not present");
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval active: %" PRIu32 " ms", mrpRetryIntervalActive.Value().count());
-        }
-        else
-        {
-            ChipLogDetail(Discovery, "\tMrp Interval active: not present");
-        }
-    }
-};
+    };
 
-/// Data that is specific to Operational Discovery of nodes
-struct OperationalNodeData
-{
-    PeerId peerId;
-
-    void Reset() { peerId = PeerId(); }
-};
-
-constexpr size_t kMaxDeviceNameLen         = 32;
-constexpr size_t kMaxRotatingIdLen         = 50;
-constexpr size_t kMaxPairingInstructionLen = 128;
-
-/// Data that is specific to commisionable/commissioning node discovery
-struct CommissionNodeData
-{
-    char instanceName[Commission::kInstanceNameMaxLength + 1];
-    uint16_t longDiscriminator;
-    uint16_t vendorId;
-    uint16_t productId;
-    uint8_t commissioningMode;
-    // TODO: possibly 32-bit - see spec issue #3226
-    uint16_t deviceType;
-    char deviceName[kMaxDeviceNameLen + 1];
-    uint8_t rotatingId[kMaxRotatingIdLen];
-    size_t rotatingIdLen;
-    uint16_t pairingHint;
-    char pairingInstruction[kMaxPairingInstructionLen + 1];
-
-    void Reset()
+    /// Data that is specific to Operational Discovery of nodes
+    struct OperationalNodeData
     {
-        // NOTE that this assumes 0-fill is ok for this class
-        memset(this, 0, sizeof(*this));
-    }
-    CommissionNodeData() { Reset(); }
+        PeerId peerId;
 
-    bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
+        void Reset() { peerId = PeerId(); }
+    };
 
-    void LogDetail() const
+    constexpr size_t kMaxDeviceNameLen         = 32;
+    constexpr size_t kMaxRotatingIdLen         = 50;
+    constexpr size_t kMaxPairingInstructionLen = 128;
+
+    /// Data that is specific to commisionable/commissioning node discovery
+    struct CommissionNodeData
     {
-        if (rotatingIdLen > 0)
-        {
-            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
-            ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
-        }
-        if (strlen(deviceName) != 0)
-        {
-            ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);
-        }
-        if (vendorId > 0)
-        {
-            ChipLogDetail(Discovery, "\tVendor ID: %u", vendorId);
-        }
-        if (productId > 0)
-        {
-            ChipLogDetail(Discovery, "\tProduct ID: %u", productId);
-        }
-        if (deviceType > 0)
-        {
-            ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
-        }
-        if (longDiscriminator > 0)
-        {
-            ChipLogDetail(Discovery, "\tLong Discriminator: %u", longDiscriminator);
-        }
-        if (strlen(pairingInstruction) != 0)
-        {
-            ChipLogDetail(Discovery, "\tPairing Instruction: %s", pairingInstruction);
-        }
-        if (pairingHint > 0)
-        {
-            ChipLogDetail(Discovery, "\tPairing Hint: %u", pairingHint);
-        }
-        if (!IsInstanceName(""))
-        {
-            ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
-        }
-        ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
-    }
-};
+        char instanceName[Commission::kInstanceNameMaxLength + 1];
+        uint16_t longDiscriminator;
+        uint16_t vendorId;
+        uint16_t productId;
+        uint8_t commissioningMode;
+        // TODO: possibly 32-bit - see spec issue #3226
+        uint16_t deviceType;
+        char deviceName[kMaxDeviceNameLen + 1];
+        uint8_t rotatingId[kMaxRotatingIdLen];
+        size_t rotatingIdLen;
+        uint16_t pairingHint;
+        char pairingInstruction[kMaxPairingInstructionLen + 1];
 
-struct ResolvedNodeData
-{
-    CommonResolutionData resolutionData;
-    OperationalNodeData operationalData;
+        void Reset()
+        {
+            // NOTE that this assumes 0-fill is ok for this class
+            memset(this, 0, sizeof(*this));
+        }
+        CommissionNodeData() { Reset(); }
 
-    void LogNodeIdResolved() const
+        bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
+
+        void LogDetail() const
+        {
+            if (rotatingIdLen > 0)
+            {
+                char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+                Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+                ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
+            }
+            if (strlen(deviceName) != 0)
+            {
+                ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);
+            }
+            if (vendorId > 0)
+            {
+                ChipLogDetail(Discovery, "\tVendor ID: %u", vendorId);
+            }
+            if (productId > 0)
+            {
+                ChipLogDetail(Discovery, "\tProduct ID: %u", productId);
+            }
+            if (deviceType > 0)
+            {
+                ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
+            }
+            if (longDiscriminator > 0)
+            {
+                ChipLogDetail(Discovery, "\tLong Discriminator: %u", longDiscriminator);
+            }
+            if (strlen(pairingInstruction) != 0)
+            {
+                ChipLogDetail(Discovery, "\tPairing Instruction: %s", pairingInstruction);
+            }
+            if (pairingHint > 0)
+            {
+                ChipLogDetail(Discovery, "\tPairing Hint: %u", pairingHint);
+            }
+            if (!IsInstanceName(""))
+            {
+                ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
+            }
+            ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+        }
+    };
+
+    struct ResolvedNodeData
     {
+        CommonResolutionData resolutionData;
+        OperationalNodeData operationalData;
+
+        void LogNodeIdResolved() const
+        {
 #if CHIP_PROGRESS_LOGGING
-        // Would be nice to log the interface id, but sorting out how to do so
-        // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
-                        ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
-                        ChipLogValueX64(operationalData.peerId.GetNodeId()));
-        resolutionData.LogDetail();
+            // Would be nice to log the interface id, but sorting out how to do so
+            // across our different InterfaceId implementations is a pain.
+            ChipLogProgress(Discovery, "Node ID resolved for " ChipLogFormatX64 ":" ChipLogFormatX64,
+                            ChipLogValueX64(operationalData.peerId.GetCompressedFabricId()),
+                            ChipLogValueX64(operationalData.peerId.GetNodeId()));
+            resolutionData.LogDetail();
 #endif // CHIP_PROGRESS_LOGGING
-    }
-};
-
-struct DiscoveredNodeData
-{
-    CommonResolutionData resolutionData;
-    CommissionNodeData commissionData;
-
-    void Reset()
-    {
-        resolutionData.Reset();
-        commissionData.Reset();
-    }
-    DiscoveredNodeData() { Reset(); }
-
-    void LogDetail() const
-    {
-        resolutionData.LogDetail();
-        commissionData.LogDetail();
-    }
-};
-
-enum class DiscoveryFilterType : uint8_t
-{
-    kNone,
-    kShortDiscriminator,
-    kLongDiscriminator,
-    kVendorId,
-    kDeviceType,
-    kCommissioningMode,
-    kInstanceName,
-    kCommissioner,
-    kCompressedFabricId,
-};
-struct DiscoveryFilter
-{
-    DiscoveryFilterType type;
-    uint64_t code             = 0;
-    const char * instanceName = nullptr;
-    DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
-    DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName)
-    {}
-    bool operator==(const DiscoveryFilter & other) const
-    {
-        if (type != other.type)
-        {
-            return false;
         }
-        if (type == DiscoveryFilterType::kInstanceName)
+    };
+
+    struct DiscoveredNodeData
+    {
+        CommonResolutionData resolutionData;
+        CommissionNodeData commissionData;
+
+        void Reset()
         {
-            return (instanceName != nullptr) && (other.instanceName != nullptr) && (strcmp(instanceName, other.instanceName) == 0);
+            resolutionData.Reset();
+            commissionData.Reset();
         }
+        DiscoveredNodeData() { Reset(); }
 
-        return code == other.code;
-    }
-};
-enum class DiscoveryType
-{
-    kUnknown,
-    kOperational,
-    kCommissionableNode,
-    kCommissionerNode
-};
+        void LogDetail() const
+        {
+            resolutionData.LogDetail();
+            commissionData.LogDetail();
+        }
+    };
 
-/// Callbacks for resolving operational node resolution
-class OperationalResolveDelegate
-{
-public:
-    virtual ~OperationalResolveDelegate() = default;
+    enum class DiscoveryFilterType : uint8_t
+    {
+        kNone,
+        kShortDiscriminator,
+        kLongDiscriminator,
+        kVendorId,
+        kDeviceType,
+        kCommissioningMode,
+        kInstanceName,
+        kCommissioner,
+        kCompressedFabricId,
+    };
+    struct DiscoveryFilter
+    {
+        DiscoveryFilterType type;
+        uint64_t code             = 0;
+        const char * instanceName = nullptr;
+        DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
+        DiscoveryFilter(const DiscoveryFilterType newType) : type(newType) {}
+        DiscoveryFilter(const DiscoveryFilterType newType, uint64_t newCode) : type(newType), code(newCode) {}
+        DiscoveryFilter(const DiscoveryFilterType newType, const char * newInstanceName) :
+            type(newType), instanceName(newInstanceName)
+        {}
+        bool operator==(const DiscoveryFilter & other) const
+        {
+            if (type != other.type)
+            {
+                return false;
+            }
+            if (type == DiscoveryFilterType::kInstanceName)
+            {
+                return (instanceName != nullptr) && (other.instanceName != nullptr) &&
+                    (strcmp(instanceName, other.instanceName) == 0);
+            }
 
-    /// Called within the CHIP event loop after a successful node resolution.
-    ///
-    /// May be called multiple times: implementations may call this once per
-    /// received packet and MDNS packets may arrive over different interfaces
-    /// which will make nodeData have different content.
-    virtual void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) = 0;
+            return code == other.code;
+        }
+    };
+    enum class DiscoveryType
+    {
+        kUnknown,
+        kOperational,
+        kCommissionableNode,
+        kCommissionerNode
+    };
 
-    /// Notify a final failure for a node operational resolution.
-    ///
-    /// Called within the chip event loop if node resolution could not be performed.
-    /// This may be due to internal errors or timeouts.
-    ///
-    /// This will be called only if 'OnOperationalNodeResolved' is never called.
-    virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
-};
+    /// Callbacks for resolving operational node resolution
+    class OperationalResolveDelegate
+    {
+    public:
+        virtual ~OperationalResolveDelegate() = default;
 
-/// Callbacks for discovering nodes advertising non-operational status:
-///   - Commissioners
-///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
-///     connected to thread/wifi or devices with a commissioning window open)
-class CommissioningResolveDelegate
-{
-public:
-    virtual ~CommissioningResolveDelegate() = default;
+        /// Called within the CHIP event loop after a successful node resolution.
+        ///
+        /// May be called multiple times: implementations may call this once per
+        /// received packet and MDNS packets may arrive over different interfaces
+        /// which will make nodeData have different content.
+        virtual void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) = 0;
 
-    /// Called within the CHIP event loop once a node is discovered.
-    ///
-    /// May be called multiple times as more nodes send their answer to a
-    /// multicast discovery query
-    virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
-};
+        /// Notify a final failure for a node operational resolution.
+        ///
+        /// Called within the chip event loop if node resolution could not be performed.
+        /// This may be due to internal errors or timeouts.
+        ///
+        /// This will be called only if 'OnOperationalNodeResolved' is never called.
+        virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+    };
 
-/**
- * Interface for resolving CHIP DNS-SD services
- */
-class Resolver
-{
-public:
-    virtual ~Resolver() {}
+    /// Callbacks for discovering nodes advertising non-operational status:
+    ///   - Commissioners
+    ///   - Nodes in commissioning modes over IP (e.g. ethernet devices, devices already
+    ///     connected to thread/wifi or devices with a commissioning window open)
+    class CommissioningResolveDelegate
+    {
+    public:
+        virtual ~CommissioningResolveDelegate() = default;
 
-    /**
-     * Initializes the resolver.
-     *
-     * The method must be called before other methods of this class.
-     * If the resolver has already been initialized, the method exits immediately with no error.
-     */
-    virtual CHIP_ERROR Init(chip::Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
-
-    /**
-     * Shuts down the resolver if it has been initialized before.
-     */
-    virtual void Shutdown() = 0;
-
-    /**
-     * If nullptr is passed, the previously registered delegate is unregistered.
-     */
-    virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
-
-    /**
-     * If nullptr is passed, the previously registered delegate is unregistered.
-     */
-    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
-
-    /**
-     * Requests resolution of the given operational node service.
-     *
-     * This will trigger a DNSSD query.
-     *
-     * When the operation succeeds or fails, and a resolver delegate has been registered,
-     * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
-     * `OnNodeIdResolutionFailed` method, respectively.
-     */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
-
-    /**
-     * Finds all commissionable nodes matching the given filter.
-     *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
-     */
-    virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+        /// Called within the CHIP event loop once a node is discovered.
+        ///
+        /// May be called multiple times as more nodes send their answer to a
+        /// multicast discovery query
+        virtual void OnNodeDiscovered(const DiscoveredNodeData & nodeData) = 0;
+    };
 
     /**
-     * Finds all commissioner nodes matching the given filter.
-     *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     * Interface for resolving CHIP DNS-SD services
      */
-    virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    class Resolver
+    {
+    public:
+        virtual ~Resolver() {}
 
-    /**
-     * Provides the system-wide implementation of the service resolver
-     */
-    static Resolver & Instance();
-};
+        /**
+         * Initializes the resolver.
+         *
+         * The method must be called before other methods of this class.
+         * If the resolver has already been initialized, the method exits immediately with no error.
+         */
+        virtual CHIP_ERROR Init(chip::Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
+
+        /**
+         * Shuts down the resolver if it has been initialized before.
+         */
+        virtual void Shutdown() = 0;
+
+        /**
+         * If nullptr is passed, the previously registered delegate is unregistered.
+         */
+        virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
+
+        /**
+         * If nullptr is passed, the previously registered delegate is unregistered.
+         */
+        virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
+
+        /**
+         * Requests resolution of the given operational node service.
+         *
+         * This will trigger a DNSSD query.
+         *
+         * When the operation succeeds or fails, and a resolver delegate has been registered,
+         * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
+         * `OnNodeIdResolutionFailed` method, respectively.
+         */
+        virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
+
+        /**
+         * Finds all commissionable nodes matching the given filter.
+         *
+         * Whenever a new matching node is found and a resolver delegate has been registered,
+         * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+         */
+        virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+
+        /**
+         * Finds all commissioner nodes matching the given filter.
+         *
+         * Whenever a new matching node is found and a resolver delegate has been registered,
+         * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+         */
+        virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+
+        /**
+         * Provides the system-wide implementation of the service resolver
+         */
+        static Resolver & Instance();
+    };
 
 } // namespace Dnssd
 } // namespace chip
