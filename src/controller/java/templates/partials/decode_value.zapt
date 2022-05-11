@@ -51,9 +51,9 @@ if ({{source}}.IsNull()) {
     );
   {{else}}
     {{#if_is_strongly_typed_chip_enum type}}
-        std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
-        std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
-         chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
+      std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
+      std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";
+      chip::JniReferences::GetInstance().CreateBoxedObject<{{asUnderlyingBasicType type}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), static_cast<{{asUnderlyingBasicType type}}>({{source}}), {{target}});
     {{else}}
       {{#if (isOctetString type)}}
         jbyteArray {{target}}ByteArray = env->NewByteArray(static_cast<jsize>({{source}}.size()));

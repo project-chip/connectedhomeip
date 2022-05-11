@@ -447,8 +447,8 @@ async function chip_endpoint_clusters(options)
 }
 
 /**
- * Helper checks if the type for the bitmap is Bitflags. This generally includes
- * all inherited bitmaps i.e. all bitmaps apart from
+ * Helper checks if the type for the bitmap is BitFlags. This generally includes
+ * all bitmaps apart from
  * bitmap8/16/32(generally defined in types.xml)
  * example:
  * {{#if_is_strongly_typed_bitmap type}}
@@ -488,8 +488,8 @@ async function if_is_strongly_typed_bitmap(type, options)
 }
 
 /**
- * This function retrieves all the strongly typed enums from the database. This
- * generally includes all inherited enums i.e. all enums apart from
+ * Helper to a handlebar helper function which checks if an enum is a strongly
+ * typed enum or not. This generally includes all enums apart from
  * enum8/16/32(generally defined in types.xml)
  *
  * * example for if_is_strongly_typed_enum:
@@ -508,6 +508,7 @@ async function if_is_strongly_typed_enum_common(type, options, context)
 {
   let packageId = await templateUtil.ensureZclPackageId(context)
   let enumRes
+  // Retrieving the enum from the enum table
   if (type && typeof type === 'string')
   {
     enumRes = await queryZcl.selectEnumByName(context.global.db, type, packageId)
@@ -517,6 +518,8 @@ async function if_is_strongly_typed_enum_common(type, options, context)
     enumRes = await queryZcl.selectEnumById(context.global.db, type)
   }
 
+  // Checking if an enum is atomic. If an eunm is not atomic then the enum
+  // is a strongly typed enum
   if (enumRes) {
     let a = await queryZcl.selectAtomicType(context.global.db, packageId, enumRes.name)
     if (a)
@@ -533,7 +536,7 @@ async function if_is_strongly_typed_enum_common(type, options, context)
 
 /**
  * Helper that checks if an enum is a strongly typed enum or not
- * This generally includes all inherited enums i.e. all enums apart from
+ * This generally includes all enums apart from
  * enum8/16/32(generally defined in types.xml)
  *
  * * example:
