@@ -96,6 +96,11 @@
             "path": "CHIPEventTLVValueDecoder-src.zapt",
             "name": "Decode TLV event values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/CHIPEventTLVValueDecoder.mm"
+        },
+        {
+            "path": "MatterClusterConstants.zapt",
+            "name": "Constants for cluster IDs",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MatterClusterConstants.h"
         }
     ]
 }
