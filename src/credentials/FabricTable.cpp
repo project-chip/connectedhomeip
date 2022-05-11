@@ -580,6 +580,12 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR FabricTable::AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
+    VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return AddNewFabricInner(newFabric, outputIndex);
+}
+
 CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outputIndex)
 {
     VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -609,6 +615,11 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
         }
     }
 
+    return AddNewFabricInner(newFabric, outputIndex);
+}
+
+CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
     if (!mNextAvailableFabricIndex.HasValue())
     {
         // No more indices available.  Bail out.
@@ -917,8 +928,7 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                           ByteSpan nodePrivateKey)
+CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey)
 {
     Reset();
 
@@ -928,9 +938,8 @@ CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert,
 
     // NOTE: this requres ENABLE_HSM_CASE_OPS_KEY is not defined
     P256SerializedKeypair opKeysSerialized;
-    memcpy(static_cast<uint8_t *>(opKeysSerialized), nodePubKey.data(), nodePubKey.size());
-    memcpy(static_cast<uint8_t *>(opKeysSerialized) + nodePubKey.size(), nodePrivateKey.data(), nodePrivateKey.size());
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(nodePubKey.size() + nodePrivateKey.size()));
+    memcpy(static_cast<uint8_t *>(opKeysSerialized), nocKey.data(), nocKey.size());
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(nocKey.size()));
 
     P256Keypair opKey;
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
