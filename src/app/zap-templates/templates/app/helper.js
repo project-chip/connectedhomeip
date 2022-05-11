@@ -463,20 +463,18 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
 
     if (types.isEnum) {
       // Catching baseline enums and converting them into 'uint[size]_t'
-      let s = type.toLowerCase().match(/^enum(\d+)$/)
-      if (s)
-      {
-        return 'uint' + s[1] + '_t'
+      let s = type.toLowerCase().match(/^enum(\d+)$/);
+      if (s) {
+        return 'uint' + s[1] + '_t';
       }
       return ns + type;
     }
 
     if (types.isBitmap) {
       // Catching baseline bitmaps and converting them into 'uint[size]_t'
-      let s = type.toLowerCase().match(/^bitmap(\d+)$/)
-      if (s)
-      {
-        return 'uint' + s[1] + '_t'
+      let s = type.toLowerCase().match(/^bitmap(\d+)$/);
+      if (s) {
+        return 'uint' + s[1] + '_t';
       }
       return 'chip::BitFlags<' + ns + type + '>';
     }
@@ -551,7 +549,7 @@ async function _zapTypeToPythonClusterObjectType(type, options)
     if (await typeChecker('isEnum')) {
       // Catching baseline enums and converting them into 'uint'
       if (type.toLowerCase().match(/^enum\d+$/g)) {
-        return 'uint'
+        return 'uint';
       }
       return ns + '.Enums.' + type;
     }

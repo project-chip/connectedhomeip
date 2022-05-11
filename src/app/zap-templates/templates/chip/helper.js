@@ -21,7 +21,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js');
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
 const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 const queryAccess  = require(zapPath + 'db/query-access')
-const queryZcl     = require(zapPath + 'db/query-zcl')
+const queryZcl     = require(zapPath + 'db/query-zcl');
 
 const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
 const StringHelper                 = require('../../common/StringHelper.js');
@@ -449,7 +449,7 @@ async function chip_endpoint_clusters(options)
 /**
  * Helper checks if the type for the bitmap is BitFlags. This generally includes
  * all bitmaps apart from
- * bitmap8/16/32(generally defined in types.xml)
+ * bitmap8/16/32 (generally defined in types.xml)
  * example:
  * {{#if_is_strongly_typed_bitmap type}}
  * strongly typed bitmap
@@ -462,111 +462,68 @@ async function chip_endpoint_clusters(options)
  */
 async function if_is_strongly_typed_bitmap(type, options)
 {
-  let packageId = await templateUtil.ensureZclPackageId(this)
-  let bitmap
-  if (type && typeof type === 'string')
-  {
-    bitmap = await queryZcl.selectBitmapByName(this.global.db, packageId, type)
-  }
-  else
-  {
-    bitmap = await queryZcl.selectBitmapById(this.global.db, type)
+  let packageId = await templateUtil.ensureZclPackageId(this);
+  let bitmap;
+  if (type && typeof type === 'string') {
+    bitmap = await queryZcl.selectBitmapByName(this.global.db, packageId, type);
+  } else {
+    bitmap = await queryZcl.selectBitmapById(this.global.db, type);
   }
 
   if (bitmap) {
-    let a = await queryZcl.selectAtomicType(this.global.db, packageId, bitmap.name)
-    if (a)
-    {
-      return options.inverse(this)
-    }
-    else
-    {
-      return options.fn(this)
+    let a = await queryZcl.selectAtomicType(this.global.db, packageId, bitmap.name);
+    if (a) {
+      // If this is an atomic type, it's a generic, weakly typed, bitmap.
+      return options.inverse(this);
+    } else {
+      return options.fn(this);
     }
   }
-  return options.inverse(this)
+  return options.inverse(this);
 }
 
 /**
- * Helper to a handlebar helper function which checks if an enum is a strongly
- * typed enum or not. This generally includes all enums apart from
- * enum8/16/32(generally defined in types.xml)
- *
- * * example for if_is_strongly_typed_enum:
- * {{#if_is_strongly_typed_enum type}}
+ * Handlebar helper function which checks if an enum is a strongly typed enum or
+ * not. This generally includes all enums apart from
+ * enum8/16/32 (generally defined in types.xml)
+ * example for if_is_strongly_typed_chip_enum:
+ * {{#if_is_strongly_typed_chip_enum type}}
  * strongly typed enum
  * {{else}}
  * not a strongly typed enum
- * {{/if_is_strongly_typed_enum}}
+ * {{/if_is_strongly_typed_chip_enum}}
  *
  * @param {*} type
  * @param {*} options
- * @param {*} context
  * @returns Promise of content.
- */
-async function if_is_strongly_typed_enum_common(type, options, context)
-{
-  let packageId = await templateUtil.ensureZclPackageId(context)
-  let enumRes
-  // Retrieving the enum from the enum table
-  if (type && typeof type === 'string')
-  {
-    enumRes = await queryZcl.selectEnumByName(context.global.db, type, packageId)
-  }
-  else
-  {
-    enumRes = await queryZcl.selectEnumById(context.global.db, type)
-  }
-
-  // Checking if an enum is atomic. If an eunm is not atomic then the enum
-  // is a strongly typed enum
-  if (enumRes) {
-    let a = await queryZcl.selectAtomicType(context.global.db, packageId, enumRes.name)
-    if (a)
-    {
-      return options.inverse(context)
-    }
-    else
-    {
-      return options.fn(context)
-    }
-  }
-  return options.inverse(context)
-}
-
-/**
- * Helper that checks if an enum is a strongly typed enum or not
- * This generally includes all enums apart from
- * enum8/16/32(generally defined in types.xml)
- *
- * * example:
- * {{#if_is_strongly_typed_enum type}}
- * strongly typed enum
- * {{else}}
- * not a strongly typed enum
- * {{/if_is_strongly_typed_enum}}
- *
- * @param {*} type
- * @returns Promise of content.
- */
-async function if_is_strongly_typed_enum(type, options)
-{
-  return if_is_strongly_typed_enum_common(type, options, this)
-}
-
-/**
- *
- * @param {*} type
- * @param {*} options
- * @returns The same as if_is_strongly_typed_enum apart from some special use
- * cases.
  */
 async function if_is_strongly_typed_chip_enum(type, options)
 {
+  // There are certain exceptions.
   if (type.toLowerCase() == 'vendor_id') {
-    return options.fn(this)
+    return options.fn(this);
   } else {
-    return if_is_strongly_typed_enum_common(type, options, this)
+    let packageId = await templateUtil.ensureZclPackageId(this);
+    let enumRes;
+    // Retrieving the enum from the enum table
+    if (type && typeof type === 'string') {
+      enumRes = await queryZcl.selectEnumByName(this.global.db, type, packageId);
+    } else {
+      enumRes = await queryZcl.selectEnumById(this.global.db, type);
+    }
+
+    // Checking if an enum is atomic. If an enum is not atomic then the enum
+    // is a strongly typed enum
+    if (enumRes) {
+      let a = await queryZcl.selectAtomicType(this.global.db, packageId, enumRes.name);
+      if (a) {
+        // if an enum has an atomic type that means it's a weakly-typed enum.
+        return options.inverse(this);
+      } else {
+        return options.fn(this);
+      }
+    }
+    return options.inverse(this);
   }
 }
 
@@ -714,6 +671,5 @@ exports.if_basic_global_response                             = if_basic_global_r
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
 exports.chip_access_elements                                 = chip_access_elements
-exports.if_is_strongly_typed_enum                            = if_is_strongly_typed_enum
 exports.if_is_strongly_typed_chip_enum                       = if_is_strongly_typed_chip_enum
 exports.if_is_strongly_typed_bitmap                          = if_is_strongly_typed_bitmap
