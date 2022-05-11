@@ -177,10 +177,8 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
 
 void OperationalStatusPrint(const chip::BitFlags<OperationalStatus> & opStatus)
 {
-    emberAfWindowCoveringClusterPrint("OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u",
-                                      opStatus.Raw(),
-                                      opStatus.GetField(OperationalStatus::kGlobal),
-                                      opStatus.GetField(OperationalStatus::kLift),
+    emberAfWindowCoveringClusterPrint("OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
+                                      opStatus.GetField(OperationalStatus::kGlobal), opStatus.GetField(OperationalStatus::kLift),
                                       opStatus.GetField(OperationalStatus::kTilt));
 }
 
@@ -217,7 +215,8 @@ void OperationalStateSet(chip::EndpointId endpoint, const chip::BitFlags<Operati
         status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
 
         /* Global Always follow Lift by priority or therefore fallback to Tilt */
-        chip::BitFlags<OperationalStatus> opGlobal = status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
+        chip::BitFlags<OperationalStatus> opGlobal =
+            status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
         status.SetField(OperationalStatus::kGlobal, status.GetField(opGlobal));
 
         OperationalStatusSet(endpoint, status);
@@ -498,7 +497,8 @@ void emberAfPluginWindowCoveringFinalizeFakeMotionEventHandler(EndpointId endpoi
     OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
     OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
 
-    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpLift=0x%02X OpTilt=0x%02X", (unsigned char) opLift, (unsigned char) opTilt);
+    emberAfWindowCoveringClusterPrint("WC DELAYED CALLBACK 100ms w/ OpLift=0x%02X OpTilt=0x%02X", (unsigned char) opLift,
+                                      (unsigned char) opTilt);
 
     /* Update position to simulate movement to pass the CI */
     if (OperationalState::Stall != opLift)
