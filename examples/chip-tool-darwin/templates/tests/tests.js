@@ -42,9 +42,6 @@ function getTests() {
   // TODO: TestDiscovery needs FindCommissionable
   tests.disable('TestDiscovery');
 
-  // TODO: TestGroupMessaging does not work on Darwin for now.
-  tests.disable('TestGroupMessaging');
-
   return tests;
 }
 
