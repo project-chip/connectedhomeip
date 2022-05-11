@@ -42,9 +42,6 @@ function getTests() {
   // TODO: TestDiscovery needs FindCommissionable
   tests.disable('TestDiscovery');
 
-  // TODO: TestConfigVariables not supported properly in codegen yet.
-  tests.disable('TestConfigVariables');
-
   // TODO: TestGroupMessaging does not work on Darwin for now.
   tests.disable('TestGroupMessaging');
 
