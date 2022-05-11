@@ -47,6 +47,7 @@ public:
     WriteAttribute(const char * _Nonnull attributeName)
         : ModelCommand("write")
     {
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
@@ -104,6 +105,7 @@ public:
 
 protected:
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<uint32_t> mDataVersion;
 
 private:
     chip::ClusterId mClusterId;

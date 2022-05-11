@@ -200,6 +200,7 @@ public:
         CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         CHIPWriteParams * params = [[CHIPWriteParams alloc] init];
         params.timedWriteTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+        params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         {{#if_chip_complex}}
         {{asObjectiveCType type parent.name}} value;
         {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
