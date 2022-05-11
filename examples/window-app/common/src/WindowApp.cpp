@@ -434,7 +434,6 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     configStatus.Set(ConfigStatus::kOnlineReserved);
     ConfigStatusSet(endpoint, configStatus);
 
-
     // Attribute: Id 13 EndProductType
     EndProductTypeSet(endpoint, EndProductType::kInteriorBlind);
 
@@ -489,7 +488,7 @@ void WindowApp::Cover::LiftUpdate(bool newTarget)
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
-    OperationalState opState   = ComputeOperationalState(target, current);
+    OperationalState opState = ComputeOperationalState(target, current);
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 

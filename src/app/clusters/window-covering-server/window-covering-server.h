@@ -50,7 +50,6 @@ enum class OperationalState : uint8_t
 };
 static_assert(sizeof(OperationalState) == sizeof(uint8_t), "OperationalState Size is not correct");
 
-
 // Declare Position Limit Status
 enum class LimitStatus : uint8_t
 {
