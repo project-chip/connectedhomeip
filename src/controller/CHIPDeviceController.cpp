@@ -141,7 +141,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
 #if defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
     chip::InitializeTracing();
-#endif  // defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
+#endif // defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
 
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
