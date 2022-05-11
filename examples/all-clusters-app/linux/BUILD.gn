@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
 
 source_set("chip-all-clusters-common") {
   sources = [
@@ -79,6 +80,23 @@ if (is_libfuzzer) {
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
     output_dir = root_out_dir
+  }
+
+  if (chip_device_platform == "darwin") {
+    action("codesign") {
+      script = "entitlements/codesign.py"
+      public_deps = [ ":chip-all-clusters-app" ]
+
+      args = [
+        "--target_path",
+        rebase_path("${root_build_dir}/chip-all-clusters-app", root_build_dir),
+        "--log_path",
+        rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+      ]
+
+      output_name = "codesign_log.txt"
+      outputs = [ "${root_build_dir}/${output_name}" ]
+    }
   }
 }
 
