@@ -319,60 +319,59 @@ void DefaultOTARequestorDriver::PeriodicQueryTimerHandler(System::Layer * system
 {
     ChipLogProgress(SoftwareUpdate, "Default Provider timer handler is invoked");
 
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
+
     // Determine which provider to query next
     ProviderLocationType providerLocation;
     bool listExhausted = false;
-    if (GetNextProviderLocation(providerLocation, listExhausted) != true)
+    if (driver->GetNextProviderLocation(providerLocation, listExhausted) != true)
     {
-        StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
+        driver->StartSelectedTimer(SelectedTimer::kPeriodicQueryTimer);
         return;
     }
 
-    mRequestor->SetCurrentProviderLocation(providerLocation);
+    driver->mRequestor->SetCurrentProviderLocation(providerLocation);
 
-    SendQueryImage();
+    driver->SendQueryImage();
 }
 
 void DefaultOTARequestorDriver::StartPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the periodic query timer, timeout: %u seconds",
                     (unsigned int) mPeriodicQueryTimeInterval);
-    ScheduleDelayedAction(
-        System::Clock::Seconds32(mPeriodicQueryTimeInterval),
-        [](System::Layer *, void * context) { (ToDriver(context))->PeriodicQueryTimerHandler(nullptr, context); }, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(mPeriodicQueryTimeInterval), PeriodicQueryTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the Periodic Query timer");
-    CancelDelayedAction([](System::Layer *, void * context) { (ToDriver(context))->PeriodicQueryTimerHandler(nullptr, context); },
-                        this);
+    CancelDelayedAction(PeriodicQueryTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::WatchdogTimerHandler(System::Layer * systemLayer, void * appState)
 {
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
+
     ChipLogError(SoftwareUpdate, "Watchdog timer detects state stuck at %u. Cancelling download and resetting state.",
-                 to_underlying(mRequestor->GetCurrentUpdateState()));
+                 to_underlying(driver->mRequestor->GetCurrentUpdateState()));
 
     // Something went wrong and OTA requestor is stuck in a non-idle state for too long.
     // Let's just cancel download, reset state, and re-start periodic query timer.
-    UpdateDiscontinued();
-    mRequestor->CancelImageUpdate();
-    StartPeriodicQueryTimer();
+    driver->UpdateDiscontinued();
+    driver->mRequestor->CancelImageUpdate();
+    driver->StartPeriodicQueryTimer();
 }
 
 void DefaultOTARequestorDriver::StartWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Starting the watchdog timer, timeout: %u seconds", (unsigned int) mWatchdogTimeInterval);
-    ScheduleDelayedAction(
-        System::Clock::Seconds32(mWatchdogTimeInterval),
-        [](System::Layer *, void * context) { (ToDriver(context))->WatchdogTimerHandler(nullptr, context); }, this);
+    ScheduleDelayedAction(System::Clock::Seconds32(mWatchdogTimeInterval), WatchdogTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::StopWatchdogTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Stopping the watchdog timer");
-    CancelDelayedAction([](System::Layer *, void * context) { (ToDriver(context))->WatchdogTimerHandler(nullptr, context); }, this);
+    CancelDelayedAction(WatchdogTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::StartSelectedTimer(SelectedTimer timer)
