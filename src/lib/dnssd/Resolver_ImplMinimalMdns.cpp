@@ -60,9 +60,8 @@ private:
     NodeData & mNodeData;
 };
 
-constexpr size_t kMdnsMaxPacketSize   = 1024;
-constexpr uint16_t kMdnsPort          = 5353;
-constexpr uint16_t kDefaultTtlSeconds = 120;
+constexpr size_t kMdnsMaxPacketSize = 1024;
+constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
 
@@ -103,8 +102,11 @@ private:
     void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
     void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
 
-    void OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr);
-    void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
+    /// Handle processing of a newly received IP address
+    ///
+    /// Will place the given [addr] into the address list of [resolutionData] assuming that
+    /// there is enough space for that.
+    void OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr);
 };
 
 void PacketDataReporter::OnQuery(const QueryData & data)
@@ -134,7 +136,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mNodeData.mHostName, it.Value());
+        Platform::CopyString(mNodeData.resolutionData.hostName, it.Value());
     }
 
     if (!name.Next())
@@ -145,14 +147,14 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
         return;
     }
 
-    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
+    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.operationalData.peerId) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
         return;
     }
 
-    mNodeData.mPort = srv.GetPort();
-    mHasNodePort    = true;
+    mNodeData.resolutionData.port = srv.GetPort();
+    mHasNodePort                  = true;
 }
 
 void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
@@ -161,16 +163,17 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mDiscoveredNodeData.hostName, it.Value());
+        Platform::CopyString(mDiscoveredNodeData.resolutionData.hostName, it.Value());
     }
     if (name.Next())
     {
-        strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
+        strncpy(mDiscoveredNodeData.commissionData.instanceName, name.Value(), sizeof(CommissionNodeData::instanceName));
     }
-    mDiscoveredNodeData.port = srv.GetPort();
+    mDiscoveredNodeData.resolutionData.port = srv.GetPort();
+    mHasNodePort                            = true;
 }
 
-void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
+void PacketDataReporter::OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr)
 {
     // TODO: should validate that the IP address we receive belongs to the
     // server associated with the SRV record.
@@ -178,24 +181,14 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    if (mNodeData.mNumIPs >= ResolvedNodeData::kMaxIPAddresses)
+    if (resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
     {
+        ChipLogDetail(Discovery, "Number of IP addresses overflow. Discarding extra addresses.");
         return;
     }
-    mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
-    mNodeData.mInterfaceId                  = mInterfaceId;
-    mHasIP                                  = true;
-}
-
-void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
-{
-    if (mDiscoveredNodeData.numIPs >= DiscoveredNodeData::kMaxIPAddresses)
-    {
-        return;
-    }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
-    mDiscoveredNodeData.interfaceId                           = mInterfaceId;
-    mDiscoveredNodeData.numIPs++;
+    resolutionData.ipAddress[resolutionData.numIPs++] = addr;
+    resolutionData.interfaceId                        = mInterfaceId;
+    mHasIP                                            = true;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -265,7 +258,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             ParsePtrRecord(data.GetData(), mPacketRange, &qname);
             if (qname.Next())
             {
-                strncpy(mDiscoveredNodeData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
+                strncpy(mDiscoveredNodeData.commissionData.instanceName, qname.Value(), sizeof(CommissionNodeData::instanceName));
             }
         }
         break;
@@ -292,11 +285,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         {
             if (mDiscoveryType == DiscoveryType::kOperational)
             {
-                OnOperationalIPAddress(addr);
+                OnNodeIPAddress(mNodeData.resolutionData, addr);
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnDiscoveredNodeIPAddress(addr);
+                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
             }
         }
         break;
@@ -311,11 +304,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         {
             if (mDiscoveryType == DiscoveryType::kOperational)
             {
-                OnOperationalIPAddress(addr);
+                OnNodeIPAddress(mNodeData.resolutionData, addr);
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnDiscoveredNodeIPAddress(addr);
+                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
             }
         }
         break;
@@ -329,7 +322,7 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
     if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
     {
-        if (!mDiscoveredNodeData.IsValid())
+        if (!mDiscoveredNodeData.resolutionData.IsValid())
         {
             ChipLogError(Discovery, "Discovered node data is not valid. Commissioning discovery not complete.");
             return;
@@ -359,14 +352,8 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
             return;
         }
 
-        activeAttempts.Complete(mNodeData.mPeerId);
+        activeAttempts.Complete(mNodeData.operationalData.peerId);
         mNodeData.LogNodeIdResolved();
-
-        //
-        // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
-        //
-        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-        mNodeData.mExpiryTime                      = currentTime + System::Clock::Seconds16(kDefaultTtlSeconds);
 
         if (mOperationalDelegate != nullptr)
         {
