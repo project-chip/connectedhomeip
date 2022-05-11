@@ -168,8 +168,14 @@ public:
         return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
+    // Verifies credentials, using this fabric info's root certificate.
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
                                  PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
+
+    // Verifies credentials, using the provided root certificate.
+    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                        Credentials::ValidationContext & context, PeerId & nocPeerId, FabricId & fabricId,
+                                        Crypto::P256PublicKey & nocPubkey);
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -192,9 +198,9 @@ public:
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
-       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
        output parameter */
-    CHIP_ERROR GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+    static CHIP_ERROR GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId);
 
     friend class FabricTable;
 
