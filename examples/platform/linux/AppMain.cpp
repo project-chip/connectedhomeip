@@ -237,7 +237,7 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
                                                    LinuxDeviceOptions::GetInstance());
     SuccessOrExit(err);
 
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+    err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
@@ -250,7 +250,7 @@ int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
     {
         // For testing of manual pairing code with custom commissioning flow
         ChipLogProgress(NotSpecified, "==== Onboarding payload for Custom Commissioning Flows ====");
-        err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+        err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
         SuccessOrExit(err);
 
         LinuxDeviceOptions::GetInstance().payload.commissioningFlow = chip::CommissioningFlow::kCustom;
