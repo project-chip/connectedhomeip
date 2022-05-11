@@ -27,9 +27,9 @@
 
 #include <stdint.h>
 
+#include <limits>
 #include <type_traits>
 #include <utility>
-#include <limits>
 
 namespace chip {
 
@@ -88,7 +88,6 @@ public:
         return *this;
     }
 
-
     /**
      * SetField to value via a mask shifting.
      *
@@ -98,7 +97,7 @@ public:
     constexpr BitFlags & SetField(FlagsEnum mask, IntegerType value)
     {
         IntegerType bitMask = static_cast<IntegerType>(mask);
-        IntegerType shift = GetShift(bitMask);
+        IntegerType shift   = GetShift(bitMask);
 
         // Clear bits overlayed by the mask
         mValue = static_cast<IntegerType>(mValue & ~bitMask);
@@ -117,7 +116,7 @@ public:
     IntegerType GetField(FlagsEnum mask) const
     {
         IntegerType bitMask = static_cast<IntegerType>(mask);
-        IntegerType shift = GetShift(bitMask);
+        IntegerType shift   = GetShift(bitMask);
 
         // Forward the right bits
         return static_cast<IntegerType>(((mValue & bitMask) >> shift));
@@ -291,7 +290,6 @@ private:
         }
         return count;
     }
-
 
     StorageType mValue = 0;
 };
