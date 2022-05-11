@@ -33,8 +33,8 @@ using namespace chip::Credentials;
 // refcounted, so it's OK if we use AutoPlatformMemory after MemoryInit has
 // already happened elsewhere.
 struct AutoPlatformMemory {
-  AutoPlatformMemory() { Platform::MemoryInit(); }
-  ~AutoPlatformMemory() { Platform::MemoryShutdown(); }
+    AutoPlatformMemory() { Platform::MemoryInit(); }
+    ~AutoPlatformMemory() { Platform::MemoryShutdown(); }
 };
 
 @implementation MatterCertificates
