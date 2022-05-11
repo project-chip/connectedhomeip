@@ -29,7 +29,6 @@
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
-#include <zap-generated/tests/simulated-cluster-objects.h>
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
