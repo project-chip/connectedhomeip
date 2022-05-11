@@ -102,9 +102,9 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     {
         ChipLogError(Zcl,
                      "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%u"
-                     ",totalCredentials=%u,maxNumberOfCredentials=%zu]",
+                     ",totalCredentials=%u,maxNumberOfCredentials=%u]",
                      mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int>(totalCredentials),
-                     userInStorage.credentials.capacity());
+                     static_cast<unsigned int>(userInStorage.credentials.capacity()));
         return false;
     }
 
