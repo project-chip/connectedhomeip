@@ -17,6 +17,10 @@
 
 #pragma once
 
+namespace chip {
+void InitializeTracing();
+} // namespace chip
+
 #if defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
 
 #include "trace/MatterCustomTrace.h"
