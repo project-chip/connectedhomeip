@@ -16,8 +16,6 @@
 # This test file tests Group Multicast Messaging.
 # For this test to work, A Group Write/Command and a unicast read need to occur to be able to confirm that the group Communication works. Every test comes in a pair
 # Only Works on Linux machines
-# When building chip-tool, chip_enable_group_messaging_tests needs to be set to true in the build command for the test to pass
-# ./scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=true chip_enable_group_messaging_tests=true
 name: Basic Group Messaging Tests
 
 config:

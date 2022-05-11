@@ -258,8 +258,6 @@ def HostTargets():
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
-    builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
-        ['-all-clusters', '-chip-tool']), test_group=True),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool', '-chip-tool-darwin']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(

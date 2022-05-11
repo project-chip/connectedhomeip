@@ -81,7 +81,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
-                        --target linux-x64-all-clusters-test-group-${BUILD_VARIANT} \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT} \
                         --target linux-x64-lock-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         build \
@@ -95,7 +95,7 @@ jobs:
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-test-group-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "

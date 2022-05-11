@@ -164,7 +164,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
+                 use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -194,10 +194,6 @@ class HostBuilder(GnBuilder):
 
         if not interactive_mode:
             self.extra_gn_options.append('config_use_interactive_mode=false')
-
-        if test_group:
-            self.extra_gn_options.append(
-                'chip_enable_group_messaging_tests=true')
 
         if use_libfuzzer:
             self.extra_gn_options.append('is_libfuzzer=true')
