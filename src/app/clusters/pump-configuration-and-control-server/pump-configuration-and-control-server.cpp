@@ -301,7 +301,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
     emberAfDebugPrintln("PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
                         (unsigned int) attributePath.mAttributeId);
 
-    Protocols::InteractionModel::Status status;
+    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 
     switch (attributePath.mAttributeId)
     {
