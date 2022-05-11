@@ -1146,7 +1146,8 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    return false;
+    auto conn = static_cast<BLEConnection *>(conId);
+    return (conn != nullptr) ? conn->mtu : 0;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
