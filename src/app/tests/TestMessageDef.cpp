@@ -545,7 +545,6 @@ void BuildEventReports(nlTestSuite * apSuite, EventReportIBs::Builder & aEventRe
     EventReportIB::Builder & eventReportIBBuilder = aEventReportsBuilder.CreateEventReport();
     NL_TEST_ASSERT(apSuite, aEventReportsBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventReportIB(apSuite, eventReportIBBuilder);
-
     aEventReportsBuilder.EndOfEventReports();
     NL_TEST_ASSERT(apSuite, aEventReportsBuilder.GetError() == CHIP_NO_ERROR);
 }
@@ -1708,6 +1707,28 @@ void EventReportsTest(nlTestSuite * apSuite, void * apContext)
     ParseEventReports(apSuite, reader);
 }
 
+void EmptyEventReportsTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    EventReportIBs::Builder eventReportsBuilder;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    eventReportsBuilder.Init(&writer);
+    eventReportsBuilder.EndOfEventReports();
+    NL_TEST_ASSERT(apSuite, eventReportsBuilder.GetError() == CHIP_NO_ERROR);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseEventReports(apSuite, reader);
+}
+
 void AttributeReportIBTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2285,6 +2306,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("EventDataIBTest", EventDataIBTest),
                 NL_TEST_DEF("EventReportIBTest", EventReportIBTest),
                 NL_TEST_DEF("EventReportsTest", EventReportsTest),
+                NL_TEST_DEF("EmptyEventReportsTest", EmptyEventReportsTest),
                 NL_TEST_DEF("StatusIBTest", StatusIBTest),
                 NL_TEST_DEF("EventStatusIBTest", EventStatusIBTest),
                 NL_TEST_DEF("CommandPathIBTest", CommandPathIBTest),
