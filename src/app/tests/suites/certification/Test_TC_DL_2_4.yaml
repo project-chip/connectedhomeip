@@ -11,27 +11,91 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    100.2.4. [TC-DL-2.4] Verification for Unlock with Timeout command
+    108.2.4. [TC-DL-2.4] Verification for Unlock with Timeout command
     [DUT-Server]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Door Lock"
+    endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Precondition: Door is in locked state"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
     - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
-      verification: |
-          https://github.com/project-chip/connectedhomeip/issues/15776
-      disabled: true
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
 
-    - label:
-          "TH sends the unlock with Timeout command to the DUT with argument
-          PINCode value as 'xxxxxxxx' and the Timeout argument value as 5
-          seconds"
-      verification: |
+    - label: "TH sends the unlock with Timeout command to the DUT "
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 5
+              - name: "PINCode"
+                value: "123456"
 
-      disabled: true
+    - label: "TH reads AutoRelockTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          value: 10
+
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "TH reads LockState attriute"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
