@@ -25,7 +25,6 @@
 #import "CHIPDevice_Internal.h"
 
 #import "zap-generated/cluster/CHIPTestClustersObjc.h"
-#import "zap-generated/tests/CHIPClustersTest.h"
 
 #include <lib/support/CHIPListUtils.h>
 #include <type_traits>
@@ -35,7 +34,7 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 
 @interface CHIPTestAccessControl ()
-@property (readonly) chip::Controller::AccessControlClusterTest cppCluster;
+@property (readonly) chip::Controller::AccessControlCluster cppCluster;
 @end
 
 @implementation CHIPTestAccessControl
@@ -258,7 +257,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestAccountLogin ()
-@property (readonly) chip::Controller::AccountLoginClusterTest cppCluster;
+@property (readonly) chip::Controller::AccountLoginCluster cppCluster;
 @end
 
 @implementation CHIPTestAccountLogin
@@ -424,7 +423,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestAdministratorCommissioning ()
-@property (readonly) chip::Controller::AdministratorCommissioningClusterTest cppCluster;
+@property (readonly) chip::Controller::AdministratorCommissioningCluster cppCluster;
 @end
 
 @implementation CHIPTestAdministratorCommissioning
@@ -644,7 +643,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestApplicationBasic ()
-@property (readonly) chip::Controller::ApplicationBasicClusterTest cppCluster;
+@property (readonly) chip::Controller::ApplicationBasicCluster cppCluster;
 @end
 
 @implementation CHIPTestApplicationBasic
@@ -978,7 +977,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestApplicationLauncher ()
-@property (readonly) chip::Controller::ApplicationLauncherClusterTest cppCluster;
+@property (readonly) chip::Controller::ApplicationLauncherCluster cppCluster;
 @end
 
 @implementation CHIPTestApplicationLauncher
@@ -1183,7 +1182,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestAudioOutput ()
-@property (readonly) chip::Controller::AudioOutputClusterTest cppCluster;
+@property (readonly) chip::Controller::AudioOutputCluster cppCluster;
 @end
 
 @implementation CHIPTestAudioOutput
@@ -1410,7 +1409,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBarrierControl ()
-@property (readonly) chip::Controller::BarrierControlClusterTest cppCluster;
+@property (readonly) chip::Controller::BarrierControlCluster cppCluster;
 @end
 
 @implementation CHIPTestBarrierControl
@@ -1648,7 +1647,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBasic ()
-@property (readonly) chip::Controller::BasicClusterTest cppCluster;
+@property (readonly) chip::Controller::BasicCluster cppCluster;
 @end
 
 @implementation CHIPTestBasic
@@ -2124,7 +2123,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBinaryInputBasic ()
-@property (readonly) chip::Controller::BinaryInputBasicClusterTest cppCluster;
+@property (readonly) chip::Controller::BinaryInputBasicCluster cppCluster;
 @end
 
 @implementation CHIPTestBinaryInputBasic
@@ -2344,7 +2343,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBinding ()
-@property (readonly) chip::Controller::BindingClusterTest cppCluster;
+@property (readonly) chip::Controller::BindingCluster cppCluster;
 @end
 
 @implementation CHIPTestBinding
@@ -2510,7 +2509,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBooleanState ()
-@property (readonly) chip::Controller::BooleanStateClusterTest cppCluster;
+@property (readonly) chip::Controller::BooleanStateCluster cppCluster;
 @end
 
 @implementation CHIPTestBooleanState
@@ -2694,7 +2693,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBridgedActions ()
-@property (readonly) chip::Controller::BridgedActionsClusterTest cppCluster;
+@property (readonly) chip::Controller::BridgedActionsCluster cppCluster;
 @end
 
 @implementation CHIPTestBridgedActions
@@ -2991,7 +2990,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestBridgedDeviceBasic ()
-@property (readonly) chip::Controller::BridgedDeviceBasicClusterTest cppCluster;
+@property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
 @end
 
 @implementation CHIPTestBridgedDeviceBasic
@@ -3411,7 +3410,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestChannel ()
-@property (readonly) chip::Controller::ChannelClusterTest cppCluster;
+@property (readonly) chip::Controller::ChannelCluster cppCluster;
 @end
 
 @implementation CHIPTestChannel
@@ -3700,7 +3699,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestColorControl ()
-@property (readonly) chip::Controller::ColorControlClusterTest cppCluster;
+@property (readonly) chip::Controller::ColorControlCluster cppCluster;
 @end
 
 @implementation CHIPTestColorControl
@@ -4571,7 +4570,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestContentLauncher ()
-@property (readonly) chip::Controller::ContentLauncherClusterTest cppCluster;
+@property (readonly) chip::Controller::ContentLauncherCluster cppCluster;
 @end
 
 @implementation CHIPTestContentLauncher
@@ -4776,7 +4775,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestDescriptor ()
-@property (readonly) chip::Controller::DescriptorClusterTest cppCluster;
+@property (readonly) chip::Controller::DescriptorCluster cppCluster;
 @end
 
 @implementation CHIPTestDescriptor
@@ -5099,7 +5098,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestDiagnosticLogs ()
-@property (readonly) chip::Controller::DiagnosticLogsClusterTest cppCluster;
+@property (readonly) chip::Controller::DiagnosticLogsCluster cppCluster;
 @end
 
 @implementation CHIPTestDiagnosticLogs
@@ -5265,7 +5264,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestDoorLock ()
-@property (readonly) chip::Controller::DoorLockClusterTest cppCluster;
+@property (readonly) chip::Controller::DoorLockCluster cppCluster;
 @end
 
 @implementation CHIPTestDoorLock
@@ -5775,7 +5774,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestElectricalMeasurement ()
-@property (readonly) chip::Controller::ElectricalMeasurementClusterTest cppCluster;
+@property (readonly) chip::Controller::ElectricalMeasurementCluster cppCluster;
 @end
 
 @implementation CHIPTestElectricalMeasurement
@@ -8141,7 +8140,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestEthernetNetworkDiagnostics ()
-@property (readonly) chip::Controller::EthernetNetworkDiagnosticsClusterTest cppCluster;
+@property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster;
 @end
 
 @implementation CHIPTestEthernetNetworkDiagnostics
@@ -8484,7 +8483,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestFanControl ()
-@property (readonly) chip::Controller::FanControlClusterTest cppCluster;
+@property (readonly) chip::Controller::FanControlCluster cppCluster;
 @end
 
 @implementation CHIPTestFanControl
@@ -8740,7 +8739,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestFixedLabel ()
-@property (readonly) chip::Controller::FixedLabelClusterTest cppCluster;
+@property (readonly) chip::Controller::FixedLabelCluster cppCluster;
 @end
 
 @implementation CHIPTestFixedLabel
@@ -8946,7 +8945,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestFlowMeasurement ()
-@property (readonly) chip::Controller::FlowMeasurementClusterTest cppCluster;
+@property (readonly) chip::Controller::FlowMeasurementCluster cppCluster;
 @end
 
 @implementation CHIPTestFlowMeasurement
@@ -9199,7 +9198,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestGeneralCommissioning ()
-@property (readonly) chip::Controller::GeneralCommissioningClusterTest cppCluster;
+@property (readonly) chip::Controller::GeneralCommissioningCluster cppCluster;
 @end
 
 @implementation CHIPTestGeneralCommissioning
@@ -9439,7 +9438,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestGeneralDiagnostics ()
-@property (readonly) chip::Controller::GeneralDiagnosticsClusterTest cppCluster;
+@property (readonly) chip::Controller::GeneralDiagnosticsCluster cppCluster;
 @end
 
 @implementation CHIPTestGeneralDiagnostics
@@ -9897,7 +9896,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestGroupKeyManagement ()
-@property (readonly) chip::Controller::GroupKeyManagementClusterTest cppCluster;
+@property (readonly) chip::Controller::GroupKeyManagementCluster cppCluster;
 @end
 
 @implementation CHIPTestGroupKeyManagement
@@ -10166,7 +10165,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestGroups ()
-@property (readonly) chip::Controller::GroupsClusterTest cppCluster;
+@property (readonly) chip::Controller::GroupsCluster cppCluster;
 @end
 
 @implementation CHIPTestGroups
@@ -10350,7 +10349,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestIdentify ()
-@property (readonly) chip::Controller::IdentifyClusterTest cppCluster;
+@property (readonly) chip::Controller::IdentifyCluster cppCluster;
 @end
 
 @implementation CHIPTestIdentify
@@ -10534,7 +10533,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestIlluminanceMeasurement ()
-@property (readonly) chip::Controller::IlluminanceMeasurementClusterTest cppCluster;
+@property (readonly) chip::Controller::IlluminanceMeasurementCluster cppCluster;
 @end
 
 @implementation CHIPTestIlluminanceMeasurement
@@ -10810,7 +10809,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestKeypadInput ()
-@property (readonly) chip::Controller::KeypadInputClusterTest cppCluster;
+@property (readonly) chip::Controller::KeypadInputCluster cppCluster;
 @end
 
 @implementation CHIPTestKeypadInput
@@ -10976,7 +10975,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestLevelControl ()
-@property (readonly) chip::Controller::LevelControlClusterTest cppCluster;
+@property (readonly) chip::Controller::LevelControlCluster cppCluster;
 @end
 
 @implementation CHIPTestLevelControl
@@ -11268,7 +11267,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestLocalizationConfiguration ()
-@property (readonly) chip::Controller::LocalizationConfigurationClusterTest cppCluster;
+@property (readonly) chip::Controller::LocalizationConfigurationCluster cppCluster;
 @end
 
 @implementation CHIPTestLocalizationConfiguration
@@ -11473,7 +11472,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestLowPower ()
-@property (readonly) chip::Controller::LowPowerClusterTest cppCluster;
+@property (readonly) chip::Controller::LowPowerCluster cppCluster;
 @end
 
 @implementation CHIPTestLowPower
@@ -11639,7 +11638,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestMediaInput ()
-@property (readonly) chip::Controller::MediaInputClusterTest cppCluster;
+@property (readonly) chip::Controller::MediaInputCluster cppCluster;
 @end
 
 @implementation CHIPTestMediaInput
@@ -11867,7 +11866,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestMediaPlayback ()
-@property (readonly) chip::Controller::MediaPlaybackClusterTest cppCluster;
+@property (readonly) chip::Controller::MediaPlaybackCluster cppCluster;
 @end
 
 @implementation CHIPTestMediaPlayback
@@ -12191,7 +12190,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestModeSelect ()
-@property (readonly) chip::Controller::ModeSelectClusterTest cppCluster;
+@property (readonly) chip::Controller::ModeSelectCluster cppCluster;
 @end
 
 @implementation CHIPTestModeSelect
@@ -12457,7 +12456,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestNetworkCommissioning ()
-@property (readonly) chip::Controller::NetworkCommissioningClusterTest cppCluster;
+@property (readonly) chip::Controller::NetworkCommissioningCluster cppCluster;
 @end
 
 @implementation CHIPTestNetworkCommissioning
@@ -12789,7 +12788,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOtaSoftwareUpdateProvider ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateProviderClusterTest cppCluster;
+@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
 @end
 
 @implementation CHIPTestOtaSoftwareUpdateProvider
@@ -12955,7 +12954,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOtaSoftwareUpdateRequestor ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorClusterTest cppCluster;
+@property (readonly) chip::Controller::OtaSoftwareUpdateRequestorCluster cppCluster;
 @end
 
 @implementation CHIPTestOtaSoftwareUpdateRequestor
@@ -13180,7 +13179,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOccupancySensing ()
-@property (readonly) chip::Controller::OccupancySensingClusterTest cppCluster;
+@property (readonly) chip::Controller::OccupancySensingCluster cppCluster;
 @end
 
 @implementation CHIPTestOccupancySensing
@@ -13401,7 +13400,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOnOff ()
-@property (readonly) chip::Controller::OnOffClusterTest cppCluster;
+@property (readonly) chip::Controller::OnOffCluster cppCluster;
 @end
 
 @implementation CHIPTestOnOff
@@ -13603,7 +13602,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOnOffSwitchConfiguration ()
-@property (readonly) chip::Controller::OnOffSwitchConfigurationClusterTest cppCluster;
+@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster cppCluster;
 @end
 
 @implementation CHIPTestOnOffSwitchConfiguration
@@ -13787,7 +13786,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOperationalCredentials ()
-@property (readonly) chip::Controller::OperationalCredentialsClusterTest cppCluster;
+@property (readonly) chip::Controller::OperationalCredentialsCluster cppCluster;
 @end
 
 @implementation CHIPTestOperationalCredentials
@@ -14137,7 +14136,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestPowerSource ()
-@property (readonly) chip::Controller::PowerSourceClusterTest cppCluster;
+@property (readonly) chip::Controller::PowerSourceCluster cppCluster;
 @end
 
 @implementation CHIPTestPowerSource
@@ -14938,7 +14937,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestPowerSourceConfiguration ()
-@property (readonly) chip::Controller::PowerSourceConfigurationClusterTest cppCluster;
+@property (readonly) chip::Controller::PowerSourceConfigurationCluster cppCluster;
 @end
 
 @implementation CHIPTestPowerSourceConfiguration
@@ -15143,7 +15142,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestPressureMeasurement ()
-@property (readonly) chip::Controller::PressureMeasurementClusterTest cppCluster;
+@property (readonly) chip::Controller::PressureMeasurementCluster cppCluster;
 @end
 
 @implementation CHIPTestPressureMeasurement
@@ -15501,7 +15500,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestPumpConfigurationAndControl ()
-@property (readonly) chip::Controller::PumpConfigurationAndControlClusterTest cppCluster;
+@property (readonly) chip::Controller::PumpConfigurationAndControlCluster cppCluster;
 @end
 
 @implementation CHIPTestPumpConfigurationAndControl
@@ -16108,7 +16107,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestRelativeHumidityMeasurement ()
-@property (readonly) chip::Controller::RelativeHumidityMeasurementClusterTest cppCluster;
+@property (readonly) chip::Controller::RelativeHumidityMeasurementCluster cppCluster;
 @end
 
 @implementation CHIPTestRelativeHumidityMeasurement
@@ -16361,7 +16360,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestScenes ()
-@property (readonly) chip::Controller::ScenesClusterTest cppCluster;
+@property (readonly) chip::Controller::ScenesCluster cppCluster;
 @end
 
 @implementation CHIPTestScenes
@@ -16635,7 +16634,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestSoftwareDiagnostics ()
-@property (readonly) chip::Controller::SoftwareDiagnosticsClusterTest cppCluster;
+@property (readonly) chip::Controller::SoftwareDiagnosticsCluster cppCluster;
 @end
 
 @implementation CHIPTestSoftwareDiagnostics
@@ -16899,7 +16898,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestSwitch ()
-@property (readonly) chip::Controller::SwitchClusterTest cppCluster;
+@property (readonly) chip::Controller::SwitchCluster cppCluster;
 @end
 
 @implementation CHIPTestSwitch
@@ -17119,7 +17118,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestTargetNavigator ()
-@property (readonly) chip::Controller::TargetNavigatorClusterTest cppCluster;
+@property (readonly) chip::Controller::TargetNavigatorCluster cppCluster;
 @end
 
 @implementation CHIPTestTargetNavigator
@@ -17343,7 +17342,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestTemperatureMeasurement ()
-@property (readonly) chip::Controller::TemperatureMeasurementClusterTest cppCluster;
+@property (readonly) chip::Controller::TemperatureMeasurementCluster cppCluster;
 @end
 
 @implementation CHIPTestTemperatureMeasurement
@@ -17596,7 +17595,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestTestCluster ()
-@property (readonly) chip::Controller::TestClusterClusterTest cppCluster;
+@property (readonly) chip::Controller::TestClusterCluster cppCluster;
 @end
 
 @implementation CHIPTestTestCluster
@@ -17762,7 +17761,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestThermostat ()
-@property (readonly) chip::Controller::ThermostatClusterTest cppCluster;
+@property (readonly) chip::Controller::ThermostatCluster cppCluster;
 @end
 
 @implementation CHIPTestThermostat
@@ -18279,7 +18278,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestThermostatUserInterfaceConfiguration ()
-@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cppCluster;
+@property (readonly) chip::Controller::ThermostatUserInterfaceConfigurationCluster cppCluster;
 @end
 
 @implementation CHIPTestThermostatUserInterfaceConfiguration
@@ -18445,7 +18444,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestThreadNetworkDiagnostics ()
-@property (readonly) chip::Controller::ThreadNetworkDiagnosticsClusterTest cppCluster;
+@property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
 @end
 
 @implementation CHIPTestThreadNetworkDiagnostics
@@ -19897,7 +19896,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestTimeFormatLocalization ()
-@property (readonly) chip::Controller::TimeFormatLocalizationClusterTest cppCluster;
+@property (readonly) chip::Controller::TimeFormatLocalizationCluster cppCluster;
 @end
 
 @implementation CHIPTestTimeFormatLocalization
@@ -20104,7 +20103,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestUnitLocalization ()
-@property (readonly) chip::Controller::UnitLocalizationClusterTest cppCluster;
+@property (readonly) chip::Controller::UnitLocalizationCluster cppCluster;
 @end
 
 @implementation CHIPTestUnitLocalization
@@ -20270,7 +20269,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestUserLabel ()
-@property (readonly) chip::Controller::UserLabelClusterTest cppCluster;
+@property (readonly) chip::Controller::UserLabelCluster cppCluster;
 @end
 
 @implementation CHIPTestUserLabel
@@ -20436,7 +20435,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestWakeOnLan ()
-@property (readonly) chip::Controller::WakeOnLanClusterTest cppCluster;
+@property (readonly) chip::Controller::WakeOnLanCluster cppCluster;
 @end
 
 @implementation CHIPTestWakeOnLan
@@ -20620,7 +20619,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestWiFiNetworkDiagnostics ()
-@property (readonly) chip::Controller::WiFiNetworkDiagnosticsClusterTest cppCluster;
+@property (readonly) chip::Controller::WiFiNetworkDiagnosticsCluster cppCluster;
 @end
 
 @implementation CHIPTestWiFiNetworkDiagnostics
@@ -21047,7 +21046,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestWindowCovering ()
-@property (readonly) chip::Controller::WindowCoveringClusterTest cppCluster;
+@property (readonly) chip::Controller::WindowCoveringCluster cppCluster;
 @end
 
 @implementation CHIPTestWindowCovering
