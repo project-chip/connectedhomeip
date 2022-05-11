@@ -17,17 +17,18 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
 #include <setup_payload/SetupPayload.h>
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags);
-void PrintOnboardingCodes(const chip::SetupPayload & payload);
+void PrintOnboardingCodes(const chip::PayloadContents & payload);
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload);
-CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string & aQRCode);
-CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload);
-CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousInformationFlags aRendezvousFlags);
+CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, chip::RendezvousInformationFlags aRendezvousFlags);
+CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, const chip::PayloadContents & payload);
+CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, chip::MutableCharSpan & aQRCode);
+CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
+CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, const chip::PayloadContents & payload);
+CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayload, chip::RendezvousInformationFlags aRendezvousFlags);
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server
