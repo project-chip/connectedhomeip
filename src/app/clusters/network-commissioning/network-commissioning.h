@@ -100,6 +100,10 @@ private:
     uint8_t mLastNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
     uint8_t mLastNetworkIDLen = 0;
 
+    Optional<uint64_t> mLastOperationBreadcrumb;
+    void KickBreadcrumbChange(const Optional<uint64_t> & breadcrumbValue);
+    void KickBreadcrumbChange();
+
     // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);
     void HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
