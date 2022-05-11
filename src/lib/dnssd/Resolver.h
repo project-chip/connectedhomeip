@@ -21,7 +21,6 @@
 #include <limits>
 #include <utility>
 
-#include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
@@ -30,6 +29,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
@@ -43,8 +43,8 @@ struct CommonResolutionData
 
     Inet::InterfaceId interfaceId;
 
-    size_t numIPs = 0; // number of valid IP addresses
-    Inet::IPAddress ipAddress[kMaxIPAddresses];
+    size_t numIPs                              = 0; // number of valid IP addresses
+    Inet::IPAddress ipAddress[kMaxIPAddresses] = {};
 
     uint16_t port                         = 0;
     char hostName[kHostNameMaxLength + 1] = {};
@@ -52,7 +52,7 @@ struct CommonResolutionData
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
 
-    CommonResolutionData() { Reset(); }
+    CommonResolutionData() {}
 
     bool IsValid() const { return !IsHost("") && (numIPs > 0) && (ipAddress[0] != chip::Inet::IPAddress::Any); }
 

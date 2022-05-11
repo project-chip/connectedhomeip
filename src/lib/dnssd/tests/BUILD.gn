@@ -27,7 +27,10 @@ chip_test_suite("tests") {
   ]
 
   if (chip_mdns == "minimal") {
-    test_sources += [ "TestActiveResolveAttempts.cpp" ]
+    test_sources += [
+      "TestActiveResolveAttempts.cpp",
+      "TestIncrementalResolve.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

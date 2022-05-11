@@ -48,6 +48,7 @@ static_library("dnssd") {
       "ActiveResolveAttempts.cpp",
       "ActiveResolveAttempts.h",
       "Advertiser_ImplMinimalMdns.cpp",
+      "IncrementalResolve.cpp",
       "MinimalMdnsServer.cpp",
       "MinimalMdnsServer.h",
       "Resolver_ImplMinimalMdns.cpp",
