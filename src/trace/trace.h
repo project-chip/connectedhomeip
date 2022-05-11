@@ -21,6 +21,12 @@
 
 #include "trace/MatterCustomTrace.h"
 
+namespace chip {
+
+void InitializeTracing();
+
+}
+
 #else // MATTER_CUSTOM_TRACE
 
 #if defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
