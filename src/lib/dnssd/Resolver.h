@@ -54,7 +54,11 @@ struct CommonResolutionData
 
     CommonResolutionData() { Reset(); }
 
-    bool IsValid() const { return !IsHost("") && (numIPs > 0) && (ipAddress[0] != chip::Inet::IPAddress::Any); }
+    bool IsValid() const
+    {
+        // TODO: numIPs should also be checked here
+        return !IsHost("") && (ipAddress[0] != chip::Inet::IPAddress::Any);
+    }
 
     ReliableMessageProtocolConfig GetMRPConfig() const
     {
