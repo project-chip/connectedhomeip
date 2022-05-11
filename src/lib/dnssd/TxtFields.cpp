@@ -195,62 +195,53 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionNodeData & nodeData)
 {
     TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)
     {
     case TxtFieldKey::kLongDiscriminator:
-        nodeData.commissionData.longDiscriminator = Internal::GetLongDiscriminator(val);
+        nodeData.longDiscriminator = Internal::GetLongDiscriminator(val);
         break;
     case TxtFieldKey::kVendorProduct:
-        nodeData.commissionData.vendorId  = Internal::GetVendor(val);
-        nodeData.commissionData.productId = Internal::GetProduct(val);
+        nodeData.vendorId  = Internal::GetVendor(val);
+        nodeData.productId = Internal::GetProduct(val);
         break;
     case TxtFieldKey::kCommissioningMode:
-        nodeData.commissionData.commissioningMode = Internal::GetCommissioningMode(val);
+        nodeData.commissioningMode = Internal::GetCommissioningMode(val);
         break;
     case TxtFieldKey::kDeviceType:
-        nodeData.commissionData.deviceType = Internal::GetDeviceType(val);
+        nodeData.deviceType = Internal::GetDeviceType(val);
         break;
     case TxtFieldKey::kDeviceName:
-        Internal::GetDeviceName(val, nodeData.commissionData.deviceName);
+        Internal::GetDeviceName(val, nodeData.deviceName);
         break;
     case TxtFieldKey::kRotatingDeviceId:
-        Internal::GetRotatingDeviceId(val, nodeData.commissionData.rotatingId, &nodeData.commissionData.rotatingIdLen);
+        Internal::GetRotatingDeviceId(val, nodeData.rotatingId, &nodeData.rotatingIdLen);
         break;
     case TxtFieldKey::kPairingInstruction:
-        Internal::GetPairingInstruction(val, nodeData.commissionData.pairingInstruction);
+        Internal::GetPairingInstruction(val, nodeData.pairingInstruction);
         break;
     case TxtFieldKey::kPairingHint:
-        nodeData.commissionData.pairingHint = Internal::GetPairingHint(val);
-        break;
-    case TxtFieldKey::kSleepyIdleInterval:
-        nodeData.resolutionData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kSleepyActiveInterval:
-        nodeData.resolutionData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.resolutionData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
+        nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
     default:
         break;
     }
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData)
 {
     switch (Internal::GetTxtFieldKey(key))
     {
     case TxtFieldKey::kSleepyIdleInterval:
-        nodeData.resolutionData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
     case TxtFieldKey::kSleepyActiveInterval:
-        nodeData.resolutionData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
     case TxtFieldKey::kTcpSupported:
-        nodeData.resolutionData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:
         break;
