@@ -15,6 +15,7 @@ import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import com.chip.casting.DACProviderStub;
 import com.chip.casting.TvCastingApp;
+import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 
 public class MainActivity extends AppCompatActivity
@@ -38,8 +39,8 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
-  public void handleManualCommissioningButtonClicked() {
-    showFragment(CommissioningFragment.newInstance(tvCastingApp));
+  public void handleCommissioningButtonClicked(DiscoveredNodeData commissioner) {
+    showFragment(CommissioningFragment.newInstance(tvCastingApp, commissioner));
   }
 
   private void initJni() {
