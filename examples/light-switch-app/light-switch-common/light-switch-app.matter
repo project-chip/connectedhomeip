@@ -1158,25 +1158,11 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-<<<<<<< HEAD
-    OCTET_STRING<65> rootPublicKey = 1;
-<<<<<<< HEAD
-    VENDOR_ID vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
-=======
-    INT16U vendorId = 2;
-    fabric_id fabricId = 3;
-    node_id nodeId = 4;
->>>>>>> Changes for cleaner regen
-    CHAR_STRING<32> label = 5;
-=======
     octet_string<65> rootPublicKey = 1;
-    int16u vendorId = 2;
+    vendor_id vendorId = 2;
     fabric_id fabricId = 3;
     node_id nodeId = 4;
     char_string<32> label = 5;
->>>>>>> Reverting the changes to the zapt template files
     fabric_idx fabricIndex = 254;
   }
 

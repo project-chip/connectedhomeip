@@ -218,6 +218,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AccessControl::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -360,6 +378,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AccountLogin::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -562,6 +598,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AdministratorCommissioning::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -884,6 +938,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ApplicationBasic::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -1065,6 +1137,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ApplicationLauncher::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -1274,6 +1364,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AudioOutput::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -1494,6 +1602,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BarrierControl::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -1958,6 +2084,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Basic::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -1989,6 +2133,24 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
+- (void)writeAttributePolarityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BinaryInputBasic::Attributes::Polarity::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeStatusFlagsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -2001,6 +2163,24 @@ using namespace chip::app::Clusters;
             using TypeInfo = BinaryInputBasic::Attributes::StatusFlags::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeApplicationTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BinaryInputBasic::Attributes::ApplicationType::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -2118,6 +2298,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BinaryInputBasic::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -2266,6 +2464,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Binding::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -2432,6 +2648,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BooleanState::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -2711,6 +2945,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BridgedActions::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -3119,6 +3371,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = BridgedDeviceBasic::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -3384,6 +3654,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Channel::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -4243,6 +4531,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ColorControl::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -4424,6 +4730,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ContentLauncher::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -4735,6 +5059,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Descriptor::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -4883,6 +5225,42 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DiagnosticLogs::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DiagnosticLogs::Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 @end
 
 @interface CHIPTestDoorLock ()
@@ -4972,6 +5350,25 @@ using namespace chip::app::Clusters;
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeNumberOfLogRecordsSupportedWithValue:(NSNumber * _Nonnull)value
+                                         completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::NumberOfLogRecordsSupported::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -5164,6 +5561,25 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeCredentialRulesSupportWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::CredentialRulesSupport::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler
 {
@@ -5175,6 +5591,25 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
             using TypeInfo = DoorLock::Attributes::SupportedOperatingModes::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDefaultConfigurationRegisterWithValue:(NSNumber * _Nonnull)value
+                                          completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::DefaultConfigurationRegister::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -5300,6 +5735,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -5349,6 +5802,348 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeDcVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcVoltage::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcVoltageMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMin::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcVoltageMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMax::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcCurrentMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMin::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcCurrentMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMax::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcPower::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcPowerMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMin::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcPowerMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMax::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcVoltageMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageMultiplier::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcVoltageDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcVoltageDivisor::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcCurrentMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentMultiplier::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcCurrentDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcCurrentDivisor::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcPowerMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcPowerMultiplier::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeDcPowerDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::DcPowerDivisor::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcFrequencyWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::AcFrequency::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcFrequencyMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMin::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcFrequencyMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMax::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeNeutralCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::NeutralCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeTotalActivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -5367,7 +6162,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeRmsVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeTotalReactivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5376,16 +6171,16 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo;
+            using TypeInfo = ElectricalMeasurement::Attributes::TotalReactivePower::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            cppValue = value.intValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeRmsVoltageMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeTotalApparentPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5394,561 +6189,17 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo;
+            using TypeInfo = ElectricalMeasurement::Attributes::TotalApparentPower::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePower::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-@end
-
-@interface CHIPTestEthernetNetworkDiagnostics ()
-@property (readonly) chip::Controller::EthernetNetworkDiagnosticsClusterTest cppCluster;
-@end
-
-@implementation CHIPTestEthernetNetworkDiagnostics
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.boolValue;
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePacketRxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePacketTxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeTxErrCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeCollisionCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.boolValue;
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeTimeSinceResetWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-            cppValue = value.shortValue;
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
->>>>>>> Changes for cleaner regen
-=======
             cppValue = value.unsignedIntValue;
->>>>>>> Cleaning up atomic enum generation
-=======
-            cppValue = value.shortValue;
->>>>>>> Regening after rebase
-=======
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeMeasured1stHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -5957,43 +6208,112 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
+            using TypeInfo = ElectricalMeasurement::Attributes::Measured1stHarmonicCurrent::TypeInfo;
             TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
+            cppValue = value.shortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
+- (void)writeAttributeMeasured3rdHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::Measured3rdHarmonicCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMeasured5thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::Measured5thHarmonicCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMeasured7thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::Measured7thHarmonicCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMeasured9thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::Measured9thHarmonicCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMeasured11thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                         completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ElectricalMeasurement::Attributes::Measured11thHarmonicCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeMeasuredPhase1stHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler
-<<<<<<< HEAD
-=======
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6002,71 +6322,17 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-<<<<<<< HEAD
-- (void)writeAttributeMeasuredPhase3rdHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
-                                             completionHandler:(StatusCompletion)completionHandler
-=======
->>>>>>> Regening after rebase
-=======
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-<<<<<<< HEAD
-<<<<<<< HEAD
-            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo;
-=======
             using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo;
->>>>>>> Regening after rebase
-=======
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            cppValue = value.shortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-- (void)writeAttributeMeasuredPhase5thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
-=======
 - (void)writeAttributeMeasuredPhase3rdHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
->>>>>>> Regening after rebase
                                              completionHandler:(StatusCompletion)completionHandler
-=======
-@end
-
-@interface CHIPTestFanControl ()
-@property (readonly) chip::Controller::FanControlClusterTest cppCluster;
-@end
-
-@implementation CHIPTestFanControl
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributePercentCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6075,33 +6341,17 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-<<<<<<< HEAD
-<<<<<<< HEAD
-            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
-=======
             using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo;
->>>>>>> Regening after rebase
-=======
-            using TypeInfo = FanControl::Attributes::PercentCurrent::TypeInfo;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            cppValue = value.shortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-- (void)writeAttributeMeasuredPhase7thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
-=======
 - (void)writeAttributeMeasuredPhase5thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
->>>>>>> Regening after rebase
                                              completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeSpeedMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6110,45 +6360,36 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-<<<<<<< HEAD
-<<<<<<< HEAD
+            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.shortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMeasuredPhase7thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
+                                             completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
             using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             cppValue = value.shortValue;
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
-=======
-            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
->>>>>>> Regening after rebase
-=======
-            using TypeInfo = FanControl::Attributes::SpeedMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 - (void)writeAttributeMeasuredPhase9thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
-=======
-- (void)writeAttributeMeasuredPhase7thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
->>>>>>> Regening after rebase
                                              completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeSpeedCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6157,46 +6398,17 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-<<<<<<< HEAD
-<<<<<<< HEAD
             using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             cppValue = value.shortValue;
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
-=======
-            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
->>>>>>> Regening after rebase
-=======
-            using TypeInfo = FanControl::Attributes::SpeedCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 - (void)writeAttributeMeasuredPhase11thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
                                               completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeMeasuredPhase9thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
-                                             completionHandler:(StatusCompletion)completionHandler
->>>>>>> Regening after rebase
-=======
-- (void)writeAttributeRockSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6205,34 +6417,17 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-<<<<<<< HEAD
-<<<<<<< HEAD
             using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo;
-=======
-            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo;
->>>>>>> Regening after rebase
-=======
-            using TypeInfo = FanControl::Attributes::RockSupport::TypeInfo;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            cppValue = value.shortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 - (void)writeAttributeAcFrequencyMultiplierWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeMeasuredPhase11thHarmonicCurrentWithValue:(NSNumber * _Nonnull)value
-                                              completionHandler:(StatusCompletion)completionHandler
->>>>>>> Regening after rebase
-=======
-- (void)writeAttributeWindSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -6241,29 +6436,15 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-<<<<<<< HEAD
-<<<<<<< HEAD
             using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMultiplier::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.unsignedShortValue;
-=======
-            using TypeInfo = ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
->>>>>>> Regening after rebase
-=======
-            using TypeInfo = FanControl::Attributes::WindSupport::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 - (void)writeAttributeAcFrequencyDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -6293,7 +6474,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ElectricalMeasurement::Attributes::PowerMultiplier::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -8402,2211 +8583,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeAcFrequencyMultiplierWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
->>>>>>> Regening after rebase
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcFrequencyDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcFrequencyDivisor::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePowerMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::PowerMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePowerDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::PowerDivisor::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeHarmonicCurrentMultiplierWithValue:(NSNumber * _Nonnull)value
-                                       completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::HarmonicCurrentMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.charValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePhaseHarmonicCurrentMultiplierWithValue:(NSNumber * _Nonnull)value
-                                            completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.charValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeInstantaneousVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousVoltage::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeInstantaneousLineCurrentWithValue:(NSNumber * _Nonnull)value
-                                      completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousLineCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-<<<<<<< HEAD
-- (void)writeAttributeInstantaneousActiveCurrentWithValue:(NSNumber * _Nonnull)value
-                                        completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousActiveCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeInstantaneousReactiveCurrentWithValue:(NSNumber * _Nonnull)value
-                                          completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousReactiveCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeInstantaneousPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::InstantaneousPower::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePower::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMinWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeReactivePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ReactivePower::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeApparentPowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ApparentPower::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePowerFactorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::PowerFactor::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.charValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcVoltageMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcVoltageDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageDivisor::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcCurrentMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcCurrentDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentDivisor::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcPowerMultiplierWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcPowerMultiplier::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcPowerDivisorWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcPowerDivisor::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeVoltageOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::VoltageOverload::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeCurrentOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::CurrentOverload::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcVoltageOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcVoltageOverload::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcCurrentOverloadWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcCurrentOverload::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcActivePowerOverloadWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcActivePowerOverload::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcReactivePowerOverloadWithValue:(NSNumber * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcReactivePowerOverload::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsOverVoltageWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltage::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsUnderVoltageWithValue:(NSNumber * _Nonnull)value
-                                    completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltage::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsExtremeOverVoltageWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltage::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsExtremeUnderVoltageWithValue:(NSNumber * _Nonnull)value
-                                    completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltage::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageSagWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSag::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageSwellWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwell::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeLineCurrentPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActiveCurrentPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeReactiveCurrentPhaseBWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltagePhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMinPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMaxPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMinPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMaxPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMinPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMaxPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeReactivePowerPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeApparentPowerPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePowerFactorPhaseBWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.charValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithValue:(NSNumber * _Nonnull)value
-                                                      completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsOverVoltageCounterPhaseBWithValue:(NSNumber * _Nonnull)value
-                                                completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsUnderVoltageCounterPhaseBWithValue:(NSNumber * _Nonnull)value
-                                                 completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsExtremeOverVoltagePeriodPhaseBWithValue:(NSNumber * _Nonnull)value
-                                               completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsExtremeUnderVoltagePeriodPhaseBWithValue:(NSNumber * _Nonnull)value
-                                                completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageSagPeriodPhaseBWithValue:(NSNumber * _Nonnull)value
-                                       completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageSwellPeriodPhaseBWithValue:(NSNumber * _Nonnull)value
-                                         completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeLineCurrentPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::LineCurrentPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActiveCurrentPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActiveCurrentPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeReactiveCurrentPhaseCWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ReactiveCurrentPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltagePhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltagePhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMinPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMinPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageMaxPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMinPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMinPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsCurrentMaxPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMinPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMinPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActivePowerMaxPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ActivePowerMaxPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeReactivePowerPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ReactivePowerPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeApparentPowerPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ApparentPowerPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePowerFactorPhaseCWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::PowerFactorPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.charValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithValue:(NSNumber * _Nonnull)value
-                                                      completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsOverVoltageCounterPhaseCWithValue:(NSNumber * _Nonnull)value
-                                                completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAverageRmsUnderVoltageCounterPhaseCWithValue:(NSNumber * _Nonnull)value
-                                                 completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsExtremeOverVoltagePeriodPhaseCWithValue:(NSNumber * _Nonnull)value
-                                               completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsExtremeUnderVoltagePeriodPhaseCWithValue:(NSNumber * _Nonnull)value
-                                                completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageSagPeriodPhaseCWithValue:(NSNumber * _Nonnull)value
-                                       completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRmsVoltageSwellPeriodPhaseCWithValue:(NSNumber * _Nonnull)value
-                                         completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-@end
-
-@interface CHIPTestEthernetNetworkDiagnostics ()
-@property (readonly) chip::Controller::EthernetNetworkDiagnosticsClusterTest cppCluster;
-@end
-
-@implementation CHIPTestEthernetNetworkDiagnostics
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributePHYRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFullDuplexWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.boolValue;
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePacketRxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePacketTxCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeTxErrCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeCollisionCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeOverrunCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeCarrierDetectWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.boolValue;
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeTimeSinceResetWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedLongLongValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-@end
-
-@interface CHIPTestFanControl ()
-@property (readonly) chip::Controller::FanControlClusterTest cppCluster;
-@end
-
-@implementation CHIPTestFanControl
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributePercentCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::PercentCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeSpeedMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::SpeedMax::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeSpeedCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::SpeedCurrent::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeRockSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::RockSupport::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeWindSupportWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = FanControl::Attributes::WindSupport::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11183,6 +9159,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = FlowMeasurement::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11399,6 +9393,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GeneralCommissioning::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11845,6 +9857,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GeneralDiagnostics::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -12096,6 +10126,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GroupKeyManagement::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -12256,6 +10304,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Groups::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12428,6 +10494,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Identify::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -12493,16 +10577,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.unsignedShortValue;
             }
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12561,16 +10641,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.unsignedCharValue;
             }
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12688,6 +10764,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = IlluminanceMeasurement::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12836,6 +10930,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = KeypadInput::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12992,11 +11104,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = LevelControl::Attributes::MaxFrequency::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
             cppValue = value.unsignedShortValue;
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -13159,11 +11267,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestLocalizationConfiguration ()
-<<<<<<< HEAD
 @property (readonly) chip::Controller::LocalizationConfigurationCluster cppCluster;
-=======
-@property (readonly) chip::Controller::LocalizationConfigurationClusterTest cppCluster;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 @end
 
 @implementation CHIPTestLocalizationConfiguration
@@ -13171,60 +11275,6 @@ using namespace chip::app::Clusters;
 - (chip::Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
-<<<<<<< HEAD
-}
-
-- (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo;
-            TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSString class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSString *) value[i_0];
-                        listHolder_0->mList[i_0] = [self asCharSpan:element_0];
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-=======
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-            }
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 }
 
 - (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -13344,6 +11394,63 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = LocalizationConfiguration::Attributes::AttributeList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = LocalizationConfiguration::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -13372,29 +11479,7 @@ using namespace chip::app::Clusters;
 
 - (chip::Controller::ClusterBase *)getCluster
 {
-<<<<<<< HEAD
     return &_cppCluster;
-=======
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.unsignedCharValue;
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
->>>>>>> Cleaning up atomic enum generation
 }
 
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -13508,6 +11593,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = LowPower::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -13724,6 +11827,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = MediaInput::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -13784,20 +11905,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = MediaPlayback::Attributes::StartTime::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.unsignedLongLongValue;
             }
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedIntValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14032,6 +12145,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = MediaPlayback::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14471,7 +12602,6 @@ using namespace chip::app::Clusters;
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = [self asByteSpan:value];
             }
-<<<<<<< HEAD
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14590,183 +12720,6 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
             using TypeInfo = NetworkCommissioning::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeLastConnectErrorValueWithValue:(NSNumber * _Nullable)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo;
-            TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.intValue;
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-<<<<<<< HEAD
-@end
-
-@interface CHIPTestOtaSoftwareUpdateProvider ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
-@end
-
-@implementation CHIPTestOtaSoftwareUpdateProvider
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = NetworkCommissioning::Attributes::AcceptedCommandList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -14835,7 +12788,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestOtaSoftwareUpdateProvider ()
-@property (readonly) chip::Controller::OtaSoftwareUpdateProviderClusterTest cppCluster;
+@property (readonly) chip::Controller::OtaSoftwareUpdateProviderCluster cppCluster;
 @end
 
 @implementation CHIPTestOtaSoftwareUpdateProvider
@@ -14843,6 +12796,84 @@ using namespace chip::app::Clusters;
 - (chip::Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
+}
+
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateProvider::Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateProvider::Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -14878,6 +12909,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateProvider::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14926,16 +12975,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
             cppValue = value.boolValue;
-=======
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = value.unsignedShortValue;
-            }
->>>>>>> Changes for cleaner regen
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14983,6 +13023,84 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -15016,6 +13134,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15219,6 +13355,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OccupancySensing::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15593,6 +13747,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OnOffSwitchConfiguration::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -15764,8 +13936,6 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
                 using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
@@ -15788,12 +13958,6 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15929,6 +14093,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OperationalCredentials::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -16405,15 +14587,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PowerSource::Attributes::BatteryANSIDesignation::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             cppValue = [self asCharSpan:value];
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -16931,6 +15105,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = PowerSourceConfiguration::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -17060,20 +15252,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PressureMeasurement::Attributes::ScaledValue::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.shortValue;
             }
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -17162,113 +15346,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = PressureMeasurement::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-=======
-<<<<<<< HEAD
-=======
-- (void)writeAttributeBatteryChargeStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = PowerSource::Attributes::BatteryChargeState::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
->>>>>>> Changes for cleaner regen
-=======
->>>>>>> Regening after rebase
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Changes for cleaner regen
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = PressureMeasurement::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -17347,8 +15424,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -17382,6 +15457,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = PressureMeasurement::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -17522,20 +15615,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             if (value == nil) {
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.shortValue;
             }
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedIntValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedIntValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -18238,6 +16323,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = RelativeHumidityMeasurement::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -18249,7 +16352,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -18266,24 +16369,7 @@ using namespace chip::app::Clusters;
 
 - (chip::Controller::ClusterBase *)getCluster
 {
-<<<<<<< HEAD
     return &_cppCluster;
-=======
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
->>>>>>> Cleaning up atomic enum generation
 }
 
 - (void)writeAttributeSceneCountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -18376,7 +16462,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 - (void)writeAttributeLastConfiguredByWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -18388,27 +16473,13 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = Scenes::Attributes::LastConfiguredBy::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
             cppValue = value.unsignedLongLongValue;
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedShortValue;
->>>>>>> Cleaning up atomic enum generation
-=======
-            cppValue = value.unsignedLongLongValue;
->>>>>>> Regening after rebase
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -18520,6 +16591,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Scenes::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -19216,6 +17305,24 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TargetNavigator::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -19334,6 +17441,84 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TemperatureMeasurement::Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TemperatureMeasurement::Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -19367,6 +17552,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TemperatureMeasurement::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -19736,7 +17939,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 - (void)writeAttributeAlarmMaskWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -19757,9 +17959,6 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeThermostatRunningModeWithValue:(NSNumber * _Nonnull)value
                                    completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -19795,7 +17994,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 - (void)writeAttributeNumberOfWeeklyTransitionsWithValue:(NSNumber * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler
 {
@@ -19836,242 +18034,6 @@ using namespace chip::app::Clusters;
 
 - (void)writeAttributeThermostatRunningStateWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeAbsMinHeatSetpointLimitWithValue:(NSNumber * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::ThermostatRunningState::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeSetpointChangeSourceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::SetpointChangeSource::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeSetpointChangeAmountWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::SetpointChangeAmount::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeSetpointChangeSourceTimestampWithValue:(NSNumber * _Nonnull)value
-                                           completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::SetpointChangeSourceTimestamp::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-- (void)writeAttributePiCoolingDemandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::PiCoolingDemand::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePiHeatingDemandWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::PiHeatingDemand::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAlarmMaskWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::AlarmMask::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeThermostatRunningModeWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::ThermostatRunningMode::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-- (void)writeAttributeStartOfWeekWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeAcCoilTemperatureWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Regening after rebase
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::AcCoilTemperature::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.shortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-<<<<<<< HEAD
-- (void)writeAttributeNumberOfDailyTransitionsWithValue:(NSNumber * _Nonnull)value
-                                      completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo;
-<<<<<<< HEAD
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeThermostatRunningStateWithValue:(NSNumber * _Nonnull)value
-                                    completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -20155,15 +18117,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = Thermostat::Attributes::AcCoilTemperature::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
-<<<<<<< HEAD
             cppValue = value.shortValue;
-=======
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
->>>>>>> Changes for cleaner regen
-=======
-            cppValue = value.unsignedCharValue;
->>>>>>> Cleaning up atomic enum generation
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -20209,8 +18163,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-=======
->>>>>>> Regening after rebase
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -20221,10 +18173,29 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
             using TypeInfo = Thermostat::Attributes::AcceptedCommandList::TypeInfo;
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -20430,6 +18401,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -21630,9 +19619,7 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPThreadNetworkDiagnosticsClusterSecurityPolicy *) value[i_0];
                         listHolder_0->mList[i_0].rotationTime = element_0.rotationTime.unsignedShortValue;
-                        listHolder_0->mList[i_0].flags
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].flags)>>(
-                                element_0.flags.unsignedShortValue);
+                        listHolder_0->mList[i_0].flags = element_0.flags.unsignedShortValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -21858,14 +19845,8 @@ using namespace chip::app::Clusters;
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-<<<<<<< HEAD
                         auto element_0 = (NSNumber *) value[i_0];
                         listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-=======
-                        auto element_0 = (CHIPThreadNetworkDiagnosticsClusterSecurityPolicy *) value[i_0];
-                        listHolder_0->mList[i_0].rotationTime = element_0.rotationTime.unsignedShortValue;
-                        listHolder_0->mList[i_0].flags = element_0.flags.unsignedShortValue;
->>>>>>> Cleaning up atomic enum generation
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -21907,7 +19888,6 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
             TypeInfo::Type cppValue;
-<<<<<<< HEAD
             cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
@@ -21915,457 +19895,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 @end
 
 @interface CHIPTestTimeFormatLocalization ()
 @property (readonly) chip::Controller::TimeFormatLocalizationCluster cppCluster;
-@end
-
-@implementation CHIPTestTimeFormatLocalization
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributeSupportedCalendarTypesWithValue:(NSArray * _Nonnull)value
-                                    completionHandler:(StatusCompletion)completionHandler
-=======
-- (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo;
-            TypeInfo::Type cppValue;
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-<<<<<<< HEAD
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0]
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
-=======
-                        if (![value[i_0] isKindOfClass:[CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponents *) value[i_0];
-                        listHolder_0->mList[i_0].activeTimestampPresent = element_0.activeTimestampPresent.boolValue;
-                        listHolder_0->mList[i_0].pendingTimestampPresent = element_0.pendingTimestampPresent.boolValue;
-                        listHolder_0->mList[i_0].masterKeyPresent = element_0.masterKeyPresent.boolValue;
-                        listHolder_0->mList[i_0].networkNamePresent = element_0.networkNamePresent.boolValue;
-                        listHolder_0->mList[i_0].extendedPanIdPresent = element_0.extendedPanIdPresent.boolValue;
-                        listHolder_0->mList[i_0].meshLocalPrefixPresent = element_0.meshLocalPrefixPresent.boolValue;
-                        listHolder_0->mList[i_0].delayPresent = element_0.delayPresent.boolValue;
-                        listHolder_0->mList[i_0].panIdPresent = element_0.panIdPresent.boolValue;
-                        listHolder_0->mList[i_0].channelPresent = element_0.channelPresent.boolValue;
-                        listHolder_0->mList[i_0].pskcPresent = element_0.pskcPresent.boolValue;
-                        listHolder_0->mList[i_0].securityPolicyPresent = element_0.securityPolicyPresent.boolValue;
-                        listHolder_0->mList[i_0].channelMaskPresent = element_0.channelMaskPresent.boolValue;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-<<<<<<< HEAD
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Regening after rebase
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-<<<<<<< HEAD
-=======
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-=======
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-<<<<<<< HEAD
->>>>>>> Regening after rebase
-            using TypeInfo = TimeFormatLocalization::Attributes::SupportedCalendarTypes::TypeInfo;
-=======
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0]
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(element_0.unsignedCharValue);
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-@end
-
-<<<<<<< HEAD
-@interface CHIPTestUnitLocalization ()
-<<<<<<< HEAD
-@property (readonly) chip::Controller::UnitLocalizationCluster cppCluster;
-=======
-@property (readonly) chip::Controller::UnitLocalizationClusterTest cppCluster;
->>>>>>> Regening after rebase
-=======
-@interface CHIPTestTimeFormatLocalization ()
-@property (readonly) chip::Controller::TimeFormatLocalizationClusterTest cppCluster;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
 @end
 
 @implementation CHIPTestTimeFormatLocalization
@@ -22494,6 +20027,63 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TimeFormatLocalization::Attributes::AttributeList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TimeFormatLocalization::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -22514,17 +20104,8 @@ using namespace chip::app::Clusters;
 
 @end
 
-<<<<<<< HEAD
-@interface CHIPTestUserLabel ()
-<<<<<<< HEAD
-@property (readonly) chip::Controller::UserLabelCluster cppCluster;
-=======
-@property (readonly) chip::Controller::UserLabelClusterTest cppCluster;
->>>>>>> Regening after rebase
-=======
 @interface CHIPTestUnitLocalization ()
-@property (readonly) chip::Controller::UnitLocalizationClusterTest cppCluster;
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
+@property (readonly) chip::Controller::UnitLocalizationCluster cppCluster;
 @end
 
 @implementation CHIPTestUnitLocalization
@@ -22532,6 +20113,84 @@ using namespace chip::app::Clusters;
 - (chip::Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
+}
+
+- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = UnitLocalization::Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = UnitLocalization::Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
@@ -22573,11 +20232,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-=======
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -22617,63 +20271,7 @@ using namespace chip::app::Clusters;
 @end
 
 @interface CHIPTestUserLabel ()
-@property (readonly) chip::Controller::UserLabelClusterTest cppCluster;
-@end
-
-@implementation CHIPTestUserLabel
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Changes for cleaner regen
-=======
-- (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Regening after rebase
-=======
-- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
->>>>>>> Cleaning up the ChipTestCluster and ChipCallback generated files so that we do not get unnecessary diff
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = UnitLocalization::Attributes::FeatureMap::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = UnitLocalization::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-@end
-
-@interface CHIPTestUserLabel ()
-@property (readonly) chip::Controller::UserLabelClusterTest cppCluster;
+@property (readonly) chip::Controller::UserLabelCluster cppCluster;
 @end
 
 @implementation CHIPTestUserLabel
@@ -22755,6 +20353,63 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = UserLabel::Attributes::AttributeList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = UserLabel::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -22921,6 +20576,24 @@ using namespace chip::app::Clusters;
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = WakeOnLan::Attributes::FeatureMap::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -23403,6 +21076,44 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)writeAttributePhysicalClosedLimitLiftWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = WindowCovering::Attributes::PhysicalClosedLimitLift::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributePhysicalClosedLimitTiltWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = WindowCovering::Attributes::PhysicalClosedLimitTilt::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -23443,6 +21154,44 @@ using namespace chip::app::Clusters;
                 auto & nonNullValue_0 = cppValue.SetNonNull();
                 nonNullValue_0 = value.unsignedShortValue;
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeNumberOfActuationsLiftWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = WindowCovering::Attributes::NumberOfActuationsLift::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeNumberOfActuationsTiltWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = WindowCovering::Attributes::NumberOfActuationsTilt::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
