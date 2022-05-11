@@ -51,12 +51,13 @@ public:
     mdns::Minimal::SerializedQNameIterator Get() const;
 
 private:
-    // kHostNameMaxLength
-
     // Try to have space for at least:
     //  L1234._sub._matterc._udp.local       => 30 chars
     //  <fabric>-<node>._mattrer._tcp.local  => 52 chars
     //  <hostname>.local (where hostname is kHostNameMaxLength == 16)
+    //
+    // This does not try to optimize out ".local" suffix which is always expected
+    // since comparisons are easier when suffix is still present.
     static constexpr size_t kMaxStoredServerNameLength = 64;
 
     uint8_t mBuffer[kMaxStoredServerNameLength] = {};
