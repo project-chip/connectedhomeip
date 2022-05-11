@@ -4177,6 +4177,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
+        case Attributes::NumberOfCredentialsSupportedPerUser::Id: {
+            using TypeInfo = Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::EnableLogging::Id: {
             using TypeInfo = Attributes::EnableLogging::TypeInfo;
             TypeInfo::DecodableType cppValue;

@@ -6321,6 +6321,8 @@ public class ChipClusters {
       void onSuccess(
           Boolean credentialExists,
           @Nullable Integer userIndex,
+          @Nullable Integer creatorFabricIndex,
+          @Nullable Integer lastModifiedFabricIndex,
           @Nullable Integer nextCredentialIndex);
 
       void onError(Exception error);
@@ -6557,6 +6559,17 @@ public class ChipClusters {
     public void subscribeMinRFIDCodeLengthAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeMinRFIDCodeLengthAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readNumberOfCredentialsSupportedPerUserAttribute(
+        IntegerAttributeCallback callback) {
+      readNumberOfCredentialsSupportedPerUserAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNumberOfCredentialsSupportedPerUserAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNumberOfCredentialsSupportedPerUserAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readLanguageAttribute(CharStringAttributeCallback callback) {
@@ -6850,6 +6863,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeMinRFIDCodeLengthAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readNumberOfCredentialsSupportedPerUserAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeNumberOfCredentialsSupportedPerUserAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readLanguageAttribute(
