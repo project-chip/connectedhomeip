@@ -13870,7 +13870,9 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPOperationalCredentialsClusterFabricDescriptor *) value[i_0];
                         listHolder_0->mList[i_0].rootPublicKey = [self asByteSpan:element_0.rootPublicKey];
-                        listHolder_0->mList[i_0].vendorId = element_0.vendorId.unsignedShortValue;
+                        listHolder_0->mList[i_0].vendorId
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].vendorId)>>(
+                                element_0.vendorId.unsignedShortValue);
                         listHolder_0->mList[i_0].fabricId = element_0.fabricId.unsignedLongLongValue;
                         listHolder_0->mList[i_0].nodeId = element_0.nodeId.unsignedLongLongValue;
                         listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
