@@ -12133,7 +12133,6 @@ public:
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
@@ -12148,7 +12147,6 @@ private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<uint16_t> mTimeout;
 
     uint32_t SoftwareVersionValue;
