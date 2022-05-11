@@ -307,7 +307,7 @@ def main(argv: Sequence[str]) -> None:
                         import("//build_overrides/chip.gni")
                         import("\\${{chip_root}}/config/standalone/args.gni")
                         chip_shell_cmd_server = false
-                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.doRPC else '0'}"]
+                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
                         """))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
