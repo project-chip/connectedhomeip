@@ -34,6 +34,7 @@
 #include <nlunit-test.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using namespace chip;
 using namespace chip::Logging;
@@ -73,7 +74,7 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, strlen(serialNumber));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64);
+    err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strlen(buf) == 12);
@@ -82,7 +83,7 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, 5);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64);
+    err = GetDeviceInstanceInfoProvider()->GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, strlen(buf) == 5);
@@ -127,7 +128,7 @@ static void TestConfigurationMgr_ManufacturingDate(nlTestSuite * inSuite, void *
     err = ConfigurationMgr().StoreManufacturingDate(mfgDate, strlen(mfgDate));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetManufacturingDate(year, month, dayOfMonth);
+    err = GetDeviceInstanceInfoProvider()->GetManufacturingDate(year, month, dayOfMonth);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, year == 2008);
@@ -143,7 +144,7 @@ static void TestConfigurationMgr_HardwareVersion(nlTestSuite * inSuite, void * i
     err = ConfigurationMgr().StoreHardwareVersion(1234);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetHardwareVersion(hardwareVer);
+    err = GetDeviceInstanceInfoProvider()->GetHardwareVersion(hardwareVer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, hardwareVer == 1234);
