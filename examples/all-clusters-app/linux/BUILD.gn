@@ -23,9 +23,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
-    "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
-    "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
-    "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
     "AppOptions.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
@@ -39,10 +36,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/lock-app/linux/include",
-  ]
+  include_dirs = [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   cflags = [ "-Wconversion" ]
 
@@ -53,30 +47,46 @@ source_set("chip-all-clusters-common") {
 
 if (is_libfuzzer) {
   executable("chip-all-clusters-app-fuzzing") {
-    sources = [ "fuzzing-main.cpp" ]
+    sources = [
+      "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
+      "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
+      "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
+      "fuzzing-main.cpp",
+    ]
 
     deps = [
       ":chip-all-clusters-common",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common",
       "${chip_root}/examples/platform/linux:app-main",
     ]
 
     cflags = [ "-Wconversion" ]
+
+    include_dirs = [ "${chip_root}/examples/lock-app/linux/include" ]
 
     output_dir = root_out_dir
   }
 } else {
   executable("chip-all-clusters-app") {
-    sources = [ "main.cpp" ]
+    sources = [
+      "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
+      "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
+      "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
+      "main.cpp",
+    ]
 
     deps = [
       ":chip-all-clusters-common",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common",
       "${chip_root}/examples/platform/linux:app-main",
     ]
 
     cflags = [ "-Wconversion" ]
 
-    include_dirs =
-        [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+    include_dirs = [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+      "${chip_root}/examples/lock-app/linux/include",
+    ]
 
     output_dir = root_out_dir
   }
