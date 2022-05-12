@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -397,7 +398,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
 void Instance::KickBreadcrumbChange(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
-    GeneralCommissioning::Attributes::Breadcrumb::Set(0, breadcrumb.Value());
+    GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
 }
 
 void Instance::KickBreadcrumbChange()
