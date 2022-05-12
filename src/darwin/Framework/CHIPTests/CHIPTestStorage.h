@@ -20,9 +20,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPTestStorage : NSObject <CHIPPersistentStorageDelegate>
-- (NSString *)CHIPGetKeyValue:(NSString *)key;
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
-- (void)CHIPDeleteKeyValue:(NSString *)key;
+- (NSData *)valueForKey:(NSString *)key;
+// value is nullable because NSKeyValueCoding has a selector collision with us.
+- (BOOL)setValue:(nullable NSData *)value forKey:(NSString *)key;
+- (BOOL)removeValueForKey:(NSString *)key;
 @end
 
 NS_ASSUME_NONNULL_END

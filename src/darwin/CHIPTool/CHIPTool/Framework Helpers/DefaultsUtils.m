@@ -34,10 +34,10 @@ id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
     return nil;
 }
 
-void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
+BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
 {
     CFPreferencesSetAppValue((CFStringRef) key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef) domain);
-    CFPreferencesAppSynchronize((CFStringRef) domain);
+    return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
 }
 
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
@@ -209,21 +209,25 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 
 // MARK: CHIPPersistentStorageDelegate
 
-- (NSString *)CHIPGetKeyValue:(NSString *)key
+- (nullable NSData *)valueForKey:(NSString *)key
 {
-    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    NSData * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
+- (BOOL)setValue:(NSData *)value forKey:(NSString *)key
 {
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    return CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
 }
 
-- (void)CHIPDeleteKeyValue:(NSString *)key
+- (BOOL)removeValueForKey:(NSString *)key
 {
+    if (CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key) == nil) {
+        return NO;
+    }
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    return YES;
 }
 
 @end

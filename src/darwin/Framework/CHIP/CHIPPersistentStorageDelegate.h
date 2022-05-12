@@ -28,22 +28,22 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 
 /**
- * Get the value for the given key
- *
+ * Get the value for the given key.  Returns nil if there is no value for the
+ * key.
  */
-- (nullable NSString *)CHIPGetKeyValue:(NSString *)key;
+- (nullable NSData *)valueForKey:(NSString *)key;
 
 /**
- * Set the value of the key to the given value
- *
+ * Set the value of the key to the given value.  Returns YES if the key was set
+ * successfully, NO otherwise.
  */
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
+- (BOOL)setValue:(NSData *)value forKey:(NSString *)key;
 
 /**
- * Delete the key and corresponding value
- *
+ * Delete the key and corresponding value.  Returns YES if the key was present,
+ * NO if the key was not present.
  */
-- (void)CHIPDeleteKeyValue:(NSString *)key;
+- (BOOL)removeValueForKey:(NSString *)key;
 
 @end
 
