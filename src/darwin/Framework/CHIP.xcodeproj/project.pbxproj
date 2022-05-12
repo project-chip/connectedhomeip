@@ -68,6 +68,7 @@
 		5AE6D4E427A99041001F2493 /* CHIPDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */; };
 		754F3DF427FBB94B00E60580 /* CHIPEventTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 754F3DF327FBB94B00E60580 /* CHIPEventTLVValueDecoder_Internal.h */; };
 		7560FD1C27FBBD3F005E85B3 /* CHIPEventTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7560FD1B27FBBD3F005E85B3 /* CHIPEventTLVValueDecoder.mm */; };
+		75C645A42825AAC3007E2C29 /* MatterClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 75C645A32825AAC3007E2C29 /* MatterClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88EBF8CE27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CB27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88EBF8CF27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88EBF8CC27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm */; };
 		88EBF8D027FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 88EBF8CD27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h */; };
@@ -172,6 +173,7 @@
 		5AE6D4E327A99041001F2493 /* CHIPDeviceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPDeviceTests.m; sourceTree = "<group>"; };
 		754F3DF327FBB94B00E60580 /* CHIPEventTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPEventTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		7560FD1B27FBBD3F005E85B3 /* CHIPEventTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPEventTLVValueDecoder.mm; path = "zap-generated/CHIPEventTLVValueDecoder.mm"; sourceTree = "<group>"; };
+		75C645A32825AAC3007E2C29 /* MatterClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MatterClusterConstants.h; path = "MatterClusterConstants.h"; sourceTree = "<group>"; };
 		88EBF8CB27FABDD500686BC1 /* CHIPDeviceAttestationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceAttestationDelegate.h; sourceTree = "<group>"; };
 		88EBF8CC27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceAttestationDelegateBridge.mm; sourceTree = "<group>"; };
 		88EBF8CD27FABDD500686BC1 /* CHIPDeviceAttestationDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceAttestationDelegateBridge.h; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 				1E857307265519AE0050A4D9 /* callback-stub.cpp */,
 				1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */,
 				1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */,
+				75C645A32825AAC3007E2C29 /* MatterClusterConstants.h */,
 			);
 			name = CHIPGeneratedFiles;
 			sourceTree = "<group>";
@@ -395,6 +398,7 @@
 				2C1B027B2641DB4E00780EF1 /* CHIPOperationalCredentialsDelegate.h in Headers */,
 				99D466E12798936D0089A18F /* CHIPCommissioningParameters.h in Headers */,
 				5136661528067D550025EDAE /* MatterControllerFactory_Internal.h in Headers */,
+				75C645A42825AAC3007E2C29 /* MatterClusterConstants.h in Headers */,
 				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* CHIPAttributeTLVValueDecoder_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */,

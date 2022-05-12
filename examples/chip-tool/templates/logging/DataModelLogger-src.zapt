@@ -46,7 +46,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{
 {{/zcl_events}}
 {{/zcl_clusters}}
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#zcl_commands_source_server}}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & value)
 {
@@ -67,7 +67,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
 
     switch (path.mClusterId)
     {
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#zcl_attributes_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -102,7 +102,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
 
     switch (path.mClusterId)
     {
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#zcl_commands_source_server}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
@@ -158,7 +158,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
 
     switch (header.mPath.mClusterId)
     {
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#chip_server_cluster_events}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:

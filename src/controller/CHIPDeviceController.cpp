@@ -184,6 +184,9 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     if (mFabricInfo != nullptr)
     {
         ReturnErrorOnFailure(mFabricInfo->SetFabricInfo(newFabric));
+        // Store the new fabric info, since we might now have new certificates
+        // and whatnot.
+        ReturnErrorOnFailure(params.systemState->Fabrics()->Store(mFabricInfo->GetFabricIndex()));
     }
     else
     {

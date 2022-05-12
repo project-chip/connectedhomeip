@@ -66,7 +66,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters-no-ble-libfuzzer-test-group \
+                        --target linux-x64-all-clusters-no-ble-libfuzzer \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "

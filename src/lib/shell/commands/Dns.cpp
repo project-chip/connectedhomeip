@@ -44,68 +44,70 @@ public:
     void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
-                        ChipLogValueX64(nodeData.mPeerId.GetCompressedFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.mHostName);
-        for (size_t i = 0; i < nodeData.mNumIPs; ++i)
+                        ChipLogValueX64(nodeData.operationalData.peerId.GetCompressedFabricId()),
+                        ChipLogValueX64(nodeData.operationalData.peerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.resolutionData.hostName);
+        for (size_t i = 0; i < nodeData.resolutionData.numIPs; ++i)
         {
-            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.mAddress[i].ToString(ipAddressBuf));
+            streamer_printf(streamer_get(), "   IP address: %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
         }
-        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Port: %u\r\n", nodeData.resolutionData.port);
 
-        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+        auto retryInterval = nodeData.resolutionData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        retryInterval = nodeData.GetMrpRetryIntervalActive();
+        retryInterval = nodeData.resolutionData.GetMrpRetryIntervalActive();
 
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.mSupportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
     }
 
     void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
 
     void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & nodeData) override
     {
-        if (!nodeData.IsValid())
+        if (!nodeData.resolutionData.IsValid())
         {
             streamer_printf(streamer_get(), "DNS browse failed - not found valid services \r\n");
             return;
         }
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
-        Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
+        Encoding::BytesToUppercaseHexString(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen, rotatingId,
+                                            sizeof(rotatingId));
 
         streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
-        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
-        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.vendorId);
-        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.productId);
-        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.longDiscriminator);
-        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.deviceType);
-        streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
-        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.commissioningMode));
-        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.pairingHint);
-        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.pairingInstruction);
+        streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.resolutionData.hostName);
+        streamer_printf(streamer_get(), "   Vendor ID: %u\r\n", nodeData.commissionData.vendorId);
+        streamer_printf(streamer_get(), "   Product ID: %u\r\n", nodeData.commissionData.productId);
+        streamer_printf(streamer_get(), "   Long discriminator: %u\r\n", nodeData.commissionData.longDiscriminator);
+        streamer_printf(streamer_get(), "   Device type: %u\r\n", nodeData.commissionData.deviceType);
+        streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.commissionData.deviceName);
+        streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n",
+                        static_cast<int>(nodeData.commissionData.commissioningMode));
+        streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.commissionData.pairingHint);
+        streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.commissionData.pairingInstruction);
         streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);
 
-        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+        auto retryInterval = nodeData.resolutionData.GetMrpRetryIntervalIdle();
 
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        retryInterval = nodeData.GetMrpRetryIntervalActive();
+        retryInterval = nodeData.resolutionData.GetMrpRetryIntervalActive();
 
         if (retryInterval.HasValue())
             streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\r\n", retryInterval.Value());
 
-        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.supportsTcp ? "yes" : "no");
+        streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
         streamer_printf(streamer_get(), "   IP addresses:\r\n");
-        for (uint8_t i = 0; i < nodeData.kMaxIPAddresses; i++)
+        for (uint8_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
-            if (nodeData.ipAddress[i] != Inet::IPAddress::Any)
-                streamer_printf(streamer_get(), "      %s\r\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
+            streamer_printf(streamer_get(), "      %s\r\n", nodeData.resolutionData.ipAddress[i].ToString(ipAddressBuf));
         }
     }
 

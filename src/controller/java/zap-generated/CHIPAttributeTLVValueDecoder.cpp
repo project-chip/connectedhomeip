@@ -9654,9 +9654,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jobject newElement_0_vendorId;
                 std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
                 std::string newElement_0_vendorIdCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_vendorIdClassName.c_str(),
-                                                                               newElement_0_vendorIdCtorSignature.c_str(),
-                                                                               entry_0.vendorId, newElement_0_vendorId);
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                    newElement_0_vendorIdClassName.c_str(), newElement_0_vendorIdCtorSignature.c_str(),
+                    static_cast<uint16_t>(entry_0.vendorId), newElement_0_vendorId);
                 jobject newElement_0_fabricId;
                 std::string newElement_0_fabricIdClassName     = "java/lang/Long";
                 std::string newElement_0_fabricIdCtorSignature = "(J)V";
