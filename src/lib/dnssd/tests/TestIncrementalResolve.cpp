@@ -139,7 +139,7 @@ void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
                 break; // filled all our tests
             }
 
-            if (writer.WritePos() <= 64)
+            if (writer.WritePos() < 64)
             {
                 // this is how much data can be fit by the copy
                 NL_TEST_ASSERT_LOOP(inSuite, idx, name.Set(AsSerializedQName(largeBuffer)) == CHIP_NO_ERROR);
