@@ -290,10 +290,86 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     mPacketParser.ParseSrvRecords(data);
     mPacketParser.ParseNonSrvRecords(data);
 
-    // TODO:
-    //   - loop through results and schedule OnComplete
-    //   - schedule AAAA queries for elements requiring it
-    //   - done?
+    bool needIpAddress = false;
+
+    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    {
+        if (!resolver->IsActive())
+        {
+            continue;
+        }
+
+        IncrementalResolver::RequiredInformationFlags missing = resolver->GetMissingRequiredInformation();
+
+        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        {
+            needIpAddress = true;
+            continue;
+        }
+
+        if (missing.HasAny())
+        {
+            // Expect either IP missing (ask for it) or done. Anything else is not handled
+            ChipLogError(Discovery, "Unexpected state: cannot advance resolver with missing information");
+            resolver->ResetToInactive();
+            continue;
+        }
+
+        // TODO: ip address interface id is NOT defined
+
+        // SUCCESS. Call the delegates
+        if (resolver->IsActiveCommissionParse())
+        {
+            DiscoveredNodeData nodeData;
+
+            CHIP_ERROR err = resolver->Take(nodeData);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            mActiveResolves.Complete(nodeData);
+            if (mCommissioningDelegate != nullptr)
+            {
+                mCommissioningDelegate->OnNodeDiscovered(nodeData);
+            }
+            else
+            {
+                ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+            }
+        }
+        else if (resolver->IsActiveOperationalParse())
+        {
+            ResolvedNodeData nodeData;
+
+            CHIP_ERROR err = resolver->Take(nodeData);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            mActiveResolves.Complete(nodeData.operationalData.peerId);
+            if (mOperationalDelegate != nullptr)
+            {
+                mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+            }
+            else
+            {
+                ChipLogError(Discovery, "No delegate to report operational node discovery");
+            }
+        }
+        else
+        {
+            ChipLogError(Discovery, "Unexpected state: record type unknown");
+            resolver->ResetToInactive();
+        }
+    }
+
+    if (needIpAddress)
+    {
+        // TODO: send AAAA query
+        ChipLogError(Discovery, "TODO: need to send out AAAA query");
+    }
 
     ScheduleRetries();
 }
@@ -458,6 +534,8 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
     Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
+
+    // TODO: schedule timeout for incremental resolves
 
     if (!delay.HasValue())
     {
