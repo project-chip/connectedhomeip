@@ -158,7 +158,7 @@ void TestCreation(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite,
-                   resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kSrvInitialization));
+                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kSrvInitialization));
 }
 
 void TestStartOperational(nlTestSuite * inSuite, void * inContext)
@@ -175,7 +175,7 @@ void TestStartOperational(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 }
 
@@ -193,7 +193,7 @@ void TestStartCommissionable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 }
 
@@ -211,7 +211,7 @@ void TestStartCommissioner(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 }
 
@@ -228,7 +228,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
 
     // once initialized, parsing should be ready however no IP address is available
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 
     // Send an irellevant IP address here
@@ -276,7 +276,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
     }
 
     // Resolver should have all data
-    NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+    NL_TEST_ASSERT(inSuite, !resolver.GetMissingRequiredInformation().HasAny());
 
     // At this point taking value should work. Once taken, the resolver is reset.
     ResolvedNodeData nodeData;
@@ -312,7 +312,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
 
     // once initialized, parsing should be ready however no IP address is available
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 
     // Send an irellevant IP address here
@@ -372,7 +372,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     }
 
     // Resolver should have all data
-    NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+    NL_TEST_ASSERT(inSuite, !resolver.GetMissingRequiredInformation().HasAny());
 
     // At this point taking value should work. Once taken, the resolver is reset.
     DiscoveredNodeData nodeData;

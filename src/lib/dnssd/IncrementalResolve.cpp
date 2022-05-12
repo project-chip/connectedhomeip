@@ -196,7 +196,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
     return CHIP_NO_ERROR;
 }
 
-IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetRequiredInformation() const
+IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingRequiredInformation() const
 {
     RequiredInformationFlags flags;
 

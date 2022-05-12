@@ -93,7 +93,7 @@ public:
     bool IsActiveCommissionParse() const { return mSpecificResolutionData.Is<CommissionNodeData>(); }
     bool IsActiveOperationalParse() const { return mSpecificResolutionData.Is<OperationalNodeData>(); }
 
-    /// Start parsing a new record. SRV records are the records CHIP is mainly
+    /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.
     ///
     /// If this function returns with error, the object will be in an inactive state.
@@ -114,19 +114,19 @@ public:
     ///
     /// If `!GetREquiredInformation().HasAny()` the parsed information is ready
     /// to be processed.
-    RequiredInformationFlags GetRequiredInformation() const;
+    RequiredInformationFlags GetMissingRequiredInformation() const;
 
     /// Fetch the server name set by `InitializeParsing`
     ///
-    /// Data references internal storage of this object and is valid as long
-    /// as this object is valid and InitializeParsing is not called again.
+    /// VALIDITY: Data references internal storage of this object and is valid as long
+    ///           as this object is valid and InitializeParsing is not called again.
     mdns::Minimal::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
 
     /// Take the current value of the object and clear it once returned.
     ///
     /// Object must be in `IsActiveCommissionParse()` for this to succeed.
     /// Data will be returned (and cleared) even if not yet complete based
-    /// on `GetRequiredInformation()`. This method takes as much data as
+    /// on `GetMissingRequiredInformation()`. This method takes as much data as
     /// it was parsed so far.
     CHIP_ERROR Take(DiscoveredNodeData & outputData);
 
@@ -134,7 +134,7 @@ public:
     ///
     /// Object must be in `IsActiveOperationalParse()` for this to succeed.
     /// Data will be returned (and cleared) even if not yet complete based
-    /// on `GetRequiredInformation()`. This method takes as much data as
+    /// on `GetMissingRequiredInformation()`. This method takes as much data as
     /// it was parsed so far.
     CHIP_ERROR Take(ResolvedNodeData & outputData);
 
