@@ -1249,6 +1249,9 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
 
                     if (ptr == nullptr)
                     {
+                        uint32_t defaultValueSizeForBigEndianNudger = 0;
+                        // Bypasses compiler warning about unused variable for little endian platforms.
+                        (void) defaultValueSizeForBigEndianNudger;
                         if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
                         {
                             // This is intentionally 2 and not DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT since min/max
@@ -1256,6 +1259,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                             if (emberAfAttributeSize(am) <= 2)
                             {
                                 ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                                defaultValueSizeForBigEndianNudger = 2;
                             }
                             else
                             {
@@ -1268,6 +1272,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                                 !emberAfIsStringAttributeType(am->attributeType))
                             {
                                 ptr = (uint8_t *) &(am->defaultValue.defaultValue);
+                                defaultValueSizeForBigEndianNudger = DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT;
                             }
                             else
                             {
@@ -1282,9 +1287,9 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // uint16_t.  On big-endian platforms, a pointer to the default value of
                         // a one-byte attribute will point to the wrong byte.  So, for those
                         // cases, nudge the pointer forward so it points to the correct byte.
-                        if (emberAfAttributeSize(am) == 1 && ptr != NULL)
+                        if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
                         {
-                            ptr += (DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT - 1);
+                            ptr += (defaultValueSizeForBigEndianNudger - 1);
                         }
 #endif // BIGENDIAN
                     }
