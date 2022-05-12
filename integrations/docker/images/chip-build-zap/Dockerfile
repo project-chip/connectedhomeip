@@ -1,7 +1,7 @@
 ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
-ENV ZAP_COMMIT=7ab717d08dfe9b0ba9de907fc7c6eb6549c86bf7
+ENV ZAP_COMMIT=e9277b989f1d128bc881e88ecbf7a3353c841c39
 
 ENV ZAP_ORIGIN=https://github.com/project-chip/zap.git
 
