@@ -33,6 +33,7 @@ android {
                     'src/main/java',
                     '../common-api/src/main/java',
             ]
+            aidl.srcDirs = ['../common-api/src/main/aidl']
         }
     }
 

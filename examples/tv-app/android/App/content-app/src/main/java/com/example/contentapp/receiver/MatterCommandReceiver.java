@@ -1,5 +1,6 @@
 package com.example.contentapp.receiver;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,12 +23,27 @@ public class MatterCommandReceiver extends BroadcastReceiver {
       case MatterIntentConstants.ACTION_MATTER_COMMAND:
         byte[] commandPayload =
             intent.getByteArrayExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD);
-        Log.e(
+        Log.d(
             TAG,
             new StringBuilder()
                 .append("Received matter command: ")
                 .append(intent.getAction())
                 .toString());
+
+        PendingIntent pendingIntent =
+            intent.getParcelableExtra(
+                MatterIntentConstants.EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT);
+        if (pendingIntent != null) {
+          final Intent responseIntent =
+              new Intent()
+                  .putExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD, "Success".getBytes());
+          try {
+            pendingIntent.send(context, 0, responseIntent);
+          } catch (final PendingIntent.CanceledException ex) {
+            Log.e(TAG, "Error sending pending intent to the Matter agent", ex);
+          }
+        }
+        break;
       default:
         Log.e(
             TAG,
