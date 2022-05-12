@@ -25,7 +25,7 @@
 
 #import "CHIPLogging.h"
 #import "MatterCertificates.h"
-#import "SpanUtils.h"
+#import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>

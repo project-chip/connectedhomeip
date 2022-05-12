@@ -17,7 +17,7 @@
 
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
-#import "SpanUtils.h"
+#import "NSDataSpanConversion.h"
 
 using namespace ::chip;
 

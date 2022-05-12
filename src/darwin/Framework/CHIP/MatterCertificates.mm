@@ -18,7 +18,7 @@
 #import "CHIPError_Internal.h"
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPP256KeypairBridge.h"
-#import "SpanUtils.h"
+#import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
