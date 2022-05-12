@@ -33,30 +33,21 @@ const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
     return ByteSpan(range.Start(), range.Size());
 }
 
-class CommonResolutionDataTxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
+/// Handles filling record data from TXT records.
+///
+/// Supported records are whatever `FillNodeDataFromTxt` supports.
+template <class DataType>
+class TxtParser : public mdns::Minimal::TxtRecordDelegate
 {
 public:
-    explicit CommonResolutionDataTxtRecordDelegateImpl(CommonResolutionData & data) : mData(data) {}
+    explicit TxtParser(DataType & data) : mData(data) {}
     void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
     {
         FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mData);
     }
 
 private:
-    CommonResolutionData & mData;
-};
-
-class CommissionResolutionDataTxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
-{
-public:
-    explicit CommissionResolutionDataTxtRecordDelegateImpl(CommissionNodeData & data) : mData(data) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
-    {
-        FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mData);
-    }
-
-private:
-    CommissionNodeData & mData;
+    DataType & mData;
 };
 
 enum class ServiceNameType
@@ -323,7 +314,7 @@ CHIP_ERROR IncrementalResolver::OnPtrRecord(const ResourceData & data, BytesRang
 CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRange packetRange)
 {
     {
-        CommonResolutionDataTxtRecordDelegateImpl delegate(mCommonResolutionData);
+        TxtParser<CommonResolutionData> delegate(mCommonResolutionData);
         if (!ParseTxtRecord(data.GetData(), &delegate))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -332,7 +323,7 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
 
     if (IsActiveCommissionParse())
     {
-        CommissionResolutionDataTxtRecordDelegateImpl delegate(mSpecificResolutionData.Get<CommissionNodeData>());
+        TxtParser<CommissionNodeData> delegate(mSpecificResolutionData.Get<CommissionNodeData>());
         if (!ParseTxtRecord(data.GetData(), &delegate))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
