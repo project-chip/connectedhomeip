@@ -275,8 +275,10 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
         CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
     }
 
-    // At this point taking value should work. Once taken, the resolver
-    // is reset.
+    // Resolver should have all data
+    NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+
+    // At this point taking value should work. Once taken, the resolver is reset.
     ResolvedNodeData nodeData;
     NL_TEST_ASSERT(inSuite, resolver.Take(nodeData) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !resolver.IsActive());
@@ -297,6 +299,108 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[0] == addr);
 }
 
+void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
+{
+    IncrementalResolver resolver;
+
+    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+
+    SrvRecord srvRecord;
+    PreloadSrvRecord(inSuite, srvRecord);
+
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(AsSerializedQName(kTestCommissionableNode), srvRecord) == CHIP_NO_ERROR);
+
+    // once initialized, parsing should be ready however no IP address is available
+    NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite, resolver.GetServerName() == AsSerializedQName(kTestServerName));
+
+    // Send an irellevant IP address here
+    {
+        const char * path[] = { "xyzt", "local" };
+        Inet::IPAddress addr;
+
+        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+    }
+
+    // Send a useful IP address here
+    {
+        const char * path[] = { "abcd", "local" };
+        Inet::IPAddress addr;
+
+        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+    }
+
+    // Send another IP address
+    {
+        const char * path[] = { "abcd", "local" };
+        Inet::IPAddress addr;
+
+        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+    }
+
+    // Adding an irrelevant text entry
+    // Note that TXT entries should be addressed to the Record address and
+    // NOT to the server name for A/AAAA records
+    {
+        const char * path[]    = { "abcd", "local" };
+        const char * entries[] = {
+            "some", "foo=bar", "x=y=z", "a=", // unused data
+            "SII=123"                         // Sleepy idle interval
+        };
+
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
+    }
+
+    // Adding actual text entries that are useful
+    // Note that TXT entries should be addressed to the Record address and
+    // NOT to the server name for A/AAAA records
+    {
+        const char * path[]    = { "C5038835313B8B98", "_matterc", "_udp", "local" };
+        const char * entries[] = {
+            "foo=bar",    // unused data
+            "SAI=321",    // sleepy active interval
+            "D=22345",    // Long discriminator
+            "VP=321+654", // VendorProduct
+            "DN=mytest"   // Device name
+        };
+
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
+    }
+
+    // Resolver should have all data
+    NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+
+    // At this point taking value should work. Once taken, the resolver is reset.
+    DiscoveredNodeData nodeData;
+    NL_TEST_ASSERT(inSuite, resolver.Take(nodeData) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+
+    // validate data as it was passed in
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.numIPs == 2);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.port == 0x1234);
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.supportsTcp);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite,
+                   nodeData.resolutionData.GetMrpRetryIntervalActive().Value() == chip::System::Clock::Milliseconds32(321));
+    NL_TEST_ASSERT(inSuite, !nodeData.resolutionData.GetMrpRetryIntervalIdle().HasValue());
+
+    Inet::IPAddress addr;
+    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[0] == addr);
+    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.ipAddress[1] == addr);
+
+    // parsed txt data for discovered nodes
+    NL_TEST_ASSERT(inSuite, nodeData.commissionData.longDiscriminator == 22345);
+    NL_TEST_ASSERT(inSuite, nodeData.commissionData.vendorId == 321);
+    NL_TEST_ASSERT(inSuite, nodeData.commissionData.productId == 654);
+    NL_TEST_ASSERT(inSuite, strcmp(nodeData.commissionData.deviceName, "mytest") == 0);
+}
+
 const nlTest sTests[] = {
     // Tests for helper class
     NL_TEST_DEF("StoredServerName", TestStoredServerName), //
@@ -307,6 +411,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("StartCommissionable", TestStartCommissionable), //
     NL_TEST_DEF("StartCommissioner", TestStartCommissioner),     //
     NL_TEST_DEF("ParseOperational", TestParseOperational),       //
+    NL_TEST_DEF("ParseCommissionable", TestParseCommissionable), //
     NL_TEST_SENTINEL()                                           //
 };
 
