@@ -256,7 +256,6 @@ public:
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
-    DiscoveryType mDiscoveryType                          = DiscoveryType::kUnknown;
     System::Layer * mSystemLayer                          = nullptr;
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
@@ -439,7 +438,6 @@ CHIP_ERROR MinMdnsResolver::FindCommissioners(DiscoveryFilter filter)
 
 CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
-    mDiscoveryType = type;
     mActiveResolves.MarkPending(filter, type);
 
     return SendPendingBrowseQueries();
@@ -522,7 +520,6 @@ CHIP_ERROR MinMdnsResolver::SendPendingBrowseQueries()
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
-    mDiscoveryType = DiscoveryType::kOperational;
     mActiveResolves.MarkPending(peerId);
 
     return SendPendingResolveQueries();
