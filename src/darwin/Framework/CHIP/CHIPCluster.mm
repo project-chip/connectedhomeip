@@ -17,7 +17,7 @@
 
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
-#import "SpanUtils.h"
+#import "NSData+Span.h"
 
 using namespace ::chip;
 
@@ -51,7 +51,7 @@ using namespace ::chip;
 
 - (chip::ByteSpan)asByteSpan:(NSData *)value
 {
-    return AsByteSpan(value);
+    return [value asByteSpan];
 }
 
 - (chip::CharSpan)asCharSpan:(NSString *)value

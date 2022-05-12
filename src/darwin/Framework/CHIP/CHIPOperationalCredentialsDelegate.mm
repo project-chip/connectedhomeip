@@ -25,7 +25,7 @@
 
 #import "CHIPLogging.h"
 #import "MatterCertificates.h"
-#import "SpanUtils.h"
+#import "NSData+Span.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -222,7 +222,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertificate(id<CHIPKe
     MutableByteSpan rcac(rcacBuffer);
     X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
     ReturnErrorOnFailure(NewRootX509Cert(rcac_request, nativeKeypair, rcac));
-    *rootCert = AsData(rcac);
+    *rootCert = [NSData fromByteSpan:rcac];
     return CHIP_NO_ERROR;
 }
 
@@ -241,7 +241,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     ReturnErrorOnFailure(keypairBridge.Init(rootKeypair));
     CHIPP256KeypairNativeBridge nativeRootKeypair(keypairBridge);
 
-    ByteSpan rcac = AsByteSpan(rootCertificate);
+    ByteSpan rcac = [rootCertificate asByteSpan];
 
     P256PublicKey pubKey;
     ReturnErrorOnFailure(CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(intermediatePublicKey, &pubKey));
@@ -271,6 +271,6 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     MutableByteSpan icac(icacBuffer);
     X509CertRequestParams icac_request = { 0, validityStart, validityEnd, icac_dn, rcac_dn };
     ReturnErrorOnFailure(NewICAX509Cert(icac_request, pubKey, nativeRootKeypair, icac));
-    *intermediateCert = AsData(icac);
+    *intermediateCert = [NSData fromByteSpan:icac];
     return CHIP_NO_ERROR;
 }

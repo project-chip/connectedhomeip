@@ -18,7 +18,7 @@
 #import "CHIPError_Internal.h"
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPP256KeypairBridge.h"
-#import "SpanUtils.h"
+#import "NSData+Span.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -97,7 +97,7 @@ struct AutoPlatformMemory {
     P256PublicKeySpan keypairKeySpan(keypairPubKey.ConstBytes());
 
     P256PublicKey certPubKey;
-    err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate), certPubKey);
+    err = ExtractPubkeyFromX509Cert([certificate asByteSpan], certPubKey);
     if (err != CHIP_NO_ERROR) {
         NSLog(@"Can't extract public key from certificate: %s", ErrorStr(err));
         return NO;

@@ -14,20 +14,18 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import "NSData+Span.h"
 
-#import "Foundation/Foundation.h"
+@implementation NSData (Span)
 
-#include <lib/support/Span.h>
+- (chip::ByteSpan)asByteSpan
+{
+    return chip::ByteSpan(static_cast<const uint8_t *>(self.bytes), self.length);
+}
 
-NS_ASSUME_NONNULL_BEGIN
++ (instancetype)fromByteSpan:(const chip::ByteSpan &)span
+{
+    return [NSData dataWithBytes:span.data() length:span.size()];
+}
 
-/**
- * Utilities for converting between NSData and chip::Span.
- */
-
-inline chip::ByteSpan AsByteSpan(NSData * data) { return chip::ByteSpan(static_cast<const uint8_t *>(data.bytes), data.length); }
-
-inline NSData * AsData(chip::ByteSpan span) { return [NSData dataWithBytes:span.data() length:span.size()]; }
-
-NS_ASSUME_NONNULL_END
+@end

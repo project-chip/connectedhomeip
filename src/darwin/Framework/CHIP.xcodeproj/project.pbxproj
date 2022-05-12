@@ -44,6 +44,8 @@
 		517BF3F0282B62B800A8B7DB /* MatterCertificates.h in Headers */ = {isa = PBXBuildFile; fileRef = 517BF3EE282B62B800A8B7DB /* MatterCertificates.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		517BF3F1282B62B800A8B7DB /* MatterCertificates.mm in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3EF282B62B800A8B7DB /* MatterCertificates.mm */; };
 		517BF3F3282B62CB00A8B7DB /* MatterCertificateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */; };
+		51874556282CAEF4008CD968 /* NSData+Span.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51874554282CAEF4008CD968 /* NSData+Span.mm */; };
+		51874557282CAEF4008CD968 /* NSData+Span.h in Headers */ = {isa = PBXBuildFile; fileRef = 51874555282CAEF4008CD968 /* NSData+Span.h */; };
 		51B22C1E2740CB0A008D5055 /* CHIPStructsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C1D2740CB0A008D5055 /* CHIPStructsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C212740CB1D008D5055 /* CHIPCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C262740CB32008D5055 /* CHIPStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */; };
@@ -152,6 +154,8 @@
 		517BF3EE282B62B800A8B7DB /* MatterCertificates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MatterCertificates.h; sourceTree = "<group>"; };
 		517BF3EF282B62B800A8B7DB /* MatterCertificates.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MatterCertificates.mm; sourceTree = "<group>"; };
 		517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MatterCertificateTests.m; sourceTree = "<group>"; };
+		51874554282CAEF4008CD968 /* NSData+Span.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSData+Span.mm"; sourceTree = "<group>"; };
+		51874555282CAEF4008CD968 /* NSData+Span.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Span.h"; sourceTree = "<group>"; };
 		51B22C1D2740CB0A008D5055 /* CHIPStructsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPStructsObjc.h; path = "zap-generated/CHIPStructsObjc.h"; sourceTree = "<group>"; };
 		51B22C212740CB1D008D5055 /* CHIPCommandPayloadsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPCommandPayloadsObjc.h; path = "zap-generated/CHIPCommandPayloadsObjc.h"; sourceTree = "<group>"; };
 		51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPStructsObjc.mm; path = "zap-generated/CHIPStructsObjc.mm"; sourceTree = "<group>"; };
@@ -358,6 +362,8 @@
 				5A6FEC8F27B563D900F25F42 /* CHIPDeviceControllerOverXPC.m */,
 				5A6FEC9427B5976200F25F42 /* CHIPDeviceControllerXPCConnection.h */,
 				5A6FEC9527B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m */,
+				51874555282CAEF4008CD968 /* NSData+Span.h */,
+				51874554282CAEF4008CD968 /* NSData+Span.mm */,
 			);
 			path = CHIP;
 			sourceTree = "<group>";
@@ -401,6 +407,7 @@
 				5136661628067D550025EDAE /* MatterControllerFactory.h in Headers */,
 				5A6FEC9927B5C88900F25F42 /* CHIPDeviceOverXPC.h in Headers */,
 				51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */,
+				51874557282CAEF4008CD968 /* NSData+Span.h in Headers */,
 				51B22C1E2740CB0A008D5055 /* CHIPStructsObjc.h in Headers */,
 				2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */,
 				5ACDDD7A27CD129700EFD68A /* CHIPAttributeCacheContainer.h in Headers */,
@@ -575,6 +582,7 @@
 				51B22C2A2740CB47008D5055 /* CHIPCommandPayloadsObjc.mm in Sources */,
 				2C5EEEF7268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.mm in Sources */,
 				51B22C262740CB32008D5055 /* CHIPStructsObjc.mm in Sources */,
+				51874556282CAEF4008CD968 /* NSData+Span.mm in Sources */,
 				2C222AD1255C620600E446B9 /* CHIPDevice.mm in Sources */,
 				1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,

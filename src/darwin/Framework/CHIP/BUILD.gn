@@ -68,6 +68,8 @@ static_library("framework") {
     "MatterControllerFactory.h",
     "MatterControllerFactory.mm",
     "MatterControllerFactory_Internal.h",
+    "NSData+Span.h",
+    "NSData+Span.mm",
     "zap-generated/CHIPAttributeTLVValueDecoder.mm",
     "zap-generated/CHIPCallbackBridge.mm",
     "zap-generated/CHIPClustersObjc.h",
