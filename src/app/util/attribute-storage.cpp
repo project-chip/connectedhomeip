@@ -71,10 +71,10 @@ EmberAfDefinedEndpoint emAfEndpoints[MAX_ENDPOINT_COUNT];
 uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 
 namespace {
-
-#if (!defined(EMBER_AF_DEFAULT_VALUE_SIZE)) || (EMBER_AF_DEFAULT_VALUE_SIZE == 0)
-#define EMBER_AF_DEFAULT_VALUE_SIZE 2
+#if (!defined(DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT)) || (DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT == 0)
+#define DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT 2
 #endif
+static_assert(DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT <= 4, "Currently only support up to 4 bytes for defaultValue");
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
 #define ACTUAL_SINGLETONS_SIZE 1
@@ -85,7 +85,7 @@ uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
 
 uint16_t emberEndpointCount = 0;
 
-// If we have attributes that are more than bytes EMBER_AF_DEFAULT_VALUE_SIZE,
+// If we have attributes that are more than bytes DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT,
 // then we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
@@ -472,7 +472,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
-        if (bufferSize < 2)  // TODO confirm is this should still be 2
+        if (bufferSize < 2)
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
@@ -480,13 +480,13 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     }
     else if (emberAfIsThisDataTypeAListType(attributeType))
     {
-        if (bufferSize < 2)   // TODO confirm is this should still be 2
+        if (bufferSize < 2)
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
 
         // Just copy the length.
-        memmove(dest, src, 2);  // TODO confirm is this should still be 2
+        memmove(dest, src, 2);
     }
     else
     {
@@ -1251,6 +1251,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                     {
                         if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
                         {
+                            // This is intentionally 2 and not DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT since min/max
+                            // attributes still are limited to size of 2-bytes.
                             if (emberAfAttributeSize(am) <= 2)
                             {
                                 ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
@@ -1262,7 +1264,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         }
                         else
                         {
-                            if (emberAfAttributeSize(am) <= EMBER_AF_DEFAULT_VALUE_SIZE)
+                            if ((emberAfAttributeSize(am) <= DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT) &&
+                                !emberAfIsStringAttributeType(am->attributeType))
                             {
                                 ptr = (uint8_t *) &(am->defaultValue.defaultValue);
                             }
@@ -1281,9 +1284,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // cases, nudge the pointer forward so it points to the correct byte.
                         if (emberAfAttributeSize(am) == 1 && ptr != NULL)
                         {
-                            // TODO I need to think about this a little more to make sure I am doing the right thing for
-                            // BIGENDIAN CPUs, now that we are changing to uint32_t. I also will need to update the comment
-                            *ptr++;
+                            ptr += (DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT - 1);
                         }
 #endif // BIGENDIAN
                     }
