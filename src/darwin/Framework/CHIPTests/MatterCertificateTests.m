@@ -32,7 +32,7 @@
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * rootCert = [MatterCertificates generateRootCertificate:testKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:testKeys issuerId:nil fabricId:nil error:nil];
     XCTAssertNotNil(rootCert);
 }
 
@@ -41,18 +41,18 @@
     __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * rootCert = [MatterCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
     XCTAssertNotNil(rootCert);
 
     __auto_type * intermediateKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(intermediateKeys);
 
-    __auto_type * intermediateCert = [MatterCertificates generateIntermediateCertificate:rootKeys
-                                                                         rootCertificate:rootCert
-                                                                   intermediatePublicKey:intermediateKeys.pubkey
-                                                                                issuerId:nil
-                                                                                fabricId:nil
-                                                                                   error:nil];
+    __auto_type * intermediateCert = [MTRCertificates generateIntermediateCertificate:rootKeys
+                                                                      rootCertificate:rootCert
+                                                                intermediatePublicKey:intermediateKeys.pubkey
+                                                                             issuerId:nil
+                                                                             fabricId:nil
+                                                                                error:nil];
     XCTAssertNotNil(intermediateCert);
 }
 

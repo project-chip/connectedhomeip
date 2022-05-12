@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#import "MatterCertificates.h"
+#import "MTRCertificates.h"
 #import "CHIPError_Internal.h"
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPP256KeypairBridge.h"
@@ -37,7 +37,7 @@ struct AutoPlatformMemory {
     ~AutoPlatformMemory() { Platform::MemoryShutdown(); }
 };
 
-@implementation MatterCertificates
+@implementation MTRCertificates
 
 + (nullable NSData *)generateRootCertificate:(id<CHIPKeypair>)keypair
                                     issuerId:(nullable NSNumber *)issuerId

@@ -24,7 +24,7 @@
 #include <Security/SecKey.h>
 
 #import "CHIPLogging.h"
-#import "MatterCertificates.h"
+#import "MTRCertificates.h"
 #import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
@@ -233,7 +233,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     *intermediateCert = nil;
 
     // Verify that the provided certificate public key matches the root keypair.
-    if ([MatterCertificates keypairMatchesCertificate:rootCertificate keypair:rootKeypair] == NO) {
+    if ([MTRCertificates keypairMatchesCertificate:rootCertificate keypair:rootKeypair] == NO) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

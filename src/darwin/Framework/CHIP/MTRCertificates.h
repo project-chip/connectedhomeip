@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CHIPKeypair;
 
-@interface MatterCertificates : NSObject
+@interface MTRCertificates : NSObject
 
 /**
  * Generate a root (self-signed) X.509 DER encoded certificate that has the
