@@ -269,14 +269,14 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
             return;
         }
-        mLastOperationBreadcrumb = req.breadcrumb;
-        mAsyncCommandHandle      = CommandHandler::Handle(&ctx.mCommandHandler);
+        mCurrentOperationBreadcrumb = req.breadcrumb;
+        mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
     }
     else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
     {
-        mLastOperationBreadcrumb = req.breadcrumb;
-        mAsyncCommandHandle      = CommandHandler::Handle(&ctx.mCommandHandler);
+        mCurrentOperationBreadcrumb = req.breadcrumb;
+        mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
     }
     else
@@ -368,7 +368,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange(req.breadcrumb);
+        UpdateBreadcrumb(req.breadcrumb);
     }
 }
 
@@ -391,20 +391,22 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange(req.breadcrumb);
+        UpdateBreadcrumb(req.breadcrumb);
     }
 }
 
-void Instance::KickBreadcrumbChange(const Optional<uint64_t> & breadcrumb)
+void Instance::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
 {
     VerifyOrReturn(breadcrumb.HasValue());
     GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
 }
 
-void Instance::KickBreadcrumbChange()
+void Instance::UpdateBreadcrumb()
 {
-    KickBreadcrumbChange(mLastOperationBreadcrumb);
-    mLastOperationBreadcrumb.ClearValue();
+    // We rejected the command when there is another ongoing command, so mCurrentOperationBreadcrumb reflects the breadcrumb
+    // argument in the only background command.
+    UpdateBreadcrumb(mCurrentOperationBreadcrumb);
+    mCurrentOperationBreadcrumb.ClearValue();
 }
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
@@ -425,7 +427,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange(req.breadcrumb);
+        UpdateBreadcrumb(req.breadcrumb);
     }
 }
 
@@ -442,8 +444,8 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
-    mAsyncCommandHandle      = CommandHandler::Handle(&ctx.mCommandHandler);
-    mLastOperationBreadcrumb = req.breadcrumb;
+    mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
+    mCurrentOperationBreadcrumb = req.breadcrumb;
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
 
@@ -461,7 +463,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
     if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange(req.breadcrumb);
+        UpdateBreadcrumb(req.breadcrumb);
     }
 }
 
@@ -501,7 +503,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     commandHandle->AddResponse(mPath, response);
     if (commissioningError == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange();
+        UpdateBreadcrumb();
     }
 }
 
@@ -567,7 +569,7 @@ exit:
     }
     if (status == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange();
+        UpdateBreadcrumb();
     }
     networks->Release();
 }
@@ -630,7 +632,7 @@ exit:
     }
     if (status == NetworkCommissioningStatus::kSuccess)
     {
-        KickBreadcrumbChange();
+        UpdateBreadcrumb();
     }
     if (networks != nullptr)
     {

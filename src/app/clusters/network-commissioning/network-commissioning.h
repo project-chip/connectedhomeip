@@ -100,9 +100,9 @@ private:
     uint8_t mLastNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
     uint8_t mLastNetworkIDLen = 0;
 
-    Optional<uint64_t> mLastOperationBreadcrumb;
-    void KickBreadcrumbChange(const Optional<uint64_t> & breadcrumbValue);
-    void KickBreadcrumbChange();
+    Optional<uint64_t> mCurrentOperationBreadcrumb;
+    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
+    void UpdateBreadcrumb();
 
     // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);

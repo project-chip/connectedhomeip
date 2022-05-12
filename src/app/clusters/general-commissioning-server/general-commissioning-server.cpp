@@ -317,7 +317,6 @@ namespace Clusters {
 namespace GeneralCommissioning {
 void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
 {
-    VerifyOrReturn(DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext().IsFailSafeArmed());
     Breadcrumb::Set(0, breadcrumb);
 }
 } // namespace GeneralCommissioning

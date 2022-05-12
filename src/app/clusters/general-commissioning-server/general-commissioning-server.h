@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,10 +22,8 @@ namespace app {
 namespace Clusters {
 namespace GeneralCommissioning {
 
-/**
- * Sets the breadcrumb attribute. If failsafe is not currently armed, this function will not change the breadcrumb attribute.
- */
 void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb);
+
 } // namespace GeneralCommissioning
 } // namespace Clusters
 } // namespace app
