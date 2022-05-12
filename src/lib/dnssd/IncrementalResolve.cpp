@@ -86,18 +86,18 @@ ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
     {
         return ServiceNameType::kOperational;
     }
-    else if (name == kCommissionableSuffix)
+
+    if (name == kCommissionableSuffix)
     {
         return ServiceNameType::kCommissionable;
     }
-    else if (name == kCommissionerSuffix)
+
+    if (name == kCommissionerSuffix)
     {
         return ServiceNameType::kCommissioner;
     }
-    else
-    {
-        return ServiceNameType::kInvalid;
-    }
+
+    return ServiceNameType::kInvalid;
 }
 
 /// Checks if the name is of the form <something>._sub._matter(c|d)._udp.local
