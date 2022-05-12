@@ -79,8 +79,8 @@ public:
     // Elements that the incremental resolve still needs
     enum class RequiredInformationBitFlags : uint8_t
     {
-        kSrvInitialization = 0x01, // server being initialized
-        kIpAddress         = 0x02, // IP address missing
+        kSrvInitialization = (1 << 0), // server being initialized
+        kIpAddress         = (1 << 1), // IP address missing
     };
     using RequiredInformationFlags = BitFlags<RequiredInformationBitFlags>;
 
