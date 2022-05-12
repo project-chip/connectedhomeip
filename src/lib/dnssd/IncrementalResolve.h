@@ -154,11 +154,6 @@ public:
 private:
     /// Notify that a PTR record can be parsed.
     ///
-    /// Input data MUST have GetType() == QType::PTR
-    CHIP_ERROR OnPtrRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
-
-    /// Notify that a PTR record can be parsed.
-    ///
     /// Input data MUST have GetType() == QType::TXT
     CHIP_ERROR OnTxtRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
 
