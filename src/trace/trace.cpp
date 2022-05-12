@@ -1,3 +1,3 @@
-#include "trace/trace.h"
+#include "trace.h"
 
-chip::InitializeTracing() {}
+void chip::InitializeTracing() {}
