@@ -18,6 +18,8 @@ import("//build_overrides/chip.gni")
 static_library("discovery") {
   output_name = "libDiscoveryCommands"
 
+  include_dirs = [ "${chip_root}/zzz_generated/app-common" ]
+
   sources = [
     "DiscoveryCommands.cpp",
     "DiscoveryCommands.h",
@@ -26,6 +28,7 @@ static_library("discovery") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
   ]

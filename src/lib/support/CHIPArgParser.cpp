@@ -75,11 +75,9 @@ static void FindOptionById(OptionSet ** optSets, int optId, OptionSet *& optSet,
 static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[]);
 static void PutStringWithNewLine(FILE * s, const char * str);
 static void PutStringWithBlankLine(FILE * s, const char * str);
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 static bool SanityCheckOptions(OptionSet * optSets[]);
-static bool HelpTextContainsLongOption(const char * optName, const char * helpText);
-static bool HelpTextContainsShortOption(char optChar, const char * helpText);
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static inline bool IsShortOptionChar(int ch)
 {
@@ -313,7 +311,7 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
     // Set gActiveOptionSets to the current option set list.
     gActiveOptionSets = optSets;
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
     if (!SanityCheckOptions(optSets))
         goto done;
 #endif
@@ -1474,7 +1472,7 @@ static void PutStringWithBlankLine(FILE * s, const char * str)
         fputs("\n", s);
 }
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static bool SanityCheckOptions(OptionSet * optSets[])
 {
@@ -1511,54 +1509,10 @@ static bool SanityCheckOptions(OptionSet * optSets[])
                     }
             }
 
-    // Fail if the option help texts do not contain a description for each option, including both
-    // the option's long and short forms.
-    for (OptionSet ** optSetP = optSets; *optSetP != nullptr; optSetP++)
-        for (OptionDef * optionDef = (*optSetP)->OptionDefs; optionDef->Name != nullptr; optionDef++)
-        {
-            if (!HelpTextContainsLongOption(optionDef->Name, (*optSetP)->OptionHelp))
-            {
-                PrintArgError("INTERNAL ERROR: No help text defined for option: --%s\n", optionDef->Name);
-                res = false;
-            }
-
-            if (IsShortOptionChar(optionDef->Id) &&
-                !HelpTextContainsShortOption(static_cast<char>(optionDef->Id), (*optSetP)->OptionHelp))
-            {
-                PrintArgError("INTERNAL ERROR: No help text defined for option: -%c\n", optionDef->Id);
-                res = false;
-            }
-        }
-
     return res;
 }
 
-static bool HelpTextContainsLongOption(const char * optName, const char * helpText)
-{
-    size_t nameLen = strlen(optName);
-
-    for (const char * p = helpText; (p = strstr(p, optName)) != nullptr; p += nameLen)
-        if ((p - helpText) >= 2 && p[-1] == '-' && p[-2] == '-' && !isalnum(p[nameLen]) && p[nameLen] != '-')
-            return true;
-
-    return false;
-}
-
-static bool HelpTextContainsShortOption(char optChar, const char * helpText)
-{
-    char optStr[3];
-    optStr[0] = '-';
-    optStr[1] = optChar;
-    optStr[2] = 0;
-
-    for (const char * p = helpText; (p = strstr(p, optStr)) != nullptr; p += 2)
-        if ((p == helpText || (!isalnum(p[-1]) && p[-1] != '-')) && !isalnum(p[2]) && p[2] != '-')
-            return true;
-
-    return false;
-}
-
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
+#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 } // namespace ArgParser
 } // namespace chip

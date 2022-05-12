@@ -27,6 +27,7 @@
 
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
 #include <lib/support/CodeUtils.h>
@@ -459,7 +460,10 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {
-        snprintf(deviceName, sizeof(deviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
+        uint16_t discriminator;
+        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
+
+        snprintf(deviceName, sizeof(deviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
 
         deviceName[kMaxDeviceNameLength] = 0;
         err                              = MapBLEError(qvCHIP_BleSetDeviceName(deviceName));

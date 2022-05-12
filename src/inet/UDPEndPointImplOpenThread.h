@@ -32,6 +32,8 @@
 namespace chip {
 namespace Inet {
 
+extern otInstance * globalOtInstance;
+
 class UDPEndPointImplOT : public UDPEndPoint, public EndPointStateOpenThread
 {
 public:
@@ -44,7 +46,7 @@ public:
     uint16_t GetBoundPort() const override;
     void Free() override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
-    inline void SetNativeParams(void * params) { mOTInstance = static_cast<otInstance *>(params); }
+    void SetNativeParams(void * params);
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 
@@ -63,7 +65,6 @@ private:
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
     otUdpSocket mSocket;
-    otInstance * mOTInstance = nullptr;
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;

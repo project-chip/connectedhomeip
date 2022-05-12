@@ -232,6 +232,15 @@ public final class ChipIdLookup {
       if (attributeId == 1L) {
         return "Extension";
       }
+      if (attributeId == 2L) {
+        return "SubjectsPerAccessControlEntry";
+      }
+      if (attributeId == 3L) {
+        return "TargetsPerAccessControlEntry";
+      }
+      if (attributeId == 4L) {
+        return "AccessControlEntriesPerFabric";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -450,6 +459,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 18L) {
         return "UniqueID";
+      }
+      if (attributeId == 19L) {
+        return "CapabilityMinima";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -892,6 +904,9 @@ public final class ChipIdLookup {
       if (attributeId == 21L) {
         return "NumberOfYearDaySchedulesSupportedPerUser";
       }
+      if (attributeId == 22L) {
+        return "NumberOfHolidaySchedulesSupported";
+      }
       if (attributeId == 23L) {
         return "MaxPINCodeLength";
       }
@@ -927,6 +942,12 @@ public final class ChipIdLookup {
       }
       if (attributeId == 48L) {
         return "WrongCodeEntryLimit";
+      }
+      if (attributeId == 49L) {
+        return "UserCodeTemporaryDisableTime";
+      }
+      if (attributeId == 51L) {
+        return "RequirePINforRemoteOperation";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1042,6 +1063,33 @@ public final class ChipIdLookup {
       if (attributeId == 1L) {
         return "FanModeSequence";
       }
+      if (attributeId == 2L) {
+        return "PercentSetting";
+      }
+      if (attributeId == 3L) {
+        return "PercentCurrent";
+      }
+      if (attributeId == 4L) {
+        return "SpeedMax";
+      }
+      if (attributeId == 5L) {
+        return "SpeedSetting";
+      }
+      if (attributeId == 6L) {
+        return "SpeedCurrent";
+      }
+      if (attributeId == 7L) {
+        return "RockSupport";
+      }
+      if (attributeId == 8L) {
+        return "RockSetting";
+      }
+      if (attributeId == 9L) {
+        return "WindSupport";
+      }
+      if (attributeId == 10L) {
+        return "WindSetting";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -1116,6 +1164,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 3L) {
         return "LocationCapability";
+      }
+      if (attributeId == 4L) {
+        return "SupportsConcurrentConnection";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1657,6 +1708,30 @@ public final class ChipIdLookup {
       if (attributeId == 2L) {
         return "Description";
       }
+      if (attributeId == 3L) {
+        return "WiredAssessedInputVoltage";
+      }
+      if (attributeId == 4L) {
+        return "WiredAssessedInputFrequency";
+      }
+      if (attributeId == 5L) {
+        return "WiredCurrentType";
+      }
+      if (attributeId == 6L) {
+        return "WiredAssessedCurrent";
+      }
+      if (attributeId == 7L) {
+        return "WiredNominalVoltage";
+      }
+      if (attributeId == 8L) {
+        return "WiredMaximumCurrent";
+      }
+      if (attributeId == 9L) {
+        return "WiredPresent";
+      }
+      if (attributeId == 10L) {
+        return "ActiveWiredFaults";
+      }
       if (attributeId == 11L) {
         return "BatteryVoltage";
       }
@@ -1669,11 +1744,53 @@ public final class ChipIdLookup {
       if (attributeId == 14L) {
         return "BatteryChargeLevel";
       }
+      if (attributeId == 15L) {
+        return "BatteryReplacementNeeded";
+      }
+      if (attributeId == 16L) {
+        return "BatteryReplaceability";
+      }
+      if (attributeId == 17L) {
+        return "BatteryPresent";
+      }
       if (attributeId == 18L) {
         return "ActiveBatteryFaults";
       }
+      if (attributeId == 19L) {
+        return "BatteryReplacementDescription";
+      }
+      if (attributeId == 20L) {
+        return "BatteryCommonDesignation";
+      }
+      if (attributeId == 21L) {
+        return "BatteryANSIDesignation";
+      }
+      if (attributeId == 22L) {
+        return "BatteryIECDesignation";
+      }
+      if (attributeId == 23L) {
+        return "BatteryApprovedChemistry";
+      }
+      if (attributeId == 24L) {
+        return "BatteryCapacity";
+      }
+      if (attributeId == 25L) {
+        return "BatteryQuantity";
+      }
       if (attributeId == 26L) {
         return "BatteryChargeState";
+      }
+      if (attributeId == 27L) {
+        return "BatteryTimeToFullCharge";
+      }
+      if (attributeId == 28L) {
+        return "BatteryFunctionalWhileCharging";
+      }
+      if (attributeId == 29L) {
+        return "BatteryChargingCurrent";
+      }
+      if (attributeId == 30L) {
+        return "ActiveBatteryChargeFaults";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1719,6 +1836,24 @@ public final class ChipIdLookup {
       }
       if (attributeId == 2L) {
         return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "Tolerance";
+      }
+      if (attributeId == 16L) {
+        return "ScaledValue";
+      }
+      if (attributeId == 17L) {
+        return "MinScaledValue";
+      }
+      if (attributeId == 18L) {
+        return "MaxScaledValue";
+      }
+      if (attributeId == 19L) {
+        return "ScaledTolerance";
+      }
+      if (attributeId == 20L) {
+        return "Scale";
       }
       if (attributeId == 65531L) {
         return "AttributeList";
@@ -2119,103 +2254,103 @@ public final class ChipIdLookup {
       if (attributeId == 255L) {
         return "Unsupported";
       }
-      if (attributeId == 32768L) {
+      if (attributeId == 16384L) {
         return "NullableBoolean";
       }
-      if (attributeId == 32769L) {
+      if (attributeId == 16385L) {
         return "NullableBitmap8";
       }
-      if (attributeId == 32770L) {
+      if (attributeId == 16386L) {
         return "NullableBitmap16";
       }
-      if (attributeId == 32771L) {
+      if (attributeId == 16387L) {
         return "NullableBitmap32";
       }
-      if (attributeId == 32772L) {
+      if (attributeId == 16388L) {
         return "NullableBitmap64";
       }
-      if (attributeId == 32773L) {
+      if (attributeId == 16389L) {
         return "NullableInt8u";
       }
-      if (attributeId == 32774L) {
+      if (attributeId == 16390L) {
         return "NullableInt16u";
       }
-      if (attributeId == 32775L) {
+      if (attributeId == 16391L) {
         return "NullableInt24u";
       }
-      if (attributeId == 32776L) {
+      if (attributeId == 16392L) {
         return "NullableInt32u";
       }
-      if (attributeId == 32777L) {
+      if (attributeId == 16393L) {
         return "NullableInt40u";
       }
-      if (attributeId == 32778L) {
+      if (attributeId == 16394L) {
         return "NullableInt48u";
       }
-      if (attributeId == 32779L) {
+      if (attributeId == 16395L) {
         return "NullableInt56u";
       }
-      if (attributeId == 32780L) {
+      if (attributeId == 16396L) {
         return "NullableInt64u";
       }
-      if (attributeId == 32781L) {
+      if (attributeId == 16397L) {
         return "NullableInt8s";
       }
-      if (attributeId == 32782L) {
+      if (attributeId == 16398L) {
         return "NullableInt16s";
       }
-      if (attributeId == 32783L) {
+      if (attributeId == 16399L) {
         return "NullableInt24s";
       }
-      if (attributeId == 32784L) {
+      if (attributeId == 16400L) {
         return "NullableInt32s";
       }
-      if (attributeId == 32785L) {
+      if (attributeId == 16401L) {
         return "NullableInt40s";
       }
-      if (attributeId == 32786L) {
+      if (attributeId == 16402L) {
         return "NullableInt48s";
       }
-      if (attributeId == 32787L) {
+      if (attributeId == 16403L) {
         return "NullableInt56s";
       }
-      if (attributeId == 32788L) {
+      if (attributeId == 16404L) {
         return "NullableInt64s";
       }
-      if (attributeId == 32789L) {
+      if (attributeId == 16405L) {
         return "NullableEnum8";
       }
-      if (attributeId == 32790L) {
+      if (attributeId == 16406L) {
         return "NullableEnum16";
       }
-      if (attributeId == 32791L) {
+      if (attributeId == 16407L) {
         return "NullableFloatSingle";
       }
-      if (attributeId == 32792L) {
+      if (attributeId == 16408L) {
         return "NullableFloatDouble";
       }
-      if (attributeId == 32793L) {
+      if (attributeId == 16409L) {
         return "NullableOctetString";
       }
-      if (attributeId == 32798L) {
+      if (attributeId == 16414L) {
         return "NullableCharString";
       }
-      if (attributeId == 32804L) {
+      if (attributeId == 16420L) {
         return "NullableEnumAttr";
       }
-      if (attributeId == 32805L) {
+      if (attributeId == 16421L) {
         return "NullableStruct";
       }
-      if (attributeId == 32806L) {
+      if (attributeId == 16422L) {
         return "NullableRangeRestrictedInt8u";
       }
-      if (attributeId == 32807L) {
+      if (attributeId == 16423L) {
         return "NullableRangeRestrictedInt8s";
       }
-      if (attributeId == 32808L) {
+      if (attributeId == 16424L) {
         return "NullableRangeRestrictedInt16u";
       }
-      if (attributeId == 32809L) {
+      if (attributeId == 16425L) {
         return "NullableRangeRestrictedInt16s";
       }
       if (attributeId == 65528L) {

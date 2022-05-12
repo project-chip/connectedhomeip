@@ -19,26 +19,26 @@
 #include "LogCommands.h"
 #include <iostream>
 
-CHIP_ERROR LogCommands::Log(const char * message)
+CHIP_ERROR LogCommands::Log(const char * identity, const chip::app::Clusters::LogCommands::Commands::Log::Type & value)
 {
-    ChipLogDetail(chipTool, "%s", message);
+    ChipLogDetail(chipTool, "%.*s", static_cast<int>(value.message.size()), value.message.data());
     return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
-CHIP_ERROR LogCommands::UserPrompt(const char * message, const char * expectedValue)
+CHIP_ERROR LogCommands::UserPrompt(const char * identity,
+                                   const chip::app::Clusters::LogCommands::Commands::UserPrompt::Type & value)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    std::string line;
-    ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
-    if (expectedValue == nullptr)
+    ChipLogDetail(chipTool, "USER_PROMPT: %.*s", static_cast<int>(value.message.size()), value.message.data());
+
+    if (value.expectedValue.HasValue())
     {
-        return ContinueOnChipMainThread(err);
+        std::string line;
+        std::getline(std::cin, line);
+        if (line != value.expectedValue.Value().data())
+        {
+            return ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT);
+        }
     }
 
-    std::getline(std::cin, line);
-    if (line != expectedValue)
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return ContinueOnChipMainThread(err);
+    return ContinueOnChipMainThread(CHIP_NO_ERROR);
 }

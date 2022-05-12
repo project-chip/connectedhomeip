@@ -32,8 +32,7 @@ public:
         ModelCommand(commandName, credsIssuerConfig), mBufferedReadAdapter(*this)
     {}
 
-    virtual void OnAttributeSubscription(){};
-    virtual void OnEventSubscription(){};
+    virtual void OnSubscription(){};
 
     /////////// ReadClient Callback Interface /////////
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data,
@@ -105,10 +104,10 @@ public:
         SetCommandExitStatus(mError);
     }
 
-    void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnAttributeSubscription(); }
+    void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnSubscription(); }
 
 protected:
-    CHIP_ERROR ReportAttribute(ChipDevice * device, std::vector<chip::EndpointId> endpointIds,
+    CHIP_ERROR ReportAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                                std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
                                chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
                                uint16_t maxInterval                                                = 0,
@@ -161,10 +160,11 @@ protected:
                 chipTool,
                 "\n%sAttribute commands targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
                 "example 1 cluster id, 1 attribute id, 2 endpoint ids)\n\t * Or the same "
-                "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %zu "
-                "cluster ids, %zu attribute ids, %zu endpoint ids.",
-                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                attributeCount, endpointCount);
+                "number of ids (for examples 2 cluster ids, 2 attribute ids and 2 endpoint ids).\n The current command has %u "
+                "cluster ids, %u attribute ids, %u endpoint ids.",
+                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
+                static_cast<unsigned int>(clusterCount), static_cast<unsigned int>(attributeCount),
+                static_cast<unsigned int>(endpointCount));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -179,7 +179,7 @@ protected:
             chip::AttributeId attributeId = attributeIds.at((hasSameIdsCount || multipleAttributes) ? i : 0);
             chip::EndpointId endpointId   = endpointIds.at((hasSameIdsCount || multipleEndpoints) ? i : 0);
 
-            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", attribute: " ChipLogFormatMEI ", endpoint %" PRIu16,
+            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", attribute: " ChipLogFormatMEI ", endpoint %u",
                             ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), endpointId);
             attributePathParams[i].mClusterId   = clusterId;
             attributePathParams[i].mAttributeId = attributeId;
@@ -215,6 +215,10 @@ protected:
         {
             params.mMinIntervalFloorSeconds   = minInterval;
             params.mMaxIntervalCeilingSeconds = maxInterval;
+            if (mKeepSubscriptions.HasValue())
+            {
+                params.mKeepSubscriptions = mKeepSubscriptions.Value();
+            }
         }
 
         mReadClient = std::make_unique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(),
@@ -222,9 +226,10 @@ protected:
         return mReadClient->SendRequest(params);
     }
 
-    CHIP_ERROR ReportEvent(ChipDevice * device, std::vector<chip::EndpointId> endpointIds, std::vector<chip::ClusterId> clusterIds,
-                           std::vector<chip::EventId> eventIds, chip::app::ReadClient::InteractionType interactionType,
-                           uint16_t minInterval = 0, uint16_t maxInterval = 0)
+    CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                           std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
+                           chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
+                           uint16_t maxInterval = 0)
     {
         const size_t clusterCount  = clusterIds.size();
         const size_t eventCount    = eventIds.size();
@@ -258,14 +263,14 @@ protected:
         }
         else
         {
-            ChipLogError(
-                chipTool,
-                "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
-                "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
-                "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %zu "
-                "cluster ids, %zu event ids, %zu endpoint ids.",
-                interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read", clusterCount,
-                eventCount, endpointCount);
+            ChipLogError(chipTool,
+                         "\n%sEvent command targetting multiple paths needs to have: \n \t * One element with multiple ids (for "
+                         "example 1 cluster id, 1 event id, 2 endpoint ids)\n\t * Or the same "
+                         "number of ids (for examples 2 cluster ids, 2 event ids and 2 endpoint ids).\n The current command has %u "
+                         "cluster ids, %u event ids, %u endpoint ids.",
+                         interactionType == chip::app::ReadClient::InteractionType::Subscribe ? "Subscribe" : "Read",
+                         static_cast<unsigned int>(clusterCount), static_cast<unsigned int>(eventCount),
+                         static_cast<unsigned int>(endpointCount));
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
@@ -279,7 +284,7 @@ protected:
             chip::EventId eventId       = eventIds.at((hasSameIdsCount || multipleEvents) ? i : 0);
             chip::EndpointId endpointId = endpointIds.at((hasSameIdsCount || multipleEndpoints) ? i : 0);
 
-            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", event: " ChipLogFormatMEI ", endpoint %" PRIu16,
+            ChipLogProgress(chipTool, "\tcluster " ChipLogFormatMEI ", event: " ChipLogFormatMEI ", endpoint %u",
                             ChipLogValueMEI(clusterId), ChipLogValueMEI(eventId), endpointId);
             eventPathParams[i].mClusterId  = clusterId;
             eventPathParams[i].mEventId    = eventId;
@@ -289,6 +294,7 @@ protected:
         chip::app::ReadPrepareParams params(device->GetSecureSession().Value());
         params.mpEventPathParamsList        = eventPathParams;
         params.mEventPathParamsListSize     = pathsCount;
+        params.mEventNumber                 = mEventNumber;
         params.mpAttributePathParamsList    = nullptr;
         params.mAttributePathParamsListSize = 0;
 
@@ -296,6 +302,10 @@ protected:
         {
             params.mMinIntervalFloorSeconds   = minInterval;
             params.mMaxIntervalCeilingSeconds = maxInterval;
+            if (mKeepSubscriptions.HasValue())
+            {
+                params.mKeepSubscriptions = mKeepSubscriptions.Value();
+            }
         }
 
         mReadClient = std::make_unique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(),
@@ -316,6 +326,11 @@ protected:
     // mFabricFiltered is really only used by the attribute commands, but we end
     // up needing it in our class's shared code.
     chip::Optional<bool> mFabricFiltered;
+
+    // mKeepSubscriptions is really only used by the subscribe commands, but we end
+    // up needing it in our class's shared code.
+    chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<chip::EventNumber> mEventNumber;
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
@@ -354,7 +369,7 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportAttribute(device, endpointIds, mClusterIds, mAttributeIds,
                                               chip::app::ReadClient::InteractionType::Read, 0, 0, mDataVersion);
@@ -376,8 +391,8 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -388,8 +403,8 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
@@ -402,40 +417,35 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
-        AddArgument("wait", 0, 1, &mWait);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
         ReportCommand::AddArguments();
     }
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportAttribute(device, endpointIds, mClusterIds, mAttributeIds,
                                               chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval,
                                               mDataVersion);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
+    void OnSubscription() override
     {
-        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
-    }
-
-    void OnAttributeSubscription() override
-    {
-        if (!mWait)
-        {
-            // The ReadClient instance can not be released directly into the OnAttributeSubscription
-            // callback since it happens to be called by ReadClient itself which is doing additional
-            // work after that.
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t arg) {
-                    auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
+        // The ReadClient instance can not be released directly into the OnSubscription
+        // callback since it happens to be called by ReadClient itself which is doing additional
+        // work after that.
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                auto * command = reinterpret_cast<SubscribeAttribute *>(arg);
+                if (!command->IsInteractive())
+                {
                     command->mReadClient.reset();
-                    command->SetCommandExitStatus(CHIP_NO_ERROR);
-                },
-                reinterpret_cast<intptr_t>(this));
-        }
+                }
+                command->SetCommandExitStatus(CHIP_NO_ERROR);
+            },
+            reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -445,7 +455,6 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     chip::Optional<std::vector<chip::DataVersion>> mDataVersion;
-    bool mWait;
 };
 
 class ReadEvent : public ReportCommand
@@ -455,6 +464,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -462,6 +472,7 @@ public:
         ReportCommand("read-event-by-id", credsIssuerConfig), mClusterIds(1, clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -471,12 +482,13 @@ public:
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
         AddArgument("event-name", eventName);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
     ~ReadEvent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportEvent(device, endpointIds, mClusterIds, mEventIds,
                                           chip::app::ReadClient::InteractionType::Read);
@@ -496,7 +508,8 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -506,7 +519,8 @@ public:
         AddArgument("event-id", 0, UINT32_MAX, &mEventIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
@@ -515,41 +529,40 @@ public:
         ReportCommand("subscribe-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
-        AddArgument("attr-name", eventName);
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
+        AddArgument("event-name", eventName, 0, "Event name.");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0,
+                    "The requested minimum interval between reports. Sets MinIntervalFloor in the Subscribe Request.");
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0,
+                    "The requested maximum interval between reports. Sets MaxIntervalCeiling in the Subscribe Request.");
+        AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
+                    "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReportCommand::AddArguments();
     }
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportEvent(device, endpointIds, mClusterIds, mEventIds,
                                           chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
+    void OnSubscription() override
     {
-        return mWait ? chip::System::Clock::Seconds16(UINT16_MAX) : ReportCommand::GetWaitDuration();
-    }
-
-    void OnEventSubscription() override
-    {
-        if (!mWait)
-        {
-            // The ReadClient instance can not be released directly into the OnEventSubscription
-            // callback since it happens to be called by ReadClient itself which is doing additional
-            // work after that.
-            chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t arg) {
-                    auto * command = reinterpret_cast<SubscribeEvent *>(arg);
+        // The ReadClient instance can not be released directly into the OnEventSubscription
+        // callback since it happens to be called by ReadClient itself which is doing additional
+        // work after that.
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t arg) {
+                auto * command = reinterpret_cast<SubscribeEvent *>(arg);
+                if (!command->IsInteractive())
+                {
                     command->mReadClient.reset();
-                    command->SetCommandExitStatus(CHIP_NO_ERROR);
-                },
-                reinterpret_cast<intptr_t>(this));
-        }
+                }
+                command->SetCommandExitStatus(CHIP_NO_ERROR);
+            },
+            reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -558,5 +571,4 @@ private:
 
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 };

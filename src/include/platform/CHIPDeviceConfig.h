@@ -126,23 +126,23 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
+ * CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
  *
- * The default amount of time in milliseconds that the sleepy end device will use as a slow-polling interval.
+ * The default amount of time in milliseconds that the sleepy end device will use as an idle interval.
  * This interval is used by the device to periodically wake up and poll the data in the idle mode.
  */
-#ifndef CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000_ms32
+#ifndef CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL 5000_ms32
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
+ * CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
  *
- * The default amount of time in milliseconds that the sleepy end device will use as a fast-polling interval.
+ * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
  * This interval is used by the device to periodically wake up and poll the data in the active mode.
  */
-#ifndef CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 200_ms32
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32
 #endif
 
 // -------------------- Device Identification Configuration --------------------
@@ -256,6 +256,20 @@
 #ifndef CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
 #define CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC 60
 #endif // CHIP_DEVICE_CONFIG_FAILSAFE_EXPIRY_LENGTH_SEC
+
+/**
+ * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+ *
+ * Whether a device supports "concurrent connection commissioning mode" (1) or
+ * or "non-concurrenct connection commissioning mode" (0).
+ *
+ * See section "5.5. Commissioning Flows" in spec for definition.
+ *
+ * The default value is to support concurrent connection.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 1
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
@@ -486,7 +500,7 @@
  * CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
  *
  * A prefix string used in forming the BLE device name.  The remainder of the name
- * consists of the final two bytes of the device's chip node id in hex.
+ * typically contains the setup discriminator as a 4-digit decimal number.
  *
  * NOTE: The device layer limits the total length of a device name to 16 characters.
  * However, due to other data sent in CHIPoBLE advertise packets, the device name
@@ -675,6 +689,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SSED
+ *
+ * Enable support for Thread Synchronized Sleepy End Device behavior.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SSED
+#define CHIP_DEVICE_CONFIG_THREAD_SSED 0
 #endif
 
 /**
@@ -1010,16 +1034,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH
 #define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH (0x10000)
-#endif
-
-/**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
- *
- *  @brief
- *    The Global event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY "global-eidc"
 #endif
 
 // -------------------- Software Update Manager Configuration --------------------

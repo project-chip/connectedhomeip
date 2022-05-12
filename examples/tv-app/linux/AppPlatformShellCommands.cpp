@@ -139,7 +139,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         uint16_t pid = 0;
         if (argc >= 3)
         {
-            pid = (uint16_t) strtol(argv[1], &eptr, 10);
+            pid = (uint16_t) strtol(argv[2], &eptr, 10);
         }
         ContentAppPlatform::GetInstance().LoadContentAppByClient(vid, pid);
 

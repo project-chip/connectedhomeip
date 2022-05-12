@@ -20,16 +20,11 @@
 // Main Code
 // ================================================================================
 
-#include "openthread/platform/logging.h"
 #include <mbedtls/platform.h>
-#include <openthread-system.h>
-#include <openthread/cli.h>
-#include <openthread/error.h>
 
+#include <AppTask.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 
@@ -40,8 +35,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
-
-#include <AppTask.h>
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "Keyboard.h"
@@ -89,6 +82,8 @@ uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
 extern "C" void main_task(void const * argument)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
     for (; pFunc < &__init_array_end; ++pFunc)
@@ -96,7 +91,11 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    SHA_ClkInit(SHA_INSTANCE);
+    err = PlatformMgrImpl().InitBoardFwk();
+    if (err != CHIP_NO_ERROR)
+    {
+        return;
+    }
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_Init();
@@ -110,13 +109,10 @@ extern "C" void main_task(void const * argument)
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    /* Used for HW initializations */
-    otSysInit(0, NULL);
-
     K32W_LOG("Welcome to NXP ELock Demo App");
 
     /* Mbedtls Threading support is needed because both
-     * Thread and Weave tasks are using it */
+     * Thread and Matter tasks are using it */
     freertos_mbedtls_mutex_init();
 
     // Init Chip memory management before the stack
@@ -125,7 +121,7 @@ extern "C" void main_task(void const * argument)
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        K32W_LOG("Error during PlatformMgr().InitWeaveStack()");
+        K32W_LOG("Error during PlatformMgr().InitMatterStack()");
         goto exit;
     }
 
@@ -324,4 +320,5 @@ static void BOARD_SetClockForWakeup(void)
     /* Enables the clock for the GPIO0 module */
     CLOCK_EnableClock(kCLOCK_Gpio0);
 }
+
 #endif

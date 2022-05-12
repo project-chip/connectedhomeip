@@ -60,6 +60,17 @@ using namespace ::chip;
 }
 @end
 
+@implementation CHIPWriteParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedWriteTimeoutMs = nil;
+    }
+    return self;
+}
+
+@end
+
 @implementation CHIPReadParams
 - (instancetype)init
 {

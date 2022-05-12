@@ -64,9 +64,9 @@ protected:
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
 #endif
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
@@ -144,22 +144,22 @@ GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(Connectiv
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
 template <class ImplClass>
 inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
+GenericConnectivityManagerImpl_Thread<ImplClass>::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    return ThreadStackMgrImpl().GetSEDPollingConfig(pollingConfig);
+    return ThreadStackMgrImpl().GetSEDIntervalsConfig(intervalsConfig);
 }
 
 template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetSEDIntervalsConfig(
+    const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    return ThreadStackMgrImpl().SetSEDPollingConfig(pollingConfig);
+    return ThreadStackMgrImpl().SetSEDIntervalsConfig(intervalsConfig);
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDActiveMode(bool onOff)
 {
-    return ThreadStackMgrImpl().RequestSEDFastPollingMode(onOff);
+    return ThreadStackMgrImpl().RequestSEDActiveMode(onOff);
 }
 #endif
 

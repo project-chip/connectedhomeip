@@ -22,6 +22,14 @@
             "path": "partials/test_cluster.zapt"
         },
         {
+            "name": "test_step",
+            "path": "partials/test_step.zapt"
+        },
+        {
+            "name": "test_step_response",
+            "path": "partials/test_step_response.zapt"
+        },
+        {
             "name": "maybeCheckExpectedValue",
             "path": "partials/checks/maybeCheckExpectedValue.zapt"
         },

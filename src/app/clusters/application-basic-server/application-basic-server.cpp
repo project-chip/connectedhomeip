@@ -60,11 +60,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetApplicationBasicDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogProgress(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
@@ -74,7 +74,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Application Basic has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Application Basic has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;

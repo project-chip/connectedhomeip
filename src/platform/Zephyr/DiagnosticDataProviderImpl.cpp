@@ -26,14 +26,29 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
+#include <platform/Zephyr/SysHeapMalloc.h>
 
 #include <drivers/hwinfo.h>
+#include <sys/util.h>
 
 #ifdef CONFIG_MCUBOOT_IMG_MANAGER
 #include <dfu/mcuboot.h>
 #endif
 
 #include <malloc.h>
+
+#if CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+
+#ifdef CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE
+const size_t kMaxHeapSize = CONFIG_NEWLIB_LIBC_ALIGNED_HEAP_SIZE;
+#elif defined(CONFIG_NEWLIB_LIBC)
+extern char _end[];
+const size_t kMaxHeapSize = CONFIG_SRAM_BASE_ADDRESS + KB(CONFIG_SRAM_SIZE) - POINTER_TO_UINT(_end);
+#else
+#pragma error "Maximum heap size is required but unknown"
+#endif
+
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -96,16 +111,20 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 inline DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(DetermineBootReason())
 {
-    ChipLogDetail(DeviceLayer, "Boot reason: %" PRIu16, static_cast<uint16_t>(mBootReason));
+    ChipLogDetail(DeviceLayer, "Boot reason: %u", static_cast<uint16_t>(mBootReason));
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#ifdef CONFIG_NEWLIB_LIBC
-    // This will return the amount of memory which has been allocated from the system, but is not
-    // used right now. Ideally, this value should be increased by the amount of memory which can
-    // be allocated from the system, but Zephyr does not expose that number.
-    currentHeapFree = mallinfo().fordblks;
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::Stats stats;
+    ReturnErrorOnFailure(Malloc::GetStats(stats));
+
+    currentHeapFree = stats.free;
+    return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+    const auto stats = mallinfo();
+    currentHeapFree  = kMaxHeapSize - stats.arena + stats.fordblks;
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -114,7 +133,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-#ifdef CONFIG_NEWLIB_LIBC
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::Stats stats;
+    ReturnErrorOnFailure(Malloc::GetStats(stats));
+
+    currentHeapUsed = stats.used;
+    return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
     currentHeapUsed = mallinfo().uordblks;
     return CHIP_NO_ERROR;
 #else
@@ -124,7 +149,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifdef CONFIG_NEWLIB_LIBC
+#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+    Malloc::Stats stats;
+    ReturnErrorOnFailure(Malloc::GetStats(stats));
+
+    // TODO: use the maximum usage once that is implemented in Zephyr
+    currentHeapHighWatermark = stats.used;
+    return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
     // ARM newlib does not provide a way to obtain the peak heap usage, so for now just return
     // the amount of memory allocated from the system which should be an upper bound of the peak
     // usage provided that the heap is not very fragmented.

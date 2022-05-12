@@ -38,15 +38,15 @@
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
-#include <app/server/Server.h>
 #include <transport/raw/PeerAddress.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#error "When using OpenThread Endpoints, one should also use GenericThreadStackManagerImpl_OpenThread"
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -230,17 +230,6 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                     addrAssigned[addrIdx] = true;
                 }
             }
-
-// Multicast won't work with LWIP on top of OT
-// Duplication of listeners, unecessary timers, buffer duplication, hardfault etc...
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-            // Refresh Multicast listening
-            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
-            {
-                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-                Server::GetInstance().RejoinExistingMulticastGroups();
-            }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
         }
 
         ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");
@@ -429,6 +418,10 @@ exit:
         // TODO: deliver CHIP platform event signaling loss of inbound packet.
     }
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

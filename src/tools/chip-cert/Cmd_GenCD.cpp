@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +59,7 @@ OptionDef gCmdOptionDefs[] =
     { "certification-type",    kArgumentRequired, 't' },
     { "dac-origin-vendor-id",  kArgumentRequired, 'o' },
     { "dac-origin-product-id", kArgumentRequired, 'r' },
+    { "authorized-paa-cert",   kArgumentRequired, 'a' },
     { }
 };
 
@@ -125,6 +126,17 @@ const char * const gCmdOptionHelp =
     "\n"
     "       DAC Origin Product Id in hex.\n"
     "\n"
+    "   -a, --authorized-paa-cert <file>\n"
+    "\n"
+    "       File containing PAA certificate authorized to sign PAI which signs the DAC\n"
+    "       for a product carrying this CD. This field is optional and if present, only specified\n"
+    "       PAAs will be authorized to sign device's PAI for the lifetime of the generated CD.\n"
+    "       Maximum 10 authorized PAA certificates can be specified.\n"
+    "       Each PAA should have its own -a (--authorized-paa-cert) option selector.\n"
+    "       The certificate can be in DER or PEM Form.\n"
+    "       Note that only the Subject Key Identifier (SKID) value will be extracted\n"
+    "       from the PAA certificate and put into CD Structure.\n"
+    "\n"
     ;
 
 OptionSet gCmdOptions =
@@ -150,10 +162,20 @@ OptionSet *gCmdOptionSets[] =
 };
 // clang-format on
 
-CertificationElements gCertElements = { 0 };
-const char * gCertFileName          = nullptr;
-const char * gKeyFileName           = nullptr;
-const char * gSignedCDFileName      = nullptr;
+CertificationElements gCertElements;
+const char * gCertFileName     = nullptr;
+const char * gKeyFileName      = nullptr;
+const char * gSignedCDFileName = nullptr;
+
+bool ExtractSKIDFromX509Cert(X509 * cert, ByteSpan & skid)
+{
+    const ASN1_OCTET_STRING * skidString = X509_get0_subject_key_id(cert);
+    VerifyOrReturnError(skidString != nullptr, false);
+    VerifyOrReturnError(skidString->length == kKeyIdentifierLength, false);
+    VerifyOrReturnError(CanCastTo<size_t>(skidString->length), false);
+    skid = ByteSpan(skidString->data, static_cast<size_t>(skidString->length));
+    return true;
+};
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -256,6 +278,22 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         gCertElements.DACOriginVIDandPIDPresent = true;
         break;
+    case 'a':
+        if (gCertElements.AuthorizedPAAListCount >= ArraySize(gCertElements.AuthorizedPAAList))
+        {
+            PrintArgError("%s: Too many Authorized PAA Certificates are specified: %s\n", progName, arg);
+            return false;
+        }
+        {
+            const char * fileName = arg;
+            std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+            VerifyOrReturnError(ReadCert(fileName, cert.get()), false);
+
+            ByteSpan skid;
+            VerifyOrReturnError(ExtractSKIDFromX509Cert(cert.get(), skid), false);
+            memcpy(gCertElements.AuthorizedPAAList[gCertElements.AuthorizedPAAListCount++], skid.data(), skid.size());
+        }
+        break;
     default:
         PrintArgError("%s: Unhandled option: %s\n", progName, name);
         return false;
@@ -325,12 +363,7 @@ bool Cmd_GenCD(int argc, char * argv[])
 
         // Extract the subject key id from the X509 certificate.
         ByteSpan signerKeyId;
-        {
-            const ASN1_OCTET_STRING * skidString = X509_get0_subject_key_id(cert.get());
-            VerifyOrReturnError(skidString != nullptr, false);
-            VerifyOrReturnError(CanCastTo<size_t>(skidString->length), false);
-            signerKeyId = ByteSpan(skidString->data, static_cast<size_t>(skidString->length));
-        }
+        VerifyOrReturnError(ExtractSKIDFromX509Cert(cert.get(), signerKeyId), false);
 
         // Initialize P256Keypair from EVP_PKEY.
         P256Keypair keypair;

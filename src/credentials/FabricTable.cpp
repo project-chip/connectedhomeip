@@ -153,7 +153,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 {
     DefaultStorageKeyAllocator keyAlloc;
 
-    ChipLogProgress(Inet, "Loading from storage for fabric index %u", mFabricIndex);
+    ChipLogProgress(Inet, "Loading from storage for fabric index 0x%x", static_cast<unsigned>(mFabricIndex));
 
     // Scopes for "size" so we don't forget to re-initialize it between gets,
     // since each get modifies it.
@@ -190,16 +190,19 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         // The compressed fabric ID doesn't change for a fabric over time.
         // Computing it here will save computational overhead when it's accessed by other
         // parts of the code.
-        ReturnErrorOnFailure(GeneratePeerId(mFabricId, nodeId, &mOperationalId));
+        ReturnErrorOnFailure(GeneratePeerId(mRootCert, mFabricId, nodeId, &mOperationalId));
         ReturnErrorOnFailure(SetNOCCert(nocCert));
     }
 
     {
-        uint8_t buf[OpKeyTLVMaxSize()];
-        uint16_t size = sizeof(buf);
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabricIndex), buf, size));
+        // Use a CapacityBoundBuffer to get RAII secret data clearing on scope exit.
+        Crypto::CapacityBoundBuffer<OpKeyTLVMaxSize()> buf;
+        uint16_t size = static_cast<uint16_t>(buf.Capacity());
+        ReturnErrorOnFailure(storage->SyncGetKeyValue(keyAlloc.FabricOpKey(mFabricIndex), buf.Bytes(), size));
+        buf.SetLength(static_cast<size_t>(size));
+
         TLV::ContiguousBufferTLVReader reader;
-        reader.Init(buf, size);
+        reader.Init(buf.Bytes(), buf.Length());
 
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
         TLV::TLVType containerType;
@@ -225,17 +228,12 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
             mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
         }
         VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-        // Set provisioned_key = true , so that key is not deleted from HSM.
-        mOperationalKey->provisioned_key = true;
-#endif
 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
         ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -269,7 +267,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId)
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
@@ -278,16 +276,11 @@ CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId *
 
     {
         P256PublicKeySpan rootPubkeySpan;
-        ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
+        ReturnErrorOnFailure(ExtractPublicKeyFromChipCert(rcac, rootPubkeySpan));
         rootPubkey = rootPubkeySpan;
     }
 
-    ChipLogDetail(Inet, "Generating compressed fabric ID using uncompressed fabric ID 0x" ChipLogFormatX64 " and root pubkey",
-                  ChipLogValueX64(fabricId));
-    ChipLogByteSpan(Inet, ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length()));
     ReturnErrorOnFailure(GenerateCompressedFabricId(rootPubkey, fabricId, compressedFabricIdSpan));
-    ChipLogDetail(Inet, "Generated compressed fabric ID");
-    ChipLogByteSpan(Inet, compressedFabricIdSpan);
 
     // Decode compressed fabric ID accounting for endianness, as GenerateCompressedFabricId()
     // returns a binary buffer and is agnostic of usage of the output as an integer type.
@@ -334,7 +327,6 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
         mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
         mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
@@ -374,6 +366,13 @@ CHIP_ERROR FabricInfo::SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCe
 CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, ValidationContext & context,
                                          PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const
 {
+    return VerifyCredentials(noc, icac, mRootCert, context, nocPeerId, fabricId, nocPubkey);
+}
+
+CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                         ValidationContext & context, PeerId & nocPeerId, FabricId & fabricId,
+                                         Crypto::P256PublicKey & nocPubkey)
+{
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
     //        It can be optimized by not loading certificate (i.e. rcac) that's local and implicitly trusted.
@@ -383,7 +382,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     ChipCertificateSet certificates;
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
 
-    ReturnErrorOnFailure(certificates.LoadCert(mRootCert, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+    ReturnErrorOnFailure(certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     if (!icac.empty())
     {
@@ -431,72 +430,10 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
         return err;
     }
 
-    ReturnErrorOnFailure(GeneratePeerId(fabricId, nodeId, &nocPeerId));
+    ReturnErrorOnFailure(GeneratePeerId(rcac, fabricId, nodeId, &nocPeerId));
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                             MutableByteSpan & destinationId) const
-{
-    constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-    constexpr size_t kDestinationMessageLen =
-        kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
-    HMAC_sha hmac;
-    uint8_t destinationMessage[kDestinationMessageLen];
-    P256PublicKeySpan rootPubkeySpan;
-
-    ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
-
-    Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
-
-    ChipLogDetail(Inet,
-                  "Generating DestinationID. Fabric ID 0x" ChipLogFormatX64 ", Dest node ID 0x" ChipLogFormatX64 ", Random data",
-                  ChipLogValueX64(mFabricId), ChipLogValueX64(destNodeId));
-    ChipLogByteSpan(Inet, random);
-
-    bbuf.Put(random.data(), random.size());
-    // TODO: In the current implementation this check is required because in some cases the
-    //       GenerateDestinationID() is called before mRootCert is initialized and GetRootPubkey() returns
-    //       empty Span.
-    if (!rootPubkeySpan.empty())
-    {
-        ChipLogDetail(Inet, "Root pubkey");
-        ChipLogByteSpan(Inet, rootPubkeySpan);
-        bbuf.Put(rootPubkeySpan.data(), rootPubkeySpan.size());
-    }
-    bbuf.Put64(mFabricId);
-    bbuf.Put64(destNodeId);
-
-    size_t written = 0;
-    VerifyOrReturnError(bbuf.Fit(written), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    ChipLogDetail(Inet, "IPK");
-    ChipLogByteSpan(Inet, ipk);
-
-    CHIP_ERROR err =
-        hmac.HMAC_SHA256(ipk.data(), ipk.size(), destinationMessage, written, destinationId.data(), destinationId.size());
-    ChipLogDetail(Inet, "Generated DestinationID output");
-    ChipLogByteSpan(Inet, destinationId);
-    return err;
-}
-
-CHIP_ERROR FabricInfo::MatchDestinationID(const ByteSpan & targetDestinationId, const ByteSpan & initiatorRandom,
-                                          const ByteSpan * ipkList, size_t ipkListEntries) const
-{
-    uint8_t localDestID[kSHA256_Hash_Length] = { 0 };
-    MutableByteSpan localDestIDSpan(localDestID);
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    for (size_t ipkIdx = 0; ipkIdx < ipkListEntries; ++ipkIdx)
-    {
-        if (GenerateDestinationID(ipkList[ipkIdx], initiatorRandom, mOperationalId.GetNodeId(), localDestIDSpan) == CHIP_NO_ERROR &&
-            targetDestinationId.data_equal(localDestIDSpan))
-        {
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_CERT_NOT_TRUSTED;
 }
 
 FabricTable::~FabricTable()
@@ -621,35 +558,32 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
 
+    // Make sure to not modify any of our state until VerifyCredentials passes.
+    PeerId operationalId;
+    FabricId fabricId;
+    ChipLogProgress(Discovery, "Verifying the received credentials");
+    ReturnErrorOnFailure(VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, validContext, operationalId,
+                                           fabricId, pubkey));
+
     SetOperationalKeypair(newFabric.GetOperationalKey());
     SetRootCert(newFabric.mRootCert);
-
-    ChipLogProgress(Discovery, "Verifying the received credentials");
-    ReturnErrorOnFailure(
-        VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, validContext, mOperationalId, mFabricId, pubkey));
-
+    mOperationalId = operationalId;
+    mFabricId      = fabricId;
     SetICACert(newFabric.mICACert);
     SetNOCCert(newFabric.mNOCCert);
     SetVendorId(newFabric.GetVendorId());
     SetFabricLabel(newFabric.GetFabricLabel());
-    ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", GetFabricIndex(), IsInitialized());
+    ChipLogProgress(Discovery, "Added new fabric at index: 0x%x, Initialized: %d", static_cast<unsigned>(GetFabricIndex()),
+                    IsInitialized());
     ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                     ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
     return CHIP_NO_ERROR;
 }
 
-FabricIndex FabricTable::FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                                    const ByteSpan * ipkList, size_t ipkListEntries)
+CHIP_ERROR FabricTable::AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex)
 {
-    for (auto & fabric : *this)
-    {
-        if (fabric.MatchDestinationID(destinationId, initiatorRandom, ipkList, ipkListEntries) == CHIP_NO_ERROR)
-        {
-            return fabric.GetFabricIndex();
-        }
-    }
-
-    return kUndefinedFabricIndex;
+    VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return AddNewFabricInner(newFabric, outputIndex);
 }
 
 CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outputIndex)
@@ -681,6 +615,11 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
         }
     }
 
+    return AddNewFabricInner(newFabric, outputIndex);
+}
+
+CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
     if (!mNextAvailableFabricIndex.HasValue())
     {
         // No more indices available.  Bail out.
@@ -770,13 +709,13 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
     {
         if (mFabricCount == 0)
         {
-            ChipLogError(Discovery, "!!Trying to delete a fabric, but the current fabric count is already 0");
+            ChipLogError(Discovery, "Trying to delete a fabric, but the current fabric count is already 0");
         }
         else
         {
             mFabricCount--;
+            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage", static_cast<unsigned>(index));
         }
-        ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", index);
 
         FabricTableDelegate * delegate = mDelegate;
         while (delegate)
@@ -880,7 +819,6 @@ void FabricTable::UpdateNextAvailableFabricIndex()
     }
 
     mNextAvailableFabricIndex.ClearValue();
-    return;
 }
 
 CHIP_ERROR FabricTable::StoreFabricIndexInfo() const
@@ -990,8 +928,7 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                           ByteSpan nodePrivateKey)
+CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey)
 {
     Reset();
 
@@ -1001,9 +938,8 @@ CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert,
 
     // NOTE: this requres ENABLE_HSM_CASE_OPS_KEY is not defined
     P256SerializedKeypair opKeysSerialized;
-    memcpy(static_cast<uint8_t *>(opKeysSerialized), nodePubKey.data(), nodePubKey.size());
-    memcpy(static_cast<uint8_t *>(opKeysSerialized) + nodePubKey.size(), nodePrivateKey.data(), nodePrivateKey.size());
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(nodePubKey.size() + nodePrivateKey.size()));
+    memcpy(static_cast<uint8_t *>(opKeysSerialized), nocKey.data(), nocKey.size());
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(nocKey.size()));
 
     P256Keypair opKey;
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));

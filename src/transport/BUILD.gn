@@ -30,7 +30,6 @@ static_library("transport") {
     "MessageCounter.cpp",
     "MessageCounter.h",
     "MessageCounterManagerInterface.h",
-    "PairingSession.cpp",
     "PeerMessageCounter.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
@@ -72,6 +71,9 @@ static_library("transport") {
   ]
 
   if (chip_enable_transport_trace) {
-    deps = [ "$dir_pw_trace" ]
+    sources += [ "TraceMessage.cpp" ]
+  }
+  if (chip_enable_transport_pw_trace) {
+    public_deps += [ "$dir_pw_trace" ]
   }
 }

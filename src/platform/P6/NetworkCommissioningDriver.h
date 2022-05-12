@@ -42,7 +42,7 @@ public:
             return false;
         }
 
-        item.security = mpScanResults[mIternum].security;
+        item.security.SetRaw(mpScanResults[mIternum].security);
         item.ssidLen =
             strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].SSID), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mpScanResults[mIternum].channel;
@@ -102,12 +102,13 @@ public:
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
 
-    Status RemoveNetwork(ByteSpan networkId) override;
-    Status ReorderNetwork(ByteSpan networkId, uint8_t index) override;
+    Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
+    Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) override;
     void ConnectNetwork(ByteSpan networkId, ConnectCallback * callback) override;
 
     // WiFiDriver
-    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) override;
+    Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                              uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
@@ -117,6 +118,11 @@ public:
 
     void OnConnectWiFiNetwork();
     void OnScanWiFiNetworkDone();
+    void OnNetworkStatusChange();
+
+    CHIP_ERROR SetLastDisconnectReason(int32_t reason);
+    int32_t GetLastDisconnectReason();
+
     static P6WiFiDriver & GetInstance()
     {
         static P6WiFiDriver instance;
@@ -132,6 +138,8 @@ private:
     WiFiNetwork mStagingNetwork;
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+    int32_t mLastDisconnectedReason;
 };
 
 } // namespace NetworkCommissioning

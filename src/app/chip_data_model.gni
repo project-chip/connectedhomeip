@@ -51,8 +51,6 @@ template("chip_data_model") {
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
                              invoker.use_default_im_dispatch
 
-  _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
-
   source_set(_data_model_name) {
     forward_variables_from(invoker,
                            "*",
@@ -132,12 +130,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
           "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestor.cpp",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.cpp",
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorStorage.h",
-          "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsentProvider.h",
+          "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsent.h",
           "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
-          "${_app_root}/clusters/${cluster}/GenericOTARequestorDriver.cpp",
-          "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
         ]
       } else if (cluster == "bindings") {
@@ -163,11 +161,6 @@ template("chip_data_model") {
       if (_use_default_im_dispatch) {
         sources +=
             [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
-      }
-
-      if (_use_tests_apis) {
-        sources +=
-            [ "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h" ]
       }
     }
 

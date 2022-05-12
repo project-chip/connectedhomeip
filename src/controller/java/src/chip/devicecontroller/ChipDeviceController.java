@@ -302,10 +302,6 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
 
-  public boolean isActive(long deviceId) {
-    return isActive(deviceControllerPtr, deviceId);
-  }
-
   /* Shutdown all cluster attribute subscriptions for a given device */
   public void shutdownSubscriptions(long devicePtr) {
     shutdownSubscriptions(deviceControllerPtr, devicePtr);
@@ -367,6 +363,10 @@ public class ChipDeviceController {
   public PaseVerifierParams computePaseVerifier(
       long devicePtr, long setupPincode, long iterations, byte[] salt) {
     return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
+  }
+
+  public void shutdownCommissioning() {
+    shutdownCommissioning(deviceControllerPtr);
   }
 
   private native PaseVerifierParams computePaseVerifier(
@@ -446,11 +446,11 @@ public class ChipDeviceController {
       int discriminator,
       long setupPinCode);
 
-  private native boolean isActive(long deviceControllerPtr, long deviceId);
-
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+
+  private native void shutdownCommissioning(long deviceControllerPtr);
 
   static {
     System.loadLibrary("CHIPController");

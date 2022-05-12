@@ -41,8 +41,6 @@
 #include "stdio.h"
 #include "timers.h"
 
-#include "RNG_Interface.h"
-
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "PWR_Configuration.h"
 #endif
@@ -100,7 +98,7 @@ namespace {
 #define CONTROLLER_TASK_STACK_SIZE (gControllerTaskStackSize_c / sizeof(StackType_t))
 
 /* host task configuration */
-#define HOST_TASK_PRIORITY (3U)
+#define HOST_TASK_PRIORITY (4U)
 #define HOST_TASK_STACK_SIZE (gHost_TaskStackSize_c / sizeof(StackType_t))
 
 /* ble app task configuration */
@@ -129,7 +127,7 @@ TimerHandle_t connectionTimeout;
 EventGroupHandle_t bleAppTaskLoopEvent;
 
 /* keep the device ID of the connected peer */
-uint8_t device_id;
+uint8_t g_device_id;
 
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -159,9 +157,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Initialize the Chip BleLayer.
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
-
-    (void) RNG_Init();
-    RNG_SetPseudoRandomNoSeed(NULL);
 
     /* Initialization of message wait events -
      * used for receiving BLE Stack events */
@@ -791,8 +786,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint16_t discriminator;
     uint16_t advInterval                                  = 0;
     gapAdvertisingData_t adv                              = { 0 };
-    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { 0 };
-    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { 0 };
+    gapAdStructure_t adv_data[BLEKW_ADV_MAX_NO]           = { { 0 } };
+    gapAdStructure_t scan_rsp_data[BLEKW_SCAN_RSP_MAX_NO] = { { 0 } };
     uint8_t advPayload[BLEKW_MAX_ADV_DATA_LEN]            = { 0 };
     gapScanResponseData_t scanRsp                         = { 0 };
     gapAdvertisingParameters_t adv_params                 = { 0 };
@@ -1040,7 +1035,7 @@ void BLEManagerImpl::bleAppTask(void * p_arg)
                 ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
 
                 /* Set the advertising parameters */
-                if (Gap_Disconnect(device_id) != gBleSuccess_c)
+                if (Gap_Disconnect(g_device_id) != gBleSuccess_c)
                 {
                     ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
                 }
@@ -1058,7 +1053,7 @@ void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
     uint8_t device_id_loc = msg->data.u8;
     ChipLogProgress(DeviceLayer, "BLE is connected with device: %d.\n", device_id_loc);
 
-    device_id = device_id_loc;
+    g_device_id = device_id_loc;
     blekw_start_connection_timeout();
     sInstance.AddConnection(device_id_loc);
     mFlags.Set(Flags::kRestartAdvertising);
@@ -1188,7 +1183,7 @@ void BLEManagerImpl::HandleRXCharWrite(blekw_msg_t * msg)
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
     ChipLogDetail(DeviceLayer,
                   "Write request/command received for"
-                  "CHIPoBLE RX characteristic (con %" PRIu16 ", len %" PRIu16 ")",
+                  "CHIPoBLE RX characteristic (con %u, len %u)",
                   att_wr_data->device_id, buf->DataLength());
 #endif
 

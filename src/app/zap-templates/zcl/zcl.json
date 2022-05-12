@@ -19,7 +19,6 @@
         "chip-types.xml",
         "channel-cluster.xml",
         "clusters-extensions.xml",
-        "commissioning.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
@@ -39,6 +38,7 @@
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
         "mode-select-cluster.xml",
+        "network-commissioning-cluster.xml",
         "onoff-cluster.xml",
         "operational-credentials-cluster.xml",
         "pressure-measurement-cluster.xml",
@@ -91,6 +91,103 @@
         }
     },
     "listsUseAttributeAccessInterface": true,
-    "attributeAccessInterfaceAttributes": {},
-    "defaultReportingPolicy": "mandatory"
+    "attributeAccessInterfaceAttributes": {
+        "Access Control": [
+            "ClusterRevision",
+            "SubjectsPerAccessControlEntry",
+            "TargetsPerAccessControlEntry",
+            "AccessControlEntriesPerFabric"
+        ],
+        "AdministratorCommissioning": [
+            "WindowStatus",
+            "AdminFabricIndex",
+            "AdminVendorId"
+        ],
+        "Basic": [
+            "DataModelRevision",
+            "VendorName",
+            "VendorID",
+            "ProductName",
+            "ProductID",
+            "Location",
+            "HardwareVersion",
+            "HardwareVersionString",
+            "SoftwareVersion",
+            "SoftwareVersionString",
+            "ManufacturingDate",
+            "PartNumber",
+            "ProductURL",
+            "ProductLabel",
+            "SerialNumber",
+            "UniqueID",
+            "CapabilityMinima"
+        ],
+        "Descriptor": ["ClusterRevision"],
+        "Ethernet Network Diagnostics": [
+            "PHYRate",
+            "FullDuplex",
+            "CarrierDetect",
+            "TimeSinceReset",
+            "PacketRxCount",
+            "PacketTxCount",
+            "TxErrCount",
+            "CollisionCount",
+            "OverrunCount"
+        ],
+        "General Commissioning": [
+            "RegulatoryConfig",
+            "LocationCapability",
+            "BasicCommissioningInfo",
+            "SupportsConcurrentConnection"
+        ],
+        "General Diagnostics": [
+            "NetworkInterfaces",
+            "ActiveHardwareFaults",
+            "ActiveRadioFaults",
+            "ActiveNetworkFaults",
+            "RebootCount",
+            "UpTime",
+            "TotalOperationalHours",
+            "BootReasons"
+        ],
+        "Group Key Management": [
+            "ClusterRevision",
+            "MaxGroupsPerFabric",
+            "MaxGroupKeysPerFabric"
+        ],
+        "Operational Credentials": [
+            "SupportedFabrics",
+            "CommissionedFabrics",
+            "CurrentFabricIndex"
+        ],
+        "Software Diagnostics": [
+            "CurrentHeapFree",
+            "CurrentHeapUsed",
+            "CurrentHeapHighWatermark",
+            "ThreadMetrics"
+        ],
+        "Test Cluster": [
+            "struct_attr",
+            "nullable_struct",
+            "general_error_boolean",
+            "cluster_error_boolean"
+        ],
+        "WiFi Network Diagnostics": [
+            "bssid",
+            "SecurityType",
+            "WiFiVersion",
+            "ChannelNumber",
+            "Rssi",
+            "BeaconLostCount",
+            "BeaconRxCount",
+            "PacketMulticastRxCount",
+            "PacketMulticastTxCount",
+            "PacketUnicastRxCount",
+            "PacketUnicastTxCount",
+            "CurrentMaxRate",
+            "OverrunCount"
+        ]
+    },
+    "defaultReportingPolicy": "mandatory",
+    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"]
 }

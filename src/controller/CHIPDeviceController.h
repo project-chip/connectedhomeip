@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <app/AttributeCache.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/ClusterStateCache.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
@@ -39,9 +39,11 @@
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
+#include <controller/DevicePairingDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/FabricTable.h>
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -79,14 +81,12 @@ namespace Controller {
 using namespace chip::Protocols::UserDirectedCommissioning;
 
 constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES;
-constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
-    PersistentStorageDelegate * storageDelegate                     = nullptr;
     DeviceControllerSystemState * systemState                       = nullptr;
     DeviceDiscoveryDelegate * deviceDiscoveryDelegate               = nullptr;
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
@@ -108,48 +108,7 @@ struct ControllerInitParams
     //
     bool enableServerInteractions = false;
 
-    uint16_t controllerVendorId;
-};
-
-class DLL_EXPORT DevicePairingDelegate
-{
-public:
-    virtual ~DevicePairingDelegate() {}
-
-    enum Status : uint8_t
-    {
-        SecurePairingSuccess = 0,
-        SecurePairingFailed,
-    };
-
-    /**
-     * @brief
-     *   Called when the pairing reaches a certain stage.
-     *
-     * @param status Current status of pairing
-     */
-    virtual void OnStatusUpdate(DevicePairingDelegate::Status status) {}
-
-    /**
-     * @brief
-     *   Called when the pairing is complete (with success or error)
-     *
-     * @param error Error cause, if any
-     */
-    virtual void OnPairingComplete(CHIP_ERROR error) {}
-
-    /**
-     * @brief
-     *   Called when the pairing is deleted (with success or error)
-     *
-     * @param error Error cause, if any
-     */
-    virtual void OnPairingDeleted(CHIP_ERROR error) {}
-
-    /**
-     *   Called when the commissioning process is complete (with success or error)
-     */
-    virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}
+    chip::VendorId controllerVendorId;
 };
 
 struct CommissionerInitParams : public ControllerInitParams
@@ -185,13 +144,17 @@ public:
      */
     virtual CHIP_ERROR Shutdown();
 
-    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
+    SessionManager * SessionMgr()
+    {
+        if (mSystemState)
+        {
+            return mSystemState->SessionMgr();
+        }
 
-    /**
-     *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
-     *   on the fabric.
-     */
-    bool DoesDevicePairingExist(const PeerId & deviceId);
+        return nullptr;
+    }
+
+    CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
      *   This function finds the device corresponding to deviceId, and establishes a secure connection with it.
@@ -286,26 +249,20 @@ protected:
 
     State mState;
 
-    SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
-    bool mPairedDevicesInitialized;
-
     PeerId mLocalId          = PeerId();
     FabricId mFabricId       = kUndefinedFabricId;
     FabricInfo * mFabricInfo = nullptr;
 
-    PersistentStorageDelegate * mStorageDelegate = nullptr;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Dnssd::DiscoveredNodeData mCommissionableNodes[kMaxCommissionableNodes];
     DeviceControllerSystemState * mSystemState = nullptr;
 
-    CHIP_ERROR InitializePairedDeviceList();
-    CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
-    uint16_t mVendorId;
+    chip::VendorId mVendorId;
 
     /// Fetches the session to use for the current device. Allows overriding
     /// in case subclasses want to create the session if it does not yet exist
@@ -322,6 +279,15 @@ private:
     CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                     ,
+                                     Transport::UDP /* IPv4 */
+#endif
+                                     >;
+#endif
+
 /**
  * @brief
  *   The commissioner applications can use this class to pair new/unpaired CHIP devices. The application is
@@ -333,7 +299,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
                                       public SessionEstablishmentDelegate,
-                                      public app::AttributeCache::Callback
+                                      public app::ClusterStateCache::Callback
 {
 public:
     DeviceCommissioner();
@@ -454,6 +420,19 @@ public:
     CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
     CHIP_ERROR Commission(NodeId remoteDeviceId);
 
+    /**
+     * @brief
+     *   This function instructs the commissioner to proceed to the next stage of commissioning after
+     *   attestation failure is reported to an installed attestation delegate.
+     *
+     * @param[in] device                The device being commissioned.
+     * @param[in] attestationResult     The attestation result to use instead of whatever the device
+     *                                  attestation verifier came up with. May be a success or an error result.
+     */
+    CHIP_ERROR
+    ContinueCommissioningAfterDeviceAttestationFailure(DeviceProxy * device,
+                                                       Credentials::AttestationVerificationResult attestationResult);
+
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
     /**
@@ -489,7 +468,7 @@ public:
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
+    void OnSessionEstablished(const SessionHandle & session) override;
 
     void RendezvousCleanup(CHIP_ERROR status);
 
@@ -587,8 +566,9 @@ public:
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
+    DevicePairingDelegate * GetPairingDelegate() const { return mPairingDelegate; }
 
-    // AttributeCache::Callback impl
+    // ClusterStateCache::Callback impl
     void OnDone() override;
 
     // Commissioner will establish new device connections after PASE.
@@ -600,11 +580,6 @@ private:
     DeviceProxy * mDeviceBeingCommissioned               = nullptr;
     CommissioneeDeviceProxy * mDeviceInPASEEstablishment = nullptr;
 
-    /* This field is true when device pairing information changes, e.g. a new device is paired, or
-       the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
-       persist the device list */
-    bool mPairedDevicesUpdated;
-
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
     bool mRunCommissioningAfterConnection  = false;
 
@@ -613,8 +588,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
-    DeviceIPTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort                 = CHIP_UDC_PORT;
+    UdcTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort            = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
@@ -638,7 +613,7 @@ private:
     /* This function sends the operational credentials to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf,
+    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const Optional<ByteSpan> & icaCertBuf,
                                           AesCcm128KeySpan ipk, NodeId adminSubject);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a reference to the device object.
@@ -654,6 +629,7 @@ private:
     /* Callback when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, CHIP_ERROR error);
 
+    void ExtendArmFailSafeForFailedDeviceAttestation(Credentials::AttestationVerificationResult result);
     static void OnCertificateChainFailureResponse(void * context, CHIP_ERROR error);
     static void OnCertificateChainResponse(
         void * context, const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response);
@@ -709,6 +685,13 @@ private:
     static void OnCommissioningCompleteResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
+    static void OnDisarmFailsafe(void * context,
+                                 const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnDisarmFailsafeFailure(void * context, CHIP_ERROR error);
+    void DisarmDone();
+    static void OnArmFailSafeExtendedForFailedDeviceAttestation(
+        void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+    static void OnFailedToExtendedArmFailSafeFailedDeviceAttestation(void * context, CHIP_ERROR error);
 
     /**
      * @brief
@@ -719,10 +702,25 @@ private:
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
      * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
      * @param[in] dac               device attestation certificate
+     * @param[in] pai               Product Attestation Intermediate certificate
      * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature, ByteSpan dac,
-                          ByteSpan csrNonce);
+    CHIP_ERROR ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                          const ByteSpan & dac, const ByteSpan & pai, const ByteSpan & csrNonce);
+
+    /**
+     * @brief
+     *   This function validates the CSR information from the device.
+     *   (Reference: Specifications section 11.18.5.6. NOCSR Elements)
+     *
+     * @param[in] proxy           device proxy
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] csrNonce          certificate signing request nonce
+     */
+    CHIP_ERROR ValidateCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                           const ByteSpan & dac, const ByteSpan & csrNonce);
 
     /**
      * @brief
@@ -732,8 +730,8 @@ private:
 
     void HandleAttestationResult(CHIP_ERROR err);
 
-    CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const Transport::PeerAddress & peerAddress);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
     template <typename ClusterObjectT, typename RequestObjectT>
@@ -758,6 +756,18 @@ private:
 
     static CHIP_ERROR ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::OperationalCertStatus err);
 
+    // Sends commissioning complete callbacks to the delegate depending on the status. Sends
+    // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
+    void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
+
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
+    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
+    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
+    // to the PairingDelegate upon arm failsafe command completion.
+    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
@@ -770,9 +780,11 @@ private:
         nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
+    CompletionStatus commissioningCompletionStatus;
 
-    Platform::UniquePtr<app::AttributeCache> mAttributeCache;
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    Credentials::AttestationVerificationResult mAttestationResult;
 };
 
 } // namespace Controller

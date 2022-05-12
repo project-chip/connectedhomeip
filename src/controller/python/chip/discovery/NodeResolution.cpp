@@ -44,12 +44,12 @@ public:
 
             // TODO: For now, just provide addr 0, but this should really provide all and
             // allow the caller to choose.
-            mSuccessCallback(                                                            //
-                nodeData.mPeerId.GetCompressedFabricId(),                                //
-                nodeData.mPeerId.GetNodeId(),                                            //
-                nodeData.mInterfaceId.GetPlatformInterface(),                            //
-                nodeData.mAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
-                nodeData.mPort                                                           //
+            mSuccessCallback(                                                                            //
+                nodeData.operationalData.peerId.GetCompressedFabricId(),                                 //
+                nodeData.operationalData.peerId.GetNodeId(),                                             //
+                nodeData.resolutionData.interfaceId.GetPlatformInterface(),                              //
+                nodeData.resolutionData.ipAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
+                nodeData.resolutionData.port                                                             //
             );
         }
         else

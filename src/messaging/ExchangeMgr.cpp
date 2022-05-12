@@ -114,15 +114,16 @@ ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, Exc
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId,
+                                                                         UnsolicitedMessageHandler * handler)
 {
-    return RegisterUMH(protocolId, kAnyMessageType, delegate);
+    return RegisterUMH(protocolId, kAnyMessageType, handler);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
-                                                                     ExchangeDelegate * delegate)
+                                                                     UnsolicitedMessageHandler * handler)
 {
-    return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
+    return RegisterUMH(protocolId, static_cast<int16_t>(msgType), handler);
 }
 
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId)
@@ -135,9 +136,9 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, UnsolicitedMessageHandler * handler)
 {
-    UnsolicitedMessageHandler * selected = nullptr;
+    UnsolicitedMessageHandlerSlot * selected = nullptr;
 
     for (auto & umh : UMHandlerPool)
     {
@@ -148,7 +149,7 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
         }
         else if (umh.Matches(protocolId, msgType))
         {
-            umh.Delegate = delegate;
+            umh.Handler = handler;
             return CHIP_NO_ERROR;
         }
     }
@@ -156,7 +157,7 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
     if (selected == nullptr)
         return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
 
-    selected->Delegate    = delegate;
+    selected->Handler     = handler;
     selected->ProtocolId  = protocolId;
     selected->MessageType = msgType;
 
@@ -181,10 +182,10 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        const SessionHandle & session, const Transport::PeerAddress & source,
-                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
+                                        const SessionHandle & session, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
 {
-    UnsolicitedMessageHandler * matchingUMH = nullptr;
+    UnsolicitedMessageHandlerSlot * matchingUMH = nullptr;
 
     ChipLogProgress(ExchangeManager,
                     "Received message of type " ChipLogFormatMessageType " with protocolId " ChipLogFormatProtocolId
@@ -207,18 +208,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         mContextPool.ForEachActiveObject([&](auto * ec) {
             if (ec->MatchExchange(session, packetHeader, payloadHeader))
             {
-                // Found a matching exchange. Set flag for correct subsequent MRP
-                // retransmission timeout selection.
-                if (!ec->HasRcvdMsgFromPeer())
-                {
-                    ec->SetMsgRcvdFromPeer(true);
-                }
-
                 ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: %p",
                               ChipLogValueExchange(ec), ec->GetDelegate());
 
                 // Matched ExchangeContext; send to message handler.
-                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+                ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
                 found = true;
                 return Loop::Break;
             }
@@ -273,7 +267,20 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // handle the message.
     if (matchingUMH != nullptr || payloadHeader.NeedsAck())
     {
-        ExchangeDelegate * delegate = matchingUMH ? matchingUMH->Delegate : nullptr;
+        ExchangeDelegate * delegate = nullptr;
+
+        // Fetch delegate from the handler
+        if (matchingUMH != nullptr)
+        {
+            CHIP_ERROR err = matchingUMH->Handler->OnUnsolicitedMessageReceived(payloadHeader, delegate);
+            if (err != CHIP_NO_ERROR)
+            {
+                // Using same error message for all errors to reduce code size.
+                ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+                return;
+            }
+        }
+
         // If rcvd msg is from initiator then this exchange is created as not Initiator.
         // If rcvd msg is not from initiator then this exchange is created as Initiator.
         // Note that if matchingUMH is not null then rcvd msg if from initiator.
@@ -283,6 +290,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         if (ec == nullptr)
         {
+            if (matchingUMH != nullptr && delegate != nullptr)
+            {
+                matchingUMH->Handler->OnExchangeCreationFailed(delegate);
+            }
+
             // Using same error message for all errors to reduce code size.
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
             return;
@@ -298,7 +310,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
+        CHIP_ERROR err = ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, msgFlags, std::move(msgBuf));
         if (err != CHIP_NO_ERROR)
         {
             // Using same error message for all errors to reduce code size.

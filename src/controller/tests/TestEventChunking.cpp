@@ -32,6 +32,7 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -53,12 +54,17 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
+
+        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+        {
+            return FAILURE;
+        }
 
         chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
@@ -68,7 +74,7 @@ public:
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
                                                           sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
+                                                          gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
 
         return SUCCESS;
     }
@@ -82,6 +88,9 @@ public:
 
         return SUCCESS;
     }
+
+private:
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
 
 uint32_t gIterationCount = 0;
@@ -303,7 +312,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -317,7 +326,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
-    readParams.mEventNumber             = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     // Since we will always read from the first event, we only generate event once.
 
@@ -370,7 +379,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -388,7 +397,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
@@ -449,7 +458,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, 0, 0, Span<DataVersion>(dataVersionStorage));
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -467,7 +476,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
@@ -525,7 +534,7 @@ nlTestSuite sSuite =
 {
     "TestEventChunking",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

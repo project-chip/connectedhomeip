@@ -98,7 +98,7 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                                              uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
 
 class PythonServerDelegate // : public ServerDelegate
@@ -172,7 +172,12 @@ void pychip_server_native_init()
     uint16_t unsecurePort = CHIP_UDC_PORT;
 
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
+
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     // SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -190,14 +195,13 @@ void pychip_server_native_init()
 }
 
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
     if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
     {
         // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
-        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size,
-                                                           value);
+        gPythonServerDelegate.mPostAttributeChangeCallback(endpoint, clusterId, attributeId, manufacturerCode, type, size, value);
     }
     else
     {

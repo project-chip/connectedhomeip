@@ -14,9 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
 import("${build_root}/toolchain/flashable_executable.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${dir_pw_build}/python_action.gni")
 import("qpg_sdk.gni")
 
 # Run the generator script that takes a .HEX file and adds the OTA header to it.
@@ -41,7 +43,7 @@ template("gen_ota_header") {
                            "data_deps",
                          ])
 
-  action(target_name) {
+  pw_python_action(target_name) {
     outputs = [ ota_header_script_name ]
 
     args = ota_header_options
@@ -94,15 +96,29 @@ template("qpg_executable") {
 
   # If OTA requestor is enabled, generate OTA image from HEX
   if (chip_enable_ota_requestor) {
+    ota_image_name = invoker.output_name + ".ota"
+
     gen_ota_header("$executable_target_name.ota") {
-      ota_header_script_name = "${root_out_dir}/${executable_target_name}.ota"
+      ota_header_script_name = "${root_out_dir}/${ota_image_name}"
       out_dir = rebase_path(root_out_dir, root_build_dir)
       ota_header_generator = "${qpg_sdk_root}/Tools/ota/generate_ota_img.py"
 
       ota_header_options = [
-        rebase_path(chip_root, root_build_dir),
-        "${out_dir}/${invoker.output_name}.hex",
-        "${out_dir}/${invoker.output_name}.ota",
+        string_join("=",
+                    [
+                      "--chip_root",
+                      rebase_path(chip_root, root_build_dir),
+                    ]),
+        string_join("=",
+                    [
+                      "--in_file",
+                      "${out_dir}/${invoker.output_name}.hex",
+                    ]),
+        string_join("=",
+                    [
+                      "--out_file",
+                      "${out_dir}/${invoker.output_name}.ota",
+                    ]),
       ]
       deps = [ ":$executable_target_name" ]
     }

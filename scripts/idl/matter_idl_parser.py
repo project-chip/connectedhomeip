@@ -15,6 +15,30 @@ except:
     from matter_idl_types import *
 
 
+class AddServerClusterToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a server cluster to the given endpoint.
+    """
+
+    def __init__(self, cluster: ServerClusterInstantiation):
+        self.cluster = cluster
+
+    def apply(self, endpoint):
+        endpoint.server_clusters.append(self.cluster)
+
+
+class AddBindingToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a cluster binding to the given endpoint.
+    """
+
+    def __init__(self, name):
+        self.name = name
+
+    def apply(self, endpoint):
+        endpoint.client_bindings.append(self.name)
+
+
 class MatterIdlTransformer(Transformer):
     """
     A transformer capable to transform data parsed by Lark according to 
@@ -41,7 +65,7 @@ class MatterIdlTransformer(Transformer):
 
     """
 
-    def number(self, tokens):
+    def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
@@ -52,6 +76,20 @@ class MatterIdlTransformer(Transformer):
             return int(n[2:], 16)
         else:
             return int(n)
+
+    @v_args(inline=True)
+    def negative_integer(self, value):
+        return -value
+
+    @v_args(inline=True)
+    def integer(self, value):
+        return value
+
+    def bool_default_true(self, _):
+        return True
+
+    def bool_default_false(self, _):
+        return False
 
     def id(self, tokens):
         """An id is a string containing an identifier
@@ -104,9 +142,6 @@ class MatterIdlTransformer(Transformer):
     def attr_readonly(self, _):
         return AttributeTag.READABLE
 
-    def attr_global(self, _):
-        return AttributeTag.GLOBAL
-
     def attr_nosubscribe(self, _):
         return AttributeTag.NOSUBSCRIBE
 
@@ -118,12 +153,6 @@ class MatterIdlTransformer(Transformer):
 
     def debug_priority(self, _):
         return EventPriority.DEBUG
-
-    def endpoint_server_cluster(self, _):
-        return EndpointContentType.SERVER_CLUSTER
-
-    def endpoint_binding_to_cluster(self, _):
-        return EndpointContentType.CLIENT_BINDING
 
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
@@ -145,6 +174,21 @@ class MatterIdlTransformer(Transformer):
     def client_cluster(self, _):
         return ClusterSide.CLIENT
 
+    def command_access(self, privilege):
+        return privilege[0]
+
+    def command_with_access(self, args):
+        # Arguments
+        #   - optional access for invoke
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["invokeacl"] = args[0]
+
+        return init_args
+
     def command(self, args):
         # A command has 4 arguments if no input or
         # 5 arguments if input parameter is available
@@ -153,13 +197,89 @@ class MatterIdlTransformer(Transformer):
             param_in = args[2]
 
         return Command(
-            attributes=args[0], name=args[1], input_param=param_in, output_param=args[-2], code=args[-1])
+            attributes=args[0], input_param=param_in, output_param=args[-2], code=args[-1], **args[1])
+
+    def event_access(self, privilege):
+        return privilege[0]
+
+    def event_with_access(self, args):
+        # Arguments
+        #   - optional access for read
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["readacl"] = args[0]
+
+        return init_args
 
     def event(self, args):
-        return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
+        return Event(priority=args[0], code=args[2], fields=args[3:], **args[1])
+
+    def view_privilege(self, args):
+        return AccessPrivilege.VIEW
+
+    def operate_privilege(self, args):
+        return AccessPrivilege.OPERATE
+
+    def manage_privilege(self, args):
+        return AccessPrivilege.MANAGE
+
+    def administer_privilege(self, args):
+        return AccessPrivilege.ADMINISTER
+
+    def read_access(self, args):
+        return AttributeOperation.READ
+
+    def write_access(self, args):
+        return AttributeOperation.WRITE
+
+    @v_args(inline=True)
+    def attribute_access_entry(self, operation, access):
+        return (operation, access)
+
+    def attribute_access(self, value):
+        # return value as-is to not need to deal with trees in `attribute_with_access`
+        return value
+
+    def attribute_with_access(self, args):
+        # Input arguments are:
+        #   - acl (optional list of pairs operation + access)
+        #   - field definition
+        acl = {}
+        if len(args) > 1:
+            for operation, access in args[0]:
+                if operation == AttributeOperation.READ:
+                    acl['readacl'] = access
+                elif operation == AttributeOperation.WRITE:
+                    acl['writeacl'] = access
+                else:
+                    raise Exception("Unknown attribute operation: %r" % operation)
+
+        return (args[-1], acl)
+
+    def ram_attribute(self, _):
+        return AttributeStorage.RAM
+
+    def persist_attribute(self, _):
+        return AttributeStorage.PERSIST
+
+    def callback_attribute(self, _):
+        return AttributeStorage.CALLBACK
+
+    @v_args(inline=True)
+    def endpoint_attribute_instantiation(self, storage, id, default=None):
+        return AttributeInstantiation(name=id, storage=storage, default=default)
+
+    def ESCAPED_STRING(self, s):
+        # handle escapes, skip the start and end quotes
+        return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
     def attribute(self, args):
         tags = set(args[:-1])
+        (definition, acl) = args[-1]
+
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
         # read/write
@@ -167,7 +287,7 @@ class MatterIdlTransformer(Transformer):
             tags.add(AttributeTag.READABLE)
             tags.add(AttributeTag.WRITABLE)
 
-        return Attribute(definition=args[-1], tags=tags)
+        return Attribute(definition=definition, tags=tags, **acl)
 
     @v_args(inline=True)
     def struct(self, id, *fields):
@@ -179,27 +299,25 @@ class MatterIdlTransformer(Transformer):
         return value
 
     @v_args(inline=True)
-    def response_struct(self, value):
-        value.tag = StructTag.RESPONSE
-        return value
+    def response_struct(self, id, code, *fields):
+        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
 
     @v_args(inline=True)
-    def endpoint(self, number, *clusters):
+    def endpoint(self, number, *transforms):
         endpoint = Endpoint(number=number)
 
-        for t, name in clusters:
-            if t == EndpointContentType.CLIENT_BINDING:
-                endpoint.client_bindings.append(name)
-            elif t == EndpointContentType.SERVER_CLUSTER:
-                endpoint.server_clusters.append(name)
-            else:
-                raise Error("Unknown endpoint content: %r" % t)
+        for t in transforms:
+            t.apply(endpoint)
 
         return endpoint
 
     @v_args(inline=True)
-    def endpoint_cluster(self, t, id):
-        return (t, id)
+    def endpoint_cluster_binding(self, id):
+        return AddBindingToEndpointTransform(id)
+
+    @v_args(inline=True)
+    def endpoint_server_cluster(self, id, *attributes):
+        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(name=id, attributes=list(attributes)))
 
     @v_args(inline=True)
     def cluster(self, side, name, code, *content):
@@ -253,6 +371,7 @@ if __name__ == '__main__':
     # The ability to run is for debug and to print out the parsed AST.
     import click
     import coloredlogs
+    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -279,6 +398,6 @@ if __name__ == '__main__':
         logging.info("Parse completed")
 
         logging.info("Data:")
-        print(data)
+        pprint.pp(data)
 
     main()

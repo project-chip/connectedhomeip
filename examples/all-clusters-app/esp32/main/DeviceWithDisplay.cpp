@@ -196,6 +196,30 @@ public:
                 ESP_LOGI(TAG, "SystemMode changed to : %d", n);
                 app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Set(1, n);
             }
+            else if (name == "Current Lift")
+            {
+                // update the current lift here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Current position lift percent 100ths changed to : %d", n * 100);
+                app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
+            }
+            else if (name == "Current Tilt")
+            {
+                // update the current tilt here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Current position tilt percent 100ths changed to : %d", n * 100);
+                app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(n * 100));
+            }
+            else if (name == "Opr Status")
+            {
+                // update the operational status here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Operational status changed to : %d", n);
+                app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, static_cast<uint8_t>(n));
+            }
+            else if (name == "Bat remaining")
+            {
+                // update the battery percent remaining here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);
+                app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::Set(1, static_cast<uint8_t>(n * 2));
+            }
             value = buffer;
         }
         else if (IsBooleanAttribute())
@@ -223,17 +247,46 @@ public:
         else
         {
             auto & name    = std::get<0>(attribute);
-            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
+            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[0]);
 
             ESP_LOGI(TAG, "editing attribute as string: '%s' (%s)", value.c_str(), i == 0 ? "+" : "-");
-            value = (value == "Closed") ? "Open" : "Closed";
             ESP_LOGI(TAG, "name and cluster: '%s' (%s)", name.c_str(), cluster.c_str());
             if (name == "State" && cluster == "Lock")
             {
+                value = (value == "Closed") ? "Open" : "Closed";
                 using namespace chip::app::Clusters;
                 // update the doorlock attribute here
                 auto attributeValue = value == "Closed" ? DoorLock::DlLockState::kLocked : DoorLock::DlLockState::kUnlocked;
                 DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, attributeValue);
+            }
+            else if (name == "Charge level" && cluster == "Power Source")
+            {
+                using namespace chip::app::Clusters::PowerSource;
+                auto attributeValue = BatChargeLevel::kOk;
+
+                if (value == "OK")
+                {
+                    value          = "Warning";
+                    attributeValue = BatChargeLevel::kWarning;
+                }
+                else if (value == "Warning")
+                {
+                    value          = "Critical";
+                    attributeValue = BatChargeLevel::kCritical;
+                }
+                else
+                {
+                    value          = "OK";
+                    attributeValue = BatChargeLevel::kOk;
+                }
+
+                // update the battery charge level here for hardcoded endpoint 1
+                ESP_LOGI(TAG, "Battery charge level changed to : %u", static_cast<uint8_t>(attributeValue));
+                app::Clusters::PowerSource::Attributes::BatteryChargeLevel::Set(1, static_cast<uint8_t>(attributeValue));
+            }
+            else
+            {
+                value = (value == "Closed") ? "Open" : "Closed";
             }
         }
     }
@@ -391,8 +444,9 @@ public:
         else if (i == 2)
         {
             chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-            chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
-                CommissioningWindowManager::MaxCommissioningTimeout(), CommissioningWindowAdvertisement::kDnssdOnly);
+            auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+            commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                       CommissioningWindowAdvertisement::kDnssdOnly);
         }
     }
 
@@ -520,6 +574,24 @@ void SetupPretendDevices()
     app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, 200);
     AddAttribute("Current Saturation\n", "150");
     app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, 150);
+
+    AddDevice("Window Covering");
+    AddEndpoint("1");
+    AddCluster("Window Covering");
+    AddAttribute("Current Lift", "5");
+    app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
+    AddAttribute("Current Tilt", "5");
+    app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Set(1, static_cast<uint16_t>(5 * 100));
+    AddAttribute("Opr Status", "0");
+    app::Clusters::WindowCovering::Attributes::OperationalStatus::Set(1, static_cast<uint8_t>(0));
+
+    AddDevice("Battery");
+    AddEndpoint("1");
+    AddCluster("Power Source");
+    AddAttribute("Bat remaining", "70");
+    app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::Set(1, static_cast<uint8_t>(70 * 2));
+    AddAttribute("Charge level", "0");
+    app::Clusters::PowerSource::Attributes::BatteryChargeLevel::Set(1, static_cast<uint8_t>(0));
 }
 
 esp_err_t InitM5Stack(std::string qrCodeText)

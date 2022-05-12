@@ -40,6 +40,17 @@ public:
     static const char kConfigNamespace_ChipFactory[];
     static const char kConfigNamespace_ChipConfig[];
     static const char kConfigNamespace_ChipCounters[];
+    static const char kConfigNamespace_ChipFabric1[];
+    static const char kConfigNamespace_ChipFabric2[];
+    static const char kConfigNamespace_ChipFabric3[];
+    static const char kConfigNamespace_ChipFabric4[];
+    static const char kConfigNamespace_ChipFabric5[];
+    static const char kConfigNamespace_ChipACL[];
+    static const char kConfigNamespace_ChipAttributes[];
+    static const char kConfigNamespace_ChipBindingTable[];
+    static const char kConfigNamespace_ChipOTA[];
+    static const char kConfigNamespace_ChipDNS[];
+    static const char kConfigNamespace_ChipOthers[];
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
@@ -50,12 +61,9 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
@@ -66,7 +74,6 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
@@ -77,8 +84,6 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
-
-    static const char kGroupKeyNamePrefix[];
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
@@ -96,6 +101,7 @@ public:
     static bool ConfigValueExists(Key key);
 
     static CHIP_ERROR EnsureNamespace(const char * ns);
+    static CHIP_ERROR EnsureNamespace2(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);

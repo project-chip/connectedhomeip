@@ -18,8 +18,11 @@
 
 #include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <app/util/mock/Constants.h>
+#include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -59,6 +62,11 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
+    if (aPath.mClusterId >= Test::kMockEndpointMin)
+    {
+        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+    }
+
     if (responseDirective == kSendDataResponse)
     {
         if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
@@ -66,8 +74,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath, 0 /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
+                                               kDataVersion /* data version */, aIsFabricFiltered, state);
 
             return valueEncoder.EncodeList([aSubjectDescriptor](const auto & encoder) -> CHIP_ERROR {
                 app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
@@ -78,79 +86,78 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                 return CHIP_NO_ERROR;
             });
         }
-        else if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
-                 aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
+        if (aPath.mClusterId == app::Clusters::TestCluster::Id &&
+            aPath.mAttributeId == app::Clusters::TestCluster::Attributes::Int16u::Id)
         {
             AttributeValueEncoder::AttributeEncodeState state =
                 (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath, 0 /* data version */,
-                                               aIsFabricFiltered, state);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, aPath,
+                                               kDataVersion /* data version */, aIsFabricFiltered, state);
 
             return valueEncoder.Encode(++totalReadCount);
         }
-        else
-        {
-            AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-            ReturnErrorOnFailure(aAttributeReports.GetError());
-            AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
-            ReturnErrorOnFailure(attributeReport.GetError());
-            TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
-            TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
-            value = valueBuf;
-
-            uint8_t i = 0;
-            for (auto & item : valueBuf)
-            {
-                item.fabricIndex = i;
-                i++;
-            }
-
-            attributeData.DataVersion(kDataVersion);
-            ReturnErrorOnFailure(attributeData.GetError());
-            AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-            attributePath.Endpoint(aPath.mEndpointId)
-                .Cluster(aPath.mClusterId)
-                .Attribute(aPath.mAttributeId)
-                .EndOfAttributePathIB();
-            ReturnErrorOnFailure(attributePath.GetError());
-
-            ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
-                                                   TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
-            ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
-            return attributeReport.EndOfAttributeReportIB().GetError();
-        }
-    }
-    else
-    {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
-        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+        AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
+        ReturnErrorOnFailure(attributeReport.GetError());
+        TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+        TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
+
+        value = valueBuf;
+
+        uint8_t i = 0;
+        for (auto & item : valueBuf)
+        {
+            item.fabricIndex = i;
+            i++;
+        }
+
+        attributeData.DataVersion(kDataVersion);
+        ReturnErrorOnFailure(attributeData.GetError());
+        AttributePathIB::Builder & attributePath = attributeData.CreatePath();
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
-        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatus.GetError());
+        ReturnErrorOnFailure(
+            DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReports.GetError());
+    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+    AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePath.GetError());
+
+    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatus.GetError());
+    errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+    attributeStatus.EndOfAttributeStatusIB();
+    ReturnErrorOnFailure(attributeStatus.GetError());
+
+    return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredDataVersion)
+bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
-    if (aRequiredDataVersion == kDataVersion)
+    if (aRequiredVersion == kDataVersion)
     {
         return true;
     }
-    else
+    if (Test::GetVersion() == aRequiredVersion)
     {
-        return false;
+        return true;
     }
+
+    return false;
+}
+
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
+{
+    return false;
 }
 } // namespace app
 } // namespace chip
@@ -178,6 +185,9 @@ public:
     static void TestReadHandler_SubscriptionAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
+    static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext);
 
 private:
     static constexpr uint16_t kTestMinInterval = 33;
@@ -191,7 +201,6 @@ private:
         {
             ReturnErrorOnFailure(aReadHandler.SetReportingIntervals(kTestMinInterval, kTestMaxInterval));
         }
-
         return CHIP_NO_ERROR;
     }
 
@@ -207,13 +216,59 @@ private:
     // of reads in parallel and wait for them all to succeed.
     static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
 
-private:
     bool mEmitSubscriptionError      = false;
     int32_t mNumActiveSubscriptions  = 0;
     bool mAlterSubscriptionIntervals = false;
 };
 
 TestReadInteraction gTestReadInteraction;
+
+class MockInteractionModelApp : public chip::app::ClusterStateCache::Callback
+{
+public:
+    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+                     const chip::app::StatusIB * apStatus) override
+    {}
+
+    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
+                         const chip::app::StatusIB & status) override
+    {
+        if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
+        {
+            mNumAttributeResponse++;
+        }
+    }
+
+    void OnError(CHIP_ERROR aError) override
+    {
+        mError     = aError;
+        mReadError = true;
+    }
+
+    void OnDone() override {}
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpAttributePathParamsList;
+        }
+
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpEventPathParamsList;
+        }
+
+        if (aReadPrepareParams.mpDataVersionFilterList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpDataVersionFilterList;
+        }
+    }
+
+    int mNumAttributeResponse = 0;
+    bool mReadError           = false;
+    CHIP_ERROR mError         = CHIP_NO_ERROR;
+};
 
 void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext)
 {
@@ -298,6 +353,452 @@ void TestReadInteraction::TestReadDataVersionFilter(nlTestSuite * apSuite, void 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && !onFailureCbInvoked);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    responseDirective = kSendDataResponse;
+
+    MockInteractionModelApp delegate;
+    chip::app::ClusterStateCache cache(delegate);
+
+    chip::app::EventPathParams eventPathParams[100];
+    for (uint32_t index = 0; index < 100; index++)
+    {
+        eventPathParams[index].mEndpointId = Test::kMockEndpoint3;
+        eventPathParams[index].mClusterId  = Test::MockClusterId(2);
+        eventPathParams[index].mEventId    = 0;
+    }
+
+    chip::app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mMinIntervalFloorSeconds   = 0;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 4;
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    int testId = 0;
+    // Read of E2C3A1, E2C3A2 and E3C2A2.
+    // Expect no versions would be cached.
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E*C2A2, E2C2A2 and E3C2A2 where 2nd, 3rd concrete paths are part of first wildcard path, would be deduplicate,
+    // E*C2A2 don't have wildcard attribute so no version would be cached.
+    // Expect no versions would be cached.
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kInvalidEndpointId;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // read of E2C2A* and E3C2A2. We cannot use the stored data versions in the cache since there is no cached version from
+    // previous test. Expect cache E2C2 version
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E2C3A1, E2C3A2, and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A1
+    // path intersects with previous cached data version Expect no E2C3 attributes in report, only E3C2A1 attribute in report
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E2C3A* and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A* path
+    // intersects with previous cached data version Expect no C1 attributes in report, only E3C2A2 attribute in report
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    Test::BumpVersion();
+
+    // Read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A*
+    // path intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in
+    // report, and invalidate the cached pending and committed data version since no wildcard attributes exists in mRequestPathSet.
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E2C3A1, E2C3A2 and E3C2A2. It would use none stored data versions in the cache since previous read does not
+    // cache any committed data version. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in report
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[0].mAttributeId = Test::MockAttributeId(1);
+
+        attributePathParams1[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams1[1].mAttributeId = Test::MockAttributeId(2);
+
+        attributePathParams1[2].mEndpointId  = Test::kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = Test::MockClusterId(2);
+        attributePathParams1[2].mAttributeId = Test::MockAttributeId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version1.HasValue());
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E2C3A* and E3C2A2, here there is no cached data version filter
+    // Expect E2C3A* attributes in report, and E3C2A2 attribute in report and cache latest data version
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E2C3A* and E3C2A2, and inject a large amount of event path list, then it would try to apply previous cache
+    // latest data version and construct data version list but no enough memory, finally fully rollback data version filter. Expect
+    // E2C3A* attributes in report, and E3C2A2 attribute in report
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+
+        readPrepareParams.mpEventPathParamsList    = eventPathParams;
+        readPrepareParams.mEventPathParamsListSize = 64;
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+        delegate.mNumAttributeResponse             = 0;
+        readPrepareParams.mpEventPathParamsList    = nullptr;
+        readPrepareParams.mEventPathParamsListSize = 0;
+    }
+
+    Test::BumpVersion();
+
+    // Read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has
+    // changed in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+
+        chip::app::AttributePathParams attributePathParams3[3];
+        attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams3[1].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[2].mEndpointId            = Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = Test::MockClusterId(2);
+        attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+
+        err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        // E1C2A* has 3 attributes and E2C3A* has 5 attributes and E2C2A* has 4 attributes
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 12);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 2));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version2.HasValue() && (version2.Value() == 2));
+        Optional<DataVersion> version3;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint1, Test::MockClusterId(2), version3) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version3.HasValue() && (version3.Value() == 2));
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    // Read of E1C2A*(3 attributes) and E2C3A*(5 attributes) and E2C2A*(4 attributes), and inject a large amount of event path
+    // list, then it would try to apply previous cache latest data version and construct data version list with the ordering from
+    // largest cluster size to smallest cluster size(C2, C3, C1) but no enough memory, finally partially rollback data version
+    // filter with only C2. Expect E1C2A*, E2C2A* attributes(7 attributes) in report,
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+
+        chip::app::AttributePathParams attributePathParams3[3];
+        attributePathParams3[0].mEndpointId  = Test::kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = Test::MockClusterId(2);
+        attributePathParams3[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[1].mEndpointId  = Test::kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = Test::MockClusterId(3);
+        attributePathParams3[1].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams3[2].mEndpointId            = Test::kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = Test::MockClusterId(2);
+        attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
+        readPrepareParams.mAttributePathParamsListSize = 3;
+        readPrepareParams.mpEventPathParamsList        = eventPathParams;
+        readPrepareParams.mEventPathParamsListSize     = 62;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 7);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 2));
+        Optional<DataVersion> version2;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version2.HasValue() && (version2.Value() == 2));
+        Optional<DataVersion> version3;
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint1, Test::MockClusterId(2), version3) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version3.HasValue() && (version3.Value() == 2));
+        delegate.mNumAttributeResponse             = 0;
+        readPrepareParams.mpEventPathParamsList    = nullptr;
+        readPrepareParams.mEventPathParamsListSize = 0;
+    }
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
@@ -457,11 +958,16 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     {
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
                            onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
     }
 
-    ctx.DrainAndServiceIO();
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
+            numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
+    });
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -786,7 +1292,16 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
                            onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
-    ctx.DrainAndServiceIO();
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
+        return numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
+            numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
+    });
+
+    ChipLogError(Zcl, "Success call cnt: %u (expect %u) subscription cnt: %u (expect %u)", numSuccessCalls,
+                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1), numSubscriptionEstablishedCalls,
+                 uint32_t(CHIP_IM_MAX_NUM_READ_HANDLER + 1));
 
     NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
     NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
@@ -997,6 +1512,317 @@ void TestReadInteraction::TestReadFabricScopedWithFabricFilter(nlTestSuite * apS
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+namespace SubscriptionPathQuotaHelpers {
+class TestReadCallback : public app::ReadClient::Callback
+{
+public:
+    TestReadCallback() {}
+    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                         const app::StatusIB & aStatus) override
+    {
+        if (apData != nullptr)
+        {
+            mAttributeCount++;
+        }
+    }
+
+    void OnDone() override { mOnDone++; }
+
+    void OnReportEnd() override { mOnReportEnd++; }
+
+    void OnError(CHIP_ERROR aError) override
+    {
+        mOnError++;
+        mLastError = aError;
+    }
+
+    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
+
+    void ClearCounters()
+    {
+        mAttributeCount                 = 0;
+        mOnReportEnd                    = 0;
+        mOnSubscriptionEstablishedCount = 0;
+        mOnDone                         = 0;
+        mOnError                        = 0;
+        mLastError                      = CHIP_NO_ERROR;
+    }
+
+    int32_t mAttributeCount                 = 0;
+    int32_t mOnReportEnd                    = 0;
+    int32_t mOnSubscriptionEstablishedCount = 0;
+    int32_t mOnDone                         = 0;
+    int32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
+};
+
+void EstablishSubscriptions(nlTestSuite * apSuite, SessionHandle sessionHandle, int32_t numSubs, int32_t pathPerSub,
+                            app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
+{
+    std::vector<app::AttributePathParams> attributePaths(
+        pathPerSub, app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id));
+
+    app::ReadPrepareParams readParams(sessionHandle);
+    readParams.mpAttributePathParamsList    = attributePaths.data();
+    readParams.mAttributePathParamsListSize = pathPerSub;
+    readParams.mMaxIntervalCeilingSeconds   = 1;
+    readParams.mKeepSubscriptions           = true;
+
+    for (int32_t i = 0; i < numSubs; i++)
+    {
+        std::unique_ptr<app::ReadClient> readClient = std::make_unique<app::ReadClient>(
+            app::InteractionModelEngine::GetInstance(), app::InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback,
+            app::ReadClient::InteractionType::Subscribe);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        readClients.push_back(std::move(readClient));
+    }
+}
+
+} // namespace SubscriptionPathQuotaHelpers
+
+void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    const int32_t kExpectedParallelSubs =
+        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
+    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    TestReadCallback readCallback;
+    TestReadCallback readCallbackFabric2;
+    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+
+    // Intentially establish subscriptions using exceeded resources.
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1, &readCallback, readClients);
+    EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs,
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallback, readClients);
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                    [&]() { return readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1; });
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount ==
+                       static_cast<int32_t>(kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                                            app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1));
+    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1);
+
+    // We have set up the environment for testing the evicting logic.
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        TestReadCallback callback;
+        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                               app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1, &callback, outReadClient);
+
+        ctx.DrainAndServiceIO();
+
+        // Over-sized request after used all paths will receive Paths Exhausted status code.
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+    }
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                               app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallback, readClients);
+
+        readCallback.ClearCounters();
+        ctx.DrainAndServiceIO();
+
+        // This read handler should evict some existing subscriptions for enough space
+        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
+    }
+
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+    readCallback.ClearCounters();
+
+    ctx.DrainAndServiceIO();
+    // Ensure the global dirty set is cleared.
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetReportingEngine().GetGlobalDirtySetSize() == 0);
+
+    // We should evict the subscriptions with excess resources, so we should use exactly all resources.
+    NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == kExpectedParallelPaths);
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
+                       static_cast<uint32_t>(kExpectedParallelSubs));
+
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
+                       app::ReadHandler::InteractionType::Subscribe, ctx.GetAliceFabricIndex()) >
+                       app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+
+    // The following check will trigger the logic in im to kill the read handlers that use more paths than the limit per fabric.
+    {
+        EstablishSubscriptions(apSuite, ctx.GetSessionAliceToBob(),
+                               app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric,
+                               app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallbackFabric2, readClients);
+
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                        [&]() { return readCallbackFabric2.mOnSubscriptionEstablishedCount == 1; });
+
+        // This read handler should evict some existing subscriptions for enough space
+        NL_TEST_ASSERT(apSuite,
+                       readCallbackFabric2.mOnSubscriptionEstablishedCount ==
+                           app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+        NL_TEST_ASSERT(apSuite,
+                       readCallbackFabric2.mAttributeCount ==
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                               app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    }
+
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+    readCallback.ClearCounters();
+    readCallbackFabric2.ClearCounters();
+
+    // Run until the global dirtyset is cleared.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), []() {
+        return app::InteractionModelEngine::GetInstance()->GetReportingEngine().GetGlobalDirtySetSize() == 0 &&
+            app::InteractionModelEngine::GetInstance()->GetReportingEngine().GetNumReportsInFlight() == 0;
+    });
+
+    // Some subscriptions on fabric 1 should be evicted since fabric 1 is using more resources than the limits.
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount ==
+                       app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                           app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    NL_TEST_ASSERT(apSuite,
+                   readCallbackFabric2.mAttributeCount ==
+                       app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                           app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
+                       app::ReadHandler::InteractionType::Subscribe, ctx.GetAliceFabricIndex()) ==
+                       app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
+                       app::ReadHandler::InteractionType::Subscribe, ctx.GetBobFabricIndex()) ==
+                       app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    // Shutdown all clients
+    readClients.clear();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+}
+
+void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace SubscriptionPathQuotaHelpers;
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    const int32_t kExpectedParallelSubs =
+        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
+    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    TestReadCallback readCallback;
+    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+
+    // This should just use all availbale resources.
+    EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs,
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallback, readClients);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   readCallback.mAttributeCount ==
+                       kExpectedParallelSubs *
+                           static_cast<int32_t>(app::InteractionModelEngine::kMinSupportedPathsPerSubscription));
+    NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs);
+    NL_TEST_ASSERT(apSuite,
+                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
+                       static_cast<size_t>(kExpectedParallelSubs));
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        TestReadCallback callback;
+        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                               app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1, &callback, outReadClient);
+
+        ctx.DrainAndServiceIO();
+
+        // Over-sized request after used all paths will receive Paths Exhausted status code.
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+    }
+
+    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    {
+        EstablishSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
+                               app::InteractionModelEngine::kMinSupportedPathsPerSubscription, &readCallback, readClients);
+        readCallback.ClearCounters();
+
+        ctx.DrainAndServiceIO();
+
+        // This read handler should evict some existing subscriptions for enough space
+        NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
+        NL_TEST_ASSERT(apSuite,
+                       app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
+                           static_cast<size_t>(kExpectedParallelSubs));
+    }
+
+    {
+        app::AttributePathParams path;
+        path.mEndpointId  = kTestEndpointId;
+        path.mClusterId   = TestCluster::Id;
+        path.mAttributeId = TestCluster::Attributes::Int16u::Id;
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+    }
+    readCallback.ClearCounters();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount <= kExpectedParallelPaths);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    ctx.DrainAndServiceIO();
+
+    // Shutdown all clients
+    readClients.clear();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -1016,6 +1842,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals),
+    NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
+    NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
+    NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -1025,7 +1854,7 @@ nlTestSuite sSuite =
 {
     "TestRead",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

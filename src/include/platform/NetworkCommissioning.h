@@ -29,6 +29,8 @@
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
+
 #include <limits>
 
 namespace chip {
@@ -73,36 +75,6 @@ protected:
     Iterator() = default;
 };
 
-/**
- * The content should match the one in zap_generated/cluster-objects.h.
- * Matching is validated by cluster code.
- */
-enum class Status : uint8_t
-{
-    kSuccess                = 0x00,
-    kOutOfRange             = 0x01,
-    kBoundsExceeded         = 0x02,
-    kNetworkIDNotFound      = 0x03,
-    kDuplicateNetworkID     = 0x04,
-    kNetworkNotFound        = 0x05,
-    kRegulatoryError        = 0x06,
-    kAuthFailure            = 0x07,
-    kUnsupportedSecurity    = 0x08,
-    kOtherConnectionFailure = 0x09,
-    kIPV6Failed             = 0x0A,
-    kIPBindFailed           = 0x0B,
-    kUnknownError           = 0x0C,
-};
-
-enum class WiFiBand : uint8_t
-{
-    k2g4  = 0x00,
-    k3g65 = 0x01,
-    k5g   = 0x02,
-    k6g   = 0x03,
-    k60g  = 0x04,
-};
-
 // The following structs follows the generated cluster object structs.
 struct Network
 {
@@ -117,12 +89,12 @@ static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network
 struct WiFiScanResponse
 {
 public:
-    uint8_t security;
+    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurity> security;
     uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     uint8_t ssidLen;
     uint8_t bssid[6];
     uint16_t channel;
-    WiFiBand wiFiBand;
+    app::Clusters::NetworkCommissioning::WiFiBand wiFiBand;
     int8_t rssi;
 };
 
@@ -131,7 +103,7 @@ static_assert(sizeof(WiFiScanResponse::ssid) <= std::numeric_limits<decltype(WiF
 
 struct ThreadScanResponse
 {
-    uint64_t panId;
+    uint16_t panId;
     uint64_t extendedPanId;
     char networkName[16];
     uint8_t networkNameLen;
@@ -148,6 +120,9 @@ static_assert(sizeof(ThreadScanResponse::networkName) <= std::numeric_limits<dec
 using NetworkIterator            = Iterator<Network>;
 using WiFiScanResponseIterator   = Iterator<WiFiScanResponse>;
 using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
+using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
+using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBand;
+using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurity;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
@@ -231,8 +206,26 @@ public:
     virtual uint8_t GetScanNetworkTimeoutSeconds()    = 0;
     virtual uint8_t GetConnectNetworkTimeoutSeconds() = 0;
 
-    virtual Status RemoveNetwork(ByteSpan networkId)                 = 0;
-    virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index) = 0;
+    /**
+     * @brief Remove a network from the device. The driver should fill the outDebugText field to pass any human-readable messages to
+     * the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug text needs to
+     * be delivered. On success, the driver should set outNetworkIndex to the index of the network just removed. The value of
+     * network index is discarded on failure.
+     *
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
+
+    /**
+     * @brief Reorder the networks on the device. The driver should fill the outDebugText field to pass any human-readable messages
+     * to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug text needs
+     * to be delivered.
+     *
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText) = 0;
 
     /**
      * @brief Initializes a network join. callback->OnResult must be called, on both success and error. Callback can be
@@ -261,13 +254,24 @@ public:
         virtual ~ScanCallback() = default;
     };
 
-    virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials) = 0;
+    /**
+     * @brief Adds or updates a WiFi network on the device. The driver should fill the outDebugText field to pass any human-readable
+     * messages to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response when no debug
+     * text needs to be delivered. On success, the driver should set outNetworkIndex to the index of the network just added or
+     * updated. The value of network index is discarded on failure.
+     *
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                      uint8_t & outNetworkIndex) = 0;
 
     /**
      * @brief Initializes a WiFi network scan. callback->OnFinished must be called, on both success and error. Callback can
      * be called inside ScanNetworks.
      *
-     * @param ssid    The interested SSID, the scanning MAY be restricted to to the given SSID.
+     * @param ssid        The interested SSID, the scanning SHALL be restricted to the given SSID if the ssid is not empty (i.e.
+     *                    ssid.empty() is false).
      * @param callback    Callback that will be invoked upon finishing the scan
      */
     virtual void ScanNetworks(ByteSpan ssid, ScanCallback * callback) = 0;
@@ -294,7 +298,16 @@ public:
         virtual ~ScanCallback() = default;
     };
 
-    virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset) = 0;
+    /**
+     * @brief Adds or updates a Thread network on the device. The driver should fill the outDebugText field to pass any
+     * human-readable messages to the client. The driver should reduce the size of outDebugText to 0 to omit it from the response
+     * when no debug text needs to be delivered. On success, the driver should set outNetworkIndex to the index of the network just
+     * added or updated. The value of the network index is discarded on failure.
+     *
+     * Note: The capacity of outDebugText passed by network commissioning cluster can be configured via
+     * CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE.
+     */
+    virtual Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) = 0;
 
     /**
      * @brief Initializes a Thread network scan. callback->OnFinished must be called, on both success and error. Callback can

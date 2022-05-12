@@ -27,7 +27,7 @@ namespace Transport {
 class IncomingGroupSession : public Session
 {
 public:
-    IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId sourceNodeId) : mGroupId(group), mSourceNodeId(sourceNodeId)
+    IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId peerNodeId) : mGroupId(group), mPeerNodeId(peerNodeId)
     {
         SetFabricIndex(fabricIndex);
     }
@@ -38,7 +38,8 @@ public:
     const char * GetSessionTypeString() const override { return "incoming group"; };
 #endif
 
-    ScopedNodeId GetPeer() const override { return ScopedNodeId(mSourceNodeId, GetFabricIndex()); }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(kUndefinedNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -58,6 +59,8 @@ public:
         return cfg;
     }
 
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
+
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         VerifyOrDie(false);
@@ -66,11 +69,9 @@ public:
 
     GroupId GetGroupId() const { return mGroupId; }
 
-    NodeId GetSourceNodeId() const { return mSourceNodeId; }
-
 private:
     const GroupId mGroupId;
-    const NodeId mSourceNodeId;
+    const NodeId mPeerNodeId;
 };
 
 class OutgoingGroupSession : public Session
@@ -84,7 +85,10 @@ public:
     const char * GetSessionTypeString() const override { return "outgoing group"; };
 #endif
 
+    // Peer node ID is unused: users care about the group, not the node
     ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    // Local node ID is unused: users care about the group, not the node
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
@@ -99,6 +103,8 @@ public:
         VerifyOrDie(false);
         return cfg;
     }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {

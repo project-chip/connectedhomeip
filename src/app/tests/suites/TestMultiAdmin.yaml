@@ -34,9 +34,15 @@ config:
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -49,6 +55,19 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Commission from alpha when the commissioning window is not opened"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeIdForDuplicateCommissioning
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
 
     - label: "Open Commissioning Window from alpha"
       cluster: "AdministratorCommissioning"
@@ -63,13 +82,15 @@ tests:
       identity: "alpha"
       cluster: "CommissionerCommands"
       command: "PairWithQRCode"
-      additionalArguments: ", CHIP_ERROR_FABRIC_EXISTS"
       arguments:
           values:
               - name: "nodeId"
                 value: nodeIdForDuplicateCommissioning
               - name: "payload"
                 value: payload
+      response:
+          error: FAILURE
+          clusterError: 0x09 #OperationalCertStatus::kFabricConflict
 
     - label: "Check that we just have the one fabric and did not add a new one"
       identity: "alpha"

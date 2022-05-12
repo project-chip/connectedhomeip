@@ -17,11 +17,19 @@
  */
 
 #include "TvCastingApp-JNI.h"
+#include "CastingServer.h"
+#include "JNIDACProvider.h"
+
+#include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/InetInterface.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 
@@ -79,8 +87,67 @@ JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app)
     TvCastingAppJNIMgr().InitializeWithObjects(app);
 }
 
-// TBD: Temp dummy function for testing
-JNI_METHOD(void, doSomethingInCpp)(JNIEnv *, jobject, jint endpoint)
+JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD doSomethingInCpp called with endpoint %d", endpoint);
+    if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
+    {
+        JNIDACProvider * p = new JNIDACProvider(provider);
+        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
+    }
+}
+
+JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint duration)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
+
+    CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject, jstring addressJStr, jint port)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD sendUserDirectedCommissioningRequest called with port %d", port);
+    Inet::IPAddress addressInet;
+    JniUtfString addressJniString(env, addressJStr);
+    if (Inet::IPAddress::FromString(addressJniString.c_str(), addressInet) == false)
+    {
+        ChipLogError(AppServer, "Failed to parse IP address");
+        return false;
+    }
+
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::FromIPAddress(addressInet);
+    chip::Transport::PeerAddress peerAddress =
+        chip::Transport::PeerAddress::UDP(addressInet, static_cast<uint16_t>(port), interfaceId);
+    CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(peerAddress);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingServer::SendUserDirectedCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
+}
+
+JNI_METHOD(jboolean, discoverCommissioners)(JNIEnv *, jobject)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD discoverCommissioners called");
+    CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingServer::DiscoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(void, initServer)(JNIEnv *, jobject)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD initServer called");
+    CastingServer::GetInstance()->InitServer();
 }

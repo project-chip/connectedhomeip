@@ -79,6 +79,8 @@
 /** @name Attribute Storage */
 // @{
 
+static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
+
 /**
  * @brief locate attribute metadata
  *
@@ -88,12 +90,11 @@
  * @param endpoint Zigbee endpoint number.
  * @param clusterId Cluster ID of the sought cluster.
  * @param attributeId Attribute ID of the sought attribute.
- * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
  *
  * @return Returns pointer to the attribute metadata location.
  */
 const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                chip::AttributeId attributeId, uint8_t mask);
+                                                                chip::AttributeId attributeId);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
@@ -144,37 +145,14 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * over the air. Because this function is being called locally
  * it assumes that the device knows what it is doing and has permission
  * to perform the given operation.
- *
- * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
  */
-EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
+EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-/**
- * @brief write a cluster server attribute.
- *
- * This function is the same as emberAfWriteAttribute
- * except that it saves having to pass the cluster mask.
- * This is useful for code savings since write attribute
- * is used frequently throughout the framework
- *
- * @see emberAfWriteClientAttribute,
- */
-EmberAfStatus emberAfWriteServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
- * @brief write a cluster client attribute.
- *
- * This function is the same as emberAfWriteAttribute
- * except that it saves having to pass the cluster mask.
- * This is useful for code savings since write attribute
- * is used frequently throughout the framework
- *
- * @see emberAfWriteServerAttribute,
- */
-EmberAfStatus emberAfWriteClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
+// For now, just define emberAfWriteServerAttribute to emberAfWriteAttribute, to
+// minimize code churn.
+// TODO: Remove this define.
+#define emberAfWriteServerAttribute emberAfWriteAttribute
 
 /**
  * @brief Function that test the success of attribute write.
@@ -186,51 +164,28 @@ EmberAfStatus emberAfWriteClientAttribute(chip::EndpointId endpoint, chip::Clust
  * @param endpoint Zigbee endpoint number
  * @param cluster Cluster ID of the sought cluster.
  * @param attributeID Attribute ID of the sought attribute.
- * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
  * @param dataPtr Location where attribute will be written from.
  * @param dataType ZCL attribute type.
  */
 EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t mask, uint8_t * dataPtr, EmberAfAttributeType dataType);
+                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.
  *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
+ * This function will attempt to read the attribute and store it into the
+ * pointer.
  *
- * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
+ * dataPtr may be NULL, signifying that we don't need the value, just the status
+ * (i.e. whether the attribute can be read).
  */
-EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
-                                   uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
+EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                   uint8_t * dataPtr, uint16_t readLength);
 
-/**
- * @brief Read the server attribute value, performing all the checks.
- *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
- *
- * @see emberAfReadClientAttribute,
- */
-EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint16_t readLength);
-
-/**
- * @brief Read the client attribute value, performing all the checks.
- *
- * This function will attempt to read the attribute and store
- * it into the pointer. It will also read the data type.
- * Both dataPtr and dataType may be NULL, signifying that either
- * value or type is not desired.
- *
- * @see emberAfReadServerAttribute,
- */
-EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint16_t readLength);
+// For now, just define emberAfReadServerAttribute to emberAfReadAttribute, to
+// minimize code churn.
+// TODO: Remove this define.
+#define emberAfReadServerAttribute emberAfReadAttribute
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -246,13 +201,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
  * @param cluster EmberAfCluster* to consider
  */
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
-
-/**
- * @brief macro that returns true if client attribute, and false if server.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
 
 /**
  * @brief macro that returns true if attribute is saved in external storage.
@@ -286,6 +234,11 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 
 /**
+ * @brief Returns root endpoint of a composed bridged device
+ */
+chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
+
+/**
  * Returns the index of a given endpoint.  Will return 0xFFFF if this is not a
  * valid endpoint id or if the endpoint is disabled.
  */
@@ -308,16 +261,6 @@ uint16_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::
  * looking only for standard clusters.
  */
 uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Macro that takes index of endpoint, and returns device Id for it
- */
-#define emberAfDeviceIdFromIndex(index) (emAfEndpoints[(index)].deviceId)
-
-/**
- * @brief Macro that takes index of endpoint, and returns device version for it
- */
-#define emberAfDeviceVersionFromIndex(index) (emAfEndpoints[(index)].deviceVersion)
 
 /**
  * @brief Macro that returns the primary endpoint.
@@ -596,11 +539,6 @@ uint8_t emberAfGetAddressIndex(void);
 EmberNetworkStatus emberAfNetworkState(void);
 
 /**
- * @brief Get this node's radio channel for the current network.
- */
-uint8_t emberAfGetRadioChannel(void);
-
-/**
  * @brief Returns the current network parameters.
  */
 EmberStatus emberAfGetNetworkParameters(EmberNodeType * nodeType, EmberNetworkParameters * parameters);
@@ -871,22 +809,6 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
 EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t delayQs);
 
 /**
- * @brief Sets the ::EmberEventControl to run "delayM" minutes in the future.
- * The 'minutes' are actually 65536 (0x10000) milliseconds long.  This function
- * first verifies that the delay is within the acceptable range before
- * scheduling the event.
- *
- * @param control a pointer to the event control.
- * @param delayM the number of minutes until the next event.
- *
- * @return If delayM is less than or equal to
-           ::EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES, this function will schedule
-           the event and return ::EMBER_SUCCESS.  Otherwise it will return
-           ::EMBER_BAD_ARGUMENT.
- */
-EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint16_t delayM);
-
-/**
  * @brief Sets the ::EmberEventControl for the current network, and only
  * the current network, as inactive.  See ::emberEventControlSetInactive.
  */
@@ -918,12 +840,6 @@ EmberStatus emberAfNetworkEventControlSetDelay(EmberEventControl * controls, uin
 #else
 #define emberAfNetworkEventControlSetDelay(controls, delayMs) emberAfNetworkEventControlSetDelayMS(controls, delayMs);
 #endif
-/**
- * @brief Sets the ::EmberEventControl for the current network, and only the
- * current network, to run "delayQs" quarter seconds in the future.  See
- * ::emberAfEventControlSetDelayQS.
- */
-EmberStatus emberAfNetworkEventControlSetDelayQS(EmberEventControl * controls, uint32_t delayQs);
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayM" minutes in the future.  See

@@ -140,17 +140,15 @@ Transport::PeerAddress GetEchoPeerAddress()
     {
         return Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
     }
-    else
-#endif
-    {
 
-        return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), ::chip::Inet::InterfaceId::Null());
-    }
+#endif
+
+    return Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), ::chip::Inet::InterfaceId::Null());
 }
 
 void Shutdown()
 {
-    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
+    chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
@@ -212,7 +210,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
 
     gPingArguments.SetLastEchoTime(System::SystemClock().GetMonotonicTimestamp());
     SuccessOrExit(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(gPingArguments.GetEchoInterval()),
-                                                              EchoTimerHandler, NULL));
+                                                              EchoTimerHandler, nullptr));
 
     streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -226,7 +224,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     }
     else
     {
-        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, NULL);
+        chip::DeviceLayer::SystemLayer().CancelTimer(EchoTimerHandler, nullptr);
     }
 
 exit:
@@ -240,19 +238,9 @@ exit:
 
 CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddress & peerAddress)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    Optional<Transport::PeerAddress> peerAddr;
-    SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>();
-    VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
-
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
-                                     CryptoContext::SessionRole::kInitiator, gFabricIndex);
-
-exit:
+    CHIP_ERROR err = gSessionManager.InjectPaseSessionWithTestKey(gSession, 1, kTestDeviceNodeId, 1, gFabricIndex, peerAddress,
+                                                                  CryptoContext::SessionRole::kInitiator);
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));

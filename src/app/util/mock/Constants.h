@@ -40,9 +40,10 @@ constexpr AttributeId MockAttributeId(const uint16_t & id)
     return (0xFFF1'0000 | id);
 }
 
-constexpr AttributeId MockClusterId(const uint16_t & id)
+constexpr ClusterId MockClusterId(const uint16_t & id)
 {
-    return (0xFFF1'0000 | id);
+    // Vendor-specific cluster ids must be at least 0xFC00
+    return (0xFFF1'0000 | (0xFC00 + id));
 }
 
 constexpr EventId MockEventId(const uint16_t & id)

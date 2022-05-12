@@ -1,12 +1,29 @@
+{{#*inline "data"}}
+{{#if isNullable}}{{asPropertyValue}}.Value().data(){{else}}{{asPropertyValue}}.data(){{/if}}
+{{/inline}}
+{{#*inline "size"}}
+{{#if isNullable}}{{asPropertyValue}}.Value().size(){{else}}{{asPropertyValue}}.size(){{/if}}
+{{/inline}}
 {{#if saveAs}}
     {{#if (isString type)}}
+        {{#if isNullable}}
+            if ({{asPropertyValue}}.IsNull()){
+                {{saveAs}}.SetNull();
+            }
+            else {
+        {{/if}}
         if ({{saveAs}}Buffer != nullptr)
         {
             chip::Platform::MemoryFree({{saveAs}}Buffer);
         }
-        {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{asPropertyValue}}.size()));
-        memcpy({{saveAs}}Buffer, {{asPropertyValue}}.data(), {{asPropertyValue}}.size());
-        {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{asPropertyValue}}.size());
+        {{saveAs}}Buffer = static_cast<{{#if (isOctetString type)}}uint8_t{{else}}char{{/if}} *>(chip::Platform::MemoryAlloc({{>size}}));
+        memcpy({{saveAs}}Buffer, {{>data}}, {{>size}});
+        {{#if isNullable}}
+            {{saveAs}}.SetNonNull({{saveAs}}Buffer, {{>size}});
+            }
+        {{else}}
+            {{saveAs}} = {{chipType}}({{saveAs}}Buffer, {{>size}});
+        {{/if}}
     {{else}}
         {{saveAs}} = {{asPropertyValue}};
     {{/if}}

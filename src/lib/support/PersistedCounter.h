@@ -22,13 +22,15 @@
  *
  * @brief
  *   Class declarations for a monotonically-increasing counter that is periodically
- *   saved in the platform's persistent storage.
+ *   saved to the provided storage.
  */
 
 #pragma once
 
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CHIPCounter.h>
-#include <platform/PersistedStorage.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
 
@@ -53,27 +55,61 @@ namespace chip {
  *   - Output: 400, 401 ...
  *
  */
-class PersistedCounter : public MonotonicallyIncreasingCounter
+template <typename T>
+class PersistedCounter : public MonotonicallyIncreasingCounter<T>
 {
 public:
-    PersistedCounter();
-    ~PersistedCounter() override;
+    PersistedCounter() {}
+    ~PersistedCounter() override {}
+
+    typedef const char * (DefaultStorageKeyAllocator::*KeyType)();
 
     /**
      *  @brief
      *    Initialize a PersistedCounter object.
      *
-     *  @param[in] aId     The identifier of this PersistedCounter instance.
+     *  @param[in] aStorage the storage to use for the counter values.
+     *  @param[in] aKey the key to use for storing the counter values.
      *  @param[in] aEpoch  On bootup, values we vend will start at a
      *                     multiple of this parameter.
      *
-     *  @return CHIP_ERROR_INVALID_ARGUMENT if aId is NULL
-     *          CHIP_ERROR_INVALID_STRING_LENGTH if aId is longer than
-     *          CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH.
+     *  @return CHIP_ERROR_INVALID_ARGUMENT if aStorageDelegate or aKey is NULL
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
+    CHIP_ERROR Init(PersistentStorageDelegate * aStorage, KeyType aKey, T aEpoch)
+    {
+        VerifyOrReturnError(aStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aEpoch > 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
+
+        mStorage = aStorage;
+        mKey     = aKey;
+        mEpoch   = aEpoch;
+
+        T startValue;
+
+        // Read our previously-stored starting value.
+        ReturnErrorOnFailure(ReadStartValue(startValue));
+
+#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
+        // Compiler should optimize these branches.
+        if (is_same_v<decltype(T), uint64_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx64 " startValue 0x%" PRIx64, aEpoch, startValue);
+        }
+        else if (is_same_v<decltype(T), uint32_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx32 " startValue 0x%" PRIx32,
+                          static_cast<uint32_t>(aEpoch), static_cast<uint32_t>(startValue));
+        }
+#endif
+
+        ReturnErrorOnFailure(PersistNextEpochStart(startValue + aEpoch));
+
+        // This will set the starting value, after which we're ready.
+        return MonotonicallyIncreasingCounter<T>::Init(startValue);
+    }
 
     /**
      *  @brief
@@ -82,7 +118,25 @@ public:
      *
      *  @return Any error returned by a write to persisted storage.
      */
-    CHIP_ERROR Advance() override;
+    CHIP_ERROR Advance() override
+    {
+        VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mKey != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        ReturnErrorOnFailure(MonotonicallyIncreasingCounter<T>::Advance());
+
+        if (MonotonicallyIncreasingCounter<T>::GetValue() >= mNextEpoch)
+        {
+            // Value advanced past the previously persisted "start point".
+            // Ensure that a new starting point is persisted.
+            ReturnErrorOnFailure(PersistNextEpochStart(mNextEpoch + mEpoch));
+
+            // Advancing the epoch should have ensured that the current value
+            // is valid
+            VerifyOrReturnError(MonotonicallyIncreasingCounter<T>::GetValue() < mNextEpoch, CHIP_ERROR_INTERNAL);
+        }
+        return CHIP_NO_ERROR;
+    }
 
 private:
     /**
@@ -93,7 +147,27 @@ private:
      *
      *  @return Any error returned by a write to persistent storage.
      */
-    CHIP_ERROR PersistNextEpochStart(uint32_t aStartValue);
+    CHIP_ERROR PersistNextEpochStart(T aStartValue)
+    {
+        mNextEpoch = aStartValue;
+#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
+        // Compiler should optimize these branches.
+        if (is_same_v<decltype(T), uint64_t>)
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%" PRIx64, aStartValue);
+        }
+        else
+        {
+            ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%" PRIx32,
+                          static_cast<uint32_t>(aStartValue));
+        }
+#endif
+
+        T valueLE = Encoding::LittleEndian::HostSwap<T>(aStartValue);
+
+        DefaultStorageKeyAllocator keyAlloc;
+        return mStorage->SyncSetKeyValue((keyAlloc.*mKey)(), &valueLE, sizeof(valueLE));
+    }
 
     /**
      *  @brief
@@ -103,11 +177,45 @@ private:
      *
      *  @return Any error returned by a read from persistent storage.
      */
-    CHIP_ERROR ReadStartValue(uint32_t & aStartValue);
+    CHIP_ERROR ReadStartValue(T & aStartValue)
+    {
+        DefaultStorageKeyAllocator keyAlloc;
+        T valueLE     = 0;
+        uint16_t size = sizeof(valueLE);
 
-    chip::Platform::PersistedStorage::Key mId; // start value is stored here
-    uint32_t mEpoch;                           // epoch modulus value
-    uint32_t mNextEpoch;                       // next epoch start
+        CHIP_ERROR err = mStorage->SyncGetKeyValue((keyAlloc.*mKey)(), &valueLE, size);
+        if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            // No previously-stored value, no worries, the counter is initialized to zero.
+            // Suppress the error.
+            err = CHIP_NO_ERROR;
+        }
+        else
+        {
+            // TODO: Figure out how to avoid a bootloop here.  Maybe we should just
+            // init to 0?  Or a random value?
+            ReturnErrorOnFailure(err);
+        }
+
+        if (size != sizeof(valueLE))
+        {
+            // TODO: Again, figure out whether this could lead to bootloops.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        aStartValue = Encoding::LittleEndian::HostSwap<T>(valueLE);
+
+#if CHIP_CONFIG_PERSISTED_COUNTER_DEBUG_LOGGING
+        ChipLogDetail(EventLogging, "PersistedCounter::ReadStartValue() aStartValue 0x%x", aStartValue);
+#endif
+
+        return CHIP_NO_ERROR;
+    }
+
+    PersistentStorageDelegate * mStorage = nullptr; // start value is stored here
+    KeyType mKey                         = nullptr;
+    T mEpoch                             = 0; // epoch modulus value
+    T mNextEpoch                         = 0; // next epoch start
 };
 
 } // namespace chip

@@ -18,7 +18,6 @@
 
 #include "AppTask.h"
 #include "AppConfig.h"
-#include "BindingHandler.h"
 #include "LEDWidget.h"
 #include "LightSwitch.h"
 #include "ThreadUtil.h"
@@ -47,7 +46,7 @@ using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 namespace {
 constexpr EndpointId kLightSwitchEndpointId    = 1;
 constexpr EndpointId kLightEndpointId          = 1;
@@ -71,9 +70,11 @@ LEDWidget sUnusedLED;
 bool sIsThreadProvisioned    = false;
 bool sIsThreadEnabled        = false;
 bool sIsThreadBLEAdvertising = false;
-bool sIsSMPAdvertising       = false;
-bool sHaveBLEConnections     = false;
-bool sWasDimmerTriggered     = false;
+#ifdef CONFIG_MCUMGR_SMP_BT
+bool sIsSMPAdvertising = false;
+#endif
+bool sHaveBLEConnections = false;
+bool sWasDimmerTriggered = false;
 
 k_timer sFunctionTimer;
 k_timer sDimmerPressKeyTimer;
@@ -114,7 +115,7 @@ CHIP_ERROR AppTask::Init()
 #elif CONFIG_OPENTHREAD_MTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -157,7 +158,9 @@ CHIP_ERROR AppTask::Init()
 
     // Print initial configs
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    ReturnErrorOnFailure(Server::GetInstance().Init());
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+    ReturnErrorOnFailure(Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
@@ -417,8 +420,9 @@ void AppTask::UpdateStatusLED()
         sStatusLED.Set(false);
     }
 
-    // Ble LED indicates BLE connectivity:
-    //- blinking 200 ms means BLE advertising
+// Ble LED indicates BLE connectivity:
+//- blinking 200 ms means BLE advertising
+#ifdef CONFIG_MCUMGR_SMP_BT
     if (sIsSMPAdvertising)
     {
         sBleLED.Blink(30, 170);
@@ -427,6 +431,9 @@ void AppTask::UpdateStatusLED()
     {
         sBleLED.Set(false);
     }
+#else
+    sBleLED.Set(false);
+#endif
 #endif
 }
 

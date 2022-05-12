@@ -31,7 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <credentials/GroupDataProviderImpl.h>
+#include <credentials/GroupDataProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
 namespace chip {
@@ -42,8 +42,6 @@ struct SetupParams
 {
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
-    PersistentStorageDelegate * storageDelegate = nullptr;
-
     /* The following keypair must correspond to the public key used for generating
     controllerNOC. It's used by controller to establish CASE sessions with devices */
     Crypto::P256Keypair * operationalKeypair = nullptr;
@@ -53,7 +51,7 @@ struct SetupParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    uint16_t controllerVendorId;
+    chip::VendorId controllerVendorId;
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
@@ -71,14 +69,16 @@ struct SetupParams
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage here should be removed.
+// TODO everything other than the fabric storage and group data provider here should be removed.
 // We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                   = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage          = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider            = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -154,14 +154,15 @@ public:
     class ControllerFabricDelegate final : public FabricTableDelegate
     {
     public:
-        ControllerFabricDelegate() {}
-        ControllerFabricDelegate(SessionManager * sessionManager) : FabricTableDelegate(true), mSessionManager(sessionManager) {}
+        ControllerFabricDelegate() : FabricTableDelegate(true) {}
 
-        CHIP_ERROR Init(SessionManager * sessionManager)
+        CHIP_ERROR Init(SessionManager * sessionManager, Credentials::GroupDataProvider * groupDataProvider)
         {
             VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(groupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-            mSessionManager = sessionManager;
+            mSessionManager    = sessionManager;
+            mGroupDataProvider = groupDataProvider;
             return CHIP_NO_ERROR;
         };
 
@@ -171,10 +172,9 @@ public:
             {
                 mSessionManager->FabricRemoved(fabricIndex);
             }
-            Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
-            if (groupDataProvider != nullptr)
+            if (mGroupDataProvider != nullptr)
             {
-                groupDataProvider->RemoveFabric(fabricIndex);
+                mGroupDataProvider->RemoveFabric(fabricIndex);
             }
         };
 
@@ -183,7 +183,8 @@ public:
         void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
     private:
-        SessionManager * mSessionManager = nullptr;
+        SessionManager * mSessionManager                    = nullptr;
+        Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
     };
 
 private:

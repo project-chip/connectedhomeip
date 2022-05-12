@@ -34,7 +34,7 @@
 #include <app/ObjectList.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
-#include <lib/support/PersistedCounter.h>
+#include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
 #include <system/SystemMutex.h>
 
@@ -108,12 +108,6 @@ private:
 
     PriorityLevel mPriority = PriorityLevel::Invalid; ///< The buffer is the final bucket for events of this priority.  Events of
                                                       ///< lesser priority are dropped when they get bumped out of this buffer
-
-    // The counter we're going to actually use.
-    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
-
-    // The backup counter to use if no counter is provided for us.
-    MonotonicallyIncreasingCounter mNonPersistedCounter;
 
     size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
 };
@@ -197,13 +191,12 @@ public:
      *
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
+     * @param[in] apEventNumberCounter   A counter to use for event numbers.
+     *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources, Platform::PersistedStorage::Key * apCounterKey,
-              uint32_t aCounterEpoch, PersistedCounter * apPersistedCounter);
-
-    void InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                           PersistedCounter * apPersistedCounter);
+              const LogStorageResources * const apLogStorageResources,
+              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static EventManagement & GetInstance();
 
@@ -225,13 +218,14 @@ public:
      * @param[in] apCircularEventBuffer  An array of CircularEventBuffer for each priority level.
      * @param[in] apLogStorageResources  An array of LogStorageResources for each priority level.
      *
+     * @param[in] apEventNumberCounter   A counter to use for event numbers.
+     *
      * @note This function must be called prior to the logging being used.
      */
     static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
                                       const LogStorageResources * const apLogStorageResources,
-                                      Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                                      PersistedCounter * apPersistedCounter);
+                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
 
     static void DestroyEventManagement();
 
@@ -343,6 +337,11 @@ public:
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
+    /**
+     * @brief brief Iterate all events and invalidate the fabric-sensitive events whose associated fabric has the given fabric
+     * index.
+     */
+    CHIP_ERROR FabricRemoved(FabricIndex aFabricIndex);
 
     /**
      * @brief
@@ -384,7 +383,7 @@ private:
         EndpointId mEndpointId   = 0;
         EventId mEventId         = 0;
         EventNumber mEventNumber = 0;
-        FabricIndex mFabricIndex = kUndefinedFabricIndex;
+        Optional<FabricIndex> mFabricIndex;
     };
 
     void VendEventNumber();
@@ -424,6 +423,16 @@ private:
      *
      */
     CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
+
+    /**
+     * @brief Iterate the event elements inside event tlv and mark the fabric index as kUndefinedFabricIndex if
+     * it matches the FabricIndex apFabricIndex points to.
+     *
+     * @param[in] aReader  event tlv reader
+     * @param[in] apFabricIndex   A FabricIndex* pointing to the fabric index for which we want to effectively evict events.
+     *
+     */
+    static CHIP_ERROR FabricRemovedCB(const TLV::TLVReader & aReader, size_t, void * apFabricIndex);
 
     /**
      * @brief
@@ -518,13 +527,10 @@ private:
     System::Mutex mAccessLock;
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    // The counter we're going to actually use.
-    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
+    // The counter we're going to use for event numbers.
+    MonotonicallyIncreasingCounter<EventNumber> * mpEventNumberCounter = nullptr;
 
-    // The backup counter to use if no counter is provided for us.
-    MonotonicallyIncreasingCounter mNonPersistedCounter;
-
-    EventNumber mLastEventNumber = 0; ///< Last event Number vended for this priority
+    EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
 };
 } // namespace app

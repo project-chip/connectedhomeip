@@ -127,7 +127,7 @@ struct FabricList : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        key.FabricTable();
+        key.GroupFabricList();
         return CHIP_NO_ERROR;
     }
 
@@ -384,7 +384,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
     bool first                      = true;
 
     GroupData() : GroupInfo(nullptr){};
-    GroupData(chip::FabricIndex fabric) : GroupInfo(), fabric_index(fabric) {}
+    GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
@@ -505,7 +505,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     chip::GroupId group_id         = kUndefinedGroupId;
     chip::KeysetId keyset_id       = 0;
 
-    KeyMapData() : GroupKey(){};
+    KeyMapData(){};
     KeyMapData(chip::FabricIndex fabric, uint16_t link_id = 0, chip::GroupId group = kUndefinedGroupId, chip::KeysetId keyset = 0) :
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
@@ -1624,6 +1624,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
         ReturnErrorOnFailure(Crypto::DeriveGroupOperationalKey(epoch_key, compressed_fabric_id, key_span));
         ReturnErrorOnFailure(Crypto::DeriveGroupSessionId(key_span, keyset.operational_keys[i].hash));
     }
+
     if (found)
     {
         // Update existing keyset info, keep next
@@ -1650,11 +1651,11 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     VerifyOrReturnError(keyset.Find(mStorage, fabric, target_id), CHIP_ERROR_NOT_FOUND);
 
     // Target keyset found
+    out_keyset.ClearKeys();
     out_keyset.keyset_id     = keyset.keyset_id;
     out_keyset.policy        = keyset.policy;
     out_keyset.num_keys_used = keyset.keys_count;
     // Epoch keys are not read back, only start times
-    memset(out_keyset.epoch_keys, 0x00, sizeof(out_keyset.epoch_keys));
     out_keyset.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
     out_keyset.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
     out_keyset.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
@@ -1724,12 +1725,12 @@ bool GroupDataProviderImpl::KeySetIteratorImpl::Next(KeySet & output)
     VerifyOrReturnError(CHIP_NO_ERROR == keyset.Load(mProvider.mStorage), false);
 
     mCount++;
-    mNextId              = keyset.next;
+    mNextId = keyset.next;
+    output.ClearKeys();
     output.keyset_id     = keyset.keyset_id;
     output.policy        = keyset.policy;
     output.num_keys_used = keyset.keys_count;
     // Epoch keys are not read back, only start times
-    memset(output.epoch_keys, 0x00, sizeof(output.epoch_keys));
     output.epoch_keys[0].start_time = keyset.operational_keys[0].start_time;
     output.epoch_keys[1].start_time = keyset.operational_keys[1].start_time;
     output.epoch_keys[2].start_time = keyset.operational_keys[2].start_time;
@@ -1804,7 +1805,8 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
     for (uint16_t i = 0; i < fabric.map_count; ++i, mapping.id = mapping.next)
     {
         VerifyOrReturnError(CHIP_NO_ERROR == mapping.Load(mStorage), nullptr);
-        // GroupKeySetID of 0 is reserved for the Identity Protection Key (IPK)
+        // GroupKeySetID of 0 is reserved for the Identity Protection Key (IPK),
+        // it cannot be used for operational group communication.
         if (mapping.keyset_id > 0 && mapping.group_id == group_id)
         {
             // Group found, get the keyset
@@ -1819,6 +1821,37 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
         }
     }
     return nullptr;
+}
+
+CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet & out_keyset)
+{
+    FabricData fabric(fabric_index);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_NOT_FOUND);
+
+    KeyMapData mapping(fabric.fabric_index, fabric.first_map);
+
+    // Fabric found, get the keyset
+    KeySetData keyset;
+    VerifyOrReturnError(keyset.Find(mStorage, fabric, kIdentityProtectionKeySetId), CHIP_ERROR_NOT_FOUND);
+
+    // If the keyset ID doesn't match, we have a ... problem.
+    VerifyOrReturnError(keyset.keyset_id == kIdentityProtectionKeySetId, CHIP_ERROR_INTERNAL);
+
+    out_keyset.keyset_id     = keyset.keyset_id;
+    out_keyset.num_keys_used = keyset.keys_count;
+    out_keyset.policy        = keyset.policy;
+
+    for (size_t key_idx = 0; key_idx < ArraySize(out_keyset.epoch_keys); ++key_idx)
+    {
+        out_keyset.epoch_keys[key_idx].Clear();
+        if (key_idx < keyset.keys_count)
+        {
+            out_keyset.epoch_keys[key_idx].start_time = keyset.operational_keys[key_idx].start_time;
+            memcpy(&out_keyset.epoch_keys[key_idx].key[0], keyset.operational_keys[key_idx].value, EpochKey::kLengthBytes);
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void GroupDataProviderImpl::GroupKeyContext::Release()
@@ -1982,33 +2015,14 @@ GroupDataProvider * gGroupsProvider = nullptr;
 
 } // namespace
 
-/**
- * Instance getter for the global GroupDataProvider.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * @return The global device attestation credentials provider. Assume never null.
- */
 GroupDataProvider * GetGroupDataProvider()
 {
     return gGroupsProvider;
 }
 
-/**
- * Instance setter for the global GroupDataProvider.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * If the `provider` is nullptr, no change is done.
- *
- * @param[in] provider the GroupDataProvider to start returning with the getter
- */
 void SetGroupDataProvider(GroupDataProvider * provider)
 {
-    if (provider)
-    {
-        gGroupsProvider = provider;
-    }
+    gGroupsProvider = provider;
 }
 
 } // namespace Credentials

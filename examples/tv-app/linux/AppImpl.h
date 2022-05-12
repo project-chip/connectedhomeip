@@ -30,6 +30,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "CommissionerMain.h"
 #include "include/account-login/AccountLoginManager.h"
 #include "include/application-basic/ApplicationBasicManager.h"
 #include "include/application-launcher/ApplicationLauncherManager.h"
@@ -46,6 +47,8 @@
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
+
+CHIP_ERROR InitVideoPlayerPlatform();
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -123,11 +126,12 @@ public:
     CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),
-                                                      ContentAppImpl("Vendor2", 65521, "App2", 32768, "Version2", "20202021"),
-                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
-                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2",
-                                                                     "20202021") };
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
+        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
+        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021"),
+        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
+        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
+    };
 };
 
 } // namespace AppPlatform

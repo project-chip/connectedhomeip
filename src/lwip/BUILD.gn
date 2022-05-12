@@ -32,7 +32,7 @@ assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
            lwip_platform == "k32w0" || lwip_platform == "qpg" ||
            lwip_platform == "mbed" || lwip_platform == "p6" ||
-           lwip_platform == "cyw30739",
+           lwip_platform == "cyw30739" || lwip_platform == "bl602",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -55,6 +55,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/p6.gni")
 } else if (lwip_platform == "cyw30739") {
   import("//build_overrides/cyw30739_sdk.gni")
+} else if (lwip_platform == "bl602") {
+  import("//build_overrides/bl602_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -63,7 +65,7 @@ buildconfig_header("lwip_buildconfig") {
 
   defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
   if (lwip_platform != "external") {
-    if (is_debug) {
+    if (lwip_debug) {
       # Automatically enable LWIP_DEBUG for internal is_debug builds.
       defines += [ "LWIP_DEBUG=1" ]
     }
@@ -117,6 +119,15 @@ if (current_os == "zephyr" || current_os == "mbed") {
       "${chip_root}/src:includes",
     ]
   }
+} else if (lwip_platform == "bl602") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
 } else {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
@@ -158,6 +169,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
     } else if (lwip_platform == "cyw30739") {
       public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
+    } else if (lwip_platform == "bl602") {
+      public_deps += [ "${bl602_sdk_build_root}:bl602_sdk" ]
     }
 
     public_configs = [

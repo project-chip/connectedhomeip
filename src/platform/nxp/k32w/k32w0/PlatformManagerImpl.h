@@ -49,6 +49,7 @@ public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
+    CHIP_ERROR InitBoardFwk(void);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.

@@ -25,7 +25,7 @@ void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const C
 {
     // We may send a chunked list. To make the behavior consistent whether a list is being chunked or not,
     // we merge the write responses for a chunked list here and provide our consumer with a single status response.
-    if (mLastAttributePath.HasValue())
+    if (mProcessingAttributePath.HasValue())
     {
         // This is not the first write response.
         if (IsAppendingToLastItem(aPath))
@@ -40,7 +40,7 @@ void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const C
         }
 
         // This is a response to another attribute write. Report the final result of last attribute write.
-        callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
+        callback->OnResponse(apWriteClient, mProcessingAttributePath.Value(), mAttributeStatus);
     }
 
     // This is the first report for a new attribute.  We assume it will never be a list item operation.
@@ -49,7 +49,7 @@ void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const C
         aStatus = StatusIB(CHIP_ERROR_INCORRECT_STATE);
     }
 
-    mLastAttributePath.SetValue(aPath);
+    mProcessingAttributePath.SetValue(aPath);
     mAttributeStatus = aStatus;
     // For the last status in the response, we will call the application callback in OnDone()
 }
@@ -61,13 +61,16 @@ void ChunkedWriteCallback::OnError(const WriteClient * apWriteClient, CHIP_ERROR
 
 void ChunkedWriteCallback::OnDone(WriteClient * apWriteClient)
 {
-    if (mLastAttributePath.HasValue())
+    if (mProcessingAttributePath.HasValue())
     {
         // We have a cached status that has yet to be reported to the application so report it now.
         // If we failed to receive the response, or we received a malformed response, OnResponse won't be called,
-        // mLastAttributePath will be Missing() in this case.
-        callback->OnResponse(apWriteClient, mLastAttributePath.Value(), mAttributeStatus);
+        // mProcessingAttributePath will be Missing() in this case.
+        callback->OnResponse(apWriteClient, mProcessingAttributePath.Value(), mAttributeStatus);
     }
+
+    mProcessingAttributePath = NullOptional;
+    mAttributeStatus         = StatusIB();
 
     callback->OnDone(apWriteClient);
 }
@@ -78,7 +81,7 @@ bool ChunkedWriteCallback::IsAppendingToLastItem(const ConcreteDataAttributePath
     {
         return false;
     }
-    if (!mLastAttributePath.HasValue() || !(mLastAttributePath.Value() == aPath))
+    if (!mProcessingAttributePath.HasValue() || !(mProcessingAttributePath.Value() == aPath))
     {
         return false;
     }

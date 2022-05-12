@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <string.h>
 
 namespace chip {
@@ -62,29 +60,28 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_DACCert;
+    static const Key kConfigKey_DACPrivateKey;
+    static const Key kConfigKey_DACPublicKey;
+    static const Key kConfigKey_PAICert;
+    static const Key kConfigKey_CertDeclaration;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
-
-    static const char kGroupKeyNamePrefix[];
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
@@ -106,6 +103,9 @@ public:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
     static void RunConfigUnitTest(void);
+
+private:
+    static const char * GetPartitionLabelByNamespace(const char * ns);
 };
 
 struct ESP32Config::Key

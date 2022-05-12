@@ -25,6 +25,7 @@
 #pragma once
 #include <stdint.h>
 
+#include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -161,11 +162,11 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
-     * SED Polling Interval Change
+     * SED Interval Change
      *
-     * Signals a change to the sleepy end device polling interval.
+     * Signals a change to the sleepy end device interval.
      */
-    kSEDPollingIntervalChange,
+    kSEDIntervalChange,
 
     /**
      * Security Session Established
@@ -240,6 +241,11 @@ enum PublicEventTypes
      * Signals that bindings were updated.
      */
     kBindingsChangedViaCluster,
+
+    /**
+     * Signals that the state of the OTA engine changed.
+     */
+    kOtaStateChanged,
 };
 
 /**
@@ -297,6 +303,11 @@ enum ActivityChange
     kActivity_NoChange = 0,
     kActivity_Started  = 1,
     kActivity_Stopped  = -1,
+};
+
+enum OtaState
+{
+    kOtaSpaceAvailable = 0,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
@@ -363,7 +374,14 @@ struct ChipDeviceEvent final
         {
             ConnectivityChange IPv4;
             ConnectivityChange IPv6;
-            char address[INET6_ADDRSTRLEN];
+            // WARNING: There used to be `char address[INET6_ADDRSTRLEN]` here and it is
+            //          deprecated/removed since it was too large and only used for logging.
+            //          Consider not relying on ipAddress field either since the platform
+            //          layer *does not actually validate* that the actual internet is reachable
+            //          before issuing this event *and* there may be multiple addresses
+            //          (especially IPv6) so it's recommended to use `ChipDevicePlatformEvent`
+            //          instead and do something that is better for your platform.
+            chip::Inet::IPAddress ipAddress;
         } InternetConnectivityChange;
         struct
         {
@@ -468,6 +486,11 @@ struct ChipDeviceEvent final
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+
+        struct
+        {
+            OtaState newState;
+        } OtaStateChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

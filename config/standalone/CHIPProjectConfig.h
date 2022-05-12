@@ -24,14 +24,12 @@
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 
-#define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
-
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
 #define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
 
 // Uncomment this for a large Tunnel MTU.
-//#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
+// #define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
@@ -57,7 +55,6 @@
 //    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 #define CHIP_CONFIG_ENABLE_UPDATE 1
 
@@ -80,10 +77,13 @@
 //
 // Default of 8 ECs is not sufficient for some of the unit tests
 // that try to validate multiple simultaneous interactions.
+// In tests like TestReadHandler_MultipleSubscriptions, we are trying to issue as many read / subscription requests as possible in
+// parallel. Since the default config says we support 16 fabrics, and we will have 4 read handlers for each fabric (3 subscriptions
+// + 1 reserved for read) that is read transactions in parallel. Since the report handlers are allocated on the heap, we will issue
+// 65 requests (the TestReadHandler_MultipleSubscriptions will issue CHIP_IM_MAX_NUM_READ_HANDLER + 1 subscriptions to verify heap
+// allocation logic) in total and that is 130 ECs. Round this up to 150 ECs
 //
-#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 24
-
-#define CHIP_IM_MAX_NUM_READ_HANDLER 8
+#define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 150
 
 #define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 

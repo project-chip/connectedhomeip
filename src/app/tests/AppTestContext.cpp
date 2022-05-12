@@ -24,6 +24,12 @@
 
 namespace {
 
+class TestDeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(chip::DeviceTypeId deviceType, chip::EndpointId endpoint) override { return false; }
+} gDeviceTypeResolver;
+
 chip::Access::AccessControl gPermissiveAccessControl;
 
 } // namespace
@@ -34,10 +40,11 @@ namespace Test {
 CHIP_ERROR AppContext::Init()
 {
     ReturnErrorOnFailure(Super::Init());
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager()));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable()));
 
     Access::SetAccessControl(gPermissiveAccessControl);
-    ReturnErrorOnFailure(Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate()));
+    ReturnErrorOnFailure(
+        Access::GetAccessControl().Init(chip::Access::Examples::GetPermissiveAccessControlDelegate(), gDeviceTypeResolver));
 
     return CHIP_NO_ERROR;
 }

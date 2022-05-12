@@ -30,7 +30,18 @@ public:
     virtual ~ValueChecker(){};
 
 protected:
-    virtual void Exit(std::string message) = 0;
+    virtual void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) = 0;
+
+    bool CheckDecodeValue(CHIP_ERROR error)
+    {
+        if (CHIP_NO_ERROR != error)
+        {
+            Exit(std::string("Can not decode data: ") + chip::ErrorStr(error));
+            return false;
+        }
+
+        return true;
+    }
 
     bool CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
     {

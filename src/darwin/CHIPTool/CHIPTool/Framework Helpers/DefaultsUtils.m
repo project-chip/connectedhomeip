@@ -16,6 +16,7 @@
  */
 
 #import "DefaultsUtils.h"
+#import "FabricKeys.h"
 
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
@@ -68,24 +69,58 @@ static CHIPToolPersistentStorageDelegate * storage = nil;
 
 static uint16_t kTestVendorId = 0xFFF1u;
 
+static CHIPDeviceController * sController = nil;
+
 CHIPDeviceController * InitializeCHIP(void)
 {
     static dispatch_once_t onceToken;
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
-        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
+        CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+        __auto_type * factory = [MatterControllerFactory sharedInstance];
+        __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+        if (![factory startup:factoryParams]) {
+            return;
+        }
+
+        __auto_type * keys = [[FabricKeys alloc] init];
+        if (keys == nil) {
+            return;
+        }
+
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys ipk:keys.ipk];
+        params.vendorId = kTestVendorId;
+        params.fabricId = 1;
+
+        // We're not sure whether we have a fabric configured already; try as if
+        // we did, and if not fall back to creating a new one.
+        sController = [factory startControllerOnExistingFabric:params];
+        if (sController == nil) {
+            sController = [factory startControllerOnNewFabric:params];
+        }
     });
 
-    return controller;
+    return sController;
 }
 
-void CHIPRestartController(CHIPDeviceController * controller)
+CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
 {
+    __auto_type * keys = [[FabricKeys alloc] init];
+    if (keys == nil) {
+        NSLog(@"No keys, can't restart controller");
+        return controller;
+    }
+
     NSLog(@"Shutting down the stack");
     [controller shutdown];
+
     NSLog(@"Starting up the stack");
-    [controller startup:storage vendorId:kTestVendorId nocSigner:nil];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys ipk:keys.ipk];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    sController = [[MatterControllerFactory sharedInstance] startControllerOnExistingFabric:params];
+
+    return sController;
 }
 
 uint64_t CHIPGetLastPairedDeviceId(void)

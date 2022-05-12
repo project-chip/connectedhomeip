@@ -52,7 +52,10 @@ void InitializeChip(nlTestSuite * suite)
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider commissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&commissionableDataProvider);
 
-    err = Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    err = chip::Server::GetInstance().Init(initParams);
+
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
 
     Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
@@ -84,7 +87,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 {
     nlTestSuite * suite                        = reinterpret_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(CommissioningWindowManager::MaxCommissioningTimeout(),
+    CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
                                                                 CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite,
@@ -193,8 +196,8 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     uint8_t salt[chip::kSpake2p_Min_PBKDF_Salt_Length];
     chip::ByteSpan saltData(salt);
 
-    err = commissionMgr.OpenEnhancedCommissioningWindow(CommissioningWindowManager::MaxCommissioningTimeout(), newDiscriminator,
-                                                        verifier, kIterations, saltData);
+    err = commissionMgr.OpenEnhancedCommissioningWindow(commissionMgr.MaxCommissioningTimeout(), newDiscriminator, verifier,
+                                                        kIterations, saltData);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite,
                    commissionMgr.CommissioningWindowStatus() ==

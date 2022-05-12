@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 13.4.5. [TC-SC-4.5] Operational Discovery - Thread Node
 
@@ -26,7 +27,7 @@ tests:
       verification:
           "1. On the raspi controller, publish matter service, using below
           command $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696
-          _matter._tcp 22222 CRI=3000 CRA=4000 T=0"
+          _matter._tcp 22222 SII=3000 SAI=2000 T=0"
       disabled: true
 
     - label:
@@ -50,7 +51,7 @@ tests:
       verification:
           "1. On the raspi controller, publish matter service chanding the T
           value 1, using below command $avahi-publish-service
-          87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 CRI=3000 CRA=4000
+          87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 SII=3000 SAI=2000
           T=1"
       disabled: true
 

@@ -51,9 +51,6 @@ System::LayerSocketsLoop & SystemLayerSocketsLoop()
 
 } // anonymous namespace
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
-
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 {
@@ -196,6 +193,10 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(voi
 
     return CHIP_NO_ERROR;
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -38,6 +38,9 @@ public:
     // ===== Methods that implement the PlatformManager abstract interface.
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+
+    // ===== Methods that implement the DiagnosticDataProvider abstract interface.
+    CHIP_ERROR ResetWatermarks() override;
 };
 
 } // namespace DeviceLayer

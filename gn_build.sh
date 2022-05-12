@@ -113,14 +113,13 @@ for arg; do
     user_args+=" $arg"
 done
 
-# Android prebuilt JAR setup
-python3 build/chip/java/tests/generate_jars_for_test.py
-python3 third_party/android_deps/set_up_android_deps.py
-
 # Android SDK setup
 android_sdk_args=""
 
 if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; then
+    # Android prebuilt JAR setup
+    python3 third_party/android_deps/set_up_android_deps.py
+
     android_sdk_args+="android_sdk_root=\"$ANDROID_HOME\" android_ndk_root=\"$ANDROID_NDK_HOME\""
     extra_args+=" $android_sdk_args enable_android_builds=true"
 else
@@ -178,17 +177,17 @@ fi
 
 echo
 
-# TI SimpleLink SDK setup
+# TI SimpleLink Build setup
 ti_simplelink_sdk_args=""
 
-if [[ -d "${TI_SIMPLELINK_SDK_ROOT}/source" && -f "${TI_SYSCONFIG_ROOT}/sysconfig_cli.sh" ]]; then
-    ti_simplelink_sdk_args+="ti_simplelink_sdk_root=\"$TI_SIMPLELINK_SDK_ROOT\" ti_sysconfig_root=\"$TI_SYSCONFIG_ROOT\""
+if [[ -f "${TI_SYSCONFIG_ROOT}/sysconfig_cli.sh" ]]; then
+    ti_simplelink_sdk_args+="ti_sysconfig_root=\"$TI_SYSCONFIG_ROOT\""
     extra_args+=" $ti_simplelink_sdk_args enable_ti_simplelink_builds=true"
 
     echo 'To build the cc13x2x7_26x2x7 lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/cc13x2x7_26x2x7; gn gen out/debug --args='$ti_simplelink_sdk_args'; ninja -C out/debug)"
 else
-    echo "Hint: Set \$TI_SIMPLELINK_SDK_ROOT and \$TI_SYSCONFIG_ROOT to enable building for cc13x2_26x2"
+    echo "Hint: Set \$TI_SYSCONFIG_ROOT to enable building for cc13x2_26x2"
 fi
 
 echo

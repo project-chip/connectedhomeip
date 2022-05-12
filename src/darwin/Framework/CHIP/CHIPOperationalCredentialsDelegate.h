@@ -25,6 +25,7 @@
 #import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
 #include <platform/Darwin/CHIPP256KeypairNativeBridge.h>
 
@@ -36,11 +37,11 @@ public:
 
     ~CHIPOperationalCredentialsDelegate() {}
 
-    CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner);
+    CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk);
 
-    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
-        const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
-        chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
+    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
+        const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
+        const chip::ByteSpan & PAI, chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
     {
@@ -57,20 +58,17 @@ public:
         const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
         chip::MutableByteSpan & noc);
 
+    const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
+
 private:
-    CHIP_ERROR GenerateKeys();
-    CHIP_ERROR LoadKeysFromKeyChain();
-    CHIP_ERROR DeleteKeys();
-
-    CHIP_ERROR SetIssuerID(CHIPPersistentStorageDelegateBridge * storage);
-
     bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     ChipP256KeypairPtr mIssuerKey;
     uint64_t mIssuerId = 1234;
 
+    chip::Crypto::AesCcm128Key mIPK;
+
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
-    const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";
 
     CHIPPersistentStorageDelegateBridge * mStorage;
 
@@ -79,7 +77,6 @@ private:
     chip::NodeId mNextRequestedNodeId = 1;
     chip::FabricId mNextFabricId = 1;
     bool mNodeIdRequested = false;
-    bool mGenerateRootCert = false;
 };
 
 NS_ASSUME_NONNULL_END

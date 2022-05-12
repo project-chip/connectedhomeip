@@ -55,6 +55,24 @@
 #include "pigweed/rpc_services/Thread.h"
 #endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
+#if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+#define PW_TRACE_BUFFER_SIZE_BYTES 1024
+#include "pw_trace/trace.h"
+#include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
+
+// Define trace time for pw_trace
+PW_TRACE_TIME_TYPE pw_trace_GetTraceTime()
+{
+    return (PW_TRACE_TIME_TYPE) chip::System::SystemClock().GetMonotonicMicroseconds64().count();
+}
+// Microsecond time source
+size_t pw_trace_GetTraceTimeTicksPerSecond()
+{
+    return 1000000;
+}
+
+#endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+
 namespace chip {
 namespace rpc {
 
@@ -130,6 +148,10 @@ OtCli ot_cli_service;
 Thread thread;
 #endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
+#if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+pw::trace::TraceService trace_service;
+#endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+
 void RegisterServices(pw::rpc::Server & server)
 {
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -163,6 +185,11 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
     server.RegisterService(thread);
 #endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
+
+#if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+    server.RegisterService(trace_service);
+    PW_TRACE_SET_ENABLED(true);
+#endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 }
 
 } // namespace

@@ -215,6 +215,13 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
+// Struct for CapabilityMinimaStruct
+typedef struct _CapabilityMinimaStruct
+{
+    uint16_t CaseSessionsPerFabric;
+    uint16_t SubscriptionsPerFabric;
+} CapabilityMinimaStruct;
+
 // Struct for ChannelInfo
 typedef struct _ChannelInfo
 {
@@ -259,7 +266,7 @@ typedef struct _ExtensionEntry
 typedef struct _FabricDescriptor
 {
     chip::ByteSpan RootPublicKey;
-    uint16_t VendorId;
+    chip::VendorId VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::CharSpan Label;
@@ -443,7 +450,7 @@ typedef struct _ProviderLocation
 typedef struct _ReadAttributeStatusRecord
 {
     chip::AttributeId attributeId;
-    chip::Protocols::InteractionModel::Status status;
+    uint8_t status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } ReadAttributeStatusRecord;
@@ -542,12 +549,12 @@ typedef struct _TestListStructOctet
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    uint64_t PanId;
+    uint16_t PanId;
     uint64_t ExtendedPanId;
     chip::CharSpan NetworkName;
     uint16_t Channel;
     uint8_t Version;
-    uint64_t ExtendedAddress;
+    chip::ByteSpan ExtendedAddress;
     int8_t RSSI;
     uint8_t LQI;
 } ThreadInterfaceScanResult;
@@ -602,7 +609,7 @@ typedef struct _WriteAttributeRecord
 // Struct for WriteAttributeStatusRecord
 typedef struct _WriteAttributeStatusRecord
 {
-    chip::Protocols::InteractionModel::Status status;
+    uint8_t status;
     chip::AttributeId attributeId;
 } WriteAttributeStatusRecord;
 
@@ -619,7 +626,7 @@ typedef struct _WriteStructuredAttributeRecord
 // Struct for WriteStructuredAttributeStatusRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
-    chip::Protocols::InteractionModel::Status status;
+    uint8_t status;
     chip::AttributeId attributeId;
     uint8_t indicator;
     /* TYPE WARNING: array array defaults to */ uint8_t * indicies;

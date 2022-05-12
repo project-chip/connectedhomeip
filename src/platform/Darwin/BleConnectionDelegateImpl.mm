@@ -111,7 +111,7 @@ namespace DeviceLayer {
             _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
         });
         dispatch_source_set_timer(
-            _timer, dispatch_walltime(NULL, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+            _timer, dispatch_walltime(nullptr, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
     }
 
     return self;
@@ -186,10 +186,8 @@ namespace DeviceLayer {
     constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
     if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
         return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
-    } else {
-        // else compare the entire thing
-        return _deviceDiscriminator == discriminator;
-    }
+    } // else compare the entire thing
+    return _deviceDiscriminator == discriminator;
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral

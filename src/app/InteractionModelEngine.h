@@ -56,6 +56,7 @@
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/util/attribute-metadata.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -68,7 +69,8 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate,
+class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
+                               public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
                                public ReadHandler::ManagementCallback
 {
@@ -80,6 +82,18 @@ public:
      *
      */
     static InteractionModelEngine * GetInstance(void);
+
+    /**
+     * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
+     * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
+     */
+    static constexpr size_t kMinSupportedSubscriptionsPerFabric           = 2;
+    static constexpr size_t kMinSupportedPathsPerSubscription             = 2;
+    static constexpr size_t kReservedPathsPerReadRequest                  = 9;
+    static constexpr size_t kReservedReadHandlersPerFabricForReadRequests = 1;
+
+    // TODO: Per spec, the above numbers should be 3, 3, 9, 1, however, we use a lower limit to reduce the memory usage and should
+    // fix it when we have reduced the memory footprint of ReadHandlers.
 
     InteractionModelEngine(void);
 
@@ -93,7 +107,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable);
 
     void Shutdown();
 
@@ -124,6 +138,11 @@ public:
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
 
+    /**
+     * Returns the number of active readhandlers with a specific type on a specific fabric.
+     */
+    uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type, FabricIndex fabricIndex) const;
+
     uint32_t GetNumActiveWriteHandlers() const;
 
     /**
@@ -142,6 +161,10 @@ public:
 
     CHIP_ERROR PushFrontAttributePathList(ObjectList<AttributePathParams> *& aAttributePathList,
                                           AttributePathParams & aAttributePath);
+
+    // If a concrete path indicates an attribute that is also referenced by a wildcard path in the request,
+    // the path SHALL be removed from the list.
+    void RemoveDuplicateConcreteAttributePath(ObjectList<AttributePathParams> *& aAttributePaths);
 
     void ReleaseEventPathList(ObjectList<EventPathParams> *& aEventPathList);
 
@@ -216,6 +239,27 @@ public:
      */
     bool HasConflictWriteRequests(const WriteHandler * apWriteHandler, const ConcreteAttributePath & aPath);
 
+    /**
+     * We only allow one active read transaction per fabric, and the number of paths used is limited by
+     * kReservedPathsPerReadRequest. This function will check if the given ReadHandler will exceed the limitations for the accessing
+     * fabric.
+     *
+     * TODO: (#17418) We are now reserving resources for read requests, could be changed to similar algorithm for read resources
+     * minimas.
+     */
+    bool CanEstablishReadTransaction(const ReadHandler * apReadHandler);
+
+    /**
+     * Select the oldest (and the one that exceeds the per subscription resource minimum if there are any) read handler on the
+     * fabric with the given fabric index. Evict it when the fabric uses more resources than the per fabric quota or aForceEvict is
+     * true.
+     *
+     * @retval Whether we have evicted a subscription.
+     */
+    bool TrimFabric(FabricIndex aFabricIndex, bool aForceEvict);
+
+    uint16_t GetMinSubscriptionsPerFabric() const;
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -226,9 +270,52 @@ public:
     // Override the maximal capacity of the underlying read handler pool to mimic
     // out of memory scenarios in unit-tests.
     //
+    // This function did not considered the resources reserved for read handlers,
+    // SetHandlerCapacityForSubscriptions if there are subscriptions in the tests.
+    //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
     void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
+
+    //
+    // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
+    // out of paths exhausted scenarios in unit-tests.
+    //
+    // This function did not considered the resources reserved for read handlers,
+    // SetPathPoolCapacityForSubscriptions if there are subscriptions in the tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetPathPoolCapacity(int32_t sz) { mPathPoolCapacityOverride = sz; }
+
+    //
+    // Override the maximal capacity of the underlying read handler pool to mimic
+    // out of memory scenarios in unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetHandlerCapacityForSubscriptions(int32_t sz)
+    {
+        SetHandlerCapacity(sz == -1 ? -1 : sz + static_cast<int32_t>(kReservedHandlersForReads));
+    }
+
+    //
+    // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
+    // out of paths exhausted scenarios in unit-tests.
+    //
+    // If -1 is passed in, no override is instituted and default behavior resumes.
+    //
+    void SetPathPoolCapacityForSubscriptions(int32_t sz)
+    {
+        SetPathPoolCapacity(sz == -1 ? -1 : sz + static_cast<int32_t>(kReservedPathsForReads));
+    }
+
+    //
+    // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
+    // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
+    // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
+    //
+    void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -243,6 +330,7 @@ public:
             readClient->mpImEngine = nullptr;
             auto * tmpClient       = readClient->GetNextClient();
             readClient->SetNextClient(nullptr);
+            readClient->Close(CHIP_NO_ERROR);
             readClient = tmpClient;
         }
 
@@ -264,6 +352,8 @@ private:
     void OnDone(ReadHandler & apReadObj) override;
 
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
+
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
@@ -319,6 +409,41 @@ private:
     CHIP_ERROR ShutdownExistingSubscriptionsIfNeeded(Messaging::ExchangeContext * apExchangeContext,
                                                      System::PacketBufferHandle && aPayload);
 
+    inline size_t GetPathPoolCapacity() const
+    {
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        return (mPathPoolCapacityOverride == -1) ? CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+                                                 : static_cast<size_t>(mPathPoolCapacityOverride);
+#else
+        return CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS;
+#endif
+    }
+
+    inline size_t GetReadHandlerPoolCapacity() const
+    {
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+        return (mReadHandlerCapacityOverride == -1) ? CHIP_IM_MAX_NUM_READ_HANDLER
+                                                    : static_cast<size_t>(mReadHandlerCapacityOverride);
+#else
+        return CHIP_IM_MAX_NUM_READ_HANDLER;
+#endif
+    }
+
+    /**
+     * Verify and ensure (by killing oldest read handlers that make the resources used by the current fabric exceed the fabric
+     * quota)
+     * - If the subscription uses resources within the per subscription limit, this function will always success by evicting
+     * existing subscriptions.
+     * - If the subscription uses more than per subscription limit, this function will return PATHS_EXHAUSTED if we are running out
+     * of paths.
+     *
+     * After the checks above, we will try to ensure we have a free Readhandler for processing the subscription.
+     *
+     * @retval true when we have enough resources for the incoming subscription, false if not.
+     */
+    bool EnsureResourceForSubscription(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
+                                       size_t aRequestedEventPathCount);
+
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
     template <typename T, size_t N>
@@ -330,19 +455,42 @@ private:
 
     ObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     ObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
-    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+
+    static constexpr size_t kReservedHandlersForReads = kReservedReadHandlersPerFabricForReadRequests * (CHIP_CONFIG_MAX_FABRICS);
+    static constexpr size_t kReservedPathsForReads    = kReservedPathsPerReadRequest * kReservedHandlersForReads;
+
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    static_assert(CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS >= CHIP_CONFIG_MAX_FABRICS *
+                          (kMinSupportedPathsPerSubscription * kMinSupportedSubscriptionsPerFabric + kReservedPathsPerReadRequest),
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+    static_assert(CHIP_IM_MAX_NUM_READ_HANDLER >= CHIP_CONFIG_MAX_FABRICS *
+                          (kMinSupportedSubscriptionsPerFabric + kReservedReadHandlersPerFabricForReadRequests),
+                  "CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS is too small to match the requirements of spec 8.5.1");
+#endif
+
     ObjectPool<ObjectList<AttributePathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mAttributePathPool;
     ObjectPool<ObjectList<EventPathParams>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mEventPathPool;
     ObjectPool<ObjectList<DataVersionFilter>, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mDataVersionFilterPool;
+
+    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
+
     ReadClient * mpActiveReadClientList = nullptr;
 
     ReadHandler::ApplicationCallback * mpReadHandlerApplicationCallback = nullptr;
 
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     int mReadHandlerCapacityOverride = -1;
+    int mPathPoolCapacityOverride    = -1;
+
+    // We won't limit the handler used per fabric on platforms that are using heap for memory pools, so we introduces a flag to
+    // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
+    // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
+    bool mForceHandlerQuota = false;
 #endif
+
+    FabricTable * mpFabricTable;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.
@@ -381,6 +529,13 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
+ *  Get the registered attribute access override. nullptr when attribute access override is not found.
+ *
+ * TODO(#16806): This function and registerAttributeAccessOverride can be member functions of InteractionModelEngine.
+ */
+AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId);
+
+/**
  * TODO: Document.
  */
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
@@ -391,5 +546,18 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
  * Check if the given cluster has the given DataVersion.
  */
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
+
+/**
+ * Returns true if device type is on endpoint, false otherwise.
+ */
+bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint);
+
+/**
+ * Returns the metadata of the attribute for the given path.
+ *
+ * @retval The metadata of the attribute, will return null if the given attribute does not exists.
+ */
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath);
+
 } // namespace app
 } // namespace chip

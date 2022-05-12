@@ -52,9 +52,9 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux `sudo apt-get install git libwebkitgtk-1.0-0 ninja-build`
 
-#Mac OS X \$ brew install ninja
+#Mac OS X `brew install ninja`
 
 -   Supported hardware:
 
@@ -78,55 +78,73 @@ Silicon Labs platform.
 
 *   Build the example application:
 
+          ```
           cd ~/connectedhomeip
           ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/efr32/ ./out/lock_app BRD4161A
+          ```
 
 -   To delete generated executable, libraries and object files use:
 
+          ```
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
+          ```
 
     OR use GN/Ninja directly
 
+          ```
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
           $ ninja -C out/debug
+          ```
 
 -   To delete generated executable, libraries and object files use:
 
+          ```
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ rm -rf out/
+          ```
 
 *   Build the example as Sleepy End Device (SED)
 
+          ```
           $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app_SED BRD4161A --sed
+          ```
 
     or use gn as previously mentioned but adding the following arguments:
 
+          ```
           $ gn gen out/debug '--args=efr32_board="BRD4161A" enable_sleepy_device=true chip_openthread_ftd=false'
+          ```
 
 *   Build the example with pigweed RCP
 
+          ```
           $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          ```
 
     or use GN/Ninja Directly
 
+          ```
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
+          ```
 
     [Running Pigweed RPC console](#running-pigweed-rpc-console)
 
 For more build options, help is provided when running the build script without
 arguments
 
+         ```
          ./scripts/examples/gn_efr32_example.sh
+         ```
 
 <a name="flashing"></a>
 
@@ -134,8 +152,10 @@ arguments
 
 -   On the command line:
 
+          ```
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ python3 out/debug/chip-efr32-lock-example.flash.py
+          ```
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -163,14 +183,18 @@ after flashing the .out file.
 
 *   Install the J-Link software
 
+          ```
           $ cd ~/Downloads
           $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+          ```
 
 *   In Linux, grant the logged in user the ability to talk to the development
     hardware via the linux tty device (/dev/ttyACMx) by adding them to the
     dialout group.
 
+          ```
           $ sudo usermod -a -G dialout ${USER}
+          ```
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
@@ -179,15 +203,21 @@ combination with JLinkRTTClient as follows:
 
     For MG12 use:
 
+          ```
           $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
+          ```
 
     For MG21 use:
 
+          ```
           $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+          ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
+          ```
           $ JLinkRTTClient
+          ```
 
 <a name="running-complete-example"></a>
 
@@ -232,9 +262,9 @@ combination with JLinkRTTClient as follows:
 
     **LED 1** Simulates the Lock The following states are possible:
 
-        -   _Solid On_ ; Bolt is locked
+        -   _Solid On_ ; Bolt is unlocked
         -   _Blinking_ ; Bolt is moving to the desired state
-        -   _Off_ ; Bolt is unlocked
+        -   _Off_ ; Bolt is locked
 
     **Push Button 0**
 
@@ -254,12 +284,47 @@ combination with JLinkRTTClient as follows:
 
     [CHIPTool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool/README.md)
 
-    Here is an example with the CHIPTool:
+Here is some CHIPTool examples:
 
+    Pairing with chip-tool:
     ```
     chip-tool pairing ble-thread 1 hex:<operationalDataset> 20202021 3840
+    ```
 
-    chip-tool onoff toggle 1 1
+    Set a user:
+    ```
+    ./out/chip-tool doorlock set-user OperationType UserIndex UserName UserUniqueId UserStatus UserType CredentialRule node-id/group-id
+    ./out/chip-tool doorlock set-user 0 1 "mike" 5 1 0 0 1 1 --timedInteractionTimeoutMs 1000
+    ```
+
+    Set a credential:
+    ```
+    ./out/chip-tool doorlock set-credential OperationType Credential CredentialData UserIndex UserStatus UserType node-id/group-id
+    ./out/chip-tool doorlock set-credential 0 '{ "credentialType": 1, "credentialIndex": 1 }' "123456" 1 null null 1 1 --timedInteractionTimeoutMs 1000
+    ```
+
+    Changing a credential:
+    ```
+    ./out/chip-tool doorlock set-credential OperationType Credential CredentialData UserIndex UserStatus UserType node-id/group-id
+    ./out/chip-tool doorlock set-credential 2 '{ "credentialType": 1, "credentialIndex": 1 }' "123457" 1 null null 1 1 --timedInteractionTimeoutMs 1000
+    ```
+
+    Get a user:
+    ```
+    ./out/chip-tool doorlock get-user UserIndex node-id/group-id
+    ./out/chip-tool doorlock get-user 1 1 1
+    ```
+
+    Unlock door:
+    ```
+    ./out/chip-tool doorlock unlock-door node-id/group-id
+    ./out/chip-tool doorlock unlock-door 1 1
+    ```
+
+    Lock door:
+    ```
+    ./out/chip-tool doorlock lock-door node-id/group-id
+    ./out/chip-tool doorlock lock-door 1 1
     ```
 
 ### Notes
@@ -306,18 +371,35 @@ features can easily be toggled on or off. Here is a short list of options :
 
 ### Disabling logging
 
-chip_progress_logging, chip_detail_logging, chip_automation_logging
+`chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
+    ```
     $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    ```
 
 ### Debug build / release build
 
-is_debug
+`is_debug`
 
+    ```
     $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+    ```
 
 ### Disabling LCD
 
-show_qr_code
+`show_qr_code`
 
+    ```
     $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+    ```
+
+### KVS maximum entry count
+
+`kvs_max_entries`
+
+    ```
+    Set the maximum Kvs entries that can be stored in NVM (Default 75)
+    Thresholds: 30 <= kvs_max_entries <= 255
+
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
+    ```

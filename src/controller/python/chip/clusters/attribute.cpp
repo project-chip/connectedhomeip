@@ -83,6 +83,11 @@ OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
 OnReportBeginCallback gOnReportEndCallback                           = nullptr;
 
+void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
+{
+    aShouldResubscribe = false;
+}
+
 class ReadClientCallback : public ReadClient::Callback
 {
 public:
@@ -223,6 +228,7 @@ struct __attribute__((packed)) PyReadAttributeParams
     uint32_t maxInterval; // MaxInterval in subscription request
     bool isSubscription;
     bool isFabricFiltered;
+    bool keepSubscriptions;
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
@@ -361,9 +367,9 @@ void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apC
     delete apCallback;
 }
 
-chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
-                                                              ReadClientCallback ** pCallback, DeviceProxy * device,
-                                                              uint8_t * readParamsBuf, size_t n, size_t total, ...)
+chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
+                                                    DeviceProxy * device, uint8_t * readParamsBuf, size_t numAttributePaths,
+                                                    size_t numDataversionFilters, size_t numEventPaths, ...)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
@@ -372,34 +378,42 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
 
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
-    size_t m = total - n;
     va_list args;
-    va_start(args, total);
+    va_start(args, numEventPaths);
 
-    std::unique_ptr<AttributePathParams[]> readPaths(new AttributePathParams[n]);
-    std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[m]);
+    std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
+    std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
+    std::unique_ptr<EventPathParams[]> eventPaths(new EventPathParams[numEventPaths]);
     std::unique_ptr<ReadClient> readClient;
 
+    for (size_t i = 0; i < numAttributePaths; i++)
     {
-        for (size_t i = 0; i < n; i++)
-        {
-            void * path = va_arg(args, void *);
+        void * path = va_arg(args, void *);
 
-            python::AttributePath pathObj;
-            memcpy(&pathObj, path, sizeof(python::AttributePath));
+        python::AttributePath pathObj;
+        memcpy(&pathObj, path, sizeof(python::AttributePath));
 
-            readPaths[i] = AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId);
-        }
+        attributePaths[i] = AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId);
     }
 
-    for (size_t j = 0; j < m; j++)
+    for (size_t i = 0; i < numDataversionFilters; i++)
     {
         void * filter = va_arg(args, void *);
 
         python::DataVersionFilter filterObj;
         memcpy(&filterObj, filter, sizeof(python::DataVersionFilter));
 
-        dataVersionFilters[j] = chip::app::DataVersionFilter(filterObj.endpointId, filterObj.clusterId, filterObj.dataVersion);
+        dataVersionFilters[i] = chip::app::DataVersionFilter(filterObj.endpointId, filterObj.clusterId, filterObj.dataVersion);
+    }
+
+    for (size_t i = 0; i < numEventPaths; i++)
+    {
+        void * path = va_arg(args, void *);
+
+        python::EventPath pathObj;
+        memcpy(&pathObj, path, sizeof(python::EventPath));
+
+        eventPaths[i] = EventPathParams(pathObj.endpointId, pathObj.clusterId, pathObj.eventId, pathObj.urgentEvent == 1);
     }
 
     Optional<SessionHandle> session = device->GetSecureSession();
@@ -411,12 +425,20 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
     VerifyOrExit(readClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
     {
         ReadPrepareParams params(session.Value());
-        params.mpAttributePathParamsList    = readPaths.get();
-        params.mAttributePathParamsListSize = n;
-        if (m != 0)
+        if (numAttributePaths != 0)
+        {
+            params.mpAttributePathParamsList    = attributePaths.get();
+            params.mAttributePathParamsListSize = numAttributePaths;
+        }
+        if (numDataversionFilters != 0)
         {
             params.mpDataVersionFilterList    = dataVersionFilters.get();
-            params.mDataVersionFilterListSize = m;
+            params.mDataVersionFilterListSize = numDataversionFilters;
+        }
+        if (numEventPaths != 0)
+        {
+            params.mpEventPathParamsList    = eventPaths.get();
+            params.mEventPathParamsListSize = numEventPaths;
         }
 
         params.mIsFabricFiltered = pyParams.isFabricFiltered;
@@ -425,75 +447,10 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         {
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
-            readPaths.release();
-            err = readClient->SendAutoResubscribeRequest(std::move(params));
-            SuccessOrExit(err);
-        }
-        else
-        {
-            err = readClient->SendRequest(params);
-            SuccessOrExit(err);
-        }
-    }
-
-    *pReadClient = readClient.get();
-    *pCallback   = callback.get();
-
-    callback->AdoptReadClient(std::move(readClient));
-
-    callback.release();
-
-exit:
-    va_end(args);
-    return err.AsInteger();
-}
-
-chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, ReadClient ** pReadClient,
-                                                          ReadClientCallback ** pCallback, DeviceProxy * device,
-
-                                                          uint8_t * readParamsBuf, size_t n, ...)
-{
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    PyReadAttributeParams pyParams = {};
-    memcpy(&pyParams, readParamsBuf, sizeof(pyParams));
-
-    std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
-
-    va_list args;
-    va_start(args, n);
-
-    std::unique_ptr<EventPathParams[]> readPaths(new EventPathParams[n]);
-    std::unique_ptr<ReadClient> readClient;
-
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            void * path = va_arg(args, void *);
-
-            python::EventPath pathObj;
-            memcpy(&pathObj, path, sizeof(python::EventPath));
-
-            readPaths[i] = EventPathParams(pathObj.endpointId, pathObj.clusterId, pathObj.eventId, pathObj.urgentEvent == 1);
-        }
-    }
-
-    Optional<SessionHandle> session = device->GetSecureSession();
-    VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NOT_CONNECTED);
-
-    readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback.get(),
-                                              pyParams.isSubscription ? ReadClient::InteractionType::Subscribe
-                                                                      : ReadClient::InteractionType::Read);
-
-    {
-        ReadPrepareParams params(session.Value());
-        params.mpEventPathParamsList    = readPaths.get();
-        params.mEventPathParamsListSize = n;
-
-        if (pyParams.isSubscription)
-        {
-            params.mMinIntervalFloorSeconds   = pyParams.minInterval;
-            params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
-            readPaths.release();
+            params.mKeepSubscriptions         = pyParams.keepSubscriptions;
+            params.mResubscribePolicy         = PythonResubscribePolicy;
+            attributePaths.release();
+            eventPaths.release();
             err = readClient->SendAutoResubscribeRequest(std::move(params));
             SuccessOrExit(err);
         }

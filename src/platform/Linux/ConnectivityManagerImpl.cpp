@@ -78,6 +78,8 @@ char ConnectivityManagerImpl::sWiFiIfName[];
 
 WiFiDriver::ScanCallback * ConnectivityManagerImpl::mpScanCallback;
 NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * ConnectivityManagerImpl::mpConnectCallback;
+uint8_t ConnectivityManagerImpl::sInterestedSSID[Internal::kMaxWiFiSSIDLength];
+uint8_t ConnectivityManagerImpl::sInterestedSSIDLen;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
@@ -423,6 +425,14 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                             break;
                         }
 
+                        DeviceLayer::SystemLayer().ScheduleLambda([reason]() {
+                            if (mpConnectCallback != nullptr)
+                            {
+                                mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), reason);
+                                mpConnectCallback = nullptr;
+                            }
+                        });
+
                         delegate->OnAssociationFailureDetected(associationFailureCause, status);
                     }
 
@@ -438,6 +448,21 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                     }
 
                     DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+                }
+                else if (g_strcmp0(value_str, "\'completed\'") == 0)
+                {
+                    if (mAssociattionStarted)
+                    {
+                        DeviceLayer::SystemLayer().ScheduleLambda([]() {
+                            if (mpConnectCallback != nullptr)
+                            {
+                                mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+                                mpConnectCallback = nullptr;
+                            }
+                            ConnectivityMgrImpl().PostNetworkConnect();
+                        });
+                    }
+                    mAssociattionStarted = false;
                 }
             }
 
@@ -925,24 +950,32 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     GVariant * args = nullptr;
     GVariantBuilder builder;
     gboolean result;
-    char ssidStr[kMaxWiFiSSIDLength] = { 0 };
-    char keyStr[kMaxWiFiKeyLength]   = { 0 };
+    char ssidStr[kMaxWiFiSSIDLength + 1u] = { 0 };
+    char keyStr[kMaxWiFiKeyLength + 1u]   = { 0 };
+
+    VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
+
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    // Clean up current network if exists
-    if (mWpaSupplicant.networkPath)
+    const gchar * networkPath = wpa_fi_w1_wpa_supplicant1_interface_get_current_network(mWpaSupplicant.iface);
+
+    // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
+    if (strcmp(networkPath, "/") != 0)
     {
         GError * error = nullptr;
 
-        result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
-                                                                              nullptr, &error);
+        result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(mWpaSupplicant.iface, networkPath, nullptr, &error);
 
         if (result)
         {
-            ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
-            g_free(mWpaSupplicant.networkPath);
-            mWpaSupplicant.networkPath = nullptr;
+            if (mWpaSupplicant.networkPath != nullptr)
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
+                g_free(mWpaSupplicant.networkPath);
+                mWpaSupplicant.networkPath = nullptr;
+            }
         }
         else
         {
@@ -1019,18 +1052,6 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
                     this_->mpConnectCallback = nullptr;
                 }
                 mpConnectCallback = nullptr;
-            });
-        }
-        else
-        {
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
-                if (this_->mpConnectCallback != nullptr)
-                {
-                    // TODO(#14175): Replace this with actual thread attach result.
-                    this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-                    this_->mpConnectCallback = nullptr;
-                }
-                this_->PostNetworkConnect();
             });
         }
     }
@@ -1160,13 +1181,15 @@ void ConnectivityManagerImpl::PostNetworkConnect()
             if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
             {
                 ChipDeviceEvent event;
-                event.Type                            = DeviceEventType::kInternetConnectivityChange;
-                event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-                event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-                addr.ToString(event.InternetConnectivityChange.address);
+                event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+                event.InternetConnectivityChange.IPv4      = kConnectivity_Established;
+                event.InternetConnectivityChange.IPv6      = kConnectivity_NoChange;
+                event.InternetConnectivityChange.ipAddress = addr;
 
-                ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
-                              event.InternetConnectivityChange.address);
+                char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+                addr.ToString(ipStrBuf);
+
+                ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName, ipStrBuf);
 
                 PlatformMgr().PostEventOrDie(&event);
             }
@@ -1345,14 +1368,12 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
     GVariant * ssid       = g_variant_lookup_value(properties, "ssid", nullptr);
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid, &length);
-    if (length > sizeof(network.networkID))
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
     // TODO: wpa_supplicant will return ssid with quotes! We should have a better way to get the actual ssid in bytes.
+    gsize length_actual = length - 2;
+    VerifyOrReturnError(length_actual <= sizeof(network.networkID), CHIP_ERROR_INTERNAL);
     ChipLogDetail(DeviceLayer, "Current connected network: %s", ssidStr);
-    memcpy(network.networkID, ssidStr + 1, length - 2);
-    network.networkIDLen = length - 2;
+    memcpy(network.networkID, ssidStr + 1, length_actual);
+    network.networkIDLen = length_actual;
     return CHIP_NO_ERROR;
 }
 
@@ -1382,12 +1403,16 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(ssid.size() <= sizeof(sInterestedSSID), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR ret  = CHIP_NO_ERROR;
     GError * err    = nullptr;
     GVariant * args = nullptr;
     GVariantBuilder builder;
     gboolean result;
+
+    memcpy(sInterestedSSID, ssid.data(), ssid.size());
+    sInterestedSSIDLen = ssid.size();
 
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
     g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
@@ -1532,7 +1557,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         bssidLen = 0;
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%" PRId16, int(ssidLen), ssidStr, bssidStr, signal);
+    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), ssidStr, bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
@@ -1641,7 +1666,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
     auto bandInfo   = GetBandAndChannelFromFrequency(frequency);
     result.wiFiBand = bandInfo.first;
     result.channel  = bandInfo.second;
-    result.security = GetNetworkSecurityType(bssProxy);
+    result.security.SetRaw(GetNetworkSecurityType(bssProxy));
 
     return true;
 }
@@ -1668,7 +1693,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, G
     for (const gchar * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
-        if (_GetBssInfo(bssPath, network))
+        if (_GetBssInfo(bssPath, network) && network.ssidLen == sInterestedSSIDLen &&
+            memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
         {
             networkScanned->push_back(network);
         }

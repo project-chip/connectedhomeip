@@ -1,7 +1,7 @@
 import enum
 
 from dataclasses import dataclass, field
-from typing import List, Set, Optional
+from typing import List, Set, Optional, Union
 
 
 class FieldAttribute(enum.Enum):
@@ -16,8 +16,13 @@ class CommandAttribute(enum.Enum):
 class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
-    GLOBAL = enum.auto()
     NOSUBSCRIBE = enum.auto()
+
+
+class AttributeStorage(enum.Enum):
+    RAM = enum.auto()
+    PERSIST = enum.auto()
+    CALLBACK = enum.auto()
 
 
 class EventPriority(enum.Enum):
@@ -39,6 +44,18 @@ class StructTag(enum.Enum):
 class EndpointContentType(enum.Enum):
     SERVER_CLUSTER = enum.auto()
     CLIENT_BINDING = enum.auto()
+
+
+class AccessPrivilege(enum.Enum):
+    VIEW = enum.auto()
+    OPERATE = enum.auto()
+    MANAGE = enum.auto()
+    ADMINISTER = enum.auto()
+
+
+class AttributeOperation(enum.Enum):
+    READ = enum.auto()
+    WRITE = enum.auto()
 
 
 @dataclass
@@ -70,6 +87,9 @@ class Field:
 class Attribute:
     definition: Field
     tags: Set[AttributeTag] = field(default_factory=set)
+    readacl: AccessPrivilege = AccessPrivilege.VIEW
+    writeacl: AccessPrivilege = AccessPrivilege.OPERATE
+    default: Optional[Union[str, int]] = None
 
     @property
     def is_readable(self):
@@ -78,10 +98,6 @@ class Attribute:
     @property
     def is_writable(self):
         return AttributeTag.WRITABLE in self.tags
-
-    @property
-    def is_global(self):
-        return AttributeTag.GLOBAL in self.tags
 
     @property
     def is_subscribable(self):
@@ -93,6 +109,7 @@ class Struct:
     name: str
     fields: List[Field]
     tag: Optional[StructTag] = None
+    code: Optional[int] = None  # for responses only
 
 
 @dataclass
@@ -101,6 +118,7 @@ class Event:
     name: str
     code: int
     fields: List[Field]
+    readacl: AccessPrivilege = AccessPrivilege.VIEW
 
 
 @dataclass
@@ -130,6 +148,7 @@ class Command:
     input_param: Optional[str]
     output_param: str
     attributes: Set[CommandAttribute] = field(default_factory=set)
+    invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
 
     @property
     def is_timed_invoke(self):
@@ -150,9 +169,22 @@ class Cluster:
 
 
 @dataclass
+class AttributeInstantiation:
+    name: str
+    storage: AttributeStorage
+    default: Optional[Union[str, int, bool]] = None
+
+
+@dataclass
+class ServerClusterInstantiation:
+    name: str
+    attributes: List[AttributeInstantiation] = field(default_factory=list)
+
+
+@dataclass
 class Endpoint:
     number: int
-    server_clusters: List[str] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

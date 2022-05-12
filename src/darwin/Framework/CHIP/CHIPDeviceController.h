@@ -30,31 +30,63 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 
 @class CHIPCommissioningParameters;
 @protocol CHIPDevicePairingDelegate;
-@protocol CHIPPersistentStorageDelegate;
-@protocol CHIPKeypair;
 
 @interface CHIPDeviceController : NSObject
 
 @property (readonly, nonatomic) BOOL isRunning;
 
+/**
+ * Start pairing for a device with the given ID, using the provided setup PIN
+ * to establish a PASE connection.
+ *
+ * The IP and port for the device will be discovered automatically based on the
+ * provided discriminator.
+ *
+ * The pairing process will proceed until a PASE session is established or an
+ * error occurs, then notify onPairingComplete on the CHIPDevicePairingDelegate
+ * for this controller.  That delegate is expected to call commissionDevice
+ * after that point if it wants to commission the device.
+ */
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
+/**
+ * Start pairing for a device with the given ID, using the provided IP address
+ * and port to connect to the device and the provided setup PIN to establish a
+ * PASE connection.
+ *
+ * The pairing process will proceed until a PASE session is established or an
+ * error occurs, then notify onPairingComplete on the CHIPDevicePairingDelegate
+ * for this controller.  That delegate is expected to call commissionDevice
+ * after that point if it wants to commission the device.
+ */
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
-     discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
+/**
+ * Start pairing for a device with the given ID and onboarding payload (QR code
+ * or manual setup code).  The payload will be used to discover the device and
+ * establish a PASE connection.
+ *
+ * The pairing process will proceed until a PASE session is established or an
+ * error occurs, then notify onPairingComplete on the CHIPDevicePairingDelegate
+ * for this controller.  That delegate is expected to call commissionDevice
+ * after that point if it wants to commission the device.
+ */
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
 - (BOOL)commissionDevice:(uint64_t)deviceId
      commissioningParams:(CHIPCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error;
 
-- (void)setListenPort:(uint16_t)port;
+- (BOOL)continueCommissioningDevice:(void *)device
+           ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
+                              error:(NSError * __autoreleasing *)error;
+
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
@@ -76,13 +108,11 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  */
 - (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
 
+/**
+ * Controllers are created via the MatterControllerFactory object.
+ */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-/**
- * Return the single CHIPDeviceController we support existing.
- */
-+ (CHIPDeviceController *)sharedController;
 
 /**
  * Return the Node Id assigned to the controller.
@@ -98,24 +128,10 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  */
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
-- (void)setKeyValueStoreManagerPath:(const char *)keyValueStorePath;
-
 /**
- * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to
- * check if the stack needs to be started up.
- *
- * @param[in] storageDelegate The delegate for persistent storage
- * @param[in] vendorId The vendor ID of the commissioner application
- * @param[in] nocSigner The CHIPKeypair that is used to generate and sign Node Operational Credentials
+ * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
  */
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
-       vendorId:(uint16_t)vendorId
-      nocSigner:(nullable id<CHIPKeypair>)nocSigner;
-
-/**
- * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
- */
-- (BOOL)shutdown;
+- (void)shutdown;
 
 @end
 

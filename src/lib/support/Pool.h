@@ -240,8 +240,15 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
-     *  @return    Loop     Returns Break or Finish according to the iteration
+     *  @param     function A functor of type `Loop (*)(T*)`.
+     *                      Return Loop::Break to break the iteration.
+     *                      The only modification the functor is allowed to make
+     *                      to the pool before returning is releasing the
+     *                      object that was passed to the functor.  Any other
+     *                      desired changes need to be made after iteration
+     *                      completes.
+     *  @return    Loop     Returns Break if some call to the functor returned
+     *                      Break.  Otherwise returns Finish.
      *
      * caution
      *   this function is not thread-safe, make sure all usage of the
@@ -336,6 +343,11 @@ public:
      */
     size_t Capacity() const { return SIZE_MAX; }
 
+    /*
+     * This method exists purely to line up with the static allocator version. Heap based object pool will never be exhausted.
+     */
+    bool Exhausted() const { return false; }
+
     void ReleaseObject(T * object)
     {
         if (object != nullptr)
@@ -343,9 +355,17 @@ public:
             internal::HeapObjectListNode * node = mObjects.FindNode(object);
             if (node != nullptr)
             {
-                // Note that the node is not removed here; that is deferred until the end of the next pool iteration.
                 node->mObject = nullptr;
                 Platform::Delete(object);
+
+                // The node needs to be released immediately if we are not in the middle of iteration.
+                // Otherwise cleanup is deferred until all iteration on this pool completes and it's safe to release nodes.
+                if (mObjects.mIterationDepth == 0)
+                {
+                    node->Remove();
+                    Platform::Delete(node);
+                }
+
                 DecreaseUsage();
             }
         }
@@ -357,8 +377,15 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
-     *  @return    Loop     Returns Break or Finish according to the iteration
+     *  @param     function A functor of type `Loop (*)(T*)`.
+     *                      Return Loop::Break to break the iteration.
+     *                      The only modification the functor is allowed to make
+     *                      to the pool before returning is releasing the
+     *                      object that was passed to the functor.  Any other
+     *                      desired changes need to be made after iteration
+     *                      completes.
+     *  @return    Loop     Returns Break if some call to the functor returned
+     *                      Break.  Otherwise returns Finish.
      */
     template <typename Function>
     Loop ForEachActiveObject(Function && function)

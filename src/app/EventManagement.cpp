@@ -82,32 +82,9 @@ struct CopyAndAdjustDeltaTimeContext
     EventLoadOutContext * mpContext = nullptr;
 };
 
-void EventManagement::InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                                        PersistedCounter * apPersistedCounter)
-{
-    PersistedCounter * eventNumberCounter = nullptr;
-    if (apPersistedCounter != nullptr && apCounterKey != nullptr && aCounterEpoch != 0)
-    {
-        eventNumberCounter =
-            (apPersistedCounter->Init(*apCounterKey, aCounterEpoch) == CHIP_NO_ERROR) ? apPersistedCounter : nullptr;
-    }
-
-    if (eventNumberCounter == nullptr)
-    {
-        mNonPersistedCounter.Init(0);
-        mpEventNumberCounter = &(mNonPersistedCounter);
-    }
-    else
-    {
-        mpEventNumberCounter = eventNumberCounter;
-    }
-    mLastEventNumber = mpEventNumberCounter->GetValue();
-}
-
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                            CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                           Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                           PersistedCounter * apPersistedCounter)
+                           MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
 {
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
@@ -140,7 +117,8 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
         current->mAppData               = nullptr;
     }
 
-    InitializeCounter(apCounterKey, aCounterEpoch, apPersistedCounter);
+    mpEventNumberCounter = apEventNumberCounter;
+    mLastEventNumber     = mpEventNumberCounter->GetValue();
 
     mpEventBuffer = apCircularEventBuffer;
     mState        = EventManagementStates::Idle;
@@ -341,6 +319,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
     // The fabricIndex profile tag is internal use only for fabric filtering when retrieving event from circular event buffer,
     // and would not go on the wire.
+    // Revisit FabricRemovedCB function should the encoding of fabricIndex change in the future.
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
@@ -357,12 +336,10 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                             CircularEventBuffer * apCircularEventBuffer,
                                             const LogStorageResources * const apLogStorageResources,
-                                            Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
-                                            PersistedCounter * apPersistedCounter)
+                                            MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter)
 {
 
-    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apCounterKey, aCounterEpoch,
-                   apPersistedCounter);
+    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter);
 }
 
 /**
@@ -405,15 +382,13 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
         return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)),
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
-    else if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEpochTimestamp))) && !(ctx->mpContext->mFirst))
+    if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEpochTimestamp))) && !(ctx->mpContext->mFirst))
     {
         return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)),
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
-    else
-    {
-        return ctx->mpWriter->CopyElement(reader);
-    }
+
+    return ctx->mpWriter->CopyElement(reader);
 }
 
 void EventManagement::VendEventNumber()
@@ -427,7 +402,7 @@ void EventManagement::VendEventNumber()
     }
 
     // Assign event Number to the buffer's counter's value.
-    mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
+    mLastEventNumber = mpEventNumberCounter->GetValue();
 }
 
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
@@ -523,7 +498,7 @@ exit:
         mLastEventTimestamp = timestamp;
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%" PRIx16
+                      "LogEvent event number: 0x" ChipLogFormatX64 " priority: %u, endpoint id:  0x%x"
                       " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), opts.mPath.mEndpointId,
                       ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId,
@@ -596,7 +571,9 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         return CHIP_ERROR_UNEXPECTED_EVENT;
     }
 
-    if (event.mFabricIndex != kUndefinedFabricIndex && eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex)
+    if (event.mFabricIndex.HasValue() &&
+        (event.mFabricIndex.Value() == kUndefinedFabricIndex ||
+         eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex.Value()))
     {
         return CHIP_ERROR_UNEXPECTED_EVENT;
     }
@@ -774,6 +751,69 @@ exit:
     return err;
 }
 
+CHIP_ERROR EventManagement::FabricRemovedCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext)
+{
+    // the function does not actually remove the event, instead, it sets the fabric index to an invalid value.
+    FabricIndex * invalidFabricIndex = static_cast<FabricIndex *>(apContext);
+
+    TLVReader event;
+    TLVType tlvType;
+    TLVType tlvType1;
+    event.Init(aReader);
+    VerifyOrReturnError(event.EnterContainer(tlvType) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.Next(TLV::ContextTag(to_underlying(EventReportIB::Tag::kEventData))) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.EnterContainer(tlvType1) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+
+    while (CHIP_NO_ERROR == event.Next())
+    {
+        if (event.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
+        {
+            uint8_t fabricIndex = 0;
+            VerifyOrReturnError(event.Get(fabricIndex) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+            if (fabricIndex == *invalidFabricIndex)
+            {
+                CHIPCircularTLVBuffer * readBuffer = static_cast<CHIPCircularTLVBuffer *>(event.GetBackingStore());
+                // fabricIndex is encoded as an integer; the dataPtr will point to a location immediately after its encoding
+                // shift the dataPtr to point to the encoding of the fabric index, accounting for wraparound in backing storage
+                // we cannot get the actual encoding size from current container beginning to the fabric index because of several
+                // optional parameters, so we are assuming minimal encoding is used and the fabric index is 1 byte.
+                uint8_t * dataPtr;
+                if (event.GetReadPoint() != readBuffer->GetQueue())
+                {
+                    dataPtr = readBuffer->GetQueue() + (event.GetReadPoint() - readBuffer->GetQueue() - 1);
+                }
+                else
+                {
+                    dataPtr = readBuffer->GetQueue() + readBuffer->GetTotalDataLength() - 1;
+                }
+
+                *dataPtr = kUndefinedFabricIndex;
+            }
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EventManagement::FabricRemoved(FabricIndex aFabricIndex)
+{
+    const bool recurse = false;
+    TLVReader reader;
+    CircularEventBufferWrapper bufWrapper;
+
+#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
+    ScopedLock lock(sInstance);
+#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
+
+    ReturnErrorOnFailure(GetEventReader(reader, PriorityLevel::Critical, &bufWrapper));
+    CHIP_ERROR err = TLV::Utilities::Iterate(reader, FabricRemovedCB, &aFabricIndex, recurse);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aPriority, CircularEventBufferWrapper * apBufWrapper)
 {
     CircularEventBuffer * buffer = GetPriorityBuffer(aPriority);
@@ -787,7 +827,7 @@ CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size_t aDepth, void * apContext)
+CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size_t, void * apContext)
 {
     EventEnvelopeContext * const envelope = static_cast<EventEnvelopeContext *>(apContext);
     TLVReader reader;
@@ -834,7 +874,9 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
 
     if (reader.GetTag() == TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag))
     {
-        ReturnErrorOnFailure(reader.Get(envelope->mFabricIndex));
+        uint8_t fabricIndex = kUndefinedFabricIndex;
+        ReturnErrorOnFailure(reader.Get(fabricIndex));
+        envelope->mFabricIndex.SetValue(fabricIndex);
     }
     return CHIP_NO_ERROR;
 }
@@ -895,10 +937,9 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
     CHIPCircularTLVBuffer::Init(apBuffer, aBufferLength);
-    mpPrev               = apPrev;
-    mpNext               = apNext;
-    mPriority            = aPriorityLevel;
-    mpEventNumberCounter = nullptr;
+    mpPrev    = apPrev;
+    mpNext    = apNext;
+    mPriority = aPriorityLevel;
 }
 
 bool CircularEventBuffer::IsFinalDestinationForPriority(PriorityLevel aPriority) const

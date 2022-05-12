@@ -44,62 +44,14 @@
 #endif /* CHIP_ENABLE_OPENTHREAD */
 #endif /* defined(SL_WIFI) */
 
-#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
-
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the EFR32 platform.
 // These can be overridden by the application as needed.
-
-// -------------- EFR32 NVM3 Storage Configuration -------------
-
-/**
- *  @def CHIP_DEVICE_CONFIG_NVM3_MAX_NUM_OBJECTS
- *
- *  @brief
- *    Configures the size of the nvm3 cache and should be set >= the
- *    maximum number of Chip Config objects, e.g...
- *    Factory configs[5], System configs[23], Counter configs[32] + margin[4] = 64.
- *
- */
-#ifndef CHIP_DEVICE_CONFIG_NVM3_MAX_NUM_OBJECTS
-#define CHIP_DEVICE_CONFIG_NVM3_MAX_NUM_OBJECTS 64
-#endif // CHIP_DEVICE_CONFIG_NVM3_MAX_NUM_OBJECTS
-
-/**
- *  @def CHIP_DEVICE_CONFIG_NVM3_MAX_OBJECT_SIZE
- *
- *  @brief
- *    This determines the max size for any Chip nvm3 object
- *    (e.g. for Config 'string' or 'binary' types).
- */
-#ifndef CHIP_DEVICE_CONFIG_NVM3_MAX_OBJECT_SIZE
-#define CHIP_DEVICE_CONFIG_NVM3_MAX_OBJECT_SIZE 1000
-#endif // CHIP_DEVICE_CONFIG_NVM3_MAX_OBJECT_SIZE
-
-/**
- *  @def CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE
- *
- *  @brief
- *    This determines the Flash size used for nvm3 data storage:-
- *    (assuming 2k Flash page size) => Total Flash size for nvm3: 8 * 2k = 16k
- *    The total size should allow sufficient margin for wear-levelling and
- *    repacking.
- *
- *    MG21 and MG 24 a 8k per page. 3 * 8k = 24k
- */
-#ifndef CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE
-#if defined(EFR32MG21) || defined(EFR32MG24)
-#define CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE 3
-#else
-#define CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE 8
-#endif
-#endif // CHIP_DEVICE_CONFIG_NVM3_NUM_FLASH_PAGES_FOR_STORAGE
 
 // ========== Platform-specific Configuration Overrides =========
 
@@ -127,7 +79,7 @@
 #if defined(EFR32MG21)
 #define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (2 * 1024)
 #else
-#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (4 * 1024)
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (8 * 1024)
 #endif
 #endif // CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
 

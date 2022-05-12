@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MatterTVServer</string>
+    <string name="send_command">Send Command</string>
+</resources>

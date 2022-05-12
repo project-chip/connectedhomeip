@@ -25,6 +25,8 @@
 #import <CHIP/CHIPDevice.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestKeys.h"
+#import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
 
@@ -40,7 +42,6 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static const uint16_t kDiscriminator = 3840;
 static const uint32_t kSetupPINCode = 20202021;
 static const uint16_t kRemotePort = 5540;
 static const uint16_t kLocalPort = 5541;
@@ -51,9 +52,12 @@ static uint16_t kTestVendorId = 0xFFF1u;
 // The following global variable holds the reference to the device object.
 static CHIPDevice * mConnectedDevice;
 
+// Singleton controller we use.
+static CHIPDeviceController * sController = nil;
+
 static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
     [controller getConnectedDevice:kDeviceId
@@ -94,8 +98,12 @@ static CHIPDevice * GetConnectedDevice(void)
 - (void)onPairingComplete:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
+
+    NSError * commissionError = nil;
+    [sController commissionDevice:kDeviceId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
+    XCTAssertNil(commissionError);
+
+    // Keep waiting for onCommissioningComplete
 }
 
 - (void)onCommissioningComplete:(NSError *)error
@@ -136,25 +144,35 @@ static CHIPDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    factoryParams.port = @(kLocalPort);
+
+    BOOL ok = [factory startup:factoryParams];
+    XCTAssertTrue(ok);
+
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys ipk:testKeys.ipk];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
+
+    sController = controller;
 
     CHIPDeviceTestPairingDelegate * pairing = [[CHIPDeviceTestPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
-    [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil vendorId:kTestVendorId nocSigner:nil];
-    XCTAssertTrue(started);
-
     NSError * error;
-    [controller pairDevice:kDeviceId
-                   address:kAddress
-                      port:kRemotePort
-             discriminator:kDiscriminator
-              setupPINCode:kSetupPINCode
-                     error:&error];
+    [controller pairDevice:kDeviceId address:kAddress port:kRemotePort setupPINCode:kSetupPINCode error:&error];
     XCTAssertEqual(error.code, 0);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
@@ -172,11 +190,13 @@ static CHIPDevice * GetConnectedDevice(void)
 
 - (void)shutdownStack
 {
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    BOOL stopped = [controller shutdown];
-    XCTAssertTrue(stopped);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [[MatterControllerFactory sharedInstance] shutdown];
 }
 
 - (void)waitForCommissionee
@@ -684,7 +704,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ cleanSubscriptionExpectation ] timeout:kTimeoutInSeconds];
 
     __auto_type attributeCacheContainer = [[CHIPAttributeCacheContainer alloc] init];
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
     XCTestExpectation * subscribeExpectation = [self expectationWithDescription:@"Subscription complete"];
 

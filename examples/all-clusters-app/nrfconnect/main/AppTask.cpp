@@ -18,7 +18,8 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "Utils.h"
+#include "LEDUtil.h"
+#include "binding-handler.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -39,18 +40,24 @@
 #include <logging/log.h>
 #include <zephyr.h>
 
+using namespace ::chip;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_EVENT_QUEUE_SIZE 10
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
 static LEDWidget sStatusLED;
 static UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
 static k_timer sFunctionTimer;
+
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 namespace LedConsts {
 constexpr uint32_t kBlinkRate_ms{ 500 };
@@ -66,10 +73,6 @@ constexpr uint32_t kOff_ms{ 950 };
 
 } // namespace StatusLed
 } // namespace LedConsts
-
-using namespace ::chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 CHIP_ERROR AppTask::Init()
 {
@@ -123,6 +126,11 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("dk_buttons_init() failed");
         return chip::System::MapErrorZephyr(ret);
     }
+    err = InitBindingHandlers();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("InitBindingHandlers() failed");
+    }
 
     // Initialize timer user data
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
@@ -130,10 +138,15 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 

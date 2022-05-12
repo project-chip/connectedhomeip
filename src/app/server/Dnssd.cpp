@@ -29,7 +29,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
@@ -48,7 +47,7 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-        || event->Type == DeviceLayer::DeviceEventType::kSEDPollingIntervalChange
+        || event->Type == DeviceLayer::DeviceEventType::kSEDIntervalChange
 #endif
     )
     {
@@ -87,26 +86,12 @@ bool DnssdServer::HaveOperationalCredentials()
 void DnssdServer::SetExtendedDiscoveryTimeoutSecs(int32_t secs)
 {
     ChipLogDetail(Discovery, "Setting extended discovery timeout to %" PRId32 "s", secs);
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), secs);
+    mExtendedDiscoveryTimeoutSecs = MakeOptional(secs);
 }
 
 int32_t DnssdServer::GetExtendedDiscoveryTimeoutSecs()
 {
-    int32_t secs;
-    CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
-        DefaultStorageKeyAllocator::DNSExtendedDiscoveryTimeout(), &secs);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        return secs;
-    }
-
-    if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        ChipLogError(Discovery, "Failed to load extended discovery timeout: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS;
+    return mExtendedDiscoveryTimeoutSecs.ValueOr(CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS);
 }
 
 /// Callback from Extended Discovery Expiration timer
@@ -221,7 +206,7 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling discovery timeout in %" PRId16 "s", mDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling discovery timeout in %ds", mDiscoveryTimeoutSecs);
 
     mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
 

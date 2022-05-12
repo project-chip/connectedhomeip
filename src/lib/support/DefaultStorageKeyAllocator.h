@@ -26,7 +26,14 @@
 namespace chip {
 
 /**
- * This is the common key allocation policy for all classes using PersistentStorageDelegate storage
+ * This is the common key allocation policy for all classes using
+ * PersistentStorageDelegate storage.
+ *
+ * Keys should have the following formats:
+ *
+ * * Keys that are not tied to a specific fabric: "g/....".
+ * * Keys that are tied to a specific fabric: "f/%x/...." where the %x gets
+ *   replaced by the fabric index.
  */
 class DefaultStorageKeyAllocator
 {
@@ -42,22 +49,37 @@ public:
     const char * FabricMetadata(FabricIndex fabric) { return Format("f/%x/m", fabric); }
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
-    // Access Control List
+    // FailSafeContext
+    const char * FailSafeContextKey() { return Format("g/fs/c"); }
+    static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
 
-    const char * AccessControlList() { return Format("acl"); }
-    const char * AccessControlEntry(size_t index)
+    // Session resumption
+    const char * FabricSession(FabricIndex fabric, NodeId nodeId)
     {
-        // This cast will never overflow because the number of ACL entries will be low.
-        return Format("acl/%x", static_cast<unsigned int>(index));
+        return Format("f/%x/s/%08" PRIX32 "%08" PRIX32, fabric, static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
     }
+    const char * SessionResumptionIndex() { return Format("g/sri"); }
+    const char * SessionResumption(const char * resumptionIdBase64) { return Format("g/s/%s", resumptionIdBase64); }
+
+    // Access Control
+    const char * AccessControlAclEntry(FabricIndex fabric, size_t index)
+    {
+        return Format("f/%x/ac/0/%x", fabric, static_cast<unsigned>(index));
+    }
+    const char * AccessControlExtensionEntry(FabricIndex fabric) { return Format("f/%x/ac/1", fabric); }
 
     // Group Message Counters
-    const char * GroupDataCounter() { return Format("gdc"); }
-    const char * GroupControlCounter() { return Format("gcc"); }
+    const char * GroupDataCounter() { return Format("g/gdc"); }
+    const char * GroupControlCounter() { return Format("g/gcc"); }
+
+    // Device Information Provider
+    const char * UserLabelLengthKey(EndpointId endpoint) { return Format("g/userlbl/%x", endpoint); }
+    const char * UserLabelIndexKey(EndpointId endpoint, uint32_t index) { return Format("g/userlbl/%x/%" PRIx32, endpoint, index); }
 
     // Group Data Provider
 
-    const char * FabricTable() { return Format("f/t"); }
+    // List of fabric indices that have endpoint-to-group associations defined.
+    const char * GroupFabricList() { return Format("g/gfl"); }
     const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
     const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
     const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }
@@ -69,22 +91,24 @@ public:
 
     const char * AttributeValue(const app::ConcreteAttributePath & aPath)
     {
-        // Needs at most 24 chars: 4 for "a///", 4 for the endpoint id, 8 each
+        // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
         // for the cluster and attribute ids.
-        return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+        return Format("g/a/%x/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
-    const char * BindingTable() { return Format("bt"); }
-    const char * BindingTableEntry(uint8_t index) { return Format("bt/%x", index); }
+    // TODO: Should store fabric-specific parts of the binding list under keys
+    // starting with "f/%x/".
+    const char * BindingTable() { return Format("g/bt"); }
+    const char * BindingTableEntry(uint8_t index) { return Format("g/bt/%x", index); }
 
-    static const char * OTADefaultProviders() { return "o/dp"; }
-    static const char * OTACurrentProvider() { return "o/cp"; }
-    static const char * OTAUpdateToken() { return "o/ut"; }
-    static const char * OTACurrentUpdateState() { return "o/us"; }
-    static const char * OTATargetVersion() { return "o/tv"; }
+    static const char * OTADefaultProviders() { return "g/o/dp"; }
+    static const char * OTACurrentProvider() { return "g/o/cp"; }
+    static const char * OTAUpdateToken() { return "g/o/ut"; }
+    static const char * OTACurrentUpdateState() { return "g/o/us"; }
+    static const char * OTATargetVersion() { return "g/o/tv"; }
 
-    // [G]lobal [D]NS-related keys
-    static const char * DNSExtendedDiscoveryTimeout() { return "g/d/edt"; }
+    // Event number counter.
+    const char * IMEventNumber() { return Format("g/im/ec"); }
 
 private:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,

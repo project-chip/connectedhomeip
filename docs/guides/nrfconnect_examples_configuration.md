@@ -34,12 +34,16 @@ Complete the following steps:
     directory, with _build-target_ replaced with the build target name of the
     kit, for example _nrf52840dk_nrf52840_:
 
-         $ west build -b build-target
+         ```
+         west build -b build-target
+         ```
 
 2.  Run the terminal-based interface called menuconfig by typing the following
     command:
 
-         $ west build -t menuconfig
+         ```
+         west build -t menuconfig
+         ```
 
     The menuconfig terminal window appears, in which you can navigate using
     arrow keys and other keys, based on the description at the bottom of the
@@ -93,7 +97,9 @@ that you rebuild your application after editing them by typing the following
 command in the example directory, with _build-target_ replaced with the build
 target name of the kit, for example _nrf52840dk_nrf52840_:
 
-        $ west build -b build-target
+        ```
+        west build -b build-target
+        ```
 
 <hr>
 

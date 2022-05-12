@@ -25,6 +25,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include <inet/InetInterface.h>
@@ -32,6 +33,8 @@
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <setup_payload/SetupPayload.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
 
 struct LinuxDeviceOptions
 {
@@ -50,6 +53,9 @@ struct LinuxDeviceOptions
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
+    bool traceStreamToLogEnabled        = false;
+    chip::Optional<std::string> traceStreamFilename;
+    chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
 
     static LinuxDeviceOptions & GetInstance();
 };

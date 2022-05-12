@@ -21,6 +21,7 @@
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/InteractionModelEngine.h>
 #include <lib/core/CHIPError.h>
 
 using namespace chip;
@@ -31,6 +32,14 @@ namespace {
 // TODO: Maybe consider making this configurable?  See also
 // CHIPIMDispatch.mm.
 constexpr EndpointId kSupportedEndpoint = 0;
+
+class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver {
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override
+    {
+        return app::IsDeviceTypeOnEndpoint(deviceType, endpoint);
+    }
+} gDeviceTypeResolver;
 
 // TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate {
@@ -68,7 +77,7 @@ AccessControlDelegate gDelegate;
 {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        GetAccessControl().Init(&gDelegate);
+        GetAccessControl().Init(&gDelegate, gDeviceTypeResolver);
     });
 }
 

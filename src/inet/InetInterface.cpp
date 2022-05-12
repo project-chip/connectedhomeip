@@ -30,11 +30,12 @@
 #include <inet/InetInterface.h>
 
 #include <inet/IPPrefix.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 #include <lwip/netif.h>
 #include <lwip/sys.h>
 #include <lwip/tcpip.h>
@@ -57,13 +58,104 @@
 #include <net/net_if.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#include <inet/UDPEndPointImplOpenThread.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 
 namespace chip {
 namespace Inet {
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
+{
+    if (mPlatformInterface && nameBufSize >= kMaxIfNameLength)
+    {
+        nameBuf[0] = 'o';
+        nameBuf[1] = 't';
+        nameBuf[2] = 0;
+    }
+    else
+    {
+        nameBuf[0] = 0;
+    }
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & interface)
+{
+    if (strlen(intfName) < 3)
+    {
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+    char * parseEnd       = nullptr;
+    unsigned long intfNum = strtoul(intfName + 2, &parseEnd, 10);
+    if (*parseEnd != 0 || intfNum > UINT8_MAX)
+    {
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+
+    interface = InterfaceId(intfNum);
+    if (intfNum == 0)
+    {
+        return INET_ERROR_UNKNOWN_INTERFACE;
+    }
+    return CHIP_NO_ERROR;
+}
+
+bool InterfaceIterator::Next()
+{
+    // TODO : Cleanup #17346
+    return false;
+}
+
+InterfaceAddressIterator::InterfaceAddressIterator()
+{
+    mNetifAddrList = nullptr;
+    mCurAddr       = nullptr;
+}
+
+bool InterfaceAddressIterator::HasCurrent()
+{
+    return (mNetifAddrList != nullptr) ? (mCurAddr != nullptr) : Next();
+}
+
+bool InterfaceAddressIterator::Next()
+{
+    if (mNetifAddrList == nullptr)
+    {
+        mNetifAddrList = otIp6GetUnicastAddresses(Inet::globalOtInstance);
+        mCurAddr       = mNetifAddrList;
+    }
+    else if (mCurAddr != nullptr)
+    {
+        mCurAddr = mCurAddr->mNext;
+    }
+
+    return (mCurAddr != nullptr);
+}
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
+{
+    if (!HasCurrent())
+    {
+        return CHIP_ERROR_SENTINEL;
+    }
+
+    outIPAddress = IPAddress(mCurAddr->mAddress);
+    return CHIP_NO_ERROR;
+}
+
+uint8_t InterfaceAddressIterator::GetPrefixLength()
+{
+    // Only 64 bits prefix are supported
+    return 64;
+}
+
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) const
 {
@@ -415,11 +507,11 @@ static void backport_if_freenameindex(struct if_nameindex * inArray)
     {
         if (inArray[i].if_name != NULL)
         {
-            free(inArray[i].if_name);
+            Platform::MemoryFree(inArray[i].if_name);
         }
     }
 
-    free(inArray);
+    Platform::MemoryFree(inArray);
 }
 
 static struct if_nameindex * backport_if_nameindex(void)
@@ -451,7 +543,7 @@ static struct if_nameindex * backport_if_nameindex(void)
         lastIntfName = addrIter->ifa_name;
     }
 
-    tmpval = (struct if_nameindex *) malloc((numIntf + 1) * sizeof(struct if_nameindex));
+    tmpval = (struct if_nameindex *) Platform::MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
     VerifyOrExit(tmpval != NULL, );
     memset(tmpval, 0, (numIntf + 1) * sizeof(struct if_nameindex));
 
@@ -483,7 +575,7 @@ static struct if_nameindex * backport_if_nameindex(void)
         }
     }
 
-    retval = (struct if_nameindex *) malloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
+    retval = (struct if_nameindex *) Platform::MemoryAlloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
     VerifyOrExit(retval != NULL, );
     memset(retval, 0, (maxIntfNum + 1) * sizeof(struct if_nameindex));
 
@@ -523,7 +615,7 @@ static struct if_nameindex * backport_if_nameindex(void)
 exit:
     if (tmpval != NULL)
     {
-        free(tmpval);
+        Platform::MemoryFree(tmpval);
     }
 
     if (addrList != NULL)

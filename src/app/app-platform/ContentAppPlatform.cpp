@@ -86,8 +86,9 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 namespace chip {
 namespace AppPlatform {
 
-EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType,
-                                             const Span<DataVersion> & dataVersionStorage)
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
+                                             const Span<DataVersion> & dataVersionStorage,
+                                             const Span<const EmberAfDeviceType> & deviceTypeList)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -113,8 +114,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             EmberAfStatus ret;
             while (1)
             {
-                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT,
-                                                dataVersionStorage);
+                ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
@@ -392,7 +392,6 @@ uint32_t ContentAppPlatform::GetPincodeFromContentApp(uint16_t vendorId, uint16_
 constexpr EndpointId kTargetBindingClusterEndpointId = 0;
 constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
 constexpr EndpointId kLocalSpeakerEndpointId         = 2;
-constexpr ClusterId kNoClusterIdSpecified            = kInvalidClusterId;
 constexpr ClusterId kClusterIdDescriptor             = 0x001d;
 constexpr ClusterId kClusterIdOnOff                  = 0x0006;
 constexpr ClusterId kClusterIdWakeOnLAN              = 0x0503;
@@ -456,7 +455,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalVideoPlayerEndpointId),
-            .cluster     = MakeOptional(kNoClusterIdSpecified),
+            .cluster     = NullOptional,
             .fabricIndex = kUndefinedFabricIndex,
         });
     }
@@ -471,7 +470,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
             .node        = MakeOptional(localNodeId),
             .group       = NullOptional,
             .endpoint    = MakeOptional(kLocalSpeakerEndpointId),
-            .cluster     = MakeOptional(kNoClusterIdSpecified),
+            .cluster     = NullOptional,
             .fabricIndex = kUndefinedFabricIndex,
         });
     }
@@ -499,7 +498,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
                         .node        = MakeOptional(localNodeId),
                         .group       = NullOptional,
                         .endpoint    = MakeOptional(app->GetEndpointId()),
-                        .cluster     = MakeOptional(kNoClusterIdSpecified),
+                        .cluster     = NullOptional,
                         .fabricIndex = kUndefinedFabricIndex,
                     });
                 }
@@ -507,7 +506,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(OperationalDeviceProxy * targe
         }
     }
 
-    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, entry, nullptr));
+    // TODO: add a subject description on the ACL
+    ReturnErrorOnFailure(GetAccessControl().CreateEntry(nullptr, targetDeviceProxy->GetFabricIndex(), nullptr, entry));
 
     ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());

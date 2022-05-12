@@ -1,0 +1,55 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
+import("sample.gni")
+
+assert(chip_build_tools)
+
+project_dir = "./.."
+
+chip_data_model("chef-data-model") {
+  zap_file = "${project_dir}/devices/${sample_zap_file}"
+
+  zap_pregenerated_dir =
+      "${chip_root}/examples/chef/out/${sample_name}/zap-generated/"
+  is_server = true
+}
+
+executable("${sample_name}") {
+  sources = [ "${project_dir}/linux/main.cpp" ]
+
+  deps = [
+    ":chef-data-model",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/platform",
+    "${project_dir}/shell_common:shell_common",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = root_out_dir
+}
+
+group("chef") {
+  deps = [ ":${sample_name}" ]
+}
+
+import("//build_overrides/chip.gni")

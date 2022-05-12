@@ -1652,6 +1652,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_boolean"
       response:
+          saveAs: booValueNull
           value: null
 
     - label: "Write attribute NULLABLE_BOOLEAN True"
@@ -1665,6 +1666,13 @@ tests:
       attribute: "nullable_boolean"
       response:
           value: true
+
+    - label: "Read attribute NULLABLE_BOOLEAN not null"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          constraints:
+              notValue: booValueNull
 
     # Tests for nullable Bitmap8 attribute
 
@@ -1692,6 +1700,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_bitmap8"
       response:
+          saveAs: nullableValue254
           value: 254
 
     - label: "Write attribute NULLABLE_BITMAP8 null Value"
@@ -1705,6 +1714,13 @@ tests:
       attribute: "nullable_bitmap8"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_BITMAP8 not 254 Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap8"
+      response:
+          constraints:
+              notValue: nullableValue254
 
     # Tests for nullable Bitmap16 attribute
 
@@ -2758,6 +2774,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
+          saveAs: nullableEnumAttr254
           value: 254
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
@@ -2771,6 +2788,13 @@ tests:
       attribute: "nullable_enum_attr"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM not 254 Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          constraints:
+              notValue: nullableEnumAttr254
 
     # Tests for Octet String attribute
 
@@ -2790,6 +2814,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_octet_string"
       response:
+          saveAs: nullableOctetStrTestValue
           value: "TestValue"
 
     - label: "Write attribute NULLABLE_OCTET_STRING"
@@ -2816,6 +2841,13 @@ tests:
       response:
           value: ""
 
+    - label: "Read attribute NULLABLE_OCTET_STRING not TestValue"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              notValue: nullableOctetStrTestValue
+
     # Tests for Char String attribute
 
     - label: "Read attribute NULLABLE_CHAR_STRING Default Value"
@@ -2834,7 +2866,14 @@ tests:
       command: "readAttribute"
       attribute: "nullable_char_string"
       response:
+          saveAs: nullableCharStringSave
           value: "☉T☉"
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: nullableCharStringSave
 
     - label: "Write attribute NULLABLE_CHAR_STRING - Value too long"
       command: "writeAttribute"
@@ -2859,6 +2898,13 @@ tests:
       attribute: "nullable_char_string"
       response:
           value: ""
+
+    - label: "Read attribute NULLABLE_CHAR_STRING not ☉T☉"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              notValue: nullableCharStringSave
 
     - label: "Read attribute from nonexistent endpoint."
       endpoint: 200
@@ -3778,7 +3824,7 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [0, 1, 4, 5, 6, 9, 10, 11]
+          value: [0, 1, 4, 5, 6, 8, 9, 10, 11]
 
     # Struct-typed attribute
     - label: "Write struct-typed attribute"

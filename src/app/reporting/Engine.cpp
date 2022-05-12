@@ -370,7 +370,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         eventReportIBs.EndOfEventReports();
         SuccessOrExit(err = eventReportIBs.GetError());
     }
-    ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
+    ChipLogDetail(DataManagement, "Fetched %u events", static_cast<unsigned int>(eventCount));
 
 exit:
     if (apHasEncodedData != nullptr)
@@ -633,7 +633,7 @@ void Engine::Run()
     }
 }
 
-bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
+bool Engine::MergeOverlappedAttributePath(const AttributePathParams & aAttributePath)
 {
     return Loop::Break == mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
         if (path->IsAttributePathSupersetOf(aAttributePath))
@@ -643,13 +643,129 @@ bool Engine::MergeOverlappedAttributePath(AttributePathParams & aAttributePath)
         }
         if (aAttributePath.IsAttributePathSupersetOf(*path))
         {
+            // TODO: the wildcard input path may be superset of next paths in globalDirtySet, it is fine at this moment, since
+            // when building report, it would use the first path of globalDirtySet to compare against interested paths read clients
+            // want.
+            // It is better to eliminate the duplicate wildcard paths in follow-up
             path->mGeneration  = GetDirtySetGeneration();
+            path->mEndpointId  = aAttributePath.mEndpointId;
+            path->mClusterId   = aAttributePath.mClusterId;
             path->mListIndex   = aAttributePath.mListIndex;
             path->mAttributeId = aAttributePath.mAttributeId;
             return Loop::Break;
         }
         return Loop::Continue;
     });
+}
+
+bool Engine::ClearTombPaths()
+{
+    bool pathReleased = false;
+    mGlobalDirtySet.ForEachActiveObject([&](auto * path) {
+        if (path->mGeneration == 0)
+        {
+            mGlobalDirtySet.ReleaseObject(path);
+            pathReleased = true;
+        }
+        return Loop::Continue;
+    });
+    return pathReleased;
+}
+
+bool Engine::MergeDirtyPathsUnderSameCluster()
+{
+    mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
+        if (outerPath->HasWildcardClusterId() || outerPath->mGeneration == 0)
+        {
+            return Loop::Continue;
+        }
+        mGlobalDirtySet.ForEachActiveObject([&](auto * innerPath) {
+            if (innerPath == outerPath)
+            {
+                return Loop::Continue;
+            }
+            // We don't support paths with a wildcard endpoint + a concrete cluster in global dirty set, so we do a simple == check
+            // here.
+            if (innerPath->mEndpointId != outerPath->mEndpointId || innerPath->mClusterId != outerPath->mClusterId)
+            {
+                return Loop::Continue;
+            }
+            if (innerPath->mGeneration > outerPath->mGeneration)
+            {
+                outerPath->mGeneration = innerPath->mGeneration;
+            }
+            outerPath->SetWildcardAttributeId();
+
+            // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
+            // generation to 0 and then clear it later.
+            innerPath->mGeneration = 0;
+            return Loop::Continue;
+        });
+        return Loop::Continue;
+    });
+
+    return ClearTombPaths();
+}
+
+bool Engine::MergeDirtyPathsUnderSameEndpoint()
+{
+    mGlobalDirtySet.ForEachActiveObject([&](auto * outerPath) {
+        if (outerPath->HasWildcardEndpointId() || outerPath->mGeneration == 0)
+        {
+            return Loop::Continue;
+        }
+        mGlobalDirtySet.ForEachActiveObject([&](auto * innerPath) {
+            if (innerPath == outerPath)
+            {
+                return Loop::Continue;
+            }
+            if (innerPath->mEndpointId != outerPath->mEndpointId)
+            {
+                return Loop::Continue;
+            }
+            if (innerPath->mGeneration > outerPath->mGeneration)
+            {
+                outerPath->mGeneration = innerPath->mGeneration;
+            }
+            outerPath->SetWildcardClusterId();
+            outerPath->SetWildcardAttributeId();
+
+            // The object pool does not allow us to release objects in a nested iteration, mark the path as a tomb by setting its
+            // generation to 0 and then clear it later.
+            innerPath->mGeneration = 0;
+            return Loop::Continue;
+        });
+        return Loop::Continue;
+    });
+    return ClearTombPaths();
+}
+
+CHIP_ERROR Engine::InsertPathIntoDirtySet(const AttributePathParams & aAttributePath)
+{
+    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+
+    if (mGlobalDirtySet.Exhausted() && !MergeDirtyPathsUnderSameCluster() && !MergeDirtyPathsUnderSameEndpoint())
+    {
+        ChipLogDetail(DataManagement, "Global dirty set pool exhausted, merge all paths.");
+        mGlobalDirtySet.ReleaseAll();
+        auto object         = mGlobalDirtySet.CreateObject();
+        object->mGeneration = GetDirtySetGeneration();
+    }
+
+    ReturnErrorCodeIf(MergeOverlappedAttributePath(aAttributePath), CHIP_NO_ERROR);
+    ChipLogDetail(DataManagement, "Cannot merge the new path into any existing path, create one.");
+
+    auto object = mGlobalDirtySet.CreateObject();
+    if (object == nullptr)
+    {
+        // This should not happen, this path should be merged into the wildcard endpoint at least.
+        ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    *object             = aAttributePath;
+    object->mGeneration = GetDirtySetGeneration();
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
@@ -676,18 +792,12 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
         return Loop::Continue;
     });
 
-    if (!MergeOverlappedAttributePath(aAttributePath) &&
-        InteractionModelEngine::GetInstance()->IsOverlappedAttributePath(aAttributePath))
+    if (!InteractionModelEngine::GetInstance()->IsOverlappedAttributePath(aAttributePath))
     {
-        auto object = mGlobalDirtySet.CreateObject();
-        if (object == nullptr)
-        {
-            ChipLogError(DataManagement, "mGlobalDirtySet pool full, cannot handle more entries!");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        *object             = aAttributePath;
-        object->mGeneration = GetDirtySetGeneration();
+        return CHIP_NO_ERROR;
     }
+
+    ReturnErrorOnFailure(InsertPathIntoDirtySet(aAttributePath));
 
     // Schedule work to run asynchronously on the CHIP thread. The scheduled
     // work won't execute until the current execution context has

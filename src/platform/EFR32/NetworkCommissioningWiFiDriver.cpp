@@ -83,8 +83,11 @@ bool SlWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
     return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
 }
 
-Status SlWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
+Status SlWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
+                                        uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
     VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
@@ -100,8 +103,10 @@ Status SlWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials)
     return Status::kSuccess;
 }
 
-Status SlWiFiDriver::RemoveNetwork(ByteSpan networkId)
+Status SlWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
@@ -109,8 +114,9 @@ Status SlWiFiDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     // Only one network is supported for now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
@@ -169,30 +175,34 @@ exit:
     }
 }
 
-uint8_t SlWiFiDriver::ConvertSecuritytype(uint8_t security)
+chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(uint8_t security)
 {
-    uint8_t securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+    chip::BitFlags<WiFiSecurity> securityType;
     if (security == WFX_SEC_NONE)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
-    }
-    else if (security == WFX_SEC_WPA3)
-    {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
-    }
-    else if (security & WFX_SEC_WPA2)
-    {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
-    }
-    else if (security & WFX_SEC_WPA)
-    {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = WiFiSecurity::kUnencrypted;
     }
     else if (security & WFX_SEC_WEP)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = WiFiSecurity::kWepPersonal;
     }
-    // wfx_sec_t support more type
+    else if (security & WFX_SEC_WPA)
+    {
+        securityType = WiFiSecurity::kWpaPersonal;
+    }
+    else if (security & WFX_SEC_WPA2)
+    {
+        securityType = WiFiSecurity::kWpa2Personal;
+    }
+    else if (security == WFX_SEC_WPA3)
+    {
+        securityType = WiFiSecurity::kWpa3Personal;
+    }
+    else
+    {
+        // wfx_sec_t support more type
+        securityType = WiFiSecurity::kUnencrypted;
+    }
 
     return securityType;
 }
@@ -201,7 +211,7 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     bool scanStarted = false;
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
-    if (ssid.size()) // ssid is given, only scan this network
+    if (!ssid.empty()) // ssid is given, only scan this network
     {
         char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
         memcpy(cSsid, ssid.data(), ssid.size());
@@ -229,12 +239,12 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     }
     else
     {
-        NetworkCommissioning::WiFiScanResponse scanResponse = { 0 };
+        NetworkCommissioning::WiFiScanResponse scanResponse = {};
 
-        scanResponse.security = GetInstance().ConvertSecuritytype(aScanResult->security);
-        scanResponse.channel  = aScanResult->chan;
-        scanResponse.rssi     = aScanResult->rssi;
-        scanResponse.ssidLen  = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        scanResponse.security.Set(GetInstance().ConvertSecuritytype(aScanResult->security));
+        scanResponse.channel = aScanResult->chan;
+        scanResponse.rssi    = aScanResult->rssi;
+        scanResponse.ssidLen = strnlen(aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
         memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
         memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 

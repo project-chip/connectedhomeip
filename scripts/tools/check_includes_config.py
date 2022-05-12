@@ -48,6 +48,7 @@ IGNORE: Set[str] = {
     '/platform/nxp/',
     '/platform/Tizen/',
     '/platform/P6/',
+    '/platform/bouffalolab/BL602',
     r'POSIX\.h$',
 }
 
@@ -102,7 +103,7 @@ DENY: Set[str] = {
 ALLOW: Dict[str, Set[str]] = {
 
     # Not intended for embedded clients (#11705).
-    'src/app/AttributeCache.h': {'list', 'map', 'set', 'vector'},
+    'src/app/ClusterStateCache.h': {'list', 'map', 'set', 'vector', 'queue'},
     'src/app/BufferedReadCallback.h': {'vector'},
 
     # Itself in DENY.

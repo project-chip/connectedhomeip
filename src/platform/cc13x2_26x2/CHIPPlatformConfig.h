@@ -37,19 +37,12 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
-#define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER 0x2
 
 // ==================== Security Adaptations ====================
-
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 76)
 
 // ==================== General Configuration Overrides ====================
-
-#ifndef CHIP_CONFIG_MAX_PEER_NODES
-#define CHIP_CONFIG_MAX_PEER_NODES 16
-#endif // CHIP_CONFIG_MAX_PEER_NODES
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 #define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 8
@@ -58,14 +51,6 @@
 #ifndef CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS 8
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
-
-#ifndef CHIP_CONFIG_MAX_ACTIVE_CHANNELS
-#define CHIP_CONFIG_MAX_ACTIVE_CHANNELS 8
-#endif // CHIP_CONFIG_MAX_ACTIVE_CHANNELS
-
-#ifndef CHIP_CONFIG_MAX_CHANNEL_HANDLES
-#define CHIP_CONFIG_MAX_CHANNEL_HANDLES 16
-#endif // CHIP_CONFIG_MAX_CHANNEL_HANDLES
 
 #ifndef CHIP_LOG_FILTERING
 #define CHIP_LOG_FILTERING 0
@@ -81,5 +66,5 @@
 
 // Limit the number of device admins to ensure enough ressources for handling them
 #ifndef CHIP_CONFIG_MAX_FABRICS
-#define CHIP_CONFIG_MAX_FABRICS 5
-#endif // CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 3 // Don't reserve one for rotation slack due to limited resources
+#endif                            // CHIP_CONFIG_MAX_FABRICS

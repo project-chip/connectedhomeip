@@ -26,9 +26,10 @@ const char * getScriptsFolder()
 }
 } // namespace
 
-CHIP_ERROR DelayCommands::WaitForMs(uint16_t ms)
+CHIP_ERROR DelayCommands::WaitForMs(const char * identity,
+                                    const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
 {
-    const auto duration = chip::System::Clock::Milliseconds32(ms);
+    const auto duration = chip::System::Clock::Milliseconds32(value.ms);
     return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
 }
 
@@ -38,7 +39,8 @@ void DelayCommands::OnWaitForMsFn(chip::System::Layer * systemLayer, void * cont
     command->OnWaitForMs();
 }
 
-CHIP_ERROR DelayCommands::WaitForCommissionableAdvertisement()
+CHIP_ERROR DelayCommands::WaitForCommissionableAdvertisement(
+    const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionableAdvertisement::Type & value)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "WaitForCommissionableAdvertisement.py";
@@ -48,7 +50,8 @@ CHIP_ERROR DelayCommands::WaitForCommissionableAdvertisement()
     return RunInternal(command);
 }
 
-CHIP_ERROR DelayCommands::WaitForOperationalAdvertisement()
+CHIP_ERROR DelayCommands::WaitForOperationalAdvertisement(
+    const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForOperationalAdvertisement::Type & value)
 {
     const char * scriptDir            = getScriptsFolder();
     constexpr const char * scriptName = "WaitForOperationalAdvertisement.py";

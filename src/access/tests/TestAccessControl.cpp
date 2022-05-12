@@ -390,6 +390,12 @@ constexpr DeviceTypeId invalidDeviceTypes[] = {
 };
 // clang-format on
 
+class DeviceTypeResolver : public AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
+} testDeviceTypeResolver;
+
 // For testing, supports one subject and target, allows any value (valid or invalid)
 class TestEntryDelegate : public Entry::Delegate
 {
@@ -1335,12 +1341,11 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         accessControl.DeleteEntry(1);
     }
 
-    // TODO(#14431): device type target not yet supported (flip != to == when supported)
     for (auto deviceType : validDeviceTypes)
     {
         NL_TEST_ASSERT(inSuite, entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
         accessControl.DeleteEntry(1);
     }
 
@@ -1358,7 +1363,6 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-    // TODO(#14431): device type target not yet supported (flip != to == when supported)
     for (auto cluster : validClusters)
     {
         for (auto deviceType : validDeviceTypes)
@@ -1368,8 +1372,8 @@ void TestAclValidateTarget(nlTestSuite * inSuite, void * inContext)
                 entry.SetTarget(
                     0, { .flags = Target::kCluster | Target::kDeviceType, .cluster = cluster, .deviceType = deviceType }) ==
                     CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) != CHIP_NO_ERROR);
-            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) != CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(0, entry) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(nullptr, entry) == CHIP_NO_ERROR);
             accessControl.DeleteEntry(1);
         }
     }
@@ -1980,11 +1984,11 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, accessControl.CreateEntry(&index, entry) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, int(index) == 2);
 
-    FabricIndex fabricIndex;
-    Privilege privilege;
-    AuthMode authMode;
-    size_t count;
-    NodeId subject;
+    FabricIndex fabricIndex = 0;
+    Privilege privilege     = Privilege::kView;
+    AuthMode authMode       = AuthMode::kNone;
+    size_t count            = 0;
+    NodeId subject          = kUndefinedNodeId;
     Target target;
 
     NL_TEST_ASSERT(inSuite, accessControl.ReadEntry(0, entry) == CHIP_NO_ERROR);
@@ -2133,9 +2137,9 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 
 int Setup(void * inContext)
 {
-    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate(nullptr);
+    AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
     SetAccessControl(accessControl);
-    VerifyOrDie(GetAccessControl().Init(delegate) == CHIP_NO_ERROR);
+    VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
     return SUCCESS;
 }
 

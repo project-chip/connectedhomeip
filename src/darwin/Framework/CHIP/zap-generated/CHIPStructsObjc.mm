@@ -166,6 +166,44 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPAccessControlClusterAccessControlEntryChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _adminNodeID = nil;
+
+        _adminPasscodeID = nil;
+
+        _changeType = @(0);
+
+        _latestValue = nil;
+
+        _adminFabricIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAccessControlClusterAccessControlExtensionChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _adminNodeID = nil;
+
+        _adminPasscodeID = nil;
+
+        _changeType = @(0);
+
+        _latestValue = nil;
+
+        _adminFabricIndex = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPBridgedActionsClusterActionStruct
 - (instancetype)init
 {
@@ -204,6 +242,91 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPBridgedActionsClusterStateChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = @(0);
+
+        _newState = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedActionsClusterActionFailedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _actionID = @(0);
+
+        _invokeID = @(0);
+
+        _newState = @(0);
+
+        _error = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBasicClusterCapabilityMinimaStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _caseSessionsPerFabric = @(0);
+
+        _subscriptionsPerFabric = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBasicClusterStartUpEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _softwareVersion = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBasicClusterShutDownEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBasicClusterLeaveEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBasicClusterReachableChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _reachableNewValue = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
@@ -214,6 +337,53 @@ NS_ASSUME_NONNULL_BEGIN
         _endpoint = @(0);
 
         _fabricIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateRequestorClusterStateTransitionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousState = @(0);
+
+        _newState = @(0);
+
+        _reason = @(0);
+
+        _targetSoftwareVersion = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateRequestorClusterVersionAppliedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _softwareVersion = @(0);
+
+        _productID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateRequestorClusterDownloadErrorEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _softwareVersion = @(0);
+
+        _bytesDownloaded = @(0);
+
+        _progressPercent = nil;
+
+        _platformCode = nil;
     }
     return self;
 }
@@ -297,7 +467,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _version = @(0);
 
-        _extendedAddress = @(0);
+        _extendedAddress = [NSData data];
 
         _rssi = @(0);
 
@@ -353,6 +523,56 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPGeneralDiagnosticsClusterHardwareFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralDiagnosticsClusterRadioFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralDiagnosticsClusterNetworkFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGeneralDiagnosticsClusterBootReasonEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _bootReason = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct
 - (instancetype)init
 {
@@ -382,6 +602,17 @@ NS_ASSUME_NONNULL_BEGIN
         _stackFreeMinimum = @(0);
 
         _stackSize = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _softwareFault = [CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct new];
     }
     return self;
 }
@@ -494,6 +725,173 @@ NS_ASSUME_NONNULL_BEGIN
         _rotationTime = @(0);
 
         _flags = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPThreadNetworkDiagnosticsClusterConnectionStatusEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionStatus = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWiFiNetworkDiagnosticsClusterDisconnectionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _reasonCode = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWiFiNetworkDiagnosticsClusterAssociationFailureEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _associationFailure = @(0);
+
+        _status = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPWiFiNetworkDiagnosticsClusterConnectionStatusEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _connectionStatus = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedDeviceBasicClusterStartUpEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _softwareVersion = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedDeviceBasicClusterShutDownEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedDeviceBasicClusterLeaveEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBridgedDeviceBasicClusterReachableChangedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _reachableNewValue = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterSwitchLatchedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newPosition = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterInitialPressEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newPosition = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterLongPressEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newPosition = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterShortReleaseEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousPosition = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterLongReleaseEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousPosition = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterMultiPressOngoingEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newPosition = @(0);
+
+        _currentNumberOfPressesCounted = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPSwitchClusterMultiPressCompleteEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _newPosition = @(0);
+
+        _totalNumberOfPressesCounted = @(0);
     }
     return self;
 }
@@ -618,6 +1016,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPBooleanStateClusterStateChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _stateValue = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
@@ -654,6 +1063,248 @@ NS_ASSUME_NONNULL_BEGIN
         _credentialType = @(0);
 
         _credentialIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterDoorLockAlarmEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarmCode = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterDoorStateChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _doorState = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterLockOperationEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _lockOperationType = @(0);
+
+        _operationSource = @(0);
+
+        _userIndex = nil;
+
+        _fabricIndex = nil;
+
+        _sourceNode = nil;
+
+        _credentials = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterLockOperationErrorEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _lockOperationType = @(0);
+
+        _operationSource = @(0);
+
+        _operationError = @(0);
+
+        _userIndex = nil;
+
+        _fabricIndex = nil;
+
+        _sourceNode = nil;
+
+        _credentials = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterLockUserChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _lockDataType = @(0);
+
+        _dataOperationType = @(0);
+
+        _operationSource = @(0);
+
+        _userIndex = nil;
+
+        _fabricIndex = nil;
+
+        _sourceNode = nil;
+
+        _dataIndex = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterSupplyVoltageLowEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterSupplyVoltageHighEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterPowerMissingPhaseEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterSystemPressureLowEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterSystemPressureHighEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterDryRunningEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterMotorTemperatureHighEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterElectronicTemperatureHighEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterPumpBlockedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterSensorFailureEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterElectronicFatalFailureEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterGeneralFaultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterLeakageEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterAirDetectionEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPumpConfigurationAndControlClusterTurbineOperationEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
     }
     return self;
 }
@@ -1035,6 +1686,38 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _operationalCert = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+
+        _arg2 = @(0);
+
+        _arg3 = @(0);
+
+        _arg4 = [CHIPTestClusterClusterSimpleStruct new];
+
+        _arg5 = [NSArray array];
+
+        _arg6 = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestFabricScopedEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
     }
     return self;
 }

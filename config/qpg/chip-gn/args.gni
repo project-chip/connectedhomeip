@@ -18,7 +18,9 @@ qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_device_platform = "qpg"
 
-is_debug = false
+optimize_debug_level = "s"
+lwip_debug = false
+
 chip_enable_openthread = true
 chip_config_network_layer_ble = true
 chip_inet_config_enable_ipv4 = false
@@ -27,6 +29,7 @@ chip_build_tests = false
 chip_monolithic_tests = false
 chip_inet_config_enable_tcp_endpoint = false
 chip_build_libshell = false
+chip_enable_ota_requestor = true
 qpg_ar = "arm-none-eabi-ar"
 qpg_cc = "arm-none-eabi-gcc"
 qpg_cxx = "arm-none-eabi-g++"

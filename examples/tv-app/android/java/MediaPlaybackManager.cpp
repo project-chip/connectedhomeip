@@ -243,14 +243,14 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::Request %d", mediaPlaybackRequest);
         env->ExceptionDescribe();
         env->ExceptionClear();
-        response.status = StatusEnum::kInvalidStateForCommand;
+        response.status = MediaPlaybackStatusEnum::kInvalidStateForCommand;
     }
-    response.status = static_cast<StatusEnum>(ret);
+    response.status = static_cast<MediaPlaybackStatusEnum>(ret);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        response.status = StatusEnum::kInvalidStateForCommand;
+        response.status = MediaPlaybackStatusEnum::kInvalidStateForCommand;
         ChipLogError(Zcl, "MediaPlaybackManager::HandleMediaRequest status error: %s", err.AsString());
     }
 

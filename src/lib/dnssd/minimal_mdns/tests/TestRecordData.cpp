@@ -106,7 +106,6 @@ void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-#if INET_CONFIG_ENABLE_IPV4
 void ARecordParsing(nlTestSuite * inSuite, void * inContext)
 {
     const uint8_t record[] = {
@@ -117,13 +116,17 @@ void ARecordParsing(nlTestSuite * inSuite, void * inContext)
     };
 
     Inet::IPAddress addr;
+
+#if INET_CONFIG_ENABLE_IPV4
     Inet::IPAddress expected;
 
     NL_TEST_ASSERT(inSuite, ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
     NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("10.11.12.13", expected));
     NL_TEST_ASSERT(inSuite, addr == expected);
-}
+#else
+    NL_TEST_ASSERT(inSuite, !ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
 #endif // INET_CONFIG_ENABLE_IPV4
+}
 
 void AAAARecordParsing(nlTestSuite * inSuite, void * inContext)
 {
@@ -240,11 +243,9 @@ void TxtRecord(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing), //
-    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),             //
-#if INET_CONFIG_ENABLE_IPV4
+    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing),   //
+    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),               //
     NL_TEST_DEF("ARecordParsing", ARecordParsing),                   //
-#endif                                                               // INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),             //
     NL_TEST_DEF("PtrRecordSimpleParsing", PtrRecordSimpleParsing),   //
     NL_TEST_DEF("PtrRecordComplexParsing", PtrRecordComplexParsing), //

@@ -1,0 +1,61 @@
+{{#if expectMultipleResponses}}
+switch(mTestSubStepIndex)
+{
+{{/if}}
+{{#chip_tests_item_responses}}
+{{~#*inline "maybeContinueWithoutWaitingOnDone"}}
+    {{~#if isWaitForReport}}shouldContinue = true;{{/if~}}
+    {{~#if (isTestOnlyCluster cluster)}}shouldContinue = true;{{/if~}}
+{{/inline~}}
+
+{{~#*inline "maybeCheckClusterError"}}
+{{#if clusterError}}
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.HasValue(), true));
+    VerifyOrReturn(CheckValue("clusterStatus", status.mClusterStatus.Value(), {{clusterError}}));
+{{/if}}
+{{/inline~}}
+
+{{~#*inline "maybeReturnOnUnsupported"}}
+{{~#if optional}}
+    if (IsUnsupported(status.mStatus))
+    {
+        {{>maybeContinueWithoutWaitingOnDone}}
+        return;
+    }
+{{/if~}}
+{{/inline~}}
+
+{{! --- Test Step Response Content --}}
+{{#if ../expectMultipleResponses}}
+  case {{index}}:
+{{/if}}
+{{#if error}}
+    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{error}}));
+    {{>maybeCheckClusterError}}
+{{else}}
+    {{>maybeReturnOnUnsupported}}
+    VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), {{error}}));
+    {{#if hasSpecificResponse}}
+    {
+        {{asDecodableType}} value;
+        VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+        {{#chip_tests_item_response_parameters}}
+            {{>maybeCheckExpectedValue}}
+            {{>maybeCheckExpectedConstraints}}
+            {{>maybeSaveAs}}
+        {{/chip_tests_item_response_parameters}}
+    }
+    {{/if}}
+{{/if}}
+{{>maybeContinueWithoutWaitingOnDone}}
+{{#if ../expectMultipleResponses}}
+  mTestSubStepIndex++;
+  break;
+{{/if}}
+{{/chip_tests_item_responses}}
+{{#if expectMultipleResponses}}
+  default:
+    LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+    break;
+}
+{{/if}}

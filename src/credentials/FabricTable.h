@@ -34,13 +34,10 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
-
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-#define CASE_OPS_KEY 0xCA5EECC0
-#endif
 
 namespace chip {
 
@@ -85,6 +82,8 @@ public:
     }
 
     NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    ScopedNodeId GetScopedNodeId() const { return ScopedNodeId(mOperationalId.GetNodeId(), mFabricIndex); }
+    ScopedNodeId GetScopedNodeIdForNode(const NodeId node) const { return ScopedNodeId(node, mFabricIndex); }
     // TODO(#15049): Refactor/rename PeerId to OperationalId or OpId throughout source
     PeerId GetPeerId() const { return mOperationalId; }
     PeerId GetPeerIdForNode(const NodeId node) const
@@ -110,20 +109,16 @@ public:
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey()
+    Crypto::P256Keypair * GetOperationalKey() const
     {
         if (mOperationalKey == nullptr)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+            mOperationalKey->CreateOperationalKey(mFabricIndex);
 #else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-#endif
             mOperationalKey->Initialize();
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            // Set provisioned_key = true , so that key is not deleted from HSM.
-            mOperationalKey->provisioned_key = true;
 #endif
         }
         return mOperationalKey;
@@ -139,12 +134,6 @@ public:
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert) { return SetCert(mNOCCert, cert); }
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
-
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
-                                     MutableByteSpan & destinationId) const;
-
-    CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
-                                  size_t ipkListEntries) const;
 
     // TODO - Refactor storing and loading of fabric info from persistent storage.
     //        The op cert array doesn't need to be in RAM except when it's being
@@ -179,8 +168,14 @@ public:
         return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
+    // Verifies credentials, using this fabric info's root certificate.
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
                                  PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
+
+    // Verifies credentials, using the provided root certificate.
+    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                        Credentials::ValidationContext & context, PeerId & nocPeerId, FabricId & fabricId,
+                                        Crypto::P256PublicKey & nocPubkey);
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -203,15 +198,14 @@ public:
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
-       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
        output parameter */
-    CHIP_ERROR GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+    static CHIP_ERROR GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId);
 
     friend class FabricTable;
 
     // Test-only, build a fabric using given root cert and NOC
-    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                   ByteSpan nodePrivateKey);
+    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey);
 
 private:
     static constexpr size_t MetadataTLVMaxSize()
@@ -231,9 +225,9 @@ private:
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
+    mutable Crypto::P256KeypairHSM * mOperationalKey = nullptr;
 #else
-    Crypto::P256Keypair * mOperationalKey = nullptr;
+    mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
 
     MutableByteSpan mRootCert;
@@ -255,22 +249,6 @@ private:
     }
 
     CHIP_ERROR SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCert);
-
-    struct StorableFabricInfo
-    {
-        uint8_t mFabricIndex;
-        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
-
-        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
-        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
-
-        Crypto::P256SerializedKeypair mOperationalKey;
-        uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
-        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
-        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-    };
 };
 
 // Once attribute store has persistence implemented, FabricTable shoud be backed using
@@ -391,15 +369,17 @@ public:
      * can release the memory associated with input parameter after the call is complete.
      *
      * If the call is successful, the assigned fabric index is returned as output parameter.
+     * The fabric information will also be persisted to storage.
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
+
+    // This is same as AddNewFabric, but skip duplicate fabric check, because we have multiple nodes belongs to the same fabric in
+    // test-cases
+    CHIP_ERROR AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex);
 
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
-
-    FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                           const ByteSpan * ipkList, size_t ipkListEntries);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
     CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
@@ -441,6 +421,8 @@ private:
      * fabric table accordingly.
      */
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
+
+    CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
 
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;

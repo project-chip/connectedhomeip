@@ -17,17 +17,16 @@
 
 #pragma once
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
-#endif
+#include <credentials/GroupDataProvider.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 
 namespace chip {
 
-class CASEServer : public SessionEstablishmentDelegate, public Messaging::ExchangeDelegate
+class CASEServer : public SessionEstablishmentDelegate,
+                   public Messaging::UnsolicitedMessageHandler,
+                   public Messaging::ExchangeDelegate
 {
 public:
     CASEServer() {}
@@ -39,15 +38,16 @@ public:
         }
     }
 
-    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-#if CONFIG_NETWORK_LAYER_BLE
-                                             Ble::BleLayer * bleLayer,
-#endif
-                                             SessionManager * sessionManager, FabricTable * fabrics);
+    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, SessionManager * sessionManager,
+                                             FabricTable * fabrics, SessionResumptionStorage * sessionResumptionStorage,
+                                             Credentials::GroupDataProvider * responderGroupDataProvider);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
+    void OnSessionEstablished(const SessionHandle & session) override;
+
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -58,17 +58,14 @@ public:
     virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
-    Messaging::ExchangeManager * mExchangeManager = nullptr;
+    Messaging::ExchangeManager * mExchangeManager        = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage = nullptr;
 
     CASESession mPairingSession;
-    uint16_t mSessionKeyId           = 0;
     SessionManager * mSessionManager = nullptr;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
-#endif
 
-    FabricTable * mFabrics = nullptr;
-    SessionIDAllocator mSessionIDAllocator;
+    FabricTable * mFabrics                              = nullptr;
+    Credentials::GroupDataProvider * mGroupDataProvider = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 

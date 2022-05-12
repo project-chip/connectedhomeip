@@ -28,6 +28,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
@@ -40,12 +41,13 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
                          InteractionType aInteractionType) :
     mManagementCallback(apCallback)
 {
-    mpExchangeMgr           = apExchangeContext->GetExchangeMgr();
-    mpExchangeCtx           = apExchangeContext;
-    mInteractionType        = aInteractionType;
-    mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
-    mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
-    mLastWrittenEventsBytes = 0;
+    mpExchangeMgr                = apExchangeContext->GetExchangeMgr();
+    mpExchangeCtx                = apExchangeContext;
+    mInteractionType             = aInteractionType;
+    mInitiatorNodeId             = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mSubjectDescriptor           = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
+    mLastWrittenEventsBytes      = 0;
+    mSubscriptionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -156,11 +158,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
     case HandlerState::AwaitingReportResponse:
         if (IsChunkedReport())
         {
-            MoveToState(HandlerState::GeneratingReports);
             mpExchangeCtx->WillSendMessage();
-
-            // Trigger ReportingEngine run for sending next chunk of data.
-            SuccessOrExit(err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
         }
         else if (IsType(InteractionType::Subscribe))
         {
@@ -181,14 +179,19 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             }
             else
             {
-                MoveToState(HandlerState::GeneratingReports);
                 mpExchangeCtx = nullptr;
             }
         }
         else
         {
+            //
+            // We're done processing a read, so let's close out and return.
+            //
             Close();
+            return CHIP_NO_ERROR;
         }
+
+        MoveToState(HandlerState::GeneratingReports);
         break;
 
     case HandlerState::GeneratingReports:
@@ -330,8 +333,16 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     ReturnErrorOnFailure(readRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
+    err = readRequestParser.CheckSchemaValidity();
+    if (err != CHIP_NO_ERROR)
+    {
+        // The actual error we want to return to our consumer is an IM "invalid
+        // action" error, not whatever internal error CheckSchemaValidity
+        // happens to come up with.
+        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
+    }
 #endif
+
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -373,11 +384,12 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     }
     ReturnErrorOnFailure(err);
 
+    // Ensure the read transaction doesn't exceed the resources dedicated to read transactions.
+    VerifyOrReturnError(InteractionModelEngine::GetInstance()->CanEstablishReadTransaction(this), CHIP_ERROR_NO_MEMORY);
+
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
-
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
 
     mpExchangeCtx->WillSendMessage();
 
@@ -392,7 +404,6 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
-
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
@@ -400,46 +411,55 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         AttributePathIB::Parser path;
         err = path.Init(reader);
         SuccessOrExit(err);
-        // TODO: MEIs (ClusterId and AttributeId) have a invalid pattern instead of a single invalid value, need to add separate
-        // functions for checking if we have received valid values.
-        // TODO: Wildcard cluster id with non-global attributes or wildcard attribute paths should be rejected.
+
         err = path.GetEndpoint(&(attribute.mEndpointId));
         if (err == CHIP_NO_ERROR)
         {
-            VerifyOrExit(!attribute.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(!attribute.HasWildcardEndpointId(), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
         }
         else if (err == CHIP_END_OF_TLV)
         {
             err = CHIP_NO_ERROR;
         }
         SuccessOrExit(err);
-        err = path.GetCluster(&(attribute.mClusterId));
+
+        ClusterId clusterId = kInvalidClusterId;
+        err                 = path.GetCluster(&clusterId);
         if (err == CHIP_NO_ERROR)
         {
-            VerifyOrExit(!attribute.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(IsValidClusterId(clusterId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+            attribute.mClusterId = clusterId;
         }
         else if (err == CHIP_END_OF_TLV)
         {
             err = CHIP_NO_ERROR;
         }
-
         SuccessOrExit(err);
-        err = path.GetAttribute(&(attribute.mAttributeId));
+
+        AttributeId attributeId = kInvalidAttributeId;
+        err                     = path.GetAttribute(&attributeId);
         if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
         else if (err == CHIP_NO_ERROR)
         {
-            VerifyOrExit(!attribute.HasWildcardAttributeId(), err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+            VerifyOrExit(IsValidAttributeId(attributeId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
+            attribute.mAttributeId = attributeId;
         }
         SuccessOrExit(err);
+
+        // A wildcard cluster requires that the attribute path either be
+        // wildcard or a global attribute.
+        VerifyOrExit(!attribute.HasWildcardClusterId() || attribute.HasWildcardAttributeId() ||
+                         IsGlobalAttribute(attribute.mAttributeId),
+                     err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
 
         err = path.GetListIndex(&(attribute.mListIndex));
         if (CHIP_NO_ERROR == err)
         {
             VerifyOrExit(!attribute.HasWildcardAttributeId() && !attribute.HasWildcardListIndex(),
-                         err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+                         err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -452,6 +472,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
+        InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         err                          = CHIP_NO_ERROR;
     }
@@ -464,8 +485,8 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
-    aDataVersionFilterListParser.GetReader(&reader);
 
+    aDataVersionFilterListParser.GetReader(&reader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
@@ -496,7 +517,6 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     aEventPathsParser.GetReader(&reader);
-
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
@@ -597,9 +617,23 @@ const char * ReadHandler::GetStateStr() const
 
 void ReadHandler::MoveToState(const HandlerState aTargetState)
 {
+    if (aTargetState == mState)
+    {
+        return;
+    }
+
     if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+
+    //
+    // If we just unblocked sending reports, let's go ahead and schedule the reporting
+    // engine to run to kick that off.
+    //
+    if (aTargetState == HandlerState::GeneratingReports)
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
 
     mState = aTargetState;
@@ -650,7 +684,6 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
 
     mIsPrimingReports = false;
-    MoveToState(HandlerState::GeneratingReports);
     return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 
@@ -733,8 +766,6 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
-
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
     mpExchangeCtx->WillSendMessage();
 

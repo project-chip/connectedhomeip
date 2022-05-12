@@ -129,35 +129,17 @@ public:
      */
     bool IsAckPending() const;
 
-    /**
-     *  Determine whether at least one message has been received
-     *  on this exchange from peer.
-     *
-     *  @return Returns 'true' if message received, else 'false'.
-     */
-    bool HasRcvdMsgFromPeer() const;
-
-    /**
-     *  Set if a message has been received from the peer
-     *  on this exchange.
-     *
-     *  @param[in]  inMsgRcvdFromPeer  A Boolean indicating whether (true) or not
-     *                                 (false) a message has been received
-     *                                 from the peer on this exchange context.
-     */
-    void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
-
     /// Determine whether there is message hasn't been acknowledged.
     bool IsMessageNotAcked() const;
 
     /// Set whether there is a message hasn't been acknowledged.
     void SetMessageNotAcked(bool messageNotAcked);
 
-    /// Set if this exchange is requesting Sleepy End Device fast-polling mode
-    void SetRequestingFastPollingMode(bool fastPollingMode);
+    /// Set if this exchange is requesting Sleepy End Device active mode
+    void SetRequestingActiveMode(bool activeMode);
 
-    /// Determine whether this exchange is requesting Sleepy End Device fast-polling mode
-    bool IsRequestingFastPollingMode() const;
+    /// Determine whether this exchange is requesting Sleepy End Device active mode
+    bool IsRequestingActiveMode() const;
 
     /**
      * Get the reliable message manager that corresponds to this reliable
@@ -181,7 +163,7 @@ protected:
         kFlagDropAckDebug = (1u << 3),
 
         /// When set, signifies there is a message which hasn't been acknowledged.
-        kFlagMesageNotAcked = (1u << 4),
+        kFlagMessageNotAcked = (1u << 4),
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = (1u << 5),
@@ -192,20 +174,14 @@ protected:
         /// some message we have needed to acknowledge in the past.
         kFlagAckMessageCounterIsValid = (1u << 6),
 
-        /// When set, signifies that at least one message has been received from peer on this exchange context.
-        kFlagMsgRcvdFromPeer = (1u << 7),
-
         /// When set, signifies that this exchange is waiting for a call to SendMessage.
-        kFlagWillSendMessage = (1u << 8),
-
-        /// When set, signifies that we are currently in the middle of HandleMessage.
-        kFlagHandlingMessage = (1u << 9),
+        kFlagWillSendMessage = (1u << 7),
 
         /// When set, we have had Close() or Abort() called on us already.
-        kFlagClosed = (1u << 10),
+        kFlagClosed = (1u << 8),
 
-        /// When set, signifies that the exchange is requesting Sleepy End Device fast-polling mode.
-        kFlagFastPollingMode = (1u << 11),
+        /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
+        kFlagActiveMode = (1u << 9),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -229,7 +205,6 @@ private:
     // will send that ack at some point.
     void SetPendingPeerAckMessageCounter(uint32_t aPeerAckMessageCounter);
 
-private:
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
     friend class ExchangeMessageDispatch;
@@ -248,14 +223,9 @@ inline bool ReliableMessageContext::IsAckPending() const
     return mFlags.Has(Flags::kFlagAckPending);
 }
 
-inline bool ReliableMessageContext::HasRcvdMsgFromPeer() const
-{
-    return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
-}
-
 inline bool ReliableMessageContext::IsMessageNotAcked() const
 {
-    return mFlags.Has(Flags::kFlagMesageNotAcked);
+    return mFlags.Has(Flags::kFlagMessageNotAcked);
 }
 
 inline bool ReliableMessageContext::ShouldDropAckDebug() const
@@ -268,19 +238,14 @@ inline bool ReliableMessageContext::HasPiggybackAckPending() const
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
 
-inline bool ReliableMessageContext::IsRequestingFastPollingMode() const
+inline bool ReliableMessageContext::IsRequestingActiveMode() const
 {
-    return mFlags.Has(Flags::kFlagFastPollingMode);
+    return mFlags.Has(Flags::kFlagActiveMode);
 }
 
 inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
 {
     mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
-}
-
-inline void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
-{
-    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
 }
 
 inline void ReliableMessageContext::SetAckPending(bool inAckPending)
@@ -295,12 +260,12 @@ inline void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
 
 inline void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
 {
-    mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
+    mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
 }
 
-inline void ReliableMessageContext::SetRequestingFastPollingMode(bool fastPollingMode)
+inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
 {
-    mFlags.Set(Flags::kFlagFastPollingMode, fastPollingMode);
+    mFlags.Set(Flags::kFlagActiveMode, activeMode);
 }
 
 } // namespace Messaging

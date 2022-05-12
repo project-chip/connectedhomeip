@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,7 @@ enum
     kTag_CertificationType   = 8,  /**< [ unsigned int ] Certification Type. */
     kTag_DACOriginVendorId   = 9,  /**< [ unsigned int, optional ] DAC origin vendor identifier. */
     kTag_DACOriginProductId  = 10, /**< [ unsigned int, optional ] DAC origin product identifier. */
+    kTag_AuthorizedPAAList   = 11, /**< [ array, optional ] Authorized PAA List. */
 };
 
 CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElements, MutableByteSpan & encodedCertElements)
@@ -75,7 +76,7 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_VendorId), certElements.VendorId));
 
     VerifyOrReturnError(certElements.ProductIdsCount > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(certElements.ProductIdsCount <= kMaxProductIdsCountPerCD, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certElements.ProductIdsCount <= kMaxProductIdsCount, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_ProductIdArray), kTLVType_Array, outerContainer2));
     for (uint8_t i = 0; i < certElements.ProductIdsCount; i++)
@@ -95,6 +96,18 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
         ReturnErrorOnFailure(writer.Put(ContextTag(kTag_DACOriginVendorId), certElements.DACOriginVendorId));
         ReturnErrorOnFailure(writer.Put(ContextTag(kTag_DACOriginProductId), certElements.DACOriginProductId));
     }
+    if (certElements.AuthorizedPAAListCount > 0)
+    {
+        VerifyOrReturnError(certElements.AuthorizedPAAListCount <= kMaxAuthorizedPAAListCount, CHIP_ERROR_INVALID_ARGUMENT);
+
+        ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_AuthorizedPAAList), kTLVType_Array, outerContainer2));
+        for (uint8_t i = 0; i < certElements.AuthorizedPAAListCount; i++)
+        {
+            ReturnErrorOnFailure(writer.Put(AnonymousTag(), ByteSpan(certElements.AuthorizedPAAList[i])));
+        }
+        ReturnErrorOnFailure(writer.EndContainer(outerContainer2));
+    }
+
     ReturnErrorOnFailure(writer.EndContainer(outerContainer1));
 
     ReturnErrorOnFailure(writer.Finalize());
@@ -170,6 +183,27 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
 
+    if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
+    {
+        VerifyOrReturnError(reader.GetType() == kTLVType_Array, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+        ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
+
+        certElements.AuthorizedPAAListCount = 0;
+        while ((err = reader.Next(kTLVType_ByteString, AnonymousTag())) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(reader.GetLength() == kKeyIdentifierLength, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+            ReturnErrorOnFailure(
+                reader.GetBytes(certElements.AuthorizedPAAList[certElements.AuthorizedPAAListCount++], kKeyIdentifierLength));
+        }
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outerContainer2));
+
+        err = reader.Next();
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+
     ReturnErrorOnFailure(reader.ExitContainer(outerContainer1));
 
     ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -182,6 +216,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     CHIP_ERROR err;
     TLVReader reader;
     TLVType outerContainer;
+    TLVType outerContainer2;
 
     VerifyOrReturnError(encodedCertElements.size() <= kMaxCMSSignedCDMessage, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -198,8 +233,15 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     ReturnErrorOnFailure(reader.Get(certDeclContent.vendorId));
 
     ReturnErrorOnFailure(reader.Next(kTLVType_Array, ContextTag(kTag_ProductIdArray)));
+    ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
 
-    // skip PID Array
+    while ((err = reader.Next(kTLVType_UnsignedInteger, AnonymousTag())) == CHIP_NO_ERROR)
+    {
+        // Verifies that the TLV structure of PID Array is correct
+        // but skip the values
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outerContainer2));
 
     ReturnErrorOnFailure(reader.Next(ContextTag(kTag_DeviceTypeId)));
     ReturnErrorOnFailure(reader.Get(certDeclContent.deviceTypeId));
@@ -236,6 +278,28 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
 
+    if (err != CHIP_END_OF_TLV && reader.GetTag() == ContextTag(kTag_AuthorizedPAAList))
+    {
+        VerifyOrReturnError(reader.GetType() == kTLVType_Array, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+        ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
+
+        while ((err = reader.Next(kTLVType_ByteString, AnonymousTag())) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(reader.GetLength() == kKeyIdentifierLength, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+            // Verifies that the TLV structure of the Authorized PAA List is correct
+            // but skip the values
+        }
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+
+        ReturnErrorOnFailure(reader.ExitContainer(outerContainer2));
+
+        certDeclContent.authorizedPAAListPresent = true;
+
+        err = reader.Next();
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT || err == CHIP_NO_ERROR, err);
+
     ReturnErrorOnFailure(reader.ExitContainer(outerContainer));
 
     ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -245,54 +309,70 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
 
 bool CertificationElementsDecoder::IsProductIdIn(const ByteSpan & encodedCertElements, uint16_t productId)
 {
-    VerifyOrReturnError(PrepareToReadProductIdList(encodedCertElements) == CHIP_NO_ERROR, false);
+    VerifyOrReturnError(FindAndEnterArray(encodedCertElements, ContextTag(kTag_ProductIdArray)) == CHIP_NO_ERROR, false);
 
     uint16_t cdProductId = 0;
-    CHIP_ERROR error     = CHIP_NO_ERROR;
-
-    while ((error = GetNextProductId(cdProductId)) == CHIP_NO_ERROR)
+    while (GetNextProductId(cdProductId) == CHIP_NO_ERROR)
     {
         if (productId == cdProductId)
         {
             return true;
         }
     }
-
     return false;
 }
 
-CHIP_ERROR CertificationElementsDecoder::PrepareToReadProductIdList(const ByteSpan & encodedCertElements)
+CHIP_ERROR CertificationElementsDecoder::FindAndEnterArray(const ByteSpan & encodedCertElements, Tag arrayTag)
 {
-    mIsInitialized                = false;
-    mCertificationDeclarationData = encodedCertElements;
+    TLVType outerContainerType1;
+    TLVType outerContainerType2;
 
-    mReader.Init(mCertificationDeclarationData);
+    mReader.Init(encodedCertElements);
     ReturnErrorOnFailure(mReader.Next(kTLVType_Structure, AnonymousTag()));
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType1));
+    ReturnErrorOnFailure(mReader.EnterContainer(outerContainerType1));
 
-    // position to ProductId Array
+    // position to arrayTag Array
     CHIP_ERROR error = CHIP_NO_ERROR;
     do
     {
-        error = mReader.Next(kTLVType_Array, ContextTag(kTag_ProductIdArray));
-        // return error code if Next method returned different than CHIP_NO_ERROR.
-        // also return if different error code than CHIP_ERROR_WRONG_TLV_TYPE/CHIP_ERROR_UNEXPECTED_TLV_ELEMENT, which means that
-        // the expected type and tags do not match.
-        VerifyOrReturnError(
-            error == CHIP_NO_ERROR || error == CHIP_ERROR_WRONG_TLV_TYPE || error == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT, error);
+        error = mReader.Next(kTLVType_Array, arrayTag);
+        // Return error code unless one of three things happened:
+        // 1. We found the right thing (CHIP_NO_ERROR returned).
+        // 2. The next tag is not the one we are looking for (CHIP_ERROR_UNEXPECTED_TLV_ELEMENT).
+        VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT, error);
     } while (error != CHIP_NO_ERROR);
 
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType2));
+    ReturnErrorOnFailure(mReader.EnterContainer(outerContainerType2));
 
-    mIsInitialized = true;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CertificationElementsDecoder::GetNextProductId(uint16_t & productId)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mReader.Next(AnonymousTag()));
     ReturnErrorOnFailure(mReader.Get(productId));
+    return CHIP_NO_ERROR;
+}
+
+bool CertificationElementsDecoder::HasAuthorizedPAA(const ByteSpan & encodedCertElements, const ByteSpan & authorizedPAA)
+{
+    VerifyOrReturnError(FindAndEnterArray(encodedCertElements, ContextTag(kTag_AuthorizedPAAList)) == CHIP_NO_ERROR, false);
+
+    ByteSpan cdAuthorizedPAA;
+    while (GetNextAuthorizedPAA(cdAuthorizedPAA) == CHIP_NO_ERROR)
+    {
+        if (authorizedPAA.data_equal(cdAuthorizedPAA))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+CHIP_ERROR CertificationElementsDecoder::GetNextAuthorizedPAA(ByteSpan & authorizedPAA)
+{
+    ReturnErrorOnFailure(mReader.Next(AnonymousTag()));
+    ReturnErrorOnFailure(mReader.Get(authorizedPAA));
     return CHIP_NO_ERROR;
 }
 

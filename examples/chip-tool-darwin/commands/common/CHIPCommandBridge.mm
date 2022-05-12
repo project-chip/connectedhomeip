@@ -30,24 +30,52 @@ static CHIPToolPersistentStorageDelegate * storage = nil;
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
+    NSData * ipk;
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
-    mController = [CHIPDeviceController sharedController];
-    if (mController == nil) {
-        ChipLogError(chipTool, "Controller is nil");
+    auto factory = [MatterControllerFactory sharedInstance];
+    if (factory == nil) {
+        ChipLogError(chipTool, "Controller factory is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    [mController setListenPort:kListenPort];
-    [mController setKeyValueStoreManagerPath:"/tmp/chip_kvs_darwin"];
+    auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    params.port = @(kListenPort);
+    params.startServer = YES;
 
-    [nocSigner createOrLoadKeys:storage];
-
-    if (![mController startup:storage vendorId:chip::VendorId::TestVendor1 nocSigner:nocSigner]) {
-        ChipLogError(chipTool, "Controller startup failure.");
+    if ([factory startup:params] == NO) {
+        ChipLogError(chipTool, "Controller factory startup failed");
         return CHIP_ERROR_INTERNAL;
     }
+
+    ReturnLogErrorOnFailure([nocSigner createOrLoadKeys:storage]);
+
+    ipk = [nocSigner getIPK];
+
+    constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
+    for (size_t i = 0; i < ArraySize(identities); ++i) {
+        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner ipk:ipk];
+        controllerParams.vendorId = chip::VendorId::TestVendor1;
+        controllerParams.fabricId = i + 1;
+
+        // We're not sure whether we're creating a new fabric or using an
+        // existing one, so just try both.
+        auto controller = [factory startControllerOnExistingFabric:controllerParams];
+        if (controller == nil) {
+            // Maybe we didn't have this fabric yet.
+            controller = [factory startControllerOnNewFabric:controllerParams];
+        }
+        if (controller == nil) {
+            ChipLogError(chipTool, "Controller startup failure.");
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        mControllers[identities[i]] = controller;
+    }
+
+    // If no commissioner name passed in, default to alpha.
+    SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
 
     ReturnLogErrorOnFailure(RunCommand());
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -55,30 +83,37 @@ CHIP_ERROR CHIPCommandBridge::Run()
     return CHIP_NO_ERROR;
 }
 
-CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mController; }
+void CHIPCommandBridge::SetIdentity(const char * identity)
+{
+    std::string name = std::string(identity);
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0) {
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+            kIdentityBeta, kIdentityGamma);
+        chipDie();
+    }
+    mCurrentController = mControllers[name];
+}
+
+CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
+
+CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
-    BOOL result = [CurrentCommissioner() shutdown];
-    if (!result) {
-        ChipLogError(chipTool, "Unable to shut down controller");
-        return CHIP_ERROR_INTERNAL;
+    for (auto & pair : mControllers) {
+        [pair.second shutdown];
     }
+    mControllers.clear();
+    mCurrentController = nil;
+
+    [[MatterControllerFactory sharedInstance] shutdown];
 
     return CHIP_NO_ERROR;
 }
 
-#if !CONFIG_USE_SEPARATE_EVENTLOOP
-static void OnResponseTimeout(chip::System::Layer *, void * appState)
-{
-    (reinterpret_cast<CHIPCommandBridge *>(appState))->SetCommandExitStatus(CHIP_ERROR_TIMEOUT);
-}
-#endif // !CONFIG_USE_SEPARATE_EVENTLOOP
-
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
 {
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
     {
@@ -88,23 +123,15 @@ CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration
         }
     }
     LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-#else
-    ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
     return mCommandExitStatus;
 }
 
 void CHIPCommandBridge::StopWaiting()
 {
-#if CONFIG_USE_SEPARATE_EVENTLOOP
     {
         std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
         mWaitingForResponse = false;
     }
     cvWaitingForResponse.notify_all();
-#else // CONFIG_USE_SEPARATE_EVENTLOOP
-    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 }

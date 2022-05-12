@@ -23,6 +23,8 @@
 #import <CHIP/CHIPDevice.h>
 
 #import "CHIPErrorTestUtils.h"
+#import "CHIPTestKeys.h"
+#import "CHIPTestStorage.h"
 
 #import <app/util/af-enums.h>
 
@@ -35,6 +37,9 @@
 #define MANUAL_INDIVIDUAL_TEST 0
 
 static uint16_t kTestVendorId = 0xFFF1u;
+
+// Singleton controller we use.
+static CHIPDeviceController * sController = nil;
 
 //
 // Sample XPC Listener implementation that directly communicates with local CHIPDevice instance
@@ -163,7 +168,7 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     (void) controller;
-    __auto_type sharedController = [CHIPDeviceController sharedController];
+    __auto_type sharedController = sController;
     if (sharedController) {
         [sharedController
             getConnectedDevice:nodeId
@@ -200,7 +205,7 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
                           completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     (void) controller;
-    __auto_type sharedController = [CHIPDeviceController sharedController];
+    __auto_type sharedController = sController;
     if (sharedController) {
         [sharedController
             getConnectedDevice:nodeId
@@ -238,7 +243,7 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
                          completion:(void (^)(id _Nullable values, NSError * _Nullable error))completion
 {
     (void) controller;
-    __auto_type sharedController = [CHIPDeviceController sharedController];
+    __auto_type sharedController = sController;
     if (sharedController) {
         [sharedController
             getConnectedDevice:nodeId
@@ -276,7 +281,7 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
                                   params:(NSDictionary<NSString *, id> * _Nullable)params
                       establishedHandler:(void (^)(void))establishedHandler
 {
-    __auto_type sharedController = [CHIPDeviceController sharedController];
+    __auto_type sharedController = sController;
     if (sharedController) {
         [sharedController
             getConnectedDevice:nodeId
@@ -326,7 +331,7 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
 
 - (void)stopReportsWithController:(id _Nullable)controller nodeId:(uint64_t)nodeId completion:(void (^)(void))completion
 {
-    __auto_type sharedController = [CHIPDeviceController sharedController];
+    __auto_type sharedController = sController;
     if (sharedController) {
         [sharedController getConnectedDevice:nodeId
                                        queue:dispatch_get_main_queue()
@@ -351,7 +356,7 @@ static NSString * const kCHIPDeviceControllerId = @"CHIPController";
                     shouldCache:(BOOL)shouldCache
                      completion:(void (^)(NSError * _Nullable error))completion
 {
-    __auto_type sharedController = [CHIPDeviceController sharedController];
+    __auto_type sharedController = sController;
     if (sharedController) {
         CHIPAttributeCacheContainer * attributeCacheContainer;
         if (shouldCache) {
@@ -426,7 +431,6 @@ static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
-static const uint16_t kDiscriminator = 3840;
 static const uint32_t kSetupPINCode = 20202021;
 static const uint16_t kRemotePort = 5540;
 static const uint16_t kLocalPort = 5541;
@@ -461,8 +465,11 @@ static CHIPDevice * GetConnectedDevice(void)
 - (void)onPairingComplete:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
+    NSError * commissionError = nil;
+    [sController commissionDevice:kDeviceId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
+    XCTAssertNil(commissionError);
+
+    // Keep waiting for onCommissioningComplete
 }
 
 - (void)onCommissioningComplete:(NSError *)error
@@ -504,26 +511,36 @@ static CHIPDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    factoryParams.port = @(kLocalPort);
+
+    BOOL ok = [factory startup:factoryParams];
+    XCTAssertTrue(ok);
+
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys ipk:testKeys.ipk];
+    params.vendorId = kTestVendorId;
+    params.fabricId = 1;
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);
+
+    sController = controller;
 
     CHIPRemoteDeviceSampleTestPairingDelegate * pairing =
         [[CHIPRemoteDeviceSampleTestPairingDelegate alloc] initWithExpectation:expectation];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
-    [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil vendorId:kTestVendorId nocSigner:nil];
-    XCTAssertTrue(started);
-
     NSError * error;
-    [controller pairDevice:kDeviceId
-                   address:kAddress
-                      port:kRemotePort
-             discriminator:kDiscriminator
-              setupPINCode:kSetupPINCode
-                     error:&error];
+    [controller pairDevice:kDeviceId address:kAddress port:kRemotePort setupPINCode:kSetupPINCode error:&error];
     XCTAssertEqual(error.code, 0);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
@@ -547,11 +564,13 @@ static CHIPDevice * GetConnectedDevice(void)
     [mSampleListener stop];
     mSampleListener = nil;
 
-    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    CHIPDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    BOOL stopped = [controller shutdown];
-    XCTAssertTrue(stopped);
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [[MatterControllerFactory sharedInstance] shutdown];
 
     mDeviceController = nil;
 }

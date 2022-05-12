@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -45,6 +46,7 @@
 
 using namespace ::chip;
 using namespace ::chip::app;
+using namespace ::chip::app::Clusters::DoorLock;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -57,7 +59,7 @@ using namespace ::chip::DeviceLayer;
 namespace {
 constexpr EndpointId kLockEndpointId = 1;
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 k_timer sFunctionTimer;
 
@@ -105,7 +107,7 @@ CHIP_ERROR AppTask::Init()
 #elif CONFIG_OPENTHREAD_MTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_FullEndDevice);
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -119,15 +121,14 @@ CHIP_ERROR AppTask::Init()
 
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
+    sLockLED.Set(BoltLockMgr().IsLocked());
 
     sUnusedLED.Init(DK_LED3);
     sUnusedLED_1.Init(DK_LED4);
 
     UpdateStatusLED();
 
-    BoltLockMgr().Init();
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    BoltLockMgr().Init(LockStateChanged);
 
     // Initialize buttons
     int ret = dk_buttons_init(ButtonEventHandler);
@@ -149,7 +150,10 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize CHIP server
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init());
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 #if CONFIG_CHIP_OTA_REQUESTOR
     InitBasicOTARequestor();
 #endif
@@ -187,22 +191,14 @@ CHIP_ERROR AppTask::StartApp()
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    BoltLockManager::Action_t action = BoltLockManager::INVALID_ACTION;
-    int32_t actor                    = 0;
-
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (BoltLockMgr().IsLocked())
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kButton);
     }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
+    else
     {
-        action = BoltLockMgr().IsUnlocked() ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION;
-        actor  = AppEvent::kEventType_Button;
+        BoltLockMgr().Lock(BoltLockManager::OperationSource::kButton);
     }
-
-    if (action != BoltLockManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
-        LOG_INF("Action is already in progress or active.");
 }
 
 void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
@@ -337,7 +333,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sUnusedLED_1.Set(false);
 
             // Set lock status LED back to show state of lock.
-            sLockLED.Set(!BoltLockMgr().IsUnlocked());
+            sLockLED.Set(BoltLockMgr().IsLocked());
 
             UpdateStatusLED();
             sAppTask.CancelTimer();
@@ -476,52 +472,32 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::LockStateChanged(BoltLockManager::State state, BoltLockManager::OperationSource source)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    switch (state)
     {
-        LOG_INF("Lock Action has been initiated");
-    }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
-    {
-        LOG_INF("Unlock Action has been initiated");
-    }
-
-    sLockLED.Blink(50, 50);
-}
-
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor)
-{
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
-    {
-        LOG_INF("Lock Action has been completed");
+    case BoltLockManager::State::kLockingInitiated:
+        LOG_INF("Lock action initiated");
+        sLockLED.Blink(50, 50);
+        break;
+    case BoltLockManager::State::kLockingCompleted:
+        LOG_INF("Lock action completed");
         sLockLED.Set(true);
-    }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
-    {
-        LOG_INF("Unlock Action has been completed");
+        break;
+    case BoltLockManager::State::kUnlockingInitiated:
+        LOG_INF("Unlock action initiated");
+        sLockLED.Blink(50, 50);
+        break;
+    case BoltLockManager::State::kUnlockingCompleted:
+        LOG_INF("Unlock action completed");
         sLockLED.Set(false);
+        break;
     }
 
-    if (aActor == AppEvent::kEventType_Button)
+    if (source != BoltLockManager::OperationSource::kRemote)
     {
-        sAppTask.UpdateClusterState();
+        sAppTask.UpdateClusterState(state, source);
     }
-}
-
-void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
-{
-    AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
-    PostEvent(&event);
 }
 
 void AppTask::PostEvent(AppEvent * aEvent)
@@ -544,13 +520,29 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState()
+void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source)
 {
-    // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kLockEndpointId, !BoltLockMgr().IsUnlocked());
+    DlLockState lockState;
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    switch (state)
     {
-        LOG_ERR("Updating on/off %x", status);
+    case BoltLockManager::State::kLockingCompleted:
+        lockState = DlLockState::kLocked;
+        break;
+    case BoltLockManager::State::kUnlockingCompleted:
+        lockState = DlLockState::kUnlocked;
+        break;
+    default:
+        lockState = DlLockState::kNotFullyLocked;
+        break;
     }
+
+    SystemLayer().ScheduleLambda([lockState, source] {
+        LOG_INF("Updating LockState attribute");
+
+        if (!DoorLockServer::Instance().SetLockState(kLockEndpointId, lockState, source))
+        {
+            LOG_ERR("Failed to update LockState attribute");
+        }
+    });
 }

@@ -121,7 +121,7 @@ extern NSString * const kCHIPArrayValueType;
  * to reportHandler.  Note that if the CHIPSubscribeParams are set to
  * automatically resubscribe this can end up being called more than once.
  *
- * TODO: The "all events" part does not work yet.
+ * TODO: Remove this once the replacement below is adopted
  */
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
                 minInterval:(uint16_t)minInterval
@@ -129,6 +129,47 @@ extern NSString * const kCHIPArrayValueType;
                      params:(nullable CHIPSubscribeParams *)params
              cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
+
+/**
+ * Subscribe to receive attribute reports for everything (all endpoints, all
+ * clusters, all attributes, all events) on the device.
+ *
+ * A non-nil attribute cache container will cache attribute values, retrievable
+ * through the designated attribute cache container.
+ *
+ * attributeReportHandler will be called any time a data update is available (with a
+ * non-nil "value")
+ *
+ * The array passed to attributeReportHandler will contain CHIPAttributeReport
+ * instances.  Errors for specific paths, not the whole subscription, will be
+ * reported via those objects.
+ *
+ * eventReportHandler will be called any time an event is reported (with a
+ * non-nil "value")
+ *
+ * The array passed to eventReportHandler will contain CHIPEventReport
+ * instances.  Errors for specific paths, not the whole subscription, will be
+ * reported via those objects.
+ *
+ * errorHandler will be called any time there is an error for the
+ * entire subscription (with a non-nil "error"), and terminate the subscription.
+ *
+ * Both report handlers are not supported over XPC at the moment.
+ *
+ * subscriptionEstablished block, if not nil, will be called once the
+ * subscription is established.  This will be _after_ the first (priming) call
+ * to both report handlers.  Note that if the CHIPSubscribeParams are set to
+ * automatically resubscribe this can end up being called more than once.
+ */
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(void (^)(NSArray * value))attributeReportHandler
+         eventReportHandler:(void (^)(NSArray * value))eventReportHandler
+               errorHandler:(void (^)(NSError * error))errorHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 
 /**
@@ -219,6 +260,17 @@ extern NSString * const kCHIPArrayValueType;
 + (instancetype)new NS_UNAVAILABLE;
 @end
 
+@interface CHIPEventPath : NSObject
+@property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * event;
+
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
 @interface CHIPCommandPath : NSObject
 @property (nonatomic, readonly, strong, nonnull) NSNumber * endpoint;
 @property (nonatomic, readonly, strong, nonnull) NSNumber * cluster;
@@ -233,6 +285,18 @@ extern NSString * const kCHIPArrayValueType;
 @interface CHIPAttributeReport : NSObject
 @property (nonatomic, readonly, strong, nonnull) CHIPAttributePath * path;
 // value is nullable because nullable attributes can have nil as value.
+@property (nonatomic, readonly, strong, nullable) id value;
+// If this specific path resulted in an error, the error (in the
+// MatterInteractionErrorDomain or CHIPErrorDomain) that corresponds to this
+// path.
+@property (nonatomic, readonly, strong, nullable) NSError * error;
+@end
+
+@interface CHIPEventReport : NSObject
+@property (nonatomic, readonly, strong, nonnull) CHIPEventPath * path;
+@property (nonatomic, readonly, strong, nonnull) NSNumber * eventNumber; // chip::EventNumber type (uint64_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * priority; // chip::app::PriorityLevel type (uint8_t)
+@property (nonatomic, readonly, strong, nonnull) NSNumber * timestamp; // chip::app::Timestamp.mValue type (uint64_t)
 @property (nonatomic, readonly, strong, nullable) id value;
 // If this specific path resulted in an error, the error (in the
 // MatterInteractionErrorDomain or CHIPErrorDomain) that corresponds to this

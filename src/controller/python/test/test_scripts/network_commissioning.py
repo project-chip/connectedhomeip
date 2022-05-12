@@ -97,11 +97,27 @@ class NetworkCommissioningTests:
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds),
             (endpointId, Clusters.NetworkCommissioning.Attributes.MaxNetworks),
-            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.AcceptedCommandList),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.GeneratedCommandList)],
             returnClusterObject=True)
         self.log_interface_basic_info(
             res[endpointId][Clusters.NetworkCommissioning])
         logger.info(f"Finished getting basic information of the endpoint")
+
+        if res[endpointId][Clusters.NetworkCommissioning].acceptedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworks.command_id,
+                Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
+            raise AssertionError(f"Unexpected accepted command list for Thread interface")
+
+        if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
+            raise AssertionError(f"Unexpected generated command list for Thread interface")
 
         # Read Last* attributes
         logger.info(f"Read Last* attributes")
@@ -118,6 +134,12 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+
+        # Arm the failsafe before making network config changes
+        logger.info(f"Arming the failsafe")
+        req = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info(f"Received response: {res}")
 
         # Remove existing network
         logger.info(f"Check network list")
@@ -142,6 +164,9 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        if res.networkIndex != 0:
+            raise AssertionError(
+                f"Unexpected result: {res.networkIndex} (should be 0)")
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
@@ -162,6 +187,12 @@ class NetworkCommissioningTests:
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info(f"Device connected to a network.")
+
+        # Disarm the failsafe
+        logger.info(f"Disarming the failsafe")
+        req = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info(f"Received response: {res}")
 
         # Note: On Linux, when connecting to a connected network, it will return immediately, however, it will try a reconnect. This will make the below attribute read return false negative values.
         await asyncio.sleep(5)
@@ -195,10 +226,27 @@ class NetworkCommissioningTests:
             (endpointId,
              Clusters.NetworkCommissioning.Attributes.ScanMaxTimeSeconds),
             (endpointId, Clusters.NetworkCommissioning.Attributes.MaxNetworks),
-            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap)],
+            (endpointId, Clusters.NetworkCommissioning.Attributes.FeatureMap),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.AcceptedCommandList),
+            (endpointId, Clusters.NetworkCommissioning.Attributes.GeneratedCommandList)],
             returnClusterObject=True)
         self.log_interface_basic_info(
             res[endpointId][Clusters.NetworkCommissioning])
+
+        if res[endpointId][Clusters.NetworkCommissioning].acceptedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworks.command_id,
+                Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
+                Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
+            raise AssertionError(f"Unexpected accepted command list for Thread interface")
+
+        if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
+                Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
+                Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
+            raise AssertionError(f"Unexpected generated command list for Thread interface")
+
         logger.info(f"Finished getting basic information of the endpoint")
 
         # Read Last* attributes
@@ -216,6 +264,12 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+
+        # Arm the failsafe before making network config changes
+        logger.info(f"Arming the failsafe")
+        req = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info(f"Received response: {res}")
 
         # Remove existing network
         logger.info(f"Check network list")
@@ -240,6 +294,9 @@ class NetworkCommissioningTests:
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        if res.networkIndex != 0:
+            raise AssertionError(
+                f"Unexpected result: {res.networkIndex} (should be 0)")
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
@@ -260,6 +317,12 @@ class NetworkCommissioningTests:
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info(f"Device connected to a network.")
+
+        # Disarm the failsafe
+        logger.info(f"Disarming the failsafe")
+        req = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
+        res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
+        logger.info(f"Received response: {res}")
 
         # Verify Last* attributes
         logger.info(f"Read Last* attributes")

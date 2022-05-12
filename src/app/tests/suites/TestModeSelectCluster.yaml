@@ -18,9 +18,6 @@ config:
     nodeId: 0x12344321
     cluster: "Mode Select"
     endpoint: 1
-    discriminator:
-        type: INT16U
-        defaultValue: 3840
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -96,7 +93,7 @@ tests:
               - name: "NewMode"
                 value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
@@ -111,6 +108,14 @@ tests:
       attribute: "CurrentMode"
       response:
           value: currentModeBeforeToggle
+
+    - label: "Change to Unsupported OnMode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 2
+      response:
+          error: INVALID_COMMAND
 
     - label: "Change OnMode"
       command: "writeAttribute"
@@ -145,7 +150,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: CONSTRAINT_ERROR
+          error: INVALID_COMMAND
 
     - label: "Change to Supported StartUp Mode"
       command: "writeAttribute"
@@ -166,13 +171,48 @@ tests:
               - name: "NewMode"
                 value: 0
 
+    - label: "Change On Mode"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 4
+
+    - label: "Set StartUpOnOff"
+      cluster: "On/Off"
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
+
     - label: "Reboot target device"
       cluster: "SystemCommands"
       command: "Reboot"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
       arguments:
           values:
-              - name: "discriminator"
-                value: discriminator
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Verify Current Mode Change based on OnMode, as it overwrites
+          StartUpMode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 4
+
+    - label: "Change On Mode to Null"
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: null
+
+    - label: "Reboot target device"
+      cluster: "SystemCommands"
+      command: "Reboot"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"

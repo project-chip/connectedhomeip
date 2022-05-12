@@ -1,2 +1,3 @@
-rootProject.name = "CHIPTVServer"
-include ':app'
+rootProject.name = "MatterTVAndroid"
+include ':platform-app'
+include ':content-app'

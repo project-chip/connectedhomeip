@@ -37,6 +37,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
@@ -224,7 +225,7 @@ CHIP_ERROR LegacyTemporaryCommissionableDataProvider<ConfigClass>::GetSpake2pVer
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
@@ -242,13 +243,37 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     char uniqueId[kMaxUniqueIDLength + 1];
 
     // Generate Unique ID only if it is not present in the storage.
-    if (GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
-        return CHIP_NO_ERROR;
+    if (GetUniqueId(uniqueId, sizeof(uniqueId)) != CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(GenerateUniqueId(uniqueId, sizeof(uniqueId)));
+        ReturnErrorOnFailure(StoreUniqueId(uniqueId, strlen(uniqueId)));
+    }
 
-    err = GenerateUniqueId(uniqueId, sizeof(uniqueId));
-    ReturnErrorOnFailure(err);
+    bool failSafeArmed = false;
 
-    err = StoreUniqueId(uniqueId, strlen(uniqueId));
+    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
+    // which the fail-safe timer was armed.
+    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
+    {
+        FabricIndex fabricIndex;
+        bool addNocCommandInvoked;
+        bool updateNocCommandInvoked;
+
+        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot");
+
+        err = FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        if (err == CHIP_NO_ERROR)
+        {
+            DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
+        }
+        else
+        {
+            // This should not happen, but we should not fail system init based on it!
+            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!", err.Format());
+            (void)SetFailSafeArmed(false);
+            err = CHIP_NO_ERROR;
+        }
+    }
 
     return err;
 }
@@ -363,12 +388,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryWiFiMACAddres
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimaryWiFiMACAddress(const uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimaryMACAddress(MutableByteSpan buf)
 {
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
@@ -401,12 +420,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPrimary802154MACAddr
 #else
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StorePrimary802154MACAddress(const uint8_t * buf)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ConfigClass>
@@ -529,18 +542,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreCountryCode(const 
     return WriteConfigValueStr(ConfigClass::kConfigKey_CountryCode, code, codeLen);
 }
 
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetBreadcrumb(uint64_t & breadcrumb)
-{
-    return ReadConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreBreadcrumb(uint64_t breadcrumb)
-{
-    return WriteConfigValue(ConfigClass::kConfigKey_Breadcrumb, breadcrumb);
-}
-
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetRebootCount(uint32_t & rebootCount)
 {
@@ -578,18 +579,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReason(uint32_t 
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetNodeLabel(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreNodeLabel(const char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -603,18 +592,6 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductURL(char * bu
 
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLocalConfigDisabled(bool & disabled)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & reachable)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -802,7 +779,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             vendorId = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Vendor Id: %" PRIu16 " (0x%" PRIX16 ")", vendorId, vendorId);
+        ChipLogProgress(DeviceLayer, "  Vendor Id: %u (0x%X)", vendorId, vendorId);
     }
 
     {
@@ -811,7 +788,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             productId = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Product Id: %" PRIu16 " (0x%" PRIX16 ")", productId, productId);
+        ChipLogProgress(DeviceLayer, "  Product Id: %u (0x%X)", productId, productId);
     }
 
     {
@@ -820,7 +797,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             hardwareVer = 0;
         }
-        ChipLogProgress(DeviceLayer, "  Hardware Version: %" PRIu16, hardwareVer);
+        ChipLogProgress(DeviceLayer, "  Hardware Version: %u", hardwareVer);
     }
 
     CommissionableDataProvider * cdp = GetCommissionableDataProvider();
@@ -840,7 +817,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         {
             setupDiscriminator = 0xFFFF;
         }
-        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %" PRIu16 " (0x%" PRIX16 ")",
+        ChipLogProgress(DeviceLayer, "  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): %u (0x%X)",
                         setupDiscriminator, setupDiscriminator);
     }
 
@@ -850,7 +827,7 @@ void GenericConfigurationManagerImpl<ConfigClass>::LogDeviceConfig()
         err = GetManufacturingDate(year, month, dayOfMonth);
         if (err == CHIP_NO_ERROR)
         {
-            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04" PRIu16 "/%02u/%02u", year, month, dayOfMonth);
+            ChipLogProgress(DeviceLayer, "  Manufacturing Date: %04u/%02u/%02u", year, month, dayOfMonth);
         }
         else
         {

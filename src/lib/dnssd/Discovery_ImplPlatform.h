@@ -21,7 +21,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
-#include <lib/dnssd/DnssdCache.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
@@ -46,7 +45,8 @@ public:
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR FinalizeServiceUpdate() override;
-    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override;
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override;
+    CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }

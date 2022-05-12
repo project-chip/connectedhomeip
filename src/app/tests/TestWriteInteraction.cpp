@@ -38,7 +38,14 @@ using TestContext = chip::Test::AppContext;
 namespace {
 
 uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-size_t attributeDataTLVLen = 0;
+size_t attributeDataTLVLen                       = 0;
+constexpr chip::DataVersion kRejectedDataVersion = 1;
+constexpr chip::DataVersion kAcceptedDataVersion = 5;
+constexpr uint16_t kMaxGroupsPerFabric           = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric        = 8;
+
+chip::TestPersistentStorageDelegate gTestStorage;
+chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
 } // namespace
 namespace chip {
@@ -51,6 +58,8 @@ public:
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteRoundtripWithClusterObjectsVersionMatch(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient);
@@ -77,6 +86,7 @@ public:
     void ResetCounter() { mOnSuccessCalled = mOnErrorCalled = mOnDoneCalled = 0; }
     void OnResponse(const WriteClient * apWriteClient, const chip::app::ConcreteDataAttributePath & path, StatusIB status) override
     {
+        mStatus = status;
         mOnSuccessCalled++;
     }
     void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
@@ -85,6 +95,7 @@ public:
     int mOnSuccessCalled = 0;
     int mOnErrorCalled   = 0;
     int mOnDoneCalled    = 0;
+    StatusIB mStatus;
 };
 
 void TestWriteInteraction::AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClient & aWriteClient)
@@ -270,22 +281,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
-    //
-    // We have to enable async dispatch here to ensure that the exchange
-    // gets correctly closed out in the test below. Otherwise, the following happens:
-    //
-    // 1. WriteHandler generates a response upon OnWriteRequest being called.
-    // 2. Since there is no matching active client-side exchange for that request, the IM engine
-    //    handles it incorrectly and treats it like an unsolicited message.
-    // 3. It is invalid to receive a WriteResponse as an unsolicited message so it correctly sends back
-    //    a StatusResponse containing an error to that message.
-    // 4. Without unwinding the existing call stack, a response is received on the same exchange that the handler
-    //    generated a WriteResponse on. This exchange should have been closed in a normal execution model, but in
-    //    a synchronous model, the exchange is still open, and the status response is sent to the WriteHandler.
-    // 5. WriteHandler::OnMessageReceived is invoked, and it correctly asserts.
-    //
-    ctx.EnableAsyncDispatch();
-
     constexpr bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
     {
@@ -323,19 +318,28 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             }
 
             ctx.DrainAndServiceIO();
-            ctx.DrainAndServiceIO();
 
             Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
             NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
         }
     }
+}
 
-    ctx.DisableAsyncDispatch();
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+{
+    // Note: This test does not make use of the real attribute metadata.
+    static EmberAfAttributeMetadata stub = { .defaultValue = EmberAfDefaultOrMinMaxAttributeValue(uint16_t(0)) };
+    return &stub;
 }
 
 CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
+    if (aPath.mDataVersion.HasValue() && aPath.mDataVersion.Value() == kRejectedDataVersion)
+    {
+        return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
+    }
+
     TLV::TLVWriter writer;
     writer.Init(attributeDataTLV);
     writer.CopyElement(TLV::AnonymousTag(), aReader);
@@ -355,7 +359,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -411,6 +415,106 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     engine->Shutdown();
 }
 
+void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    AttributePathParams attributePathParams;
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
+
+    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
+
+    Optional<DataVersion> version(kAcceptedDataVersion);
+
+    writeClient.EncodeAttribute(attributePathParams, dataTx, version);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);
+
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1 &&
+                       callback.mStatus.mStatus == Protocols::InteractionModel::Status::Success);
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
+
+void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    AttributePathParams attributePathParams;
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
+
+    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTxValue;
+    dataTxValue.a = 12;
+    dataTxValue.b = true;
+    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
+    dataTx.SetNonNull(dataTxValue);
+    Optional<DataVersion> version(kRejectedDataVersion);
+    writeClient.EncodeAttribute(attributePathParams, dataTx, version);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 0);
+
+    err = writeClient.SendWriteRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   callback.mOnSuccessCalled == 1 && callback.mOnErrorCalled == 0 && callback.mOnDoneCalled == 1 &&
+                       callback.mStatus.mStatus == Protocols::InteractionModel::Status::DataVersionMismatch);
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
+
 void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -423,7 +527,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -464,6 +568,8 @@ const nlTest sTests[] =
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
         NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),
+        NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch),
+        NL_TEST_DEF("TestWriteRoundtripWithClusterObjectsVersionMismatch", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch),
         NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -477,15 +583,18 @@ int Test_Setup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
-    VerifyOrReturnError(TestContext::InitializeAsync(inContext) == SUCCESS, FAILURE);
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
 
     TestContext & ctx = *static_cast<TestContext *>(inContext);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitProvider(), FAILURE);
+    gTestStorage.ClearStorage();
+    gGroupsProvider.SetStorageDelegate(&gTestStorage);
+    VerifyOrReturnError(CHIP_NO_ERROR == gGroupsProvider.Init(), FAILURE);
+    chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
     uint8_t buf[sizeof(chip::CompressedFabricId)];
     chip::MutableByteSpan span(buf);
     VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedId(span), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(ctx.GetBobFabricIndex(), span), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(&gGroupsProvider, ctx.GetBobFabricIndex(), span), FAILURE);
 
     return SUCCESS;
 }

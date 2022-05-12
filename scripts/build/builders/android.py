@@ -14,7 +14,6 @@
 
 import os
 import shlex
-
 from enum import Enum, auto
 
 from .builder import Builder
@@ -96,6 +95,12 @@ class AndroidApp(Enum):
         else:
             return None
 
+    def Modules(self):
+        if self == AndroidApp.CHIP_TVServer:
+            return ["platform-app", "content-app"]
+        else:
+            return None
+
 
 class AndroidBuilder(Builder):
 
@@ -117,7 +122,8 @@ class AndroidBuilder(Builder):
         # New SDK manager at cmdline-tools/latest/bin/
         new_sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools', 'latest',
                                        'bin', 'sdkmanager')
-        if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)) and not (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)):
+        if (not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)) and
+                not (os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK))):
             raise Exception("'%s' and '%s' is not executable by the current user" %
                             (sdk_manager, new_sdk_manager))
 
@@ -183,8 +189,7 @@ class AndroidBuilder(Builder):
                       title='Prepare Native libs ' + self.identifier)
 
         if self.app.ExampleName() == 'tv-casting-app':
-            libs = ['libCHIPController.so',
-                    'libc++_shared.so', 'libTvCastingApp.so']
+            libs = ['libc++_shared.so', 'libTvCastingApp.so']
         else:
             libs = ['libSetupPayloadParser.so',
                     'libc++_shared.so', 'libTvApp.so']
@@ -196,7 +201,6 @@ class AndroidBuilder(Builder):
             jars = {
                 'AndroidPlatform.jar': 'third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar',
                 'CHIPAppServer.jar': 'third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar',
-                'CHIPController.jar': 'third_party/connectedhomeip/src/controller/java/CHIPController.jar',
                 'TvCastingApp.jar': 'TvCastingApp.jar',
             }
         else:
@@ -225,22 +229,31 @@ class AndroidBuilder(Builder):
 
     def gradlewBuildExampleAndroid(self):
         # Example compilation
-        self._Execute([
-            '%s/examples/%s/android/App/gradlew' % (self.root,
-                                                    self.app.ExampleName()), '-p',
-            '%s/examples/%s/android/App/' % (self.root,
-                                             self.app.ExampleName()),
-            '-PmatterBuildSrcDir=%s' % self.output_dir,
-            '-PmatterSdkSourceBuild=false',
-            '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
-        ],
-            title='Building Example ' + self.identifier)
+        if self.app.Modules():
+            for module in self.app.Modules():
+                self._Execute([
+                    '%s/examples/%s/android/App/gradlew' % (self.root,
+                                                            self.app.ExampleName()), '-p',
+                    '%s/examples/%s/android/App/' % (self.root,
+                                                     self.app.ExampleName()),
+                    '-PmatterBuildSrcDir=%s' % self.output_dir,
+                    '-PmatterSdkSourceBuild=false',
+                    '-PbuildDir=%s/%s' % (self.output_dir, module), ':%s:assembleDebug' % module
+                ],
+                    title='Building Example %s, module %s' % (self.identifier, module))
+        else:
+            self._Execute([
+                '%s/examples/%s/android/App/gradlew' % (self.root,
+                                                        self.app.ExampleName()), '-p',
+                '%s/examples/%s/android/App/' % (self.root,
+                                                 self.app.ExampleName()),
+                '-PmatterBuildSrcDir=%s' % self.output_dir,
+                '-PmatterSdkSourceBuild=false',
+                '-PbuildDir=%s' % self.output_dir, 'assembleDebug'
+            ],
+                title='Building Example ' + self.identifier)
 
     def generate(self):
-        self._Execute([
-            'python3', 'build/chip/java/tests/generate_jars_for_test.py'
-        ], title='Generating JARs for Java build rules test')
-
         self._Execute([
             'python3', 'third_party/android_deps/set_up_android_deps.py'
         ], title='Setting up Android deps through Gradle')

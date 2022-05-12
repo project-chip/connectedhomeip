@@ -1,6 +1,5 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
 #import <Foundation/Foundation.h>
 
 #import "CHIPAttributeCacheContainer_Internal.h"
@@ -18,8 +17,8 @@
 using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
-
-{{#chip_client_clusters}}
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
+{{#chip_client_clusters includeAll=true}}
 @implementation CHIP{{asUpperCamelCase name}}
 
 - (chip::Controller::ClusterBase *)getCluster
@@ -29,10 +28,27 @@ using namespace chip::app::Clusters;
 
 {{#chip_cluster_commands}}
 {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}{{else}}CommandSuccess{{/if}}{{/inline}}
-- (void){{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler{{else}}CompletionHandler{{/if}}:({{>command_completion_type command=.}})completionHandler
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler
 {
+  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
+}
+{{/unless}}
+- (void){{asLowerCamelCase name}}WithParams: (CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
+{
+    chip::Optional<uint16_t> timedInvokeTimeoutMs;
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
+    if (params != nil) {
+      if (params.timedInvokeTimeoutMs != nil) {
+        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+      }
+    }
+    {{#if mustUseTimedInvoke}}
+    if (!timedInvokeTimeoutMs.HasValue()) {
+      timedInvokeTimeoutMs.SetValue(10000);
+    }
+    {{/if}}
     {{#chip_cluster_command_arguments}}
       {{#first}}
         {{#unless (commandHasRequiredField parent)}}
@@ -63,12 +79,7 @@ using namespace chip::app::Clusters;
       ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall
-        {{#if mustUseTimedInvoke}}
-          {{!TODO Fix Darwin API to pass in this information.  For now, 10 seconds.}}
-          , 10000
-          {{/if}}
-        );
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, timedInvokeTimeoutMs);
     });
 }
 {{/chip_cluster_commands}}
@@ -103,6 +114,22 @@ using namespace chip::app::Clusters;
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
 {
+  [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completionHandler:completionHandler];
+}
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(CHIPWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
+{
+    chip::Optional<uint16_t> timedWriteTimeoutMs;
+    if (params != nil) {
+      if (params.timedWriteTimeoutMs != nil){
+        timedWriteTimeoutMs.SetValue(params.timedWriteTimeoutMs.unsignedShortValue);
+      }
+    }
+    {{#if mustUseTimedInvoke}}
+    if (!timedWriteTimeoutMs.HasValue()) {
+      timedWriteTimeoutMs.SetValue(10000);
+    }
+    {{/if}}
+    
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
@@ -117,13 +144,9 @@ using namespace chip::app::Clusters;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall
-        {{#if mustUseTimedWrite}}
-          {{!TODO Fix Darwin API to pass in this information.  For now, 10 seconds.}}
-          , 10000
-          {{/if}}
-       );
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeoutMs);
     });
+    
 }
 
 {{/if}}
@@ -181,4 +204,4 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 @end
 
 {{/chip_client_clusters}}
-{{/if}}
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

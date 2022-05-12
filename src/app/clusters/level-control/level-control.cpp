@@ -142,7 +142,7 @@ static void deactivate(EndpointId endpoint)
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, LevelControl::Id);
-    return (ep == 0xFFFF ? NULL : &stateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : &stateTable[ep]);
 }
 
 #if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
@@ -156,7 +156,7 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
         return;
     }
 
-    if (emberAfContainsAttribute(endpoint, ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id, true))
+    if (emberAfContainsAttribute(endpoint, ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id))
     {
         if (READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL))
         {
@@ -172,7 +172,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     EmberAfStatus status;
     uint8_t currentLevel;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         return;
     }
@@ -278,7 +278,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
 {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id, true))
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id))
     {
         // Convert milliseconds to tenths of a second, rounding any fractional value
         // up to the nearest whole value.  This means:
@@ -319,7 +319,7 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride)
 {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::Options::Id, true))
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::Options::Id))
     {
         // From 3.10.2.2.8.1 of ZCL7 document 14-0127-20j-zcl-ch-3-general.docx:
         //   "Command execution SHALL NOT continue beyond the Options processing if
@@ -515,7 +515,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     uint8_t currentLevel;
     uint8_t actualStepSize;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         return EMBER_ZCL_STATUS_FAILURE;
     }
@@ -583,7 +583,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     if (transitionTimeDs == 0xFFFF)
     {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
-        if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id, true))
+        if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
         {
             status = Attributes::OnOffTransitionTime::Get(endpoint, &transitionTimeDs);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -649,7 +649,7 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     uint8_t currentLevel;
     uint8_t difference;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         status = EMBER_ZCL_STATUS_FAILURE;
         goto send_default_response;
@@ -762,7 +762,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     uint8_t currentLevel;
     uint8_t actualStepSize = stepSize;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         status = EMBER_ZCL_STATUS_FAILURE;
         goto send_default_response;
@@ -881,7 +881,7 @@ static void stopHandler(CommandId commandId, uint8_t optionMask, uint8_t optionO
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         status = EMBER_ZCL_STATUS_FAILURE;
         goto send_default_response;
@@ -912,7 +912,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     EmberAfStatus status;
 
     EmberAfLevelControlState * state = getState(endpoint);
-    if (state == NULL)
+    if (state == nullptr)
     {
         emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
         return;
@@ -930,7 +930,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
     // Read the OnLevel attribute.
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id, true))
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id))
     {
         status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -955,7 +955,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
     // Read the OnOffTransitionTime attribute.
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
-    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id, true))
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id))
     {
         status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -1006,7 +1006,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
 
-    if (state == NULL)
+    if (state == nullptr)
     {
         emberAfLevelControlClusterPrintln("ERR: Level control cluster not available on ep%d", endpoint);
         return;
@@ -1108,9 +1108,9 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint)
 {
-    if (emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id, true))
+    if (emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id))
     {
-        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpCurrentLevel::Id, true);
+        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpCurrentLevel::Id);
     }
 
     return false;

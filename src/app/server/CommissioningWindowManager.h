@@ -23,7 +23,6 @@
 #include <lib/dnssd/Advertiser.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -57,15 +56,13 @@ public:
         return System::Clock::Seconds16(15 * 60);
     }
 
-    static constexpr System::Clock::Seconds16 MinCommissioningTimeout()
+    System::Clock::Seconds16 MinCommissioningTimeout() const
     {
         // Specification section 5.4.2.3. Announcement Duration says 3 minutes.
-        return System::Clock::Seconds16(3 * 60);
+        return mMinCommissioningTimeoutOverride.ValueOr(System::Clock::Seconds16(3 * 60));
     }
 
     void SetAppDelegate(AppDelegate * delegate) { mAppDelegate = delegate; }
-
-    void SetSessionIDAllocator(SessionIDAllocator * idAllocator) { mIDAllocator = idAllocator; }
 
     /**
      * Open the pairing window using default configured parameters.
@@ -88,7 +85,7 @@ public:
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablishmentStarted() override;
-    void OnSessionEstablished() override;
+    void OnSessionEstablished(const SessionHandle & session) override;
 
     void Shutdown();
     void Cleanup();
@@ -118,6 +115,11 @@ private:
     // called when a commissioning window timeout timer is running.
     CHIP_ERROR AdvertiseAndListenForPASE();
 
+    // Call AdvertiseAndListenForPASE, only if max attempts have not been reached.
+    // Cleans up and calls app server delegate on failure.
+    // err gives the current error we're attemping to recover from
+    void HandleFailedAttempt(CHIP_ERROR err);
+
     // Helper for Shutdown and Cleanup.  Does not do anything with
     // advertisements, because Shutdown and Cleanup want to handle those
     // differently.
@@ -146,7 +148,6 @@ private:
 
     bool mIsBLE = true;
 
-    SessionIDAllocator * mIDAllocator = nullptr;
     PASESession mPairingSession;
 
     uint8_t mFailedCommissioningAttempts = 0;

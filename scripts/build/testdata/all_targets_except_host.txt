@@ -13,7 +13,15 @@ android-arm64-chip-tool
 android-arm64-chip-tv-casting-app
 android-arm64-chip-tvserver
 android-x64-chip-tool
+android-x64-chip-tvserver
 android-x86-chip-tool
+android-x86-chip-tvserver
+bl602-light
+cc13x2x7_26x2x7-all-clusters
+cc13x2x7_26x2x7-lock-ftd
+cc13x2x7_26x2x7-lock-mtd
+cc13x2x7_26x2x7-pump
+cc13x2x7_26x2x7-pump-controller
 cyw30739-cyw930739m2evb_01-light
 cyw30739-cyw930739m2evb_01-lock
 cyw30739-cyw930739m2evb_01-ota-requestor (NOGLOB: Running out of XIP flash space)
@@ -144,12 +152,21 @@ esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 esp32-qemu-tests
+imx-all-clusters-app
+imx-all-clusters-app-release
+imx-chip-tool
+imx-chip-tool-release
+imx-lighting-app
+imx-lighting-app-release
+imx-ota-provider-app
+imx-ota-provider-app-release
+imx-thermostat
+imx-thermostat-release
 infineon-p6-all-clusters
 infineon-p6-light
 infineon-p6-lock
-k32w-light (NOGLOB: Debug builds broken due to LWIP_DEBUG redefition)
-k32w-light-release
-k32w-light-tokenizer-release (NOGLOB: Only on demand build)
+k32w-light-ota-se (NOGLOB: Only on demand build)
+k32w-light-release-no-ota
 k32w-lock-low-power-release (NOGLOB: Only on demand build)
 k32w-lock-release
 k32w-shell-release
@@ -169,13 +186,16 @@ mbed-CY8CPROTO_062_4343W-shell-debug (NOGLOB: Compile only for debugging purpose
 mbed-CY8CPROTO_062_4343W-shell-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-shell-release
 nrf-native-posix-64-tests
+nrf-nrf52840dk-all-clusters
 nrf-nrf52840dk-light
 nrf-nrf52840dk-light-rpc
 nrf-nrf52840dk-lock
 nrf-nrf52840dk-pump
 nrf-nrf52840dk-pump-controller
 nrf-nrf52840dk-shell
+nrf-nrf52840dongle-all-clusters
 nrf-nrf52840dongle-light
+nrf-nrf5340dk-all-clusters
 nrf-nrf5340dk-light
 nrf-nrf5340dk-light-rpc (NOGLOB: Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760)
 nrf-nrf5340dk-lock
@@ -188,3 +208,10 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 tizen-arm-light
+tizen-arm-light-asan (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble-asan (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-ble-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-light-no-wifi-asan (NOGLOB: Reduce default build variants)

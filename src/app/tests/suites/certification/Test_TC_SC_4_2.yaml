@@ -34,9 +34,15 @@ config:
         defaultValue: 5
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -233,7 +239,8 @@ tests:
       response:
           values:
               - name: "pairingHint"
-                notValue: 0
+                constraints:
+                    notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
       PICS: PI_KEY
@@ -255,9 +262,15 @@ tests:
                     minValue: 1
 
     # The testplan needs TH needs to be Rebooted so below steps disabled for now
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -457,7 +470,8 @@ tests:
       response:
           values:
               - name: "pairingHint"
-                notValue: 0
+                constraints:
+                    notValue: 0
 
     - label: "Optional TXT key for pairing instructions (PI)"
       disabled: true

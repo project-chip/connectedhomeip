@@ -92,7 +92,8 @@ if (chip_enable_wifi) {
   ]
 
   if (use_rs911x) {
-    wiseconnect_sdk_root = "${chip_root}/third_party/wiseconnect-wifi-bt-sdk"
+    wiseconnect_sdk_root =
+        "${chip_root}/third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"
     import("${wifi_sdk_dir}/rs911x/rs911x.gni")
   } else {
     import("${wifi_sdk_dir}/wf200/wf200.gni")
@@ -102,7 +103,7 @@ if (chip_enable_wifi) {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -160,8 +161,10 @@ efr32_executable("lighting_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -253,6 +256,7 @@ efr32_executable("lighting_app") {
       "PW_RPC_LIGHTING_SERVICE=1",
       "PW_RPC_OTCLI_SERVICE=1",
       "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
     ]
 
     sources += [
@@ -265,6 +269,9 @@ efr32_executable("lighting_app") {
     deps += [
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",

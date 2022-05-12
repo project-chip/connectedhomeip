@@ -56,7 +56,12 @@ static CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
 {
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetInstance().Init(nullptr, sServerPortOperational, sServerPortCommissioning);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.operationalServicePort        = sServerPortOperational;
+    initParams.userDirectedCommissioningPort = sServerPortCommissioning;
+
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -167,8 +172,9 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 
     for (int i = 0; i < emberAfEndpointCount(); i++)
     {
-        EndpointId endpoint   = emberAfEndpointFromIndex(i);
-        uint16_t clusterCount = emberAfClusterCount(endpoint, server);
+        EndpointId endpoint = emberAfEndpointFromIndex(i);
+
+        uint8_t clusterCount = emberAfClusterCount(endpoint, server);
 
         streamer_printf(streamer_get(), "Endpoint %d:\r\n", endpoint);
 

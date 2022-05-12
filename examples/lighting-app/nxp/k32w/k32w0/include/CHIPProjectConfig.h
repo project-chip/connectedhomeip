@@ -33,7 +33,6 @@
 // WARNING: These options make it possible to circumvent basic CHIP security functionality,
 // including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 0
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -86,7 +85,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "04-2020-te2"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "03-2022-te8"
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -102,35 +101,12 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
- *
- * Enable support for CHIP-over-BLE (CHIPOBLE).
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
  *
  * Enables synchronizing the device's real time clock with a remote CHIP Time service
  * using the CHIP Time Sync protocol.
  */
-//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
-
-/**
- * CHIP_CONFIG_MAX_BINDINGS
- *
- * Maximum number of simultaneously active bindings per ChipExchangeManager
- * 1 (Time Sync) + 2 (Two 1-way subscriptions) + 1 (Software Update) = 4
- * in the worst case. Keeping another 4 as buffer.
- */
-#define CHIP_CONFIG_MAX_BINDINGS 8
-
-/**
- * CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD
- *
- * Select the ability to offload event logs to any interested subscribers using WDM.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
+// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
@@ -153,14 +129,6 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 
 /**
- * CONFIG_CHIP_NFC_COMMISSIONING, CHIP_DEVICE_CONFIG_ENABLE_NFC
- *
- * Set these defines to 1 if NFC Commissioning is needed
- */
-#define CONFIG_CHIP_NFC_COMMISSIONING 1
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC 1
-
-/**
  *  @def CHIP_CONFIG_MAX_FABRICS
  *
  *  @brief
@@ -169,6 +137,20 @@
  *    its own access control lists.
  */
 #define CHIP_CONFIG_MAX_FABRICS 4 // 3 fabrics + 1 for rotation slack
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 2
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
@@ -182,3 +164,5 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
+
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

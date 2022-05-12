@@ -19,6 +19,7 @@
 #pragma once
 #include <app/OperationalDeviceProxy.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/support/Variant.h>
 
@@ -39,6 +40,7 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,
     kAttestationVerification,
     kSendOpCertSigningRequest,
+    kValidateCSR,
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,
@@ -66,6 +68,16 @@ struct NOCChainGenerationParameters
     ByteSpan signature;
 };
 
+struct CompletionStatus
+{
+    CompletionStatus() : err(CHIP_NO_ERROR), failedStage(NullOptional), attestationResult(NullOptional) {}
+    CHIP_ERROR err;
+    Optional<CommissioningStage> failedStage;
+    Optional<Credentials::AttestationVerificationResult> attestationResult;
+    Optional<app::Clusters::GeneralCommissioning::CommissioningError> commissioningError;
+    Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> networkCommissioningStatus;
+};
+
 constexpr uint16_t kDefaultFailsafeTimeout = 60;
 class CommissioningParameters
 {
@@ -73,6 +85,7 @@ public:
     static constexpr size_t kMaxThreadDatasetLen = 254;
     static constexpr size_t kMaxSsidLen          = 32;
     static constexpr size_t kMaxCredentialsLen   = 64;
+    static constexpr size_t kMaxCountryCodeLen   = 2;
 
     // Value to use when setting the commissioning failsafe timer on the node being commissioned.
     // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
@@ -91,6 +104,9 @@ public:
     {
         return mDeviceRegulatoryLocation;
     }
+
+    // The country code to be used for the node, if set.
+    Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
 
     // Nonce sent to the node to use during the CSR request.
     // When using the AutoCommissioner, this value will be ignored in favour of the value supplied by the
@@ -198,7 +214,7 @@ public:
 
     // Status to send when calling CommissioningComplete on the PairingDelegate during the kCleanup step. The AutoCommissioner uses
     // this to pass through any error messages received during commissioning.
-    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
+    const CompletionStatus & GetCompletionStatus() const { return completionStatus; }
 
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
@@ -209,6 +225,14 @@ public:
     CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
     {
         mDeviceRegulatoryLocation.SetValue(location);
+        return *this;
+    }
+
+    // The lifetime of the buffer countryCode is pointing to should exceed the
+    // lifetime of CommissioningParameters object.
+    CommissioningParameters & SetCountryCode(CharSpan countryCode)
+    {
+        mCountryCode.SetValue(countryCode);
         return *this;
     }
 
@@ -312,7 +336,15 @@ public:
         mLocationCapability = MakeOptional(capability);
         return *this;
     }
-    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
+    void SetCompletionStatus(const CompletionStatus & status) { completionStatus = status; }
+
+    CommissioningParameters & SetDeviceAttestationDelegate(Credentials::DeviceAttestationDelegate * deviceAttestationDelegate)
+    {
+        mDeviceAttestationDelegate = deviceAttestationDelegate;
+        return *this;
+    }
+
+    Credentials::DeviceAttestationDelegate * GetDeviceAttestationDelegate() const { return mDeviceAttestationDelegate; }
 
 private:
     // Items that can be set by the commissioner
@@ -321,6 +353,7 @@ private:
     Optional<ByteSpan> mCSRNonce;
     Optional<ByteSpan> mAttestationNonce;
     Optional<WiFiCredentials> mWiFiCreds;
+    Optional<CharSpan> mCountryCode;
     Optional<ByteSpan> mThreadOperationalDataset;
     Optional<NOCChainGenerationParameters> mNOCChainGenerationParameters;
     Optional<ByteSpan> mRootCert;
@@ -337,7 +370,9 @@ private:
     Optional<uint16_t> mRemoteProductId;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mLocationCapability;
-    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
+    CompletionStatus completionStatus;
+    Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
+        nullptr; // Delegate to handle device attestation failures during commissioning
 };
 
 struct RequestedCertificate
@@ -414,10 +449,24 @@ struct ReadCommissioningInfo
     GeneralCommissioningInfo general;
 };
 
-struct AdditionalErrorInfo
+struct AttestationErrorInfo
 {
-    AdditionalErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
+    AttestationErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
     Credentials::AttestationVerificationResult attestationResult;
+};
+
+struct CommissioningErrorInfo
+{
+    CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningError result) : commissioningError(result) {}
+    app::Clusters::GeneralCommissioning::CommissioningError commissioningError;
+};
+
+struct NetworkCommissioningStatusInfo
+{
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatus result) :
+        networkCommissioningStatus(result)
+    {}
+    app::Clusters::NetworkCommissioning::NetworkCommissioningStatus networkCommissioningStatus;
 };
 
 class CommissioningDelegate
@@ -426,31 +475,33 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo - ReadCommissioningInfo
-     * kArmFailsafe: none
-     * kConfigRegulatory: none
+     * kArmFailsafe: CommissioningErrorInfo if there is an error
+     * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kSendPAICertificateRequest: RequestedCertificate
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
-     * kAttestationVerification: AdditionalErrorInfo if there is an error
+     * kAttestationVerification: AttestationErrorInfo if there is an error
      * kSendOpCertSigningRequest: CSRResponse
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
      * kSendNOC: none
-     * kWiFiNetworkSetup: none
-     * kThreadNetworkSetup: none
-     * kWiFiNetworkEnable: none
-     * kThreadNetworkEnable: none
+     * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
+     * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
+     * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
+     * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kFindOperational: OperationalNodeFoundData
-     * kSendComplete: none
+     * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AdditionalErrorInfo>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
     };
     virtual CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params)                           = 0;
+    virtual const CommissioningParameters & GetCommissioningParameters() const                                      = 0;
     virtual void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) = 0;
     virtual CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy)       = 0;
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report)                        = 0;

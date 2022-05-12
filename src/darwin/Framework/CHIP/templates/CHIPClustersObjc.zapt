@@ -1,6 +1,5 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
 #ifndef CHIP_CLUSTERS_H
 #define CHIP_CLUSTERS_H
 
@@ -17,7 +16,7 @@ typedef void (^SubscriptionEstablishedHandler)(void);
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 
 
 /**
@@ -27,7 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIP{{asUpperCamelCase name}} : CHIPCluster
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}With{{#if (hasArguments)}}Params:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler{{else}}CompletionHandler{{/if}}:({{>command_completion_type command=.}})completionHandler;
+- (void){{asLowerCamelCase name}}WithParams:(CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler;
+{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=.}})completionHandler;
+{{/unless}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
@@ -41,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
 {{#if isWritableAttribute}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(CHIPWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler;
 {{/if}}
 {{#if isReportableAttribute}}
 /**
@@ -60,7 +63,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
-typedef NS_ENUM({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
+typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName ../name label}}) {
    {{#zcl_enum_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
    {{/zcl_enum_items}}
@@ -68,7 +71,7 @@ typedef NS_ENUM({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
 
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
-typedef NS_OPTIONS({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
+typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName ../name label}}) {
    {{#zcl_bitmap_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
    {{/zcl_bitmap_items}}
@@ -80,4 +83,3 @@ typedef NS_OPTIONS({{asUnderlyingZclType type}}, {{objCEnumName ../name label}})
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */
-{{/if}}

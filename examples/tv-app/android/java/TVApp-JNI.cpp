@@ -17,13 +17,16 @@
  */
 
 #include "TvApp-JNI.h"
+#include "AppImpl.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
 #include "JNIDACProvider.h"
 #include "KeypadInputManager.h"
+#include "LevelManager.h"
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
+#include "OnOffManager.h"
 #include "WakeOnLanManager.h"
 #include "credentials/DeviceAttestationCredsProvider.h"
 #include <app/server/Dnssd.h>
@@ -37,9 +40,8 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::AppPlatform;
 using namespace chip::Credentials;
-
-#define EXTENDED_DISCOVERY_TIMEOUT_SEC 20
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_com_tcl_chip_tvapp_TvApp_##METHOD_NAME
 
@@ -138,9 +140,38 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
     }
 }
 
-JNI_METHOD(void, postInit)(JNIEnv *, jobject app)
+JNI_METHOD(void, preServerInit)(JNIEnv *, jobject app)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
-#endif
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(Zcl, "TvAppJNI::preServerInit");
+
+    PreServerInit();
+}
+
+JNI_METHOD(void, postServerInit)(JNIEnv *, jobject app)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(Zcl, "TvAppJNI::postServerInit");
+
+    InitVideoPlayerPlatform();
+}
+
+JNI_METHOD(void, setOnOffManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    OnOffManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setOnOff)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return OnOffManager::SetOnOff(endpoint, value);
+}
+
+JNI_METHOD(void, setLevelManager)(JNIEnv *, jobject, jint endpoint, jobject manager)
+{
+    LevelManager::NewManager(endpoint, manager);
+}
+
+JNI_METHOD(jboolean, setCurrentLevel)(JNIEnv *, jobject, jint endpoint, jboolean value)
+{
+    return LevelManager::SetLevel(endpoint, value);
 }

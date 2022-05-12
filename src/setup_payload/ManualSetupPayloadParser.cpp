@@ -38,7 +38,8 @@ CHIP_ERROR ManualSetupPayloadParser::CheckDecimalStringValidity(std::string deci
 {
     if (decimalString.length() < 2)
     {
-        ChipLogError(SetupPayload, "Failed decoding base10. Input was empty. %zu", decimalString.length());
+        ChipLogError(SetupPayload, "Failed decoding base10. Input was empty. %u",
+                     static_cast<unsigned int>(decimalString.length()));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     std::string repWithoutCheckChar = decimalString.substr(0, decimalString.length() - 1);
@@ -57,8 +58,8 @@ CHIP_ERROR ManualSetupPayloadParser::CheckCodeLengthValidity(const std::string &
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
     {
-        ChipLogError(SetupPayload, "Failed decoding base10. Input length %zu was not expected length %zu", decimalString.length(),
-                     expectedCharLength);
+        ChipLogError(SetupPayload, "Failed decoding base10. Input length %u was not expected length %u",
+                     static_cast<unsigned int>(decimalString.length()), static_cast<unsigned int>(expectedCharLength));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
     return CHIP_NO_ERROR;
@@ -87,7 +88,8 @@ CHIP_ERROR ManualSetupPayloadParser::ReadDigitsFromDecimalString(const std::stri
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
     {
-        ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %zu", decimalString.length());
+        ChipLogError(SetupPayload, "Failed decoding base10. Input was too short. %u",
+                     static_cast<unsigned int>(decimalString.length()));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
