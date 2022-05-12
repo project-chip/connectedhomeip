@@ -20,6 +20,7 @@
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
+#include <trace/trace.h>
 
 namespace chip {
 namespace Dnssd {
@@ -212,6 +213,8 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetRequiredIn
 
 CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange packetRange)
 {
+    MATTER_TRACE_EVENT_SCOPE("Incremental resolver record parsing"); // measure until loop finished
+
     if (!IsActive())
     {
         return CHIP_NO_ERROR; // nothing to parse
@@ -224,14 +227,14 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
     case QType::TXT:
         if (data.GetName() != mRecordName.Get())
         {
-            ChipLogDetail(Discovery, "TXT record received for a different host name.");
+            MATTER_TRACE_EVENT_INSTANT("TXT not applicable");
             return CHIP_NO_ERROR;
         }
         return OnTxtRecord(data, packetRange);
     case QType::A: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            ChipLogDetail(Discovery, "IP address received for a different host name.");
+            MATTER_TRACE_EVENT_INSTANT("A (IPv4) not applicable");
             return CHIP_NO_ERROR;
         }
 
@@ -246,7 +249,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            ChipLogDetail(Discovery, "IP address received for a different host name.");
+            MATTER_TRACE_EVENT_INSTANT("AAAA (IPv6) not applicable");
             return CHIP_NO_ERROR;
         }
 
@@ -278,13 +281,13 @@ CHIP_ERROR IncrementalResolver::OnPtrRecord(const ResourceData & data, BytesRang
 
     if (!IsActiveCommissionParse())
     {
-        ChipLogDetail(Discovery, "PTR record for non-commission resolution.");
+        MATTER_TRACE_EVENT_INSTANT("PTR for non-commission");
         return CHIP_NO_ERROR;
     }
 
     if (!IsCommissionSubtype(data.GetName()))
     {
-        ChipLogDetail(Discovery, "PTR record that is not a sub-type for commissioning.");
+        MATTER_TRACE_EVENT_INSTANT("PTR without a commission subtype");
         return CHIP_NO_ERROR;
     }
 
@@ -297,7 +300,7 @@ CHIP_ERROR IncrementalResolver::OnPtrRecord(const ResourceData & data, BytesRang
 
     if (qname != mRecordName.Get())
     {
-        ChipLogDetail(Discovery, "PTR record that is not pointing to the current commission server.");
+        MATTER_TRACE_EVENT_INSTANT("PTR not applicable");
         return CHIP_NO_ERROR;
     }
 
