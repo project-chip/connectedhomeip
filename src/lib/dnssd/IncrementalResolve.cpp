@@ -112,6 +112,29 @@ bool IsCommissionSubtype(SerializedQNameIterator name)
     return (name == kCommissionerSubTypeSuffix) || (name == kCommissionableSubTypeSuffix);
 }
 
+/// Automatically resets a IncrementalResolver to inactive in its destructor
+/// unless disarmed.
+///
+/// Used for RAII for inactive reset
+class AutoInactiveResetter
+{
+public:
+    explicit AutoInactiveResetter(IncrementalResolver & resolver) : mResolver(resolver) {}
+    ~AutoInactiveResetter()
+    {
+        if (mArmed)
+        {
+            mResolver.ResetToInactive();
+        }
+    }
+
+    void Disarm() { mArmed = false; }
+
+private:
+    bool mArmed = true;
+    IncrementalResolver & mResolver;
+};
+
 } // namespace
 
 CHIP_ERROR StoredServerName::Set(SerializedQNameIterator value)
@@ -137,8 +160,7 @@ SerializedQNameIterator StoredServerName::Get() const
 
 CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv)
 {
-    mSpecificResolutionData = ParsedRecordSpecificData();
-    mCommonResolutionData.Reset();
+    AutoInactiveResetter inactiveReset(*this);
 
     ReturnErrorOnFailure(mRecordName.Set(name));
     ReturnErrorOnFailure(mTargetHostName.Set(srv.GetName()));
@@ -171,7 +193,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
             SerializedQNameIterator nameCopy = name;
             if (!nameCopy.Next() || !nameCopy.IsValid())
             {
-                mSpecificResolutionData = ParsedRecordSpecificData();
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
@@ -179,7 +200,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
                 ExtractIdFromInstanceName(nameCopy.Value(), &mSpecificResolutionData.Get<OperationalNodeData>().peerId);
             if (err != CHIP_NO_ERROR)
             {
-                mSpecificResolutionData = ParsedRecordSpecificData();
                 return err;
             }
         }
@@ -189,10 +209,10 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         mSpecificResolutionData.Set<CommissionNodeData>();
         break;
     default:
-        mSpecificResolutionData = ParsedRecordSpecificData();
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    inactiveReset.Disarm();
     return CHIP_NO_ERROR;
 }
 
@@ -358,8 +378,7 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
     outputData.resolutionData = mCommonResolutionData;
     outputData.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
 
-    mSpecificResolutionData = ParsedRecordSpecificData();
-    mCommonResolutionData.Reset();
+    ResetToInactive();
 
     return CHIP_NO_ERROR;
 }
@@ -371,8 +390,7 @@ CHIP_ERROR IncrementalResolver::Take(ResolvedNodeData & outputData)
     outputData.resolutionData  = mCommonResolutionData;
     outputData.operationalData = mSpecificResolutionData.Get<OperationalNodeData>();
 
-    mSpecificResolutionData = ParsedRecordSpecificData();
-    mCommonResolutionData.Reset();
+    ResetToInactive();
 
     return CHIP_NO_ERROR;
 }

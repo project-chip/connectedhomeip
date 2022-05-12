@@ -138,6 +138,13 @@ public:
     /// it was parsed so far.
     CHIP_ERROR Take(ResolvedNodeData & outputData);
 
+    /// Clears current state, setting as inactive
+    void ResetToInactive()
+    {
+        mCommonResolutionData.Reset();
+        mSpecificResolutionData = ParsedRecordSpecificData();
+    }
+
 private:
     /// Notify that a PTR record can be parsed.
     ///

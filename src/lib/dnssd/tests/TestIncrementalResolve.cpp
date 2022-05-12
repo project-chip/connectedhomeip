@@ -170,6 +170,23 @@ void TestCreation(nlTestSuite * inSuite, void * inContext)
         resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kSrvInitialization));
 }
 
+void TestInactiveResetOnInitError(nlTestSuite * inSuite, void * inContext)
+{
+    IncrementalResolver resolver;
+
+    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+
+    SrvRecord srvRecord;
+    PreloadSrvRecord(inSuite, srvRecord);
+
+    // test host name is not a 'matter' name
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestHostName.Serialized(), srvRecord) != CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, !resolver.IsActive());
+    NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
+    NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
+}
+
 void TestStartOperational(nlTestSuite * inSuite, void * inContext)
 {
     IncrementalResolver resolver;
@@ -408,13 +425,14 @@ const nlTest sTests[] = {
     NL_TEST_DEF("StoredServerName", TestStoredServerName), //
 
     // Actual resolver tests
-    NL_TEST_DEF("Creation", TestCreation),                       //
-    NL_TEST_DEF("StartOperational", TestStartOperational),       //
-    NL_TEST_DEF("StartCommissionable", TestStartCommissionable), //
-    NL_TEST_DEF("StartCommissioner", TestStartCommissioner),     //
-    NL_TEST_DEF("ParseOperational", TestParseOperational),       //
-    NL_TEST_DEF("ParseCommissionable", TestParseCommissionable), //
-    NL_TEST_SENTINEL()                                           //
+    NL_TEST_DEF("Creation", TestCreation),                                 //
+    NL_TEST_DEF("InactiveResetOnInitError", TestInactiveResetOnInitError), //
+    NL_TEST_DEF("StartOperational", TestStartOperational),                 //
+    NL_TEST_DEF("StartCommissionable", TestStartCommissionable),           //
+    NL_TEST_DEF("StartCommissioner", TestStartCommissioner),               //
+    NL_TEST_DEF("ParseOperational", TestParseOperational),                 //
+    NL_TEST_DEF("ParseCommissionable", TestParseCommissionable),           //
+    NL_TEST_SENTINEL()                                                     //
 };
 
 } // namespace
