@@ -47,6 +47,7 @@ static_library("transport") {
     "SessionManager.h",
     "SessionMessageCounter.h",
     "SessionMessageDelegate.h",
+    "SessionSharedPtr.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",

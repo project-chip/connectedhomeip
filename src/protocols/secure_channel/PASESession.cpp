@@ -208,6 +208,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
+    GrabUnauthenticatedSession(exchangeCtxt->GetSessionHandle());
     SuccessOrExit(err);
 
     mRole = CryptoContext::SessionRole::kInitiator;
@@ -802,6 +803,8 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
 {
     CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, msg);
     SuccessOrExit(err);
+
+    GrabUnauthenticatedSession(exchange->GetSessionHandle());
 
     switch (static_cast<MsgType>(payloadHeader.GetMessageType()))
     {

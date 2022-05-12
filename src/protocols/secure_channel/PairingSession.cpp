@@ -25,9 +25,10 @@ namespace chip {
 
 CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager)
 {
-    auto handle = sessionManager.AllocateSession(GetSecureSessionType());
+    Optional<SessionHandle> handle = sessionManager.AllocateSession(GetSecureSessionType());
     VerifyOrReturnError(handle.HasValue(), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mSecureSessionHolder.GrabPairing(handle.Value()), CHIP_ERROR_INTERNAL);
+    mSecureSessionRef = handle.Value().ToShared();
     mSessionManager = &sessionManager;
     return CHIP_NO_ERROR;
 }
@@ -153,7 +154,9 @@ void PairingSession::Clear()
         mExchangeCtxt = nullptr;
     }
 
+    mUnauthenticatedSessionRef.Release();
     mSecureSessionHolder.Release();
+    mSecureSessionRef.Release();
     mPeerSessionId.ClearValue();
     mSessionManager = nullptr;
 }

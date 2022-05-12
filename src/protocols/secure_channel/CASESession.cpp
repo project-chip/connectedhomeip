@@ -199,6 +199,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     err = Init(sessionManager, delegate);
+    GrabUnauthenticatedSession(exchangeCtxt->GetSessionHandle());
 
     mRole = CryptoContext::SessionRole::kInitiator;
 
@@ -1641,6 +1642,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     CHIP_ERROR err                            = ValidateReceivedMessage(ec, payloadHeader, msg);
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
+
+    GrabUnauthenticatedSession(ec->GetSessionHandle());
 
     // By default, CHIP_ERROR_INVALID_MESSAGE_TYPE is returned if in the current state
     // a message handler is not defined for the received message type.
