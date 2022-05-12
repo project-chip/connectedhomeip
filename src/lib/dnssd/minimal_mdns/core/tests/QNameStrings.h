@@ -21,6 +21,15 @@
 
 namespace testing {
 
+/// Convenience class for testing.
+///
+/// Allows defining of constants for tests for FullQName and SerializedQNameIterator.
+/// Usage:
+///
+/// const auto kTestHostName = testing::TestQName<2>({ "abcd", "local" });
+///
+/// kTestHostName.Serialized(); // SerializedQNameIterator: abcd.local
+/// kTestHostName.Full();       // FullQName: abcd.local
 template <size_t N>
 class TestQName
 {
