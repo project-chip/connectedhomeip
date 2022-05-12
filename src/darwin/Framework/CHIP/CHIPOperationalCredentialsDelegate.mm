@@ -24,6 +24,8 @@
 #include <Security/SecKey.h>
 
 #import "CHIPLogging.h"
+#import "MTRCertificates.h"
+#import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -176,4 +178,99 @@ bool CHIPOperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32
     uint8_t minute = static_cast<uint8_t>([components minute]);
     uint8_t second = static_cast<uint8_t>([components second]);
     return chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, epoch);
+}
+
+namespace {
+uint64_t GetIssuerId(NSNumber * _Nullable providedIssuerId)
+{
+    if (providedIssuerId != nil) {
+        return [providedIssuerId unsignedLongLongValue];
+    }
+
+    return (uint64_t(arc4random()) << 32) | arc4random();
+}
+} // anonymous namespace
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertificate(id<CHIPKeypair> keypair, NSNumber * _Nullable issuerId,
+    NSNumber * _Nullable fabricId, NSData * _Nullable __autoreleasing * _Nonnull rootCert)
+{
+    *rootCert = nil;
+    CHIPP256KeypairBridge keypairBridge;
+    ReturnErrorOnFailure(keypairBridge.Init(keypair));
+    CHIPP256KeypairNativeBridge nativeKeypair(keypairBridge);
+
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(GetIssuerId(issuerId)));
+
+    if (fabricId != nil) {
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId([fabricId unsignedLongLongValue]));
+    }
+
+    uint32_t validityStart, validityEnd;
+
+    if (!ToChipEpochTime(0, validityStart)) {
+        NSLog(@"Failed in computing certificate validity start date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (!ToChipEpochTime(kCertificateValiditySecs, validityEnd)) {
+        NSLog(@"Failed in computing certificate validity end date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint8_t rcacBuffer[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan rcac(rcacBuffer);
+    X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, nativeKeypair, rcac));
+    *rootCert = AsData(rcac);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(id<CHIPKeypair> rootKeypair,
+    NSData * rootCertificate, SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+    NSData * _Nullable __autoreleasing * _Nonnull intermediateCert)
+{
+    *intermediateCert = nil;
+
+    // Verify that the provided certificate public key matches the root keypair.
+    if ([MTRCertificates keypairMatchesCertificate:rootCertificate keypair:rootKeypair] == NO) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIPP256KeypairBridge keypairBridge;
+    ReturnErrorOnFailure(keypairBridge.Init(rootKeypair));
+    CHIPP256KeypairNativeBridge nativeRootKeypair(keypairBridge);
+
+    ByteSpan rcac = AsByteSpan(rootCertificate);
+
+    P256PublicKey pubKey;
+    ReturnErrorOnFailure(CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(intermediatePublicKey, &pubKey));
+
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+
+    ChipDN icac_dn;
+    ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(GetIssuerId(issuerId)));
+    if (fabricId != nil) {
+        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId([fabricId unsignedLongLongValue]));
+    }
+
+    uint32_t validityStart, validityEnd;
+
+    if (!ToChipEpochTime(0, validityStart)) {
+        NSLog(@"Failed in computing certificate validity start date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (!ToChipEpochTime(kCertificateValiditySecs, validityEnd)) {
+        NSLog(@"Failed in computing certificate validity end date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint8_t icacBuffer[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan icac(icacBuffer);
+    X509CertRequestParams icac_request = { 0, validityStart, validityEnd, icac_dn, rcac_dn };
+    ReturnErrorOnFailure(NewICAX509Cert(icac_request, pubKey, nativeRootKeypair, icac));
+    *intermediateCert = AsData(icac);
+    return CHIP_NO_ERROR;
 }
