@@ -119,7 +119,7 @@ void TestPayloadBase38Rep(nlTestSuite * inSuite, void * inContext)
 void TestBase38(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t input[3] = { 10, 10, 10 };
-    char encodedBuf[32];
+    char encodedBuf[64];
     MutableByteSpan inputSpan(input);
     MutableCharSpan encodedSpan(encodedBuf);
 

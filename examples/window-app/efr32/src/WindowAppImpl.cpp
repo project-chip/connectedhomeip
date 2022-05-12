@@ -435,7 +435,7 @@ void WindowAppImpl::UpdateLCD()
     {
         if (GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
         {
-            LCDWriteQRCode((uint8_t *) mQRCode.c_str());
+            LCDWriteQRCode((uint8_t *) mQRCode.data());
         }
     }
 #endif // QR_CODE_ENABLED

@@ -50,7 +50,7 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 
 void PrintOnboardingCodes(const chip::PayloadContents & payload)
 {
-    char payloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength];
+    char payloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan qrCode(payloadBuffer);
 
     if (GetQRCode(qrCode, payload) == CHIP_NO_ERROR)
@@ -86,7 +86,7 @@ void PrintOnboardingCodes(const chip::PayloadContents & payload)
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 {
     // Get QR Code and emulate its content using NFC tag
-    char payloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength];
+    char payloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan qrCode(payloadBuffer);
 
     ReturnOnFailure(GetQRCode(qrCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
@@ -154,8 +154,6 @@ CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, chip::RendezvousInformatio
 
 CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, const chip::PayloadContents & payload)
 {
-    // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
-    // generating payload
     CHIP_ERROR err = chip::QRCodeBasicSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
     if (err != CHIP_NO_ERROR)
     {
@@ -166,7 +164,7 @@ CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, const chip::PayloadContent
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, chip::MutableCharSpan & aQRCode)
+CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const chip::CharSpan & aQRCode)
 {
     VerifyOrReturnError(aQRCodeUrl, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aUrlMaxSize >= (strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + aQRCode.size() + 1),
