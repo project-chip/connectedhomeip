@@ -49,6 +49,8 @@ const auto kTestCommissionerNode = testing::TestQName<4>({ "C5038835313B8B98", "
 // Server name that is preloaded by the `PreloadSrvRecord`
 const auto kTestHostName = testing::TestQName<2>({ "abcd", "local" });
 
+const auto kIrrelevantHostName = testing::TestQName<2>({ "different", "local" });
+
 void PreloadSrvRecord(nlTestSuite * inSuite, SrvRecord & record)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes] = {};
@@ -239,46 +241,41 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
 
     // Send an IP for an irrelevant host name
     {
-        const char * path[] = { "xyzt", "local" };
         Inet::IPAddress addr;
-
         NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+
+        CallOnRecord(inSuite, resolver, IPResourceRecord(kIrrelevantHostName.Full(), addr));
     }
 
     // Send a useful IP address here
     {
-        const char * path[] = { "abcd", "local" };
         Inet::IPAddress addr;
-
         NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(kTestHostName.Full(), addr));
     }
 
     // Send a TXT record for an irrelevant host name
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
-        const char * path[]    = { "abcd", "local" };
         const char * entries[] = {
             "some", "foo=bar", "x=y=z", "a=", // unused data
             "T=1"                             // TCP supported
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestHostName.Full(), entries));
     }
 
     // Adding actual text entries that are useful
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
-        const char * path[]    = { "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" };
         const char * entries[] = {
             "foo=bar", // unused data
             "SII=23"   // sleepy idle interval
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestOperationalName.Full(), entries));
     }
 
     // Resolver should have all data
@@ -323,49 +320,42 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
 
     // Send an IP for an irrelevant host name
     {
-        const char * path[] = { "xyzt", "local" };
         Inet::IPAddress addr;
 
         NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(kIrrelevantHostName.Full(), addr));
     }
 
     // Send a useful IP address here
     {
-        const char * path[] = { "abcd", "local" };
         Inet::IPAddress addr;
-
         NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(kTestHostName.Full(), addr));
     }
 
     // Send another IP address
     {
-        const char * path[] = { "abcd", "local" };
         Inet::IPAddress addr;
-
         NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::f0f1:f2f3:f4f5:1234", addr));
-        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(kTestHostName.Full(), addr));
     }
 
     // Send a TXT record for an irrelevant host name
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
-        const char * path[]    = { "abcd", "local" };
         const char * entries[] = {
             "some", "foo=bar", "x=y=z", "a=", // unused data
             "SII=123"                         // Sleepy idle interval
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestHostName.Full(), entries));
     }
 
     // Adding actual text entries that are useful
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
-        const char * path[]    = { "C5038835313B8B98", "_matterc", "_udp", "local" };
         const char * entries[] = {
             "foo=bar",    // unused data
             "SAI=321",    // sleepy active interval
@@ -374,7 +364,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
             "DN=mytest"   // Device name
         };
 
-        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(kTestCommissionableNode.Full(), entries));
     }
 
     // Resolver should have all data
