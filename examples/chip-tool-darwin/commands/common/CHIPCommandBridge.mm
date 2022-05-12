@@ -19,6 +19,7 @@
 #include "CHIPCommandBridge.h"
 
 #import "CHIPToolKeypair.h"
+#import "GroupTestData.h"
 #import <CHIP/CHIPDeviceController.h>
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -71,6 +72,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
             return CHIP_ERROR_INTERNAL;
         }
 
+        ReturnLogErrorOnFailure(AddGroupTestData(controller));
         mControllers[identities[i]] = controller;
     }
 

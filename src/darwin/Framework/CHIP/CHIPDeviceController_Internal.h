@@ -79,6 +79,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricInfo *)fabric isRunning:(BOOL *)isRunning;
 
+/**
+ * Temporary wrapper for adding a group with all the necessary informations (e.g key sets).
+ */
+- (BOOL)addGroupKeySet:(NSDictionary *)groupKeySet error:(NSError * __autoreleasing *)error;
+
 @end
 
 NS_ASSUME_NONNULL_END
