@@ -21,10 +21,10 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/ActiveResolveAttempts.h>
+#include <lib/dnssd/IncrementalResolve.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
-#include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
@@ -41,332 +41,196 @@ namespace chip {
 namespace Dnssd {
 namespace {
 
-const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
-{
-    return ByteSpan(range.Start(), range.Size());
-}
-
-template <class NodeData>
-class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
-{
-public:
-    explicit TxtRecordDelegateImpl(NodeData & nodeData) : mNodeData(nodeData) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
-    {
-        FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mNodeData);
-    }
-
-private:
-    NodeData & mNodeData;
-};
-
 constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
 
-class PacketDataReporter : public ParserDelegate
+/// Handles processing of minmdns packet data.
+///
+/// Can process multiple incremental resolves based on SRV data and allows
+/// retreival of pending (e.g. to ask for AAAA) and complete data items.
+///
+class PacketParser : private ParserDelegate
 {
 public:
-    PacketDataReporter(OperationalResolveDelegate * opDelegate, CommissioningResolveDelegate * commissionDelegate,
-                       chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType, const BytesRange & packet) :
-        mOperationalDelegate(opDelegate),
-        mCommissioningDelegate(commissionDelegate), mDiscoveryType(discoveryType), mPacketRange(packet)
-    {
-        mInterfaceId = interfaceId;
-    }
+    PacketParser() {}
 
+    /// Goes through the given SRV records within a response packet
+    /// and sets up data resolution
+    void ParseSrvRecords(const BytesRange & packet);
+
+    /// Goes through non-SRV records and feeds them through the initialized
+    /// SRV record parsing.
+    ///
+    /// Must be called AFTER ParseSrvRecords has been called.
+    void ParseNonSrvRecords(const BytesRange & packet);
+
+    IncrementalResolver * ResolverBegin() { return mResolvers; }
+    const IncrementalResolver * ResolverBegin() const { return mResolvers; }
+
+    IncrementalResolver * ResolverEnd() { return mResolvers + kMinMdnsNumParallelResolvers; }
+    const IncrementalResolver * ResolverEnd() const { return mResolvers + kMinMdnsNumParallelResolvers; }
+
+private:
     // ParserDelegate implementation
-
     void OnHeader(ConstHeaderRef & header) override;
     void OnQuery(const QueryData & data) override;
     void OnResource(ResourceType type, const ResourceData & data) override;
 
-    // Called after ParsePacket is complete to send final notifications to the delegate.
-    // Used to ensure all the available IP addresses are attached before completion.
-    void OnComplete(ActiveResolveAttempts & activeAttempts);
-
-private:
-    OperationalResolveDelegate * mOperationalDelegate;
-    CommissioningResolveDelegate * mCommissioningDelegate;
-    DiscoveryType mDiscoveryType;
-    ResolvedNodeData mNodeData;
-    DiscoveredNodeData mDiscoveredNodeData;
-    chip::Inet::InterfaceId mInterfaceId;
-    BytesRange mPacketRange;
-
-    bool mValid       = false;
-    bool mHasNodePort = false;
-    bool mHasIP       = false;
-
-    void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
-    void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
-
-    /// Handle processing of a newly received IP address
+    /// Called IFF data is of SRV type and we are in SRV initialization state
     ///
-    /// Will place the given [addr] into the address list of [resolutionData] assuming that
-    /// there is enough space for that.
-    void OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr);
+    /// Initializes a resolver with the given SRV content as long as
+    /// inactive resolvers exist.
+    void ParseSRVResource(const ResourceData & data);
+
+    /// Called IFF parsing state is in RecordParsing
+    ///
+    /// Forwards the resource to all active resolvers.
+    void ParseResource(const ResourceData & data);
+
+    enum class RecordParsingState
+    {
+        kIdle,
+        kSrvInitialization,
+        kRecordParsing,
+    };
+
+    // TODO: use a CHIP constant here
+    static constexpr size_t kMinMdnsNumParallelResolvers = 2;
+
+    bool mIsResponse = false;
+    BytesRange mPacketRange;
+    IncrementalResolver mResolvers[kMinMdnsNumParallelResolvers];
+    RecordParsingState mParsingState = RecordParsingState::kIdle;
 };
 
-void PacketDataReporter::OnQuery(const QueryData & data)
+void PacketParser::OnHeader(ConstHeaderRef & header)
+{
+    mIsResponse = header.GetFlags().IsResponse();
+
+#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
+    if (header.GetFlags().IsTruncated())
+    {
+        // MinMdns does not cache data, so receiving piecewise data does not work
+        ChipLogError(Discovery, "Truncated responses not supported for address resolution");
+    }
+#endif
+}
+
+void PacketParser::OnQuery(const QueryData & data)
 {
     // Ignore queries:
     //   - unicast answers will include the corresponding query in the answer
     //     packet, however that is not interesting for the resolver.
 }
 
-void PacketDataReporter::OnHeader(ConstHeaderRef & header)
+void PacketParser::OnResource(ResourceType type, const ResourceData & data)
 {
-    mValid       = header.GetFlags().IsResponse();
-    mHasIP       = false; // will need to get at least one valid IP eventually
-    mHasNodePort = false; // also need node-port which we do not have yet
-
-    if (header.GetFlags().IsTruncated())
+    if (!mIsResponse)
     {
+        return;
+    }
+
+    switch (mParsingState)
+    {
+    case RecordParsingState::kSrvInitialization: {
+        if (data.GetType() != QType::SRV)
+        {
+            return;
+        }
+        ParseSRVResource(data);
+        break;
+    }
+    case RecordParsingState::kRecordParsing:
+        ParseResource(data);
+        break;
+    case RecordParsingState::kIdle:
+        ChipLogError(Discovery, "Illegal state: received DNSSD resource while IDLE");
+        break;
+    }
+}
+
+void PacketParser::ParseResource(const ResourceData & data)
+{
+    for (auto & resolver : mResolvers)
+    {
+        if (resolver.IsActive())
+        {
+            CHIP_ERROR err = resolver.OnRecord(data, mPacketRange);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+    }
+}
+
+void PacketParser::ParseSRVResource(const ResourceData & data)
+{
+    SrvRecord srv;
+    if (!srv.Parse(data.GetData(), mPacketRange))
+    {
+        ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
+        return;
+    }
+
+    for (auto & resolver : mResolvers)
+    {
+        if (resolver.IsActive() && (resolver.GetRecordName() == data.GetName()))
+        {
+            ChipLogDetail(Discovery, "SRV record already actively procssed.");
+            return;
+        }
+    }
+
+    for (auto & resolver : mResolvers)
+    {
+        if (resolver.IsActive())
+        {
+            continue;
+        }
+
+        CHIP_ERROR err = resolver.InitializeParsing(data.GetName(), srv);
+        if (err != CHIP_NO_ERROR)
+        {
+            // Receiving records that we do not need to parse is normal:
+            // MinMDNS may receive all DNSSD packets on the network, only
+            // interested in a subset that is matter-specific
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
-        // MinMdns does not cache data, so receiving piecewise data does not work
-        ChipLogError(Discovery, "Truncated responses not supported for address resolution");
+            ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
 #endif
-    }
-}
-
-void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
-{
-    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
-    if (it.Next())
-    {
-        Platform::CopyString(mNodeData.resolutionData.hostName, it.Value());
-    }
-
-    if (!name.Next())
-    {
-#ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
-        ChipLogError(Discovery, "mDNS packet is missing a valid server name");
-#endif
-        return;
-    }
-
-    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.operationalData.peerId) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
-        return;
-    }
-
-    mNodeData.resolutionData.port = srv.GetPort();
-    mHasNodePort                  = true;
-}
-
-void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
-{
-    // Host name is the first part of the qname
-    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
-    if (it.Next())
-    {
-        Platform::CopyString(mDiscoveredNodeData.resolutionData.hostName, it.Value());
-    }
-    if (name.Next())
-    {
-        strncpy(mDiscoveredNodeData.commissionData.instanceName, name.Value(), sizeof(CommissionNodeData::instanceName));
-    }
-    mDiscoveredNodeData.resolutionData.port = srv.GetPort();
-    mHasNodePort                            = true;
-}
-
-void PacketDataReporter::OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr)
-{
-    // TODO: should validate that the IP address we receive belongs to the
-    // server associated with the SRV record.
-    //
-    // This code assumes that all entries in the mDNS packet relate to the
-    // same entity. This may not be correct if multiple servers are reported
-    // (if multi-admin decides to use unique ports for every ecosystem).
-    if (resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
-    {
-        ChipLogDetail(Discovery, "Number of IP addresses overflow. Discarding extra addresses.");
-        return;
-    }
-    resolutionData.ipAddress[resolutionData.numIPs++] = addr;
-    resolutionData.interfaceId                        = mInterfaceId;
-    mHasIP                                            = true;
-}
-
-bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
-{
-    while (qname.Next())
-    {
-        if (strcmp(qname.Value(), part) == 0)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data)
-{
-    if (!mValid)
-    {
-        return;
-    }
-
-    /// Data content is expected to contain:
-    /// - A SRV entry that includes the node ID in expected format (fabric + nodeid)
-    ///    - Can extract: fabricid, nodeid, port
-    ///    - References ServerName
-    /// - Additional records tied to ServerName contain A/AAAA records for IP address data
-    switch (data.GetType())
-    {
-    case QType::SRV: {
-        SrvRecord srv;
-        if (!srv.Parse(data.GetData(), mPacketRange))
-        {
-            ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
-        }
-        else if (mDiscoveryType == DiscoveryType::kOperational)
-        {
-            // Ensure this is our record.
-            // TODO: Fix this comparison which is too loose.
-            if (HasQNamePart(data.GetName(), kOperationalServiceName))
-            {
-                OnOperationalSrvRecord(data.GetName(), srv);
-            }
-            else
-            {
-                ChipLogError(Discovery, "Invalid operational srv name: no '%s' part found.", kOperationalServiceName);
-            }
-        }
-        else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-        {
-            // TODO: Fix this comparison which is too loose.
-            if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
-            {
-                OnCommissionableNodeSrvRecord(data.GetName(), srv);
-            }
-            else
-            {
-                ChipLogError(Discovery, "Invalid commision srv name: no '%s' or '%s' part found.", kCommissionableServiceName,
-                             kCommissionerServiceName);
-            }
-        }
-        break;
-    }
-    case QType::PTR: {
-        if (mDiscoveryType == DiscoveryType::kCommissionableNode)
-        {
-            SerializedQNameIterator qname;
-            ParsePtrRecord(data.GetData(), mPacketRange, &qname);
-            if (qname.Next())
-            {
-                strncpy(mDiscoveredNodeData.commissionData.instanceName, qname.Value(), sizeof(CommissionNodeData::instanceName));
-            }
-        }
-        break;
-    }
-    case QType::TXT:
-        if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-        {
-            TxtRecordDelegateImpl<CommonResolutionData> commonDelegate(mDiscoveredNodeData.resolutionData);
-            ParseTxtRecord(data.GetData(), &commonDelegate);
-
-            TxtRecordDelegateImpl<CommissionNodeData> commissionDelegate(mDiscoveredNodeData.commissionData);
-            ParseTxtRecord(data.GetData(), &commissionDelegate);
-        }
-        else if (mDiscoveryType == DiscoveryType::kOperational)
-        {
-            TxtRecordDelegateImpl<CommonResolutionData> commonDelegate(mNodeData.resolutionData);
-            ParseTxtRecord(data.GetData(), &commonDelegate);
-        }
-        break;
-    case QType::A: {
-        Inet::IPAddress addr;
-        if (!ParseARecord(data.GetData(), &addr))
-        {
-            ChipLogError(Discovery, "Packet data reporter failed to parse A record");
-        }
-        else
-        {
-            if (mDiscoveryType == DiscoveryType::kOperational)
-            {
-                OnNodeIPAddress(mNodeData.resolutionData, addr);
-            }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-            {
-                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
-            }
-        }
-        break;
-    }
-    case QType::AAAA: {
-        Inet::IPAddress addr;
-        if (!ParseAAAARecord(data.GetData(), &addr))
-        {
-            ChipLogError(Discovery, "Packet data reporter failed to parse AAAA record");
-        }
-        else
-        {
-            if (mDiscoveryType == DiscoveryType::kOperational)
-            {
-                OnNodeIPAddress(mNodeData.resolutionData, addr);
-            }
-            else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-            {
-                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
-{
-    if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
-    {
-        if (!mDiscoveredNodeData.resolutionData.IsValid())
-        {
-            ChipLogError(Discovery, "Discovered node data is not valid. Commissioning discovery not complete.");
             return;
         }
-
-        activeAttempts.Complete(mDiscoveredNodeData);
-        if (mCommissioningDelegate != nullptr)
-        {
-            mCommissioningDelegate->OnNodeDiscovered(mDiscoveredNodeData);
-        }
-        else
-        {
-            ChipLogError(Discovery, "No delegate to report commissioning node discovery");
-        }
     }
-    else if (mDiscoveryType == DiscoveryType::kOperational)
+
+    ChipLogError(Discovery, "Insufficient parsers to process all SRV entries.");
+}
+
+void PacketParser::ParseSrvRecords(const BytesRange & packet)
+{
+    mParsingState = RecordParsingState::kSrvInitialization;
+    mPacketRange  = packet;
+
+    if (!ParsePacket(packet, this))
     {
-        if (!mHasIP)
-        {
-            ChipLogError(Discovery, "Operational discovery has no valid ip address. Resolve not complete.");
-            return;
-        }
-
-        if (!mHasNodePort)
-        {
-            ChipLogError(Discovery, "Operational discovery has no valid node/port. Resolve not complete.");
-            return;
-        }
-
-        activeAttempts.Complete(mNodeData.operationalData.peerId);
-        mNodeData.LogNodeIdResolved();
-
-        if (mOperationalDelegate != nullptr)
-        {
-            mOperationalDelegate->OnOperationalNodeResolved(mNodeData);
-        }
-        else
-        {
-            ChipLogError(Discovery, "No delegate to report operational node discovery");
-        }
+        ChipLogError(Discovery, "DNSSD packet parsing failed (for SRV records)");
     }
+
+    mParsingState = RecordParsingState::kIdle;
+}
+
+void PacketParser::ParseNonSrvRecords(const BytesRange & packet)
+{
+    mParsingState = RecordParsingState::kRecordParsing;
+    mPacketRange  = packet;
+
+    if (!ParsePacket(packet, this))
+    {
+        ChipLogError(Discovery, "DNSSD packet parsing failed (for non-srv records)");
+    }
+
+    mParsingState = RecordParsingState::kIdle;
 }
 
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
@@ -395,6 +259,7 @@ private:
     DiscoveryType mDiscoveryType                          = DiscoveryType::kUnknown;
     System::Layer * mSystemLayer                          = nullptr;
     ActiveResolveAttempts mActiveResolves;
+    PacketParser mPacketParser;
 
     CHIP_ERROR SendPendingResolveQueries();
     CHIP_ERROR SendPendingBrowseQueries();
@@ -421,22 +286,16 @@ private:
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
-    if ((mOperationalDelegate == nullptr) && (mCommissioningDelegate == nullptr))
-    {
-        return;
-    }
+    // Fill up any relevant data
+    mPacketParser.ParseSrvRecords(data);
+    mPacketParser.ParseNonSrvRecords(data);
 
-    PacketDataReporter reporter(mOperationalDelegate, mCommissioningDelegate, info->Interface, mDiscoveryType, data);
+    // TODO:
+    //   - loop through results and schedule OnComplete
+    //   - schedule AAAA queries for elements requiring it
+    //   - done?
 
-    if (!ParsePacket(data, &reporter))
-    {
-        ChipLogError(Discovery, "Failed to parse received mDNS packet");
-    }
-    else
-    {
-        reporter.OnComplete(mActiveResolves);
-        ScheduleRetries();
-    }
+    ScheduleRetries();
 }
 
 CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)

@@ -116,11 +116,17 @@ public:
     /// to be processed.
     RequiredInformationFlags GetMissingRequiredInformation() const;
 
-    /// Fetch the server name set by `InitializeParsing`
+    /// Fetch the target host name set by `InitializeParsing`
     ///
     /// VALIDITY: Data references internal storage of this object and is valid as long
     ///           as this object is valid and InitializeParsing is not called again.
     mdns::Minimal::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
+
+    /// Fetch the recrod name set by `InitializeParsing`.
+    ///
+    /// VALIDITY: Data references internal storage of this object and is valid as long
+    ///           as this object is valid and InitializeParsing is not called again.
+    mdns::Minimal::SerializedQNameIterator GetRecordName() const { return mRecordName.Get(); }
 
     /// Take the current value of the object and clear it once returned.
     ///
