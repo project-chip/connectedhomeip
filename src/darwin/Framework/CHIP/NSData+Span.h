@@ -28,9 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSData (Span)
 
--(chip::ByteSpan)asByteSpan;
+- (chip::ByteSpan)asByteSpan;
 
-+(instancetype)fromByteSpan:(const chip::ByteSpan &)span;
++ (instancetype)fromByteSpan:(const chip::ByteSpan &)span;
 
 @end
 
