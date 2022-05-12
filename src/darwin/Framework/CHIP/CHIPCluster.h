@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 @class CHIPDevice;
+@class CHIPDeviceController;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,6 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithDeviceController:(CHIPDeviceController *)deviceController
+                                            group:(uint16_t)group
+                                            queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 @end
