@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.contentapp">
+
+
+    <uses-permission android:name="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:allowBackup="true"
@@ -22,7 +28,7 @@
         </activity>
         <receiver
             android:name=".receiver.MatterCommandReceiver"
-            android:permission="com.matter.app_agent_api.permission.SEND_DATA"
+            android:permission="com.matter.tv.app.api.permission.SEND_DATA"
             android:enabled="true"
             android:exported="true">
             <!-- Intent action for receiving an Matter directive-->

@@ -45,8 +45,8 @@ client cluster ApplicationBasic = 1293 {
   }
 
   struct ApplicationBasicApplication {
-    INT16U catalogVendorId = 0;
-    CHAR_STRING applicationId = 1;
+    int16u catalogVendorId = 0;
+    char_string applicationId = 1;
   }
 
   readonly attribute char_string<32> vendorName = 0;
@@ -72,8 +72,8 @@ server cluster ApplicationBasic = 1293 {
   }
 
   struct ApplicationBasicApplication {
-    INT16U catalogVendorId = 0;
-    CHAR_STRING applicationId = 1;
+    int16u catalogVendorId = 0;
+    char_string applicationId = 1;
   }
 
   readonly attribute char_string<32> vendorName = 0;
@@ -187,19 +187,19 @@ server cluster BridgedActions = 37 {
   }
 
   struct ActionStruct {
-    INT16U actionID = 0;
-    CHAR_STRING<32> name = 1;
+    int16u actionID = 0;
+    char_string<32> name = 1;
     ActionTypeEnum type = 2;
-    INT16U endpointListID = 3;
-    INT16U supportedCommands = 4;
+    int16u endpointListID = 3;
+    int16u supportedCommands = 4;
     ActionStateEnum status = 5;
   }
 
   struct EndpointListStruct {
-    INT16U endpointListID = 0;
-    CHAR_STRING<32> name = 1;
+    int16u endpointListID = 0;
+    char_string<32> name = 1;
     EndpointListTypeEnum type = 2;
-    ENDPOINT_NO endpoints[] = 3;
+    endpoint_no endpoints[] = 3;
   }
 
   info event StateChanged = 0 {
@@ -370,17 +370,17 @@ client cluster ContentLauncher = 1290 {
 
   struct Parameter {
     ParameterEnum type = 0;
-    CHAR_STRING value = 1;
+    char_string value = 1;
     optional AdditionalInfo externalIDList[] = 2;
   }
 
   struct AdditionalInfo {
-    CHAR_STRING name = 0;
-    CHAR_STRING value = 1;
+    char_string name = 0;
+    char_string value = 1;
   }
 
   struct BrandingInformation {
-    CHAR_STRING providerName = 0;
+    char_string providerName = 0;
     optional StyleInformation background = 1;
     optional StyleInformation logo = 2;
     optional StyleInformation progressBar = 3;
@@ -389,8 +389,8 @@ client cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformation {
-    optional CHAR_STRING imageUrl = 0;
-    optional CHAR_STRING color = 1;
+    optional char_string imageUrl = 0;
+    optional char_string color = 1;
     optional Dimension size = 2;
   }
 
@@ -472,17 +472,17 @@ server cluster ContentLauncher = 1290 {
 
   struct Parameter {
     ParameterEnum type = 0;
-    CHAR_STRING value = 1;
+    char_string value = 1;
     optional AdditionalInfo externalIDList[] = 2;
   }
 
   struct AdditionalInfo {
-    CHAR_STRING name = 0;
-    CHAR_STRING value = 1;
+    char_string name = 0;
+    char_string value = 1;
   }
 
   struct BrandingInformation {
-    CHAR_STRING providerName = 0;
+    char_string providerName = 0;
     optional StyleInformation background = 1;
     optional StyleInformation logo = 2;
     optional StyleInformation progressBar = 3;
@@ -491,8 +491,8 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct StyleInformation {
-    optional CHAR_STRING imageUrl = 0;
-    optional CHAR_STRING color = 1;
+    optional char_string imageUrl = 0;
+    optional char_string color = 1;
     optional Dimension size = 2;
   }
 
@@ -532,8 +532,8 @@ server cluster ContentLauncher = 1290 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
-    INT16U revision = 1;
+    devtype_id type = 0;
+    int16u revision = 1;
   }
 
   readonly attribute DeviceType deviceList[] = 0;
@@ -596,7 +596,7 @@ client cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfo {
-    INT16U failSafeExpiryLengthSeconds = 0;
+    int16u failSafeExpiryLengthSeconds = 0;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -642,7 +642,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfo {
-    INT16U failSafeExpiryLengthSeconds = 0;
+    int16u failSafeExpiryLengthSeconds = 0;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -738,13 +738,13 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING<32> name = 0;
-    BOOLEAN isOperational = 1;
-    nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
-    nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
-    OCTET_STRING<8> hardwareAddress = 4;
-    OCTET_STRING IPv4Addresses[] = 5;
-    OCTET_STRING IPv6Addresses[] = 6;
+    char_string<32> name = 0;
+    boolean isOperational = 1;
+    nullable boolean offPremiseServicesReachableIPv4 = 2;
+    nullable boolean offPremiseServicesReachableIPv6 = 3;
+    octet_string<8> hardwareAddress = 4;
+    octet_string IPv4Addresses[] = 5;
+    octet_string IPv6Addresses[] = 6;
     InterfaceType type = 7;
   }
 
@@ -1201,9 +1201,9 @@ client cluster ModeSelect = 80 {
   }
 
   struct ModeOptionStruct {
-    CHAR_STRING<32> label = 0;
-    INT8U mode = 1;
-    INT32U semanticTag = 2;
+    char_string<32> label = 0;
+    int8u mode = 1;
+    int32u semanticTag = 2;
   }
 
   readonly attribute char_string<32> description = 0;
@@ -1230,9 +1230,9 @@ server cluster ModeSelect = 80 {
   }
 
   struct ModeOptionStruct {
-    CHAR_STRING<32> label = 0;
-    INT8U mode = 1;
-    INT32U semanticTag = 2;
+    char_string<32> label = 0;
+    int8u mode = 1;
+    int32u semanticTag = 2;
   }
 
   readonly attribute char_string<32> description = 0;
@@ -1293,28 +1293,28 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct NetworkInfo {
-    OCTET_STRING<32> networkID = 0;
-    BOOLEAN connected = 1;
+    octet_string<32> networkID = 0;
+    boolean connected = 1;
   }
 
   struct WiFiInterfaceScanResult {
     WiFiSecurity security = 0;
-    OCTET_STRING<32> ssid = 1;
-    OCTET_STRING<6> bssid = 2;
-    INT16U channel = 3;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
     WiFiBand wiFiBand = 4;
-    INT8S rssi = 5;
+    int8s rssi = 5;
   }
 
   struct ThreadInterfaceScanResult {
-    INT16U panId = 0;
-    INT64U extendedPanId = 1;
-    CHAR_STRING<16> networkName = 2;
-    INT16U channel = 3;
-    INT8U version = 4;
-    OCTET_STRING<8> extendedAddress = 5;
-    INT8S rssi = 6;
-    INT8U lqi = 7;
+    int16u panId = 0;
+    int64u extendedPanId = 1;
+    char_string<16> networkName = 2;
+    int16u channel = 3;
+    int8u version = 4;
+    octet_string<8> extendedAddress = 5;
+    int8s rssi = 6;
+    int8u lqi = 7;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
@@ -1388,17 +1388,17 @@ server cluster NetworkCommissioning = 49 {
 }
 
 client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -1445,17 +1445,17 @@ client cluster OnOff = 6 {
 }
 
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : enum8 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
     kNoFade = 1;
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : enum8 {
+  enum OnOffDyingLightEffectVariant : ENUM8 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
   }
 
-  enum OnOffEffectIdentifier : enum8 {
+  enum OnOffEffectIdentifier : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
@@ -1516,11 +1516,11 @@ client cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    OCTET_STRING<65> rootPublicKey = 1;
-    VENDOR_ID vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
-    CHAR_STRING<32> label = 5;
+    octet_string<65> rootPublicKey = 1;
+    vendor_id vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+    char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1598,11 +1598,11 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    OCTET_STRING<65> rootPublicKey = 1;
-    VENDOR_ID vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
-    CHAR_STRING<32> label = 5;
+    octet_string<65> rootPublicKey = 1;
+    vendor_id vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+    char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1944,9 +1944,9 @@ server cluster Scenes = 5 {
   }
 
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 0;
-    INT8U length = 1;
-    INT8U value = 2;
+    cluster_id clusterId = 0;
+    int8u length = 1;
+    int8u value = 2;
   }
 
   readonly attribute int8u sceneCount = 0;
@@ -2044,11 +2044,11 @@ server cluster Scenes = 5 {
 
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
-    INT64U id = 0;
-    CHAR_STRING<8> name = 1;
-    INT32U stackFreeCurrent = 2;
-    INT32U stackFreeMinimum = 3;
-    INT32U stackSize = 4;
+    int64u id = 0;
+    char_string<8> name = 1;
+    int32u stackFreeCurrent = 2;
+    int32u stackFreeMinimum = 3;
+    int32u stackSize = 4;
   }
 
   info event SoftwareFault = 0 {
@@ -2155,8 +2155,8 @@ client cluster TargetNavigator = 1285 {
   }
 
   struct TargetInfo {
-    INT8U identifier = 0;
-    CHAR_STRING<32> name = 1;
+    int8u identifier = 0;
+    char_string<32> name = 1;
   }
 
   readonly attribute TargetInfo targetList[] = 0;
@@ -2187,8 +2187,8 @@ server cluster TargetNavigator = 1285 {
   }
 
   struct TargetInfo {
-    INT8U identifier = 0;
-    CHAR_STRING<32> name = 1;
+    int8u identifier = 0;
+    char_string<32> name = 1;
   }
 
   readonly attribute TargetInfo targetList[] = 0;

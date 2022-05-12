@@ -43,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
   private LinkedHashMap<String, String> packages = new LinkedHashMap<>();
 
   @Override
+  protected void onRestart() {
+    super.onRestart();
+    packages.clear();
+    ContentAppDiscoveryService.getReceiverInstance()
+        .initializeMatterApps(this.getApplicationContext());
+  }
+
+  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
@@ -140,8 +148,8 @@ public class MainActivity extends AppCompatActivity {
     registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.add"));
     registerReceiver(broadcastReceiver, new IntentFilter("com.matter.tv.server.appagent.remove"));
 
-    ContentAppDiscoveryService.getRecieverInstance().registerSelf(this.getApplicationContext());
-    ContentAppDiscoveryService.getRecieverInstance()
+    ContentAppDiscoveryService.getReceiverInstance().registerSelf(this.getApplicationContext());
+    ContentAppDiscoveryService.getReceiverInstance()
         .initializeMatterApps(this.getApplicationContext());
   }
 
