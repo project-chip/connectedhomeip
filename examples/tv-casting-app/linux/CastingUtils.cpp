@@ -112,7 +112,8 @@ void HandleUDCSendExpiration(System::Layer * aSystemLayer, void * context)
 
     // Send User Directed commissioning request
     ReturnOnFailure(CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
-        selectedCommissioner->resolutionData.ipAddress[0], selectedCommissioner->resolutionData.port, selectedCommissioner->resolutionData.interfaceId)));
+        selectedCommissioner->resolutionData.ipAddress[0], selectedCommissioner->resolutionData.port,
+        selectedCommissioner->resolutionData.interfaceId)));
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
