@@ -150,6 +150,7 @@ SerializedQNameIterator StoredServerName::Get() const
 CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv)
 {
     mSpecificResolutionData = SpecificParseData();
+    mCommonResolutionData.Reset();
 
     ReturnErrorOnFailure(mRecordName.Set(name));
     ReturnErrorOnFailure(mServerName.Set(srv.GetName()));
@@ -359,9 +360,11 @@ CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & data)
 {
     VerifyOrReturnError(IsActiveCommissionParse(), CHIP_ERROR_INCORRECT_STATE);
 
-    data.resolutionData     = mCommonResolutionData;
-    data.commissionData     = mSpecificResolutionData.Get<CommissionNodeData>();
+    data.resolutionData = mCommonResolutionData;
+    data.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
+
     mSpecificResolutionData = SpecificParseData();
+    mCommonResolutionData.Reset();
 
     return CHIP_NO_ERROR;
 }
@@ -370,9 +373,11 @@ CHIP_ERROR IncrementalResolver::Take(ResolvedNodeData & data)
 {
     VerifyOrReturnError(IsActiveOperationalParse(), CHIP_ERROR_INCORRECT_STATE);
 
-    data.resolutionData     = mCommonResolutionData;
-    data.operationalData    = mSpecificResolutionData.Get<OperationalNodeData>();
+    data.resolutionData  = mCommonResolutionData;
+    data.operationalData = mSpecificResolutionData.Get<OperationalNodeData>();
+
     mSpecificResolutionData = SpecificParseData();
+    mCommonResolutionData.Reset();
 
     return CHIP_NO_ERROR;
 }
