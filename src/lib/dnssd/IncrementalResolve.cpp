@@ -67,10 +67,7 @@ enum class ServiceNameType
     kCommissionable,
 };
 
-// Common prefix to check for all operational/commissioner/commissionable name
-// parts
-constexpr char kMatterNamePrefixPart[] = "_matter";
-
+// Common prefix to check for all operational/commissioner/commissionable name parts
 constexpr QNamePart kOperationalSuffix[]           = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
 constexpr QNamePart kCommissionableSuffix[]        = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
 constexpr QNamePart kCommissionerSuffix[]          = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
