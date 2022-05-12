@@ -6,7 +6,8 @@ public class MatterIntentConstants {
 
   public static final String ACTION_MATTER_AGENT = "com.matter.tv.app.api.action.MatterAppAgent";
 
-  public static final String PERMISSION_MATTER_AGENT_BIND = "com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION";
+  public static final String PERMISSION_MATTER_AGENT_BIND =
+      "com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION";
 
   public static final String PERMISSION_MATTER_AGENT = "com.matter.tv.app.api.permission.SEND_DATA";
 
@@ -14,6 +15,6 @@ public class MatterIntentConstants {
 
   public static final String EXTRA_RESPONSE_PAYLOAD = "EXTRA_RESPONSE_PAYLOAD";
 
-  public static final String EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT = "EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT";
-
+  public static final String EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT =
+      "EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT";
 }

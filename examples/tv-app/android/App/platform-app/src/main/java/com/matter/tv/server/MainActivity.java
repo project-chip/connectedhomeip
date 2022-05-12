@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     super.onRestart();
     packages.clear();
     ContentAppDiscoveryService.getReceiverInstance()
-            .initializeMatterApps(this.getApplicationContext());
+        .initializeMatterApps(this.getApplicationContext());
   }
 
   @Override

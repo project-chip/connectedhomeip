@@ -30,11 +30,15 @@ public class MatterCommandReceiver extends BroadcastReceiver {
                 .append(intent.getAction())
                 .toString());
 
-        PendingIntent pendingIntent = intent.getParcelableExtra(MatterIntentConstants.EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT);
-        if(pendingIntent != null) {
-          final Intent responseIntent = new Intent().putExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD, "Success".getBytes());
+        PendingIntent pendingIntent =
+            intent.getParcelableExtra(
+                MatterIntentConstants.EXTRA_DIRECTIVE_RESPONSE_PENDING_INTENT);
+        if (pendingIntent != null) {
+          final Intent responseIntent =
+              new Intent()
+                  .putExtra(MatterIntentConstants.EXTRA_RESPONSE_PAYLOAD, "Success".getBytes());
           try {
-            pendingIntent.send(context, 0 , responseIntent);
+            pendingIntent.send(context, 0, responseIntent);
           } catch (final PendingIntent.CanceledException ex) {
             Log.e(TAG, "Error sending pending intent to the Matter agent", ex);
           }
