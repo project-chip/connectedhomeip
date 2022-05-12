@@ -20,6 +20,11 @@
 
 #include <string.h>
 
+#include <lib/dnssd/minimal_mdns/records/IP.h>
+#include <lib/dnssd/minimal_mdns/records/Ptr.h>
+#include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
+#include <lib/dnssd/minimal_mdns/records/Srv.h>
+#include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -74,6 +79,25 @@ static SerializedQNameIterator AsSerializedQName(const uint8_t (&v)[N])
     // NOTE: the -1 is because we format these items as STRINGS and that
     // appends an extra NULL terminator
     return SerializedQNameIterator(BytesRange(v, v + N - 1), v);
+}
+
+void CallOnRecord(nlTestSuite * inSuite, IncrementalResolver & resolver, const ResourceRecord & record)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes] = {};
+    HeaderRef dummyHeader(headerBuffer);
+
+    uint8_t dataBuffer[256];
+    chip::Encoding::BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    NL_TEST_ASSERT(inSuite, record.Append(dummyHeader, ResourceType::kAnswer, writer));
+    NL_TEST_ASSERT(inSuite, writer.Fit());
+
+    ResourceData resource;
+    BytesRange packet(dataBuffer, dataBuffer + sizeof(dataBuffer));
+    const uint8_t * _ptr = dataBuffer;
+    NL_TEST_ASSERT(inSuite, resource.Parse(packet, &_ptr));
+    NL_TEST_ASSERT(inSuite, resolver.OnRecord(resource, packet) == CHIP_NO_ERROR);
 }
 
 void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
@@ -209,120 +233,46 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
 
     // Send an irellevant IP address here
     {
-        const uint8_t packetAAAA[] = {                                   //
-                                       4,    'x',  'y',  'x',  't',      // QNAME part: xyzt
-                                       5,    'l',  'o',  'c',  'a', 'l', // QNAME part: local
-                                       0,                                // QNAME ends
-                                       0,    28,                         // QType AAAA
-                                       0,    1,                          // QClass IN
-                                       0x12, 0x34, 0x56, 0x78,           // TTL
-                                       0,    16,                         // data size - size for IPv4
-                                       0xfe, 0x80, 0x00, 0x00,           // IPv6
-                                       0x00, 0x00, 0x00, 0x00,           //
-                                       0x02, 0x24, 0x32, 0xff,           //
-                                       0xfe, 0x19, 0x35, 0x9b
-        };
-        BytesRange packet(packetAAAA, packetAAAA + sizeof(packetAAAA));
-        BytesRange aaaa_data(packetAAAA, packetAAAA + sizeof(packetAAAA));
+        const char * path[] = { "xyzt", "local" };
+        Inet::IPAddress addr;
 
-        ResourceData data;
-        const uint8_t * ptr = packetAAAA;
-        NL_TEST_ASSERT(inSuite, data.Parse(aaaa_data, &ptr));
-
-        // Parsing irellevant IP does not take effect
-        NL_TEST_ASSERT(inSuite, resolver.OnRecord(data, packet) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, resolver.GetRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
     }
 
     // Send a useful IP address here
     {
-        const uint8_t packetAAAA[] = {                                   //
-                                       4,    'a',  'b',  'c',  'd',      // QNAME part: abcd
-                                       5,    'l',  'o',  'c',  'a', 'l', // QNAME part: local
-                                       0,                                // QNAME ends
-                                       0,    28,                         // QType AAAA
-                                       0,    1,                          // QClass IN
-                                       0x12, 0x34, 0x56, 0x78,           // TTL
-                                       0,    16,                         // data size - size for IPv4
-                                       0xfe, 0x80, 0x00, 0x00,           // IPv6
-                                       0x00, 0x00, 0x00, 0x00,           //
-                                       0xab, 0xcd, 0xef, 0x11,           //
-                                       0x22, 0x33, 0x44, 0x55
-        };
-        BytesRange packet(packetAAAA, packetAAAA + sizeof(packetAAAA));
-        BytesRange aaaa_data(packetAAAA, packetAAAA + sizeof(packetAAAA));
+        const char * path[] = { "abcd", "local" };
+        Inet::IPAddress addr;
 
-        ResourceData data;
-        const uint8_t * ptr = packetAAAA;
-        NL_TEST_ASSERT(inSuite, data.Parse(aaaa_data, &ptr));
-
-        // Parsing valid data makes requirement for IP addresses go away
-        NL_TEST_ASSERT(inSuite, resolver.OnRecord(data, packet) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+        NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("fe80::abcd:ef11:2233:4455", addr));
+        CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
     }
 
     // Adding an irrelevant text entry
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
-        const uint8_t packetTxt[] = {
-            //
-            4,    'a',  'b',  'c',  'd',                // QNAME part: abcd
-            5,    'l',  'o',  'c',  'a', 'l',           // QNAME part: local
-            0,                                          // QNAME ends
-            0,    16,                                   // QType TXT
-            0,    1,                                    // QClass IN
-            0x12, 0x34, 0x56, 0x78,                     // TTL
-            0,    26,                                   // data size - sum of entires
-            4,    's',  'o',  'm',  'e',                // some
-            7,    'f',  'o',  'o',  '=', 'b', 'a', 'r', // foo=bar
-            5,    'x',  '=',  'y',  '=', 'z',           // x=y=z
-            2,    'a',  '=',                            // a=
-            3,    'T',  '=',  '1'                       // TCP supported = 1
+        const char * path[]    = { "abcd", "local" };
+        const char * entries[] = {
+            "some", "foo=bar", "x=y=z", "a=", // unused data
+            "T=1"                             // TCP supported
         };
-        BytesRange packet(packetTxt, packetTxt + sizeof(packetTxt));
-        BytesRange txt_data(packetTxt, packetTxt + sizeof(packetTxt));
 
-        ResourceData data;
-        const uint8_t * ptr = packetTxt;
-        NL_TEST_ASSERT(inSuite, data.Parse(txt_data, &ptr));
-
-        // Parsing valid data makes requirement for IP addresses go away
-        NL_TEST_ASSERT(inSuite, resolver.OnRecord(data, packet) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
     }
 
     // Adding actual text entries that are useful
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
-        const uint8_t packetTxt[] = {
-            // below is the same as `kTestOperationalname`:
-            33,   '1',  '2',  '3',  '4', '5', '6', '7', '8', '9', // QNAME part:
-            '8',  '7',  '6',  '5',  '4', '3', '2', '-', 'A', 'B', //    1234567898765432-ABCDEFEDCBAABCDE
-            'C',  'D',  'E',  'F',  'E', 'D', 'C', 'B', 'A', 'A', //
-            'B',  'C',  'D',  'E',                                //
-            7,    '_',  'm',  'a',  't', 't', 'e', 'r',           // QNAME part: _matter
-            4,    '_',  't',  'c',  'p',                          // QNAME part: _tcp
-            5,    'l',  'o',  'c',  'a', 'l',                     // QNAME part: local
-            0,                                                    // QNAME ends
-            0,    16,                                             // QType TXT
-            0,    1,                                              // QClass IN
-            0x12, 0x34, 0x56, 0x78,                               // TTL
-            0,    15,                                             // data size - sum of entires
-            7,    'f',  'o',  'o',  '=', 'b', 'a', 'r',           // foo=bar
-            6,    'S',  'I',  'I',  '=', '2', '3',                // SII=23 (sleepy idle interval)
+        const char * path[]    = { "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" };
+        const char * entries[] = {
+            "foo=bar", // unused data
+            "SII=23"   // sleepy idle interval
         };
-        BytesRange packet(packetTxt, packetTxt + sizeof(packetTxt));
-        BytesRange txt_data(packetTxt, packetTxt + sizeof(packetTxt));
 
-        ResourceData data;
-        const uint8_t * ptr = packetTxt;
-        NL_TEST_ASSERT(inSuite, data.Parse(txt_data, &ptr));
-
-        // Parsing valid data makes requirement for IP addresses go away
-        NL_TEST_ASSERT(inSuite, resolver.OnRecord(data, packet) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, !resolver.GetRequiredInformation().HasAny());
+        CallOnRecord(inSuite, resolver, TxtResourceRecord(FullQName(path), entries));
     }
 
     // At this point taking value should work. Once taken, the resolver
