@@ -213,6 +213,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             params.enableServerInteractions = true;
         }
 
+        chip::Credentials::SetGroupDataProvider(_groupDataProvider);
         params.groupDataProvider = _groupDataProvider;
         params.fabricIndependentStorage = _persistentStorageDelegateBridge;
         CHIP_ERROR errorCode = _controllerFactory->Init(params);

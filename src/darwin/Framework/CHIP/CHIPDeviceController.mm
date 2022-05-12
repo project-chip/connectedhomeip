@@ -63,6 +63,7 @@ static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrie
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
 static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code failed";
+static NSString * const kErrorGroupKeySet = @"Adding a group key set failed";
 
 @interface CHIPDeviceController ()
 
@@ -699,6 +700,85 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
 
     return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
+}
+
+- (BOOL)addGroupKeySet:(NSDictionary *)groupKeySet error:(NSError * __autoreleasing *)error
+{
+    if (!_cppCommissioner) {
+        *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        return ![self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorGroupKeySet error:error];
+    }
+
+    // TODO Add policy support as an argument
+    NSNumber * groupIdArg = groupKeySet[@"groupId"];
+    NSString * groupNameArg = groupKeySet[@"groupName"];
+    NSNumber * endpointIdArg = groupKeySet[@"endpointId"];
+    NSNumber * keySetIdArg = groupKeySet[@"keySetId"];
+    NSArray * keySetDataArg = groupKeySet[@"keySetData"];
+    if (groupIdArg == nil || groupNameArg == nil || endpointIdArg == nil || keySetIdArg == nil || keySetDataArg == nil) {
+        return ![self checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorGroupKeySet error:error];
+    }
+
+    if (!chip::CanCastTo<uint8_t>([keySetDataArg count])) {
+        return ![self checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorGroupKeySet error:error];
+    }
+
+    uint8_t compressedIdBuffer[sizeof(uint64_t)];
+    chip::MutableByteSpan compressedId(compressedIdBuffer);
+    CHIP_ERROR errorCode = _cppCommissioner->GetFabricInfo()->GetCompressedId(compressedId);
+    if ([self checkForError:errorCode logMsg:kErrorGroupKeySet error:error]) {
+        return NO;
+    }
+
+    chip::FabricIndex fabricIndex;
+    errorCode = _cppCommissioner->GetFabricIndex(&fabricIndex);
+    if ([self checkForError:errorCode logMsg:kErrorGroupKeySet error:error]) {
+        return NO;
+    }
+
+    const chip::GroupId groupId = [groupIdArg unsignedShortValue];
+    const char * groupName = [groupNameArg UTF8String];
+    const chip::Credentials::GroupDataProvider::GroupInfo groupInfo(groupId, groupName);
+    errorCode = _factory.groupData->SetGroupInfo(fabricIndex, groupInfo);
+    if ([self checkForError:errorCode logMsg:kErrorGroupKeySet error:error]) {
+        return NO;
+    }
+
+    const chip::EndpointId endpointId = [endpointIdArg unsignedShortValue];
+    errorCode = _factory.groupData->AddEndpoint(fabricIndex, groupId, endpointId);
+    if ([self checkForError:errorCode logMsg:kErrorGroupKeySet error:error]) {
+        return NO;
+    }
+
+    const uint16_t keySetId = [keySetIdArg unsignedShortValue];
+    uint8_t keySetDataSize = static_cast<uint8_t>([keySetDataArg count]);
+    chip::Credentials::GroupDataProvider::SecurityPolicy policy
+        = chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync;
+
+    chip::Credentials::GroupDataProvider::KeySet keyset(keySetId, policy, keySetDataSize);
+    for (uint8_t i = 0; i < keySetDataSize; i++) {
+        NSNumber * startTime = keySetDataArg[i][@"epochStartTime"];
+        NSData * data = keySetDataArg[i][@"epochKey"];
+
+        keyset.epoch_keys[i].start_time = [startTime unsignedLongLongValue];
+        memcpy(keyset.epoch_keys[i].key, [data bytes], [data length]);
+    }
+
+    errorCode = _factory.groupData->SetKeySet(fabricIndex, compressedId, keyset);
+    if ([self checkForError:errorCode logMsg:kErrorGroupKeySet error:error]) {
+        return NO;
+    }
+
+    auto iter = _factory.groupData->IterateGroupKeys(fabricIndex);
+    size_t count = iter->Count();
+    iter->Release();
+
+    errorCode
+        = _factory.groupData->SetGroupKeyAt(fabricIndex, count, chip::Credentials::GroupDataProvider::GroupKey(groupId, keySetId));
+    if ([self checkForError:errorCode logMsg:kErrorGroupKeySet error:error]) {
+        return NO;
+    }
+    return YES;
 }
 
 @end
