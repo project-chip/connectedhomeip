@@ -131,6 +131,8 @@ extern "C" sl_status_t initialize_bluetooth()
     NVIC_ClearPendingIRQ(PendSV_IRQn);
     NVIC_EnableIRQ(PendSV_IRQn);
 #endif
+    sl_bt_configure_backwards_compatibility(&config);
+
     sl_status_t ret = sl_bt_init_stack(&config);
     sl_bt_init_classes(bt_class_table);
     sl_bt_init_multiprotocol();
@@ -182,7 +184,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     ret =
         bluetooth_start(CHIP_DEVICE_CONFIG_BLE_LL_TASK_PRIORITY, CHIP_DEVICE_CONFIG_BLE_STACK_TASK_PRIORITY, initialize_bluetooth);
 
-    VerifyOrExit(ret == bg_err_success, err = MapBLEError(ret));
+    VerifyOrExit(ret == SL_STATUS_OK, err = MapBLEError(ret));
 
     // Create the Bluetooth Application task
     BluetoothEventTaskHandle =
@@ -868,13 +870,13 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 
         switch (conn_evt->reason)
         {
-        case bg_err_bt_remote_user_terminated:
-        case bg_err_bt_remote_device_terminated_connection_due_to_low_resources:
-        case bg_err_bt_remote_powering_off:
+        case SL_STATUS_BT_CTRL_REMOTE_USER_TERMINATED:
+        case SL_STATUS_BT_CTRL_REMOTE_DEVICE_TERMINATED_CONNECTION_DUE_TO_LOW_RESOURCES:
+        case SL_STATUS_BT_CTRL_REMOTE_POWERING_OFF:
             event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
 
-        case bg_err_bt_connection_terminated_by_local_host:
+        case SL_STATUS_BT_CTRL_CONNECTION_TERMINATED_BY_LOCAL_HOST:
             event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
             break;
 

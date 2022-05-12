@@ -30,7 +30,7 @@ config("openthread_efr32_config") {
 
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
-    "${efr32_sdk_root}/matter/efr32/${efr32_family}/${efr32_board}",
+    "${sdk_support_root}/matter/efr32/${efr32_family}/${efr32_board}",
     "${openthread_efr32_root}/src/src",
   ]
 }

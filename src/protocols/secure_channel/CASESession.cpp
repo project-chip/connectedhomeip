@@ -47,6 +47,34 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 
+#ifdef MATTER_TRACE_EVENT_SCOPE
+#undef MATTER_TRACE_EVENT_SCOPE
+#endif
+
+class ScopeTracer
+{
+public:
+    ScopeTracer(const char * scope, const char * module) : mScope(scope), mModule(module)
+    {
+        start = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+
+        ChipLogProgress(SecureChannel, "TIME " ChipLogFormatX64 " MODULE %s START %s \n", ChipLogValueX64(start), mModule, mScope);
+    }
+    ~ScopeTracer()
+    {
+        uint64_t nowMS = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+        ChipLogProgress(SecureChannel, "TIME " ChipLogFormatX64 " DELTA " ChipLogFormatX64 " MODULE %s END %s \n",
+                        ChipLogValueX64(nowMS), ChipLogValueX64((nowMS - start)), mModule, mScope);
+    }
+
+private:
+    const char * mScope;
+    const char * mModule;
+    uint64_t start = 0;
+};
+
+#define MATTER_TRACE_EVENT_SCOPE(event, scope) /*ScopeTracer scopeTracer ## __LINE__ (event, scope)*/
+
 namespace {
 
 enum
@@ -1315,6 +1343,16 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     // Step 5/6
     // Validate initiator identity located in msg->Start()
     // Constructing responder identity
+
+    // TEMPORARY!!!!
+    //    {
+    //        uint8_t * forcibleData = const_cast<uint8_t *>(initiatorNOC.data());
+    //        forcibleData[initiatorNOC.size()-20] ^= 0xFF;
+    //    }
+
+    SuccessOrExit(err = ValidatePeerIdentity(initiatorNOC, initiatorICAC, initiatorNodeId, initiatorPublicKey));
+    mPeerNodeId = initiatorNodeId;
+
     SuccessOrExit(err = ValidatePeerIdentity(initiatorNOC, initiatorICAC, initiatorNodeId, initiatorPublicKey));
     mPeerNodeId = initiatorNodeId;
 
