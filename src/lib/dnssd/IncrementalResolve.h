@@ -36,7 +36,7 @@ class StoredServerName
 public:
     StoredServerName() {}
 
-    void Clear() { memset(mBuffer, 0, sizeof(mBuffer)); }
+    void Clear() { memset(mNameBuffer, 0, sizeof(mNameBuffer)); }
 
     /// Set the underlying value. Will return CHIP_ERROR_NO_MEMORY
     /// on insufficient storage space.
@@ -52,15 +52,15 @@ public:
 
 private:
     // Try to have space for at least:
-    //  L1234._sub._matterc._udp.local       => 30 chars
-    //  <fabric>-<node>._mattrer._tcp.local  => 52 chars
+    //  L1234._sub._matterc._udp.local      => 30 chars
+    //  <fabric>-<node>._matter._tcp.local  => 52 chars
     //  <hostname>.local (where hostname is kHostNameMaxLength == 16)
     //
     // This does not try to optimize out ".local" suffix which is always expected
     // since comparisons are easier when suffix is still present.
-    static constexpr size_t kMaxStoredServerNameLength = 64;
+    static constexpr size_t kMaxStoredNameLength = 64;
 
-    uint8_t mBuffer[kMaxStoredServerNameLength] = {};
+    uint8_t mNameBuffer[kMaxStoredNameLength] = {};
 };
 
 /// Incrementally accumulates data from DNSSD packets. It is generally geared
@@ -95,6 +95,8 @@ public:
 
     /// Start parsing a new record. SRV records are the records CHIP is mainly
     /// interested on, after which TXT and A/AAAA are looked for.
+    ///
+    /// If this function returns with error, the object will be in an inactive state.
     CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv);
 
     /// Notify that a new record is being processed.
@@ -106,7 +108,6 @@ public:
     ///
     /// [data] represents the record and [packetRange] represents the range of valid bytes within
     /// the packet for the purpose of QName parsing
-
     CHIP_ERROR OnRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
 
     /// Return what additional data is required until the object can be extracted
@@ -127,7 +128,7 @@ public:
     /// Data will be returned (and cleared) even if not yet complete based
     /// on `GetRequiredInformation()`. This method takes as much data as
     /// it was parsed so far.
-    CHIP_ERROR Take(DiscoveredNodeData & data);
+    CHIP_ERROR Take(DiscoveredNodeData & outputData);
 
     /// Take the current value of the object and clear it once returned.
     ///
@@ -135,7 +136,7 @@ public:
     /// Data will be returned (and cleared) even if not yet complete based
     /// on `GetRequiredInformation()`. This method takes as much data as
     /// it was parsed so far.
-    CHIP_ERROR Take(ResolvedNodeData & data);
+    CHIP_ERROR Take(ResolvedNodeData & outputData);
 
 private:
     /// Notify that a PTR record can be parsed.
@@ -156,12 +157,12 @@ private:
     /// Prerequisite: IP address belongs to the right nost name
     CHIP_ERROR OnIpAddress(const Inet::IPAddress & addr);
 
-    using SpecificParseData = Variant<OperationalNodeData, CommissionNodeData>;
+    using ParsedRecordSpecificData = Variant<OperationalNodeData, CommissionNodeData>;
 
     StoredServerName mRecordName;     // Record name for what is parsed (SRV/PTR/TXT)
     StoredServerName mTargetHostName; // `Target` for the SRV record
     CommonResolutionData mCommonResolutionData;
-    SpecificParseData mSpecificResolutionData;
+    ParsedRecordSpecificData mSpecificResolutionData;
 };
 
 } // namespace Dnssd

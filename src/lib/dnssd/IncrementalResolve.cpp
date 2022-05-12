@@ -71,12 +71,11 @@ constexpr QNamePart kCommissionerSubTypeSuffix[]   = { kSubtypeServiceNamePart, 
 ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
 {
     // SRV record names look like:
-    //   <fabric>-<node>._matter._tcp.local  (operational)
+    //   <compressed-fabric-id>-<node-id>._matter._tcp.local  (operational)
     //   <instance>._matterc._udp.local  (commissionable)
     //   <instance>._matterd._udp.local  (commissioner)
 
-    // Get fabric/node or instance name first
-    // This skips over that value
+    // Starts with compressed-fabric-node or instance, skip over it.
     if (!name.Next() || !name.IsValid())
     {
         // missing required components - empty service name
@@ -117,7 +116,7 @@ bool IsCommissionSubtype(SerializedQNameIterator name)
 
 CHIP_ERROR StoredServerName::Set(SerializedQNameIterator value)
 {
-    chip::Encoding::BigEndian::BufferWriter output(mBuffer, sizeof(mBuffer));
+    chip::Encoding::BigEndian::BufferWriter output(mNameBuffer, sizeof(mNameBuffer));
     RecordWriter writer(&output);
 
     writer.WriteQName(value);
@@ -133,12 +132,12 @@ CHIP_ERROR StoredServerName::Set(SerializedQNameIterator value)
 
 SerializedQNameIterator StoredServerName::Get() const
 {
-    return SerializedQNameIterator(BytesRange(mBuffer, mBuffer + sizeof(mBuffer)), mBuffer);
+    return SerializedQNameIterator(BytesRange(mNameBuffer, mNameBuffer + sizeof(mNameBuffer)), mNameBuffer);
 }
 
 CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const mdns::Minimal::SrvRecord & srv)
 {
-    mSpecificResolutionData = SpecificParseData();
+    mSpecificResolutionData = ParsedRecordSpecificData();
     mCommonResolutionData.Reset();
 
     ReturnErrorOnFailure(mRecordName.Set(name));
@@ -150,6 +149,11 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         // form "<MAC or 802.15.4 Extended Address in hex>.local" and only saves the first part.
         //
         // This should not be needed as server name should not be relevant once parsed.
+        // The Resolver keeps track of this name for the purpose of address resolution
+        // in mTargetHostName.
+        //
+        // Keeping track of this in resolution data does not seem useful and should be
+        // removed.
         SerializedQNameIterator serverName = srv.GetName();
 
         VerifyOrReturnError(serverName.Next() && serverName.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -167,7 +171,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
             SerializedQNameIterator nameCopy = name;
             if (!nameCopy.Next() || !nameCopy.IsValid())
             {
-                mSpecificResolutionData = SpecificParseData();
+                mSpecificResolutionData = ParsedRecordSpecificData();
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
 
@@ -175,7 +179,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
                 ExtractIdFromInstanceName(nameCopy.Value(), &mSpecificResolutionData.Get<OperationalNodeData>().peerId);
             if (err != CHIP_NO_ERROR)
             {
-                mSpecificResolutionData = SpecificParseData();
+                mSpecificResolutionData = ParsedRecordSpecificData();
                 return err;
             }
         }
@@ -185,7 +189,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         mSpecificResolutionData.Set<CommissionNodeData>();
         break;
     default:
-        mSpecificResolutionData = SpecificParseData();
+        mSpecificResolutionData = ParsedRecordSpecificData();
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -347,27 +351,27 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(const Inet::IPAddress & addr)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & data)
+CHIP_ERROR IncrementalResolver::Take(DiscoveredNodeData & outputData)
 {
     VerifyOrReturnError(IsActiveCommissionParse(), CHIP_ERROR_INCORRECT_STATE);
 
-    data.resolutionData = mCommonResolutionData;
-    data.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
+    outputData.resolutionData = mCommonResolutionData;
+    outputData.commissionData = mSpecificResolutionData.Get<CommissionNodeData>();
 
-    mSpecificResolutionData = SpecificParseData();
+    mSpecificResolutionData = ParsedRecordSpecificData();
     mCommonResolutionData.Reset();
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IncrementalResolver::Take(ResolvedNodeData & data)
+CHIP_ERROR IncrementalResolver::Take(ResolvedNodeData & outputData)
 {
     VerifyOrReturnError(IsActiveOperationalParse(), CHIP_ERROR_INCORRECT_STATE);
 
-    data.resolutionData  = mCommonResolutionData;
-    data.operationalData = mSpecificResolutionData.Get<OperationalNodeData>();
+    outputData.resolutionData  = mCommonResolutionData;
+    outputData.operationalData = mSpecificResolutionData.Get<OperationalNodeData>();
 
-    mSpecificResolutionData = SpecificParseData();
+    mSpecificResolutionData = ParsedRecordSpecificData();
     mCommonResolutionData.Reset();
 
     return CHIP_NO_ERROR;
