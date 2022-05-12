@@ -30,68 +30,69 @@ typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 template <class TypeInfo>
 NSError * DispatchGroupCommand(const TypeInfo & value, chip::GroupId groupId, chip::FabricIndex fabricIndex)
 {
-  __block CHIP_ERROR err = CHIP_NO_ERROR;
-  dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-    auto exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
-    VerifyOrReturn(exchangeManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        auto exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+        VerifyOrReturn(exchangeManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    auto commandSender = chip::Platform::MakeUnique<chip::app::CommandSender>(nullptr, exchangeManager, false);
-    VerifyOrReturn(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        auto commandSender = chip::Platform::MakeUnique<chip::app::CommandSender>(nullptr, exchangeManager, false);
+        VerifyOrReturn(commandSender != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    chip::app::CommandPathParams commandPath = { groupId, TypeInfo::GetClusterId(), TypeInfo::GetCommandId(), chip::app::CommandPathFlags::kGroupIdValid };
-    err = commandSender->AddRequestData(commandPath, value);
-    if (CHIP_NO_ERROR != err) {
-      commandSender.reset();
-      return;
-    }
+        chip::app::CommandPathParams commandPath
+            = { groupId, TypeInfo::GetClusterId(), TypeInfo::GetCommandId(), chip::app::CommandPathFlags::kGroupIdValid };
+        err = commandSender->AddRequestData(commandPath, value);
+        if (CHIP_NO_ERROR != err) {
+            commandSender.reset();
+            return;
+        }
 
-    chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-    err = commandSender->SendGroupCommandRequest(chip::SessionHandle(session));
-    if (CHIP_NO_ERROR != err) {
-      commandSender.reset();
-      return;
-    }
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        err = commandSender->SendGroupCommandRequest(chip::SessionHandle(session));
+        if (CHIP_NO_ERROR != err) {
+            commandSender.reset();
+            return;
+        }
 
-    commandSender.release();
-  });
+        commandSender.release();
+    });
 
-  VerifyOrReturnError(err == CHIP_NO_ERROR, [CHIPError errorForCHIPErrorCode:err]);
-  return nil;
+    VerifyOrReturnError(err == CHIP_NO_ERROR, [CHIPError errorForCHIPErrorCode:err]);
+    return nil;
 }
 
 template <typename TypeInfo>
 NSError * DispatchGroupWrite(const typename TypeInfo::Type & value, chip::GroupId groupId, chip::FabricIndex fabricIndex)
 {
-  __block CHIP_ERROR err = CHIP_NO_ERROR;
-  dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-    auto exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
-    VerifyOrReturn(exchangeManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+        auto exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+        VerifyOrReturn(exchangeManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    auto writeClient = chip::Platform::MakeUnique<chip::app::WriteClient>(exchangeManager, nullptr, chip::NullOptional);
-    VerifyOrReturn(writeClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        auto writeClient = chip::Platform::MakeUnique<chip::app::WriteClient>(exchangeManager, nullptr, chip::NullOptional);
+        VerifyOrReturn(writeClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    chip::Optional<chip::DataVersion> dataVersion = chip::NullOptional;
-    chip::app::AttributePathParams attributePathParams;
-    attributePathParams.mClusterId = TypeInfo::GetClusterId();
-    attributePathParams.mAttributeId = TypeInfo::GetAttributeId();
-    err = writeClient->EncodeAttribute(attributePathParams, value, dataVersion);
-    if (CHIP_NO_ERROR != err) {
-      writeClient.reset();
-      return;
-    }
+        chip::Optional<chip::DataVersion> dataVersion = chip::NullOptional;
+        chip::app::AttributePathParams attributePathParams;
+        attributePathParams.mClusterId = TypeInfo::GetClusterId();
+        attributePathParams.mAttributeId = TypeInfo::GetAttributeId();
+        err = writeClient->EncodeAttribute(attributePathParams, value, dataVersion);
+        if (CHIP_NO_ERROR != err) {
+            writeClient.reset();
+            return;
+        }
 
-    chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-    err = writeClient->SendWriteRequest(chip::SessionHandle(session));
-    if (CHIP_NO_ERROR != err) {
-      writeClient.reset();
-      return;
-    }
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        err = writeClient->SendWriteRequest(chip::SessionHandle(session));
+        if (CHIP_NO_ERROR != err) {
+            writeClient.reset();
+            return;
+        }
 
-    writeClient.release();
-  });
+        writeClient.release();
+    });
 
-  VerifyOrReturnError(err == CHIP_NO_ERROR, [CHIPError errorForCHIPErrorCode:err]);
-  return nil;
+    VerifyOrReturnError(err == CHIP_NO_ERROR, [CHIPError errorForCHIPErrorCode:err]);
+    return nil;
 }
 
 template <class T> class CHIPCallbackBridge {
