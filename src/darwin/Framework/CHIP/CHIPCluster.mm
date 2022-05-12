@@ -17,6 +17,7 @@
 
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
+#import "CHIPDeviceController_Internal.h"
 
 using namespace ::chip;
 
@@ -38,6 +39,23 @@ using namespace ::chip;
             return nil;
         }
 
+        _callbackQueue = queue;
+    }
+    return self;
+}
+
+- (instancetype)initWithDeviceController:(CHIPDeviceController *)deviceController group:(GroupId)group queue:(dispatch_queue_t)queue
+{
+    if (self = [super init]) {
+        Controller::ClusterBase * cppCluster = [self getCluster];
+        if (cppCluster == nullptr) {
+            return nil;
+        }
+
+        chip::FabricIndex fabricIndex = [deviceController fabricIndex];
+        _isGroupCluster = true;
+        _groupId = group;
+        _fabricIndex = fabricIndex;
         _callbackQueue = queue;
     }
     return self;

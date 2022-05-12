@@ -36,19 +36,8 @@ using namespace chip::app::Clusters;
 {{/unless}}
 - (void){{asLowerCamelCase name}}WithParams: (CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=.}})completionHandler
 {
-    chip::Optional<uint16_t> timedInvokeTimeoutMs;
     ListFreer listFreer;
     {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
-    if (params != nil) {
-      if (params.timedInvokeTimeoutMs != nil) {
-        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-      }
-    }
-    {{#if mustUseTimedInvoke}}
-    if (!timedInvokeTimeoutMs.HasValue()) {
-      timedInvokeTimeoutMs.SetValue(10000);
-    }
-    {{/if}}
     {{#chip_cluster_command_arguments}}
       {{#first}}
         {{#unless (commandHasRequiredField parent)}}
@@ -62,6 +51,32 @@ using namespace chip::app::Clusters;
        {{/unless}}
       {{/last}}
     {{/chip_cluster_command_arguments}}
+
+    {{#unless mustUseTimedInvoke}}
+    if (self.isGroupCluster) {
+      auto error = DispatchGroupCommand(request, self.groupId, self.fabricIndex);
+      dispatch_async(self.callbackQueue, ^{
+        {{#if hasSpecificResponse}}
+        completionHandler(nil, error);
+        {{else}}
+        completionHandler(error);
+        {{/if}}
+      });
+      return;
+    }
+    {{/unless}}
+
+    chip::Optional<uint16_t> timedInvokeTimeoutMs;
+    if (params != nil) {
+      if (params.timedInvokeTimeoutMs != nil) {
+        timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+      }
+    }
+    {{#if mustUseTimedInvoke}}
+    if (!timedInvokeTimeoutMs.HasValue()) {
+      timedInvokeTimeoutMs.SetValue(10000);
+    }
+    {{/if}}
 
     new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
       {{#if hasSpecificResponse}}
@@ -118,6 +133,21 @@ using namespace chip::app::Clusters;
 }
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(CHIPWriteParams * _Nullable)params completionHandler:(StatusCompletion)completionHandler
 {
+    ListFreer listFreer;
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    TypeInfo::Type cppValue;
+    {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return;" depth=0}}
+
+    {{#unless mustUseTimedInvoke}}
+    if (self.isGroupCluster) {
+      auto error = DispatchGroupWrite<TypeInfo>(cppValue, self.groupId, self.fabricIndex);
+      dispatch_async(self.callbackQueue, ^{
+        completionHandler(error);
+      });
+      return;
+    }
+    {{/unless}}
+
     chip::Optional<uint16_t> timedWriteTimeoutMs;
     if (params != nil) {
       if (params.timedWriteTimeoutMs != nil){
@@ -138,15 +168,10 @@ using namespace chip::app::Clusters;
         completionHandler(error);
       },
       ^(Cancelable * success, Cancelable * failure) {
-        ListFreer listFreer;
-        using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-        TypeInfo::Type cppValue;
-        {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeoutMs);
     });
-    
 }
 
 {{/if}}

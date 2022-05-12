@@ -26,6 +26,9 @@
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@property (readonly, nonatomic) bool isGroupCluster;
+@property (readonly, nonatomic) chip::GroupId groupId;
+@property (readonly, nonatomic) chip::FabricIndex fabricIndex;
 - (chip::Controller::ClusterBase *)getCluster;
 - (chip::ByteSpan)asByteSpan:(NSData *)value;
 - (chip::CharSpan)asCharSpan:(NSString *)value;
