@@ -263,7 +263,7 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return commissionerInitialized;
 }
 
-- (NSNumber *)getControllerNodeId
+- (NSNumber *)controllerNodeId
 {
     if (![self isRunning]) {
         CHIP_LOG_ERROR("A controller has no node id if it has not been started");

@@ -229,7 +229,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     *intermediateCert = nil;
 
     // Verify that the provided certificate public key matches the root keypair.
-    if ([MTRCertificates keypairMatchesCertificate:rootCertificate keypair:rootKeypair] == NO) {
+    if ([MTRCertificates keypair:rootKeypair matchesCertificate:rootCertificate] == NO) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

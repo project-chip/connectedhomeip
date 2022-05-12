@@ -383,7 +383,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
             // It's possible that we are switching from using an ICA cert to
             // not using one.  We can detect this case by checking whether the
             // provided nocSigner matches the ICA cert.
-            if ([MTRCertificates keypairMatchesCertificate:oldIntermediateCert keypair:params.nocSigner] == YES) {
+            if ([MTRCertificates keypair:params.nocSigner matchesCertificate:oldIntermediateCert] == YES) {
                 // Keep using the existing intermediate certificate.
                 params.intermediateCertificate = oldIntermediateCert;
             }
@@ -398,7 +398,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
         // those.
         if ((oldIntermediateCert == nil) != (params.intermediateCertificate == nil)
             || ((oldIntermediateCert != nil) &&
-                [MTRCertificates isEquivalent:oldIntermediateCert to:params.intermediateCertificate] == NO)) {
+                [MTRCertificates isCertificate:oldIntermediateCert equalTo:params.intermediateCertificate] == NO)) {
             params.operationalCertificate = nil;
         }
 
@@ -418,7 +418,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
         if (params.rootCertificate == nil) {
             params.rootCertificate = oldRootCert;
-        } else if ([MTRCertificates isEquivalent:oldRootCert to:params.rootCertificate] == NO) {
+        } else if ([MTRCertificates isCertificate:oldRootCert equalTo:params.rootCertificate] == NO) {
             CHIP_LOG_ERROR("Root certificate identity does not match existing root certificate");
             return;
         }

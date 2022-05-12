@@ -57,7 +57,7 @@
         }
     }
 
-    return [MTRCertificates keypairMatchesCertificate:signingCert keypair:self.nocSigner];
+    return [MTRCertificates keypair:self.nocSigner matchesCertificate:signingCert];
 }
 
 - (void)dealloc

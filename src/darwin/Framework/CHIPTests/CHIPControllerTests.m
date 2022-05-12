@@ -329,7 +329,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller getControllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeId];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -558,7 +558,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller getControllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeId];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -567,7 +567,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -598,7 +598,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], @17);
+    XCTAssertEqualObjects([controller controllerNodeId], @17);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -609,7 +609,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], @18);
+    XCTAssertEqualObjects([controller controllerNodeId], @18);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -620,7 +620,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], @18);
+    XCTAssertEqualObjects([controller controllerNodeId], @18);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -661,7 +661,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], @17);
+    XCTAssertEqualObjects([controller controllerNodeId], @17);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -707,7 +707,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller getControllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeId];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -721,7 +721,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -768,7 +768,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller getControllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeId];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -781,7 +781,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -841,7 +841,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    NSNumber * nodeId = [controller getControllerNodeId];
+    NSNumber * nodeId = [controller controllerNodeId];
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -855,7 +855,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller);
     XCTAssertTrue([controller isRunning]);
 
-    XCTAssertEqualObjects([controller getControllerNodeId], nodeId);
+    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);

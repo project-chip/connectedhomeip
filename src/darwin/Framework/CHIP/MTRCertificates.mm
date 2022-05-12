@@ -86,7 +86,7 @@ struct AutoPlatformMemory {
     return intermediate;
 }
 
-+ (BOOL)keypairMatchesCertificate:(NSData *)certificate keypair:(id<CHIPKeypair>)keypair
++ (BOOL)keypair:(id<CHIPKeypair>)keypair matchesCertificate:(NSData *)certificate
 {
     P256PublicKey keypairPubKey;
     CHIP_ERROR err = CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(keypair.pubkey, &keypairPubKey);
@@ -107,7 +107,7 @@ struct AutoPlatformMemory {
     return certKeySpan.data_equal(keypairKeySpan);
 }
 
-+ (BOOL)isEquivalent:(NSData *)certificate1 to:(NSData *)certificate2
++ (BOOL)isCertificate:(NSData *)certificate1 equalTo:(NSData *)certificate2
 {
     P256PublicKey pubKey1;
     CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate1), pubKey1);
