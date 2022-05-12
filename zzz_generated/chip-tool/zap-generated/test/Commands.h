@@ -21,7 +21,6 @@
 
 #if CONFIG_ENABLE_YAML_TESTS
 
-#include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommand.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPListUtils.h>

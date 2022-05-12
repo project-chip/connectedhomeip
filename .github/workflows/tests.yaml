@@ -43,12 +43,12 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.5.64
+            image: connectedhomeip/chip-build:0.5.73
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -132,7 +132,7 @@ jobs:
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -222,12 +222,7 @@ jobs:
         name: REPL Tests - Linux
         timeout-minutes: 120
 
-        strategy:
-            matrix:
-                build_variant: [no-ble-no-wifi-tsan-clang]
-
         env:
-            BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'
@@ -269,7 +264,7 @@ jobs:
                     scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                     ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters-${BUILD_VARIANT}-test \
+                        --target linux-x64-all-clusters-no-ble-no-wifi-tsan-clang-test \
                         --target linux-x64-python-bindings \
                         build \
                         --copy-artifacts-to objdir-clone \

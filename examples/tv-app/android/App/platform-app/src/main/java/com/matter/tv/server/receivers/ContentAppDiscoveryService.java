@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ContentAppDiscoveryService extends BroadcastReceiver {
-  private static final String TAG = "MatterContentAppDiscoveryService";
+  private static final String TAG = "ContentAppDiscoveryService";
   static final String CLUSTERS_RESOURCE_METADATA_KEY = "com.matter.app_agent_api.clusters";
   private static final String ANDROID_PACKAGE_REMOVED_ACTION =
       "android.intent.action.PACKAGE_REMOVED";
@@ -116,10 +116,10 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
 
     Log.i(TAG, "Trying to register the matter package update receiver");
     IntentFilter pckAdded = new IntentFilter(ANDROID_PACKAGE_ADDED_ACTION);
-    pckAdded.hasDataScheme("package");
+    pckAdded.addDataScheme("package");
     context.registerReceiver(this, pckAdded);
     IntentFilter pckRemoved = new IntentFilter(ANDROID_PACKAGE_REMOVED_ACTION);
-    pckRemoved.hasDataScheme("package");
+    pckRemoved.addDataScheme("package");
     context.registerReceiver(this, pckRemoved);
     Log.i(TAG, "Registered the matter package update receiver");
   }
@@ -134,7 +134,8 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
   private Set<String> getMatterApps(Context context) {
     PackageManager pm = context.getPackageManager();
     List<ResolveInfo> receivers =
-        pm.queryBroadcastReceivers(new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND), 0);
+        pm.queryBroadcastReceivers(
+            new Intent(MatterIntentConstants.ACTION_MATTER_COMMAND), PackageManager.MATCH_ALL);
 
     Set<String> matterApps = new HashSet<>();
     if (receivers.isEmpty()) {
@@ -151,7 +152,8 @@ public class ContentAppDiscoveryService extends BroadcastReceiver {
     return matterApps;
   }
 
-  public static ContentAppDiscoveryService getRecieverInstance() {
+  // TODO : Introduce dependency injection
+  public static ContentAppDiscoveryService getReceiverInstance() {
     return instance;
   }
 }

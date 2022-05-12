@@ -44,10 +44,12 @@ android {
                     'src/main/java',
                     '../common-api/src/main/java',
             ]
+            aidl.srcDirs = ['../common-api/src/main/aidl']
 
             // uncomment this code to debug
 //            java.srcDirs = [
 //                    'src/main/java',
+//                    '../common-api/src/main/java',
 //                    '../../third_party/connectedhomeip/src/setup_payload/java/src',
 //                    '../../third_party/connectedhomeip/src/platform/android/java',
 //                    '../../third_party/connectedhomeip/src/app/server/java/src/',

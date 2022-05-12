@@ -5,7 +5,6 @@
 #if CONFIG_ENABLE_YAML_TESTS
 
 #include <commands/tests/TestCommandBridge.h>
-#include <commands/common/CommandInvoker.h>
 #include <lib/core/Optional.h>
 #include <system/SystemClock.h>
 

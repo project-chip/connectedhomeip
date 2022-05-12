@@ -39,8 +39,13 @@ public class TvCastingApp {
 
   public native void setDACProvider(DACProvider provider);
 
-  /** TBD: Temp dummy function for testing */
   public native boolean openBasicCommissioningWindow(int duration);
+
+  public native boolean sendUserDirectedCommissioningRequest(String address, int port);
+
+  public native boolean discoverCommissioners();
+
+  public native void initServer();
 
   static {
     System.loadLibrary("TvCastingApp");

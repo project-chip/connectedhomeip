@@ -30,14 +30,13 @@ class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterC
 public:
     {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
-        (void)mRequest; // Might not be used if we have no complex args
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
-        AddArgument("{{asUpperCamelCase label}}", &m{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -53,33 +52,7 @@ public:
         __auto_type * params = [[CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase name}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         {{#chip_cluster_command_arguments}}
-        {{#if_chip_complex}}
-        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asStructPropertyName label)) cluster=parent.clusterName type=type depth=0}}
-        {{else if (isOctetString type)}} 
-            {{#if isOptional}}
-                if (m{{asUpperCamelCase label}}.HasValue()) {
-            {{/if}}
-                params.{{asStructPropertyName label}} = [[NSData alloc] initWithBytes:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.data() length:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.size()];
-            {{#if isOptional}}
-            } 
-            {{/if}}
-        {{else if (isString type)}}
-            {{#if isOptional}}
-                if (m{{asUpperCamelCase label}}.HasValue()) {
-            {{/if}}
-                 params.{{asStructPropertyName label}} = [[NSString alloc] initWithBytes:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.data() length:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.size() encoding:NSUTF8StringEncoding];
-            {{#if isOptional}}
-                } 
-            {{/if}}
-        {{else}}
-            {{#if isOptional}}
-                 if (m{{asUpperCamelCase label}}.HasValue()) {
-            {{/if}}
-                 params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}];
-            {{#if isOptional}}
-                } 
-            {{/if}}
-        {{/if_chip_complex}}
+        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.clusterName type=type depth=0}}
         {{/chip_cluster_command_arguments}}
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -107,14 +80,12 @@ public:
     }
 
 private:
+    {{#if (hasArguments)}}
     chip::app::Clusters::{{asUpperCamelCase clusterName}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
+    {{/if}}
     {{#chip_cluster_command_arguments}}
     {{#if_chip_complex}}
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
-    {{else if (isString type)}}
-    {{#if isOptional}}chip::Optional<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} m{{asUpperCamelCase label}};
-    {{else}}
-    {{#if isOptional}}chip::Optional<{{chipType}}>{{else}}{{chipType}}{{/if}} m{{asUpperCamelCase label}};
     {{/if_chip_complex}}
     {{/chip_cluster_command_arguments}}
 };
@@ -200,6 +171,7 @@ public:
         CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         CHIPWriteParams * params = [[CHIPWriteParams alloc] init];
         params.timedWriteTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+        params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         {{#if_chip_complex}}
         {{asObjectiveCType type parent.name}} value;
         {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
