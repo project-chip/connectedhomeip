@@ -2642,6 +2642,10 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = nil;
 
+        _creatorFabricIndex = nil;
+
+        _lastModifiedFabricIndex = nil;
+
         _nextCredentialIndex = nil;
         _timedInvokeTimeoutMs = nil;
     }
