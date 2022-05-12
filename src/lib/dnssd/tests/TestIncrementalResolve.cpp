@@ -127,26 +127,31 @@ void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
     {
         // setting to a too long value should reset it
         uint8_t largeBuffer[256];
-        for (unsigned i = 0; i < 20; i++)
-        {
-            memcpy(largeBuffer + i * 8, "\07abcd123", 8);
-            largeBuffer[(i + 1) * 8] = 0;
+        memset(largeBuffer, 0, sizeof(largeBuffer));
 
-            // Up to 64 bytes supported to copy
-            if (i < 7)
+        Encoding::BigEndian::BufferWriter writer(largeBuffer, sizeof(largeBuffer));
+
+        for (unsigned idx = 0; true; idx++)
+        {
+            writer.Put("\07abcd123"); // will not NULL-terminate, but buffer is 0-filled
+            if (!writer.Fit())
             {
-                NL_TEST_ASSERT_LOOP(inSuite, i, name.Set(AsSerializedQName(largeBuffer)) == CHIP_NO_ERROR);
-                NL_TEST_ASSERT_LOOP(inSuite, i, name.Get() == AsSerializedQName(largeBuffer));
-                NL_TEST_ASSERT_LOOP(inSuite, i, name.Get() != AsSerializedQName(kTestOperationalName));
+                break; // filled all our tests
+            }
+
+            if (writer.WritePos() <= 64)
+            {
+                // this is how much data can be fit by the copy
+                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Set(AsSerializedQName(largeBuffer)) == CHIP_NO_ERROR);
+                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() == AsSerializedQName(largeBuffer));
+                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() != AsSerializedQName(kTestOperationalName));
             }
             else
             {
-                NL_TEST_ASSERT_LOOP(inSuite, i, name.Set(AsSerializedQName(largeBuffer)) == CHIP_ERROR_NO_MEMORY);
-                NL_TEST_ASSERT_LOOP(inSuite, i, !name.Get().Next());
+                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Set(AsSerializedQName(largeBuffer)) == CHIP_ERROR_NO_MEMORY);
+                NL_TEST_ASSERT_LOOP(inSuite, idx, !name.Get().Next());
             }
         }
-        NL_TEST_ASSERT(inSuite, name.Set(AsSerializedQName(largeBuffer)) == CHIP_ERROR_NO_MEMORY);
-        NL_TEST_ASSERT(inSuite, !name.Get().Next());
     }
 }
 
@@ -231,7 +236,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 
-    // Send an irellevant IP address here
+    // Send an IP for an irrelevant host name
     {
         const char * path[] = { "xyzt", "local" };
         Inet::IPAddress addr;
@@ -249,7 +254,7 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
         CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
     }
 
-    // Adding an irrelevant text entry
+    // Send a TXT record for an irrelevant host name
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
@@ -315,7 +320,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
 
-    // Send an irellevant IP address here
+    // Send an IP for an irrelevant host name
     {
         const char * path[] = { "xyzt", "local" };
         Inet::IPAddress addr;
@@ -342,7 +347,7 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
         CallOnRecord(inSuite, resolver, IPResourceRecord(FullQName(path), addr));
     }
 
-    // Adding an irrelevant text entry
+    // Send a TXT record for an irrelevant host name
     // Note that TXT entries should be addressed to the Record address and
     // NOT to the server name for A/AAAA records
     {
