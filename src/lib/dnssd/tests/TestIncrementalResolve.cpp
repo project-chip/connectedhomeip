@@ -20,11 +20,13 @@
 
 #include <string.h>
 
+#include <lib/dnssd/minimal_mdns/core/tests/QNameStrings.h>
 #include <lib/dnssd/minimal_mdns/records/IP.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -36,43 +38,42 @@ using namespace mdns::Minimal;
 namespace {
 
 // Operational names must be <compressed-fabric>-<node>._matter._tcp.local
-constexpr uint8_t kTestOperationalName[] = "\0411234567898765432-ABCDEFEDCBAABCDE\07_matter\04_tcp\05local\00";
+const auto kTestOperationalName = testing::TestQName<4>({ "1234567898765432-ABCDEFEDCBAABCDE", "_matter", "_tcp", "local" });
 
 // Commissionable names must be <instance>._matterc._udp.local
-constexpr uint8_t kTestCommissionableNode[] = "\020C5038835313B8B98\10_matterc\04_udp\05local\00";
+const auto kTestCommissionableNode = testing::TestQName<4>({ "C5038835313B8B98", "_matterc", "_udp", "local" });
 
 // Commissioner names must be <instance>._matterd._udp.local
-constexpr uint8_t kTestCommissionerNode[] = "\020C5038835313B8B98\10_matterd\04_udp\05local\00";
+const auto kTestCommissionerNode = testing::TestQName<4>({ "C5038835313B8B98", "_matterd", "_udp", "local" });
 
 // Server name that is preloaded by the `PreloadSrvRecord`
-constexpr uint8_t kTestServerName[] = "\04abcd\05local\00";
+const auto kTestHostName = testing::TestQName<2>({ "abcd", "local" });
 
 void PreloadSrvRecord(nlTestSuite * inSuite, SrvRecord & record)
 {
+    uint8_t headerBuffer[HeaderRef::kSizeBytes] = {};
+    HeaderRef dummyHeader(headerBuffer);
+
     // NOTE: record pointers persist beyond  this function, so
     // this data MUST be static
-    static const uint8_t data[] = {
-        0,    12,                       // Priority
-        0,    3,                        // weight
-        0x12, 0x34,                     // port
-        4,    'a',  'b', 'c', 'd',      // QNAME part: abcd
-        5,    'l',  'o', 'c', 'a', 'l', // QNAME part: local
-        0,                              // QNAME ends
-    };
+    static uint8_t dataBuffer[256];
+    chip::Encoding::BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
 
-    BytesRange packet(data, data + sizeof(data));
-    BytesRange srv_data(data, data + sizeof(data));
+    NL_TEST_ASSERT(inSuite,
+                   SrvResourceRecord(kTestOperationalName.Full(), kTestHostName.Full(), 0x1234 /* port */)
+                       .Append(dummyHeader, ResourceType::kAnswer, writer));
 
-    NL_TEST_ASSERT(inSuite, record.Parse(srv_data, packet));
+    ResourceData resource;
+    BytesRange packet(dataBuffer, dataBuffer + sizeof(dataBuffer));
+    const uint8_t * _ptr = dataBuffer;
+
+    NL_TEST_ASSERT(inSuite, resource.Parse(packet, &_ptr));
+    NL_TEST_ASSERT(inSuite, record.Parse(resource.GetData(), packet));
 }
 
-/// Convenience method to have a  serialized QName:
-///
-/// static const uint8_t kData[] = "datahere\00";
-///  AsSerializedQName(kData);
-///
-/// NOTE: this MUST be using the string "" format to add an extra NULL
-/// terminator that this method discards.
+/// Convenience method to have a  serialized QName.
+/// Assumes valid QName data that is terminated by null.
 template <size_t N>
 static SerializedQNameIterator AsSerializedQName(const uint8_t (&v)[N])
 {
@@ -109,20 +110,20 @@ void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !name.Get().Next());
 
     // Data should be storable in server name
-    NL_TEST_ASSERT(inSuite, name.Set(AsSerializedQName(kTestOperationalName)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, name.Get() == AsSerializedQName(kTestOperationalName));
-    NL_TEST_ASSERT(inSuite, name.Get() != AsSerializedQName(kTestCommissionerNode));
-    NL_TEST_ASSERT(inSuite, name.Get() != AsSerializedQName(kTestCommissionableNode));
+    NL_TEST_ASSERT(inSuite, name.Set(kTestOperationalName.Serialized()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, name.Get() == kTestOperationalName.Serialized());
+    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionerNode.Serialized());
+    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionableNode.Serialized());
 
-    NL_TEST_ASSERT(inSuite, name.Set(AsSerializedQName(kTestCommissionerNode)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, name.Get() != AsSerializedQName(kTestOperationalName));
-    NL_TEST_ASSERT(inSuite, name.Get() == AsSerializedQName(kTestCommissionerNode));
-    NL_TEST_ASSERT(inSuite, name.Get() != AsSerializedQName(kTestCommissionableNode));
+    NL_TEST_ASSERT(inSuite, name.Set(kTestCommissionerNode.Serialized()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, name.Get() != kTestOperationalName.Serialized());
+    NL_TEST_ASSERT(inSuite, name.Get() == kTestCommissionerNode.Serialized());
+    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionableNode.Serialized());
 
-    NL_TEST_ASSERT(inSuite, name.Set(AsSerializedQName(kTestCommissionableNode)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, name.Get() != AsSerializedQName(kTestOperationalName));
-    NL_TEST_ASSERT(inSuite, name.Get() != AsSerializedQName(kTestCommissionerNode));
-    NL_TEST_ASSERT(inSuite, name.Get() == AsSerializedQName(kTestCommissionableNode));
+    NL_TEST_ASSERT(inSuite, name.Set(kTestCommissionableNode.Serialized()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, name.Get() != kTestOperationalName.Serialized());
+    NL_TEST_ASSERT(inSuite, name.Get() != kTestCommissionerNode.Serialized());
+    NL_TEST_ASSERT(inSuite, name.Get() == kTestCommissionableNode.Serialized());
 
     {
         // setting to a too long value should reset it
@@ -144,7 +145,7 @@ void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
                 // this is how much data can be fit by the copy
                 NL_TEST_ASSERT_LOOP(inSuite, idx, name.Set(AsSerializedQName(largeBuffer)) == CHIP_NO_ERROR);
                 NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() == AsSerializedQName(largeBuffer));
-                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() != AsSerializedQName(kTestOperationalName));
+                NL_TEST_ASSERT_LOOP(inSuite, idx, name.Get() != kTestOperationalName.Serialized());
             }
             else
             {
@@ -175,13 +176,13 @@ void TestStartOperational(nlTestSuite * inSuite, void * inContext)
     SrvRecord srvRecord;
     PreloadSrvRecord(inSuite, srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(AsSerializedQName(kTestOperationalName), srvRecord) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
+    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 }
 
 void TestStartCommissionable(nlTestSuite * inSuite, void * inContext)
@@ -193,13 +194,13 @@ void TestStartCommissionable(nlTestSuite * inSuite, void * inContext)
     SrvRecord srvRecord;
     PreloadSrvRecord(inSuite, srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(AsSerializedQName(kTestCommissionableNode), srvRecord) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
+    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 }
 
 void TestStartCommissioner(nlTestSuite * inSuite, void * inContext)
@@ -211,13 +212,13 @@ void TestStartCommissioner(nlTestSuite * inSuite, void * inContext)
     SrvRecord srvRecord;
     PreloadSrvRecord(inSuite, srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(AsSerializedQName(kTestCommissionerNode), srvRecord) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionerNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
+    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 }
 
 void TestParseOperational(nlTestSuite * inSuite, void * inContext)
@@ -229,12 +230,12 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
     SrvRecord srvRecord;
     PreloadSrvRecord(inSuite, srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(AsSerializedQName(kTestOperationalName), srvRecord) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestOperationalName.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
+    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 
     // Send an IP for an irrelevant host name
     {
@@ -313,12 +314,12 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
     SrvRecord srvRecord;
     PreloadSrvRecord(inSuite, srvRecord);
 
-    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(AsSerializedQName(kTestCommissionableNode), srvRecord) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, resolver.InitializeParsing(kTestCommissionableNode.Serialized(), srvRecord) == CHIP_NO_ERROR);
 
     // once initialized, parsing should be ready however no IP address is available
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
-    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == AsSerializedQName(kTestServerName));
+    NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 
     // Send an IP for an irrelevant host name
     {
