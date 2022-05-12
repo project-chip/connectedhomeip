@@ -235,6 +235,8 @@ def HostTargets():
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
     app_targets.append(
+        target_native.Extend('tv-casting-app', app=HostApp.TV_CASTING_APP))
+    app_targets.append(
         target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
