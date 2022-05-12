@@ -46,6 +46,95 @@ constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
 
+/// Contructs a FullQName from a SerializedNameIterator
+///
+/// Generally a conversion from an iterator to a `const char *[]`
+
+class FullQNameWrapper
+{
+public:
+    FullQNameWrapper(SerializedQNameIterator name)
+    {
+        // Storage is:
+        //    - separate pointers into mElementPointers
+        //    - allocated pointers inside that
+        mElementCount = 0;
+
+        SerializedQNameIterator it = name;
+        while (it.Next())
+        {
+            // Count all elements
+            mElementCount++;
+        }
+
+        if (!it.IsValid())
+        {
+            return;
+        }
+
+        mElementPointers.Alloc(mElementCount);
+        if (!mElementPointers)
+        {
+            return;
+        }
+        // ensure all set to null since we may need to free
+        for (size_t i = 0; i < mElementCount; i++)
+        {
+            mElementPointers[i] = nullptr;
+        }
+
+        it         = name;
+        size_t idx = 0;
+        while (it.Next())
+        {
+            mElementPointers[idx] = Platform::MemoryAllocString(it.Value(), strlen(it.Value()));
+            if (!mElementPointers[idx])
+            {
+                return;
+            }
+        }
+        mIsOk = true;
+    }
+
+    ~FullQNameWrapper()
+    {
+        if (!mElementPointers)
+        {
+            return;
+        }
+
+        for (size_t i = 0; i < mElementCount; i++)
+        {
+            if (mElementPointers[i] != nullptr)
+            {
+                Platform::MemoryFree(mElementPointers[i]);
+                mElementPointers[i] = nullptr;
+            }
+        }
+    }
+
+    bool IsOk() const { return mIsOk; }
+
+    /// Returns the contained FullQName.
+    ///
+    /// VALIDITY: since this references data inside `this` it is only valid
+    ///           as long as `this` is valid.
+    FullQName Content()
+    {
+        FullQName result;
+
+        result.names     = mElementPointers.Get();
+        result.nameCount = mElementCount;
+
+        return result;
+    }
+
+private:
+    bool mIsOk = false;
+    size_t mElementCount;
+    Platform::ScopedMemoryBuffer<char *> mElementPointers;
+};
+
 /// Handles processing of minmdns packet data.
 ///
 /// Can process multiple incremental resolves based on SRV data and allows
@@ -262,8 +351,12 @@ private:
 
     CHIP_ERROR SendPendingResolveQueries();
     CHIP_ERROR SendPendingBrowseQueries();
+    CHIP_ERROR SendPendingIpAddressQueries();
     CHIP_ERROR SendAllPendingQueries();
     CHIP_ERROR ScheduleRetries();
+
+    // Any active resolves that still need their AAAA address
+    bool NeedsMoreIPaddresses();
 
     static void RetryCallback(System::Layer *, void * self);
 
@@ -283,13 +376,28 @@ private:
     char qnameStorage[kMaxQnameSize];
 };
 
+bool MinMdnsResolver::NeedsMoreIPaddresses()
+{
+    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    {
+        if (!resolver->IsActive())
+        {
+            continue;
+        }
+        if (resolver->GetMissingRequiredInformation().Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
     // Fill up any relevant data
     mPacketParser.ParseSrvRecords(data);
     mPacketParser.ParseNonSrvRecords(data);
-
-    bool needIpAddress = false;
 
     for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
     {
@@ -302,7 +410,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
 
         if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            needIpAddress = true;
+            // Processed later
             continue;
         }
 
@@ -364,12 +472,6 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         }
     }
 
-    if (needIpAddress)
-    {
-        // TODO: send AAAA query
-        ChipLogError(Discovery, "TODO: need to send out AAAA query");
-    }
-
     ScheduleRetries();
 }
 
@@ -421,9 +523,21 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
 CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
 {
-    CHIP_ERROR browseErr  = SendPendingBrowseQueries();
-    CHIP_ERROR resolveErr = SendPendingResolveQueries();
-    return resolveErr == CHIP_NO_ERROR ? browseErr : resolveErr;
+    CHIP_ERROR browseErr    = SendPendingBrowseQueries();
+    CHIP_ERROR resolveErr   = SendPendingResolveQueries();
+    CHIP_ERROR ipAddressErr = SendPendingIpAddressQueries();
+
+    if (resolveErr != CHIP_NO_ERROR)
+    {
+        return resolveErr;
+    }
+
+    if (browseErr != CHIP_NO_ERROR)
+    {
+        return browseErr;
+    }
+
+    return ipAddressErr;
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -518,6 +632,63 @@ CHIP_ERROR MinMdnsResolver::SendPendingBrowseQueries()
     return returnErr;
 }
 
+CHIP_ERROR MinMdnsResolver::SendPendingIpAddressQueries()
+{
+    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    {
+        if (!resolver->IsActive())
+        {
+            continue;
+        }
+
+        if (!resolver->GetMissingRequiredInformation().Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        {
+            continue;
+        }
+
+        ChipLogProgress(Discovery, "Requesting addional IP address");
+
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
+        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        constexpr bool kUseUnicast = false;
+
+        QueryBuilder builder(std::move(buffer));
+        builder.Header().SetMessageId(0);
+        {
+            FullQNameWrapper wrapper(resolver->GetTargetHostName());
+
+            if (!wrapper.IsOk())
+            {
+                ChipLogError(Discovery, "Failed to construct IP query for given target host name");
+                resolver->ResetToInactive();
+                continue;
+            }
+
+            Query query(wrapper.Content());
+
+            query
+                .SetClass(QClass::IN)             //
+                .SetType(QType::AAAA)             //
+                .SetAnswerViaUnicast(kUseUnicast) //
+                ;
+            builder.AddQuery(query);
+        }
+
+        ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+        if (kUseUnicast)
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        }
+        else
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     mActiveResolves.MarkPending(peerId);
@@ -532,7 +703,11 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 
     Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    // TODO: schedule timeout for incremental resolves
+    if (NeedsMoreIPaddresses())
+    {
+        // send a request for IP addresses as quickly as possible.
+        delay = Optional<System::Clock::Timeout>::Value(0);
+    }
 
     if (!delay.HasValue())
     {
