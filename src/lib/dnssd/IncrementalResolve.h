@@ -63,8 +63,8 @@ private:
     uint8_t mNameBuffer[kMaxStoredNameLength] = {};
 };
 
-/// Incrementally accumulates data from DNSSD packets. It is generally geared
-/// towards processing minmdns records.
+/// Incrementally accumulates data from DNSSD packets. It is geared twoards
+/// resource-constrained dns-sd querier implementations.
 ///
 /// It all starts with processing SRV records which define the type of record
 /// (could be operational, commissionable or commissioner), after which the
