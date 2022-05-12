@@ -83,6 +83,7 @@ public:
     void SetDelayedApplyActionTimeSec(uint32_t time) { mDelayedApplyActionTimeSec = time; }
     void SetUserConsentDelegate(chip::ota::OTAProviderUserConsentDelegate * delegate) { mUserConsentDelegate = delegate; }
     void SetUserConsentNeeded(bool needed) { mUserConsentNeeded = needed; }
+    void SetPollFrequency(uint32_t freq) { if (freq != 0) mPollFrequency = freq; }
 
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
@@ -117,4 +118,5 @@ private:
     bool mUserConsentNeeded;
     uint32_t mSoftwareVersion;
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
+    uint32_t mPollFrequency;
 };

@@ -54,6 +54,7 @@ constexpr uint16_t kOptionDelayedQueryActionTimeSec = 't';
 constexpr uint16_t kOptionUserConsentState          = 'u';
 constexpr uint16_t kOptionIgnoreQueryImage          = 'x';
 constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
+constexpr uint16_t kOptionPollFrequency             = 'P';
 
 OTAProviderExample gOtaProvider;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
@@ -70,6 +71,8 @@ static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentSta
 static bool gUserConsentNeeded                       = false;
 static uint32_t gIgnoreQueryImageCount               = 0;
 static uint32_t gIgnoreApplyUpdateCount              = 0;
+static uint32_t gPollFrequency                       = 0;
+
 
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
@@ -241,6 +244,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionUserConsentNeeded:
         gUserConsentNeeded = true;
         break;
+    case kOptionPollFrequency:
+        gPollFrequency = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        break;
+
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -262,6 +269,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "ignoreQueryImage", chip::ArgParser::kArgumentRequired, kOptionIgnoreQueryImage },
     { "ignoreApplyUpdate", chip::ArgParser::kArgumentRequired, kOptionIgnoreApplyUpdate },
+    { "pollFrequency", chip::ArgParser::kArgumentRequired, kOptionPollFrequency },
     {},
 };
 
@@ -300,7 +308,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -x, --ignoreQueryImage <ignore count>\n"
                              "        The number of times to ignore the QueryImage Command and not send a response.\n"
                              "  -y, --ignoreApplyUpdate <ignore count>\n"
-                             "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n" };
+                             "        The number of times to ignore the ApplyUpdateRequest Command and not send a response.\n"
+                             "  -P, --pollFrequency <frequency in milliseconds>\n"
+                             "        Poll frequency for the BDX transfer \n" };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
@@ -348,6 +358,11 @@ void ApplicationInit()
         gOtaProvider.SetUserConsentNeeded(true);
     }
 
+    if (gPollFrequency != 0)
+    {
+        gOtaProvider.SetPollFrequency(gPollFrequency);
+    }
+    
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
 
     if (gOtaImageListFilepath != nullptr)
