@@ -94,7 +94,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads LockState attriute"
+    - label: "TH reads LockState attribute"
       command: "readAttribute"
       attribute: "LockState"
       response:
