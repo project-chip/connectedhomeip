@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <lib/core/Optional.h>
 #include <lib/support/IntrusiveList.h>
 #include <transport/SessionDelegate.h>
@@ -44,14 +46,14 @@ public:
 
     bool Contains(const SessionHandle & session) const
     {
-        return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
+        return mSession.HasValue() && &mSession.Value().get() == &session.mSession.Get();
     }
 
     bool GrabPairing(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
     bool Grab(const SessionHandle & session);
     void Release();
 
-    operator bool() const { return mSession.HasValue(); }
+    explicit operator bool() const { return mSession.HasValue(); }
     Optional<SessionHandle> Get() const
     {
         //
@@ -60,14 +62,14 @@ public:
         //
         // So, construct a new Optional<SessionHandle> from the underlying Transport::Session reference.
         //
-        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().get())
                                    : chip::Optional<SessionHandle>::Missing();
     }
 
-    Transport::Session * operator->() const { return &mSession.Value().Get(); }
+    Transport::Session * operator->() const { return &mSession.Value().get(); }
 
 private:
-    Optional<ReferenceCountedHandle<Transport::Session>> mSession;
+    Optional<std::reference_wrapper<Transport::Session>> mSession;
 };
 
 // @brief Extends SessionHolder to allow propagate OnSessionReleased event to an extra given destination

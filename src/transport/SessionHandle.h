@@ -19,6 +19,7 @@
 
 #include <access/SubjectDescriptor.h>
 #include <lib/support/ReferenceCountedHandle.h>
+#include <transport/SessionSharedPtr.h>
 
 namespace chip {
 
@@ -46,6 +47,7 @@ public:
     SessionHandle & operator=(SessionHandle &&) = delete;
 
     bool operator==(const SessionHandle & that) const { return &mSession.Get() == &that.mSession.Get(); }
+    SessionSharedPtr ToShared() const { return SessionSharedPtr(mSession.Get()); }
 
     Transport::Session * operator->() const { return mSession.operator->(); }
 
