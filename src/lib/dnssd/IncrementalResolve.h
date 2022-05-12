@@ -119,7 +119,7 @@ public:
     ///
     /// Data references internal storage of this object and is valid as long
     /// as this object is valid and InitializeParsing is not called again.
-    mdns::Minimal::SerializedQNameIterator GetServerName() const { return mServerName.Get(); }
+    mdns::Minimal::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
 
     /// Take the current value of the object and clear it once returned.
     ///
@@ -158,8 +158,8 @@ private:
 
     using SpecificParseData = Variant<OperationalNodeData, CommissionNodeData>;
 
-    StoredServerName mRecordName; // Record name for what is parsed (SRV/PTR/TXT)
-    StoredServerName mServerName; // Server name for A/AAAA addresses
+    StoredServerName mRecordName;     // Record name for what is parsed (SRV/PTR/TXT)
+    StoredServerName mTargetHostName; // `Target` for the SRV record
     CommonResolutionData mCommonResolutionData;
     SpecificParseData mSpecificResolutionData;
 };
