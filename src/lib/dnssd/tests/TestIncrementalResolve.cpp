@@ -165,8 +165,9 @@ void TestCreation(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !resolver.IsActive());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite,
-                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kSrvInitialization));
+    NL_TEST_ASSERT(
+        inSuite,
+        resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kSrvInitialization));
 }
 
 void TestStartOperational(nlTestSuite * inSuite, void * inContext)
@@ -183,7 +184,8 @@ void TestStartOperational(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite,
+                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 }
 
@@ -201,7 +203,8 @@ void TestStartCommissionable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite,
+                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 }
 
@@ -219,7 +222,8 @@ void TestStartCommissioner(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, resolver.IsActive());
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
     NL_TEST_ASSERT(inSuite, !resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite,
+                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 }
 
@@ -236,7 +240,8 @@ void TestParseOperational(nlTestSuite * inSuite, void * inContext)
 
     // once initialized, parsing should be ready however no IP address is available
     NL_TEST_ASSERT(inSuite, resolver.IsActiveOperationalParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite,
+                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 
     // Send an IP for an irrelevant host name
@@ -315,7 +320,8 @@ void TestParseCommissionable(nlTestSuite * inSuite, void * inContext)
 
     // once initialized, parsing should be ready however no IP address is available
     NL_TEST_ASSERT(inSuite, resolver.IsActiveCommissionParse());
-    NL_TEST_ASSERT(inSuite, resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformation::kIpAddress));
+    NL_TEST_ASSERT(inSuite,
+                   resolver.GetMissingRequiredInformation().HasOnly(IncrementalResolver::RequiredInformationBitFlags::kIpAddress));
     NL_TEST_ASSERT(inSuite, resolver.GetTargetHostName() == kTestHostName.Serialized());
 
     // Send an IP for an irrelevant host name

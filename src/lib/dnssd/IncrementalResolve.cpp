@@ -202,13 +202,13 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
 
     if (!mSpecificResolutionData.Valid())
     {
-        flags.Set(RequiredInformation::kSrvInitialization);
+        flags.Set(RequiredInformationBitFlags::kSrvInitialization);
     }
     else
     {
         if (mCommonResolutionData.numIPs == 0)
         {
-            flags.Set(RequiredInformation::kIpAddress);
+            flags.Set(RequiredInformationBitFlags::kIpAddress);
         }
     }
 

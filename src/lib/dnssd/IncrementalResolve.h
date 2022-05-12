@@ -77,12 +77,12 @@ class IncrementalResolver
 {
 public:
     // Elements that the incremental resolve still needs
-    enum class RequiredInformation : uint8_t
+    enum class RequiredInformationBitFlags : uint8_t
     {
         kSrvInitialization = 0x01, // server being initialized
         kIpAddress         = 0x02, // IP address missing
     };
-    using RequiredInformationFlags = BitFlags<RequiredInformation>;
+    using RequiredInformationFlags = BitFlags<RequiredInformationBitFlags>;
 
     IncrementalResolver() {}
 
