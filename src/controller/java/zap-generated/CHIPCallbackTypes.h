@@ -1106,6 +1106,8 @@ typedef void (*CHIPPowerSourceConfigurationClusterAcceptedCommandListAttributeCa
     void *, const chip::app::Clusters::PowerSourceConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPowerSourceConfigurationClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::PowerSourceConfiguration::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPPowerSourceConfigurationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSourceConfiguration::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceConfigurationClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSourceConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 

@@ -203,6 +203,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPPowerSourceClusterWiredFaultChangeEvent : NSObject
+@property (strong, nonatomic) CHIPPowerSourceClusterWiredFaultChangeType * _Nonnull wiredFaultChangeType;
+@end
+
+@interface CHIPPowerSourceClusterBatFaultChangeEvent : NSObject
+@property (strong, nonatomic) CHIPPowerSourceClusterBatFaultChangeType * _Nonnull batFaultChangeType;
+@end
+
+@interface CHIPPowerSourceClusterBatChargeFaultChangeEvent : NSObject
+@property (strong, nonatomic) CHIPPowerSourceClusterBatChargeFaultChangeType * _Nonnull batChargeFaultChangeType;
+@end
+
 @interface CHIPGeneralCommissioningClusterBasicCommissioningInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
 - (instancetype)init;

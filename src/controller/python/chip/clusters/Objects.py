@@ -9256,6 +9256,64 @@ class PowerSource(Cluster):
             value: 'uint' = 0
 
 
+    class Events:
+        @dataclass
+        class WiredFaultChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="wiredFaultChangeType", Tag=1, Type=PowerSource.Structs.WiredFaultChangeType),
+                    ])
+
+            wiredFaultChangeType: 'PowerSource.Structs.WiredFaultChangeType' = field(default_factory=lambda: PowerSource.Structs.WiredFaultChangeType())
+
+        @dataclass
+        class BatFaultChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="batFaultChangeType", Tag=1, Type=PowerSource.Structs.BatFaultChangeType),
+                    ])
+
+            batFaultChangeType: 'PowerSource.Structs.BatFaultChangeType' = field(default_factory=lambda: PowerSource.Structs.BatFaultChangeType())
+
+        @dataclass
+        class BatChargeFaultChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="batChargeFaultChangeType", Tag=1, Type=PowerSource.Structs.BatChargeFaultChangeType),
+                    ])
+
+            batChargeFaultChangeType: 'PowerSource.Structs.BatChargeFaultChangeType' = field(default_factory=lambda: PowerSource.Structs.BatChargeFaultChangeType())
+
 
 @dataclass
 class GeneralCommissioning(Cluster):

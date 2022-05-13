@@ -2543,6 +2543,11 @@ typedef NS_ENUM(uint32_t, MatterClusterEventIDType) {
     kMatterClusterOtaSoftwareUpdateRequestorEventVersionAppliedID = 0x00000001,
     kMatterClusterOtaSoftwareUpdateRequestorEventDownloadErrorID = 0x00000002,
 
+    // Cluster PowerSource events
+    kMatterClusterPowerSourceEventWiredFaultChangeID = 0x00000000,
+    kMatterClusterPowerSourceEventBatFaultChangeID = 0x00000001,
+    kMatterClusterPowerSourceEventBatChargeFaultChangeID = 0x00000002,
+
     // Cluster GeneralDiagnostics events
     kMatterClusterGeneralDiagnosticsEventHardwareFaultChangeID = 0x00000000,
     kMatterClusterGeneralDiagnosticsEventRadioFaultChangeID = 0x00000001,

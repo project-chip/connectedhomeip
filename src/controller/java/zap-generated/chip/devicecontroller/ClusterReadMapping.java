@@ -6839,6 +6839,18 @@ public class ClusterReadMapping {
     readPowerSourceConfigurationInteractionInfo.put(
         "readAttributeListAttribute",
         readPowerSourceConfigurationAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceConfigurationFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceConfigurationFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceConfigurationCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPowerSourceConfigurationFeatureMapCommandParams);
+    readPowerSourceConfigurationInteractionInfo.put(
+        "readFeatureMapAttribute", readPowerSourceConfigurationFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readPowerSourceConfigurationClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readPowerSourceConfigurationClusterRevisionAttributeInteractionInfo =

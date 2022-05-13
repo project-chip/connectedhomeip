@@ -63,7 +63,6 @@ limitations under the License.
     <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryChargingCurrent</attribute>
     <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="ENUM8" length="16" writable="false" optional="true">ActiveBatteryChargeFaults</attribute>
 
-    <!-- TODO: Do events work?
     <event code="0x0000" name="WiredFaultChange" priority="info" side="server">
       <description>The WiredFaultChange Event SHALL indicate a change in the set of wired faults currently detected by the Node on this wired power source.</description>
       <field id="1" name="WiredFaultChangeType" type="WiredFaultChangeType"/>
@@ -78,7 +77,6 @@ limitations under the License.
       <description>The BatChargeFaultChange Event SHALL indicate a change in the set of charge faults currently detected by the Node on this battery power source.</description>
       <field id="1" name="BatChargeFaultChangeType" type="BatChargeFaultChangeType"/>
     </event>
-    -->
 
   </cluster>
 

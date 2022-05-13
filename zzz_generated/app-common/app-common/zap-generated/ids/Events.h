@@ -93,6 +93,24 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
 
+namespace PowerSource {
+namespace Events {
+
+namespace WiredFaultChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace WiredFaultChange
+
+namespace BatFaultChange {
+static constexpr EventId Id = 0x00000001;
+} // namespace BatFaultChange
+
+namespace BatChargeFaultChange {
+static constexpr EventId Id = 0x00000002;
+} // namespace BatChargeFaultChange
+
+} // namespace Events
+} // namespace PowerSource
+
 namespace GeneralDiagnostics {
 namespace Events {
 

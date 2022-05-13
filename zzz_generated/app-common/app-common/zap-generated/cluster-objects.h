@@ -10336,6 +10336,107 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace WiredFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kWiredFaultChangeType = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::WiredFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::WiredFaultChangeType::Type wiredFaultChangeType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::WiredFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+
+    Structs::WiredFaultChangeType::DecodableType wiredFaultChangeType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace WiredFaultChange
+namespace BatFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kBatFaultChangeType = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BatFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::BatFaultChangeType::Type batFaultChangeType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BatFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+
+    Structs::BatFaultChangeType::DecodableType batFaultChangeType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BatFaultChange
+namespace BatChargeFaultChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields
+{
+    kBatChargeFaultChangeType = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BatChargeFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::BatChargeFaultChangeType::Type batChargeFaultChangeType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::BatChargeFaultChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+
+    Structs::BatChargeFaultChangeType::DecodableType batChargeFaultChangeType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace BatChargeFaultChange
+} // namespace Events
 } // namespace PowerSource
 namespace GeneralCommissioning {
 namespace Structs {

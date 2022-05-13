@@ -1822,6 +1822,9 @@ public final class ChipIdLookup {
       if (attributeId == 65531L) {
         return "AttributeList";
       }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
       if (attributeId == 65533L) {
         return "ClusterRevision";
       }

@@ -428,6 +428,39 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPPowerSourceClusterWiredFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _wiredFaultChangeType = [CHIPPowerSourceClusterWiredFaultChangeType new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerSourceClusterBatFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _batFaultChangeType = [CHIPPowerSourceClusterBatFaultChangeType new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPPowerSourceClusterBatChargeFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _batChargeFaultChangeType = [CHIPPowerSourceClusterBatChargeFaultChangeType new];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPGeneralCommissioningClusterBasicCommissioningInfo
 - (instancetype)init
 {

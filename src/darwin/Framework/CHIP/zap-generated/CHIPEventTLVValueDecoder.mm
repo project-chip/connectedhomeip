@@ -1395,6 +1395,156 @@ id CHIPDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRea
         using namespace Clusters::PowerSource;
         switch (aPath.mEventId) {
 
+        case Events::WiredFaultChange::Id: {
+            Events::WiredFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            CHIPPowerSourceClusterWiredFaultChangeEvent * value = [CHIPPowerSourceClusterWiredFaultChangeEvent new];
+
+            do {
+                CHIPPowerSourceClusterWiredFaultChangeType * _Nonnull memberValue;
+                memberValue = [CHIPPowerSourceClusterWiredFaultChangeType new];
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.wiredFaultChangeType.current.begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        NSNumber * newElement_1;
+                        newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue.current = array_1;
+                }
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.wiredFaultChangeType.previous.begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        NSNumber * newElement_1;
+                        newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue.previous = array_1;
+                }
+                value.wiredFaultChangeType = memberValue;
+            } while (0);
+
+            return value;
+        }
+
+        case Events::BatFaultChange::Id: {
+            Events::BatFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            CHIPPowerSourceClusterBatFaultChangeEvent * value = [CHIPPowerSourceClusterBatFaultChangeEvent new];
+
+            do {
+                CHIPPowerSourceClusterBatFaultChangeType * _Nonnull memberValue;
+                memberValue = [CHIPPowerSourceClusterBatFaultChangeType new];
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.batFaultChangeType.current.begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        NSNumber * newElement_1;
+                        newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue.current = array_1;
+                }
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.batFaultChangeType.previous.begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        NSNumber * newElement_1;
+                        newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue.previous = array_1;
+                }
+                value.batFaultChangeType = memberValue;
+            } while (0);
+
+            return value;
+        }
+
+        case Events::BatChargeFaultChange::Id: {
+            Events::BatChargeFaultChange::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+
+            CHIPPowerSourceClusterBatChargeFaultChangeEvent * value = [CHIPPowerSourceClusterBatChargeFaultChangeEvent new];
+
+            do {
+                CHIPPowerSourceClusterBatChargeFaultChangeType * _Nonnull memberValue;
+                memberValue = [CHIPPowerSourceClusterBatChargeFaultChangeType new];
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.batChargeFaultChangeType.current.begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        NSNumber * newElement_1;
+                        newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue.current = array_1;
+                }
+                { // Scope for our temporary variables
+                    auto * array_1 = [NSMutableArray new];
+                    auto iter_1 = cppValue.batChargeFaultChangeType.previous.begin();
+                    while (iter_1.Next()) {
+                        auto & entry_1 = iter_1.GetValue();
+                        NSNumber * newElement_1;
+                        newElement_1 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1)];
+                        [array_1 addObject:newElement_1];
+                    }
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    memberValue.previous = array_1;
+                }
+                value.batChargeFaultChangeType = memberValue;
+            } while (0);
+
+            return value;
+        }
+
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH;
             break;
