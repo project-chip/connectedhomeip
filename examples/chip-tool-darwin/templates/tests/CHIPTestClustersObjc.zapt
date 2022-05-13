@@ -1,6 +1,6 @@
 {{> header}}
 
-#import <CHIP/CHIPClustersObjc.h>
+#import <CHIP/CHIP.h>
 
 @class CHIPDevice;
 
