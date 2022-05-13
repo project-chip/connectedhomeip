@@ -575,38 +575,38 @@ CHIP_ERROR MinMdnsResolver::SendPendingBrowseQueries()
 
         mdns::Minimal::FullQName qname;
 
-        switch (attempt.Value().browse.type)
+        switch (attempt.Value().BrowseData().type)
         {
         case DiscoveryType::kOperational:
             qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
             break;
         case DiscoveryType::kCommissionableNode:
-            if (attempt.Value().browse.filter.type == DiscoveryFilterType::kNone)
+            if (attempt.Value().BrowseData().filter.type == DiscoveryFilterType::kNone)
             {
                 qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
             }
-            else if (attempt.Value().browse.filter.type == DiscoveryFilterType::kInstanceName)
+            else if (attempt.Value().BrowseData().filter.type == DiscoveryFilterType::kInstanceName)
             {
-                qname = CheckAndAllocateQName(attempt.Value().browse.filter.instanceName, kCommissionableServiceName,
+                qname = CheckAndAllocateQName(attempt.Value().BrowseData().filter.instanceName, kCommissionableServiceName,
                                               kCommissionProtocol, kLocalDomain);
             }
             else
             {
                 char subtypeStr[Common::kSubTypeMaxLength + 1];
-                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().browse.filter));
+                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().BrowseData().filter));
                 qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
                                               kLocalDomain);
             }
             break;
         case DiscoveryType::kCommissionerNode:
-            if (attempt.Value().browse.filter.type == DiscoveryFilterType::kNone)
+            if (attempt.Value().BrowseData().filter.type == DiscoveryFilterType::kNone)
             {
                 qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
             }
             else
             {
                 char subtypeStr[Common::kSubTypeMaxLength + 1];
-                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().browse.filter));
+                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().BrowseData().filter));
                 qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
                                               kLocalDomain);
             }
@@ -747,7 +747,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             char nameBuffer[kMaxOperationalServiceNameSize] = "";
 
             // Node and fabricid are encoded in server names.
-            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), resolve.Value().peerId));
+            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), resolve.Value().ResolveData().peerId));
 
             const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
             Query query(instanceQName);
