@@ -36,6 +36,10 @@
 #include <common/CHIPDeviceManager.h>
 #include <lib/dnssd/Advertiser.h>
 
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#include <app-common/zap-generated/cluster-id.h>
+#endif
+
 static const char * TAG = "app-devicecallbacks";
 
 using namespace ::chip;
