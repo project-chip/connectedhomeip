@@ -28,7 +28,7 @@ namespace chip {
 /*
  * The out_buf is null-terminated on success.
  *
- * The resulting size of the out_buf span will not include the null terminator.
+ * The resulting size of the out_buf span will be the size of data written and not including the null terminator.
  */
 CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf);
 

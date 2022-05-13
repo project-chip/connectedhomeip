@@ -27,14 +27,14 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags);
 /**
  * Creates a null-terminated QR code from the payload created based on rendezvous flag information.
  *
- * The resulting size of the QR code span will not include the null terminator.
+ * The resulting size of the QR code span will be the size of data written and not including the null terminator.
  */
 CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, chip::RendezvousInformationFlags aRendezvousFlags);
 
 /**
  * Creates a null-terminated QR code based on the provided payload.
  *
- * The resulting size of the QR code span will not include the null terminator.
+ * The resulting size of the QR code span will be the size of data written and not including the null terminator.
  */
 CHIP_ERROR GetQRCode(chip::MutableCharSpan & aQRCode, const chip::PayloadContents & payload);
 
@@ -46,14 +46,14 @@ CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const chip::CharS
 /**
  * Creates a null-terminated manual pairing code from the payload created based on rendezvous flag information.
  *
- * The resulting size of the manual pairing code span will not include the null terminator.
+ * The resulting size of the manual pairing code span will be the size of data written and not including the null terminator.
  */
 CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
 
 /**
  * Creates a null-terminated manual pairing code based on the provided payload.
  *
- * The resulting size of the manual pairing code span will not include the null terminator.
+ * The resulting size of the manual pairing code span will be the size of data written and not including the null terminator.
  */
 CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, const chip::PayloadContents & payload);
 
