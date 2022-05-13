@@ -111,6 +111,18 @@ public:
 
                 return a.peerId == b.peerId;
             }
+
+            if (resolveData.Is<IpResolve>())
+            {
+                if (!other.resolveData.Is<IpResolve>())
+                {
+                    return false;
+                }
+                auto & a = resolveData.Get<IpResolve>();
+                auto & b = other.resolveData.Get<IpResolve>();
+
+                return a.hostName == b.hostName;
+            }
             return false;
         }
 

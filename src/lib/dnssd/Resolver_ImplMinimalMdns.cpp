@@ -485,8 +485,17 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
                                        bool firstSend)
 {
 
-    // FIXME: implement
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    Query query(data.hostName.Content());
+
+    query
+        .SetClass(QClass::IN)           //
+        .SetType(QType::AAAA)           //
+        .SetAnswerViaUnicast(firstSend) //
+        ;
+
+    builder.AddQuery(query);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt & attempt)

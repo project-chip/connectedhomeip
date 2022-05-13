@@ -126,7 +126,7 @@ public:
     ///
     /// VALIDITY: since this references data inside `this` it is only valid
     ///           as long as `this` is valid.
-    FullQName Content()
+    FullQName Content() const
     {
         FullQName result;
 
