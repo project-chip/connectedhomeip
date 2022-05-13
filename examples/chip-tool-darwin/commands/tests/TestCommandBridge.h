@@ -19,6 +19,8 @@
 #pragma once
 
 #include "../common/CHIPCommandBridge.h"
+#include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
@@ -58,6 +60,8 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
                           public ConstraintsChecker,
                           public PICSChecker,
+                          public DelayCommands,
+                          public LogCommands,
                           public SystemCommands {
 public:
     TestCommandBridge(const char * _Nonnull commandName)
@@ -98,37 +102,19 @@ public:
         SetCommandExitStatus(err);
     }
 
-    void Log(const char * _Nullable identity, const chip::app::Clusters::LogCommands::Commands::Log::Type & value)
+    /////////// DelayCommands Interface /////////
+    void OnWaitForMs() override
     {
-        NSLog(@"%.*s", static_cast<int>(value.message.size()), value.message.data());
-        NextTest();
-    }
-
-    /////////// DelayCommands-like Interface /////////
-    void WaitForMs(unsigned int ms)
-    {
-        chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-        value.ms = ms;
-        WaitForMs(nil, value);
-    }
-
-    void WaitForMs(const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
-    {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, value.ms * NSEC_PER_MSEC), mCallbackQueue, ^{
+        dispatch_async(mCallbackQueue, ^{
             NextTest();
         });
     }
 
-    void UserPrompt(const char * _Nullable identity, const chip::app::Clusters::LogCommands::Commands::UserPrompt::Type & value)
-    {
-        NextTest();
-    }
-
-    void WaitForCommissionee(
-        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
+    CHIP_ERROR WaitForCommissionee(const char * _Nullable identity,
+        const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override
     {
         CHIPDeviceController * controller = GetCommissioner(identity);
-        VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
 
@@ -152,6 +138,7 @@ public:
                          mConnectedDevices[identity] = device;
                          NextTest();
                      }];
+        return CHIP_NO_ERROR;
     }
 
     /////////// CommissionerCommands-like Interface /////////
@@ -183,8 +170,9 @@ public:
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
         if (CHIP_NO_ERROR == err) {
-            WaitForMs(0);
-
+            dispatch_async(mCallbackQueue, ^{
+                NextTest();
+            });
         } else {
             Exit(chip::ErrorStr(err), err);
         }

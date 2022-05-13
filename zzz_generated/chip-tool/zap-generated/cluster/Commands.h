@@ -7409,6 +7409,7 @@ private:
 | * MaxRFIDCodeLength                                                 | 0x0019 |
 | * MinRFIDCodeLength                                                 | 0x001A |
 | * CredentialRulesSupport                                            | 0x001B |
+| * NumberOfCredentialsSupportedPerUser                               | 0x001C |
 | * EnableLogging                                                     | 0x0020 |
 | * Language                                                          | 0x0021 |
 | * LEDSettings                                                       | 0x0022 |
@@ -22097,12 +22098,14 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "number-of-year-day-schedules-supported-per-user",
                                    Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-holiday-schedules-supported", Attributes::NumberOfHolidaySchedulesSupported::Id,
-                                   credsIssuerConfig),                                                                           //
-        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig),   //
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "number-of-credentials-supported-per-user",
+                                   Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),                           //
@@ -22199,7 +22202,9 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id,
-                                        credsIssuerConfig),                                                         //
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "number-of-credentials-supported-per-user",
+                                        Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),         //

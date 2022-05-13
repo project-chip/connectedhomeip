@@ -25,6 +25,7 @@
 #import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIPDeviceController+XPC.h>
 #import <CHIP/CHIPDeviceController.h>
+#import <CHIP/CHIPDeviceControllerStartupParams.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>
 #import <CHIP/CHIPError.h>
 #import <CHIP/CHIPKeypair.h>

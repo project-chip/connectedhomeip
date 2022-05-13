@@ -27,7 +27,7 @@
 
 #include "Options.h"
 
-int ChipLinuxAppInit(int argc, char ** argv, chip::ArgParser::OptionSet * customOptions = nullptr);
+int ChipLinuxAppInit(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
 void ChipLinuxAppMainLoop();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

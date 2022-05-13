@@ -20,12 +20,18 @@
 #import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPControllerAccessControl.h"
 #import "CHIPDeviceController.h"
+#import "CHIPDeviceControllerStartupParams.h"
+#import "CHIPDeviceControllerStartupParams_Internal.h"
 #import "CHIPDeviceController_Internal.h"
 #import "CHIPLogging.h"
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
+#import "MTRCertificates.h"
+#import "NSDataSpanConversion.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/OperationalCredentialsDelegate.h>
+#include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -57,7 +63,25 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 @property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) NSMutableArray<CHIPDeviceController *> * controllers;
 
+- (BOOL)findMatchingFabric:(FabricTable &)fabricTable
+                    params:(CHIPDeviceControllerStartupParams *)params
+                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric;
 @end
+
+// Conver a ByteSpan representing a Matter TLV certificate into NSData holding a
+// DER X.509 certificate.  Returns nil on failures.
+static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
+{
+    uint8_t buf[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan derCert(buf);
+    CHIP_ERROR err = Credentials::ConvertChipCertToX509Cert(cert, derCert);
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Failed do convert Matter certificate to X.509 DER: %s", ErrorStr(err));
+        return nil;
+    }
+
+    return AsData(derCert);
+}
 
 @implementation MatterControllerFactory
 
@@ -255,6 +279,20 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
+    // Make a copy of the startup params, because we're going to fill
+    // out various optional fields and we don't want to modify what
+    // the caller passed us, especially from another work queue.
+    auto * params = [[CHIPDeviceControllerStartupParamsInternal alloc] initWithKeypair:startupParams.nocSigner
+                                                                              fabricId:startupParams.fabricId
+                                                                                   ipk:startupParams.ipk];
+    if (params == nil) {
+        return nil;
+    }
+    params.vendorId = startupParams.vendorId;
+    params.nodeId = startupParams.nodeId;
+    params.rootCertificate = startupParams.rootCertificate;
+    params.intermediateCertificate = startupParams.intermediateCertificate;
+
     // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
@@ -264,19 +302,14 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     __block BOOL okToStart = NO;
     dispatch_sync(_chipWorkQueue, ^{
         FabricTable fabricTable;
-        if (fabricTable.Init(_persistentStorageDelegateBridge) != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't start on existing fabric: fabric table init failed");
+        FabricInfo * fabric = nullptr;
+        BOOL ok = [self findMatchingFabric:fabricTable params:params fabric:&fabric];
+        if (!ok) {
+            CHIP_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
             return;
         }
 
-        CHIPP256KeypairBridge keypairBridge;
-        if (keypairBridge.Init(startupParams.rootCAKeypair) != CHIP_NO_ERROR) {
-            return;
-        }
-        auto * fabric
-            = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
-
-        if (!fabric) {
+        if (fabric == nullptr) {
             CHIP_LOG_ERROR("Can't start on existing fabric: fabric not found");
             return;
         }
@@ -294,6 +327,102 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             }
         }
 
+        // Fill out our params.
+        if (params.vendorId == nil) {
+            params.vendorId = @(fabric->GetVendorId());
+        }
+
+        if (params.nodeId == nil) {
+            params.nodeId = @(fabric->GetNodeId());
+            ByteSpan noc;
+            CHIP_ERROR err = fabric->GetNOCCert(noc);
+            if (err != CHIP_NO_ERROR) {
+                CHIP_LOG_ERROR("Failed to get existing NOC: %s", ErrorStr(err));
+                return;
+            }
+            params.operationalCertificate = MatterCertToX509Data(noc);
+            if (params.operationalCertificate == nil) {
+                CHIP_LOG_ERROR("Failed to convert TLV NOC to DER X.509: %s", ErrorStr(err));
+                return;
+            }
+            if (fabric->GetOperationalKey() == nullptr) {
+                CHIP_LOG_ERROR("No existing operational key for fabric");
+                return;
+            }
+            params.operationalKeypair = new Crypto::P256SerializedKeypair();
+            if (params.operationalKeypair == nullptr) {
+                CHIP_LOG_ERROR("Failed to allocate serialized keypair");
+                return;
+            }
+
+            err = fabric->GetOperationalKey()->Serialize(*params.operationalKeypair);
+            if (err != CHIP_NO_ERROR) {
+                CHIP_LOG_ERROR("Failed to serialize operational keypair: %s", ErrorStr(err));
+                return;
+            }
+        }
+
+        NSData * oldIntermediateCert = nil;
+        {
+            ByteSpan icaCert;
+            CHIP_ERROR err = fabric->GetICACert(icaCert);
+            if (err != CHIP_NO_ERROR) {
+                CHIP_LOG_ERROR("Failed to get existing intermediate certificate: %s", ErrorStr(err));
+                return;
+            }
+            // There might not be an ICA cert for this fabric.
+            if (!icaCert.empty()) {
+                oldIntermediateCert = MatterCertToX509Data(icaCert);
+                if (oldIntermediateCert == nil) {
+                    return;
+                }
+            }
+        }
+
+        if (params.intermediateCertificate == nil && oldIntermediateCert != nil) {
+            // It's possible that we are switching from using an ICA cert to
+            // not using one.  We can detect this case by checking whether the
+            // provided nocSigner matches the ICA cert.
+            if ([MTRCertificates keypair:params.nocSigner matchesCertificate:oldIntermediateCert] == YES) {
+                // Keep using the existing intermediate certificate.
+                params.intermediateCertificate = oldIntermediateCert;
+            }
+            // else presumably the nocSigner matches the root (will be
+            // verified later) and we are no longer using an intermediate.
+        }
+
+        // If we are changing from having an ICA to not having one, or changing
+        // from having one to not having one, or changing the identity of our
+        // ICA, we need to generate a new NOC.  But we can keep our existing
+        // operational keypair and node id; nothing is forcing us to rotate
+        // those.
+        if ((oldIntermediateCert == nil) != (params.intermediateCertificate == nil)
+            || ((oldIntermediateCert != nil) &&
+                [MTRCertificates isCertificate:oldIntermediateCert equalTo:params.intermediateCertificate] == NO)) {
+            params.operationalCertificate = nil;
+        }
+
+        NSData * oldRootCert;
+        {
+            ByteSpan rootCert;
+            CHIP_ERROR err = fabric->GetRootCert(rootCert);
+            if (err != CHIP_NO_ERROR) {
+                CHIP_LOG_ERROR("Failed to get existing root certificate: %s", ErrorStr(err));
+                return;
+            }
+            oldRootCert = MatterCertToX509Data(rootCert);
+            if (oldRootCert == nil) {
+                return;
+            }
+        }
+
+        if (params.rootCertificate == nil) {
+            params.rootCertificate = oldRootCert;
+        } else if ([MTRCertificates isCertificate:oldRootCert equalTo:params.rootCertificate] == NO) {
+            CHIP_LOG_ERROR("Root certificate identity does not match existing root certificate");
+            return;
+        }
+
         okToStart = YES;
     });
 
@@ -302,8 +431,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    // TODO: Pass in the existing NOC and whatnot, as needed.
-    BOOL ok = [controller startup:startupParams];
+    BOOL ok = [controller startup:params];
     if (ok == NO) {
         return nil;
     }
@@ -318,6 +446,30 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
+    if (startupParams.vendorId == nil) {
+        CHIP_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
+        return nil;
+    }
+
+    if (startupParams.intermediateCertificate != nil && startupParams.rootCertificate == nil) {
+        CHIP_LOG_ERROR("Must provide a root certificate when using an intermediate certificate");
+        return nil;
+    }
+
+    // Make a copy of the startup params, because we're going to fill
+    // out various optional fields and we don't want to modify what
+    // the caller passed us, especially from another work queue.
+    auto * params = [[CHIPDeviceControllerStartupParamsInternal alloc] initWithKeypair:startupParams.nocSigner
+                                                                              fabricId:startupParams.fabricId
+                                                                                   ipk:startupParams.ipk];
+    if (params == nil) {
+        return nil;
+    }
+    params.vendorId = startupParams.vendorId;
+    params.nodeId = startupParams.nodeId;
+    params.rootCertificate = startupParams.rootCertificate;
+    params.intermediateCertificate = startupParams.intermediateCertificate;
+
     // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
@@ -327,21 +479,36 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     __block BOOL okToStart = NO;
     dispatch_sync(_chipWorkQueue, ^{
         FabricTable fabricTable;
-        if (fabricTable.Init(_persistentStorageDelegateBridge) != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't start on new fabric: storage can't read fabric table");
+        FabricInfo * fabric = nullptr;
+        BOOL ok = [self findMatchingFabric:fabricTable params:params fabric:&fabric];
+        if (!ok) {
+            CHIP_LOG_ERROR("Can't start on new fabric: fabric matching failed");
             return;
         }
 
-        CHIPP256KeypairBridge keypairBridge;
-        if (keypairBridge.Init(startupParams.rootCAKeypair) != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't start controller without a usable public key");
-            return;
-        }
-        auto * fabric
-            = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
-        if (fabric) {
+        if (fabric != nullptr) {
             CHIP_LOG_ERROR("Can't start on new fabric that matches existing fabric");
             return;
+        }
+
+        if (params.nodeId == nil) {
+            // Just avoid setting the top bit, to avoid issues with node
+            // ids outside the operational range.
+            uint64_t nodeId = arc4random();
+            nodeId = (nodeId << 31) | (arc4random() >> 1);
+            params.nodeId = @(nodeId);
+        }
+
+        if (params.rootCertificate == nil) {
+            NSError * error;
+            params.rootCertificate = [MTRCertificates generateRootCertificate:params.nocSigner
+                                                                     issuerId:nil
+                                                                     fabricId:@(params.fabricId)
+                                                                        error:&error];
+            if (error != nil || params.rootCertificate == nil) {
+                CHIP_LOG_ERROR("Failed to generate root certificate: %@", error);
+                return;
+            }
         }
 
         okToStart = YES;
@@ -352,7 +519,7 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    BOOL ok = [controller startup:startupParams];
+    BOOL ok = [controller startup:params];
     if (ok == NO) {
         return nil;
     }
@@ -379,6 +546,45 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     [_controllers addObject:controller];
 
     return controller;
+}
+
+// Finds a fabric that matches the given params, if one exists.
+//
+// Returns NO on failure, YES on success.  If YES is returned, the
+// outparam will be written to, but possibly with a null value.
+//
+// fabricTable should be an un-initialized fabric table.  It needs to
+// outlive the consumer's use of the FabricInfo we return, which is
+// why it's provided by the caller.
+- (BOOL)findMatchingFabric:(FabricTable &)fabricTable
+                    params:(CHIPDeviceControllerStartupParams *)params
+                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric
+{
+    CHIP_ERROR err = fabricTable.Init(_persistentStorageDelegateBridge);
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
+        return NO;
+    }
+
+    Crypto::P256PublicKey pubKey;
+    if (params.rootCertificate != nil) {
+        err = ExtractPubkeyFromX509Cert(AsByteSpan(params.rootCertificate), pubKey);
+        if (err != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't extract public key from root certificate: %s", ErrorStr(err));
+            return NO;
+        }
+    } else {
+        // No root certificate means the nocSigner is using the root keys, because
+        // consumers must provide a root certificate whenever an ICA is used.
+        err = CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.pubkey, &pubKey);
+        if (err != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't extract public key from CHIPKeypair: %s", ErrorStr(err));
+            return NO;
+        }
+    }
+
+    *fabric = fabricTable.FindFabric(Credentials::P256PublicKeySpan(pubKey.ConstBytes()), params.fabricId);
+    return YES;
 }
 
 @end
