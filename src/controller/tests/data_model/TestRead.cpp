@@ -958,13 +958,13 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
     {
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 120,
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
                            onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(90), [&]() {
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
         return numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
             numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
     });
@@ -1288,13 +1288,13 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     {
         NL_TEST_ASSERT(apSuite,
                        Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 120,
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
                            onSubscriptionEstablishedCb, false, true, dataVersion) == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(90), [&]() {
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
         return numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
             numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
     });
