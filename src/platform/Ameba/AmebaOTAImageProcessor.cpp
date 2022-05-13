@@ -322,7 +322,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
 
             // Erase target partition
             ChipLogProgress(SoftwareUpdate, "Erasing partition");
-            imageProcessor->NewFWBlkSize = ((0x1F8000 - 1) / 4096) + 1; // Use a fixed image length of 0xF8000, change in the future
+            imageProcessor->NewFWBlkSize = ((0x1AC000 - 1) / 4096) + 1; // Use a fixed image length of 0x1AC000, change in the future
             ChipLogProgress(SoftwareUpdate, "Erasing %d sectors", imageProcessor->NewFWBlkSize);
             device_mutex_lock(RT_DEV_LOCK_FLASH);
             for (int i = 0; i < imageProcessor->NewFWBlkSize; i++)
