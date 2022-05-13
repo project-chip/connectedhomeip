@@ -110,9 +110,8 @@ static CHIPDeviceController * sController = nil;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys ipk:testKeys.ipk];
-    params.vendorId = kTestVendorId;
-    params.fabricId = 1;
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);

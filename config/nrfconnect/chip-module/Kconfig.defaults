@@ -169,7 +169,7 @@ config BT_BUF_ACL_TX_SIZE
 
 config BT_RX_STACK_SIZE
     int
-    default 1120
+    default 1200
 
 # Enable NFC support
 
