@@ -37,7 +37,6 @@ RUN apt-get update \
   sudo=1.8.31-1ubuntu1.2 \
   wireless-tools=30~pre9-13ubuntu1 \
   wpasupplicant=2:2.9-1ubuntu4.3 \
-  systemd \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
   && git clone https://github.com/openthread/ot-br-posix . \
   && git checkout $OT_BR_POSIX_CHECKOUT \
