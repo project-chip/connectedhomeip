@@ -318,6 +318,7 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
+        self._persistentStorage = None
         self.Call(lambda: self._ChipStackLib.pychip_Stack_Shutdown())
         self.networkLock = None
         self.completeEvent = None
