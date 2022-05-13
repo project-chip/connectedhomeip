@@ -74,6 +74,7 @@ bool sHaveBLEConnections  = false;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 AppTask AppTask::sAppTask;
 
