@@ -186,7 +186,7 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
     {
         if (resolver.IsActive() && (resolver.GetRecordName() == data.GetName()))
         {
-            ChipLogDetail(Discovery, "SRV record already actively procssed.");
+            ChipLogDetail(Discovery, "SRV record already actively processed.");
             return;
         }
     }
