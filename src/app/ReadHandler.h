@@ -282,7 +282,7 @@ private:
     bool IsActiveSubscription() const { return mFlags.Has(ReadHandlerFlags::ActiveSubscription); }
     bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
+    void GetSubscriptionId(uint32_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
     /**
@@ -428,7 +428,7 @@ private:
     // engine, the "oldest" subscription is the subscription with the smallest generation.
     uint64_t mSubscriptionStartGeneration = 0;
 
-    SubscriptionId mSubscriptionId      = 0;
+    uint32_t mSubscriptionId            = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
 

@@ -1052,8 +1052,8 @@ void ParseReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser reportDataParser;
 
-    bool suppressResponse               = false;
-    chip::SubscriptionId subscriptionId = 0;
+    bool suppressResponse   = false;
+    uint32_t subscriptionId = 0;
     AttributeReportIBs::Parser attributeReportIBsParser;
     EventReportIBs::Parser eventReportsParser;
     bool moreChunkedMessages = false;
@@ -1353,10 +1353,10 @@ void ParseSubscribeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader &
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SubscribeResponseMessage::Parser subscribeResponseParser;
-    chip::SubscriptionId subscriptionId = 0;
-    uint16_t minIntervalFloorSeconds    = 0;
-    uint16_t maxIntervalCeilingSeconds  = 0;
-    err                                 = subscribeResponseParser.Init(aReader);
+    uint32_t subscriptionId            = 0;
+    uint16_t minIntervalFloorSeconds   = 0;
+    uint16_t maxIntervalCeilingSeconds = 0;
+    err                                = subscribeResponseParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = subscribeResponseParser.CheckSchemaValidity();

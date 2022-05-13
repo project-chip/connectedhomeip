@@ -124,7 +124,7 @@ public:
          *
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
-        virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
+        virtual void OnSubscriptionEstablished(uint32_t aSubscriptionId) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -312,7 +312,7 @@ private:
         SubscriptionActive,        ///< The client is maintaining subscription
     };
 
-    bool IsMatchingClient(SubscriptionId aSubscriptionId)
+    bool IsMatchingClient(uint32_t aSubscriptionId)
     {
         return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
     }
@@ -383,7 +383,7 @@ private:
     bool mPendingMoreChunks             = false;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
-    SubscriptionId mSubscriptionId      = 0;
+    uint32_t mSubscriptionId            = 0;
     NodeId mPeerNodeId                  = kUndefinedNodeId;
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;

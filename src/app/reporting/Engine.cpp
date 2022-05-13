@@ -446,7 +446,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
-        SubscriptionId subscriptionId = 0;
+        uint32_t subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
         reportDataBuilder.SubscriptionId(subscriptionId);
     }

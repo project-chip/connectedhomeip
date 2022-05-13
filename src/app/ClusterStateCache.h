@@ -569,10 +569,7 @@ private:
         return mCallback.OnDone();
     }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
-    {
-        mCallback.OnSubscriptionEstablished(aSubscriptionId);
-    }
+    void OnSubscriptionEstablished(uint32_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
