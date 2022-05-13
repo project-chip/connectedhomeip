@@ -362,7 +362,7 @@ void ApplicationInit()
     {
         gOtaProvider.SetPollInterval(gPollInterval);
     }
-    
+
     ChipLogDetail(SoftwareUpdate, "Using ImageList file: %s", gOtaImageListFilepath ? gOtaImageListFilepath : "(none)");
 
     if (gOtaImageListFilepath != nullptr)

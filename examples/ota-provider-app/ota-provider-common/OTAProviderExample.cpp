@@ -275,7 +275,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
                                              commandObj->GetSubjectDescriptor().subject) == CHIP_NO_ERROR)
         {
             CHIP_ERROR error = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
-                                                                bdxFlags, kMaxBdxBlockSize, kBdxTimeout, 
+                                                                bdxFlags, kMaxBdxBlockSize, kBdxTimeout,
                                                                 chip::System::Clock::Milliseconds32(mPollInterval));
             if (error != CHIP_NO_ERROR)
             {
