@@ -67,17 +67,20 @@ void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & dat
 
 void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
 {
-    ScheduledAttempt attempt(peerId, /* firstSend */ true);
-    MarkPending(attempt);
+    MarkPending(ScheduledAttempt(peerId, /* firstSend */ true));
 }
 
 void ActiveResolveAttempts::MarkPending(const chip::Dnssd::DiscoveryFilter & filter, const chip::Dnssd::DiscoveryType type)
 {
-    ScheduledAttempt attempt(filter, type, /* firstSend */ true);
-    MarkPending(attempt);
+    MarkPending(ScheduledAttempt(filter, type, /* firstSend */ true));
 }
 
-void ActiveResolveAttempts::MarkPending(const ScheduledAttempt & attempt)
+void ActiveResolveAttempts::MarkPending(ScheduledAttempt::IpResolve && resolve)
+{
+    MarkPending(ScheduledAttempt(std::move(resolve), /* firstSend */ true));
+}
+
+void ActiveResolveAttempts::MarkPending(ScheduledAttempt && attempt)
 {
     // Strategy when picking the peer id to use:
     //   1 if a matching peer id is already found, use that one

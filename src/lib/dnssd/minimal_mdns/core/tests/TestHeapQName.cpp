@@ -62,8 +62,26 @@ void Construction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void Copying(nlTestSuite * inSuite, void * inContext)
+{
+    const testing::TestQName<2> kShort({ "some", "test" });
+
+    HeapQName name1(kShort.Serialized());
+    HeapQName name2(name1);
+    HeapQName name3;
+
+    name3 = name2;
+
+    NL_TEST_ASSERT(inSuite, name1.IsOk());
+    NL_TEST_ASSERT(inSuite, name2.IsOk());
+    NL_TEST_ASSERT(inSuite, name3.IsOk());
+    NL_TEST_ASSERT(inSuite, name1.Content() == name2.Content());
+    NL_TEST_ASSERT(inSuite, name1.Content() == name3.Content());
+}
+
 static const nlTest sTests[] = {               //
     NL_TEST_DEF("Construction", Construction), //
+    NL_TEST_DEF("Copying", Copying),           //
     NL_TEST_SENTINEL()
 };
 

@@ -34,6 +34,7 @@ namespace Minimal {
 class HeapQName
 {
 public:
+    HeapQName() {}
     HeapQName(SerializedQNameIterator name)
     {
         // Storage is:
@@ -77,27 +78,49 @@ public:
         }
         mIsOk = true;
     }
-    HeapQName(const HeapQName &) = delete;
-    HeapQName & operator=(const HeapQName &) = delete;
 
-    ~HeapQName()
+    HeapQName(const HeapQName & other) { *this = other; }
+
+    HeapQName & operator=(const HeapQName & other)
     {
+        Free();
+
+        if (!other)
+        {
+            return *this; // No point in copying the other value
+        }
+
+        mElementCount = other.mElementCount;
+        mElementPointers.Alloc(other.mElementCount);
         if (!mElementPointers)
         {
-            return;
+            return *this;
         }
 
         for (size_t i = 0; i < mElementCount; i++)
         {
-            if (mElementPointers[i] != nullptr)
+            mElementPointers[i] = nullptr;
+        }
+
+        for (size_t i = 0; i < mElementCount; i++)
+        {
+            const char * other_data = other.mElementPointers[i];
+            mElementPointers[i]     = chip::Platform::MemoryAllocString(other_data, strlen(other_data));
+            if (!mElementPointers[i])
             {
-                chip::Platform::MemoryFree(mElementPointers[i]);
-                mElementPointers[i] = nullptr;
+                return *this;
             }
         }
+        mIsOk = true;
+        return *this;
     }
 
+    ~HeapQName() { Free(); }
+
     bool IsOk() const { return mIsOk; }
+
+    operator bool() const { return IsOk(); }
+    bool operator!() const { return !IsOk(); }
 
     /// Returns the contained FullQName.
     ///
@@ -114,6 +137,25 @@ public:
     }
 
 private:
+    void Free()
+    {
+        if (!mElementPointers)
+        {
+            return;
+        }
+
+        for (size_t i = 0; i < mElementCount; i++)
+        {
+            if (mElementPointers[i] != nullptr)
+            {
+                chip::Platform::MemoryFree(mElementPointers[i]);
+                mElementPointers[i] = nullptr;
+            }
+        }
+        mElementPointers.Free();
+        mIsOk = false;
+    }
+
     bool mIsOk = false;
     size_t mElementCount;
     chip::Platform::ScopedMemoryBuffer<char *> mElementPointers;

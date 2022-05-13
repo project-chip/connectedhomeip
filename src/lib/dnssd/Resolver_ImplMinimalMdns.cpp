@@ -46,95 +46,6 @@ constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
 
-/// Contructs a FullQName from a SerializedNameIterator
-///
-/// Generally a conversion from an iterator to a `const char *[]`
-
-class FullQNameWrapper
-{
-public:
-    FullQNameWrapper(SerializedQNameIterator name)
-    {
-        // Storage is:
-        //    - separate pointers into mElementPointers
-        //    - allocated pointers inside that
-        mElementCount = 0;
-
-        SerializedQNameIterator it = name;
-        while (it.Next())
-        {
-            // Count all elements
-            mElementCount++;
-        }
-
-        if (!it.IsValid())
-        {
-            return;
-        }
-
-        mElementPointers.Alloc(mElementCount);
-        if (!mElementPointers)
-        {
-            return;
-        }
-        // ensure all set to null since we may need to free
-        for (size_t i = 0; i < mElementCount; i++)
-        {
-            mElementPointers[i] = nullptr;
-        }
-
-        it         = name;
-        size_t idx = 0;
-        while (it.Next())
-        {
-            mElementPointers[idx] = Platform::MemoryAllocString(it.Value(), strlen(it.Value()));
-            if (!mElementPointers[idx])
-            {
-                return;
-            }
-        }
-        mIsOk = true;
-    }
-
-    ~FullQNameWrapper()
-    {
-        if (!mElementPointers)
-        {
-            return;
-        }
-
-        for (size_t i = 0; i < mElementCount; i++)
-        {
-            if (mElementPointers[i] != nullptr)
-            {
-                Platform::MemoryFree(mElementPointers[i]);
-                mElementPointers[i] = nullptr;
-            }
-        }
-    }
-
-    bool IsOk() const { return mIsOk; }
-
-    /// Returns the contained FullQName.
-    ///
-    /// VALIDITY: since this references data inside `this` it is only valid
-    ///           as long as `this` is valid.
-    FullQName Content()
-    {
-        FullQName result;
-
-        result.names     = mElementPointers.Get();
-        result.nameCount = mElementCount;
-
-        return result;
-    }
-
-private:
-    bool mIsOk = false;
-    size_t mElementCount;
-    Platform::ScopedMemoryBuffer<char *> mElementPointers;
-};
-
 /// Handles processing of minmdns packet data.
 ///
 /// Can process multiple incremental resolves based on SRV data and allows
@@ -349,18 +260,21 @@ private:
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
 
-    CHIP_ERROR SendPendingResolveQueries();
-    CHIP_ERROR SendPendingBrowseQueries();
-    CHIP_ERROR SendPendingIpAddressQueries();
+    void ScheduleIpAddressResolve(SerializedQNameIterator hostName);
+
     CHIP_ERROR SendAllPendingQueries();
     CHIP_ERROR ScheduleRetries();
 
-    // Any active resolves that still need their AAAA address
-    bool NeedsMoreIPaddresses();
+    /// Prepare a query for the given schedule attempt
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt & attempt);
+
+    /// Prepare a query for specific resolve types
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data, bool firstSend);
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Resolve & data, bool firstSend);
+    CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::IpResolve & data, bool firstSend);
 
     static void RetryCallback(System::Layer *, void * self);
 
-    CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type, bool unicastResponse);
     CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
     template <typename... Args>
     mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
@@ -376,21 +290,15 @@ private:
     char qnameStorage[kMaxQnameSize];
 };
 
-bool MinMdnsResolver::NeedsMoreIPaddresses()
+void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 {
-    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    HeapQName target(hostName);
+    if (!target.IsOk())
     {
-        if (!resolver->IsActive())
-        {
-            continue;
-        }
-        if (resolver->GetMissingRequiredInformation().Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
-        {
-            return true;
-        }
+        ChipLogError(Discovery, "Memory allocation error for IP address resolution");
+        return;
     }
-
-    return false;
+    mActiveResolves.MarkPending(ActiveResolveAttempts::ScheduledAttempt::IpResolve(std::move(target)));
 }
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -410,7 +318,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
 
         if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
         {
-            // Processed later
+            ScheduleIpAddressResolve(resolver->GetTargetHostName());
             continue;
         }
 
@@ -494,50 +402,146 @@ void MinMdnsResolver::Shutdown()
     GlobalMinimalMdnsServer::Instance().ShutdownServer();
 }
 
-CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type, bool unicastResponse)
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data,
+                                       bool firstSend)
 {
-    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+    mdns::Minimal::FullQName qname;
 
-    QueryBuilder builder(std::move(buffer));
-    builder.Header().SetMessageId(0);
+    switch (data.type)
+    {
+    case DiscoveryType::kOperational:
+        qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+        break;
+    case DiscoveryType::kCommissionableNode:
+        if (data.filter.type == DiscoveryFilterType::kNone)
+        {
+            qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else if (data.filter.type == DiscoveryFilterType::kInstanceName)
+        {
+            qname = CheckAndAllocateQName(data.filter.instanceName, kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else
+        {
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), data.filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
+                                          kLocalDomain);
+        }
+        break;
+    case DiscoveryType::kCommissionerNode:
+        if (data.filter.type == DiscoveryFilterType::kNone)
+        {
+            qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
+        }
+        else
+        {
+            char subtypeStr[Common::kSubTypeMaxLength + 1];
+            ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), data.filter));
+            qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
+                                          kLocalDomain);
+        }
+        break;
+    case DiscoveryType::kUnknown:
+        break;
+    }
+
+    ReturnErrorCodeIf(!qname.nameCount, CHIP_ERROR_NO_MEMORY);
 
     mdns::Minimal::Query query(qname);
-    query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
-    query.SetAnswerViaUnicast(unicastResponse);
+    query
+        .SetClass(QClass::IN)           //
+        .SetType(QType::ANY)            //
+        .SetAnswerViaUnicast(firstSend) //
+        ;
+    builder.AddQuery(query);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Resolve & data,
+                                       bool firstSend)
+{
+    char nameBuffer[kMaxOperationalServiceNameSize] = "";
+
+    // Node and fabricid are encoded in server names.
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), data.peerId));
+
+    const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+    Query query(instanceQName);
+
+    query
+        .SetClass(QClass::IN)           //
+        .SetType(QType::ANY)            //
+        .SetAnswerViaUnicast(firstSend) //
+        ;
 
     builder.AddQuery(query);
 
-    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
 
-    if (unicastResponse)
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::IpResolve & data,
+                                       bool firstSend)
+{
+
+    // FIXME: implement
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt & attempt)
+{
+    if (attempt.IsResolve())
     {
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        ReturnErrorOnFailure(BuildQuery(builder, attempt.ResolveData(), attempt.firstSend));
+    }
+    else if (attempt.IsBrowse())
+    {
+        ReturnErrorOnFailure(BuildQuery(builder, attempt.BrowseData(), attempt.firstSend));
+    }
+    else if (attempt.IsIpResolve())
+    {
+        ReturnErrorOnFailure(BuildQuery(builder, attempt.IpResolveData(), attempt.firstSend));
     }
     else
     {
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
 {
-    CHIP_ERROR browseErr    = SendPendingBrowseQueries();
-    CHIP_ERROR resolveErr   = SendPendingResolveQueries();
-    CHIP_ERROR ipAddressErr = SendPendingIpAddressQueries();
-
-    if (resolveErr != CHIP_NO_ERROR)
+    while (true)
     {
-        return resolveErr;
+        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
+
+        if (!resolve.HasValue())
+        {
+            break;
+        }
+
+        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
+        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+        QueryBuilder builder(std::move(buffer));
+        builder.Header().SetMessageId(0);
+
+        ReturnErrorOnFailure(BuildQuery(builder, resolve.Value()));
+
+        if (resolve.Value().firstSend)
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
+        }
+        else
+        {
+            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        }
     }
 
-    if (browseErr != CHIP_NO_ERROR)
-    {
-        return browseErr;
-    }
-
-    return ipAddressErr;
+    return ScheduleRetries();
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -554,146 +558,14 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
 {
     mActiveResolves.MarkPending(filter, type);
 
-    return SendPendingBrowseQueries();
-}
-
-CHIP_ERROR MinMdnsResolver::SendPendingBrowseQueries()
-{
-    CHIP_ERROR returnErr = CHIP_NO_ERROR;
-    while (true)
-    {
-        Optional<ActiveResolveAttempts::ScheduledAttempt> attempt = mActiveResolves.NextScheduled();
-
-        if (!attempt.HasValue())
-        {
-            break;
-        }
-        if (!attempt.Value().IsBrowse())
-        {
-            continue;
-        }
-
-        mdns::Minimal::FullQName qname;
-
-        switch (attempt.Value().BrowseData().type)
-        {
-        case DiscoveryType::kOperational:
-            qname = CheckAndAllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-            break;
-        case DiscoveryType::kCommissionableNode:
-            if (attempt.Value().BrowseData().filter.type == DiscoveryFilterType::kNone)
-            {
-                qname = CheckAndAllocateQName(kCommissionableServiceName, kCommissionProtocol, kLocalDomain);
-            }
-            else if (attempt.Value().BrowseData().filter.type == DiscoveryFilterType::kInstanceName)
-            {
-                qname = CheckAndAllocateQName(attempt.Value().BrowseData().filter.instanceName, kCommissionableServiceName,
-                                              kCommissionProtocol, kLocalDomain);
-            }
-            else
-            {
-                char subtypeStr[Common::kSubTypeMaxLength + 1];
-                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().BrowseData().filter));
-                qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
-                                              kLocalDomain);
-            }
-            break;
-        case DiscoveryType::kCommissionerNode:
-            if (attempt.Value().BrowseData().filter.type == DiscoveryFilterType::kNone)
-            {
-                qname = CheckAndAllocateQName(kCommissionerServiceName, kCommissionProtocol, kLocalDomain);
-            }
-            else
-            {
-                char subtypeStr[Common::kSubTypeMaxLength + 1];
-                ReturnErrorOnFailure(MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), attempt.Value().BrowseData().filter));
-                qname = CheckAndAllocateQName(subtypeStr, kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
-                                              kLocalDomain);
-            }
-            break;
-        case DiscoveryType::kUnknown:
-            break;
-        }
-        if (!qname.nameCount)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        bool unicastResponse = attempt.Value().firstSend;
-
-        CHIP_ERROR err = SendQuery(qname, mdns::Minimal::QType::ANY, unicastResponse);
-        if (err != CHIP_NO_ERROR)
-        {
-            // We want to continue sending, but we do want this error returned
-            returnErr = err;
-        }
-    }
-    ReturnErrorOnFailure(ScheduleRetries());
-    return returnErr;
-}
-
-CHIP_ERROR MinMdnsResolver::SendPendingIpAddressQueries()
-{
-    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
-    {
-        if (!resolver->IsActive())
-        {
-            continue;
-        }
-
-        if (!resolver->GetMissingRequiredInformation().Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
-        {
-            continue;
-        }
-
-        ChipLogProgress(Discovery, "Requesting addional IP address");
-
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-        constexpr bool kUseUnicast = false;
-
-        QueryBuilder builder(std::move(buffer));
-        builder.Header().SetMessageId(0);
-        {
-            FullQNameWrapper wrapper(resolver->GetTargetHostName());
-
-            if (!wrapper.IsOk())
-            {
-                ChipLogError(Discovery, "Failed to construct IP query for given target host name");
-                resolver->ResetToInactive();
-                continue;
-            }
-
-            Query query(wrapper.Content());
-
-            query
-                .SetClass(QClass::IN)             //
-                .SetType(QType::AAAA)             //
-                .SetAnswerViaUnicast(kUseUnicast) //
-                ;
-            builder.AddQuery(query);
-        }
-
-        ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
-        if (kUseUnicast)
-        {
-            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
-        }
-        else
-        {
-            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
-        }
-    }
-
-    return CHIP_NO_ERROR;
+    return SendAllPendingQueries();
 }
 
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     mActiveResolves.MarkPending(peerId);
 
-    return SendPendingResolveQueries();
+    return SendAllPendingQueries();
 }
 
 CHIP_ERROR MinMdnsResolver::ScheduleRetries()
@@ -702,12 +574,6 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
     Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
-
-    if (NeedsMoreIPaddresses())
-    {
-        // send a request for IP addresses as quickly as possible.
-        delay = Optional<System::Clock::Timeout>::Value(0);
-    }
 
     if (!delay.HasValue())
     {
@@ -720,73 +586,6 @@ CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 void MinMdnsResolver::RetryCallback(System::Layer *, void * self)
 {
     reinterpret_cast<MinMdnsResolver *>(self)->SendAllPendingQueries();
-}
-
-CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
-{
-    while (true)
-    {
-        Optional<ActiveResolveAttempts::ScheduledAttempt> resolve = mActiveResolves.NextScheduled();
-
-        if (!resolve.HasValue())
-        {
-            break;
-        }
-        if (!resolve.Value().IsResolve())
-        {
-            continue;
-        }
-
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
-        ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-        QueryBuilder builder(std::move(buffer));
-        builder.Header().SetMessageId(0);
-
-        {
-            char nameBuffer[kMaxOperationalServiceNameSize] = "";
-
-            // Node and fabricid are encoded in server names.
-            ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), resolve.Value().ResolveData().peerId));
-
-            const char * instanceQName[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-            Query query(instanceQName);
-
-            query
-                .SetClass(QClass::IN)                           //
-                .SetType(QType::ANY)                            //
-                .SetAnswerViaUnicast(resolve.Value().firstSend) //
-                ;
-
-            // NOTE: type above is NOT A or AAAA because the name searched for is
-            // a SRV record. The layout is:
-            //    SRV -> hostname
-            //    Hostname -> A
-            //    Hostname -> AAAA
-            //
-            // Query is sent for ANY and expectation is to receive A/AAAA records
-            // in the additional section of the reply.
-            //
-            // Sending a A/AAAA query will return no results
-            // Sending a SRV query will return the srv only and an additional query
-            // would be needed to resolve the host name to an IP address
-
-            builder.AddQuery(query);
-        }
-
-        ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
-
-        if (resolve.Value().firstSend)
-        {
-            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
-        }
-        else
-        {
-            ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
-        }
-    }
-
-    return ScheduleRetries();
 }
 
 MinMdnsResolver gResolver;
