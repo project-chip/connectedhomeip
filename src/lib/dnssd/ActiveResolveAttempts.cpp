@@ -65,6 +65,18 @@ void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & dat
     }
 }
 
+void ActiveResolveAttempts::CompleteIpResolution(SerializedQNameIterator targetHostName)
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.MatchesIpResolve(targetHostName))
+        {
+            item.attempt.Clear();
+            return;
+        }
+    }
+}
+
 void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
 {
     MarkPending(ScheduledAttempt(peerId, /* firstSend */ true));

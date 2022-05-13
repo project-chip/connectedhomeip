@@ -126,6 +126,10 @@ public:
             return false;
         }
 
+        bool MatchesIpResolve(SerializedQNameIterator hostName) const
+        {
+            return resolveData.Is<IpResolve>() && (hostName == resolveData.Get<IpResolve>().hostName.Content());
+        }
         bool Matches(const chip::PeerId & peer) const
         {
             return resolveData.Is<Resolve>() && (resolveData.Get<Resolve>().peerId == peer);
@@ -170,6 +174,7 @@ public:
                 return false;
             }
         }
+
         bool IsEmpty() const { return !resolveData.Valid(); }
         bool IsResolve() const { return resolveData.Is<Resolve>(); }
         bool IsBrowse() const { return resolveData.Is<Browse>(); }
@@ -197,6 +202,7 @@ public:
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
     void Complete(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
     /// Mark that a resolution is pending, adding it to the internal list
     ///
