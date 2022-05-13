@@ -985,6 +985,7 @@ PlatformManagerImpl
 plt
 png
 PollControl
+pollInterval
 polymorphism
 POSIX
 PosixConfig
