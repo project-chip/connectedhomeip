@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.dnssd.DiscoveredNodeData;
+import com.chip.casting.platform.MatterCallbackHandler;
 import com.chip.casting.util.GlobalCastingConstants;
 
 /** A {@link Fragment} to get the TV Casting App commissioned. */
@@ -18,6 +19,10 @@ public class CommissioningFragment extends Fragment {
 
   private final TvCastingApp tvCastingApp;
   private final DiscoveredNodeData selectedCommissioner;
+
+  private boolean initServerSuccess;
+  private boolean openCommissioningWindowSuccess;
+  private boolean sendUdcSuccess;
 
   public CommissioningFragment(TvCastingApp tvCastingApp, DiscoveredNodeData selectedCommissioner) {
     this.tvCastingApp = tvCastingApp;
@@ -43,40 +48,68 @@ public class CommissioningFragment extends Fragment {
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    // Inflate the layout for this fragment
+    Callback callback = (CommissioningFragment.Callback) this.getActivity();
+    this.initServerSuccess =
+        tvCastingApp.initServer(
+            new MatterCallbackHandler() {
+              @Override
+              public boolean handle(boolean success) {
+                Log.d(
+                    TAG, "handle() called on CommissioningComplete event with success " + success);
+                if (success) {
+                  callback.handleCommissioningComplete();
+                }
+                return true;
+              }
+            });
+
+    if (this.initServerSuccess) {
+      this.openCommissioningWindowSuccess =
+          tvCastingApp.openBasicCommissioningWindow(
+              GlobalCastingConstants.CommissioningWindowDurationSecs);
+      if (this.openCommissioningWindowSuccess) {
+        if (selectedCommissioner != null && selectedCommissioner.getNumIPs() > 0) {
+          String ipAddress = selectedCommissioner.getIpAddresses().get(0).getHostAddress();
+          Log.d(
+              TAG,
+              "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest with IP: "
+                  + ipAddress
+                  + " port: "
+                  + selectedCommissioner.getPort());
+
+          this.sendUdcSuccess =
+              tvCastingApp.sendUserDirectedCommissioningRequest(
+                  ipAddress, selectedCommissioner.getPort());
+        }
+      }
+    }
     return inflater.inflate(R.layout.fragment_commissioning, container, false);
   }
 
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-
-    tvCastingApp.initServer();
-
     String commissioningWindowStatus = "Failed to open commissioning window";
-    if (tvCastingApp.openBasicCommissioningWindow(
-        GlobalCastingConstants.CommissioningWindowDurationSecs)) {
-      commissioningWindowStatus = "Commissioning window has been opened. Commission manually.";
-      if (selectedCommissioner != null && selectedCommissioner.getNumIPs() > 0) {
-        String ipAddress = selectedCommissioner.getIpAddresses().get(0).getHostAddress();
-        Log.d(
-            TAG,
-            "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest with IP: "
-                + ipAddress
-                + " port: "
-                + selectedCommissioner.getPort());
-
-        if (tvCastingApp.sendUserDirectedCommissioningRequest(
-            ipAddress, selectedCommissioner.getPort())) {
+    if (this.initServerSuccess) {
+      if (this.openCommissioningWindowSuccess) {
+        commissioningWindowStatus = "Commissioning window has been opened. Commission manually.";
+        if (this.sendUdcSuccess) {
           commissioningWindowStatus =
               "Commissioning window has been opened. Commissioning requested from "
                   + selectedCommissioner.getDeviceName();
         }
+        TextView onboardingPayloadView = getView().findViewById(R.id.onboardingPayload);
+        onboardingPayloadView.setText("Onboarding PIN: " + GlobalCastingConstants.SetupPasscode);
       }
-      TextView onboardingPayloadView = getView().findViewById(R.id.onboardingPayload);
-      onboardingPayloadView.setText("Onboarding PIN: " + GlobalCastingConstants.SetupPasscode);
     }
+
     TextView commissioningWindowStatusView = getView().findViewById(R.id.commissioningWindowStatus);
     commissioningWindowStatusView.setText(commissioningWindowStatus);
+  }
+
+  /** Interface for notifying the host. */
+  public interface Callback {
+    /** Notifies listener to trigger transition on completion of commissioning */
+    void handleCommissioningComplete();
   }
 }

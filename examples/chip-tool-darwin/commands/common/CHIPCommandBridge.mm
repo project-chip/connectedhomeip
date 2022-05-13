@@ -55,15 +55,14 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner ipk:ipk];
-        controllerParams.vendorId = chip::VendorId::TestVendor1;
-        controllerParams.fabricId = i + 1;
+        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner fabricId:(i + 1) ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
         auto controller = [factory startControllerOnExistingFabric:controllerParams];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
+            controllerParams.vendorId = @(chip::VendorId::TestVendor1);
             controller = [factory startControllerOnNewFabric:controllerParams];
         }
         if (controller == nil) {

@@ -41,6 +41,9 @@
 		513DDB8A2761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 513DDB892761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm */; };
 		51431AF927D2973E008A7943 /* CHIPIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* CHIPIMDispatch.mm */; };
 		51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
+		517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */ = {isa = PBXBuildFile; fileRef = 517BF3EE282B62B800A8B7DB /* MTRCertificates.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */; };
+		517BF3F3282B62CB00A8B7DB /* MatterCertificateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */; };
 		51B22C1E2740CB0A008D5055 /* CHIPStructsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C1D2740CB0A008D5055 /* CHIPStructsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C212740CB1D008D5055 /* CHIPCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C262740CB32008D5055 /* CHIPStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */; };
@@ -50,6 +53,9 @@
 		51E0310027EA20D20083DC9C /* CHIPControllerAccessControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E030FE27EA20D20083DC9C /* CHIPControllerAccessControl.h */; };
 		51E0310127EA20D20083DC9C /* CHIPControllerAccessControl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E030FF27EA20D20083DC9C /* CHIPControllerAccessControl.mm */; };
 		51E24E73274E0DAC007CCF6E /* CHIPErrorTestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */; };
+		51E51FBF282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E51FBC282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		51E51FC0282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E51FBD282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h */; };
+		51E51FC1282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E51FBE282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm */; };
 		5A60370827EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A60370727EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h */; };
 		5A6FEC9027B563D900F25F42 /* CHIPDeviceControllerOverXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC8F27B563D900F25F42 /* CHIPDeviceControllerOverXPC.m */; };
 		5A6FEC9227B5669C00F25F42 /* CHIPDeviceControllerOverXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */; };
@@ -146,6 +152,9 @@
 		513DDB892761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPAttributeTLVValueDecoder.mm; path = "zap-generated/CHIPAttributeTLVValueDecoder.mm"; sourceTree = "<group>"; };
 		51431AF827D2973E008A7943 /* CHIPIMDispatch.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPIMDispatch.mm; sourceTree = "<group>"; };
 		51431AFA27D29CA4008A7943 /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "../../../app/clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
+		517BF3EE282B62B800A8B7DB /* MTRCertificates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCertificates.h; sourceTree = "<group>"; };
+		517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRCertificates.mm; sourceTree = "<group>"; };
+		517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MatterCertificateTests.m; sourceTree = "<group>"; };
 		51B22C1D2740CB0A008D5055 /* CHIPStructsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPStructsObjc.h; path = "zap-generated/CHIPStructsObjc.h"; sourceTree = "<group>"; };
 		51B22C212740CB1D008D5055 /* CHIPCommandPayloadsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPCommandPayloadsObjc.h; path = "zap-generated/CHIPCommandPayloadsObjc.h"; sourceTree = "<group>"; };
 		51B22C252740CB32008D5055 /* CHIPStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPStructsObjc.mm; path = "zap-generated/CHIPStructsObjc.mm"; sourceTree = "<group>"; };
@@ -155,6 +164,9 @@
 		51E030FE27EA20D20083DC9C /* CHIPControllerAccessControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPControllerAccessControl.h; sourceTree = "<group>"; };
 		51E030FF27EA20D20083DC9C /* CHIPControllerAccessControl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPControllerAccessControl.mm; sourceTree = "<group>"; };
 		51E24E72274E0DAC007CCF6E /* CHIPErrorTestUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPErrorTestUtils.mm; sourceTree = "<group>"; };
+		51E51FBC282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerStartupParams.h; sourceTree = "<group>"; };
+		51E51FBD282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerStartupParams_Internal.h; sourceTree = "<group>"; };
+		51E51FBE282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceControllerStartupParams.mm; sourceTree = "<group>"; };
 		5A60370727EA1FF60020DB79 /* CHIPAttributeCacheContainer+XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CHIPAttributeCacheContainer+XPC.h"; sourceTree = "<group>"; };
 		5A6FEC8B27B5609C00F25F42 /* CHIPDeviceOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceOverXPC.h; sourceTree = "<group>"; };
 		5A6FEC8D27B5624E00F25F42 /* CHIPDeviceControllerOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceControllerOverXPC.h; sourceTree = "<group>"; };
@@ -335,9 +347,14 @@
 				991DC0872475F47D00C13860 /* CHIPDeviceController.mm */,
 				5136660F28067D540025EDAE /* CHIPDeviceController_Internal.h */,
 				5136661128067D540025EDAE /* MatterControllerFactory_Internal.h */,
+				51E51FBD282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h */,
+				51E51FBC282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h */,
+				51E51FBE282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm */,
 				5136661228067D550025EDAE /* MatterControllerFactory.h */,
 				5136661028067D540025EDAE /* MatterControllerFactory.mm */,
 				5A7947E227C0101200434CF2 /* CHIPDeviceController+XPC.h */,
+				517BF3EE282B62B800A8B7DB /* MTRCertificates.h */,
+				517BF3EF282B62B800A8B7DB /* MTRCertificates.mm */,
 				5A7947E327C0129500434CF2 /* CHIPDeviceController+XPC.m */,
 				B20252912459E34F00F97062 /* Info.plist */,
 				998F286C26D55E10001846C6 /* CHIPKeypair.h */,
@@ -367,6 +384,7 @@
 				5A7947DD27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m */,
 				B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */,
 				997DED1926955D0200975E97 /* CHIPThreadOperationalDatasetTests.mm */,
+				517BF3F2282B62CB00A8B7DB /* MatterCertificateTests.m */,
 				B202529D2459E34F00F97062 /* Info.plist */,
 			);
 			path = CHIPTests;
@@ -388,6 +406,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */,
+				51E51FBF282AD37A00FC978D /* CHIPDeviceControllerStartupParams.h in Headers */,
 				5136661628067D550025EDAE /* MatterControllerFactory.h in Headers */,
 				5A6FEC9927B5C88900F25F42 /* CHIPDeviceOverXPC.h in Headers */,
 				51B22C222740CB1D008D5055 /* CHIPCommandPayloadsObjc.h in Headers */,
@@ -426,6 +446,7 @@
 				1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */,
 				2C5EEEF6268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.h in Headers */,
 				2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */,
+				51E51FC0282AD37A00FC978D /* CHIPDeviceControllerStartupParams_Internal.h in Headers */,
 				998F286F26D55EC5001846C6 /* CHIPP256KeypairBridge.h in Headers */,
 				2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */,
 				51E0310027EA20D20083DC9C /* CHIPControllerAccessControl.h in Headers */,
@@ -574,7 +595,9 @@
 				1ED276E226C5812A00547A89 /* CHIPCluster.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */,
+				51E51FC1282AD37A00FC978D /* CHIPDeviceControllerStartupParams.mm in Sources */,
 				1ED276E026C57CF000547A89 /* CHIPCallbackBridge.mm in Sources */,
+				517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */,
 				5A6FEC9627B5983000F25F42 /* CHIPDeviceControllerXPCConnection.m in Sources */,
 				5ACDDD7D27CD16D200EFD68A /* CHIPAttributeCacheContainer.mm in Sources */,
 				513DDB8A2761F6F900DAA01A /* CHIPAttributeTLVValueDecoder.mm in Sources */,
@@ -606,6 +629,7 @@
 				5AE6D4E427A99041001F2493 /* CHIPDeviceTests.m in Sources */,
 				5A7947DE27BEC3F500434CF2 /* CHIPXPCListenerSampleTests.m in Sources */,
 				B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */,
+				517BF3F3282B62CB00A8B7DB /* MatterCertificateTests.m in Sources */,
 				51E24E73274E0DAC007CCF6E /* CHIPErrorTestUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -72,6 +72,10 @@ def checkout_modules(modules: list, shallow: bool) -> None:
     names = ', '.join(names)
     logging.info(f'Checking out: {names}')
 
+    # ensure no errors regarding ownership in the directory. Newer GIT seems to
+    # require this:
+    subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
+
     cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
     cmd += [module.path for module in modules]

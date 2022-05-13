@@ -36,7 +36,7 @@
 using namespace chip::ArgParser;
 
 static bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
-static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 static void HandleArgError(const char * msg, ...);
 static void ClearCallbackRecords();
 
@@ -701,7 +701,7 @@ static bool HandleOption(const char * progName, OptionSet * optSet, int id, cons
     return true;
 }
 
-static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+static bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
 #if DEBUG_TESTS
     // clang-format off
