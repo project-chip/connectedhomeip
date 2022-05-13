@@ -86,7 +86,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
+    CHIP_ERROR GetSubscriptionId(SubscriptionId * const apSubscriptionId) const;
 
     /**
      *  @brief Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
@@ -145,7 +145,7 @@ public:
      *
      *  @return A reference to *this
      */
-    ReportDataMessage::Builder & SubscriptionId(const uint64_t aSubscriptionId);
+    ReportDataMessage::Builder & SubscriptionId(const chip::SubscriptionId aSubscriptionId);
 
     /**
      *  @brief Initialize a AttributeReportIBs::Builder for writing into the TLV stream
