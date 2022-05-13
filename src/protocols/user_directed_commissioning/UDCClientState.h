@@ -58,10 +58,10 @@ class UDCClientState
 public:
     UDCClientState() : mPeerAddress(PeerAddress::Uninitialized()) {}
 
-    UDCClientState(UDCClientState &&)      = default;
-    UDCClientState(const UDCClientState &) = default;
+    UDCClientState(UDCClientState &&)                  = default;
+    UDCClientState(const UDCClientState &)             = default;
     UDCClientState & operator=(const UDCClientState &) = default;
-    UDCClientState & operator=(UDCClientState &&) = default;
+    UDCClientState & operator=(UDCClientState &&)      = default;
 
     const PeerAddress GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
@@ -85,8 +85,9 @@ public:
     size_t GetRotatingIdLength() const { return mRotatingIdLen; }
     void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
     {
-        memcpy(mRotatingId, rotatingId, rotatingIdLen);
-        mRotatingIdLen = rotatingIdLen;
+        size_t maxSize = ArraySize(mRotatingId);
+        mRotatingIdLen = (maxSize < rotatingIdLen) ? maxSize : rotatingIdLen;
+        memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
 
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }

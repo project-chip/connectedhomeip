@@ -3,6 +3,7 @@
 #include <nlunit-test.h>
 
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/dnssd/TxtFields.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -15,7 +16,16 @@
 
 using namespace chip;
 using namespace chip::Protocols::UserDirectedCommissioning;
+using namespace chip::Dnssd;
+using namespace chip::Dnssd::Internal;
 
+ByteSpan GetSpan(char * key)
+{
+    size_t len = strlen(key);
+    // Stop the string from being null terminated to ensure the code makes no assumptions.
+    key[len] = '1';
+    return ByteSpan(reinterpret_cast<uint8_t *>(key), len);
+}
 class DLL_EXPORT TestCallback : public UserConfirmationProvider, public InstanceNameResolver
 {
 public:
@@ -273,15 +283,28 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     const char * instanceName1 = "test1";
     Inet::IPAddress address;
     Inet::IPAddress::FromString("127.0.0.1", address);
-    uint16_t port                                                 = 333;
-    uint16_t longDiscriminator                                    = 1234;
-    uint16_t vendorId                                             = 1111;
-    uint16_t productId                                            = 2222;
-    const char * deviceName                                       = "test name";
-    uint8_t rotatingId[50]                                        = {};
-    size_t rotatingIdLen                                          = 0;
-    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "92873498273948734534";
-    Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+    uint16_t port              = 333;
+    uint16_t longDiscriminator = 1234;
+    uint16_t vendorId          = 1111;
+    uint16_t productId         = 2222;
+    const char * deviceName    = "test name";
+
+    // Rotating ID is given as up to 50 hex bytes
+    char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+    uint8_t rotatingId[chip::Dnssd::kMaxRotatingIdLen];
+    size_t rotatingIdLen;
+    strcpy(rotatingIdString, "92873498273948734534");
+    GetRotatingDeviceId(GetSpan(rotatingIdString), rotatingId, &rotatingIdLen);
+
+    // create a Rotating ID longer than kMaxRotatingIdLen
+    char rotatingIdLongString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
+    uint8_t rotatingIdLong[chip::Dnssd::kMaxRotatingIdLen];
+    size_t rotatingIdLongLen;
+    strcpy(rotatingIdLongString,
+           "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+    GetRotatingDeviceId(GetSpan(rotatingIdLongString), rotatingIdLong, &rotatingIdLongLen);
+
+    NL_TEST_ASSERT(inSuite, rotatingIdLongLen > chip::Dnssd::kMaxRotatingIdLen);
 
     // test base case
     UDCClientState * state = mUdcClients.FindUDCClientState(instanceName1);
@@ -317,6 +340,15 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     for (size_t i = 0; i < rotatingIdLen; i++)
     {
         NL_TEST_ASSERT(inSuite, testRotatingId[i] == rotatingId[i]);
+    }
+
+    state->SetRotatingId(rotatingIdLong, rotatingIdLongLen);
+    NL_TEST_ASSERT(inSuite, chip::Dnssd::kMaxRotatingIdLen == state->GetRotatingIdLength());
+
+    const uint8_t * testRotatingIdLong = state->GetRotatingId();
+    for (size_t i = 0; i < chip::Dnssd::kMaxRotatingIdLen; i++)
+    {
+        NL_TEST_ASSERT(inSuite, testRotatingIdLong[i] == rotatingIdLong[i]);
     }
 }
 
