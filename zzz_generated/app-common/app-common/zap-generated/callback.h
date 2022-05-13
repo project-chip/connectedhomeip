@@ -13433,6 +13433,8 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
  */
 bool emberAfDoorLockClusterGetCredentialStatusResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                bool credentialExists, uint16_t userIndex,
+                                                               chip::FabricIndex creatorFabricIndex,
+                                                               chip::FabricIndex lastModifiedFabricIndex,
                                                                uint16_t nextCredentialIndex);
 /**
  * @brief Door Lock Cluster ClearCredential Command callback (from client)

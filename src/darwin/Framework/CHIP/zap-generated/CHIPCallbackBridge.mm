@@ -12002,6 +12002,20 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
         }
     }
     {
+        if (data.creatorFabricIndex.IsNull()) {
+            response.creatorFabricIndex = nil;
+        } else {
+            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
+        }
+    }
+    {
+        if (data.lastModifiedFabricIndex.IsNull()) {
+            response.lastModifiedFabricIndex = nil;
+        } else {
+            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
+        }
+    }
+    {
         if (data.nextCredentialIndex.IsNull()) {
             response.nextCredentialIndex = nil;
         } else {

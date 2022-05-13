@@ -2096,6 +2096,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000001C: {
+                    "attributeName": "NumberOfCredentialsSupportedPerUser",
+                    "attributeId": 0x0000001C,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000021: {
                     "attributeName": "Language",
                     "attributeId": 0x00000021,
