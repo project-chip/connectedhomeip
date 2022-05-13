@@ -96,8 +96,7 @@ private:
         kRecordParsing,
     };
 
-    // TODO: use a CHIP constant here
-    static constexpr size_t kMinMdnsNumParallelResolvers = 2;
+    static constexpr size_t kMinMdnsNumParallelResolvers = CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES;
 
     // Individual parse set
     bool mIsResponse               = false;
