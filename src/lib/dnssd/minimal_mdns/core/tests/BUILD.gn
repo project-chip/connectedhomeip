@@ -32,9 +32,9 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestFlatAllocatedQName.cpp",
+    "TestHeapQName.cpp",
     "TestQName.cpp",
     "TestRecordWriter.cpp",
-    "TestHeapQName.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
