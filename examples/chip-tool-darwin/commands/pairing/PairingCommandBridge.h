@@ -22,6 +22,7 @@
 
 enum class PairingMode
 {
+    None,
     QRCode,
     ManualCode,
     Ethernet,
@@ -59,6 +60,8 @@ public:
 
         switch (mode)
         {
+        case PairingMode::None:
+            break;
         case PairingMode::QRCode:
             AddArgument("payload", &mOnboardingPayload);
             break;
@@ -86,6 +89,7 @@ private:
     void PairWithCode(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
     void PairWithIPAddress(NSError * __autoreleasing * error);
+    void Unpair();
     void SetUpPairingDelegate();
 
     const PairingMode mPairingMode;
