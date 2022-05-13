@@ -91,9 +91,9 @@ communicate with each other.
 To perform binding, you need a controller that can write the binding table to
 the light switch device and write proper ACL to the endpoint light bulb on the
 Lighting Example application. For example, you can use the CHIP Tool as the
-controller. The ACL should contain information about all clusters that can
-be called by the light switch application. See the section about interacting
-with ZCL clusters in the CHIP Tool's user guide for more information about ACLs.
+controller. The ACL should contain information about all clusters that can be
+called by the light switch application. See the section about interacting with
+ZCL clusters in the CHIP Tool's user guide for more information about ACLs.
 
 You can perform the binding process to a single remote endpoint (unicast
 binding) or to a group of remote endpoints (group multicast).
@@ -104,8 +104,8 @@ binding) or to a group of remote endpoints (group multicast).
 #### Unicast binding to a remote endpoint using the CHIP Tool
 
 In this scenario, commands are provided for a light switch device with the
-`nodeId = <light-switch-node-id>` and a light bulb device with `nodeId = <lighting-node-id>`,
-both commissioned to the same Matter network.
+`nodeId = <light-switch-node-id>` and a light bulb device with
+`nodeId = <lighting-node-id>`, both commissioned to the same Matter network.
 
 To perform the unicast binding process, complete the following steps:
 
@@ -135,10 +135,10 @@ To perform the unicast binding process, complete the following steps:
 
     In this command:
 
-    -   `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}` is a
-        binding for the On/Off cluster.
-    -   `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}` is a
-        binding for the Level Control cluster.
+    -   `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}`
+        is a binding for the On/Off cluster.
+    -   `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}`
+        is a binding for the Level Control cluster.
 
 #### Group multicast binding to the group of remote endpoints using the CHIP Tool
 
@@ -152,11 +152,13 @@ requests, and all of the devices in the bound groups can run the received
 command.
 
 In this scenario, commands are provided for a light switch device with the
-`nodeId = <light-switch-node-id>` and a light bulb device with `nodeId = <lighting-node-id>`, both commissioned to the same Matter network.
+`nodeId = <light-switch-node-id>` and a light bulb device with
+`nodeId = <lighting-node-id>`, both commissioned to the same Matter network.
 
 To perform the unicast binding process, complete the following steps:
 
-1.  Add an ACL to the lighting endpoint permissions by running the following command:
+1.  Add an ACL to the lighting endpoint permissions by running the following
+    command:
 
     ```bash
     $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [<light-switch-node-id>], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' <lighting-node-id> 0
@@ -173,23 +175,24 @@ To perform the unicast binding process, complete the following steps:
     This allows the lighting application device to receive commands from the
     light switch device.
 
-4.  Add the light switch device to the multicast group by running the following
+2.  Add the light switch device to the multicast group by running the following
     command:
 
     ```bash
     $ ./chip-tool tests TestGroupDemoConfig --nodeId <light-switch-node-id>
     ```
 
-5.  Add all light bulbs to the same multicast group by applying command below
+3.  Add all light bulbs to the same multicast group by applying command below
     for each of the light bulbs, using the appropriate `<lighting-node-id>` (the
-    user-defined ID of the node being commissioned except `<light-switch-node-id>`
-    due to use this `<light-switch-node-id>` for light-switch) for each of them:
+    user-defined ID of the node being commissioned except
+    `<light-switch-node-id>` due to use this `<light-switch-node-id>` for
+    light-switch) for each of them:
 
     ```bash
     $ ./chip-tool tests TestGroupDemoConfig --nodeId <lighting-node-id>
     ```
 
-6.  Add Binding commands for group multicast:
+4.  Add Binding commands for group multicast:
 
     ```bash
     $ ./chip-tool binding write binding '[{"fabricIndex": 1, "group": 257}]' <light-switch-node-id> 1
