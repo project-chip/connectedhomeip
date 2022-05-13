@@ -104,7 +104,7 @@ public:
         SetCommandExitStatus(mError);
     }
 
-    void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnSubscription(); }
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override { OnSubscription(); }
 
 protected:
     CHIP_ERROR ReportAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,

@@ -742,7 +742,7 @@ class AsyncWriteTransaction:
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
-_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
+_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint32)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint64, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
