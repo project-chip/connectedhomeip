@@ -60,9 +60,9 @@ enum class ServiceNameType
 };
 
 // Common prefix to check for all operational/commissioner/commissionable name parts
-constexpr QNamePart kOperationalSuffix[]         = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-constexpr QNamePart kCommissionableSuffix[]      = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
-constexpr QNamePart kCommissionerSuffix[]        = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
+constexpr QNamePart kOperationalSuffix[]    = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+constexpr QNamePart kCommissionableSuffix[] = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
+constexpr QNamePart kCommissionerSuffix[]   = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
 
 ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
 {
