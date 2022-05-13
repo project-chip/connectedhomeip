@@ -60,7 +60,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
+    CHIP_ERROR GetSubscriptionId(SubscriptionId * const apSubscriptionId) const;
 
     /**
      *  @brief Get Final MinIntervalFloorSeconds. Next() must be called before accessing them.
@@ -85,7 +85,7 @@ public:
     /**
      *  @brief final subscription Id for the subscription back to the client.s.
      */
-    SubscribeResponseMessage::Builder & SubscriptionId(const uint64_t SubscriptionId);
+    SubscribeResponseMessage::Builder & SubscriptionId(const chip::SubscriptionId SubscriptionId);
 
     /**
      *  @brief Final Min Interval for the subscription back to the clients.

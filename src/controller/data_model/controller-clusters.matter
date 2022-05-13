@@ -1183,6 +1183,7 @@ client cluster DoorLock = 257 {
     kDuplicate = 2;
     kOccupied = 3;
     kInvalidField = 133;
+    kResourceExhausted = 137;
     kNotFound = 139;
   }
 
@@ -1460,6 +1461,7 @@ client cluster DoorLock = 257 {
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
   readonly attribute int8u minRFIDCodeLength = 26;
+  readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
   attribute access(write: manage) int8u soundVolume = 36;
@@ -1629,7 +1631,9 @@ client cluster DoorLock = 257 {
   response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
+    nullable fabric_idx creatorFabricIndex = 2;
+    nullable fabric_idx lastModifiedFabricIndex = 3;
+    nullable INT16U nextCredentialIndex = 4;
   }
 
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;

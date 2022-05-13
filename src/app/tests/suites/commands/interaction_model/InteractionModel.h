@@ -25,42 +25,162 @@
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestUtils.h>
 
-class InteractionModel : public chip::app::ReadClient::Callback,
-                         public chip::app::WriteClient::Callback,
-                         public chip::app::CommandSender::Callback
+constexpr uint8_t kMaxAllowedPaths = 10;
+
+class InteractionModelReports
 {
 public:
-    InteractionModel() : mBufferedReadAdapter(*this), mChunkedWriteCallback(this){};
-    virtual ~InteractionModel(){};
+    InteractionModelReports(chip::app::ReadClient::Callback * callback) : mBufferedReadAdapter(*callback) {}
 
-    virtual void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) = 0;
-    virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
-    virtual chip::DeviceProxy * GetDevice(const char * identity)                             = 0;
+protected:
+    CHIP_ERROR ReadAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                             std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                             const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
+                             const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional)
+    {
+        return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
+                               fabricFiltered, dataVersions);
+    }
 
-    CHIP_ERROR ReadAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                             chip::AttributeId attributeId, bool fabricFiltered = true);
+    CHIP_ERROR SubscribeAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                                  std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                                  uint16_t minInterval = 0, uint16_t maxInterval = 0,
+                                  const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
+                                  const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
+                                  const chip::Optional<bool> & keepSubscriptions                      = chip::NullOptional)
+    {
+        return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Subscribe,
+                               minInterval, maxInterval, fabricFiltered, dataVersions, keepSubscriptions);
+    }
 
-    CHIP_ERROR SubscribeAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                  chip::AttributeId attributeId, uint16_t minInterval, uint16_t maxInterval,
-                                  bool fabricFiltered = true);
+    CHIP_ERROR ReportAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                               std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                               chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
+                               uint16_t maxInterval = 0, const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true),
+                               const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
+                               const chip::Optional<bool> & keepSubscriptions                      = chip::NullOptional);
 
-    CHIP_ERROR ReadEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
-                         bool fabricFiltered = true);
+    CHIP_ERROR ReadEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                         std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
+                         const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional)
+    {
+        return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
+                           eventNumber);
+    }
 
-    CHIP_ERROR SubscribeEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
-                              uint16_t minInterval, uint16_t maxInterval, bool fabricFiltered = true);
+    CHIP_ERROR SubscribeEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
+                              uint16_t minInterval = 0, uint16_t maxInterval = 0,
+                              const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
+                              const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional)
+    {
+        return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
+                           minInterval, maxInterval, eventNumber, keepSubscriptions);
+    }
 
-    CHIP_ERROR WaitForReport() { return CHIP_NO_ERROR; }
+    CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                           std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
+                           chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
+                           uint16_t maxInterval = 0, const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
+                           const chip::Optional<bool> & keepSubscriptions = chip::NullOptional);
+
+    void Shutdown()
+    {
+        mSubscribeClient.reset();
+        mReadClient.reset();
+    }
+
+    std::unique_ptr<chip::app::ReadClient> mReadClient;
+    std::unique_ptr<chip::app::ReadClient> mSubscribeClient;
+    chip::app::BufferedReadCallback mBufferedReadAdapter;
+};
+
+class InteractionModelCommands
+{
+public:
+    InteractionModelCommands(chip::app::CommandSender::Callback * callback) : mCallback(callback) {}
+
+protected:
+    template <class T>
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                           chip::CommandId commandId, const T & value,
+                           chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional,
+                           chip::Optional<uint16_t> repeatCount               = chip::NullOptional,
+                           chip::Optional<uint16_t> repeatDelayInMs           = chip::NullOptional,
+                           chip::Optional<bool> suppressResponse              = chip::NullOptional)
+    {
+        uint16_t repeat = repeatCount.ValueOr(1);
+        while (repeat--)
+        {
+
+            chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
+                                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+            auto commandSender = std::make_unique<chip::app::CommandSender>(mCallback, device->GetExchangeManager(),
+                                                                            timedInteractionTimeoutMs.HasValue());
+            VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, timedInteractionTimeoutMs,
+                                                                           suppressResponse.ValueOr(false)));
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
+            mCommandSender.push_back(std::move(commandSender));
+
+            if (repeatDelayInMs.HasValue())
+            {
+                chip::test_utils::SleepMillis(repeatDelayInMs.Value());
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
 
     template <class T>
-    CHIP_ERROR WriteAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                              chip::AttributeId attributeId, const T & value,
-                              chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional)
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
+                                chip::CommandId commandId, const T & value)
     {
-        chip::DeviceProxy * device = GetDevice(identity);
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        chip::app::CommandPathParams commandPath = { groupId, clusterId, commandId, (chip::app::CommandPathFlags::kGroupIdValid) };
 
+        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+        VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto commandSender = chip::Platform::MakeUnique<chip::app::CommandSender>(mCallback, exchangeManager, false);
+        VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, chip::NullOptional));
+
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(chip::SessionHandle(session)));
+        commandSender.release();
+
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown()
+    {
+        for (auto & commandSender : mCommandSender)
+        {
+            commandSender.reset();
+        }
+        mCommandSender.clear();
+    }
+
+    std::vector<std::unique_ptr<chip::app::CommandSender>> mCommandSender;
+    chip::app::CommandSender::Callback * mCallback;
+};
+
+class InteractionModelWriter
+{
+public:
+    InteractionModelWriter(chip::app::WriteClient::Callback * callback) : mChunkedWriteCallback(callback) {}
+
+protected:
+    template <class T>
+    CHIP_ERROR WriteAttribute(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                              chip::AttributeId attributeId, const T & value,
+                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs = chip::NullOptional,
+                              const chip::Optional<bool> & suppressResponse              = chip::NullOptional,
+                              const chip::Optional<chip::DataVersion> & dataVersion      = chip::NullOptional)
+    {
         chip::app::AttributePathParams attributePathParams;
         if (endpointId != chip::kInvalidEndpointId)
         {
@@ -78,23 +198,18 @@ public:
         }
 
         mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
-                                                                timedInteractionTimeoutMs);
+                                                                timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
         VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        // TODO: Add data version supports
-        chip::Optional<chip::DataVersion> dataVersion = chip::NullOptional;
         ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, dataVersion));
         return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
     }
 
     template <class T>
-    CHIP_ERROR WriteGroupAttribute(const char * identity, chip::GroupId groupId, chip::ClusterId clusterId,
+    CHIP_ERROR WriteGroupAttribute(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
                                    chip::AttributeId attributeId, const T & value,
-                                   chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional)
+                                   const chip::Optional<chip::DataVersion> & dataVersion = chip::NullOptional)
     {
-        chip::DeviceProxy * device = GetDevice(identity);
-        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
         chip::app::AttributePathParams attributePathParams;
 
         if (clusterId != chip::kInvalidClusterId)
@@ -107,17 +222,78 @@ public:
             attributePathParams.mAttributeId = attributeId;
         }
 
-        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
-                                                                timedInteractionTimeoutMs);
-        VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
+        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
+        VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        // TODO: Add data version supports
-        chip::Optional<chip::DataVersion> dataVersion = chip::NullOptional;
-        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, dataVersion));
+        auto writeClient =
+            chip::Platform::MakeUnique<chip::app::WriteClient>(exchangeManager, &mChunkedWriteCallback, chip::NullOptional);
+        VerifyOrReturnError(writeClient != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(writeClient->EncodeAttribute(attributePathParams, value, dataVersion));
+
+        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
+        ReturnErrorOnFailure(writeClient->SendWriteRequest(chip::SessionHandle(session)));
+        writeClient.release();
+
+        return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() { mWriteClient.reset(); }
+
+    std::unique_ptr<chip::app::WriteClient> mWriteClient;
+    chip::app::ChunkedWriteCallback mChunkedWriteCallback;
+};
+
+class InteractionModel : public InteractionModelReports,
+                         public InteractionModelCommands,
+                         public InteractionModelWriter,
+                         public chip::app::ReadClient::Callback,
+                         public chip::app::WriteClient::Callback,
+                         public chip::app::CommandSender::Callback
+{
+public:
+    InteractionModel() : InteractionModelReports(this), InteractionModelCommands(this), InteractionModelWriter(this){};
+    virtual ~InteractionModel(){};
+
+    virtual void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) = 0;
+    virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
+    virtual chip::DeviceProxy * GetDevice(const char * identity)                             = 0;
+
+    CHIP_ERROR ReadAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                             chip::AttributeId attributeId, bool fabricFiltered = true);
+
+    CHIP_ERROR SubscribeAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                  chip::AttributeId attributeId, uint16_t minInterval, uint16_t maxInterval,
+                                  bool fabricFiltered = true);
+
+    CHIP_ERROR ReadEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
+                         const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional);
+
+    CHIP_ERROR SubscribeEvent(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::EventId eventId,
+                              uint16_t minInterval, uint16_t maxInterval,
+                              const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional);
+
+    CHIP_ERROR WaitForReport() { return CHIP_NO_ERROR; }
+
+    template <class T>
+    CHIP_ERROR WriteAttribute(const char * identity, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                              chip::AttributeId attributeId, const T & value,
+                              chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional)
+    {
+        chip::DeviceProxy * device = GetDevice(identity);
+        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        return InteractionModelWriter::WriteAttribute(device, endpointId, clusterId, attributeId, value, timedInteractionTimeoutMs);
+    }
+
+    template <class T>
+    CHIP_ERROR WriteGroupAttribute(const char * identity, chip::GroupId groupId, chip::ClusterId clusterId,
+                                   chip::AttributeId attributeId, const T & value)
+    {
+        chip::DeviceProxy * device = GetDevice(identity);
+        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         chip::FabricIndex fabricIndex = device->GetSecureSession().Value()->GetFabricIndex();
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        return mWriteClient->SendWriteRequest(chip::SessionHandle(session));
+        return InteractionModelWriter::WriteGroupAttribute(groupId, fabricIndex, clusterId, attributeId, value);
     }
 
     template <class T>
@@ -127,34 +303,18 @@ public:
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        chip::app::CommandPathParams commandPath = { endpointId, 0 /* groupId */, clusterId, commandId,
-                                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
-        mCommandSender =
-            std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(), timedInteractionTimeoutMs.HasValue());
-        VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, timedInteractionTimeoutMs));
-        return mCommandSender->SendCommandRequest(device->GetSecureSession().Value());
+        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, timedInteractionTimeoutMs);
     }
 
     template <class T>
     CHIP_ERROR SendGroupCommand(const char * identity, chip::GroupId groupId, chip::ClusterId clusterId, chip::CommandId commandId,
-                                const T & value, chip::Optional<uint16_t> timedInteractionTimeoutMs = chip::NullOptional)
+                                const T & value)
     {
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        chip::app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, clusterId, commandId,
-                                                     (chip::app::CommandPathFlags::kGroupIdValid) };
-
-        mCommandSender =
-            std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(), timedInteractionTimeoutMs.HasValue());
-        VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-
         chip::FabricIndex fabricIndex = device->GetSecureSession().Value()->GetFabricIndex();
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        ReturnErrorOnFailure(mCommandSender->AddRequestDataNoTimedCheck(commandPath, value, timedInteractionTimeoutMs));
-        return mCommandSender->SendGroupCommandRequest(chip::SessionHandle(session));
+        return InteractionModelCommands::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, value);
     }
 
     void Shutdown();
@@ -166,7 +326,7 @@ public:
                      const chip::app::StatusIB * status) override;
     void OnError(CHIP_ERROR error) override;
     void OnDone() override;
-    void OnSubscriptionEstablished(uint64_t subscriptionId) override;
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override;
 
     /////////// WriteClient Callback Interface /////////
     void OnResponse(const chip::app::WriteClient * client, const chip::app::ConcreteDataAttributePath & path,
@@ -179,14 +339,4 @@ public:
                     const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
     void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
     void OnDone(chip::app::CommandSender * client) override;
-
-protected:
-    std::unique_ptr<chip::app::ReadClient> mReadClient;
-    // TODO: Add multiple subscriptions at the same time supports
-    std::unique_ptr<chip::app::ReadClient> mSubscribeClient;
-    std::unique_ptr<chip::app::WriteClient> mWriteClient;
-    std::unique_ptr<chip::app::CommandSender> mCommandSender;
-
-    chip::app::BufferedReadCallback mBufferedReadAdapter;
-    chip::app::ChunkedWriteCallback mChunkedWriteCallback;
 };

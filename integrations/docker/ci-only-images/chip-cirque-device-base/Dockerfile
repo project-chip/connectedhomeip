@@ -43,7 +43,6 @@ RUN apt-get update \
   && git submodule update --init --depth=1 \
   && ./script/bootstrap \
   && ./script/setup \
-  && chmod 644 /etc/bind/named.conf.options \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   git psmisc ninja-build cmake wget libreadline-dev libncurses-dev libcpputest-dev \
   libavahi-common-dev libavahi-client-dev libboost-dev libboost-filesystem-dev \

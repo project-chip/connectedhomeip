@@ -244,6 +244,12 @@ config CHIP_OTA_IMAGE_INCLUDE_MCUBOOT
 
 endif
 
+config CHIP_EXTENDED_DISCOVERY
+	bool "Enable extended discovery"
+	help
+	  Enables the device to advertise commissionable service when not in the
+	  commissioning mode.
+
 module = MATTER
 module-str = Matter
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

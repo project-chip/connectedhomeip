@@ -2910,6 +2910,20 @@ public class ClusterReadMapping {
             readDoorLockMinRFIDCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMinRFIDCodeLengthAttribute", readDoorLockMinRFIDCodeLengthAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readDoorLockNumberOfCredentialsSupportedPerUserCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readDoorLockNumberOfCredentialsSupportedPerUserAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .readNumberOfCredentialsSupportedPerUserAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readDoorLockNumberOfCredentialsSupportedPerUserCommandParams);
+    readDoorLockInteractionInfo.put(
+        "readNumberOfCredentialsSupportedPerUserAttribute",
+        readDoorLockNumberOfCredentialsSupportedPerUserAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readDoorLockLanguageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readDoorLockLanguageAttributeInteractionInfo =

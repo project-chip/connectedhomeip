@@ -197,7 +197,7 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
+int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE

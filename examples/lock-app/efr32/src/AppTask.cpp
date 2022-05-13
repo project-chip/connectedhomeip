@@ -235,7 +235,17 @@ CHIP_ERROR AppTask::Init()
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    err = LockMgr().Init(state);
+    uint8_t maxCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        maxCredentialsPerUser = 5;
+    }
+
+    err = LockMgr().Init(state, maxCredentialsPerUser);
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("LockMgr().Init() failed");

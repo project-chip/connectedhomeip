@@ -23,6 +23,10 @@ using namespace chip::System;
 using namespace chip::DeviceLayer;
 using namespace chip::Dnssd;
 
+// TODO: Accept these values over CLI
+const char * kContentUrl        = "https://www.test.com/videoid";
+const char * kContentDisplayStr = "Test video";
+
 CHIP_ERROR DiscoverCommissioners()
 {
     // Send discover commissioners request
@@ -53,7 +57,7 @@ CHIP_ERROR RequestCommissioning(int index)
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
-    CastingServer::GetInstance()->InitServer();
+    CastingServer::GetInstance()->InitServer(HandleCommissioningCompleteCallback);
 
     CastingServer::GetInstance()->OpenBasicCommissioningWindow();
 
@@ -103,6 +107,12 @@ void InitCommissioningFlow(intptr_t commandArg)
         ChipLogError(AppServer, "No commissioner discovered, commissioning must be initiated manually!");
         PrepareForCommissioning();
     }
+}
+
+CHIP_ERROR HandleCommissioningCompleteCallback()
+{
+    ChipLogProgress(AppServer, "HandleCommissioningCompleteCallback calling ContentLauncherLaunchURL");
+    return CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
