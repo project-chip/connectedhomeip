@@ -73,7 +73,6 @@ static uint32_t gIgnoreQueryImageCount               = 0;
 static uint32_t gIgnoreApplyUpdateCount              = 0;
 static uint32_t gPollInterval                        = 0;
 
-
 // Parses the JSON filepath and extracts DeviceSoftwareVersionModel parameters
 static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
                                                std::vector<OTAProviderExample::DeviceSoftwareVersionModel> & candidates)
