@@ -80,7 +80,7 @@ struct TestState
 
 static void HandleSignal(int aSignal);
 static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
-static bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[]);
+static bool HandleNonOptionArgs(const char * aProgram, int argc, char * const argv[]);
 
 static void StartTest();
 static void CleanupTest();
@@ -429,7 +429,7 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
     return (retval);
 }
 
-bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * aProgram, int argc, char * const argv[])
 {
     if (Common::IsSender())
     {
