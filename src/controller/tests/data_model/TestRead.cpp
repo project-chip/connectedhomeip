@@ -1294,7 +1294,7 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(120), [&]() {
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(90), [&]() {
         return numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1) &&
             numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1);
     });

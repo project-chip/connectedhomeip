@@ -789,7 +789,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the maximum number of Reports, limits the traffic of read and subscription transactions.
  */
 #ifndef CHIP_IM_MAX_REPORTS_IN_FLIGHT
-#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 8
+#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 4
 #endif
 
 /**
