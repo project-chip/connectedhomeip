@@ -234,7 +234,7 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
     return flags;
 }
 
-CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange packetRange)
+CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const ResourceData & data, BytesRange packetRange)
 {
     MATTER_TRACE_EVENT_SCOPE("Incremental resolver record parsing"); // measure until loop finished
 
@@ -265,7 +265,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        return OnIpAddress(addr);
+        return OnIpAddress(interface, addr);
     }
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
@@ -280,7 +280,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        return OnIpAddress(addr);
+        return OnIpAddress(interface, addr);
     }
     case QType::SRV: // SRV handled on creation, ignored for 'additional data'
     default:
@@ -313,11 +313,22 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IncrementalResolver::OnIpAddress(const Inet::IPAddress & addr)
+CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr)
 {
     if (mCommonResolutionData.numIPs >= ArraySize(mCommonResolutionData.ipAddress))
     {
         return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (!mCommonResolutionData.interfaceId.IsPresent())
+    {
+        mCommonResolutionData.interfaceId = interface;
+    }
+    else if (mCommonResolutionData.interfaceId != interface)
+    {
+        // IP addresses received from multiple packets over different interfaces.
+        // Processing is assumed per single interface.
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     mCommonResolutionData.ipAddress[mCommonResolutionData.numIPs++] = addr;

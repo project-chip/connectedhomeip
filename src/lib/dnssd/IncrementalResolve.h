@@ -106,9 +106,11 @@ public:
     /// Providing a data that is not relevant to the current parser is not considered and error,
     /// however if the resource fails parsing completely an error will be returned.
     ///
-    /// [data] represents the record and [packetRange] represents the range of valid bytes within
-    /// the packet for the purpose of QName parsing
-    CHIP_ERROR OnRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
+    ///
+    /// [data] represents the record received via [interface] and [packetRange] represents the range
+    /// of valid bytes within the packet for the purpose of QName parsing
+    CHIP_ERROR OnRecord(Inet::InterfaceId interface, const mdns::Minimal::ResourceData & data,
+                        mdns::Minimal::BytesRange packetRange);
 
     /// Return what additional data is required until the object can be extracted
     ///
@@ -163,7 +165,7 @@ private:
     /// addresses.
     ///
     /// Prerequisite: IP address belongs to the right nost name
-    CHIP_ERROR OnIpAddress(const Inet::IPAddress & addr);
+    CHIP_ERROR OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr);
 
     using ParsedRecordSpecificData = Variant<OperationalNodeData, CommissionNodeData>;
 

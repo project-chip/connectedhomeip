@@ -64,7 +64,7 @@ public:
     /// SRV record parsing.
     ///
     /// Must be called AFTER ParseSrvRecords has been called.
-    void ParseNonSrvRecords(const BytesRange & packet);
+    void ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet);
 
     IncrementalResolver * ResolverBegin() { return mResolvers; }
     const IncrementalResolver * ResolverBegin() const { return mResolvers; }
@@ -99,10 +99,14 @@ private:
     // TODO: use a CHIP constant here
     static constexpr size_t kMinMdnsNumParallelResolvers = 2;
 
-    bool mIsResponse = false;
+    // Individual parse set
+    bool mIsResponse               = false;
+    Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
     BytesRange mPacketRange;
-    IncrementalResolver mResolvers[kMinMdnsNumParallelResolvers];
     RecordParsingState mParsingState = RecordParsingState::kIdle;
+
+    // resolvers kept between parse steps
+    IncrementalResolver mResolvers[kMinMdnsNumParallelResolvers];
 };
 
 void PacketParser::OnHeader(ConstHeaderRef & header)
@@ -157,7 +161,7 @@ void PacketParser::ParseResource(const ResourceData & data)
     {
         if (resolver.IsActive())
         {
-            CHIP_ERROR err = resolver.OnRecord(data, mPacketRange);
+            CHIP_ERROR err = resolver.OnRecord(mInterfaceId, data, mPacketRange);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -220,10 +224,11 @@ void PacketParser::ParseSrvRecords(const BytesRange & packet)
     mParsingState = RecordParsingState::kIdle;
 }
 
-void PacketParser::ParseNonSrvRecords(const BytesRange & packet)
+void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet)
 {
     mParsingState = RecordParsingState::kRecordParsing;
     mPacketRange  = packet;
+    mInterfaceId  = interface;
 
     if (!ParsePacket(packet, this))
     {
@@ -305,7 +310,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
 {
     // Fill up any relevant data
     mPacketParser.ParseSrvRecords(data);
-    mPacketParser.ParseNonSrvRecords(data);
+    mPacketParser.ParseNonSrvRecords(info->Interface, data);
 
     for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
     {
@@ -329,8 +334,6 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
             resolver->ResetToInactive();
             continue;
         }
-
-        // TODO: ip address interface id is NOT defined
 
         // SUCCESS. Call the delegates
         if (resolver->IsActiveCommissionParse())

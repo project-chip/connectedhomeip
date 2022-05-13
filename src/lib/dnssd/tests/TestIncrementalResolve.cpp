@@ -100,7 +100,7 @@ void CallOnRecord(nlTestSuite * inSuite, IncrementalResolver & resolver, const R
     BytesRange packet(dataBuffer, dataBuffer + sizeof(dataBuffer));
     const uint8_t * _ptr = dataBuffer;
     NL_TEST_ASSERT(inSuite, resource.Parse(packet, &_ptr));
-    NL_TEST_ASSERT(inSuite, resolver.OnRecord(resource, packet) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, resolver.OnRecord(chip::Inet::InterfaceId::Null(), resource, packet) == CHIP_NO_ERROR);
 }
 
 void TestStoredServerName(nlTestSuite * inSuite, void * inContext)
