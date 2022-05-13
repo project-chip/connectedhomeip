@@ -54,7 +54,7 @@ using namespace mdns::Minimal;
 class PacketParser : private ParserDelegate
 {
 public:
-    PacketParser() {}
+    PacketParser(ActiveResolveAttempts & activeResolves) : mActiveResolves(activeResolves) {}
 
     /// Goes through the given SRV records within a response packet
     /// and sets up data resolution
@@ -102,6 +102,7 @@ private:
     RecordParsingState mParsingState = RecordParsingState::kIdle;
 
     // resolvers kept between parse steps
+    ActiveResolveAttempts & mActiveResolves;
     IncrementalResolver mResolvers[kMinMdnsNumParallelResolvers];
 };
 
@@ -163,6 +164,12 @@ void PacketParser::ParseResource(const ResourceData & data)
                 ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
+    }
+
+    // Once an IP address is received, stop requesting it.
+    if (data.GetType() == QType::AAAA)
+    {
+        mActiveResolves.CompleteIpResolution(data.GetName());
     }
 }
 
@@ -237,7 +244,7 @@ void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRa
 class MinMdnsResolver : public Resolver, public MdnsPacketDelegate
 {
 public:
-    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock())
+    MinMdnsResolver() : mActiveResolves(&chip::System::SystemClock()), mPacketParser(mActiveResolves)
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }
@@ -276,6 +283,7 @@ private:
 
     /// Clear any incremental resolver that is not waiting for a AAAA address.
     void ExpireIncrementalResolvers();
+    void AdvancePendingResolverStates();
 
     static void RetryCallback(System::Layer *, void * self);
 
@@ -305,12 +313,8 @@ void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
     mActiveResolves.MarkPending(ActiveResolveAttempts::ScheduledAttempt::IpResolve(std::move(target)));
 }
 
-void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
+void MinMdnsResolver::AdvancePendingResolverStates()
 {
-    // Fill up any relevant data
-    mPacketParser.ParseSrvRecords(data);
-    mPacketParser.ParseNonSrvRecords(info->Interface, data);
-
     for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
     {
         if (!resolver->IsActive())
@@ -381,6 +385,15 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
             resolver->ResetToInactive();
         }
     }
+}
+
+void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
+{
+    // Fill up any relevant data
+    mPacketParser.ParseSrvRecords(data);
+    mPacketParser.ParseNonSrvRecords(info->Interface, data);
+
+    AdvancePendingResolverStates();
 
     ScheduleRetries();
 }
