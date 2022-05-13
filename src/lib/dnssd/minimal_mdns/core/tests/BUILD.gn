@@ -34,11 +34,13 @@ chip_test_suite("tests") {
     "TestFlatAllocatedQName.cpp",
     "TestQName.cpp",
     "TestRecordWriter.cpp",
+    "TestHeapQName.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":support",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd/minimal_mdns/core",
     "${nlunit_test_root}:nlunit-test",
