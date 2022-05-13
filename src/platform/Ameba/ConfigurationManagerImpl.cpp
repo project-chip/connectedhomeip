@@ -79,6 +79,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipSessionResumption);
     SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipDeviceInfoProvider);
+    SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOthers);
     SuccessOrExit(err);
 

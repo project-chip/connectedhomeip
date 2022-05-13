@@ -57,6 +57,7 @@ const char AmebaConfig::kConfigNamespace_ChipOTA[]                      = "chip-
 const char AmebaConfig::kConfigNamespace_ChipFailSafe[]                 = "chip-failsafe";
 const char AmebaConfig::kConfigNamespace_ChipSessionResumptionIndex[]   = "chip-sessionresumptionindex";
 const char AmebaConfig::kConfigNamespace_ChipSessionResumption[]        = "chip-sessionresumption";
+const char AmebaConfig::kConfigNamespace_ChipDeviceInfoProvider[]       = "chip-deviceinfoprovider";
 const char AmebaConfig::kConfigNamespace_ChipOthers[]                   = "chip-others";
 
 // Keys stored in the chip-factory namespace
