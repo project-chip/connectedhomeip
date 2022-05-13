@@ -21,6 +21,7 @@
 #include "lib/core/CHIPError.h"
 
 CHIP_ERROR InitBindingHandler();
+bool IsGroupBound();
 void SwitchWorkerFunction(intptr_t context);
 void BindingWorkerFunction(intptr_t context);
 
