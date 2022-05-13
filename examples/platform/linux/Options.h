@@ -60,4 +60,4 @@ struct LinuxDeviceOptions
     static LinuxDeviceOptions & GetInstance();
 };
 
-CHIP_ERROR ParseArguments(int argc, char * argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
+CHIP_ERROR ParseArguments(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);

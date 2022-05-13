@@ -19,7 +19,7 @@ import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 
 public class MainActivity extends AppCompatActivity
-    implements CommissionerDiscoveryFragment.Callback {
+    implements CommissionerDiscoveryFragment.Callback, CommissioningFragment.Callback {
 
   private ChipAppServer chipAppServer;
   private TvCastingApp tvCastingApp;
@@ -41,6 +41,11 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void handleCommissioningButtonClicked(DiscoveredNodeData commissioner) {
     showFragment(CommissioningFragment.newInstance(tvCastingApp, commissioner));
+  }
+
+  @Override
+  public void handleCommissioningComplete() {
+    showFragment(ContentLauncherFragment.newInstance(tvCastingApp));
   }
 
   private void initJni() {

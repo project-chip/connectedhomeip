@@ -29,7 +29,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
-@class CHIPDeviceControllerStartupParams;
+@class CHIPDeviceControllerStartupParamsInternal;
 @class MatterControllerFactory;
 
 namespace chip {
@@ -50,9 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Only MatterControllerFactory should be calling this.
  */
-// TODO: This needs to be refactored to allow specifying things like the NOC to
-// use (instead of always generating a new one).
-- (BOOL)startup:(CHIPDeviceControllerStartupParams *)startupParams;
+- (BOOL)startup:(CHIPDeviceControllerStartupParamsInternal *)startupParams;
 
 /**
  * Will return chip::kUndefinedFabricIndex if we do not have a fabric index.

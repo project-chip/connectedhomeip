@@ -35,17 +35,15 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/TimeUtils.h>
 
-constexpr const char kOperationalCredentialsRootCertificateStorage[] = "MatterCARootCert";
-
 using namespace chip;
 using namespace TLV;
 using namespace Credentials;
 using namespace Crypto;
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
-    CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::Init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner,
+    NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
 {
-    if (storage == nil || nocSigner == nullptr || ipk == nil) {
+    if (storage == nil || nocSigner == nullptr || ipk == nil || rootCert == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -59,15 +57,27 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
     }
     memcpy(mIPK.Bytes(), [ipk bytes], [ipk length]);
 
+    // Make copies of the certificates, just in case the API consumer
+    // has them as MutableData.
+    mRootCert = [NSData dataWithData:rootCert];
+    if (mRootCert == nil) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (icaCert != nil) {
+        mIntermediateCert = [NSData dataWithData:icaCert];
+        if (mIntermediateCert == nil) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
-    const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
-    MutableByteSpan & noc)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(
+    NodeId nodeId, FabricId fabricId, const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & noc)
 {
     uint32_t validityStart, validityEnd;
-    bool haveRootCert = false;
 
     if (!ToChipEpochTime(0, validityStart)) {
         NSLog(@"Failed in computing certificate validity start date");
@@ -79,37 +89,16 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipDN rcac_dn;
-    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-        haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
-    if (haveRootCert) {
-        uint64_t rcacId;
-        rcac.reduce_size(rcacBufLen);
-        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
-        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
-        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
-    } else {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabricId));
-
-        NSLog(@"Generating RCAC");
-        X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
-        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, *mIssuerKey, rcac));
-
-        VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
-    }
-
-    icac.reduce_size(0);
+    ChipDN signerSubject;
+    NSData * signer = (mIntermediateCert != nil) ? mIntermediateCert : mRootCert;
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(AsByteSpan(signer), signerSubject));
 
     ChipDN noc_dn;
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
-    X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
+    X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, signerSubject };
     return NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc);
 }
 
@@ -151,16 +140,23 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
     NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
     MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
 
-    NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
-    MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+    ReturnErrorOnFailure(GenerateNOC(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, noc));
 
-    MutableByteSpan icac;
-
-    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcac, icac, noc));
-
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac, MakeOptional(GetIPK()), Optional<NodeId>());
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, IntermediateCertSpan(), RootCertSpan(), MakeOptional(GetIPK()),
+        Optional<NodeId>());
 
     return CHIP_NO_ERROR;
+}
+
+ByteSpan CHIPOperationalCredentialsDelegate::RootCertSpan() const { return AsByteSpan(mRootCert); }
+
+ByteSpan CHIPOperationalCredentialsDelegate::IntermediateCertSpan() const
+{
+    if (mIntermediateCert == nil) {
+        return ByteSpan();
+    }
+
+    return AsByteSpan(mIntermediateCert);
 }
 
 bool CHIPOperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32_t & epoch)
@@ -233,7 +229,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     *intermediateCert = nil;
 
     // Verify that the provided certificate public key matches the root keypair.
-    if ([MTRCertificates keypairMatchesCertificate:rootCertificate keypair:rootKeypair] == NO) {
+    if ([MTRCertificates keypair:rootKeypair matchesCertificate:rootCertificate] == NO) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
