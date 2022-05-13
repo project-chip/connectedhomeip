@@ -12,6 +12,7 @@ import chip.logging
 import argparse
 import builtins
 import chip.FabricAdmin
+import atexit
 
 _fabricAdmins = None
 
@@ -96,6 +97,12 @@ def ReplInit():
     logging.getLogger().setLevel(logging.WARN)
 
 
+def StackShutdown():
+    chip.FabricAdmin.FabricAdmin.ShutdownAll()
+    ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
+    builtins.chipStack.Shutdown()
+
+
 def matterhelp(classOrObj=None):
     if (classOrObj is None):
         inspect(builtins.devCtrl, methods=True, help=True, private=False)
@@ -129,6 +136,8 @@ fabricAdmins = LoadFabricAdmins()
 devCtrl = CreateDefaultDeviceController()
 
 builtins.devCtrl = devCtrl
+
+atexit.register(StackShutdown)
 
 console.print(
     '\n\n[blue]Default CHIP Device Controller has been initialized to manage [bold red]fabricAdmins[0][blue], and is available as [bold red]devCtrl')
