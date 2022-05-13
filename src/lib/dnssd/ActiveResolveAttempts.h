@@ -23,6 +23,7 @@
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 
 namespace mdns {
@@ -44,44 +45,76 @@ public:
 
     struct ScheduledAttempt
     {
-        enum AttemptType
+        struct Browse
         {
-            kInvalid,
-            kResolve,
-            kBrowse,
+            Browse(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType discoveryType) :
+                filter(discoveryFilter), type(discoveryType)
+            {}
+            chip::Dnssd::DiscoveryFilter filter;
+            chip::Dnssd::DiscoveryType type;
         };
 
-        ScheduledAttempt() : attemptType(kInvalid) {}
-        ScheduledAttempt(const chip::PeerId & peer, bool first) : attemptType(kResolve), peerId(peer), firstSend(first) {}
+        struct Resolve
+        {
+            chip::PeerId peerId;
+
+            Resolve(chip::PeerId id) : peerId(id) {}
+        };
+
+        ScheduledAttempt() {}
+        ScheduledAttempt(const chip::PeerId & peer, bool first) :
+            resolveData(chip::InPlaceTemplateType<Resolve>(), peer), firstSend(first)
+        {}
         ScheduledAttempt(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType type, bool first) :
-            attemptType(kBrowse), browse(discoveryFilter, type), firstSend(first)
+            resolveData(chip::InPlaceTemplateType<Browse>(), discoveryFilter, type), firstSend(first)
         {}
         bool operator==(const ScheduledAttempt & other) const { return Matches(other) && other.firstSend == firstSend; }
         bool Matches(const ScheduledAttempt & other) const
         {
-            if (other.attemptType != attemptType)
+            if (!resolveData.Valid())
             {
-                return false;
+                return !other.resolveData.Valid();
             }
-            switch (attemptType)
+
+            if (resolveData.Is<Browse>())
             {
-            case kInvalid:
-                return true;
-            case kBrowse:
-                return (other.browse.filter == browse.filter && other.browse.type == browse.type);
-            case kResolve:
-                return other.peerId == peerId;
-            default:
-                return false;
+                if (!other.resolveData.Is<Browse>())
+                {
+                    return false;
+                }
+
+                auto & a = resolveData.Get<Browse>();
+                auto & b = other.resolveData.Get<Browse>();
+                return (a.filter == b.filter && a.type == b.type);
             }
+
+            if (resolveData.Is<Resolve>())
+            {
+                if (!other.resolveData.Is<Resolve>())
+                {
+                    return false;
+                }
+                auto & a = resolveData.Get<Resolve>();
+                auto & b = other.resolveData.Get<Resolve>();
+
+                return a.peerId == b.peerId;
+            }
+            return false;
         }
-        bool Matches(const chip::PeerId & peer) const { return (attemptType == kResolve) && (peerId == peer); }
+
+        bool Matches(const chip::PeerId & peer) const
+        {
+            return resolveData.Is<Resolve>() && (resolveData.Get<Resolve>().peerId == peer);
+        }
         bool Matches(const chip::Dnssd::DiscoveredNodeData & data) const
         {
-            if (attemptType != kBrowse)
+            if (!resolveData.Is<Browse>())
             {
                 return false;
             }
+
+            auto & browse = resolveData.Get<Browse>();
+
             // TODO: we should mark returned node data based on the query
             if (browse.type != chip::Dnssd::DiscoveryType::kCommissionableNode)
             {
@@ -113,26 +146,18 @@ public:
                 return false;
             }
         }
-        bool IsEmpty() const { return attemptType == kInvalid; }
-        bool IsResolve() const { return attemptType == kResolve; }
-        bool IsBrowse() const { return attemptType == kBrowse; }
-        void Clear() { attemptType = kInvalid; }
+        bool IsEmpty() const { return resolveData.Valid(); }
+        bool IsResolve() const { return resolveData.Is<Resolve>(); }
+        bool IsBrowse() const { return resolveData.Is<Browse>(); }
+        void Clear() { resolveData = DataType(); }
 
-        // Not using Variant because it assumes a heap impl
-        AttemptType attemptType;
-        struct Browse
-        {
-            Browse(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType discoveryType) :
-                filter(discoveryFilter), type(discoveryType)
-            {}
-            chip::Dnssd::DiscoveryFilter filter;
-            chip::Dnssd::DiscoveryType type;
-        };
-        union
-        {
-            chip::PeerId peerId; // Peer id for resolve attempts
-            Browse browse;
-        };
+        const Browse & BrowseData() const { return resolveData.Get<Browse>(); }
+        const Resolve & ResolveData() const { return resolveData.Get<Resolve>(); }
+
+        using DataType = chip::Variant<Browse, Resolve>;
+
+        DataType resolveData;
+
         // First packet send is marked separately: minMDNS logic can choose
         // to first send a unicast query followed by a multicast one.
         bool firstSend = false;
