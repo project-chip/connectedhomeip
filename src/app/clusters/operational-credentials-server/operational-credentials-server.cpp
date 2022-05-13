@@ -364,8 +364,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
                        static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
-        // The Leave event SHOULD be emitted by a Node prior to permanently
-        // leaving the Fabric.
+        // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
             // If Basic cluster is implemented on this endpoint
@@ -375,6 +374,21 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
             if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
             {
                 ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+            }
+        }
+
+        // Removing the fabric will cause expiring all associated ReadHandlers so try to send the event ASAP.
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
+        EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
+        // Remove access control entries in reverse order. (It could be any order, but reverse order
+        // will cause less churn in persistent storage.)
+        size_t aclCount = 0;
+        if (Access::GetAccessControl().GetEntryCount(fabricIndex, aclCount) == CHIP_NO_ERROR)
+        {
+            while (aclCount)
+            {
+                Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --aclCount);
             }
         }
     }
