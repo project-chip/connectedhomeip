@@ -35,6 +35,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == OnOffSwitchConfiguration::Id)
     {
+        // Following print is used for printing single-byte value. Change it for printing non-single-byte values.
         ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
@@ -42,6 +43,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
     else if (clusterId == Identify::Id)
     {
+        // Following print is used for printing single-byte value. Change it for printing non-single-byte values.
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
     }
