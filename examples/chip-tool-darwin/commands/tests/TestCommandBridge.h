@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommandBridge.h"
 #include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
@@ -60,6 +61,7 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ConstraintsChecker,
                           public PICSChecker,
                           public DelayCommands,
+                          public LogCommands,
                           public SystemCommands {
 public:
     TestCommandBridge(const char * _Nonnull commandName)
@@ -98,17 +100,6 @@ public:
     {
         ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
         SetCommandExitStatus(err);
-    }
-
-    void Log(const char * _Nullable identity, const chip::app::Clusters::LogCommands::Commands::Log::Type & value)
-    {
-        NSLog(@"%.*s", static_cast<int>(value.message.size()), value.message.data());
-        NextTest();
-    }
-
-    void UserPrompt(const char * _Nullable identity, const chip::app::Clusters::LogCommands::Commands::UserPrompt::Type & value)
-    {
-        NextTest();
     }
 
     /////////// DelayCommands Interface /////////
