@@ -108,7 +108,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(chip::SubscriptionId * const apSubscribeId) const
+CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(SubscriptionId * const apSubscribeId) const
 {
     return GetUnsignedInteger(to_underlying(Tag::kSubscriptionId), apSubscribeId);
 }
