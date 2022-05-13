@@ -94,7 +94,7 @@ public class CommissionerDiscoveryFragment extends Fragment {
 
   /** Interface for notifying the host. */
   public interface Callback {
-    /** Notifies listener of Skip to manual Commissioning Button click. */
+    /** Notifies listener of Commissioning Button click. */
     void handleCommissioningButtonClicked(DiscoveredNodeData selectedCommissioner);
   }
 }

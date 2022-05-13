@@ -107,8 +107,8 @@ OptionSet ** gActiveOptionSets = nullptr;
 void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
 
 /**
- * @fn bool ParseArgs(const char *progName, int argc, char *argv[], OptionSet *optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
- * bool ignoreUnknown)
+ * @fn bool ParseArgs(const char *progName, int argc, char * const argv[], OptionSet *optSets[],
+ * NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown)
  *
  * @brief
  * Parse a set of command line-style arguments, calling handling functions to process each
@@ -119,8 +119,9 @@ void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
  *                                  messages and warnings.
  * @param[in]  argc                 The number of arguments to be parsed, plus 1.
  * @param[in]  argv                 An array of argument strings to be parsed.  The array length must
- * 									be 1 greater than the value specified for argc, and
- * argv[argc] must be set to NULL.  Argument parsing begins with the *second* array element (argv[1]); element 0 is ignored.
+ *                                  be 1 greater than the value specified for argc, and
+ *                                  argv[argc] must be set to NULL.  Argument parsing begins with the
+ *                                  *second* array element (argv[1]); element 0 is ignored.
  * @param[in]  optSets              A list of pointers to `OptionSet` structures that define the legal
  *                                  options.  The supplied list must be terminated with a NULL.
  * @param[in]  nonOptArgHandler     A pointer to a function that will be called once option parsing
@@ -280,8 +281,8 @@ void (*PrintArgError)(const char * msg, ...) = DefaultPrintArgError;
  * a common section title.
  *
  */
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler,
-               bool ignoreUnknown)
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown)
 {
     bool res = false;
     char optName[64];
@@ -433,12 +434,13 @@ done:
     return res;
 }
 
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[], NonOptionArgHandlerFunct nonOptArgHandler)
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[],
+               NonOptionArgHandlerFunct nonOptArgHandler)
 {
     return ParseArgs(progName, argc, argv, optSets, nonOptArgHandler, false);
 }
 
-bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSets[])
+bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet * optSets[])
 {
     return ParseArgs(progName, argc, argv, optSets, nullptr, false);
 }

@@ -91,7 +91,7 @@ class {{filename}}: public TestCommandBridge
       }
 
       // Go on to the next test.
-      WaitForMs(0);
+      ContinueOnChipMainThread(CHIP_NO_ERROR);
     }
 
   chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr({{chip_tests_config_get_default_value "timeout"}})); }
@@ -272,14 +272,6 @@ class {{filename}}: public TestCommandBridge
     {{/if}}
     {{#if async}}
     NextTest();
-    {{else}}
-    {{#*inline "minCommandTimeout"~}}
-      {{#if (isTestOnlyCluster cluster)~}}
-        {{#if (isStrEqual command "WaitForMs")~}}
-          {{#chip_tests_item_parameters}}{{#if (isStrEqual name "ms")}}({{definedValue}} / 1000) + {{/if}}{{/chip_tests_item_parameters}}
-        {{~/if}}
-      {{~/if}}
-    {{~/inline}}
     {{/if}}
     return CHIP_NO_ERROR;
   }

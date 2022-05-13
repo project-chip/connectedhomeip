@@ -17,6 +17,7 @@
  */
 
 #include "TvCastingApp-JNI.h"
+#include "CallbackHelper.h"
 #include "CastingServer.h"
 #include "JNIDACProvider.h"
 
@@ -146,8 +147,30 @@ JNI_METHOD(jboolean, discoverCommissioners)(JNIEnv *, jobject)
     return true;
 }
 
-JNI_METHOD(void, initServer)(JNIEnv *, jobject)
+JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCompleteHandler)
 {
     ChipLogProgress(AppServer, "JNI_METHOD initServer called");
-    CastingServer::GetInstance()->InitServer();
+    CHIP_ERROR err = SetUpMatterCallbackHandler(env, jCommissioningCompleteHandler, gCommissioningCompleteHandler);
+    if (err == CHIP_NO_ERROR)
+    {
+        CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
+        return true;
+    }
+    else
+    {
+        ChipLogError(AppServer, "initServer error: %s", err.AsString());
+        return false;
+    }
+}
+
+JNI_METHOD(void, contentLauncherLaunchURL)(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD contentLauncherLaunchURL called");
+    const char * nativeContentUrl        = env->GetStringUTFChars(contentUrl, 0);
+    const char * nativeContentDisplayStr = env->GetStringUTFChars(contentDisplayStr, 0);
+
+    CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr);
+
+    env->ReleaseStringUTFChars(contentUrl, nativeContentUrl);
+    env->ReleaseStringUTFChars(contentDisplayStr, nativeContentDisplayStr);
 }

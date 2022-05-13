@@ -69,3 +69,5 @@
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 0
 
 #define OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS 0
+// TCP disabled until OpenThread has a GN/Ninja build for the tcplp library
+#define OPENTHREAD_CONFIG_TCP_ENABLE 0

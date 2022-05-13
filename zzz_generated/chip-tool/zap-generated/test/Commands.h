@@ -21,7 +21,6 @@
 
 #if CONFIG_ENABLE_YAML_TESTS
 
-#include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommand.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPListUtils.h>
@@ -45182,15 +45181,11 @@ private:
         }
         case 1: {
             LogStep(1, "Check there is no event on the target endpoint");
-            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
-
-            );
+            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id);
         }
         case 2: {
             LogStep(2, "Check reading events from an invalid endpoint");
-            return ReadEvent(kIdentityAlpha, GetEndpoint(0), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
-
-            );
+            return ReadEvent(kIdentityAlpha, GetEndpoint(0), TestCluster::Id, TestCluster::Events::TestEvent::Id);
         }
         case 3: {
             LogStep(3, "Generate an event on the accessory");
@@ -45203,9 +45198,7 @@ private:
         }
         case 4: {
             LogStep(4, "Read the event back");
-            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
-
-            );
+            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id);
         }
         case 5: {
             LogStep(5, "Generate a second event on the accessory");
@@ -45219,14 +45212,12 @@ private:
         case 6: {
             LogStep(6, "Read the event back");
             mTestSubStepCount = 2;
-            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, false
-
-            );
+            return ReadEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id);
         }
         case 7: {
             LogStep(7, "Subscribe to the event");
             mTestSubStepCount = 2;
-            return SubscribeEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, 3, 5, false);
+            return SubscribeEvent(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Events::TestEvent::Id, 3, 5);
         }
         case 8: {
             LogStep(8, "Generate a third event on the accessory");

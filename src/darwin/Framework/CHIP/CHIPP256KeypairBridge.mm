@@ -124,9 +124,10 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::setPubkey()
+CHIP_ERROR CHIPP256KeypairBridge::setPubkey() { return MatterPubKeyFromSecKeyRef([mKeypair pubkey], &mPubkey); }
+
+CHIP_ERROR CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(SecKeyRef pubkeyRef, P256PublicKey * matterPubKey)
 {
-    SecKeyRef pubkeyRef = [mKeypair pubkey];
     if (!pubkeyRef) {
         CHIP_LOG_ERROR("Unable to initialize Pubkey");
         return CHIP_ERROR_INTERNAL;
@@ -142,7 +143,7 @@ CHIP_ERROR CHIPP256KeypairBridge::setPubkey()
         return CHIP_ERROR_INTERNAL;
     }
     chip::FixedByteSpan<kP256_PublicKey_Length> pubkeyBytes((const uint8_t *) pubkeyData.bytes);
-    mPubkey = P256PublicKey(pubkeyBytes);
+    *matterPubKey = P256PublicKey(pubkeyBytes);
 
     return CHIP_NO_ERROR;
 }
