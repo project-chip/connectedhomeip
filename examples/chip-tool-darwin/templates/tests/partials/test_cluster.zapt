@@ -132,7 +132,7 @@ class {{filename}}: public TestCommandBridge
         {{#chip_tests_item_parameters}}
           {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
         {{/chip_tests_item_parameters}}
-        {{command}}("{{identity}}", value);
+        return {{command}}("{{identity}}", value);
         {{else}}
         CHIPDevice * device = GetDevice("{{identity}}");
         CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
@@ -269,11 +269,11 @@ class {{filename}}: public TestCommandBridge
         {{/chip_tests_item_responses}}
     }{{#unless isWaitForReport}}]{{/unless}};
 
-    {{/if}}
     {{#if async}}
     NextTest();
     {{/if}}
     return CHIP_NO_ERROR;
+    {{/if}}
   }
 {{/chip_tests_items}}
 
