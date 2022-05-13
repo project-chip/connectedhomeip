@@ -318,8 +318,6 @@ function getManualTests()
 
   const DoorLock = [
     'Test_TC_DL_2_1',
-    'Test_TC_DL_2_2',
-    'Test_TC_DL_2_4',
     'Test_TC_DL_2_5',
     'Test_TC_DL_2_6',
     'Test_TC_DL_2_7',
@@ -397,8 +395,6 @@ function getManualTests()
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_2_2',
-    'Test_TC_DIAG_TH_NW_2_3',
     'Test_TC_DIAG_TH_NW_2_6',
     'Test_TC_DIAG_TH_NW_2_7',
     'Test_TC_DIAG_TH_NW_2_8',
@@ -675,6 +671,8 @@ function getTests()
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAG_TH_NW_1_1',
     'Test_TC_DIAG_TH_NW_1_2',
+    'Test_TC_DIAG_TH_NW_2_2',
+    'Test_TC_DIAG_TH_NW_2_3',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -757,7 +755,9 @@ function getTests()
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
-    'Test_TC_DL_1_3',
+    'Test_TC_DL_2_2',
+    'Test_TC_DL_2_3',
+    'Test_TC_DL_2_4',
   ];
 
   const Groups = [
