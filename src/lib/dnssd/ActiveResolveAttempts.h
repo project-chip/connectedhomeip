@@ -146,7 +146,7 @@ public:
                 return false;
             }
         }
-        bool IsEmpty() const { return resolveData.Valid(); }
+        bool IsEmpty() const { return !resolveData.Valid(); }
         bool IsResolve() const { return resolveData.Is<Resolve>(); }
         bool IsBrowse() const { return resolveData.Is<Browse>(); }
         void Clear() { resolveData = DataType(); }
