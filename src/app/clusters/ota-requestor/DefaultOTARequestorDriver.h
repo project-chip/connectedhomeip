@@ -84,6 +84,7 @@ public:
 protected:
     static void PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState);
     static void WatchdogTimerHandler(System::Layer * systemLayer, void * appState);
+    static void DownloadUpdateTimerHandler(System::Layer * systemLayer, void * appState);
 
     void StartPeriodicQueryTimer();
     void StopPeriodicQueryTimer();
