@@ -207,8 +207,10 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
             ChipLogError(Discovery, "Could not start SRV record processing: %" CHIP_ERROR_FORMAT, err.Format());
 #endif
-            return;
         }
+
+        // Done finding an inactive resolver and attempting to use it.
+        return;
     }
 
     ChipLogError(Discovery, "Insufficient parsers to process all SRV entries.");
