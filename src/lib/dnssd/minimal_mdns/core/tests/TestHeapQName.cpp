@@ -49,17 +49,6 @@ void Construction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, heapQName.Content() == kLonger.Full());
         NL_TEST_ASSERT(inSuite, kLonger.Serialized() == heapQName.Content());
     }
-
-    {
-
-        const testing::TestQName<0> kEmpty({});
-
-        HeapQName heapQName(kEmpty.Serialized());
-
-        NL_TEST_ASSERT(inSuite, heapQName.IsOk());
-        NL_TEST_ASSERT(inSuite, heapQName.Content() == kEmpty.Full());
-        NL_TEST_ASSERT(inSuite, kEmpty.Serialized() == heapQName.Content());
-    }
 }
 
 void Copying(nlTestSuite * inSuite, void * inContext)
