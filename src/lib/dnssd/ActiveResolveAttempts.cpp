@@ -214,5 +214,28 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
     return Optional<ScheduledAttempt>::Missing();
 }
 
+bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const
+{
+    for (auto & entry : mRetryQueue)
+    {
+        if (entry.attempt.IsEmpty())
+        {
+            continue; // not a pending item
+        }
+
+        if (!entry.attempt.IsIpResolve())
+        {
+            continue;
+        }
+
+        if (hostName == entry.attempt.IpResolveData().hostName.Content())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 } // namespace Minimal
 } // namespace mdns

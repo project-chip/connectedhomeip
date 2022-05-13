@@ -221,6 +221,10 @@ public:
     //    any peer that needs a new request sent
     chip::Optional<ScheduledAttempt> NextScheduled();
 
+    /// Check if any of the pending queries are for the given host name for
+    /// IP resolution.
+    bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
+
 private:
     struct RetryEntry
     {

@@ -67,10 +67,7 @@ public:
     void ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet);
 
     IncrementalResolver * ResolverBegin() { return mResolvers; }
-    const IncrementalResolver * ResolverBegin() const { return mResolvers; }
-
     IncrementalResolver * ResolverEnd() { return mResolvers + kMinMdnsNumParallelResolvers; }
-    const IncrementalResolver * ResolverEnd() const { return mResolvers + kMinMdnsNumParallelResolvers; }
 
 private:
     // ParserDelegate implementation
@@ -276,6 +273,9 @@ private:
     CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Browse & data, bool firstSend);
     CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::Resolve & data, bool firstSend);
     CHIP_ERROR BuildQuery(QueryBuilder & builder, const ActiveResolveAttempts::ScheduledAttempt::IpResolve & data, bool firstSend);
+
+    /// Clear any incremental resolver that is not waiting for a AAAA address.
+    void ExpireIncrementalResolvers();
 
     static void RetryCallback(System::Layer *, void * self);
 
@@ -552,7 +552,33 @@ CHIP_ERROR MinMdnsResolver::SendAllPendingQueries()
         }
     }
 
+    ExpireIncrementalResolvers();
+
     return ScheduleRetries();
+}
+
+void MinMdnsResolver::ExpireIncrementalResolvers()
+{
+    // once all queries are sent, if any SRV cannot receive AAAA addresses, expire it
+    for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
+    {
+        if (!resolver->IsActive())
+        {
+            continue;
+        }
+
+        IncrementalResolver::RequiredInformationFlags missing = resolver->GetMissingRequiredInformation();
+        if (missing.Has(IncrementalResolver::RequiredInformationBitFlags::kIpAddress))
+        {
+            if (mActiveResolves.IsWaitingForIpResolutionFor(resolver->GetTargetHostName()))
+            {
+                continue;
+            }
+        }
+
+        // mark as expired: not waiting for anything
+        resolver->ResetToInactive();
+    }
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
