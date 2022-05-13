@@ -294,6 +294,40 @@ DlStatus LockEndpoint::SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlS
     return DlStatus::kSuccess;
 }
 
+DlStatus LockEndpoint::GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
+{
+    if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    const auto & scheduleInStorage = mHolidaySchedules[holidayIndex - 1];
+    if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
+    {
+        return DlStatus::kNotFound;
+    }
+
+    schedule = scheduleInStorage.schedule;
+    return DlStatus::kSuccess;
+}
+
+DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
+                                   DlOperatingMode operatingMode)
+{
+    if (0 == holidayIndex || holidayIndex > mHolidaySchedules.size())
+    {
+        return DlStatus::kFailure;
+    }
+
+    auto & scheduleInStorage                  = mHolidaySchedules[holidayIndex - 1];
+    scheduleInStorage.schedule.localStartTime = localStartTime;
+    scheduleInStorage.schedule.localEndTime   = localEndTime;
+    scheduleInStorage.schedule.operatingMode  = operatingMode;
+    scheduleInStorage.status                  = status;
+
+    return DlStatus::kSuccess;
+}
+
 bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     if (!pin.HasValue())
