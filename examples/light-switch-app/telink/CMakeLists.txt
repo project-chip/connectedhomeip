@@ -49,7 +49,6 @@ add_definitions(
 # TODO - re-use chip_data_model.cmake to add cluster implementations.
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
                src/binding-handler.cpp

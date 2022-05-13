@@ -19,7 +19,8 @@
 #pragma once
 
 #include "AppEvent.h"
-#include "LightingManager.h"
+
+#include <drivers/gpio.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -32,7 +33,16 @@ class AppTask
 public:
     CHIP_ERROR StartApp();
 
-    void PostLightingActionRequest(LightingManager::Action_t aAction);
+    enum Action_t : uint8_t
+    {
+        ON_ACTION = 0,
+        OFF_ACTION,
+        LEVEL_ACTION,
+
+        INVALID_ACTION
+    };
+
+    void PostLightingActionRequest(Action_t aAction);
     void PostEvent(AppEvent * event);
     void UpdateClusterState();
 
@@ -41,8 +51,8 @@ private:
 
     CHIP_ERROR Init();
 
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionInitiated(AppTask::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(AppTask::Action_t aAction, int32_t aActor);
 
     void DispatchEvent(AppEvent * event);
 

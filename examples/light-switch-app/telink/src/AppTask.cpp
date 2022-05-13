@@ -269,9 +269,9 @@ void AppTask::StartBleAdvHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor) {}
+void AppTask::ActionInitiated(AppTask::Action_t aAction, int32_t aActor) {}
 
-void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionCompleted(AppTask::Action_t aAction, int32_t aActor)
 {
     if (aActor == AppEvent::kEventType_Button)
     {

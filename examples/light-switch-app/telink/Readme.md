@@ -83,19 +83,7 @@ following states:
 
     - \${NODE_ID_TO_ASSIGN} is the node id to assign to the light switch
 
-3. Binding the light switch with the lighting:
-
-    ```
-    ${CHIP_TOOL_DIR}/chip-tool tests TestGroupDemoConfig --nodeId <light-switch-node-id>
-    ${CHIP_TOOL_DIR}/chip-tool tests TestGroupDemoConfig --nodeId <lighting-node-id>
-    ${CHIP_TOOL_DIR}/chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster":6}]' <light-switch-node-id> 1
-    ```
-
-    here:
-
-    - **1** ID of endpoint
-
-4. Add an ACL to the development kit that is programmed with the Lighting
+3. Add an ACL to the development kit that is programmed with the Lighting
    Application Example by running the following command:
 
     ```
@@ -113,7 +101,7 @@ following states:
     This command adds permissions on the lighting application device that allows
     it to receive commands from the light switch device.
 
-5. Add a binding table to the Light Switch binding cluster:
+4. Add a binding table to the Light Switch binding cluster:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}, {"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}]' <light-switch-node-id> 1
