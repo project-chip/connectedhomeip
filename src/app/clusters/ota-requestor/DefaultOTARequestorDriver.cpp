@@ -152,13 +152,29 @@ void DefaultOTARequestorDriver::DownloadUpdateTimerHandler(System::Layer * syste
     driver->mRequestor->DownloadUpdate();
 }
 
+void DefaultOTARequestorDriver::ApplyUpdateTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
+
+    VerifyOrDie(driver->mRequestor != nullptr);
+    driver->mRequestor->ApplyUpdate();
+}
+
+void DefaultOTARequestorDriver::ApplyTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    DefaultOTARequestorDriver * driver = ToDriver(appState);
+
+    VerifyOrDie(driver->mImageProcessor != nullptr);
+    driver->mImageProcessor->Apply();
+}
+
 void DefaultOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     // IMPLEMENTATION CHOICE:
     // This implementation unconditionally downloads an available update
 
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction( delay, DownloadUpdateTimerHandler, this);
+    ScheduleDelayedAction(delay, DownloadUpdateTimerHandler, this);
 }
 
 CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay)
@@ -196,8 +212,7 @@ void DefaultOTARequestorDriver::UpdateDownloaded()
 void DefaultOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    ScheduleDelayedAction(
-        delay, [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
+    ScheduleDelayedAction(delay, ApplyTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
@@ -209,8 +224,7 @@ void DefaultOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
         delay = kDefaultDelayedActionTime;
     }
 
-    ScheduleDelayedAction(
-        delay, [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
+    ScheduleDelayedAction(delay, ApplyUpdateTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::UpdateDiscontinued()
@@ -228,8 +242,8 @@ void DefaultOTARequestorDriver::UpdateCancelled()
     // Cancel all OTA Update timers started by OTARequestorDriver regardless of whether thery are running or not
     CancelDelayedAction(DownloadUpdateTimerHandler, this);
     CancelDelayedAction(StartDelayTimerHandler, this);
-    CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); }, this);
-    CancelDelayedAction([](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); }, this);
+    CancelDelayedAction(ApplyTimerHandler, this);
+    CancelDelayedAction(ApplyUpdateTimerHandler, this);
 }
 
 void DefaultOTARequestorDriver::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
