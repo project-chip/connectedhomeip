@@ -51,6 +51,7 @@ const char AmebaConfig::kConfigNamespace_ChipFabric3[]                  = "chip-
 const char AmebaConfig::kConfigNamespace_ChipFabric4[]                  = "chip-fabric-4";
 const char AmebaConfig::kConfigNamespace_ChipFabric5[]                  = "chip-fabric-5";
 const char AmebaConfig::kConfigNamespace_ChipACL[]                      = "chip-acl";
+const char AmebaConfig::kConfigNamespace_ChipGroupMessageCounters[]     = "chip-groupmsgcounters";
 const char AmebaConfig::kConfigNamespace_ChipAttributes[]               = "chip-attributes";
 const char AmebaConfig::kConfigNamespace_ChipBindingTable[]             = "chip-bindingtable";
 const char AmebaConfig::kConfigNamespace_ChipOTA[]                      = "chip-ota";
@@ -59,6 +60,7 @@ const char AmebaConfig::kConfigNamespace_ChipSessionResumptionIndex[]   = "chip-
 const char AmebaConfig::kConfigNamespace_ChipSessionResumption[]        = "chip-sessionresumption";
 const char AmebaConfig::kConfigNamespace_ChipDeviceInfoProvider[]       = "chip-deviceinfoprovider";
 const char AmebaConfig::kConfigNamespace_ChipOthers[]                   = "chip-others";
+const char AmebaConfig::kConfigNamespace_ChipOthers2[]                  = "chip-others2";
 
 // Keys stored in the chip-factory namespace
 const AmebaConfig::Key AmebaConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };

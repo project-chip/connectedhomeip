@@ -23,6 +23,8 @@ static_library("Ameba") {
     "../SingletonConfigurationManager.cpp",
     "AmebaConfig.cpp",
     "AmebaConfig.h",
+    "AmebaUtils.cpp",
+    "AmebaUtils.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
