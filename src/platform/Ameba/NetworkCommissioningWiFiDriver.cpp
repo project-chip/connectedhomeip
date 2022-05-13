@@ -18,6 +18,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <limits>
@@ -129,22 +130,41 @@ Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
 
 CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // If device is already connected to WiFi, then disconnect the WiFi,
+    // clear the WiFi configurations and add the newly provided WiFi configurations.
+    if (chip::DeviceLayer::Internal::AmebaUtils::IsStationProvisioned())
+    {
+        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
+        err = chip::DeviceLayer::Internal::AmebaUtils::WiFiDisconnect();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "WiFiDisconnect() failed");
+            return err;
+        }
+        err = chip::DeviceLayer::Internal::AmebaUtils::ClearWiFiConfig();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed");
+            return err;
+        }
+    }
+
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
-    rtw_wifi_setting_t wifiConfig;
+    rtw_wifi_config_t wifiConfig;
 
     // Set the wifi configuration
     memset(&wifiConfig, 0, sizeof(wifiConfig));
     memcpy(wifiConfig.ssid, ssid, ssidLen + 1);
     memcpy(wifiConfig.password, key, keyLen + 1);
-    wifiConfig.mode = RTW_MODE_STA;
 
     // Configure the WiFi interface.
-    int err = CHIP_SetWiFiConfig(&wifiConfig);
-    if (err != 0)
+    err = chip::DeviceLayer::Internal::AmebaUtils::SetWiFiConfig(&wifiConfig);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "_SetWiFiConfig() failed: %d", err);
-        return CHIP_ERROR_INCORRECT_STATE;
+        ChipLogError(DeviceLayer, "SetWiFiConfig() failed");
+        return err;
     }
 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
@@ -249,7 +269,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
 CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
     rtw_wifi_setting_t wifi_setting;
-    CHIP_GetWiFiConfig(&wifi_setting);
+    wifi_get_setting(WLAN0_NAME, &wifi_setting);
 
     uint8_t length = strnlen(reinterpret_cast<const char *>(wifi_setting.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
     if (length > sizeof(network.networkID))
@@ -266,10 +286,9 @@ CHIP_ERROR GetConfiguredNetwork(Network & network)
 void AmebaWiFiDriver::OnNetworkStatusChange()
 {
     Network configuredNetwork;
-    rtw_wifi_setting_t mWiFiSetting;
-    CHIP_GetWiFiConfig(&mWiFiSetting);
-    bool staEnable    = (mWiFiSetting.mode == RTW_MODE_STA || mWiFiSetting.mode == RTW_MODE_STA_AP);
-    bool staConnected = (mWiFiSetting.ssid[0] != 0);
+    bool staEnabled = false, staConnected = false;
+    VerifyOrReturn(chip::DeviceLayer::Internal::AmebaUtils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);
+    VerifyOrReturn(staEnabled && mpStatusChangeCallback != nullptr);
 
     CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
     if (err != CHIP_NO_ERROR)
@@ -278,6 +297,7 @@ void AmebaWiFiDriver::OnNetworkStatusChange()
         return;
     }
 
+    VerifyOrReturn(chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(staConnected) == CHIP_NO_ERROR);
     if (staConnected)
     {
         mpStatusChangeCallback->OnNetworkingStatusChange(
@@ -334,9 +354,8 @@ bool AmebaWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     CHIP_ERROR err = GetConfiguredNetwork(configuredNetwork);
     if (err == CHIP_NO_ERROR)
     {
-        rtw_wifi_setting_t mWiFiSetting;
-        CHIP_GetWiFiConfig(&mWiFiSetting);
-        bool isConnected = (mWiFiSetting.ssid[0] != 0);
+        bool isConnected = false;
+        err = chip::DeviceLayer::Internal::AmebaUtils::IsStationConnected(isConnected);
 
         if (isConnected && configuredNetwork.networkIDLen == item.networkIDLen &&
             memcmp(configuredNetwork.networkID, item.networkID, item.networkIDLen) == 0)

@@ -46,6 +46,7 @@ public:
     static const char kConfigNamespace_ChipFabric4[];
     static const char kConfigNamespace_ChipFabric5[];
     static const char kConfigNamespace_ChipACL[];
+    static const char kConfigNamespace_ChipGroupMessageCounters[];
     static const char kConfigNamespace_ChipAttributes[];
     static const char kConfigNamespace_ChipBindingTable[];
     static const char kConfigNamespace_ChipOTA[];
@@ -54,6 +55,7 @@ public:
     static const char kConfigNamespace_ChipSessionResumption[];
     static const char kConfigNamespace_ChipDeviceInfoProvider[];
     static const char kConfigNamespace_ChipOthers[];
+    static const char kConfigNamespace_ChipOthers2[];
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
