@@ -259,10 +259,7 @@ public:
     //
     // Get direct access to the underlying read handler pool
     //
-    auto & GetReadHandlerPool()
-    {
-        return mReadHandlers;
-    }
+    auto & GetReadHandlerPool() { return mReadHandlers; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -273,10 +270,7 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetHandlerCapacity(int32_t sz)
-    {
-        mReadHandlerCapacityOverride = sz;
-    }
+    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
 
     //
     // Override the maximal capacity of the underlying attribute path pool and event path pool to mimic
@@ -287,10 +281,7 @@ public:
     //
     // If -1 is passed in, no override is instituted and default behavior resumes.
     //
-    void SetPathPoolCapacity(int32_t sz)
-    {
-        mPathPoolCapacityOverride = sz;
-    }
+    void SetPathPoolCapacity(int32_t sz) { mPathPoolCapacityOverride = sz; }
 
     //
     // Override the maximal capacity of the underlying read handler pool to mimic
@@ -319,10 +310,7 @@ public:
     // enforce such check based on the configured size. This flag is used for unit tests only, there is another compare time flag
     // CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK for stress tests.
     //
-    void SetForceHandlerQuota(bool forceHandlerQuota)
-    {
-        mForceHandlerQuota = forceHandlerQuota;
-    }
+    void SetForceHandlerQuota(bool forceHandlerQuota) { mForceHandlerQuota = forceHandlerQuota; }
 
     //
     // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
@@ -358,10 +346,7 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
-    ReadHandler::ApplicationCallback * GetAppCallback() override
-    {
-        return mpReadHandlerApplicationCallback;
-    }
+    ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
