@@ -63,8 +63,6 @@ enum class ServiceNameType
 constexpr QNamePart kOperationalSuffix[]         = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
 constexpr QNamePart kCommissionableSuffix[]      = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
 constexpr QNamePart kCommissionerSuffix[]        = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
-constexpr QNamePart kCommissionerSubTypeSuffix[] = { kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
-                                                     kLocalDomain };
 
 ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
 {
