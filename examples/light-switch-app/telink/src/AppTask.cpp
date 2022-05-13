@@ -103,7 +103,7 @@ CHIP_ERROR AppTask::Init()
     {
         LOG_ERR("InitBindingHandler() failed");
         return ret;
-    } 
+    }
 
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 

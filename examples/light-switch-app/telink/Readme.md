@@ -95,7 +95,8 @@ following states:
 
     - **1** ID of endpoint
 
-3.  Add an ACL to the development kit that is programmed with the Lighting Application Example by running the following command:
+4. Add an ACL to the development kit that is programmed with the Lighting
+   Application Example by running the following command:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [<light-switch-node-id>], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' <lighting-node-id> 0
@@ -103,16 +104,16 @@ following states:
 
     In this command:
 
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
-        is an ACL for the communication with the CHIP Tool.
-    -   `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<light-switch-node-id>], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
-        is an ACL for binding (cluster no. 6 is the On/Off cluster and the
-        cluster no. 8 is the Level Control cluster).
+    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}`
+      is an ACL for the communication with the CHIP Tool.
+    - `{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [<light-switch-node-id>], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}`
+      is an ACL for binding (cluster no. 6 is the On/Off cluster and the cluster
+      no. 8 is the Level Control cluster).
 
     This command adds permissions on the lighting application device that allows
     it to receive commands from the light switch device.
 
-4.  Add a binding table to the Light Switch binding cluster:
+5. Add a binding table to the Light Switch binding cluster:
 
     ```
     ${CHIP_TOOL_DIR}/chip-tool binding write binding '[{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}, {"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}]' <light-switch-node-id> 1
@@ -120,10 +121,10 @@ following states:
 
     In this command:
 
-    -   `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}` is a
-        binding for the On/Off cluster.
-    -   `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}` is a
-        binding for the Level Control cluster.
+    - `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 6}`
+      is a binding for the On/Off cluster.
+    - `{"fabricIndex": 1, "node": <lighting-node-id>, "endpoint": 1, "cluster": 8}`
+      is a binding for the Level Control cluster.
 
 ### Testing the communication
 
