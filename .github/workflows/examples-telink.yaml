@@ -57,12 +57,12 @@ jobs:
             - name: Build example Telink Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'telink-tlsr9518adk80d-light' build"
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light' build"
 
             - name: Build example Telink Light Switch App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'telink-tlsr9518adk80d-light-switch*' build"
+                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light-switch' build"
 
             - name: Get Lighting size stats
               run: |
