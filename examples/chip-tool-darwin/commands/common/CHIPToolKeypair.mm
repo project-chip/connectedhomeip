@@ -61,11 +61,11 @@ std::string Base64ToString(const std::string & b64Value)
     return _mKeyPair.Initialize() == CHIP_NO_ERROR;
 }
 
-- (NSData *)ECDSA_sign_hash:(NSData *)hash
+- (NSData *)ECDSA_sign_message_raw:(NSData *)message
 {
     chip::Crypto::P256ECDSASignature signature;
     NSData * out_signature;
-    CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_hash((const uint8_t *) [hash bytes], (const size_t)[hash length], signature);
+    CHIP_ERROR signing_error = _mKeyPair.ECDSA_sign_msg((const uint8_t *) [message bytes], (size_t)[message length], signature);
     if (signing_error != CHIP_NO_ERROR)
         return nil;
     out_signature = [NSData dataWithBytes:signature.Bytes() length:signature.Length()];
