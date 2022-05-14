@@ -44,13 +44,13 @@ namespace {
 
 // Last known UTC time in Unix format.
 #ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME
-Clock::Microseconds64 gRealTime = Microseconds64(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME * UINT64_C(1000000));
+Microseconds64 gRealTime = Seconds64(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME * UINT64_C(1000000));
 #else
-Clock::Microseconds64 gRealTime = Microseconds64(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD * UINT64_C(1000000));
+Microseconds64 gRealTime = Seconds64(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD * UINT64_C(1000000));
 #endif
 
 // Monotonic time of setting the last known UTC time.
-Clock::Microseconds64 gRealTimeSetTime;
+Microseconds64 gRealTimeSetTime;
 
 } // namespace
 
