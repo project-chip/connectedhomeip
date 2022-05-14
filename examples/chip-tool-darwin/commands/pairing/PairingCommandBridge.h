@@ -18,8 +18,7 @@
 
 #pragma once
 #include "../common/CHIPCommandBridge.h"
-#import <CHIP/CHIPClustersObjc.h>
-#import <CHIP/CHIPDevicePairingDelegate.h>
+#import <CHIP/CHIP.h>
 
 enum class PairingMode
 {

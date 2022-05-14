@@ -17,7 +17,7 @@
  */
 
 #pragma once
-#import <CHIP/CHIPDeviceController.h>
+#import <CHIP/CHIP.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <map>
@@ -36,6 +36,11 @@ public:
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
+
+    // Will convert error to a CHIP_ERROR and call SetCommandExitStatus with the
+    // result.  If a log string is provided, will log that plus the string
+    // representation of the CHIP_ERROR.
+    void SetCommandExitStatus(NSError * error, const char * logString = nullptr);
 
     void SetCommandExitStatus(CHIP_ERROR status)
     {
@@ -74,6 +79,10 @@ protected:
     CHIPDeviceController * CurrentCommissioner();
 
     CHIPDeviceController * GetCommissioner(const char * identity);
+
+    // Will log the given string and given error (as progress if success, error
+    // if failure).
+    void LogNSError(const char * logString, NSError * error);
 
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,

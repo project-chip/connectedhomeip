@@ -19,7 +19,7 @@
 #pragma once
 
 #import <CHIP/CHIP.h>
-#import <CHIP/CHIPDevice_Internal.h>
+#import <CHIP/CHIPDevice_Internal.h> // For NSObjectFromCHIPTLV
 #include <lib/support/UnitTestUtils.h>
 
 #include "ModelCommandBridge.h"
@@ -99,11 +99,10 @@ public:
                                     clientQueue:callbackQueue
                                      completion:^(
                                          NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                         CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
                                          responsesNeeded--;
-                                         if (err != CHIP_NO_ERROR) {
-                                             mError = err;
-                                             ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
+                                         if (error != nil) {
+                                             mError = error;
+                                             LogNSError("Error", error);
                                          }
                                          if (responsesNeeded == 0) {
                                              SetCommandExitStatus(mError);
@@ -121,7 +120,7 @@ protected:
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<uint16_t> mRepeatCount;
     chip::Optional<uint16_t> mRepeatDelayInMs;
-    CHIP_ERROR mError = CHIP_NO_ERROR;
+    NSError * _Nullable mError = nil;
 
 private:
     chip::ClusterId mClusterId;
