@@ -24,7 +24,7 @@ ByteSpan GetSpan(char * key)
     size_t len = strlen(key);
     // Stop the string from being null terminated to ensure the code makes no assumptions.
     key[len] = '1';
-    return ByteSpan(reinterpret_cast<uint8_t *>(key), len);
+    return ByteSpan(Uint8::from_char(key), len);
 }
 class DLL_EXPORT TestCallback : public UserConfirmationProvider, public InstanceNameResolver
 {
@@ -304,6 +304,7 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
            "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
     GetRotatingDeviceId(GetSpan(rotatingIdLongString), rotatingIdLong, &rotatingIdLongLen);
 
+    printf(" max length %zu, long length %zu\n", chip::Dnssd::kMaxRotatingIdLen, rotatingIdLongLen);
     NL_TEST_ASSERT(inSuite, rotatingIdLongLen > chip::Dnssd::kMaxRotatingIdLen);
 
     // test base case
@@ -343,6 +344,9 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     }
 
     state->SetRotatingId(rotatingIdLong, rotatingIdLongLen);
+
+    printf(" max length %zu, long length %zu, current length %zu\n", chip::Dnssd::kMaxRotatingIdLen, rotatingIdLongLen,
+           state->GetRotatingIdLength());
     NL_TEST_ASSERT(inSuite, chip::Dnssd::kMaxRotatingIdLen == state->GetRotatingIdLength());
 
     const uint8_t * testRotatingIdLong = state->GetRotatingId();
