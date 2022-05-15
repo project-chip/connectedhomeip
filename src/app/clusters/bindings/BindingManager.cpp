@@ -23,9 +23,9 @@
 
 namespace {
 
-class BindingFabricTableDelegate : public chip::FabricTableDelegate
+class BindingFabricTableDelegate : public chip::FabricTable::FabricTableDelegate
 {
-    void OnFabricDeletedFromStorage(chip::CompressedFabricId compressedFabricId, chip::FabricIndex fabricIndex)
+    void OnFabricDeletedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
         chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
         auto iter                         = bindingTable.begin();
@@ -40,14 +40,14 @@ class BindingFabricTableDelegate : public chip::FabricTableDelegate
                 ++iter;
             }
         }
-        chip::BindingManager::GetInstance().FabricRemoved(compressedFabricId, fabricIndex);
+        chip::BindingManager::GetInstance().FabricRemoved(fabricIndex);
     }
 
     // Intentionally left blank
-    void OnFabricRetrievedFromStorage(chip::FabricInfo * fabricInfo) {}
+    void OnFabricRetrievedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) {}
 
     // Intentionally left blank
-    void OnFabricPersistedToStorage(chip::FabricInfo * fabricInfo) {}
+    void OnFabricPersistedToStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) {}
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;
@@ -180,10 +180,12 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
     mInitParams.mCASESessionManager->ReleaseSession(peerId);
 }
 
-void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, FabricIndex fabricIndex)
+void BindingManager::FabricRemoved(FabricIndex fabricIndex)
 {
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
-    mInitParams.mCASESessionManager->ReleaseSessionsForFabric(compressedFabricId);
+
+    // TODO(#18436): This indiscriminate session releasing can kill unexpected sessions...
+    mInitParams.mCASESessionManager->ReleaseSessionsForFabric(fabricIndex);
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)

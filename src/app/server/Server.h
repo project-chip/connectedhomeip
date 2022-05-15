@@ -290,7 +290,7 @@ private:
         ServerTransportMgr * mTransports;
     };
 
-    class ServerFabricDelegate final : public FabricTableDelegate
+    class ServerFabricDelegate final : public chip::FabricTable::FabricTableDelegate
     {
     public:
         ServerFabricDelegate() {}
@@ -303,16 +303,33 @@ private:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
-            (void) compressedId;
+            (void)fabricTable;
             auto & sessionManager = mServer->GetSecureSessionManager();
             sessionManager.FabricRemoved(fabricIndex);
+
+            // Remove all CASE session resumption state
+            auto * sessionResumptionStorage = mServer->GetSessionResumptionStorage();
+            if (sessionResumptionStorage != nullptr)
+            {
+                CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                        static_cast<unsigned>(fabricIndex), err.Format());
+                }
+            }
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
             {
-                groupDataProvider->RemoveFabric(fabricIndex);
+                CHIP_ERROR err = groupDataProvider->RemoveFabric(fabricIndex);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Warning, failed to delete GroupDataProvider state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                        static_cast<unsigned>(fabricIndex), err.Format());
+                }
             }
 
             {
@@ -324,15 +341,24 @@ private:
                 {
                     while (count)
                     {
-                        Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
+                        (void)Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
                     }
                 }
             }
             app::EventManagement::GetInstance().FabricRemoved(fabricIndex);
         };
-        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
 
-        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
+
+        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
 
     private:
         Server * mServer = nullptr;

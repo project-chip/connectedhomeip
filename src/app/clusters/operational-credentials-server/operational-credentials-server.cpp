@@ -300,7 +300,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
             FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
             VerifyOrReturn(fabricInfo != nullptr);
 
-            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
+            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
         }
 
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
@@ -354,11 +354,11 @@ void fabricListChanged()
 // only that should be modifed to perosst/read/write fabrics.
 // TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
 // logic.
-class OpCredsFabricTableDelegate : public FabricTableDelegate
+class OpCredsFabricTableDelegate : public chip::FabricTable::FabricTableDelegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricIndex) override
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
                        static_cast<unsigned>(fabricIndex));
@@ -380,8 +380,11 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     }
 
     // Gets called when a fabric is loaded into the FabricTable from storage
-    void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        VerifyOrReturn(fabric != nullptr);
+
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
@@ -391,8 +394,11 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     }
 
     // Gets called when a fabric in FabricTable is persisted to storage
-    void OnFabricPersistedToStorage(FabricInfo * fabric) override
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        VerifyOrReturn(fabric != nullptr);
+
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
