@@ -44,10 +44,10 @@ class BindingFabricTableDelegate : public chip::FabricTable::FabricTableDelegate
     }
 
     // Intentionally left blank
-    void OnFabricRetrievedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) {}
+    void OnFabricRetrievedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 
     // Intentionally left blank
-    void OnFabricPersistedToStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) {}
+    void OnFabricPersistedToStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;
