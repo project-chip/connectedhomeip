@@ -166,7 +166,7 @@ public:
 
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
-            (void)fabricTable;
+            (void) fabricTable;
 
             if (mSessionManager != nullptr)
             {

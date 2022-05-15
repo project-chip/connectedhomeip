@@ -305,7 +305,7 @@ private:
 
         void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
-            (void)fabricTable;
+            (void) fabricTable;
             auto & sessionManager = mServer->GetSecureSessionManager();
             sessionManager.FabricRemoved(fabricIndex);
 
@@ -316,8 +316,9 @@ private:
                 CHIP_ERROR err = sessionResumptionStorage->DeleteAll(fabricIndex);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
-                        static_cast<unsigned>(fabricIndex), err.Format());
+                    ChipLogError(AppServer,
+                                 "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                                 static_cast<unsigned>(fabricIndex), err.Format());
                 }
             }
 
@@ -327,8 +328,9 @@ private:
                 CHIP_ERROR err = groupDataProvider->RemoveFabric(fabricIndex);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(AppServer, "Warning, failed to delete GroupDataProvider state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
-                        static_cast<unsigned>(fabricIndex), err.Format());
+                    ChipLogError(AppServer,
+                                 "Warning, failed to delete GroupDataProvider state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                                 static_cast<unsigned>(fabricIndex), err.Format());
                 }
             }
 
@@ -341,7 +343,7 @@ private:
                 {
                     while (count)
                     {
-                        (void)Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
+                        (void) Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
                     }
                 }
             }

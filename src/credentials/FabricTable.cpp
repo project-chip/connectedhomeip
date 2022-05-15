@@ -520,7 +520,8 @@ CHIP_ERROR FabricTable::Store(FabricIndex fabricIndex)
 exit:
     if (err == CHIP_NO_ERROR && mDelegateListRoot != nullptr)
     {
-        ChipLogProgress(Discovery, "Fabric (0x%x) persisted to storage. Calling OnFabricPersistedToStorage", static_cast<unsigned>(fabricIndex));
+        ChipLogProgress(Discovery, "Fabric (0x%x) persisted to storage. Calling OnFabricPersistedToStorage",
+                        static_cast<unsigned>(fabricIndex));
         FabricTableDelegate * delegate = mDelegateListRoot;
         while (delegate)
         {
@@ -675,7 +676,7 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 
     FabricInfo * fabric      = FindFabricWithIndex(fabricIndex);
     bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
-    CHIP_ERROR err = FabricInfo::DeleteFromStorage(mStorage, fabricIndex); // Delete from storage regardless
+    CHIP_ERROR err           = FabricInfo::DeleteFromStorage(mStorage, fabricIndex); // Delete from storage regardless
     if (!fabricIsInitialized)
     {
         // Make sure to return the error our API promises, not whatever storage
@@ -712,7 +713,8 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
         else
         {
             mFabricCount--;
-            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage", static_cast<unsigned>(fabricIndex));
+            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage",
+                            static_cast<unsigned>(fabricIndex));
         }
 
         FabricTableDelegate * delegate = mDelegateListRoot;

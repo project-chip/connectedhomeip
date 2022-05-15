@@ -355,8 +355,9 @@ public:
         bool MustDeleteOnRemoval() const { return mDeleteOnRemoval; }
 
         FabricTableDelegate * next = nullptr;
+
     protected:
-        bool mDeleteOnRemoval    = false;
+        bool mDeleteOnRemoval = false;
     };
 
     FabricTable() {}
