@@ -124,7 +124,7 @@ public:
     ///           as this object is valid and InitializeParsing is not called again.
     mdns::Minimal::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
 
-    /// Fetch the recrod name set by `InitializeParsing`.
+    /// Fetch the record name set by `InitializeParsing`.
     ///
     /// VALIDITY: Data references internal storage of this object and is valid as long
     ///           as this object is valid and InitializeParsing is not called again.

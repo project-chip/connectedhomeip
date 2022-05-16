@@ -49,7 +49,7 @@ using namespace mdns::Minimal;
 /// Handles processing of minmdns packet data.
 ///
 /// Can process multiple incremental resolves based on SRV data and allows
-/// retreival of pending (e.g. to ask for AAAA) and complete data items.
+/// retrieval of pending (e.g. to ask for AAAA) and complete data items.
 ///
 class PacketParser : private ParserDelegate
 {
