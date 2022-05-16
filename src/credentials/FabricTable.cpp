@@ -797,7 +797,6 @@ void FabricTable::RemoveFabricDelegate(FabricTable::Delegate * delegateToRemove)
         // Removing head of the list, keep link to next, may
         // be nullptr.
         mDelegateListRoot = mDelegateListRoot->next;
-        return;
     }
     else
     {
