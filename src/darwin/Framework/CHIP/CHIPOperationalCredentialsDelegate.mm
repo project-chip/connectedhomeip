@@ -43,7 +43,7 @@ using namespace Crypto;
 CHIP_ERROR CHIPOperationalCredentialsDelegate::Init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner,
     NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
 {
-    if (storage == nil || nocSigner == nullptr || ipk == nil || rootCert == nil) {
+    if (storage == nil || ipk == nil || rootCert == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -77,6 +77,10 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::Init(CHIPPersistentStorageDelegat
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(
     NodeId nodeId, FabricId fabricId, const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & noc)
 {
+    if (!mIssuerKey) {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     return GenerateNOC(
         *mIssuerKey, (mIntermediateCert != nil) ? mIntermediateCert : mRootCert, nodeId, fabricId, cats, pubkey, noc);
 }
