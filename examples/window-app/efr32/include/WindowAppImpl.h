@@ -21,6 +21,7 @@
 #include <LEDWidget.h>
 #include <WindowApp.h>
 #include <queue.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <sl_simple_button_instances.h>
 #include <string>
 #include <task.h>
@@ -77,7 +78,9 @@ private:
     QueueHandle_t mQueue = nullptr;
     LEDWidget mStatusLED;
     LEDWidget mActionLED;
-    std::string mQRCode;
+
+    // Get QR Code and emulate its content using NFC tag
+    char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     Timer mIconTimer;
     LcdIcon mIcon = LcdIcon::None;
 };

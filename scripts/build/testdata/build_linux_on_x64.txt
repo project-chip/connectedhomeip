@@ -159,6 +159,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-tv-app-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-tv-app-ipv6only
 
+# Generating linux-x64-tv-casting-app
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux {out}/linux-x64-tv-casting-app
+
+# Generating linux-x64-tv-casting-app-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/tv-casting-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-tv-casting-app-ipv6only
+
 # Building linux-arm64-all-clusters
 ninja -C {out}/linux-arm64-all-clusters
 
@@ -284,3 +290,9 @@ ninja -C {out}/linux-x64-tv-app
 
 # Building linux-x64-tv-app-ipv6only
 ninja -C {out}/linux-x64-tv-app-ipv6only
+
+# Building linux-x64-tv-casting-app
+ninja -C {out}/linux-x64-tv-casting-app
+
+# Building linux-x64-tv-casting-app-ipv6only
+ninja -C {out}/linux-x64-tv-casting-app-ipv6only

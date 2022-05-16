@@ -1,11 +1,10 @@
 {{> header}}
 #import <Foundation/Foundation.h>
-#import <CHIP/CHIPError_Internal.h>
 
-#import "CHIPCallbackBridge_internal.h"
-#import "CHIPCluster_internal.h"
-#import "CHIPDevice.h"
-#import "CHIPDevice_Internal.h"
+#import "CHIP/CHIP.h"
+
+#import "CHIPCallbackBridge_internal.h" // For CHIPDefaultSuccessCallbackBridge, etc
+#import "CHIPCluster_internal.h" // For self.callbackQueue
 
 #import "zap-generated/cluster/CHIPTestClustersObjc.h"
 

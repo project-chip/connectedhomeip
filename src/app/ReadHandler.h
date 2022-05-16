@@ -240,7 +240,7 @@ private:
     bool IsActiveSubscription() const { return mActiveSubscription; }
     bool IsFabricFiltered() const { return mIsFabricFiltered; }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(uint64_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
+    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
     /**
@@ -356,7 +356,7 @@ private:
     // prior to receiving a subscribe response.
     bool mIsPrimingReports              = true;
     InteractionType mInteractionType    = InteractionType::Read;
-    uint64_t mSubscriptionId            = 0;
+    SubscriptionId mSubscriptionId      = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
     SessionHolder mSessionHandle;

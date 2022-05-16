@@ -31,7 +31,6 @@
 #include <zap-generated/cluster/CHIPTestClustersObjc.h>
 
 #import <CHIP/CHIP.h>
-#import <CHIP/CHIPDevice_Internal.h>
 #import <CHIP/CHIPError_Internal.h>
 
 class TestCommandBridge;
@@ -132,8 +131,10 @@ public:
         [controller getConnectedDevice:value.nodeId
                                  queue:mCallbackQueue
                      completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                         CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-                         VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
+                         if (error != nil) {
+                             SetCommandExitStatus(error);
+                             return;
+                         }
 
                          mConnectedDevices[identity] = device;
                          NextTest();
