@@ -223,7 +223,6 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kContentSearch),
                  err = CHIP_ERROR_INCORRECT_STATE);
     {
-
         delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
     }
 
