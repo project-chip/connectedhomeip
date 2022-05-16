@@ -242,7 +242,7 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
 
     for (Optional<ActiveResolveAttempts::ScheduledAttempt> s = attempts.NextScheduled(); s.HasValue(); s = attempts.NextScheduled())
     {
-        NL_TEST_ASSERT(inSuite, s.Value().peerId.GetNodeId() != 9999);
+        NL_TEST_ASSERT(inSuite, s.Value().ResolveData().peerId.GetNodeId() != 9999);
     }
 
     // Still have active pending items (queue is full)
@@ -266,7 +266,7 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
         Optional<ActiveResolveAttempts::ScheduledAttempt> s = attempts.NextScheduled();
         while (s.HasValue())
         {
-            NL_TEST_ASSERT(inSuite, s.Value().peerId.GetNodeId() != 9999);
+            NL_TEST_ASSERT(inSuite, s.Value().ResolveData().peerId.GetNodeId() != 9999);
             s = attempts.NextScheduled();
         }
     }

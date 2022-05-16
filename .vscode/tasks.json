@@ -374,6 +374,7 @@
                 "nrf-nrf5340-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
+                "telink-tlsr9518adk80d-light-switch",
                 "tizen-arm-light"
             ]
         }
