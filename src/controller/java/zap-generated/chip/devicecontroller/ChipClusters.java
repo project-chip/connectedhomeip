@@ -7596,6 +7596,22 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public interface PercentSettingAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface SpeedSettingAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -7656,7 +7672,7 @@ public class ChipClusters {
       subscribeFanModeSequenceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readPercentSettingAttribute(IntegerAttributeCallback callback) {
+    public void readPercentSettingAttribute(PercentSettingAttributeCallback callback) {
       readPercentSettingAttribute(chipClusterPtr, callback);
     }
 
@@ -7670,7 +7686,7 @@ public class ChipClusters {
     }
 
     public void subscribePercentSettingAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        PercentSettingAttributeCallback callback, int minInterval, int maxInterval) {
       subscribePercentSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -7692,7 +7708,7 @@ public class ChipClusters {
       subscribeSpeedMaxAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readSpeedSettingAttribute(IntegerAttributeCallback callback) {
+    public void readSpeedSettingAttribute(SpeedSettingAttributeCallback callback) {
       readSpeedSettingAttribute(chipClusterPtr, callback);
     }
 
@@ -7706,7 +7722,7 @@ public class ChipClusters {
     }
 
     public void subscribeSpeedSettingAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        SpeedSettingAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeSpeedSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -7843,7 +7859,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPercentSettingAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, PercentSettingAttributeCallback callback);
 
     private native void writePercentSettingAttribute(
         long chipClusterPtr,
@@ -7852,7 +7868,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribePercentSettingAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        PercentSettingAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readPercentCurrentAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -7867,7 +7886,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readSpeedSettingAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, SpeedSettingAttributeCallback callback);
 
     private native void writeSpeedSettingAttribute(
         long chipClusterPtr,
@@ -7876,7 +7895,10 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeSpeedSettingAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        SpeedSettingAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readSpeedCurrentAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

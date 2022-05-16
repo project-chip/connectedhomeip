@@ -1408,10 +1408,10 @@ server cluster FanControl = 514 {
 
   attribute FanModeType fanMode = 0;
   attribute FanModeSequenceType fanModeSequence = 1;
-  attribute int8u percentSetting = 2;
+  attribute nullable int8u percentSetting = 2;
   readonly attribute int8u percentCurrent = 3;
   readonly attribute int8u speedMax = 4;
-  attribute int8u speedSetting = 5;
+  attribute nullable int8u speedSetting = 5;
   readonly attribute int8u speedCurrent = 6;
   readonly attribute bitmap8 rockSupport = 7;
   attribute bitmap8 rockSetting = 8;
@@ -4276,7 +4276,7 @@ endpoint 1 {
     ram      attribute operationMode;
     ram      attribute controlMode;
     ram      attribute alarmMask;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0x0F;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -4307,7 +4307,7 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 0x02;
     ram      attribute percentSetting;
     ram      attribute percentCurrent;
-    ram      attribute speedMax;
+    ram      attribute speedMax default = 100;
     ram      attribute speedSetting;
     ram      attribute speedCurrent;
     ram      attribute rockSupport;
