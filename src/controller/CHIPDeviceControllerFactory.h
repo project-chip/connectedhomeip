@@ -204,7 +204,6 @@ private:
     uint16_t mListenPort;
     DeviceControllerSystemState * mSystemState            = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
-    FabricTable::Delegate * mFabricTableDelegate          = nullptr;
     bool mEnableServerInteractions                        = false;
 };
 
