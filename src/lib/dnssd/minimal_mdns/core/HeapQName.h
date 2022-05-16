@@ -153,7 +153,8 @@ private:
             }
         }
         mElementPointers.Free();
-        mIsOk = false;
+        mElementCount = 0;
+        mIsOk         = false;
     }
 
     bool mIsOk           = false;
