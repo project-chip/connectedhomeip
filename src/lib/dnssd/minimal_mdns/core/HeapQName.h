@@ -156,8 +156,8 @@ private:
         mIsOk = false;
     }
 
-    bool mIsOk = false;
-    size_t mElementCount;
+    bool mIsOk           = false;
+    size_t mElementCount = 0;
     chip::Platform::ScopedMemoryBuffer<char *> mElementPointers;
 };
 
