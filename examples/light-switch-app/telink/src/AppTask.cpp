@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 #include "AppEvent.h"
 #include "ButtonManager.h"
 #include "LEDWidget.h"
-#include "LightingManager.h"
+#include "binding-handler.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
@@ -61,7 +61,7 @@ K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppE
 LEDWidget sStatusLED;
 
 Button sFactoryResetButton;
-Button sLightingButton;
+Button sSwitchButton;
 Button sThreadStartButton;
 Button sBleAdvStartButton;
 
@@ -88,16 +88,6 @@ CHIP_ERROR AppTask::Init()
 
     InitButtons();
 
-    // Init lighting manager
-    ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
-    if (ret != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to int lighting manager");
-        return ret;
-    }
-
-    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -107,9 +97,18 @@ CHIP_ERROR AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     ConfigurationMgr().LogDeviceConfig();
+
+    // Configure Bindings
+    ret = InitBindingHandler();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("InitBindingHandler() failed");
+        return ret;
+    }
+
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-    ret = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
+    ret = ConnectivityMgr().SetBLEDeviceName("TelinkSwitch");
     if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Fail to set BLE device name");
@@ -176,34 +175,26 @@ CHIP_ERROR AppTask::StartApp()
     }
 }
 
-void AppTask::LightingActionButtonEventHandler(void)
+void AppTask::SwitchActionButtonEventHandler(void)
 {
     AppEvent event;
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = LightingActionEventHandler;
+    event.Handler            = SwitchActionEventHandler;
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::LightingActionEventHandler(AppEvent * aEvent)
+void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
-    LightingManager::Action_t action = LightingManager::INVALID_ACTION;
-    int32_t actor                    = 0;
-
-    if (aEvent->Type == AppEvent::kEventType_Lighting)
+    if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
-        actor  = aEvent->LightingEvent.Actor;
-    }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
-        actor  = AppEvent::kEventType_Button;
-    }
+        BindingCommandData * data = chip::Platform::New<BindingCommandData>();
+        data->commandId           = chip::app::Clusters::OnOff::Commands::Toggle::Id;
+        data->clusterId           = chip::app::Clusters::OnOff::Id;
 
-    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, NULL))
-        LOG_INF("Action is already in progress or active.");
+        PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    }
 }
 
 void AppTask::FactoryResetButtonEventHandler(void)
@@ -282,50 +273,14 @@ void AppTask::StartBleAdvHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
-{
-    if (aAction == LightingManager::ON_ACTION)
-    {
-        LOG_INF("Turn On Action has been initiated");
-    }
-    else if (aAction == LightingManager::OFF_ACTION)
-    {
-        LOG_INF("Turn Off Action has been initiated");
-    }
-    else if (aAction == LightingManager::LEVEL_ACTION)
-    {
-        LOG_INF("Level Action has been initiated");
-    }
-}
+void AppTask::ActionInitiated(AppTask::Action_t aAction, int32_t aActor) {}
 
-void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionCompleted(AppTask::Action_t aAction, int32_t aActor)
 {
-    if (aAction == LightingManager::ON_ACTION)
-    {
-        LOG_INF("Turn On Action has been completed");
-    }
-    else if (aAction == LightingManager::OFF_ACTION)
-    {
-        LOG_INF("Turn Off Action has been completed");
-    }
-    else if (aAction == LightingManager::LEVEL_ACTION)
-    {
-        LOG_INF("Level Action has been completed");
-    }
-
     if (aActor == AppEvent::kEventType_Button)
     {
         sAppTask.UpdateClusterState();
     }
-}
-
-void AppTask::PostLightingActionRequest(LightingManager::Action_t aAction)
-{
-    AppEvent event;
-    event.Type                 = AppEvent::kEventType_Lighting;
-    event.LightingEvent.Action = aAction;
-    event.Handler              = LightingActionEventHandler;
-    PostEvent(&event);
 }
 
 void AppTask::PostEvent(AppEvent * aEvent)
@@ -348,38 +303,17 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState()
-{
-    uint8_t onoff = LightingMgr().IsTurnedOn();
-
-    // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        LOG_ERR("Updating on/off cluster failed: %x", status);
-    }
-
-    uint8_t level = LightingMgr().GetLevel();
-
-    status =
-        emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &level, ZCL_INT8U_ATTRIBUTE_TYPE);
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        LOG_ERR("Updating level cluster failed: %x", status);
-    }
-}
+void AppTask::UpdateClusterState() {}
 
 void AppTask::InitButtons(void)
 {
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
+    sSwitchButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, SwitchActionButtonEventHandler);
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
-    ButtonManagerInst().AddButton(sLightingButton);
+    ButtonManagerInst().AddButton(sSwitchButton);
     ButtonManagerInst().AddButton(sThreadStartButton);
     ButtonManagerInst().AddButton(sBleAdvStartButton);
 }
