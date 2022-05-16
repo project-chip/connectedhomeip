@@ -119,3 +119,55 @@ private:
     uint32_t mFeatureMap;
     DeviceCallback_fn mChanged_CB;
 };
+
+class ComposedDevice : public Device
+{
+public:
+    ComposedDevice(const char * szDeviceName, const char * szLocation) : Device(szDeviceName, szLocation){};
+
+    using DeviceCallback_fn = std::function<void(ComposedDevice *, ComposedDevice::Changed_t)>;
+
+    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
+
+private:
+    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
+
+private:
+    DeviceCallback_fn mChanged_CB;
+};
+
+class DevicePowerSource : public Device
+{
+public:
+    enum Changed_t
+    {
+        kChanged_BatLevel    = kChanged_Last << 1,
+        kChanged_Description = kChanged_Last << 2,
+    } Changed;
+
+    DevicePowerSource(const char * szDeviceName, const char * szLocation, uint32_t aFeatureMap) :
+        Device(szDeviceName, szLocation), mFeatureMap(aFeatureMap){};
+
+    using DeviceCallback_fn = std::function<void(DevicePowerSource *, DevicePowerSource::Changed_t)>;
+    void SetChangeCallback(DeviceCallback_fn aChanged_CB) { mChanged_CB = aChanged_CB; }
+
+    void SetBatChargeLevel(uint8_t aBatChargeLevel);
+    void SetDescription(std::string aDescription);
+
+    inline uint32_t GetFeatureMap() { return mFeatureMap; };
+    inline uint8_t GetBatChargeLevel() { return mBatChargeLevel; };
+    inline uint8_t GetOrder() { return mOrder; };
+    inline uint8_t GetStatus() { return mStatus; };
+    inline std::string GetDescription() { return mDescription; };
+
+private:
+    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
+
+private:
+    uint8_t mBatChargeLevel  = 0;
+    uint8_t mOrder           = 0;
+    uint8_t mStatus          = 0;
+    std::string mDescription = "Primary Battery";
+    uint32_t mFeatureMap;
+    DeviceCallback_fn mChanged_CB;
+};
