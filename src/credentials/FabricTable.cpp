@@ -221,11 +221,11 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
 
             if (mOperationalKey == nullptr)
             {
-    #ifdef ENABLE_HSM_CASE_OPS_KEY
+#ifdef ENABLE_HSM_CASE_OPS_KEY
                 mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-    #else
+#else
                 mOperationalKey = chip::Platform::New<P256Keypair>();
-    #endif
+#endif
             }
             VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
             ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
