@@ -81,9 +81,6 @@ public:
 
 using TestContext = chip::Test::LoopbackMessagingContext;
 
-TestContext sContext;
-auto & gLoopback = sContext.GetLoopback();
-
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
@@ -120,6 +117,7 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kPASE);
 
+    auto & gLoopback = ctx.GetLoopback();
     gLoopback.Reset();
 
     NL_TEST_ASSERT(inSuite,
@@ -158,6 +156,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegate;
     PASESession pairing;
 
+    auto & gLoopback = ctx.GetLoopback();
     gLoopback.Reset();
 
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
@@ -205,6 +204,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     PASESession pairingAccessory;
 
     PASETestLoopbackTransportDelegate delegate;
+    auto & gLoopback = ctx.GetLoopback();
     gLoopback.SetLoopbackTransportDelegate(&delegate);
     gLoopback.mSentMessageCount = 0;
 
@@ -282,6 +282,8 @@ void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    auto & gLoopback  = ctx.GetLoopback();
     gLoopback.Reset();
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
                                      Optional<ReliableMessageProtocolConfig>::Missing(),
@@ -293,6 +295,8 @@ void SecurePairingHandshakeWithCommissionerMRPTest(nlTestSuite * inSuite, void *
     SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    auto & gLoopback  = ctx.GetLoopback();
     gLoopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
@@ -305,6 +309,8 @@ void SecurePairingHandshakeWithDeviceMRPTest(nlTestSuite * inSuite, void * inCon
     SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    auto & gLoopback  = ctx.GetLoopback();
     gLoopback.Reset();
     ReliableMessageProtocolConfig config(1000_ms32, 10000_ms32);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
@@ -317,6 +323,8 @@ void SecurePairingHandshakeWithAllMRPTest(nlTestSuite * inSuite, void * inContex
     SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    auto & gLoopback  = ctx.GetLoopback();
     gLoopback.Reset();
     ReliableMessageProtocolConfig commissionerConfig(1000_ms32, 10000_ms32);
     ReliableMessageProtocolConfig deviceConfig(2000_ms32, 7000_ms32);
@@ -330,6 +338,8 @@ void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inCo
     SessionManager sessionManager;
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    auto & gLoopback  = ctx.GetLoopback();
     gLoopback.Reset();
     gLoopback.mNumMessagesToDrop = 2;
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner,
@@ -350,6 +360,7 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
 
+    auto & gLoopback = ctx.GetLoopback();
     gLoopback.Reset();
     gLoopback.mSentMessageCount = 0;
 
@@ -471,6 +482,8 @@ int TestSecurePairing_Teardown(void * inContext)
  */
 int TestPASESession()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

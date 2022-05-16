@@ -56,11 +56,7 @@ using namespace chip::System::Clock::Literals;
 
 using TestContext = Test::LoopbackMessagingContext;
 
-TestContext sContext;
-
 const char PAYLOAD[] = "Hello!";
-
-auto & gLoopback = sContext.GetLoopback();
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
@@ -222,6 +218,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     });
 
     // Let's drop the initial message
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 2;
     gLoopback.mDroppedMessageCount = 0;
@@ -241,7 +238,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the first re-transmit (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
@@ -251,7 +248,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the second re-transmit (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
@@ -285,6 +282,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     });
 
     // Let's drop the initial message
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 2;
     gLoopback.mDroppedMessageCount = 0;
@@ -302,7 +300,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the first re-transmit (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
@@ -312,7 +310,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the second re-transmit (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
@@ -344,6 +342,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
     // Let's drop the initial message
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
     gLoopback.mDroppedMessageCount = 0;
@@ -358,7 +357,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
 
     // Wait for the first re-transmit (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
@@ -386,6 +385,7 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -431,6 +431,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     });
 
     // Let's drop the initial message
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
     gLoopback.mDroppedMessageCount = 0;
@@ -449,7 +450,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
 
     // Wait for the first re-transmit (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
@@ -492,6 +493,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -520,7 +522,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Wait for the first re-transmit and ack (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
@@ -558,6 +560,7 @@ void CheckDuplicateOldMessageClosedExchange(nlTestSuite * inSuite, void * inCont
     });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -620,7 +623,7 @@ void CheckDuplicateOldMessageClosedExchange(nlTestSuite * inSuite, void * inCont
 
     // Wait for the first re-transmit and ack (should take 64ms)
     rm->StartTimer();
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [extraMessages] { return gLoopback.mSentMessageCount >= 3 + extraMessages; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 3 + extraMessages; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
@@ -662,6 +665,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     });
 
     // Let's drop the initial message
+    auto & gLoopback               = inctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 1;
     gLoopback.mDroppedMessageCount = 0;
@@ -680,7 +684,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
 
     // Wait for the first re-transmit (should take 64ms)
-    inctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
+    inctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 2; });
     inctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
@@ -725,6 +729,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     });
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -754,7 +759,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mRetainExchange  = false;
 
     // Wait for the first re-transmit and ack (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
@@ -798,6 +803,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // exchange alive until it does the message send (so we can send the
     // response from the receiver and so the initial sender exchange can get
     // it).
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -888,6 +894,7 @@ void CheckPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     // piggybacked.  We need to keep both exchanges alive for that (so we can
     // send the response from the receiver and so the initial sender exchange
     // can get it).
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -1016,6 +1023,7 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
 
     // We send a message, have it get received by the peer, expect an ack from
     // the peer.
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -1096,6 +1104,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     // Ensure the retransmit table is empty right now
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -1227,6 +1236,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // we can send the response from the receiver), but don't need anything
     // special for the sender exchange, because it will be waiting for the
     // application-level response.
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -1290,7 +1300,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     mockSender.mReceivedPiggybackAck       = false;
 
     // Wait for re-transmit from sender and ack (should take 64ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 4; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 4; });
     ctx.DrainAndServiceIO();
 
     // We resent our first message, which did not make it to the app-level
@@ -1319,7 +1329,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     }
 
     // Wait for re-transmit from receiver (should take 256ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 6; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return gLoopback.mSentMessageCount >= 6; });
     ctx.DrainAndServiceIO();
 
     // And now we've definitely resent our response message, which should show
@@ -1374,6 +1384,7 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // We need to keep both exchanges alive for that (so we can send the
     // response from the receiver and so the initial sender exchange can send a
     // response to that).
+    auto & gLoopback               = ctx.GetLoopback();
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
@@ -1599,6 +1610,8 @@ nlTestSuite sSuite =
  */
 int TestReliableMessageProtocol()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

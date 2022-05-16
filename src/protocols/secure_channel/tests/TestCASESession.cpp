@@ -53,10 +53,6 @@ using namespace chip::Protocols;
 using TestContext = Test::LoopbackMessagingContext;
 
 namespace {
-TestContext sContext;
-
-auto & gLoopback = sContext.GetLoopback();
-
 FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;
 GroupDataProviderImpl gCommissionerGroupDataProvider;
@@ -227,6 +223,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
                    pairing.EstablishSession(sessionManager, fabric, Node01_01, context, nullptr, &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
+    auto & gLoopback = ctx.GetLoopback();
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
     // Clear pending packet in CRMP
@@ -264,6 +261,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(System::Clock::Milliseconds32(5000),
                                                                  System::Clock::Milliseconds32(300));
 
+    auto & gLoopback            = ctx.GetLoopback();
     gLoopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite,
@@ -317,6 +315,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
+    auto & gLoopback            = ctx.GetLoopback();
     gLoopback.mSentMessageCount = 0;
 
     // Use the same session manager on both CASE client and server sides to validate that both
@@ -740,6 +739,7 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         },
     };
 
+    auto & gLoopback = ctx.GetLoopback();
     for (size_t i = 0; i < sizeof(testVectors) / sizeof(testVectors[0]); ++i)
     {
         auto * pairingCommissioner = chip::Platform::New<CASESession>();
@@ -847,6 +847,8 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
  */
 int TestCASESession()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 
