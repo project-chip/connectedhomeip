@@ -1,6 +1,5 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
 #import <Foundation/Foundation.h>
 
 #import "CHIPAttributeCacheContainer_Internal.h"
@@ -19,7 +18,7 @@ using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 @implementation CHIP{{asUpperCamelCase name}}
 
 - (chip::Controller::ClusterBase *)getCluster
@@ -206,4 +205,3 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{/chip_client_clusters}}
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
-{{/if}}

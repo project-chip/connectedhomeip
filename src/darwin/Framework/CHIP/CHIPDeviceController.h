@@ -35,18 +35,55 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 
 @property (readonly, nonatomic) BOOL isRunning;
 
+/**
+ * Return the Node Id assigned to the controller.  Will return nil if the
+ * controller is not running (and hence does not know its node id).
+ */
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId;
+
+/**
+ * Start pairing for a device with the given ID, using the provided setup PIN
+ * to establish a PASE connection.
+ *
+ * The IP and port for the device will be discovered automatically based on the
+ * provided discriminator.
+ *
+ * The pairing process will proceed until a PASE session is established or an
+ * error occurs, then notify onPairingComplete on the CHIPDevicePairingDelegate
+ * for this controller.  That delegate is expected to call commissionDevice
+ * after that point if it wants to commission the device.
+ */
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
+/**
+ * Start pairing for a device with the given ID, using the provided IP address
+ * and port to connect to the device and the provided setup PIN to establish a
+ * PASE connection.
+ *
+ * The pairing process will proceed until a PASE session is established or an
+ * error occurs, then notify onPairingComplete on the CHIPDevicePairingDelegate
+ * for this controller.  That delegate is expected to call commissionDevice
+ * after that point if it wants to commission the device.
+ */
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
-     discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
+/**
+ * Start pairing for a device with the given ID and onboarding payload (QR code
+ * or manual setup code).  The payload will be used to discover the device and
+ * establish a PASE connection.
+ *
+ * The pairing process will proceed until a PASE session is established or an
+ * error occurs, then notify onPairingComplete on the CHIPDevicePairingDelegate
+ * for this controller.  That delegate is expected to call commissionDevice
+ * after that point if it wants to commission the device.
+ */
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
 - (BOOL)commissionDevice:(uint64_t)deviceId
      commissioningParams:(CHIPCommissioningParameters *)commissioningParams
@@ -82,11 +119,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-/**
- * Return the Node Id assigned to the controller.
- */
-- (NSNumber *)getControllerNodeId;
 
 /**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered

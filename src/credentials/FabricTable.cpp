@@ -190,7 +190,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         // The compressed fabric ID doesn't change for a fabric over time.
         // Computing it here will save computational overhead when it's accessed by other
         // parts of the code.
-        ReturnErrorOnFailure(GeneratePeerId(mFabricId, nodeId, &mOperationalId));
+        ReturnErrorOnFailure(GeneratePeerId(mRootCert, mFabricId, nodeId, &mOperationalId));
         ReturnErrorOnFailure(SetNOCCert(nocCert));
     }
 
@@ -267,7 +267,7 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId)
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
@@ -276,7 +276,7 @@ CHIP_ERROR FabricInfo::GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId *
 
     {
         P256PublicKeySpan rootPubkeySpan;
-        ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
+        ReturnErrorOnFailure(ExtractPublicKeyFromChipCert(rcac, rootPubkeySpan));
         rootPubkey = rootPubkeySpan;
     }
 
@@ -366,6 +366,13 @@ CHIP_ERROR FabricInfo::SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCe
 CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, ValidationContext & context,
                                          PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const
 {
+    return VerifyCredentials(noc, icac, mRootCert, context, nocPeerId, fabricId, nocPubkey);
+}
+
+CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                         ValidationContext & context, PeerId & nocPeerId, FabricId & fabricId,
+                                         Crypto::P256PublicKey & nocPubkey)
+{
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
     //        It can be optimized by not loading certificate (i.e. rcac) that's local and implicitly trusted.
@@ -375,7 +382,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
     ChipCertificateSet certificates;
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
 
-    ReturnErrorOnFailure(certificates.LoadCert(mRootCert, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+    ReturnErrorOnFailure(certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     if (!icac.empty())
     {
@@ -423,7 +430,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
         return err;
     }
 
-    ReturnErrorOnFailure(GeneratePeerId(fabricId, nodeId, &nocPeerId));
+    ReturnErrorOnFailure(GeneratePeerId(rcac, fabricId, nodeId, &nocPeerId));
     nocPubkey = P256PublicKey(certificates.GetLastCert()[0].mPublicKey);
 
     return CHIP_NO_ERROR;
@@ -551,13 +558,17 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     validContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
     validContext.mRequiredKeyPurposes.Set(KeyPurposeFlags::kServerAuth);
 
+    // Make sure to not modify any of our state until VerifyCredentials passes.
+    PeerId operationalId;
+    FabricId fabricId;
+    ChipLogProgress(Discovery, "Verifying the received credentials");
+    ReturnErrorOnFailure(VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, validContext, operationalId,
+                                           fabricId, pubkey));
+
     SetOperationalKeypair(newFabric.GetOperationalKey());
     SetRootCert(newFabric.mRootCert);
-
-    ChipLogProgress(Discovery, "Verifying the received credentials");
-    ReturnErrorOnFailure(
-        VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, validContext, mOperationalId, mFabricId, pubkey));
-
+    mOperationalId = operationalId;
+    mFabricId      = fabricId;
     SetICACert(newFabric.mICACert);
     SetNOCCert(newFabric.mNOCCert);
     SetVendorId(newFabric.GetVendorId());
@@ -567,6 +578,12 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     ChipLogProgress(Discovery, "Assigned compressed fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                     ChipLogValueX64(mOperationalId.GetCompressedFabricId()), ChipLogValueX64(mOperationalId.GetNodeId()));
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
+    VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return AddNewFabricInner(newFabric, outputIndex);
 }
 
 CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outputIndex)
@@ -598,6 +615,11 @@ CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outpu
         }
     }
 
+    return AddNewFabricInner(newFabric, outputIndex);
+}
+
+CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
     if (!mNextAvailableFabricIndex.HasValue())
     {
         // No more indices available.  Bail out.
@@ -906,8 +928,7 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                           ByteSpan nodePrivateKey)
+CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey)
 {
     Reset();
 
@@ -917,9 +938,8 @@ CHIP_ERROR FabricInfo::TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert,
 
     // NOTE: this requres ENABLE_HSM_CASE_OPS_KEY is not defined
     P256SerializedKeypair opKeysSerialized;
-    memcpy(static_cast<uint8_t *>(opKeysSerialized), nodePubKey.data(), nodePubKey.size());
-    memcpy(static_cast<uint8_t *>(opKeysSerialized) + nodePubKey.size(), nodePrivateKey.data(), nodePrivateKey.size());
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(nodePubKey.size() + nodePrivateKey.size()));
+    memcpy(static_cast<uint8_t *>(opKeysSerialized), nocKey.data(), nocKey.size());
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(nocKey.size()));
 
     P256Keypair opKey;
     ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));

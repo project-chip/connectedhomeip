@@ -2018,6 +2018,8 @@ public class ClusterInfoMapping {
     public void onSuccess(
         Boolean credentialExists,
         @Nullable Integer userIndex,
+        @Nullable Integer creatorFabricIndex,
+        @Nullable Integer lastModifiedFabricIndex,
         @Nullable Integer nextCredentialIndex) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo credentialExistsResponseValue =
@@ -2025,6 +2027,12 @@ public class ClusterInfoMapping {
       responseValues.put(credentialExistsResponseValue, credentialExists);
       CommandResponseInfo userIndexResponseValue = new CommandResponseInfo("userIndex", "Integer");
       responseValues.put(userIndexResponseValue, userIndex);
+      CommandResponseInfo creatorFabricIndexResponseValue =
+          new CommandResponseInfo("creatorFabricIndex", "Integer");
+      responseValues.put(creatorFabricIndexResponseValue, creatorFabricIndex);
+      CommandResponseInfo lastModifiedFabricIndexResponseValue =
+          new CommandResponseInfo("lastModifiedFabricIndex", "Integer");
+      responseValues.put(lastModifiedFabricIndexResponseValue, lastModifiedFabricIndex);
       CommandResponseInfo nextCredentialIndexResponseValue =
           new CommandResponseInfo("nextCredentialIndex", "Integer");
       responseValues.put(nextCredentialIndexResponseValue, nextCredentialIndex);
@@ -4972,8 +4980,58 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedPowerSourceClusterActiveWiredFaultsAttributeCallback
+      implements ChipClusters.PowerSourceCluster.ActiveWiredFaultsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedPowerSourceClusterActiveBatteryFaultsAttributeCallback
       implements ChipClusters.PowerSourceCluster.ActiveBatteryFaultsAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedPowerSourceClusterActiveBatteryChargeFaultsAttributeCallback
+      implements ChipClusters.PowerSourceCluster.ActiveBatteryChargeFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 

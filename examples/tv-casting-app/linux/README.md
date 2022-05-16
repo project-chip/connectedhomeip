@@ -42,7 +42,7 @@ commissioned. Then it allows the user to send CHIP commands to the TV.
 -   Pre-requisite: Build and run the tv-app
 
         $ cd ~/connectedhomeip/examples/tv-app/linux
-        $ out/debug/chip-tv-app
+        $ out/debug/chip-tv-app --secured-device-port 5640 --secured-commissioner-port 5552
 
 -   Run the tv-casting-app (clean start)
 
@@ -71,11 +71,16 @@ printed list.
 
 -   Initiate UDC for the discovered video player with index 0
 
-        > cast request 0
+        tv-casting-app> cast request 0
+
+-   After sending UDC command to tv-app, you should be able to enter into tv-app
+    shell:
+
+        tv-app> controller ux ok
 
 -   Re-run commissioner discovery
 
-        > cast discover
+        tv-casting-app> cast discover
 
 ### Re-Running the Example on Linux with Cached Fabrics
 
@@ -88,20 +93,20 @@ valid cached fabric will be used.
 
 -   Print all shell commands
 
-        > help
-        > cast help
+        tv-casting-app> help
+        tv-casting-app> cast help
 
 -   Print all fabrics
 
-        > cast print-fabrics
+        tv-casting-app> cast print-fabrics
 
 -   Delete fabric with index 1
 
-        > cast delete-fabric 1
+        tv-casting-app> cast delete-fabric 1
 
--   Switch to fabric index 
+-   Switch to fabric index
 
-        > cast set-fabric 1
+        tv-casting-app> cast set-fabric 1
 
 ### Sending Arbitrary Cluster commands
 
@@ -116,9 +121,9 @@ the video player (TV). For convenience, when nodeId '0' is used, the
 tv-casting-app will use the cached nodeId for the video player corresponding to
 the current fabric.
 
-The tv-casting-app is able to determine the nodeId for the given fabric by 
-checking its binding table since the video player sets bindings on the 
-tv-casting-app for each endpoint to which the tv-casting-app is granted access 
+The tv-casting-app is able to determine the nodeId for the given fabric by
+checking its binding table since the video player sets bindings on the
+tv-casting-app for each endpoint to which the tv-casting-app is granted access
 during commissioning.
 
 -   Run the tv-casting-app and invoke a cluster command using default fabric,
@@ -144,9 +149,9 @@ during commissioning.
 -   Run the tv-casting-app and invoke a cluster command from the shell using
     default fabric, video player nodeId for that fabric
 
-        > cast cluster keypadinput send-key 1 0 1
+        tv-casting-app> cast cluster keypadinput send-key 1 0 1
 
--   Run the tv-casting-app and invoke a cluster command from the shell using 
+-   Run the tv-casting-app and invoke a cluster command from the shell using
     default fabric, target video player nodeId 0xFFFFFFEFFFFFFFFF
 
-        > cast cluster keypadinput send-key 1 0xFFFFFFEFFFFFFFFF 1
+        tv-casting-app> cast cluster keypadinput send-key 1 0xFFFFFFEFFFFFFFFF 1

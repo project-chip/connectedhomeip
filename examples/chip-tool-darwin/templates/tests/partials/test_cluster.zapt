@@ -91,7 +91,7 @@ class {{filename}}: public TestCommandBridge
       }
 
       // Go on to the next test.
-      WaitForMs(0);
+      ContinueOnChipMainThread(CHIP_NO_ERROR);
     }
 
   chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr({{chip_tests_config_get_default_value "timeout"}})); }
@@ -126,20 +126,15 @@ class {{filename}}: public TestCommandBridge
     {{#*inline "testCommand"}}Test{{asUpperCamelCase label}}_{{index}}{{/inline}}
     CHIP_ERROR {{>testCommand}}()
     {
-        SetIdentity("{{identity}}");
         {{#if (isTestOnlyCluster cluster)}}
-        {{command}}(
+        {{#if (chip_tests_item_has_list)}}ListFreer listFreer;{{/if~}}
+        {{asEncodableType}} value;
         {{#chip_tests_item_parameters}}
-        {{~#not_first}}, {{/not_first~}}
-        {{#*inline "defaultValue"}}{{asTypedLiteral (chip_tests_config_get_default_value definedValue) (chip_tests_config_get_type definedValue)}}{{/inline}}
-          {{~#if (chip_tests_config_has definedValue)~}}
-              m{{asUpperCamelCase definedValue}}.HasValue() ? m{{asUpperCamelCase definedValue}}.Value() : {{~#if (isString type)}}chip::CharSpan::fromCharString("{{>defaultValue}}"){{else}}{{>defaultValue}}{{/if~}}
-          {{else}}
-          {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}
-          {{~/if~}}
-        {{/chip_tests_item_parameters}});
+          {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
+        {{/chip_tests_item_parameters}}
+        return {{command}}("{{identity}}", value);
         {{else}}
-        CHIPDevice * device = GetConnectedDevice();
+        CHIPDevice * device = GetDevice("{{identity}}");
         CHIPTest{{asUpperCamelCase cluster}} * cluster = [[CHIPTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
@@ -201,10 +196,10 @@ class {{filename}}: public TestCommandBridge
 
             {{#chip_tests_item_responses}}
             {{#if error}}
-              VerifyOrReturn(CheckValue("status", err, {{error}}));
+              VerifyOrReturn(CheckValue("status", err ? err.code : 0, {{error}}));
               NextTest();
             {{else}}
-              VerifyOrReturn(CheckValue("status", err, 0));
+              VerifyOrReturn(CheckValue("status", err ? err.code : 0, 0));
             {{#unless isSubscribeAttribute}}
 
             {{#chip_tests_item_response_parameters}}
@@ -274,19 +269,11 @@ class {{filename}}: public TestCommandBridge
         {{/chip_tests_item_responses}}
     }{{#unless isWaitForReport}}]{{/unless}};
 
-    {{/if}}
     {{#if async}}
     NextTest();
-    {{else}}
-    {{#*inline "minCommandTimeout"~}}
-      {{#if (isTestOnlyCluster cluster)~}}
-        {{#if (isStrEqual command "WaitForMs")~}}
-          {{#chip_tests_item_parameters}}{{#if (isStrEqual name "ms")}}({{definedValue}} / 1000) + {{/if}}{{/chip_tests_item_parameters}}
-        {{~/if}}
-      {{~/if}}
-    {{~/inline}}
     {{/if}}
     return CHIP_NO_ERROR;
+    {{/if}}
   }
 {{/chip_tests_items}}
 

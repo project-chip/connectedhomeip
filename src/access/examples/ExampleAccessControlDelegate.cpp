@@ -971,6 +971,24 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const override
+    {
+        value = EntryStorage::kEntriesPerFabric;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetMaxSubjectsPerEntry(size_t & value) const override
+    {
+        value = EntryStorage::kMaxSubjects;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetMaxTargetsPerEntry(size_t & value) const override
+    {
+        value = EntryStorage::kMaxTargets;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR GetMaxEntryCount(size_t & value) const override
     {
         value = ArraySize(EntryStorage::acl);

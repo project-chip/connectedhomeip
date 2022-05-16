@@ -104,7 +104,8 @@ static void _logSSLError()
         const char * err_str_reason  = ERR_reason_error_string(ssl_err_code);
         if (err_str_lib)
         {
-            ChipLogError(Crypto, " ssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
+            ChipLogError(Crypto, " ssl err  %s %s %s\n", StringOrNullMarker(err_str_lib), StringOrNullMarker(err_str_routine),
+                         StringOrNullMarker(err_str_reason));
         }
 #endif // CHIP_ERROR_LOGGING
         ssl_err_code = ERR_get_error();
@@ -511,6 +512,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     HMAC_CTX * mac_ctx = HMAC_CTX_new();
     VerifyOrExit(mac_ctx != nullptr, error = CHIP_ERROR_INTERNAL);
 
+    VerifyOrExit(CanCastTo<int>(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
     error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<int>(key_length), EVP_sha256(), nullptr);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
@@ -1111,8 +1113,9 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
 {
     ERR_clear_error();
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    CHIP_ERROR error     = CHIP_NO_ERROR;
+    int result           = 0;
+    int csr_length_local = 0;
 
     X509_REQ * x509_req = X509_REQ_new();
     EVP_PKEY * evp_pkey = nullptr;
@@ -1151,6 +1154,10 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     result = X509_REQ_sign(x509_req, evp_pkey, EVP_sha256());
     VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
 
+    csr_length_local = i2d_X509_REQ(x509_req, nullptr);
+    VerifyOrExit(csr_length_local >= 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<size_t>(csr_length_local), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(static_cast<size_t>(csr_length_local) <= csr_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
     csr_length = static_cast<size_t>(i2d_X509_REQ(x509_req, &out_csr));
 
 exit:
@@ -1515,154 +1522,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
-static void security_free_cert_list(X509_LIST * certs)
-{
-    if (certs)
-    {
-        sk_X509_pop_free(certs, X509_free);
-    }
-}
-
-CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    X509_LIST * certs = nullptr;
-    BIO * bio_cert    = nullptr;
-    PKCS7 * p7        = nullptr;
-    int p7_type       = 0;
-
-    VerifyOrExit(x509list != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(max_certs != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    bio_cert = BIO_new_mem_buf(pkcs7, -1);
-
-    p7 = PEM_read_bio_PKCS7(bio_cert, nullptr, nullptr, nullptr);
-    VerifyOrExit(p7 != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-    p7_type = OBJ_obj2nid(p7->type);
-    if (p7_type == NID_pkcs7_signed)
-    {
-        certs = p7->d.sign->cert;
-    }
-    else if (p7_type == NID_pkcs7_signedAndEnveloped)
-    {
-        certs = p7->d.signed_and_enveloped->cert;
-    }
-
-    VerifyOrExit(certs != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
-    VerifyOrExit(static_cast<uint32_t>(sk_X509_num(certs)) <= *max_certs, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-    *max_certs = static_cast<uint32_t>(sk_X509_num(certs));
-
-    certs = X509_chain_up_ref(certs);
-
-    for (uint32_t i = 0; i < *max_certs; ++i)
-    {
-        size_t bytes_written          = 0;
-        unsigned char * pX509ListEnd  = x509list[i];
-        unsigned char ** pX509ListAux = &pX509ListEnd;
-
-        bytes_written = static_cast<size_t>(i2d_X509(sk_X509_value(certs, static_cast<int>(i)), pX509ListAux));
-
-        VerifyOrExit(bytes_written <= x509list[i].Capacity(), err = CHIP_ERROR_NO_MEMORY);
-
-        x509list[i].SetLength(bytes_written);
-    }
-
-exit:
-    BIO_free_all(bio_cert);
-    PKCS7_free(p7);
-    security_free_cert_list(certs);
-
-    return err;
-}
-
-CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t n_cert)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    X509_LIST * certs = nullptr;
-    BIO * bio_cert    = nullptr;
-    PKCS7 * p7        = nullptr;
-    int p7_type       = 0;
-
-    VerifyOrExit(x509list != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    bio_cert = BIO_new_mem_buf(pkcs7, -1);
-
-    p7 = PEM_read_bio_PKCS7(bio_cert, nullptr, nullptr, nullptr);
-    VerifyOrExit(p7 != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-    p7_type = OBJ_obj2nid(p7->type);
-    if (p7_type == NID_pkcs7_signed)
-    {
-        certs = p7->d.sign->cert;
-    }
-    else if (p7_type == NID_pkcs7_signedAndEnveloped)
-    {
-        certs = p7->d.signed_and_enveloped->cert;
-    }
-
-    VerifyOrExit(certs != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
-    VerifyOrExit(n_cert < static_cast<uint32_t>(sk_X509_num(certs)), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    certs = X509_chain_up_ref(certs);
-
-    {
-        size_t bytes_written          = 0;
-        unsigned char * pX509ListEnd  = reinterpret_cast<unsigned char *>(x509list);
-        unsigned char ** pX509ListAux = &pX509ListEnd;
-
-        bytes_written = static_cast<size_t>(i2d_X509(sk_X509_value(certs, static_cast<int>(n_cert)), pX509ListAux));
-
-        VerifyOrExit(bytes_written <= x509list->Capacity(), err = CHIP_ERROR_NO_MEMORY);
-
-        x509list->SetLength(bytes_written);
-    }
-
-exit:
-    BIO_free_all(bio_cert);
-    PKCS7_free(p7);
-    security_free_cert_list(certs);
-
-    return err;
-}
-
-CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    X509_LIST * certs = nullptr;
-    BIO * bio_cert    = nullptr;
-    PKCS7 * p7        = nullptr;
-    int p7_type       = 0;
-
-    VerifyOrExit(n_certs != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    bio_cert = BIO_new_mem_buf(pkcs7, -1);
-
-    p7 = PEM_read_bio_PKCS7(bio_cert, nullptr, nullptr, nullptr);
-    VerifyOrExit(p7 != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-    p7_type = OBJ_obj2nid(p7->type);
-    if (p7_type == NID_pkcs7_signed)
-    {
-        certs = p7->d.sign->cert;
-    }
-    else if (p7_type == NID_pkcs7_signedAndEnveloped)
-    {
-        certs = p7->d.signed_and_enveloped->cert;
-    }
-
-    VerifyOrExit(certs != nullptr, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-    *n_certs = static_cast<uint32_t>(sk_X509_num(certs));
-
-exit:
-    BIO_free_all(bio_cert);
-    PKCS7_free(p7);
-
-    return err;
-}
-
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
                                     CertificateChainValidationResult & result)
@@ -1671,17 +1530,18 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     int status                 = 0;
     X509_STORE_CTX * verifyCtx = nullptr;
     X509_STORE * store         = nullptr;
+    STACK_OF(X509) * chain     = nullptr;
     X509 * x509RootCertificate = nullptr;
     X509 * x509CACertificate   = nullptr;
     X509 * x509LeafCertificate = nullptr;
 
     result = CertificateChainValidationResult::kInternalFrameworkError;
 
-    VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0,
+    VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0 && CanCastTo<long>(rootCertificateLen),
                         (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0,
+    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0 && CanCastTo<long>(caCertificateLen),
                         (result = CertificateChainValidationResult::kICAArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
-    VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0,
+    VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0 && CanCastTo<long>(leafCertificateLen),
                         (result = CertificateChainValidationResult::kLeafArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
 
     store = X509_STORE_new();
@@ -1689,6 +1549,9 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
     verifyCtx = X509_STORE_CTX_new();
     VerifyOrExit(verifyCtx != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
+
+    chain = sk_X509_new_null();
+    VerifyOrExit(chain != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
     x509RootCertificate = d2i_X509(nullptr, &rootCertificate, static_cast<long>(rootCertificateLen));
     VerifyOrExit(x509RootCertificate != nullptr,
@@ -1701,14 +1564,14 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     VerifyOrExit(x509CACertificate != nullptr,
                  (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-    status = X509_STORE_add_cert(store, x509CACertificate);
+    status = sk_X509_push(chain, x509CACertificate);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
     x509LeafCertificate = d2i_X509(nullptr, &leafCertificate, static_cast<long>(leafCertificateLen));
     VerifyOrExit(x509LeafCertificate != nullptr,
                  (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-    status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, nullptr);
+    status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, chain);
     VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
     status = X509_verify_cert(verifyCtx);
@@ -1721,6 +1584,7 @@ exit:
     X509_free(x509LeafCertificate);
     X509_free(x509CACertificate);
     X509_free(x509RootCertificate);
+    sk_X509_free(chain);
     X509_STORE_CTX_free(verifyCtx);
     X509_STORE_free(store);
 
@@ -1739,7 +1603,9 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     ASN1_TIME * tbeNotAfterTime                     = nullptr;
     int result                                      = 0;
 
-    VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!referenceCertificate.empty() && CanCastTo<long>(referenceCertificate.size()) &&
+                            !toBeEvaluatedCertificate.empty() && CanCastTo<long>(toBeEvaluatedCertificate.size()),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     x509ReferenceCertificate = d2i_X509(nullptr, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
     VerifyOrExit(x509ReferenceCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
@@ -1776,7 +1642,7 @@ CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
     ASN1_TIME * time                   = nullptr;
     int result                         = 0;
 
-    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     x509Certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
@@ -1812,6 +1678,8 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     unsigned char ** ppPubkey            = &pPubkey;
     int pkeyLen;
 
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
     x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
@@ -1842,13 +1710,15 @@ CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, Mut
     const unsigned char ** ppCertificate = &pCertificate;
     const ASN1_OCTET_STRING * kidString  = nullptr;
 
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
     x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     kidString = isSKID ? X509_get0_subject_key_id(x509certificate) : X509_get0_authority_key_id(x509certificate);
     VerifyOrExit(kidString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(kidString->length <= static_cast<int>(kid.size()), err = CHIP_ERROR_BUFFER_TOO_SMALL);
     VerifyOrExit(CanCastTo<size_t>(kidString->length), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(static_cast<size_t>(kidString->length) <= kid.size(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(kid.data(), kidString->data, static_cast<size_t>(kidString->length));
 
@@ -1884,6 +1754,8 @@ CHIP_ERROR ExtractVIDPIDFromX509Cert(const ByteSpan & certificate, AttestationCe
     X509_NAME * subject                = nullptr;
     int x509EntryCountIdx              = 0;
     AttestationCertVidPid vidpidFromCN;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
     x509certificate = d2i_X509(nullptr, &pCertificate, static_cast<long>(certificate.size()));
     VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);

@@ -57,6 +57,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (strong, nonatomic, nullable) NSNumber * timedWriteTimeoutMs;
 
+/**
+ * Sets the data version for the Write Request for the interaction.
+ *
+ * If not nil, the write will only succeed if the current data version of
+ * the cluster matches the provided data version.
+ */
+@property (strong, nonatomic, nullable) NSNumber * dataVersion;
+
 - (instancetype)init;
 @end
 

@@ -4,6 +4,10 @@ Matter tracing provides a tool for applications to trace information about the
 execution of the application. It depends on
 [pw_trace module](https://pigweed.dev/pw_trace/).
 
+Application can override trace events with custom trace system by setting
+MATTER_CUSTOM_TRACE to true and direct trace macros to
+trace/MatterCustomTrace.h.
+
 ## How to add trace events
 
 1. Include "trace/trace.h" in the source file.

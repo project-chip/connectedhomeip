@@ -44,7 +44,6 @@ constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::DeviceProxy;
     using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;

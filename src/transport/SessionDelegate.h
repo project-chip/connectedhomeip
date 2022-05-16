@@ -20,10 +20,26 @@
 
 namespace chip {
 
-class DLL_EXPORT SessionReleaseDelegate
+class DLL_EXPORT SessionDelegate
 {
 public:
-    virtual ~SessionReleaseDelegate() {}
+    virtual ~SessionDelegate() {}
+
+    enum class NewSessionHandlingPolicy : uint8_t
+    {
+        kShiftToNewSession,
+        kStayAtOldSession,
+    };
+
+    /**
+     * @brief
+     *   Called when a new secure session to the same peer is established, over the delegate of SessionHolderWithDelegate object. It
+     *   is suggested to shift to the newly created session.
+     *
+     * Note: the default implementation orders shifting to the new session, it should be fine for all users, unless the
+     * SessionHolder object is expected to be sticky to a specified session.
+     */
+    virtual NewSessionHandlingPolicy GetNewSessionHandlingPolicy() { return NewSessionHandlingPolicy::kShiftToNewSession; }
 
     /**
      * @brief

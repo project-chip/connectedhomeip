@@ -19,6 +19,8 @@
 #pragma once
 
 #include "../common/CHIPCommandBridge.h"
+#include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
@@ -29,7 +31,6 @@
 #include <zap-generated/cluster/CHIPTestClustersObjc.h>
 
 #import <CHIP/CHIP.h>
-#import <CHIP/CHIPDevice_Internal.h>
 #import <CHIP/CHIPError_Internal.h>
 
 class TestCommandBridge;
@@ -58,6 +59,8 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
                           public ConstraintsChecker,
                           public PICSChecker,
+                          public DelayCommands,
+                          public LogCommands,
                           public SystemCommands {
 public:
     TestCommandBridge(const char * _Nonnull commandName)
@@ -98,62 +101,65 @@ public:
         SetCommandExitStatus(err);
     }
 
-    void Log(NSString * _Nonnull message)
+    /////////// DelayCommands Interface /////////
+    void OnWaitForMs() override
     {
-        NSLog(@"%@", message);
-        NextTest();
-    }
-
-    /////////// DelayCommands-like Interface /////////
-    void WaitForMs(unsigned int ms)
-    {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ms * NSEC_PER_MSEC), mCallbackQueue, ^{
+        dispatch_async(mCallbackQueue, ^{
             NextTest();
         });
     }
 
-    void UserPrompt(NSString * _Nonnull message, NSString * _Nullable expectedValue = nil) { NextTest(); }
-
-    void WaitForCommissionee(chip::NodeId nodeId)
+    CHIP_ERROR WaitForCommissionee(const char * _Nullable identity,
+        const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override
     {
-        CHIPDeviceController * controller = CurrentCommissioner();
-        VerifyOrReturn(controller != nil, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
+        CHIPDeviceController * controller = GetCommissioner(identity);
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        SetIdentity(identity);
 
         // Disconnect our existing device; otherwise getConnectedDevice will
         // just hand it right back to us without establishing a new CASE
         // session.
-        if (GetConnectedDevice() != nil) {
-            auto device = [GetConnectedDevice() internalDevice];
+        if (GetDevice(identity) != nil) {
+            auto device = [GetDevice(identity) internalDevice];
             if (device != nullptr) {
                 device->Disconnect();
             }
-            mConnectedDevices[mCurrentIdentity] = nil;
+            mConnectedDevices[identity] = nil;
         }
 
-        [controller getConnectedDevice:nodeId
+        [controller getConnectedDevice:value.nodeId
                                  queue:mCallbackQueue
                      completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                         CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-                         VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
+                         if (error != nil) {
+                             SetCommandExitStatus(error);
+                             return;
+                         }
 
-                         mConnectedDevices[mCurrentIdentity] = device;
+                         mConnectedDevices[identity] = device;
                          NextTest();
                      }];
+        return CHIP_NO_ERROR;
     }
 
     /////////// CommissionerCommands-like Interface /////////
-    CHIP_ERROR PairWithQRCode(chip::NodeId nodeId, const chip::CharSpan payload)
+    CHIP_ERROR PairWithQRCode(
+        const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value)
     {
-        CHIPDeviceController * controller = CurrentCommissioner();
+        CHIPDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
+        SetIdentity(identity);
+
         [controller setPairingDelegate:mPairingDelegate queue:mCallbackQueue];
-        [mPairingDelegate setDeviceId:nodeId];
+        [mPairingDelegate setDeviceId:value.nodeId];
         [mPairingDelegate setActive:YES];
 
-        NSString * payloadStr = [[NSString alloc] initWithBytes:payload.data() length:payload.size() encoding:NSUTF8StringEncoding];
+        NSString * payloadStr = [[NSString alloc] initWithBytes:value.payload.data()
+                                                         length:value.payload.size()
+                                                       encoding:NSUTF8StringEncoding];
         NSError * err;
-        BOOL ok = [controller pairDevice:nodeId onboardingPayload:payloadStr error:&err];
+        BOOL ok = [controller pairDevice:value.nodeId onboardingPayload:payloadStr error:&err];
         if (ok == YES) {
             return CHIP_NO_ERROR;
         }
@@ -165,15 +171,16 @@ public:
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
         if (CHIP_NO_ERROR == err) {
-            WaitForMs(0);
-
+            dispatch_async(mCallbackQueue, ^{
+                NextTest();
+            });
         } else {
             Exit(chip::ErrorStr(err), err);
         }
         return CHIP_NO_ERROR;
     }
 
-    CHIPDevice * _Nullable GetConnectedDevice(void) { return mConnectedDevices[mCurrentIdentity]; }
+    CHIPDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -201,12 +208,6 @@ public:
             Exit("Failed to kick off commissioning", err);
             return;
         }
-    }
-
-    void SetIdentity(const char * _Nonnull name)
-    {
-        mCurrentIdentity = name;
-        CHIPCommandBridge::SetIdentity(name);
     }
 
 protected:
@@ -270,8 +271,15 @@ protected:
         return ConstraintsChecker::CheckConstraintNotValue(itemName, currentValue, expectedValue);
     }
 
-    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nonnull current, NSNumber * _Nonnull expected)
+    bool CheckConstraintNotValue(const char * _Nonnull itemName, const NSNumber * _Nullable current, NSNumber * _Nullable expected)
     {
+        if (current == nil && expected == nil) {
+            Exit(std::string(itemName) + " got unexpected value. Both values are nil.");
+            return false;
+        }
+        if ((current == nil) != (expected == nil)) {
+            return true;
+        }
         if ([current isEqualToNumber:expected]) {
             Exit(std::string(itemName) + " got unexpected value: " + std::string([[current stringValue] UTF8String]));
             return false;
@@ -371,9 +379,6 @@ protected:
 
 private:
     TestPairingDelegate * _Nonnull mPairingDelegate;
-
-    // Currently selected identity ("alpha", "beta", "gamma").
-    std::string mCurrentIdentity;
 
     // Set of our connected devices, keyed by identity.
     std::map<std::string, CHIPDevice *> mConnectedDevices;

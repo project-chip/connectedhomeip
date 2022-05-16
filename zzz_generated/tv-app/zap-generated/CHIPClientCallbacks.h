@@ -24,41 +24,26 @@
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
-#include <app/util/attribute-filter.h>
 #include <app/util/im-client-callbacks.h>
 #include <inttypes.h>
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
 // List specific responses
-void BindingClusterBindingListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                              chip::Callback::Cancelable * onFailureCallback);
 typedef void (*BindingBindingListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
-void NetworkCommissioningClusterNetworksListAttributeFilter(chip::TLV::TLVReader * data,
-                                                            chip::Callback::Cancelable * onSuccessCallback,
-                                                            chip::Callback::Cancelable * onFailureCallback);
 typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
         data);
-void OperationalCredentialsClusterNOCsListAttributeFilter(chip::TLV::TLVReader * data,
-                                                          chip::Callback::Cancelable * onSuccessCallback,
-                                                          chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsNOCsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
         data);
-void OperationalCredentialsClusterFabricsListAttributeFilter(chip::TLV::TLVReader * data,
-                                                             chip::Callback::Cancelable * onSuccessCallback,
-                                                             chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsFabricsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
-void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                             chip::Callback::Cancelable * onSuccessCallback,
-                                                                             chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);

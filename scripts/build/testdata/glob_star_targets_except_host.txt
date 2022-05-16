@@ -22,6 +22,7 @@ cc13x2x7_26x2x7-lock-ftd
 cc13x2x7_26x2x7-lock-mtd
 cc13x2x7_26x2x7-pump
 cc13x2x7_26x2x7-pump-controller
+cc13x2x7_26x2x7-shell
 cyw30739-cyw930739m2evb_01-light
 cyw30739-cyw930739m2evb_01-lock
 cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging

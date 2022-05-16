@@ -769,6 +769,7 @@ ManufacturingDate
 masterkey
 matterBuildSrcDir
 matterc
+MatterCustomTrace
 matterd
 MatterLock
 matterSdkSourceBuild
@@ -984,6 +985,7 @@ PlatformManagerImpl
 plt
 png
 PollControl
+pollInterval
 polymorphism
 POSIX
 PosixConfig
@@ -1347,6 +1349,7 @@ UTF
 util
 utils
 UUID
+ux
 VCP
 Vectorcall
 VendorID

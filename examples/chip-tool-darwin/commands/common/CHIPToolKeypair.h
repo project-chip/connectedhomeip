@@ -1,6 +1,5 @@
 #include "CHIPCommandStorageDelegate.h"
 #import <CHIP/CHIP.h>
-#import <CHIP/CHIPKeypair.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 @interface CHIPToolKeypair : NSObject <CHIPKeypair>

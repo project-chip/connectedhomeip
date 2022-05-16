@@ -21,6 +21,7 @@
 #import <Security/Security.h>
 
 #import "CHIPError_Internal.h"
+#import "CHIPKeypair.h"
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 
@@ -37,14 +38,8 @@ public:
 
     ~CHIPOperationalCredentialsDelegate() {}
 
-    /**
-     * If nocSigner is not provided (is null), a keypair will be loaded from the
-     * keychain, or generated if nothing is present in the keychain.
-     *
-     * If ipk is not provided (is nil), an IPK will be loaded from the keychain,
-     * or generated if nothing is present in the keychain.
-     */
-    CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * _Nullable ipk);
+    CHIP_ERROR Init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert,
+        NSData * _Nullable icaCert);
 
     CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
@@ -61,33 +56,42 @@ public:
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
 
-    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
-        const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac,
-        chip::MutableByteSpan & noc);
+    CHIP_ERROR GenerateNOC(chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
+        const chip::Crypto::P256PublicKey & pubkey, chip::MutableByteSpan & noc);
 
     const chip::Crypto::AesCcm128KeySpan GetIPK() { return mIPK.Span(); }
 
+    // Get the root/intermediate X.509 DER certs as a ByteSpan.
+    chip::ByteSpan RootCertSpan() const;
+    chip::ByteSpan IntermediateCertSpan() const;
+
+    // Generate a root (self-signed) DER-encoded X.509 certificate for the given
+    // CHIPKeypair.  If issuerId is provided, it is used; otherwise a random one
+    // is generated.  If a fabric id is provided it is added to the subject DN
+    // of the certificate.
+    //
+    // The outparam must not be null and is set to nil on errors.
+    static CHIP_ERROR GenerateRootCertificate(id<CHIPKeypair> keypair, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+        NSData * _Nullable __autoreleasing * _Nonnull rootCert);
+
+    // Generate an intermediate DER-encoded X.509 certificate for the given root
+    // and intermediate public key.  If issuerId is provided, it is used;
+    // otherwise a random one is generated.  If a fabric id is provided it is
+    // added to the subject DN of the certificate.
+    //
+    // The outparam must not be null and is set to nil on errors.
+    static CHIP_ERROR GenerateIntermediateCertificate(id<CHIPKeypair> rootKeypair, NSData * rootCertificate,
+        SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+        NSData * _Nullable __autoreleasing * _Nonnull intermediateCert);
+
 private:
-    CHIP_ERROR GenerateRootCertKeys();
-    CHIP_ERROR LoadRootCertKeysFromKeyChain();
-    CHIP_ERROR DeleteRootCertKeysFromKeychain();
-
-    CHIP_ERROR GenerateIPK();
-    CHIP_ERROR LoadIPKFromKeyChain();
-    CHIP_ERROR DeleteIPKFromKeyChain();
-
-    CHIP_ERROR SetIssuerID(CHIPPersistentStorageDelegateBridge * storage);
-
-    bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
+    static bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     ChipP256KeypairPtr mIssuerKey;
-    uint64_t mIssuerId = 1234;
 
     chip::Crypto::AesCcm128Key mIPK;
 
-    const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
-    const NSString * kCHIPCAKeyChainLabel = @"matter.nodeopcerts.CA:0";
-    const NSString * kCHIPIPKKeyChainLabel = @"matter.nodeopcerts.IPK:0";
+    static const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
 
     CHIPPersistentStorageDelegateBridge * mStorage;
 
@@ -96,7 +100,11 @@ private:
     chip::NodeId mNextRequestedNodeId = 1;
     chip::FabricId mNextFabricId = 1;
     bool mNodeIdRequested = false;
-    bool mForceRootCertRegeneration = false;
+
+    // mRootCert should not really be nullable, but we are constructed before we
+    // have a root cert, and at that point it gets initialized to nil.
+    NSData * _Nullable mRootCert;
+    NSData * _Nullable mIntermediateCert;
 };
 
 NS_ASSUME_NONNULL_END

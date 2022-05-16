@@ -109,6 +109,9 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
+// when the shell is enabled, don't intercept signals since it prevents the user from
+// using expected commands like CTRL-C to quit the application. (see issue #17845)
+#if !defined(ENABLE_CHIP_SHELL)
 void OnSignalHandler(int signum)
 {
     ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
@@ -159,6 +162,7 @@ void SetupSignalHandlers()
     signal(SIGIO, OnSignalHandler);
     signal(SIGINT, OnSignalHandler);
 }
+#endif // !defined(ENABLE_CHIP_SHELL)
 
 void Cleanup()
 {
@@ -193,7 +197,7 @@ static bool EnsureWiFiIsStarted()
 }
 #endif
 
-int ChipLinuxAppInit(int argc, char ** argv, OptionSet * customOptions)
+int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -364,7 +368,9 @@ void ChipLinuxAppMainLoop()
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if !defined(ENABLE_CHIP_SHELL)
     SetupSignalHandlers();
+#endif // !defined(ENABLE_CHIP_SHELL)
 
     ApplicationInit();
 

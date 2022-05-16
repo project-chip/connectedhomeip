@@ -846,7 +846,7 @@ function if_include_struct_item_value(structValue, name, options)
   }
 
   if (!this.isOptional) {
-    throw new Error(`Value not provided for ${name} where one is expected`);
+    throw new Error(`Value not provided for ${name} where one is expected in ` + JSON.stringify(structValue));
   }
 
   return options.inverse(this);
@@ -887,26 +887,139 @@ function chip_tests_item_has_list(options)
   });
 }
 
+function checkIsInsideTestOnlyClusterBlock(conditions, name)
+{
+  conditions.forEach(condition => {
+    if (condition == undefined) {
+      const errorStr = `Not inside a ({#${name}}} block.`;
+      console.error(errorStr);
+      throw new Error(errorStr);
+    }
+  });
+}
+
+/**
+ * Creates block iterator over the simulated clusters.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_clusters(options)
+{
+  const clusters         = await getClusters(this);
+  const testOnlyClusters = clusters.filter(cluster => isTestOnlyCluster(cluster.name));
+  return asBlocks.call(this, Promise.resolve(testOnlyClusters), options);
+}
+
+/**
+ * Creates block iterator over the cluster commands for a given simulated cluster.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_commands(options)
+{
+  const conditions = [ isTestOnlyCluster(this.name) ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_clusters');
+
+  const commands = await getCommands(this, this.name);
+  return asBlocks.call(this, Promise.resolve(commands), options);
+}
+
+/**
+ * Creates block iterator over the command arguments for a given simulated cluster command.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_cluster_commands}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_command_parameters(options)
+{
+  const conditions = [ isTestOnlyCluster(this.parent.name), this.arguments, this.response ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_cluster_commands');
+
+  return asBlocks.call(this, Promise.resolve(this.arguments), options);
+}
+
+/**
+ * Creates block iterator over the cluster responses for a given simulated cluster.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_responses(options)
+{
+  const conditions = [ isTestOnlyCluster(this.name) ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_clusters');
+
+  const commands  = await getCommands(this, this.name);
+  const responses = [];
+  commands.forEach(command => {
+    if (!command.response.arguments) {
+      return;
+    }
+
+    if (!('responseName' in command)) {
+      return;
+    }
+
+    const alreadyExists = responses.some(item => item.responseName == command.responseName);
+    if (alreadyExists) {
+      return;
+    }
+
+    command.response.responseName = command.responseName;
+    responses.push(command.response);
+  });
+
+  return asBlocks.call(this, Promise.resolve(responses), options);
+}
+
+/**
+ * Creates block iterator over the response arguments for a given simulated cluster response.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_cluster_responses}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_response_parameters(options)
+{
+  const conditions = [ isTestOnlyCluster(this.parent.name), this.arguments, this.responseName ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_cluster_responses');
+
+  return asBlocks.call(this, Promise.resolve(this.arguments), options);
+}
+
 //
 // Module exports
 //
-exports.chip_tests                          = chip_tests;
-exports.chip_tests_items                    = chip_tests_items;
-exports.chip_tests_item_has_list            = chip_tests_item_has_list;
-exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_responses           = chip_tests_item_responses;
-exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
-exports.chip_tests_pics                     = chip_tests_pics;
-exports.chip_tests_config                   = chip_tests_config;
-exports.chip_tests_config_has               = chip_tests_config_has;
-exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
-exports.chip_tests_config_get_type          = chip_tests_config_get_type;
-exports.chip_tests_variables                = chip_tests_variables;
-exports.chip_tests_variables_has            = chip_tests_variables_has;
-exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
-exports.chip_tests_variables_is_nullable    = chip_tests_variables_is_nullable;
-exports.isTestOnlyCluster                   = isTestOnlyCluster;
-exports.isLiteralNull                       = isLiteralNull;
-exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
-exports.if_include_struct_item_value        = if_include_struct_item_value;
-exports.ensureIsArray                       = ensureIsArray;
+exports.chip_tests                                  = chip_tests;
+exports.chip_tests_items                            = chip_tests_items;
+exports.chip_tests_item_has_list                    = chip_tests_item_has_list;
+exports.chip_tests_item_parameters                  = chip_tests_item_parameters;
+exports.chip_tests_item_responses                   = chip_tests_item_responses;
+exports.chip_tests_item_response_parameters         = chip_tests_item_response_parameters;
+exports.chip_tests_pics                             = chip_tests_pics;
+exports.chip_tests_config                           = chip_tests_config;
+exports.chip_tests_config_has                       = chip_tests_config_has;
+exports.chip_tests_config_get_default_value         = chip_tests_config_get_default_value;
+exports.chip_tests_config_get_type                  = chip_tests_config_get_type;
+exports.chip_tests_variables                        = chip_tests_variables;
+exports.chip_tests_variables_has                    = chip_tests_variables_has;
+exports.chip_tests_variables_get_type               = chip_tests_variables_get_type;
+exports.chip_tests_variables_is_nullable            = chip_tests_variables_is_nullable;
+exports.isTestOnlyCluster                           = isTestOnlyCluster;
+exports.isLiteralNull                               = isLiteralNull;
+exports.octetStringEscapedForCLiteral               = octetStringEscapedForCLiteral;
+exports.if_include_struct_item_value                = if_include_struct_item_value;
+exports.ensureIsArray                               = ensureIsArray;
+exports.chip_tests_only_clusters                    = chip_tests_only_clusters;
+exports.chip_tests_only_cluster_commands            = chip_tests_only_cluster_commands;
+exports.chip_tests_only_cluster_command_parameters  = chip_tests_only_cluster_command_parameters;
+exports.chip_tests_only_cluster_responses           = chip_tests_only_cluster_responses;
+exports.chip_tests_only_cluster_response_parameters = chip_tests_only_cluster_response_parameters;

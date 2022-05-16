@@ -297,7 +297,7 @@ private:
 
     void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override;
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 
     void ReportError(CHIP_ERROR err);
     void ReportError(const StatusIB & status);
@@ -791,7 +791,7 @@ private:
 
     void OnDone() override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished) {
             mOnSubscriptionEstablished();
@@ -1520,7 +1520,7 @@ void SubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPreparePa
     }
 }
 
-void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
+void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
     if (mSubscriptionEstablishedHandler) {
         dispatch_async(mQueue, mSubscriptionEstablishedHandler);

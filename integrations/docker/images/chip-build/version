@@ -1,1 +1,1 @@
-0.5.70 Version bump reason: push git to 2.25.1-1ubuntu3.4 (from 3.3)
+0.5.73 Version bump reason: Add TIZEN_SDK_SYSROOT to vscode dockerfile and sort env variables

@@ -16,6 +16,7 @@
  */
 
 #import "DefaultsUtils.h"
+#import "FabricKeys.h"
 
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
@@ -81,9 +82,13 @@ CHIPDeviceController * InitializeCHIP(void)
             return;
         }
 
-        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
-        params.vendorId = kTestVendorId;
-        params.fabricId = 1;
+        __auto_type * keys = [[FabricKeys alloc] init];
+        if (keys == nil) {
+            return;
+        }
+
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys fabricId:1 ipk:keys.ipk];
+        params.vendorId = @(kTestVendorId);
 
         // We're not sure whether we have a fabric configured already; try as if
         // we did, and if not fall back to creating a new one.
@@ -98,13 +103,17 @@ CHIPDeviceController * InitializeCHIP(void)
 
 CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
 {
+    __auto_type * keys = [[FabricKeys alloc] init];
+    if (keys == nil) {
+        NSLog(@"No keys, can't restart controller");
+        return controller;
+    }
+
     NSLog(@"Shutting down the stack");
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nil];
-    params.vendorId = kTestVendorId;
-    params.fabricId = 1;
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys fabricId:1 ipk:keys.ipk];
 
     sController = [[MatterControllerFactory sharedInstance] startControllerOnExistingFabric:params];
 

@@ -16,15 +16,11 @@
  *
  */
 
-#import <CHIP/CHIPCommissioningParameters.h>
-#import <CHIP/CHIPError_Internal.h>
-#import <setup_payload/ManualSetupPayloadGenerator.h>
-#import <setup_payload/SetupPayload.h>
+#import <CHIP/CHIP.h>
 
 #include "../common/CHIPCommandBridge.h"
 #include "PairingCommandBridge.h"
 #include "PairingDelegateBridge.h"
-#include "platform/PlatformManager.h"
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
@@ -73,7 +69,10 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
         break;
     }
 
-    return [CHIPError errorToCHIPErrorCode:error];
+    if (error != nil) {
+        SetCommandExitStatus(error);
+    }
+    return CHIP_NO_ERROR;
 }
 
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
@@ -96,7 +95,6 @@ void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
     [CurrentCommissioner() pairDevice:mNodeId
                               address:[NSString stringWithUTF8String:ipAddress]
                                  port:mRemotePort
-                        discriminator:mDiscriminator
                          setupPINCode:mSetupPINCode
                                 error:error];
 }

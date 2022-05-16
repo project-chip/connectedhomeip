@@ -54,10 +54,6 @@
 
 #include <lib/support/BytesToHex.h>
 
-#if CHIP_CRYPTO_OPENSSL
-#include "X509_PKCS7Extraction_test_vectors.h"
-#endif
-
 #if CHIP_CRYPTO_MBEDTLS
 #include <mbedtls/memory_buffer_alloc.h>
 #endif
@@ -1828,28 +1824,6 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-#if CHIP_CRYPTO_OPENSSL
-static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int status     = 0;
-    X509DerCertificate x509list[3];
-    uint32_t max_certs = sizeof(x509list) / sizeof(X509DerCertificate);
-
-    err = LoadCertsFromPKCS7(pem_pkcs7_blob, x509list, &max_certs);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    status = memcmp(certificate_blob_leaf, x509list[0], x509list[0].Length());
-    NL_TEST_ASSERT(inSuite, status == 0);
-
-    status = memcmp(certificate_blob_intermediate, x509list[1], x509list[1].Length());
-    NL_TEST_ASSERT(inSuite, status == 0);
-
-    status = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
-    NL_TEST_ASSERT(inSuite, status == 0);
-}
-#endif // CHIP_CRYPTO_OPENSSL
-
 static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
@@ -1925,6 +1899,23 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
 
     err = ValidateCertificateChain(root_cert.data(), root_cert.size(), wrong_ica_cert.data(), wrong_ica_cert.size(),
                                    leaf_cert.data(), leaf_cert.size(), chainValidationResult);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
+    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
+
+    // Now test with a Root certificate that does not correspond to the chain
+    ByteSpan wrong_root_cert;
+    err = GetTestCert(TestCert::kRoot02, TestCertLoadFlags::kDERForm, wrong_root_cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ValidateCertificateChain(wrong_root_cert.data(), wrong_root_cert.size(), ica_cert.data(), ica_cert.size(),
+                                   leaf_cert.data(), leaf_cert.size(), chainValidationResult);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
+    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
+
+    // Now test with a Root certificate that does not correspond to the chain.
+    // Trying to validate ICA (as a leaf) which chains to Root - should fail bacause Root is loaded as untrusted intermediate cert.
+    err = ValidateCertificateChain(wrong_root_cert.data(), wrong_root_cert.size(), root_cert.data(), root_cert.size(),
+                                   ica_cert.data(), ica_cert.size(), chainValidationResult);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
     NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
 }
@@ -2164,15 +2155,12 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
     };
     // clang-format on
 
-    int i = 1;
     for (const auto & testCase : kTestCases)
     {
-        fprintf(stderr, "DEBUG 01 i = %d\n", i);
         AttestationCertVidPid vidpid;
         AttestationCertVidPid vidpidFromCN;
         AttestationCertVidPid vidpidToCheck;
         CHIP_ERROR result = ExtractVIDPIDFromAttributeString(testCase.attrType, testCase.attr, vidpid, vidpidFromCN);
-        fprintf(stderr, "DEBUG 02 i = %d equal = %d\n", i++, (result == testCase.expectedResult));
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
         if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
@@ -2240,13 +2228,10 @@ static void TestVIDPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         { kOpCertNoVID, false, false, chip::VendorId::NotSpecified, 0x0000, CHIP_NO_ERROR },
     };
 
-    int i = 1;
     for (const auto & testCase : kTestCases)
     {
-        fprintf(stderr, "DEBUG 01 i = %d\n", i);
         AttestationCertVidPid vidpid;
         CHIP_ERROR result = ExtractVIDPIDFromX509Cert(testCase.cert, vidpid);
-        fprintf(stderr, "DEBUG 02 i = %d equal = %d\n", i++, (result == testCase.expectedResult));
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
         NL_TEST_ASSERT(inSuite, vidpid.mVendorId.HasValue() == testCase.expectedVidPresent);
         NL_TEST_ASSERT(inSuite, vidpid.mProductId.HasValue() == testCase.expectedPidPresent);
@@ -2391,9 +2376,6 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2+ object reuse", TestSPAKE2P_Reuse),
     NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
     NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
-#if CHIP_CRYPTO_OPENSSL
-    NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
-#endif // CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test x509 Certificate Chain Validation", TestX509_CertChainValidation),
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),

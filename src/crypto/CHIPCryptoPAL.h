@@ -1352,12 +1352,6 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKe
 
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
-CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);
-
-CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t n_cert);
-
-CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
-
 enum class CertificateChainValidationResult
 {
     kSuccess = 0,

@@ -213,9 +213,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     // Set up client API buffer.
     emberAfSetExternalBuffer(appResponseData, EMBER_AF_RESPONSE_BUFFER_LEN, &appResponseLength, &emberAfResponseApsFrame);
 
-    // initialize event management system
-    emAfInitEvents();
-
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
@@ -771,7 +768,7 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
-    return (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId) != nullptr);
+    return (emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) != UINT16_MAX);
 }
 
 bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)

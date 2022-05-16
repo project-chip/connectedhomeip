@@ -14,6 +14,8 @@ static_library("secure_channel") {
     "DefaultSessionResumptionStorage.h",
     "PASESession.cpp",
     "PASESession.h",
+    "PairingSession.cpp",
+    "PairingSession.h",
     "RendezvousParameters.h",
     "SessionEstablishmentDelegate.h",
     "SessionEstablishmentExchangeDispatch.cpp",

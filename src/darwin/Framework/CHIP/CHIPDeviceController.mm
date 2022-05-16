@@ -17,6 +17,8 @@
 #import "CHIPDeviceController.h"
 
 #import "CHIPCommissioningParameters.h"
+#import "CHIPDeviceControllerStartupParams.h"
+#import "CHIPDeviceControllerStartupParams_Internal.h"
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
@@ -27,6 +29,7 @@
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
 #import "MatterControllerFactory_Internal.h"
+#import "NSDataSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/CHIPClustersObjc.h>
@@ -46,8 +49,6 @@
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
-
-static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
@@ -71,7 +72,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 @property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) CHIPP256KeypairBridge keypairBridge;
 @property (readonly) CHIPDeviceAttestationDelegateBridge * deviceAttestationDelegateBridge;
-@property (readonly) chip::NodeId localDeviceId;
 @property (readonly) MatterControllerFactory * factory;
 @end
 
@@ -140,20 +140,8 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     }
 }
 
-- (BOOL)startup:(CHIPDeviceControllerStartupParams *)startupParams
+- (BOOL)startup:(CHIPDeviceControllerStartupParamsInternal *)startupParams
 {
-    if (startupParams.vendorId == chip::VendorId::Common) {
-        // Shouldn't be using the "standard" vendor ID for actual devices.
-        CHIP_LOG_ERROR("%d is not a valid vendorId to initialize a device controller with", startupParams.vendorId);
-        return NO;
-    }
-
-    if (startupParams.fabricId == chip::kUndefinedFabricId) {
-        // Shouldn't be using the "standard" vendor ID for actual devices.
-        CHIP_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", startupParams.fabricId);
-        return NO;
-    }
-
     __block BOOL commissionerInitialized = NO;
     if ([self isRunning]) {
         CHIP_LOG_ERROR("Unexpected duplicate call to startup");
@@ -165,22 +153,38 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
             return;
         }
 
-        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-
-        // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
-        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
-        if (startupParams.rootCAKeypair != nil) {
-            _keypairBridge.Init(startupParams.rootCAKeypair);
-            nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
-        }
-        errorCode
-            = _operationalCredentialsDelegate->init(_factory.storageDelegateBridge, std::move(nativeBridge), startupParams.ipk);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
+        if (startupParams.vendorId == nil || [startupParams.vendorId unsignedShortValue] == chip::VendorId::Common) {
+            // Shouldn't be using the "standard" vendor ID for actual devices.
+            CHIP_LOG_ERROR("%@ is not a valid vendorId to initialize a device controller with", startupParams.vendorId);
             return;
         }
 
-        // initialize NodeID if needed
-        [self _getControllerNodeId];
+        if (startupParams.nodeId == nil) {
+            CHIP_LOG_ERROR("Can't start a controller if we don't know what node id it is");
+            return;
+        }
+
+        if ([startupParams nocSignerMatchesCerts] == NO) {
+            CHIP_LOG_ERROR("Provided nocSigner does not match certificates");
+            return;
+        }
+
+        if (startupParams.operationalCertificate != nil && startupParams.operationalKeypair == nullptr) {
+            CHIP_LOG_ERROR("Have no operational keypair for our operational certificate");
+            return;
+        }
+
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+
+        // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
+        _keypairBridge.Init(startupParams.nocSigner);
+        auto nativeBridge = std::make_unique<chip::Crypto::CHIPP256KeypairNativeBridge>(_keypairBridge);
+
+        errorCode = _operationalCredentialsDelegate->Init(_factory.storageDelegateBridge, std::move(nativeBridge),
+            startupParams.ipk, startupParams.rootCertificate, startupParams.intermediateCertificate);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
+            return;
+        }
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
         if ([self checkForStartError:(_cppCommissioner != nullptr) logMsg:kErrorCommissionerInit]) {
@@ -193,31 +197,35 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
         commissionerParams.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
-        chip::Crypto::P256Keypair ephemeralKey;
-        errorCode = ephemeralKey.Initialize();
+        commissionerParams.controllerRCAC = _operationalCredentialsDelegate->RootCertSpan();
+        commissionerParams.controllerICAC = _operationalCredentialsDelegate->IntermediateCertSpan();
+
+        chip::Crypto::P256Keypair operationalKeypair;
+        if (startupParams.operationalKeypair != nullptr) {
+            errorCode = operationalKeypair.Deserialize(*startupParams.operationalKeypair);
+        } else {
+            errorCode = operationalKeypair.Initialize();
+        }
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
+        commissionerParams.operationalKeypair = &operationalKeypair;
 
-        NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
-        chip::MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+        // nocBuffer might not be used, but if it is it needs to live long enough.
+        uint8_t nocBuffer[chip::Controller::kMaxCHIPDERCertLength];
+        if (startupParams.operationalCertificate) {
+            commissionerParams.controllerNOC = AsByteSpan(startupParams.operationalCertificate);
+        } else {
+            chip::MutableByteSpan noc(nocBuffer);
 
-        NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
-        chip::MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
-
-        chip::MutableByteSpan icac;
-
-        errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
-            _localDeviceId, startupParams.fabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(), rcac, icac, noc);
-        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
-            return;
+            errorCode = _operationalCredentialsDelegate->GenerateNOC([startupParams.nodeId unsignedLongLongValue],
+                startupParams.fabricId, chip::kUndefinedCATs, operationalKeypair.Pubkey(), noc);
+            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+                return;
+            }
+            commissionerParams.controllerNOC = noc;
         }
-
-        commissionerParams.operationalKeypair = &ephemeralKey;
-        commissionerParams.controllerRCAC = rcac;
-        commissionerParams.controllerICAC = icac;
-        commissionerParams.controllerNOC = noc;
-        commissionerParams.controllerVendorId = startupParams.vendorId;
+        commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorId unsignedShortValue]);
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
 
@@ -255,29 +263,22 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return commissionerInitialized;
 }
 
-- (NSNumber *)getControllerNodeId
+- (NSNumber *)controllerNodeId
 {
+    if (![self isRunning]) {
+        CHIP_LOG_ERROR("A controller has no node id if it has not been started");
+        return nil;
+    }
     __block NSNumber * nodeID;
     dispatch_sync(_chipWorkQueue, ^{
-        nodeID = [self _getControllerNodeId];
+        if (![self isRunning]) {
+            CHIP_LOG_ERROR("A controller has no node id if it has not been started");
+            nodeID = nil;
+        } else {
+            nodeID = @(_cppCommissioner->GetNodeId());
+        }
     });
     return nodeID;
-}
-
-- (NSNumber *)_getControllerNodeId
-{
-    uint16_t deviceIdLength = sizeof(_localDeviceId);
-    if (CHIP_NO_ERROR
-        != _factory.storageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
-        _localDeviceId = arc4random();
-        _localDeviceId = _localDeviceId << 32 | arc4random();
-        CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
-
-        _factory.storageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
-    } else {
-        CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
-    }
-    return [NSNumber numberWithUnsignedLongLong:_localDeviceId];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -315,7 +316,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
-     discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
@@ -330,13 +330,10 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
 
-        chip::RendezvousParameters params = chip::RendezvousParameters()
-                                                .SetSetupPINCode(setupPINCode)
-                                                .SetDiscriminator(discriminator)
-                                                .SetPeerAddress(peerAddress);
+        chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
-            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
+            errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
@@ -721,26 +718,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
 
     *isRunning = (ourRootPublicKey.data_equal(otherRootPublicKey));
     return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation CHIPDeviceControllerStartupParams
-
-- (instancetype)initWithKeypair:(_Nullable id<CHIPKeypair>)rootCAKeypair
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _rootCAKeypair = rootCAKeypair;
-
-    // Set various invalid values.
-    _vendorId = chip::VendorId::Common;
-    _fabricId = chip::kUndefinedFabricId;
-    _ipk = nil;
-
-    return self;
 }
 
 @end

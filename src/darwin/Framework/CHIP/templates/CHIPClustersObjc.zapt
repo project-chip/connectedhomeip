@@ -1,6 +1,5 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
 #ifndef CHIP_CLUSTERS_H
 #define CHIP_CLUSTERS_H
 
@@ -17,7 +16,7 @@ typedef void (^SubscriptionEstablishedHandler)(void);
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 
 
 /**
@@ -64,7 +63,7 @@ subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEs
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
-typedef NS_ENUM({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
+typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName ../name label}}) {
    {{#zcl_enum_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
    {{/zcl_enum_items}}
@@ -72,7 +71,7 @@ typedef NS_ENUM({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
 
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
-typedef NS_OPTIONS({{asUnderlyingZclType type}}, {{objCEnumName ../name label}}) {
+typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName ../name label}}) {
    {{#zcl_bitmap_items}}
    {{objCEnumName ../../name ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
    {{/zcl_bitmap_items}}
@@ -84,4 +83,3 @@ typedef NS_OPTIONS({{asUnderlyingZclType type}}, {{objCEnumName ../name label}})
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_CLUSTERS_H */
-{{/if}}

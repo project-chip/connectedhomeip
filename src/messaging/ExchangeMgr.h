@@ -226,12 +226,12 @@ private:
     uint16_t mNextKeyId;
     State mState;
 
-    SessionManager * mSessionManager;
-    ReliableMessageMgr mReliableMessageMgr;
-
     FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
+
+    SessionManager * mSessionManager;
+    ReliableMessageMgr mReliableMessageMgr;
 
     UnsolicitedMessageHandlerSlot UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
 

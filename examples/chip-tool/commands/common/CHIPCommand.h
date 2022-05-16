@@ -45,7 +45,6 @@ constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::DeviceProxy;
     using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
@@ -106,6 +105,8 @@ protected:
     // The default commissioner instance name is "alpha", but it can be overridden by passing
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
+
+    ChipDeviceCommissioner & GetCommissioner(const char * identity);
 
 private:
     CHIP_ERROR MaybeSetUpStack();

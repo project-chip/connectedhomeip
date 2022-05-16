@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING<16> label = 0;
-    CHAR_STRING<16> value = 1;
+    char_string<16> label = 0;
+    char_string<16> value = 1;
 }
 
 server cluster AccessControl = 31 {
@@ -30,7 +30,7 @@ server cluster AccessControl = 31 {
   struct AccessControlEntry {
     Privilege privilege = 1;
     AuthMode authMode = 2;
-    nullable INT64U subjects[] = 3;
+    nullable int64u subjects[] = 3;
     nullable Target targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
@@ -42,7 +42,7 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    OCTET_STRING<128> data = 1;
+    octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
 
@@ -151,8 +151,8 @@ server cluster Basic = 40 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 0;
-    INT16U revision = 1;
+    devtype_id type = 0;
+    int16u revision = 1;
   }
 
   readonly attribute DeviceType deviceList[] = 0;
@@ -240,7 +240,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfo {
-    INT16U failSafeExpiryLengthSeconds = 0;
+    int16u failSafeExpiryLengthSeconds = 0;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -333,13 +333,13 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING<32> name = 0;
-    BOOLEAN isOperational = 1;
-    nullable BOOLEAN offPremiseServicesReachableIPv4 = 2;
-    nullable BOOLEAN offPremiseServicesReachableIPv6 = 3;
-    OCTET_STRING<8> hardwareAddress = 4;
-    OCTET_STRING IPv4Addresses[] = 5;
-    OCTET_STRING IPv6Addresses[] = 6;
+    char_string<32> name = 0;
+    boolean isOperational = 1;
+    nullable boolean offPremiseServicesReachableIPv4 = 2;
+    nullable boolean offPremiseServicesReachableIPv6 = 3;
+    octet_string<8> hardwareAddress = 4;
+    octet_string IPv4Addresses[] = 5;
+    octet_string IPv6Addresses[] = 6;
     InterfaceType type = 7;
   }
 
@@ -419,28 +419,28 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct NetworkInfo {
-    OCTET_STRING<32> networkID = 0;
-    BOOLEAN connected = 1;
+    octet_string<32> networkID = 0;
+    boolean connected = 1;
   }
 
   struct WiFiInterfaceScanResult {
     WiFiSecurity security = 0;
-    OCTET_STRING<32> ssid = 1;
-    OCTET_STRING<6> bssid = 2;
-    INT16U channel = 3;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
     WiFiBand wiFiBand = 4;
-    INT8S rssi = 5;
+    int8s rssi = 5;
   }
 
   struct ThreadInterfaceScanResult {
-    INT16U panId = 0;
-    INT64U extendedPanId = 1;
-    CHAR_STRING<16> networkName = 2;
-    INT16U channel = 3;
-    INT8U version = 4;
-    OCTET_STRING<8> extendedAddress = 5;
-    INT8S rssi = 6;
-    INT8U lqi = 7;
+    int16u panId = 0;
+    int64u extendedPanId = 1;
+    char_string<16> networkName = 2;
+    int16u channel = 3;
+    int8u version = 4;
+    octet_string<8> extendedAddress = 5;
+    int8s rssi = 6;
+    int8u lqi = 7;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
@@ -522,17 +522,17 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    OCTET_STRING noc = 1;
-    nullable OCTET_STRING icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
     fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    OCTET_STRING<65> rootPublicKey = 1;
-    INT16U vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
-    CHAR_STRING<32> label = 5;
+    octet_string<65> rootPublicKey = 1;
+    vendor_id vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+    char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -561,7 +561,7 @@ server cluster OperationalCredentials = 62 {
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
     NODE_ID caseAdminNode = 3;
-    INT16U adminVendorId = 4;
+    VENDOR_ID adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
@@ -744,27 +744,188 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
-  server  cluster AccessControl;
-  server  cluster AdministratorCommissioning;
-  server  cluster Basic;
-  server  cluster Descriptor;
-  server  cluster DiagnosticLogs;
-  server  cluster EthernetNetworkDiagnostics;
-  server  cluster FixedLabel;
-  server  cluster GeneralCommissioning;
-  server  cluster GeneralDiagnostics;
-  server  cluster LocalizationConfiguration;
-  server  cluster NetworkCommissioning;
-  server  cluster OperationalCredentials;
-  server  cluster SoftwareDiagnostics;
-  server  cluster TimeFormatLocalization;
-  server  cluster UnitLocalization;
-  server  cluster UserLabel;
-  server  cluster WiFiNetworkDiagnostics;
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster AccessControl {
+    callback attribute acl;
+    callback attribute extension;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute attributeList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat;
+    persist  attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitLocalization {
+    persist  attribute temperatureUnit;
+    ram      attribute featureMap default = 0x1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GeneralCommissioning {
+    ram      attribute breadcrumb;
+    callback attribute basicCommissioningInfo;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster DiagnosticLogs {
+  }
+
+  server cluster GeneralDiagnostics {
+    callback attribute networkInterfaces;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
+    callback attribute bootReasons;
+    callback attribute activeHardwareFaults;
+    callback attribute activeRadioFaults;
+    callback attribute activeNetworkFaults;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster SoftwareDiagnostics {
+    callback attribute currentHeapHighWatermark;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster WiFiNetworkDiagnostics {
+    callback attribute bssid;
+    callback attribute securityType;
+    callback attribute wiFiVersion;
+    callback attribute channelNumber;
+    callback attribute rssi;
+    callback attribute beaconLostCount;
+    callback attribute beaconRxCount;
+    callback attribute packetMulticastRxCount;
+    callback attribute packetMulticastTxCount;
+    callback attribute packetUnicastRxCount;
+    callback attribute packetUnicastTxCount;
+    callback attribute currentMaxRate;
+    callback attribute overrunCount;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster EthernetNetworkDiagnostics {
+    callback attribute PHYRate;
+    callback attribute fullDuplex;
+    callback attribute packetRxCount;
+    callback attribute packetTxCount;
+    callback attribute txErrCount;
+    callback attribute collisionCount;
+    callback attribute overrunCount;
+    callback attribute carrierDetect;
+    callback attribute timeSinceReset;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster AdministratorCommissioning {
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex default = 1;
+    callback attribute adminVendorId;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalCredentials {
+    callback attribute NOCs;
+    callback attribute fabrics;
+    callback attribute supportedFabrics;
+    callback attribute commissionedFabrics;
+    callback attribute trustedRootCertificates;
+    callback attribute currentFabricIndex;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
 }
 
 endpoint 1 {
-  server  cluster Descriptor;
-  server  cluster TemperatureMeasurement;
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute clusterRevision default = 1;
+  }
+
+  server cluster TemperatureMeasurement {
+    ram      attribute measuredValue default = 0x8000;
+    ram      attribute minMeasuredValue default = 0x8000;
+    ram      attribute maxMeasuredValue default = 0x8000;
+    ram      attribute clusterRevision default = 4;
+  }
 }
+
 

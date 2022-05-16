@@ -79,6 +79,38 @@ CHIP_ERROR AmebaOTAImageProcessor::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
+bool AmebaOTAImageProcessor::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return false;
+    }
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
+}
+
+CHIP_ERROR AmebaOTAImageProcessor::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    uint32_t targetVersion = requestor->GetTargetVersion();
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != targetVersion)
+    {
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
+                     targetVersion);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void AmebaOTAImageProcessor::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<AmebaOTAImageProcessor *>(context);
@@ -290,7 +322,8 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
 
             // Erase target partition
             ChipLogProgress(SoftwareUpdate, "Erasing partition");
-            imageProcessor->NewFWBlkSize = ((0x1F8000 - 1) / 4096) + 1; // Use a fixed image length of 0xF8000, change in the future
+            imageProcessor->NewFWBlkSize =
+                ((0x1AC000 - 1) / 4096) + 1; // Use a fixed image length of 0x1AC000, change in the future
             ChipLogProgress(SoftwareUpdate, "Erasing %d sectors", imageProcessor->NewFWBlkSize);
             device_mutex_lock(RT_DEV_LOCK_FLASH);
             for (int i = 0; i < imageProcessor->NewFWBlkSize; i++)
@@ -371,15 +404,14 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
         return;
     }
 
-    OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    if (requestor != nullptr)
-    {
-        // TODO: Implement restarting into new image instead of changing the version
-        DeviceLayer::ConfigurationMgr().StoreSoftwareVersion(imageProcessor->mSoftwareVersion);
-        requestor->NotifyUpdateApplied();
-    }
+    ChipLogProgress(SoftwareUpdate, "Rebooting in 2 seconds...");
 
-    // Reboot
+    // Delay action time before calling HandleRestart
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
+}
+
+void AmebaOTAImageProcessor::HandleRestart(chip::System::Layer * systemLayer, void * appState)
+{
     ota_platform_reset();
 }
 

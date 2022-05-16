@@ -31,8 +31,8 @@ namespace Dnssd {
 using namespace System::Clock::Literals;
 
 // Operational node TXT entries
-static constexpr size_t kKeyMrpRetryIntervalIdleMaxLength        = 7; // [CRI] 0-3600000
-static constexpr size_t kKeyMrpRetryIntervalActiveMaxLength      = 7; // [CRA] 0-3600000
+static constexpr size_t kKeySleepyIdleIntervalMaxLength          = 7; // [SII] 0-3600000
+static constexpr size_t kKeySleepyActiveIntervalMaxLength        = 7; // [SAI] 0-3600000
 static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 
@@ -66,8 +66,8 @@ enum class TxtFieldKey : uint8_t
     kRotatingDeviceId,
     kPairingInstruction,
     kPairingHint,
-    kMrpRetryIntervalIdle,
-    kMrpRetryIntervalActive,
+    kSleepyIdleInterval,
+    kSleepyActiveInterval,
     kTcpSupported,
     kCount,
 };
@@ -92,8 +92,8 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kRotatingDeviceId, kKeyRotatingDeviceIdMaxLength, "RI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingInstruction, kKeyPairingInstructionMaxLength, "PI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingHint, kKeyPairingHintMaxLength, "PH", TxtKeyUse::kCommission },
-    { TxtFieldKey::kMrpRetryIntervalIdle, kKeyMrpRetryIntervalIdleMaxLength, "CRI", TxtKeyUse::kCommon },
-    { TxtFieldKey::kMrpRetryIntervalActive, kKeyMrpRetryIntervalActiveMaxLength, "CRA", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSleepyIdleInterval, kKeySleepyIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSleepyActiveInterval, kKeySleepyActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
     { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
 };
 #ifdef CHIP_CONFIG_TEST
@@ -184,8 +184,8 @@ constexpr size_t ValSize(TxtFieldKey key)
     return Internal::txtFieldInfo[static_cast<int>(key)].valMaxSize;
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DiscoveredNodeData & nodeData);
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionNodeData & nodeData);
 
 } // namespace Dnssd
 } // namespace chip

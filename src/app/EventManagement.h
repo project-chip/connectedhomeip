@@ -337,6 +337,11 @@ public:
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, const ObjectList<EventPathParams> * apEventPathList,
                                 EventNumber & aEventMin, size_t & aEventCount,
                                 const Access::SubjectDescriptor & aSubjectDescriptor);
+    /**
+     * @brief brief Iterate all events and invalidate the fabric-sensitive events whose associated fabric has the given fabric
+     * index.
+     */
+    CHIP_ERROR FabricRemoved(FabricIndex aFabricIndex);
 
     /**
      * @brief
@@ -378,7 +383,7 @@ private:
         EndpointId mEndpointId   = 0;
         EventId mEventId         = 0;
         EventNumber mEventNumber = 0;
-        FabricIndex mFabricIndex = kUndefinedFabricIndex;
+        Optional<FabricIndex> mFabricIndex;
     };
 
     void VendEventNumber();
@@ -418,6 +423,16 @@ private:
      *
      */
     CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
+
+    /**
+     * @brief Iterate the event elements inside event tlv and mark the fabric index as kUndefinedFabricIndex if
+     * it matches the FabricIndex apFabricIndex points to.
+     *
+     * @param[in] aReader  event tlv reader
+     * @param[in] apFabricIndex   A FabricIndex* pointing to the fabric index for which we want to effectively evict events.
+     *
+     */
+    static CHIP_ERROR FabricRemovedCB(const TLV::TLVReader & aReader, size_t, void * apFabricIndex);
 
     /**
      * @brief

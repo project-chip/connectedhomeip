@@ -1,13 +1,12 @@
-{{#if (chip_has_client_clusters)}}
 {{> header}}
 
-#import <CHIP/CHIPClustersObjc.h>
+#import <CHIP/CHIP.h>
 
 @class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 
 /**
  * Cluster {{name}}
@@ -26,4 +25,3 @@ NS_ASSUME_NONNULL_BEGIN
 {{/chip_client_clusters}}
 
 NS_ASSUME_NONNULL_END
-{{/if}}

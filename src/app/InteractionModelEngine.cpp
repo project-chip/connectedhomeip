@@ -144,6 +144,22 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::Interacti
     return count;
 }
 
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::InteractionType aType, FabricIndex aFabricIndex) const
+{
+    uint32_t count = 0;
+
+    mReadHandlers.ForEachActiveObject([aType, aFabricIndex, &count](const ReadHandler * handler) {
+        if (handler->IsType(aType) && handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            count++;
+        }
+
+        return Loop::Continue;
+    });
+
+    return count;
+}
+
 ReadHandler * InteractionModelEngine::ActiveHandlerAt(unsigned int aIndex)
 {
     if (aIndex >= mReadHandlers.Allocated())
@@ -201,7 +217,7 @@ void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabri
     });
 }
 
-CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
@@ -454,7 +470,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     ReportDataMessage::Parser report;
     ReturnErrorOnFailure(report.Init(reader));
 
-    uint64_t subscriptionId = 0;
+    SubscriptionId subscriptionId = 0;
     ReturnErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
     ReturnErrorOnFailure(report.ExitContainer());
 

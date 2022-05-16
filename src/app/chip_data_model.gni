@@ -51,8 +51,6 @@ template("chip_data_model") {
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
                              invoker.use_default_im_dispatch
 
-  _use_tests_apis = defined(invoker.use_tests_apis) && invoker.use_tests_apis
-
   source_set(_data_model_name) {
     forward_variables_from(invoker,
                            "*",
@@ -163,11 +161,6 @@ template("chip_data_model") {
       if (_use_default_im_dispatch) {
         sources +=
             [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
-      }
-
-      if (_use_tests_apis) {
-        sources +=
-            [ "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h" ]
       }
     }
 

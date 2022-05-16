@@ -919,6 +919,9 @@ public final class ChipIdLookup {
       if (attributeId == 26L) {
         return "MinRFIDCodeLength";
       }
+      if (attributeId == 28L) {
+        return "NumberOfCredentialsSupportedPerUser";
+      }
       if (attributeId == 33L) {
         return "Language";
       }
@@ -1708,6 +1711,30 @@ public final class ChipIdLookup {
       if (attributeId == 2L) {
         return "Description";
       }
+      if (attributeId == 3L) {
+        return "WiredAssessedInputVoltage";
+      }
+      if (attributeId == 4L) {
+        return "WiredAssessedInputFrequency";
+      }
+      if (attributeId == 5L) {
+        return "WiredCurrentType";
+      }
+      if (attributeId == 6L) {
+        return "WiredAssessedCurrent";
+      }
+      if (attributeId == 7L) {
+        return "WiredNominalVoltage";
+      }
+      if (attributeId == 8L) {
+        return "WiredMaximumCurrent";
+      }
+      if (attributeId == 9L) {
+        return "WiredPresent";
+      }
+      if (attributeId == 10L) {
+        return "ActiveWiredFaults";
+      }
       if (attributeId == 11L) {
         return "BatteryVoltage";
       }
@@ -1720,11 +1747,53 @@ public final class ChipIdLookup {
       if (attributeId == 14L) {
         return "BatteryChargeLevel";
       }
+      if (attributeId == 15L) {
+        return "BatteryReplacementNeeded";
+      }
+      if (attributeId == 16L) {
+        return "BatteryReplaceability";
+      }
+      if (attributeId == 17L) {
+        return "BatteryPresent";
+      }
       if (attributeId == 18L) {
         return "ActiveBatteryFaults";
       }
+      if (attributeId == 19L) {
+        return "BatteryReplacementDescription";
+      }
+      if (attributeId == 20L) {
+        return "BatteryCommonDesignation";
+      }
+      if (attributeId == 21L) {
+        return "BatteryANSIDesignation";
+      }
+      if (attributeId == 22L) {
+        return "BatteryIECDesignation";
+      }
+      if (attributeId == 23L) {
+        return "BatteryApprovedChemistry";
+      }
+      if (attributeId == 24L) {
+        return "BatteryCapacity";
+      }
+      if (attributeId == 25L) {
+        return "BatteryQuantity";
+      }
       if (attributeId == 26L) {
         return "BatteryChargeState";
+      }
+      if (attributeId == 27L) {
+        return "BatteryTimeToFullCharge";
+      }
+      if (attributeId == 28L) {
+        return "BatteryFunctionalWhileCharging";
+      }
+      if (attributeId == 29L) {
+        return "BatteryChargingCurrent";
+      }
+      if (attributeId == 30L) {
+        return "ActiveBatteryChargeFaults";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1770,6 +1839,24 @@ public final class ChipIdLookup {
       }
       if (attributeId == 2L) {
         return "MaxMeasuredValue";
+      }
+      if (attributeId == 3L) {
+        return "Tolerance";
+      }
+      if (attributeId == 16L) {
+        return "ScaledValue";
+      }
+      if (attributeId == 17L) {
+        return "MinScaledValue";
+      }
+      if (attributeId == 18L) {
+        return "MaxScaledValue";
+      }
+      if (attributeId == 19L) {
+        return "ScaledTolerance";
+      }
+      if (attributeId == 20L) {
+        return "Scale";
       }
       if (attributeId == 65531L) {
         return "AttributeList";

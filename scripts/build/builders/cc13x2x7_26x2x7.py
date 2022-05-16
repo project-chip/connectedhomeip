@@ -23,6 +23,7 @@ class cc13x2x7_26x2x7App(Enum):
     PUMP = auto()
     PUMP_CONTROLLER = auto()
     ALL_CLUSTERS = auto()
+    SHELL = auto()
 
     def ExampleName(self):
         if self == cc13x2x7_26x2x7App.LOCK:
@@ -33,6 +34,8 @@ class cc13x2x7_26x2x7App(Enum):
             return 'pump-controller-app'
         elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS:
             return 'all-clusters-app'
+        elif self == cc13x2x7_26x2x7App.SHELL:
+            return 'shell'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -45,6 +48,8 @@ class cc13x2x7_26x2x7App(Enum):
             return 'chip-LP_CC2652R7-pump-controller-example'
         elif self == cc13x2x7_26x2x7App.ALL_CLUSTERS:
             return 'chip-LP_CC2652R7-all-clusters-example'
+        elif self == cc13x2x7_26x2x7App.SHELL:
+            return 'chip-LP_CC2652R7-shell-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

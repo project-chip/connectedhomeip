@@ -49,38 +49,39 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     DiscoveredNodeData nodeData;
 
-    Platform::CopyString(nodeData.hostName, result->mHostName);
-    Platform::CopyString(nodeData.instanceName, result->mName);
+    Platform::CopyString(nodeData.resolutionData.hostName, result->mHostName);
+    Platform::CopyString(nodeData.commissionData.instanceName, result->mName);
 
     size_t addressesFound = 0;
     if (result->mAddress.HasValue())
     {
-        nodeData.ipAddress[addressesFound] = result->mAddress.Value();
-        nodeData.interfaceId               = result->mInterface;
+        nodeData.resolutionData.ipAddress[addressesFound] = result->mAddress.Value();
+        nodeData.resolutionData.interfaceId               = result->mInterface;
         ++addressesFound;
     }
 
     for (auto & ip : extraIPs)
     {
-        if (addressesFound == ArraySize(nodeData.ipAddress))
+        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
             break;
         }
-        nodeData.ipAddress[addressesFound] = ip;
+        nodeData.resolutionData.ipAddress[addressesFound] = ip;
         ++addressesFound;
     }
 
-    nodeData.numIPs = addressesFound;
+    nodeData.resolutionData.numIPs = addressesFound;
 
-    nodeData.port = result->mPort;
+    nodeData.resolutionData.port = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData);
+        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
+        FillNodeDataFromTxt(key, val, nodeData.commissionData);
     }
 
     proxy->OnNodeDiscovered(nodeData);
@@ -120,39 +121,35 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     VerifyOrDie(proxy != nullptr);
 
     ResolvedNodeData nodeData;
-    Platform::CopyString(nodeData.mHostName, result->mHostName);
-    nodeData.mInterfaceId = result->mInterface;
-    nodeData.mPort        = result->mPort;
-    nodeData.mPeerId      = peerId;
-    // TODO: Use seconds?
-    const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-
-    nodeData.mExpiryTime = currentTime + System::Clock::Seconds16(result->mTtlSeconds);
+    Platform::CopyString(nodeData.resolutionData.hostName, result->mHostName);
+    nodeData.resolutionData.interfaceId = result->mInterface;
+    nodeData.resolutionData.port        = result->mPort;
+    nodeData.operationalData.peerId     = peerId;
 
     size_t addressesFound = 0;
     if (result->mAddress.HasValue())
     {
-        nodeData.mAddress[addressesFound] = result->mAddress.Value();
+        nodeData.resolutionData.ipAddress[addressesFound] = result->mAddress.Value();
         ++addressesFound;
     }
     for (auto & ip : extraIPs)
     {
-        if (addressesFound == ArraySize(nodeData.mAddress))
+        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
             break;
         }
-        nodeData.mAddress[addressesFound] = ip;
+        nodeData.resolutionData.ipAddress[addressesFound] = ip;
         ++addressesFound;
     }
-    nodeData.mNumIPs = addressesFound;
+    nodeData.resolutionData.numIPs = addressesFound;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData);
+        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
     }
 
     nodeData.LogNodeIdResolved();
@@ -287,9 +284,9 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
     {
     case TxtFieldKey::kTcpSupported:
         return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kMrpRetryIntervalIdle);
+    case TxtFieldKey::kSleepyIdleInterval:
+    case TxtFieldKey::kSleepyActiveInterval:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kSleepyIdleInterval);
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -537,8 +534,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 {
     PREPARE_RECORDS(Operational);
 
-    ADD_TXT_RECORD(MrpRetryIntervalIdle);
-    ADD_TXT_RECORD(MrpRetryIntervalActive);
+    ADD_TXT_RECORD(SleepyIdleInterval);
+    ADD_TXT_RECORD(SleepyActiveInterval);
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(CompressedFabricId);
@@ -555,8 +552,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     ADD_TXT_RECORD(VendorProduct);
     ADD_TXT_RECORD(DeviceType);
     ADD_TXT_RECORD(DeviceName);
-    ADD_TXT_RECORD(MrpRetryIntervalIdle);
-    ADD_TXT_RECORD(MrpRetryIntervalActive);
+    ADD_TXT_RECORD(SleepyIdleInterval);
+    ADD_TXT_RECORD(SleepyActiveInterval);
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(VendorId);

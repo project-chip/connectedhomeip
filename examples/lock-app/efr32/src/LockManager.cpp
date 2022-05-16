@@ -31,8 +31,17 @@ TimerHandle_t sLockTimer;
 
 using namespace ::chip::DeviceLayer::Internal;
 
-CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state)
+CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
+                             uint8_t maxNumberOfCredentialsPerUser)
 {
+    // Allocate buffer for credentials
+    if (!mCredentials.Alloc(maxNumberOfCredentialsPerUser))
+    {
+        EFR32_LOG("Failed to allocate array for lock credentials");
+        return APP_ERROR_ALLOCATION_FAILED;
+    }
+    mMaxCredentialsPerUser = maxNumberOfCredentialsPerUser;
+
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
                               1,                // == default timer period (mS)
@@ -67,7 +76,7 @@ bool LockManager::ReadConfigValues()
 
     EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_CredentialData, mCredentialData, sizeof(mCredentialData), outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(&mCredentials),
+    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials.Get()),
                                     sizeof(DlCredential), outLen);
 
     return true;
@@ -254,7 +263,7 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
         return false;
     }
 
-    if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
+    if (totalCredentials > mMaxCredentialsPerUser)
     {
         ChipLogError(Zcl, "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,totalCredentials=%u]",
                      mEndpointId, userIndex, totalCredentials);
@@ -278,13 +287,13 @@ bool LockManager::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::F
         mCredentials[i].CredentialIndex = i + 1;
     }
 
-    userInStorage.credentials = chip::Span<const DlCredential>(mCredentials, totalCredentials);
+    userInStorage.credentials = chip::Span<const DlCredential>(mCredentials.Get(), totalCredentials);
 
     // Save user information in NVM flash
     EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&userInStorage),
                                      sizeof(EmberAfPluginDoorLockUserInfo));
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(&mCredentials),
+    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials.Get()),
                                      sizeof(DlCredential));
 
     EFR32Config::WriteConfigValueStr(EFR32Config::kConfigKey_LockUserName, mUserName, sizeof(userName.size()));

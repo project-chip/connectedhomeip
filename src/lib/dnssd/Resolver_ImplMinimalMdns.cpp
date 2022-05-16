@@ -60,9 +60,8 @@ private:
     NodeData & mNodeData;
 };
 
-constexpr size_t kMdnsMaxPacketSize   = 1024;
-constexpr uint16_t kMdnsPort          = 5353;
-constexpr uint16_t kDefaultTtlSeconds = 120;
+constexpr size_t kMdnsMaxPacketSize = 1024;
+constexpr uint16_t kMdnsPort        = 5353;
 
 using namespace mdns::Minimal;
 
@@ -103,8 +102,11 @@ private:
     void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
     void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
 
-    void OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr);
-    void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
+    /// Handle processing of a newly received IP address
+    ///
+    /// Will place the given [addr] into the address list of [resolutionData] assuming that
+    /// there is enough space for that.
+    void OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr);
 };
 
 void PacketDataReporter::OnQuery(const QueryData & data)
@@ -116,7 +118,9 @@ void PacketDataReporter::OnQuery(const QueryData & data)
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
 {
-    mValid = header.GetFlags().IsResponse();
+    mValid       = header.GetFlags().IsResponse();
+    mHasIP       = false; // will need to get at least one valid IP eventually
+    mHasNodePort = false; // also need node-port which we do not have yet
 
     if (header.GetFlags().IsTruncated())
     {
@@ -132,7 +136,7 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mNodeData.mHostName, it.Value());
+        Platform::CopyString(mNodeData.resolutionData.hostName, it.Value());
     }
 
     if (!name.Next())
@@ -140,19 +144,17 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
         ChipLogError(Discovery, "mDNS packet is missing a valid server name");
 #endif
-        mHasNodePort = false;
         return;
     }
 
-    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.mPeerId) != CHIP_NO_ERROR)
+    if (ExtractIdFromInstanceName(name.Value(), &mNodeData.operationalData.peerId) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to parse peer id from %s", name.Value());
-        mHasNodePort = false;
         return;
     }
 
-    mNodeData.mPort = srv.GetPort();
-    mHasNodePort    = true;
+    mNodeData.resolutionData.port = srv.GetPort();
+    mHasNodePort                  = true;
 }
 
 void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
@@ -161,16 +163,17 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        Platform::CopyString(mDiscoveredNodeData.hostName, it.Value());
+        Platform::CopyString(mDiscoveredNodeData.resolutionData.hostName, it.Value());
     }
     if (name.Next())
     {
-        strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
+        strncpy(mDiscoveredNodeData.commissionData.instanceName, name.Value(), sizeof(CommissionNodeData::instanceName));
     }
-    mDiscoveredNodeData.port = srv.GetPort();
+    mDiscoveredNodeData.resolutionData.port = srv.GetPort();
+    mHasNodePort                            = true;
 }
 
-void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
+void PacketDataReporter::OnNodeIPAddress(CommonResolutionData & resolutionData, const chip::Inet::IPAddress & addr)
 {
     // TODO: should validate that the IP address we receive belongs to the
     // server associated with the SRV record.
@@ -178,24 +181,14 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    if (mNodeData.mNumIPs >= ResolvedNodeData::kMaxIPAddresses)
+    if (resolutionData.numIPs >= CommonResolutionData::kMaxIPAddresses)
     {
+        ChipLogDetail(Discovery, "Number of IP addresses overflow. Discarding extra addresses.");
         return;
     }
-    mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
-    mNodeData.mInterfaceId                  = mInterfaceId;
-    mHasIP                                  = true;
-}
-
-void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
-{
-    if (mDiscoveredNodeData.numIPs >= DiscoveredNodeData::kMaxIPAddresses)
-    {
-        return;
-    }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs] = addr;
-    mDiscoveredNodeData.interfaceId                           = mInterfaceId;
-    mDiscoveredNodeData.numIPs++;
+    resolutionData.ipAddress[resolutionData.numIPs++] = addr;
+    resolutionData.interfaceId                        = mInterfaceId;
+    mHasIP                                            = true;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
@@ -229,7 +222,6 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         if (!srv.Parse(data.GetData(), mPacketRange))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
-            mHasNodePort = false;
         }
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
@@ -239,6 +231,10 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             {
                 OnOperationalSrvRecord(data.GetName(), srv);
             }
+            else
+            {
+                ChipLogError(Discovery, "Invalid operational srv name: no '%s' part found.", kOperationalServiceName);
+            }
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
@@ -246,6 +242,11 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
             {
                 OnCommissionableNodeSrvRecord(data.GetName(), srv);
+            }
+            else
+            {
+                ChipLogError(Discovery, "Invalid commision srv name: no '%s' or '%s' part found.", kCommissionableServiceName,
+                             kCommissionerServiceName);
             }
         }
         break;
@@ -257,7 +258,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
             ParsePtrRecord(data.GetData(), mPacketRange, &qname);
             if (qname.Next())
             {
-                strncpy(mDiscoveredNodeData.instanceName, qname.Value(), sizeof(DiscoveredNodeData::instanceName));
+                strncpy(mDiscoveredNodeData.commissionData.instanceName, qname.Value(), sizeof(CommissionNodeData::instanceName));
             }
         }
         break;
@@ -265,13 +266,16 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            TxtRecordDelegateImpl<DiscoveredNodeData> textRecordDelegate(mDiscoveredNodeData);
-            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+            TxtRecordDelegateImpl<CommonResolutionData> commonDelegate(mDiscoveredNodeData.resolutionData);
+            ParseTxtRecord(data.GetData(), &commonDelegate);
+
+            TxtRecordDelegateImpl<CommissionNodeData> commissionDelegate(mDiscoveredNodeData.commissionData);
+            ParseTxtRecord(data.GetData(), &commissionDelegate);
         }
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
-            TxtRecordDelegateImpl<ResolvedNodeData> textRecordDelegate(mNodeData);
-            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+            TxtRecordDelegateImpl<CommonResolutionData> commonDelegate(mNodeData.resolutionData);
+            ParseTxtRecord(data.GetData(), &commonDelegate);
         }
         break;
     case QType::A: {
@@ -279,17 +283,16 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         if (!ParseARecord(data.GetData(), &addr))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse A record");
-            mHasIP = false;
         }
         else
         {
             if (mDiscoveryType == DiscoveryType::kOperational)
             {
-                OnOperationalIPAddress(addr);
+                OnNodeIPAddress(mNodeData.resolutionData, addr);
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnDiscoveredNodeIPAddress(addr);
+                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
             }
         }
         break;
@@ -299,17 +302,16 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         if (!ParseAAAARecord(data.GetData(), &addr))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse AAAA record");
-            mHasIP = false;
         }
         else
         {
             if (mDiscoveryType == DiscoveryType::kOperational)
             {
-                OnOperationalIPAddress(addr);
+                OnNodeIPAddress(mNodeData.resolutionData, addr);
             }
             else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
             {
-                OnDiscoveredNodeIPAddress(addr);
+                OnNodeIPAddress(mDiscoveredNodeData.resolutionData, addr);
             }
         }
         break;
@@ -321,9 +323,14 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
 
 void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
 {
-    if ((mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode) &&
-        mDiscoveredNodeData.IsValid())
+    if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
     {
+        if (!mDiscoveredNodeData.resolutionData.IsValid())
+        {
+            ChipLogError(Discovery, "Discovered node data is not valid. Commissioning discovery not complete.");
+            return;
+        }
+
         activeAttempts.Complete(mDiscoveredNodeData);
         if (mCommissioningDelegate != nullptr)
         {
@@ -334,16 +341,22 @@ void PacketDataReporter::OnComplete(ActiveResolveAttempts & activeAttempts)
             ChipLogError(Discovery, "No delegate to report commissioning node discovery");
         }
     }
-    else if (mDiscoveryType == DiscoveryType::kOperational && mHasIP && mHasNodePort)
+    else if (mDiscoveryType == DiscoveryType::kOperational)
     {
-        activeAttempts.Complete(mNodeData.mPeerId);
-        mNodeData.LogNodeIdResolved();
+        if (!mHasIP)
+        {
+            ChipLogError(Discovery, "Operational discovery has no valid ip address. Resolve not complete.");
+            return;
+        }
 
-        //
-        // This is a quick fix to address some failing tests. Issue #15489 tracks the correct fix here.
-        //
-        const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-        mNodeData.mExpiryTime                      = currentTime + System::Clock::Seconds16(kDefaultTtlSeconds);
+        if (!mHasNodePort)
+        {
+            ChipLogError(Discovery, "Operational discovery has no valid node/port. Resolve not complete.");
+            return;
+        }
+
+        activeAttempts.Complete(mNodeData.operationalData.peerId);
+        mNodeData.LogNodeIdResolved();
 
         if (mOperationalDelegate != nullptr)
         {

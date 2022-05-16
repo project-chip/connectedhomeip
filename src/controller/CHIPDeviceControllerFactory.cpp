@@ -82,6 +82,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
         params.fabricIndependentStorage = mFabricIndependentStorage;
         params.enableServerInteractions = mEnableServerInteractions;
         params.groupDataProvider        = mSystemState->GetGroupDataProvider();
+        params.fabricTable              = mSystemState->Fabrics();
     }
 
     return InitSystemState(params);
@@ -147,7 +148,6 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #endif
                                                             ));
 
-    stateParams.fabricTable                                   = chip::Platform::New<FabricTable>();
     stateParams.sessionMgr                                    = chip::Platform::New<SessionManager>();
     SimpleSessionResumptionStorage * sessionResumptionStorage = chip::Platform::New<SimpleSessionResumptionStorage>();
     stateParams.sessionResumptionStorage                      = sessionResumptionStorage;
@@ -155,7 +155,14 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.messageCounterManager                         = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider                             = params.groupDataProvider;
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    // if no fabricTable was provided, create one and track it in stateParams for cleanup
+    FabricTable * tempFabricTable = nullptr;
+    stateParams.fabricTable       = params.fabricTable;
+    if (stateParams.fabricTable == nullptr)
+    {
+        stateParams.fabricTable = tempFabricTable = chip::Platform::New<FabricTable>();
+        ReturnErrorOnFailure(stateParams.fabricTable->Init(params.fabricIndependentStorage));
+    }
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
@@ -234,6 +241,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
+    mSystemState->SetTempFabricTable(tempFabricTable);
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
 }
@@ -403,9 +411,13 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr = nullptr;
     }
 
-    if (mFabrics != nullptr)
+    if (mTempFabricTable != nullptr)
     {
-        chip::Platform::Delete(mFabrics);
+        chip::Platform::Delete(mTempFabricTable);
+        mTempFabricTable = nullptr;
+        // if we created a temp fabric table, then mFabrics points to it.
+        // if we did not create a temp fabric table, then keep the reference
+        // so that SetupController/Commissioner can use it
         mFabrics = nullptr;
     }
 

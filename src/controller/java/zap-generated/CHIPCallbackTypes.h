@@ -489,6 +489,8 @@ typedef void (*CHIPDoorLockClusterMaxRFIDCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MaxRFIDCodeLength::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterMinRFIDCodeLengthAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::MinRFIDCodeLength::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfCredentialsSupportedPerUserAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterLanguageAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterAutoRelockTimeAttributeCallbackType)(
@@ -1031,6 +1033,22 @@ typedef void (*CHIPPowerSourceClusterOrderAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceClusterDescriptionAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredAssessedInputVoltageAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredAssessedInputVoltage::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredAssessedInputFrequencyAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredAssessedInputFrequency::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredCurrentTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredCurrentType::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredAssessedCurrentAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredAssessedCurrent::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredNominalVoltageAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredNominalVoltage::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredMaximumCurrentAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredMaximumCurrent::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterWiredPresentAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::WiredPresent::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterActiveWiredFaultsAttributeCallbackType)(
+    void *, const chip::app::Clusters::PowerSource::Attributes::ActiveWiredFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPPowerSourceClusterBatteryVoltageAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceClusterBatteryPercentRemainingAttributeCallbackType)(
@@ -1039,10 +1057,38 @@ typedef void (*CHIPPowerSourceClusterBatteryTimeRemainingAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceClusterBatteryChargeLevelAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryReplacementNeededAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryReplacementNeeded::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryReplaceabilityAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryReplaceability::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryPresentAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryPresent::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceClusterActiveBatteryFaultsAttributeCallbackType)(
     void *, const chip::app::Clusters::PowerSource::Attributes::ActiveBatteryFaults::TypeInfo::DecodableType &);
+typedef void (*CHIPPowerSourceClusterBatteryReplacementDescriptionAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryReplacementDescription::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryCommonDesignationAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryCommonDesignation::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryANSIDesignationAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryANSIDesignation::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryIECDesignationAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryIECDesignation::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryApprovedChemistryAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryApprovedChemistry::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryCapacityAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryCapacity::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryQuantityAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryQuantity::TypeInfo::DecodableArgType);
 typedef void (*CHIPPowerSourceClusterBatteryChargeStateAttributeCallbackType)(
     void *, chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryTimeToFullChargeAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryTimeToFullCharge::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryFunctionalWhileChargingAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryFunctionalWhileCharging::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterBatteryChargingCurrentAttributeCallbackType)(
+    void *, chip::app::Clusters::PowerSource::Attributes::BatteryChargingCurrent::TypeInfo::DecodableArgType);
+typedef void (*CHIPPowerSourceClusterActiveBatteryChargeFaultsAttributeCallbackType)(
+    void *, const chip::app::Clusters::PowerSource::Attributes::ActiveBatteryChargeFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPPowerSourceClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::PowerSource::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPPowerSourceClusterAcceptedCommandListAttributeCallbackType)(
@@ -1071,6 +1117,18 @@ typedef void (*CHIPPressureMeasurementClusterMinMeasuredValueAttributeCallbackTy
     void *, chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterMaxMeasuredValueAttributeCallbackType)(
     void *, chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterToleranceAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::Tolerance::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterScaledValueAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::ScaledValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterMinScaledValueAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::MinScaledValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterMaxScaledValueAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::MaxScaledValue::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterScaledToleranceAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::ScaledTolerance::TypeInfo::DecodableArgType);
+typedef void (*CHIPPressureMeasurementClusterScaleAttributeCallbackType)(
+    void *, chip::app::Clusters::PressureMeasurement::Attributes::Scale::TypeInfo::DecodableArgType);
 typedef void (*CHIPPressureMeasurementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPPressureMeasurementClusterClusterRevisionAttributeCallbackType)(

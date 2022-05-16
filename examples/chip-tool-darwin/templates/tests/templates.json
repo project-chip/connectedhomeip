@@ -3,6 +3,7 @@
     "version": "chip-v1",
     "helpers": [
         "../../../../examples/chip-tool/templates/helper.js",
+        "../../../../examples/chip-tool/templates/tests/helper.js",
         "../../../../src/app/zap-templates/partials/helper.js",
         "../../../../src/app/zap-templates/common/StringHelper.js",
         "../../../../src/app/zap-templates/templates/app/helper.js",
@@ -21,6 +22,10 @@
         {
             "name": "encode_value",
             "path": "../../../../src/darwin/Framework/CHIP/templates/partials/encode_value.zapt"
+        },
+        {
+            "name": "commandValue",
+            "path": "../../../../examples/chip-tool/templates/tests/partials/command_value.zapt"
         },
         {
             "name": "test_cluster",

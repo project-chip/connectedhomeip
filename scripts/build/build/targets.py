@@ -235,6 +235,8 @@ def HostTargets():
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
     app_targets.append(
+        target_native.Extend('tv-casting-app', app=HostApp.TV_CASTING_APP))
+    app_targets.append(
         target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
@@ -258,8 +260,6 @@ def HostTargets():
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
-    builder.AppendVariant(name="test-group", validator=AcceptNameWithSubstrings(
-        ['-all-clusters', '-chip-tool']), test_group=True),
     builder.AppendVariant(name="same-event-loop", validator=AcceptNameWithSubstrings(
         ['-chip-tool', '-chip-tool-darwin']), separate_event_loop=False),
     builder.AppendVariant(name="no-interactive", validator=AcceptNameWithSubstrings(
@@ -494,6 +494,7 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
     yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
+    yield target.Extend('shell', app=cc13x2x7_26x2x7App.SHELL)
 
 
 def Cyw30739Targets():

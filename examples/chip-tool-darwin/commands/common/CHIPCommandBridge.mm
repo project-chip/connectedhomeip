@@ -19,10 +19,11 @@
 #include "CHIPCommandBridge.h"
 
 #import "CHIPToolKeypair.h"
-#import <CHIP/CHIPDeviceController.h>
+#import <CHIP/CHIP.h>
+#import <CHIP/CHIPError_Internal.h>
+
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/CodeUtils.h>
 
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
@@ -53,18 +54,16 @@ CHIP_ERROR CHIPCommandBridge::Run()
 
     ipk = [nocSigner getIPK];
 
-    constexpr const char * identities[] = { "alpha", "beta", "gamma" };
+    constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner];
-        controllerParams.vendorId = chip::VendorId::TestVendor1;
-        controllerParams.fabricId = i + 1;
-        controllerParams.ipk = ipk;
+        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:nocSigner fabricId:(i + 1) ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
         auto controller = [factory startControllerOnExistingFabric:controllerParams];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
+            controllerParams.vendorId = @(chip::VendorId::TestVendor1);
             controller = [factory startControllerOnNewFabric:controllerParams];
         }
         if (controller == nil) {
@@ -75,8 +74,8 @@ CHIP_ERROR CHIPCommandBridge::Run()
         mControllers[identities[i]] = controller;
     }
 
-    // Default to alpha.
-    SetIdentity("alpha");
+    // If no commissioner name passed in, default to alpha.
+    SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
 
     ReturnLogErrorOnFailure(RunCommand());
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -84,9 +83,20 @@ CHIP_ERROR CHIPCommandBridge::Run()
     return CHIP_NO_ERROR;
 }
 
-void CHIPCommandBridge::SetIdentity(const char * name) { mCurrentController = mControllers[name]; }
+void CHIPCommandBridge::SetIdentity(const char * identity)
+{
+    std::string name = std::string(identity);
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0) {
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+            kIdentityBeta, kIdentityGamma);
+        chipDie();
+    }
+    mCurrentController = mControllers[name];
+}
 
 CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
+
+CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
 CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
 {
@@ -124,4 +134,23 @@ void CHIPCommandBridge::StopWaiting()
         mWaitingForResponse = false;
     }
     cvWaitingForResponse.notify_all();
+}
+
+void CHIPCommandBridge::SetCommandExitStatus(NSError * error, const char * logString)
+{
+    if (logString != nullptr) {
+        LogNSError(logString, error);
+    }
+    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    SetCommandExitStatus(err);
+}
+
+void CHIPCommandBridge::LogNSError(const char * logString, NSError * error)
+{
+    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    if (err == CHIP_NO_ERROR) {
+        ChipLogProgress(chipTool, "%s: %s", logString, chip::ErrorStr(err));
+    } else {
+        ChipLogError(chipTool, "%s: %s", logString, chip::ErrorStr(err));
+    }
 }

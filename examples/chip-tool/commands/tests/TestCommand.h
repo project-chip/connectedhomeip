@@ -29,7 +29,6 @@
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
-#include <zap-generated/tests/CHIPClustersTest.h>
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
@@ -61,7 +60,8 @@ public:
 
 protected:
     /////////// DelayCommands Interface /////////
-    CHIP_ERROR WaitForCommissionee(chip::NodeId nodeId) override;
+    CHIP_ERROR WaitForCommissionee(const char * identity,
+                                   const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override;
     void OnWaitForMs() override { NextTest(); };
 
     /////////// Interaction Model Interface /////////
@@ -73,7 +73,10 @@ protected:
 
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
 
-    chip::Controller::DeviceCommissioner & GetCurrentCommissioner() override { return CurrentCommissioner(); };
+    chip::Controller::DeviceCommissioner & GetCommissioner(const char * identity) override
+    {
+        return CHIPCommand::GetCommissioner(identity);
+    };
 
     static void ExitAsync(intptr_t context);
     void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) override;
@@ -89,7 +92,7 @@ protected:
 
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
-    std::map<std::string, ChipDevice *> mDevices;
+    std::map<std::string, chip::DeviceProxy *> mDevices;
 
     // When set to false, prevents interaction model events from affecting the current test status.
     // This flag exists because if an error happens while processing a response the allocated

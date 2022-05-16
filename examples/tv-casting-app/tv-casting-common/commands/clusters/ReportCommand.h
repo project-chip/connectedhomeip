@@ -105,10 +105,10 @@ public:
         SetCommandExitStatus(mError);
     }
 
-    void OnSubscriptionEstablished(uint64_t subscriptionId) override { OnAttributeSubscription(); }
+    void OnSubscriptionEstablished(chip::SubscriptionId subscriptionId) override { OnAttributeSubscription(); }
 
 protected:
-    CHIP_ERROR ReportAttribute(ChipDevice * device, std::vector<chip::EndpointId> endpointIds,
+    CHIP_ERROR ReportAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                                std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
                                chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
                                uint16_t maxInterval                                                = 0,
@@ -227,9 +227,10 @@ protected:
         return mReadClient->SendRequest(params);
     }
 
-    CHIP_ERROR ReportEvent(ChipDevice * device, std::vector<chip::EndpointId> endpointIds, std::vector<chip::ClusterId> clusterIds,
-                           std::vector<chip::EventId> eventIds, chip::app::ReadClient::InteractionType interactionType,
-                           uint16_t minInterval = 0, uint16_t maxInterval = 0)
+    CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                           std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
+                           chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval = 0,
+                           uint16_t maxInterval = 0)
     {
         const size_t clusterCount  = clusterIds.size();
         const size_t eventCount    = eventIds.size();
@@ -369,7 +370,7 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportAttribute(device, endpointIds, mClusterIds, mAttributeIds,
                                               chip::app::ReadClient::InteractionType::Read, 0, 0, mDataVersion);
@@ -424,7 +425,7 @@ public:
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportAttribute(device, endpointIds, mClusterIds, mAttributeIds,
                                               chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval,
@@ -490,7 +491,7 @@ public:
 
     ~ReadEvent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportEvent(device, endpointIds, mClusterIds, mEventIds,
                                           chip::app::ReadClient::InteractionType::Read);
@@ -541,7 +542,7 @@ public:
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return ReportCommand::ReportEvent(device, endpointIds, mClusterIds, mEventIds,
                                           chip::app::ReadClient::InteractionType::Subscribe, mMinInterval, mMaxInterval);
