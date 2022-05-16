@@ -2389,8 +2389,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
 
 /**
- *  @}
+ * @def CHIP_ERROR_MISSING_SECURE_SESSION
+ *
+ * @brief
+ *
+ *  A secure session is needed to do work, but is missing/is not present.
  */
+#define CHIP_ERROR_MISSING_SECURE_SESSION                   CHIP_CORE_ERROR(0xe2)
 
 // clang-format on
 

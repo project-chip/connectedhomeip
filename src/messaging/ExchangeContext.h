@@ -156,7 +156,12 @@ public:
 
     ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSessionHandle() const { return mSession.Get(); }
+    SessionHandle GetSessionHandle() const {
+	    VerifyOrDie(mSession);
+        auto sessionHandle = mSession.Get();
+        return std::move(sessionHandle.Value());
+    }
+
     bool HasSessionHandle() const { return mSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
