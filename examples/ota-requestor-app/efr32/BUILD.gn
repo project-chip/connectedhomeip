@@ -47,20 +47,20 @@ declare_args() {
 
   # Disable LCD on supported devices
   disable_lcd = false
-
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = true
 }
+
+declare_args() {
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = !disable_lcd
+}
+
+# qr code cannot be true if lcd is disabled
+assert(!(disable_lcd && show_qr_code))
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
   disable_lcd = true
-}
-
-# Disable QR code is lcd is disabled
-if (disable_lcd) {
-  show_qr_code = false
 }
 
 efr32_sdk("sdk") {
