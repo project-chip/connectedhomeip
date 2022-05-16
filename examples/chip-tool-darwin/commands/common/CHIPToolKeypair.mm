@@ -87,7 +87,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     effectiveTime.Day = 1;
     ReturnErrorOnFailure(chip::Credentials::ASN1ToChipEpochTime(effectiveTime, _mNow));
 
-    value = [storage valueForKey:kOperationalCredentialsIssuerKeypairStorage];
+    value = [storage storageDataForKey:kOperationalCredentialsIssuerKeypairStorage];
     err = [self initSerializedKeyFromValue:value serializedKey:serializedKey];
 
     if (err != CHIP_NO_ERROR) {
@@ -98,12 +98,12 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         ReturnErrorOnFailure([self Serialize:serializedKey]);
 
         NSData * valueData = [NSData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
-        [storage setValue:valueData forKey:kOperationalCredentialsIssuerKeypairStorage];
+        [storage setStorageData:valueData forKey:kOperationalCredentialsIssuerKeypairStorage];
     } else {
         ReturnErrorOnFailure([self Deserialize:serializedKey]);
     }
 
-    NSData * ipk = [storage valueForKey:kOperationalCredentialsIPK];
+    NSData * ipk = [storage storageDataForKey:kOperationalCredentialsIPK];
     if (ipk == nil) {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
@@ -113,7 +113,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
         ReturnLogErrorOnFailure(chip::Crypto::DRBG_get_bytes(tempIPK, sizeof(tempIPK)));
 
         _ipk = [NSData dataWithBytes:tempIPK length:sizeof(tempIPK)];
-        [storage setValue:_ipk forKey:kOperationalCredentialsIPK];
+        [storage setStorageData:_ipk forKey:kOperationalCredentialsIPK];
     } else {
         _ipk = ipk;
     }

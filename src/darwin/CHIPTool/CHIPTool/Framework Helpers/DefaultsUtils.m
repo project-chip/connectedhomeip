@@ -209,19 +209,19 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 
 // MARK: CHIPPersistentStorageDelegate
 
-- (nullable NSData *)valueForKey:(NSString *)key
+- (nullable NSData *)storageDataForKey:(NSString *)key
 {
     NSData * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
-- (BOOL)setValue:(NSData *)value forKey:(NSString *)key
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
     return CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
 }
 
-- (BOOL)removeValueForKey:(NSString *)key
+- (BOOL)removeStorageDataForKey:(NSString *)key
 {
     if (CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key) == nil) {
         return NO;

@@ -39,8 +39,12 @@ BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallbac
 void CHIPUnpairDeviceWithID(uint64_t deviceId);
 CHIPDevice * CHIPGetDeviceBeingCommissioned(void);
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
-- (NSData *)valueForKey:(NSString *)key;
-- (BOOL)setValue:(NSData *)value forKey:(NSString *)key;
-- (BOOL)removeValueForKey:(NSString *)key;
+- (NSData *)storageDataForKey:(NSString *)key;
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
+- (BOOL)removeStorageDataForKey:(NSString *)key;
 @end
+
+NS_ASSUME_NONNULL_END

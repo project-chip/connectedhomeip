@@ -28,22 +28,22 @@ NS_ASSUME_NONNULL_BEGIN
 @required
 
 /**
- * Get the value for the given key.  Returns nil if there is no value for the
+ * Get the data for the given key.  Returns nil if there is no data for the
  * key.
  */
-- (nullable NSData *)valueForKey:(NSString *)key;
+- (nullable NSData *)storageDataForKey:(NSString *)key;
 
 /**
- * Set the value of the key to the given value.  Returns YES if the key was set
- * successfully, NO otherwise.
+ * Set the data for the viven key to the given value.  Returns YES if the key
+ * was set successfully, NO otherwise.
  */
-- (BOOL)setValue:(NSData *)value forKey:(NSString *)key;
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
 
 /**
- * Delete the key and corresponding value.  Returns YES if the key was present,
+ * Delete the key and corresponding data.  Returns YES if the key was present,
  * NO if the key was not present.
  */
-- (BOOL)removeValueForKey:(NSString *)key;
+- (BOOL)removeStorageDataForKey:(NSString *)key;
 
 @end
 

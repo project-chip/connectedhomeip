@@ -37,7 +37,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
     dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Sync Get Value for Key: %@", keyString);
 
-        NSData * value = [mDelegate valueForKey:keyString];
+        NSData * value = [mDelegate storageDataForKey:keyString];
 
         if (value == nil) {
             error = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -80,7 +80,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
     dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
 
-        if ([mDelegate setValue:valueData forKey:keyString] == NO) {
+        if ([mDelegate setStorageData:valueData forKey:keyString] == NO) {
             error = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
     });
@@ -96,7 +96,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * 
     dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
 
-        if ([mDelegate removeValueForKey:keyString] == NO) {
+        if ([mDelegate removeStorageDataForKey:keyString] == NO) {
             error = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
         }
     });

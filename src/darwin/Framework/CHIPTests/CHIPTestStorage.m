@@ -22,16 +22,16 @@
 
 @implementation CHIPTestStorage
 
-- (NSData *)valueForKey:(NSString *)key
+- (NSData *)storageDataForKey:(NSString *)key
 {
     return _values[key];
 }
-- (BOOL)setValue:(NSData *)value forKey:(NSString *)key
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
     _values[key] = value;
     return YES;
 }
-- (BOOL)removeValueForKey:(NSString *)key
+- (BOOL)removeStorageDataForKey:(NSString *)key
 {
     BOOL present = (_values[key] != nil);
     [_values removeObjectForKey:key];
