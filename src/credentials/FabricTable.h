@@ -321,11 +321,11 @@ private:
 class DLL_EXPORT FabricTable
 {
 public:
-    class DLL_EXPORT FabricTableDelegate
+    class DLL_EXPORT Delegate
     {
     public:
-        FabricTableDelegate() {}
-        virtual ~FabricTableDelegate() {}
+        Delegate() {}
+        virtual ~Delegate() {}
 
         /**
          * Gets called when a fabric is deleted, such as on FabricTable::Delete().
@@ -344,22 +344,11 @@ public:
          **/
         virtual void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
 
-        /**
-         * @brief If set to true, the delegate must be deleted on removal from fabric table,
-         *        since the caller relinquished ownership of a dynamically allocated object.
-         *
-         * @param deleteOnRemoval - true for a delete on removal, false if owned by caller
-         */
-        void SetMustDeleteOnRemoval(bool deleteOnRemoval) { mDeleteOnRemoval = deleteOnRemoval; }
-
-        bool MustDeleteOnRemoval() const { return mDeleteOnRemoval; }
-
-        FabricTableDelegate * next = nullptr;
-
-    protected:
-        bool mDeleteOnRemoval = false;
+        // Intrusive list pointer for FabricTable to manage the entries.
+        Delegate * next = nullptr;
     };
 
+public:
     FabricTable() {}
     ~FabricTable();
 
@@ -391,7 +380,8 @@ public:
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
-    CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
+    CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
+    void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
 
@@ -436,9 +426,9 @@ private:
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
 
-    // FabricTableDelegate link to first node, since FabricTableDelegate is a form
+    // FabricTable::Delegate link to first node, since FabricTable::Delegate is a form
     // of intrusive linked-list item.
-    FabricTableDelegate * mDelegateListRoot = nullptr;
+    FabricTable::Delegate * mDelegateListRoot = nullptr;
 
     // We may not have an mNextAvailableFabricIndex if our table is as large as
     // it can go and is full.

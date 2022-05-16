@@ -354,7 +354,7 @@ void fabricListChanged()
 // only that should be modifed to perosst/read/write fabrics.
 // TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
 // logic.
-class OpCredsFabricTableDelegate : public chip::FabricTable::FabricTableDelegate
+class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 
     // Gets called when a fabric is deleted from KVS store

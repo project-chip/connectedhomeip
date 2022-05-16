@@ -290,7 +290,7 @@ private:
         ServerTransportMgr * mTransports;
     };
 
-    class ServerFabricDelegate final : public chip::FabricTable::FabricTableDelegate
+    class ServerFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
         ServerFabricDelegate() {}

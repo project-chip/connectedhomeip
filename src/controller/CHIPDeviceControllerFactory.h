@@ -151,7 +151,7 @@ public:
     //
     const DeviceControllerSystemState * GetSystemState() const { return mSystemState; }
 
-    class ControllerFabricDelegate final : public chip::FabricTable::FabricTableDelegate
+    class ControllerFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
         CHIP_ERROR Init(SessionManager * sessionManager, Credentials::GroupDataProvider * groupDataProvider)
@@ -204,6 +204,7 @@ private:
     uint16_t mListenPort;
     DeviceControllerSystemState * mSystemState            = nullptr;
     PersistentStorageDelegate * mFabricIndependentStorage = nullptr;
+    FabricTable::Delegate * mFabricTableDelegate          = nullptr;
     bool mEnableServerInteractions                        = false;
 };
 

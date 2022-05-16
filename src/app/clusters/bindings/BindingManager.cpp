@@ -23,7 +23,7 @@
 
 namespace {
 
-class BindingFabricTableDelegate : public chip::FabricTable::FabricTableDelegate
+class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
     void OnFabricDeletedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {

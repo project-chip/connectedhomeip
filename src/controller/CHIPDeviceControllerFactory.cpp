@@ -166,9 +166,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
-    delegate->SetMustDeleteOnRemoval(true);
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
-    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.release()));
+    mFabricTableDelegate = delegate.get();
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(mFabricTableDelegate));
+    delegate.release();
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
                                                       stateParams.messageCounterManager, params.fabricIndependentStorage,
@@ -309,6 +310,13 @@ void DeviceControllerFactory::Shutdown()
 {
     if (mSystemState != nullptr)
     {
+        // FabricTable is non-owning, so we have delete our delegate
+        if (mFabricTableDelegate != nullptr)
+        {
+            chip::Platform::Delete(mFabricTableDelegate);
+            mFabricTableDelegate = nullptr;
+        }
+
         mSystemState->Release();
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
