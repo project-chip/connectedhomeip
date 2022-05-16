@@ -95,7 +95,7 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 
     {
         Crypto::P256SerializedKeypair serializedOpKey;
-        if (mOperationalKey != nullptr)
+        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
         }
@@ -117,7 +117,10 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 
         ReturnErrorOnFailure(writer.Put(kOpKeyVersionTag, kOpKeyVersion));
 
-        ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
+        if (!mHasExternallyOwnedOperationalKey)
+        {
+            ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
+        }
 
         ReturnErrorOnFailure(writer.EndContainer(outerType));
 
@@ -318,9 +321,12 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
     return prevDeleteErr;
 }
 
-CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
+CHIP_ERROR FabricInfo::SetOperationalKeypair(P256Keypair * keyPair)
 {
     VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mHasExternallyOwnedOperationalKey = false;
+
     P256SerializedKeypair serialized;
     ReturnErrorOnFailure(keyPair->Serialize(serialized));
     if (mOperationalKey == nullptr)
@@ -333,6 +339,20 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
     return mOperationalKey->Deserialize(serialized);
+}
+
+CHIP_ERROR FabricInfo::SetExternallyOwnedOperationalKeypair(P256Keypair * keyPair)
+{
+    VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
+    {
+        chip::Platform::Delete(mOperationalKey);
+        mOperationalKey = nullptr;
+    }
+
+    mHasExternallyOwnedOperationalKey = true;
+    mOperationalKey = keyPair;
+    return CHIP_NO_ERROR;
 }
 
 void FabricInfo::ReleaseCert(MutableByteSpan & cert)
@@ -565,7 +585,15 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     ReturnErrorOnFailure(VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, validContext, operationalId,
                                            fabricId, pubkey));
 
-    SetOperationalKeypair(newFabric.GetOperationalKey());
+    if (newFabric.mHasExternallyOwnedOperationalKey)
+    {
+        ReturnErrorOnFailure(SetExternallyOwnedOperationalKeypair(newFabric.GetOperationalKey()));
+    }
+    else
+    {
+        ReturnErrorOnFailure(SetOperationalKeypair(newFabric.GetOperationalKey()));
+    }
+
     SetRootCert(newFabric.mRootCert);
     mOperationalId = operationalId;
     mFabricId      = fabricId;

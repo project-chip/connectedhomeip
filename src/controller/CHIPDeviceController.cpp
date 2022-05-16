@@ -127,7 +127,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mVendorId = params.controllerVendorId;
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
-        ReturnErrorOnFailure(ProcessControllerNOCChain(params));
+        ReturnErrorOnFailure(InitControllerNOCChain(params));
 
         if (params.enableServerInteractions)
         {
@@ -144,7 +144,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParams & params)
+CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams & params)
 {
     FabricInfo newFabric;
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
@@ -152,7 +152,15 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     Credentials::P256PublicKeySpan rootPublicKey;
     FabricId fabricId;
 
-    ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
+    if (params.hasExternallyOwnedOperationalKeypair)
+    {
+        ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
+    }
+    else
+    {
+        ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
+    }
+
     newFabric.SetVendorId(params.controllerVendorId);
 
     ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);

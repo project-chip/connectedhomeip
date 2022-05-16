@@ -74,7 +74,7 @@ public:
 
     ~FabricInfo()
     {
-        if (mOperationalKey != nullptr)
+        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
         }
@@ -123,7 +123,31 @@ public:
         }
         return mOperationalKey;
     }
-    CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
+
+
+    /**
+     * Sets the P256Keypair used for this fabric, transferring ownership of the
+     * key to this object by making a copy via the P256Keypair::Serialize and
+     * P256Keypair::Deserialize methods.
+     *
+     * If your P256Keypair does not support serialization, use the
+     * `SetExternallyOwnedOperationalKeypair` method instead.
+     */
+    CHIP_ERROR SetOperationalKeypair(Crypto::P256Keypair * keyPair);
+
+    /**
+     * Sets the P256Keypair used for this fabric, delegating ownership of the
+     * key to the caller. The P256Keypair provided here must be freed later by
+     * the caller of this method.
+     *
+     * This should be used if your P256Keypair does not support serialization
+     * and deserialization (e.g. your private key is held in a secure element
+     * and cannot be accessed directly).
+     *
+     * To have the ownership of the key managed for you, use
+     * SetOperationalKeypair instead.
+     */
+    CHIP_ERROR SetExternallyOwnedOperationalKeypair(Crypto::P256Keypair * keyPair);
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
@@ -186,7 +210,7 @@ public:
         mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
 
-        if (mOperationalKey != nullptr)
+        if (mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
             mOperationalKey = nullptr;
@@ -229,6 +253,7 @@ private:
 #else
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
+    bool mHasExternallyOwnedOperationalKey = false;
 
     MutableByteSpan mRootCert;
     MutableByteSpan mICACert;
