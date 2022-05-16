@@ -60,14 +60,14 @@ union EmberAfDefaultAttributeValue
     constexpr EmberAfDefaultAttributeValue(uint16_t val) : defaultValue(val) {}
 
     /**
-     * Points to data if size is more than 4 bytes.
-     * If size is more than 4 bytes, and this value is NULL,
+     * Points to data if size is more than 2 bytes.
+     * If size is more than 2 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     const uint8_t * ptrToDefaultValue;
 
     /**
-     * Actual default value if the attribute size is 4 bytes or less.
+     * Actual default value if the attribute size is 2 bytes or less.
      */
     uint16_t defaultValue;
 };
