@@ -133,16 +133,17 @@ public:
      * If your P256Keypair does not support serialization, use the
      * `SetExternallyOwnedOperationalKeypair` method instead.
      */
-    CHIP_ERROR SetOperationalKeypair(Crypto::P256Keypair * keyPair);
+    CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
 
     /**
      * Sets the P256Keypair used for this fabric, delegating ownership of the
      * key to the caller. The P256Keypair provided here must be freed later by
-     * the caller of this method.
+     * the caller of this method if it was allocated dynamically.
      *
      * This should be used if your P256Keypair does not support serialization
      * and deserialization (e.g. your private key is held in a secure element
-     * and cannot be accessed directly).
+     * and cannot be accessed directly), or if you back your operational
+     * private keys by external implementation of the cryptographic interfaces.
      *
      * To have the ownership of the key managed for you, use
      * SetOperationalKeypair instead.
@@ -215,7 +216,7 @@ public:
             chip::Platform::Delete(mOperationalKey);
         }
         mOperationalKey = nullptr;
-        }
+
         ReleaseOperationalCerts();
         mFabricIndex = kUndefinedFabricIndex;
     }

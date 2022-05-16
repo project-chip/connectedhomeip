@@ -249,8 +249,14 @@ public:
 
     /**
      * @brief
-     *   Configures a new set of operational credentials to be used with this
-     *   controller.
+     *   Reconfigures a new set of operational credentials to be used with this
+     *   controller given ControllerInitParams state.
+     *
+     * WARNING: This is a low-level method that should only be called directly
+     *          if you know exactly how this will interact with controller state,
+     *          since there are several integrations that do this call for you.
+     *          It can be used for fine-grained dependency injection of a controller's
+     *          NOC and operational keypair.
      */
     CHIP_ERROR InitControllerNOCChain(const ControllerInitParams & params);
 

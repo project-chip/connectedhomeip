@@ -94,20 +94,6 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
         storage->SyncSetKeyValue(keyAlloc.FabricNOC(mFabricIndex), mNOCCert.data(), static_cast<uint16_t>(mNOCCert.size())));
 
     {
-        Crypto::P256SerializedKeypair serializedOpKey;
-        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
-        {
-            ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
-        }
-        else
-        {
-            // Could we just not store it instead?  What would deserialize need
-            // to do then?
-            P256Keypair keypair;
-            ReturnErrorOnFailure(keypair.Initialize());
-            ReturnErrorOnFailure(keypair.Serialize(serializedOpKey));
-        }
-
         uint8_t buf[OpKeyTLVMaxSize()];
         TLV::TLVWriter writer;
         writer.Init(buf);
@@ -117,8 +103,12 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 
         ReturnErrorOnFailure(writer.Put(kOpKeyVersionTag, kOpKeyVersion));
 
-        if (!mHasExternallyOwnedOperationalKey)
+        // If key storage is externally managed, key is not stored here,
+        // and when loading is done later, it will be ignored.
+        if (!mHasExternallyOwnedOperationalKey && (mOperationalKey != nullptr))
         {
+            Crypto::P256SerializedKeypair serializedOpKey;
+            ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
             ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
         }
 
@@ -216,27 +206,36 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         ReturnErrorOnFailure(reader.Get(opKeyVersion));
         VerifyOrReturnError(opKeyVersion == kOpKeyVersion, CHIP_ERROR_VERSION_MISMATCH);
 
-        ReturnErrorOnFailure(reader.Next(kOpKeyDataTag));
-        ByteSpan keyData;
-        ReturnErrorOnFailure(reader.GetByteView(keyData));
-
-        // Unfortunately, we have to copy the data into a P256SerializedKeypair.
-        Crypto::P256SerializedKeypair serializedOpKey;
-        VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
-        serializedOpKey.SetLength(keyData.size());
-
-        if (mOperationalKey == nullptr)
+        CHIP_ERROR err = reader.Next(kOpKeyDataTag);
+        if (err == CHIP_NO_ERROR)
         {
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-#else
-            mOperationalKey = chip::Platform::New<P256Keypair>();
-#endif
+            ByteSpan keyData;
+            ReturnErrorOnFailure(reader.GetByteView(keyData));
+
+            // Unfortunately, we have to copy the data into a P256SerializedKeypair.
+            Crypto::P256SerializedKeypair serializedOpKey;
+            VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
+            serializedOpKey.SetLength(keyData.size());
+
+            if (mOperationalKey == nullptr)
+            {
+    #ifdef ENABLE_HSM_CASE_OPS_KEY
+                mOperationalKey = chip::Platform::New<P256KeypairHSM>();
+    #else
+                mOperationalKey = chip::Platform::New<P256Keypair>();
+    #endif
+            }
+            VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
+            ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
         }
-        VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
+        else
+        {
+            // Key was absent: set mOperationalKey to null, for another caller to set
+            // it. This may happen if externally owned.
+            mOperationalKey = nullptr;
+        }
 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
         ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -321,7 +320,7 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
     return prevDeleteErr;
 }
 
-CHIP_ERROR FabricInfo::SetOperationalKeypair(P256Keypair * keyPair)
+CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
     VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
