@@ -51,6 +51,9 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
+  # Enables LCD on supported devices
+  disable_lcd = false
+
   # Enables Qr Code on supported devices
   show_qr_code = true
 }
@@ -63,13 +66,15 @@ if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
 }
 
-# Enables LCD on supported devices
-lcd_on = true
-
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
-  lcd_on = false
+  disable_lcd = true
+}
+
+# Disable QR code is lcd is disabled
+if (disable_lcd) {
+  show_qr_code = false
 }
 
 # WiFi settings
@@ -226,7 +231,7 @@ efr32_executable("window_app") {
     }
   }
 
-  if (lcd_on) {
+  if (!disable_lcd) {
     sources += [
       "${examples_plat_dir}/display/lcd.c",
       "src/LcdPainter.cpp",
