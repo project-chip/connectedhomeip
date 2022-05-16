@@ -18475,12 +18475,10 @@ class WindowCovering(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="liftPercentageValue", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="liftPercent100thsValue", Tag=1, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="liftPercent100thsValue", Tag=0, Type=uint),
                     ])
 
-            liftPercentageValue: 'uint' = 0
-            liftPercent100thsValue: 'typing.Optional[uint]' = None
+            liftPercent100thsValue: 'uint' = 0
 
         @dataclass
         class GoToTiltValue(ClusterCommand):
@@ -18507,12 +18505,10 @@ class WindowCovering(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="tiltPercentageValue", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="tiltPercent100thsValue", Tag=1, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="tiltPercent100thsValue", Tag=0, Type=uint),
                     ])
 
-            tiltPercentageValue: 'uint' = 0
-            tiltPercent100thsValue: 'typing.Optional[uint]' = None
+            tiltPercent100thsValue: 'uint' = 0
 
 
     class Attributes:

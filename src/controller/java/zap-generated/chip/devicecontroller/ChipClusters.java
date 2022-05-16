@@ -22751,24 +22751,13 @@ public class ChipClusters {
     }
 
     public void goToLiftPercentage(
-        DefaultClusterCallback callback,
-        Integer liftPercentageValue,
-        Optional<Integer> liftPercent100thsValue) {
-      goToLiftPercentage(
-          chipClusterPtr, callback, liftPercentageValue, liftPercent100thsValue, null);
+        DefaultClusterCallback callback, Integer liftPercent100thsValue) {
+      goToLiftPercentage(chipClusterPtr, callback, liftPercent100thsValue, null);
     }
 
     public void goToLiftPercentage(
-        DefaultClusterCallback callback,
-        Integer liftPercentageValue,
-        Optional<Integer> liftPercent100thsValue,
-        int timedInvokeTimeoutMs) {
-      goToLiftPercentage(
-          chipClusterPtr,
-          callback,
-          liftPercentageValue,
-          liftPercent100thsValue,
-          timedInvokeTimeoutMs);
+        DefaultClusterCallback callback, Integer liftPercent100thsValue, int timedInvokeTimeoutMs) {
+      goToLiftPercentage(chipClusterPtr, callback, liftPercent100thsValue, timedInvokeTimeoutMs);
     }
 
     public void goToLiftValue(DefaultClusterCallback callback, Integer liftValue) {
@@ -22781,24 +22770,13 @@ public class ChipClusters {
     }
 
     public void goToTiltPercentage(
-        DefaultClusterCallback callback,
-        Integer tiltPercentageValue,
-        Optional<Integer> tiltPercent100thsValue) {
-      goToTiltPercentage(
-          chipClusterPtr, callback, tiltPercentageValue, tiltPercent100thsValue, null);
+        DefaultClusterCallback callback, Integer tiltPercent100thsValue) {
+      goToTiltPercentage(chipClusterPtr, callback, tiltPercent100thsValue, null);
     }
 
     public void goToTiltPercentage(
-        DefaultClusterCallback callback,
-        Integer tiltPercentageValue,
-        Optional<Integer> tiltPercent100thsValue,
-        int timedInvokeTimeoutMs) {
-      goToTiltPercentage(
-          chipClusterPtr,
-          callback,
-          tiltPercentageValue,
-          tiltPercent100thsValue,
-          timedInvokeTimeoutMs);
+        DefaultClusterCallback callback, Integer tiltPercent100thsValue, int timedInvokeTimeoutMs) {
+      goToTiltPercentage(chipClusterPtr, callback, tiltPercent100thsValue, timedInvokeTimeoutMs);
     }
 
     public void goToTiltValue(DefaultClusterCallback callback, Integer tiltValue) {
@@ -22836,8 +22814,7 @@ public class ChipClusters {
     private native void goToLiftPercentage(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer liftPercentageValue,
-        Optional<Integer> liftPercent100thsValue,
+        Integer liftPercent100thsValue,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void goToLiftValue(
@@ -22849,8 +22826,7 @@ public class ChipClusters {
     private native void goToTiltPercentage(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer tiltPercentageValue,
-        Optional<Integer> tiltPercent100thsValue,
+        Integer tiltPercent100thsValue,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void goToTiltValue(

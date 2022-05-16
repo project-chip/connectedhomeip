@@ -9323,7 +9323,6 @@ public:
     WindowCoveringGoToLiftPercentage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("go-to-lift-percentage", credsIssuerConfig)
     {
-        AddArgument("LiftPercentageValue", 0, UINT8_MAX, &mRequest.liftPercentageValue);
         AddArgument("LiftPercent100thsValue", 0, UINT16_MAX, &mRequest.liftPercent100thsValue);
         ClusterCommand::AddArguments();
     }
@@ -9386,7 +9385,6 @@ public:
     WindowCoveringGoToTiltPercentage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("go-to-tilt-percentage", credsIssuerConfig)
     {
-        AddArgument("TiltPercentageValue", 0, UINT8_MAX, &mRequest.tiltPercentageValue);
         AddArgument("TiltPercent100thsValue", 0, UINT16_MAX, &mRequest.tiltPercent100thsValue);
         ClusterCommand::AddArguments();
     }

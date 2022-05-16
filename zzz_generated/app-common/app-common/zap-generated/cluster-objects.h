@@ -20358,8 +20358,7 @@ public:
 namespace GoToLiftPercentage {
 enum class Fields
 {
-    kLiftPercentageValue    = 0,
-    kLiftPercent100thsValue = 1,
+    kLiftPercent100thsValue = 0,
 };
 
 struct Type
@@ -20369,8 +20368,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent liftPercentageValue = static_cast<chip::Percent>(0);
-    Optional<chip::Percent100ths> liftPercent100thsValue;
+    chip::Percent100ths liftPercent100thsValue = static_cast<chip::Percent100ths>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -20385,8 +20383,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent liftPercentageValue = static_cast<chip::Percent>(0);
-    Optional<chip::Percent100ths> liftPercent100thsValue;
+    chip::Percent100ths liftPercent100thsValue = static_cast<chip::Percent100ths>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToLiftPercentage
@@ -20425,8 +20422,7 @@ public:
 namespace GoToTiltPercentage {
 enum class Fields
 {
-    kTiltPercentageValue    = 0,
-    kTiltPercent100thsValue = 1,
+    kTiltPercent100thsValue = 0,
 };
 
 struct Type
@@ -20436,8 +20432,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent tiltPercentageValue = static_cast<chip::Percent>(0);
-    Optional<chip::Percent100ths> tiltPercent100thsValue;
+    chip::Percent100ths tiltPercent100thsValue = static_cast<chip::Percent100ths>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -20452,8 +20447,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    chip::Percent tiltPercentageValue = static_cast<chip::Percent>(0);
-    Optional<chip::Percent100ths> tiltPercent100thsValue;
+    chip::Percent100ths tiltPercent100thsValue = static_cast<chip::Percent100ths>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToTiltPercentage

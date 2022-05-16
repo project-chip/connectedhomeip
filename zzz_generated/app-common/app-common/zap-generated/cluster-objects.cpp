@@ -15122,8 +15122,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLiftPercentageValue)), liftPercentageValue));
-    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLiftPercent100thsValue)), liftPercent100thsValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -15143,9 +15141,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kLiftPercentageValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, liftPercentageValue));
-            break;
         case to_underlying(Fields::kLiftPercent100thsValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, liftPercent100thsValue));
             break;
@@ -15202,8 +15197,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTiltPercentageValue)), tiltPercentageValue));
-    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTiltPercent100thsValue)), tiltPercent100thsValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -15223,9 +15216,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kTiltPercentageValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercentageValue));
-            break;
         case to_underlying(Fields::kTiltPercent100thsValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercent100thsValue));
             break;
