@@ -80,7 +80,7 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
 }
 
 # Disable QR code if lcd is disabled
-if(disable_lcd) {
+if (disable_lcd) {
   show_qr_code = false
 }
 
