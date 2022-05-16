@@ -111,8 +111,9 @@ public:
 
     Crypto::P256Keypair * GetOperationalKey() const
     {
-        if (mOperationalKey == nullptr)
+        if (!mHasExternallyOwnedOperationalKey && (mOperationalKey == nullptr))
         {
+            // TODO: Refactor the following two cases to go through SetOperationalKey()
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
             mOperationalKey->CreateOperationalKey(mFabricIndex);
