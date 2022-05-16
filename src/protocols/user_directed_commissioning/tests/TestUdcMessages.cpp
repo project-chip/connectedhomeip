@@ -71,18 +71,18 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     udcServer.SetUDCClientProcessingState((char *) instanceName1, UDCClientProcessingState::kUserDeclined);
 
     Dnssd::DiscoveredNodeData nodeData1;
-    nodeData1.port         = 5540;
-    nodeData1.ipAddress[0] = address;
-    nodeData1.numIPs       = 1;
-    strncpy((char *) nodeData1.instanceName, instanceName1, sizeof(nodeData1.instanceName));
+    nodeData1.resolutionData.port         = 5540;
+    nodeData1.resolutionData.ipAddress[0] = address;
+    nodeData1.resolutionData.numIPs       = 1;
+    strncpy((char *) nodeData1.commissionData.instanceName, instanceName1, sizeof(nodeData1.commissionData.instanceName));
 
     Dnssd::DiscoveredNodeData nodeData2;
-    nodeData2.port              = 5540;
-    nodeData2.ipAddress[0]      = address;
-    nodeData2.numIPs            = 1;
-    nodeData2.longDiscriminator = disc2;
-    strncpy((char *) nodeData2.instanceName, instanceName2, sizeof(nodeData2.instanceName));
-    strncpy((char *) nodeData2.deviceName, deviceName2, sizeof(nodeData2.deviceName));
+    nodeData2.resolutionData.port              = 5540;
+    nodeData2.resolutionData.ipAddress[0]      = address;
+    nodeData2.resolutionData.numIPs            = 1;
+    nodeData2.commissionData.longDiscriminator = disc2;
+    strncpy((char *) nodeData2.commissionData.instanceName, instanceName2, sizeof(nodeData2.commissionData.instanceName));
+    strncpy((char *) nodeData2.commissionData.deviceName, deviceName2, sizeof(nodeData2.commissionData.deviceName));
 
     // test empty UserConfirmationProvider
     udcServer.OnCommissionableNodeFound(nodeData2);

@@ -134,7 +134,7 @@ public:
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
                      const chip::app::StatusIB * apStatus) override
     {}
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override
     {
         if (mReadClient->IsSubscriptionType())
         {

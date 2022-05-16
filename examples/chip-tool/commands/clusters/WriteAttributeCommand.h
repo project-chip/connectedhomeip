@@ -18,15 +18,16 @@
 
 #pragma once
 
-#include <app/WriteClient.h>
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 
 #include "DataModelLogger.h"
 #include "ModelCommand.h"
 
-class WriteAttribute : public ModelCommand, public chip::app::WriteClient::Callback
+class WriteAttribute : public InteractionModelWriter, public ModelCommand, public chip::app::WriteClient::Callback
 {
 public:
-    WriteAttribute(CredentialIssuerCommands * credsIssuerConfig) : ModelCommand("write-by-id", credsIssuerConfig)
+    WriteAttribute(CredentialIssuerCommands * credsIssuerConfig) :
+        InteractionModelWriter(this), ModelCommand("write-by-id", credsIssuerConfig)
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
@@ -38,7 +39,7 @@ public:
     }
 
     WriteAttribute(chip::ClusterId clusterId, CredentialIssuerCommands * credsIssuerConfig) :
-        ModelCommand("write-by-id", credsIssuerConfig), mClusterId(clusterId)
+        InteractionModelWriter(this), ModelCommand("write-by-id", credsIssuerConfig), mClusterId(clusterId)
     {
         AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
         AddArgument("attribute-value", &mAttributeValue);
@@ -49,7 +50,7 @@ public:
     }
 
     WriteAttribute(const char * attributeName, CredentialIssuerCommands * credsIssuerConfig) :
-        ModelCommand("write", credsIssuerConfig)
+        InteractionModelWriter(this), ModelCommand("write", credsIssuerConfig)
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
         AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
@@ -58,7 +59,7 @@ public:
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), mClusterId, mAttributeId, mAttributeValue);
     }
@@ -88,55 +89,27 @@ public:
 
     void OnDone(chip::app::WriteClient * client) override
     {
-        mWriteClient.reset();
+        InteractionModelWriter::Shutdown();
         SetCommandExitStatus(mError);
     }
 
     template <class T>
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
                            chip::AttributeId attributeId, const T & value)
     {
         ChipLogProgress(chipTool, "Sending WriteAttribute to cluster " ChipLogFormatMEI " on endpoint %u",
                         ChipLogValueMEI(clusterId), endpointId);
-        chip::app::AttributePathParams attributePathParams;
-        if (!device->GetSecureSession().Value()->IsGroupSession())
-        {
-            attributePathParams.mEndpointId = endpointId;
-        }
-        attributePathParams.mClusterId   = clusterId;
-        attributePathParams.mAttributeId = attributeId;
-
-        mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), this, mTimedInteractionTimeoutMs,
-                                                                mSuppressResponse.ValueOr(false));
-
-        ReturnErrorOnFailure(mWriteClient->EncodeAttribute(attributePathParams, value, mDataVersion));
-
-        return mWriteClient->SendWriteRequest(device->GetSecureSession().Value());
+        return InteractionModelWriter::WriteAttribute(device, endpointId, clusterId, attributeId, value, mTimedInteractionTimeoutMs,
+                                                      mSuppressResponse, mDataVersion);
     }
 
     template <class T>
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, chip::ClusterId clusterId,
                                 chip::AttributeId attributeId, const T & value)
     {
-
-        chip::app::AttributePathParams attributePathParams;
-        attributePathParams.mClusterId   = clusterId;
-        attributePathParams.mAttributeId = attributeId;
-
-        chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
-
         ChipLogDetail(chipTool, "Sending Write Attribute to Group %u, on Fabric %x, for cluster %u with attributeId %u", groupId,
                       fabricIndex, clusterId, attributeId);
-
-        auto writeClient = chip::Platform::MakeUnique<chip::app::WriteClient>(exchangeManager, this, mTimedInteractionTimeoutMs);
-        VerifyOrReturnError(writeClient != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(writeClient->EncodeAttribute(attributePathParams, value, mDataVersion));
-
-        chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        ReturnErrorOnFailure(writeClient->SendWriteRequest(chip::SessionHandle(session)));
-        writeClient.release();
-
-        return CHIP_NO_ERROR;
+        return InteractionModelWriter::WriteGroupAttribute(groupId, fabricIndex, clusterId, attributeId, value, mDataVersion);
     }
 
 private:
@@ -147,5 +120,4 @@ private:
     chip::Optional<chip::DataVersion> mDataVersion = chip::NullOptional;
     chip::Optional<bool> mSuppressResponse;
     CustomArgument mAttributeValue;
-    std::unique_ptr<chip::app::WriteClient> mWriteClient;
 };

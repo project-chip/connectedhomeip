@@ -4563,6 +4563,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable userIndex;
 
+@property (strong, nonatomic) NSNumber * _Nullable creatorFabricIndex;
+
+@property (strong, nonatomic) NSNumber * _Nullable lastModifiedFabricIndex;
+
 @property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).

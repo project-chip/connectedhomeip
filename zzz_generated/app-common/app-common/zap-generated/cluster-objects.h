@@ -15149,7 +15149,7 @@ struct Type
 {
 public:
     chip::ByteSpan rootPublicKey;
-    uint16_t vendorId       = static_cast<uint16_t>(0);
+    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
     chip::FabricId fabricId = static_cast<chip::FabricId>(0);
     chip::NodeId nodeId     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
@@ -15497,8 +15497,8 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
-    chip::NodeId caseAdminNode = static_cast<chip::NodeId>(0);
-    uint16_t adminVendorId     = static_cast<uint16_t>(0);
+    chip::NodeId caseAdminNode   = static_cast<chip::NodeId>(0);
+    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15516,8 +15516,8 @@ public:
     chip::ByteSpan NOCValue;
     Optional<chip::ByteSpan> ICACValue;
     chip::ByteSpan IPKValue;
-    chip::NodeId caseAdminNode = static_cast<chip::NodeId>(0);
-    uint16_t adminVendorId     = static_cast<uint16_t>(0);
+    chip::NodeId caseAdminNode   = static_cast<chip::NodeId>(0);
+    chip::VendorId adminVendorId = static_cast<chip::VendorId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddNOC
@@ -19207,9 +19207,11 @@ public:
 namespace GetCredentialStatusResponse {
 enum class Fields
 {
-    kCredentialExists    = 0,
-    kUserIndex           = 1,
-    kNextCredentialIndex = 2,
+    kCredentialExists        = 0,
+    kUserIndex               = 1,
+    kCreatorFabricIndex      = 2,
+    kLastModifiedFabricIndex = 3,
+    kNextCredentialIndex     = 4,
 };
 
 struct Type
@@ -19221,6 +19223,8 @@ public:
 
     bool credentialExists = static_cast<bool>(0);
     DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
+    DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -19238,6 +19242,8 @@ public:
 
     bool credentialExists = static_cast<bool>(0);
     DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
+    DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -19506,6 +19512,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CredentialRulesSupport
+namespace NumberOfCredentialsSupportedPerUser {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfCredentialsSupportedPerUser::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfCredentialsSupportedPerUser
 namespace EnableLogging {
 struct TypeInfo
 {
@@ -19911,6 +19929,8 @@ struct TypeInfo
         Attributes::MinRFIDCodeLength::TypeInfo::DecodableType minRFIDCodeLength = static_cast<uint8_t>(0);
         Attributes::CredentialRulesSupport::TypeInfo::DecodableType credentialRulesSupport =
             static_cast<chip::BitFlags<chip::app::Clusters::DoorLock::DlCredentialRuleMask>>(0);
+        Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo::DecodableType numberOfCredentialsSupportedPerUser =
+            static_cast<uint8_t>(0);
         Attributes::EnableLogging::TypeInfo::DecodableType enableLogging = static_cast<bool>(0);
         Attributes::Language::TypeInfo::DecodableType language;
         Attributes::LEDSettings::TypeInfo::DecodableType LEDSettings       = static_cast<uint8_t>(0);

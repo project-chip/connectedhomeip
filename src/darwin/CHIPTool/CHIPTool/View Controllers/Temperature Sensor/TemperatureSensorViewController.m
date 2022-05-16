@@ -233,8 +233,9 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
                                      }
                                      for (CHIPAttributeReport * report in reports) {
                                          // These should be exposed by the SDK
-                                         if ([report.path.cluster isEqualToNumber:@(1026)] &&
-                                             [report.path.attribute isEqualToNumber:@(0)]) {
+                                         if ([report.path.cluster isEqualToNumber:@(kMatterClusterTemperatureMeasurementID)] &&
+                                             [report.path.attribute
+                                                 isEqualToNumber:@(kMatterClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
                                              if (report.error != nil) {
                                                  NSLog(@"Error reading temperature: %@", report.error);
                                              } else {

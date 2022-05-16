@@ -82,12 +82,13 @@ public:
     bool GetNextProviderLocation(ProviderLocationType & providerLocation, bool & listExhausted) override;
 
 protected:
+    static void PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState);
+    static void WatchdogTimerHandler(System::Layer * systemLayer, void * appState);
+
     void StartPeriodicQueryTimer();
     void StopPeriodicQueryTimer();
-    void PeriodicQueryTimerHandler(System::Layer * systemLayer, void * appState);
     void StartWatchdogTimer();
     void StopWatchdogTimer();
-    void WatchdogTimerHandler(System::Layer * systemLayer, void * appState);
     void StartSelectedTimer(SelectedTimer timer);
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
     void CancelDelayedAction(System::TimerCompleteCallback action, void * aAppState);

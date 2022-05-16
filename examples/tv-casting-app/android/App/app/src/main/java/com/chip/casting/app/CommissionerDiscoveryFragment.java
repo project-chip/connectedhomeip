@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,14 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.dnssd.CommissionerDiscoveryListener;
+import com.chip.casting.dnssd.DiscoveredNodeData;
 import com.chip.casting.util.GlobalCastingConstants;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /** A {@link Fragment} to discover commissioners on the network */
 public class CommissionerDiscoveryFragment extends Fragment {
+  private static final String TAG = CommissionerDiscoveryFragment.class.getSimpleName();
 
   public CommissionerDiscoveryFragment() {}
 
@@ -52,12 +55,13 @@ public class CommissionerDiscoveryFragment extends Fragment {
         new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-            callback.handleManualCommissioningButtonClicked();
+            callback.handleCommissioningButtonClicked(null);
           }
         });
   }
 
   private void startCommissionerDiscovery() {
+    Log.d(TAG, "CommissionerDiscoveryFragment.startCommissionerDiscovery called");
     WifiManager wifi = (WifiManager) this.getContext().getSystemService(Context.WIFI_SERVICE);
     WifiManager.MulticastLock multicastLock = wifi.createMulticastLock("multicastLock");
     multicastLock.setReferenceCounted(true);
@@ -85,11 +89,12 @@ public class CommissionerDiscoveryFragment extends Fragment {
             },
             10,
             TimeUnit.SECONDS);
+    Log.d(TAG, "CommissionerDiscoveryFragment.startCommissionerDiscovery ended");
   }
 
   /** Interface for notifying the host. */
-  interface Callback {
-    /** Notifies listener of Skip to manual Commissioning Button click. */
-    void handleManualCommissioningButtonClicked();
+  public interface Callback {
+    /** Notifies listener of Commissioning Button click. */
+    void handleCommissioningButtonClicked(DiscoveredNodeData selectedCommissioner);
   }
 }

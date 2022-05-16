@@ -27,15 +27,10 @@
 #import "CHIPTestKeys.h"
 #import "CHIPTestStorage.h"
 
-#import <app/util/af-enums.h>
-
-#import <math.h> // For INFINITY
-
 // system dependencies
 #import <XCTest/XCTest.h>
 
 const uint16_t kPairingTimeoutInSeconds = 10;
-const uint16_t kAddressResolveTimeoutInSeconds = 10;
 const uint16_t kCASESetupTimeoutInSeconds = 30;
 const uint16_t kTimeoutInSeconds = 20;
 const uint64_t nodeId = 0x12344321;
@@ -45,18 +40,8 @@ const uint16_t kLocalPort = 5541;
 NSString * kAddress = @"::1";
 static uint16_t kTestVendorId = 0xFFF1u;
 
-// This test suite reuses a device object to speed up the test process for CI.
-// The following global variable holds the reference to the device object.
-static CHIPDevice * mConnectedDevice;
-
 // Singleton controller we use.
 static CHIPDeviceController * sController = nil;
-
-CHIPDevice * GetConnectedDevice(void)
-{
-    XCTAssertNotNil(mConnectedDevice);
-    return mConnectedDevice;
-}
 
 @interface CHIPToolPairingDelegate : NSObject <CHIPDevicePairingDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -125,9 +110,8 @@ CHIPDevice * GetConnectedDevice(void)
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys ipk:testKeys.ipk];
-    params.vendorId = kTestVendorId;
-    params.fabricId = 1;
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNotNil(controller);

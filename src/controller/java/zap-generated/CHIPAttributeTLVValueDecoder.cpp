@@ -4665,6 +4665,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
+        case Attributes::NumberOfCredentialsSupportedPerUser::Id: {
+            using TypeInfo = Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          cppValue, value);
+            return value;
+        }
         case Attributes::Language::Id: {
             using TypeInfo = Attributes::Language::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -9654,9 +9669,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jobject newElement_0_vendorId;
                 std::string newElement_0_vendorIdClassName     = "java/lang/Integer";
                 std::string newElement_0_vendorIdCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_vendorIdClassName.c_str(),
-                                                                               newElement_0_vendorIdCtorSignature.c_str(),
-                                                                               entry_0.vendorId, newElement_0_vendorId);
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                    newElement_0_vendorIdClassName.c_str(), newElement_0_vendorIdCtorSignature.c_str(),
+                    static_cast<uint16_t>(entry_0.vendorId), newElement_0_vendorId);
                 jobject newElement_0_fabricId;
                 std::string newElement_0_fabricIdClassName     = "java/lang/Long";
                 std::string newElement_0_fabricIdCtorSignature = "(J)V";

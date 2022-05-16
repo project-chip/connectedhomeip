@@ -94,17 +94,17 @@ public:
             case chip::Dnssd::DiscoveryFilterType::kNone:
                 return true;
             case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-                return browse.filter.code == static_cast<uint64_t>((data.longDiscriminator >> 8) & 0x0F);
+                return browse.filter.code == static_cast<uint64_t>((data.commissionData.longDiscriminator >> 8) & 0x0F);
             case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
-                return browse.filter.code == data.longDiscriminator;
+                return browse.filter.code == data.commissionData.longDiscriminator;
             case chip::Dnssd::DiscoveryFilterType::kVendorId:
-                return browse.filter.code == data.vendorId;
+                return browse.filter.code == data.commissionData.vendorId;
             case chip::Dnssd::DiscoveryFilterType::kDeviceType:
-                return browse.filter.code == data.deviceType;
+                return browse.filter.code == data.commissionData.deviceType;
             case chip::Dnssd::DiscoveryFilterType::kCommissioningMode:
-                return browse.filter.code == data.commissioningMode;
+                return browse.filter.code == data.commissionData.commissioningMode;
             case chip::Dnssd::DiscoveryFilterType::kInstanceName:
-                return strncmp(browse.filter.instanceName, data.instanceName,
+                return strncmp(browse.filter.instanceName, data.commissionData.instanceName,
                                chip::Dnssd::Commission::kInstanceNameMaxLength + 1) == 0;
             case chip::Dnssd::DiscoveryFilterType::kCommissioner:
             case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:

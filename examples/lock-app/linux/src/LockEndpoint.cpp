@@ -34,7 +34,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
 {
     ChipLogProgress(Zcl, "Lock App: LockEndpoint::GetUser [endpoint=%d,userIndex=%hu]", mEndpointId, userIndex);
 
-    uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
+    auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
     {
         ChipLogError(Zcl, "Cannot get user - index out of range [endpoint=%d,index=%hu,adjustedIndex=%d]", mEndpointId, userIndex,
@@ -51,7 +51,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     }
 
     user.userName       = chip::CharSpan(userInDb.userName, strlen(userInDb.userName));
-    user.credentials    = chip::Span<const DlCredential>(userInDb.credentials, userInDb.totalCredentials);
+    user.credentials    = chip::Span<const DlCredential>(userInDb.credentials.data(), userInDb.credentials.size());
     user.userUniqueId   = userInDb.userUniqueId;
     user.userType       = userInDb.userType;
     user.credentialRule = userInDb.credentialRule;
@@ -82,7 +82,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
                     static_cast<unsigned int>(totalCredentials));
 
-    uint16_t adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
+    auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())
     {
         ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
@@ -91,7 +91,6 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     }
 
     auto & userInStorage = mLockUsers[adjustedUserIndex];
-
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
         ChipLogError(Zcl, "Cannot set user - user name is too long [endpoint=%d,index=%d,adjustedUserIndex=%u]", mEndpointId,
@@ -99,12 +98,13 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         return false;
     }
 
-    if (totalCredentials > sizeof(DOOR_LOCK_MAX_CREDENTIALS_PER_USER))
+    if (totalCredentials > userInStorage.credentials.capacity())
     {
         ChipLogError(Zcl,
                      "Cannot set user - total number of credentials is too big [endpoint=%d,index=%d,adjustedUserIndex=%u"
-                     ",totalCredentials=%u]",
-                     mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int>(totalCredentials));
+                     ",totalCredentials=%u,maxNumberOfCredentials=%u]",
+                     mEndpointId, userIndex, adjustedUserIndex, static_cast<unsigned int>(totalCredentials),
+                     static_cast<unsigned int>(userInStorage.credentials.capacity()));
         return false;
     }
 
@@ -117,10 +117,10 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     userInStorage.lastModifiedBy            = modifier;
     userInStorage.createdBy                 = creator;
 
-    userInStorage.totalCredentials = totalCredentials;
+    userInStorage.credentials.clear();
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        userInStorage.credentials[i] = credentials[i];
+        userInStorage.credentials.push_back(credentials[i]);
     }
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d,adjustedIndex=%d]", mEndpointId, userIndex,
@@ -151,21 +151,26 @@ bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType cred
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
+    credential.createdBy      = credentialInStorage.createdBy;
+    credential.lastModifiedBy = credentialInStorage.modifiedBy;
 
-    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%u,type=%u,dataSize=%u]", mEndpointId, credentialIndex,
-                  to_underlying(credential.credentialType), static_cast<unsigned int>(credential.credentialData.size()));
+    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%u,type=%u,dataSize=%u,createdBy=%u,modifiedBy=%u]",
+                  mEndpointId, credentialIndex, to_underlying(credential.credentialType),
+                  static_cast<unsigned int>(credential.credentialData.size()), credential.createdBy, credential.lastModifiedBy);
 
     return true;
 }
 
-bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+bool LockEndpoint::SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                                 DlCredentialStatus credentialStatus, DlCredentialType credentialType,
                                  const chip::ByteSpan & credentialData)
 {
-    ChipLogProgress(Zcl,
-                    "Lock App: LockEndpoint::SetCredential "
-                    "[endpoint=%d,credentialIndex=%u,credentialStatus=%u,credentialType=%u,credentialDataSize=%u]",
-                    mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
-                    static_cast<unsigned int>(credentialData.size()));
+    ChipLogProgress(
+        Zcl,
+        "Lock App: LockEndpoint::SetCredential "
+        "[endpoint=%d,credentialIndex=%u,credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%u,modifier=%u]",
+        mEndpointId, credentialIndex, to_underlying(credentialStatus), to_underlying(credentialType),
+        static_cast<unsigned int>(credentialData.size()), creator, modifier);
 
     if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
     {
@@ -185,11 +190,14 @@ bool LockEndpoint::SetCredential(uint16_t credentialIndex, DlCredentialStatus cr
     }
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
+    credentialInStorage.createdBy      = creator;
+    credentialInStorage.modifiedBy     = modifier;
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
     credentialInStorage.credentialDataSize = credentialData.size();
 
-    ChipLogProgress(Zcl, "Successfully set the credential [mEndpointId=%d,index=%d,credentialType=%u]", mEndpointId,
-                    credentialIndex, to_underlying(credentialType));
+    ChipLogProgress(Zcl, "Successfully set the credential [mEndpointId=%d,index=%d,credentialType=%u,creator=%u,modifier=%u]",
+                    mEndpointId, credentialIndex, to_underlying(credentialType), credentialInStorage.createdBy,
+                    credentialInStorage.modifiedBy);
 
     return true;
 }

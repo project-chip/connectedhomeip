@@ -1,1 +1,1 @@
-0.5.72 Version bump reason: [Ameba] Migrate mbedtls cmake file to Matter SDK
+0.5.73 Version bump reason: Add TIZEN_SDK_SYSROOT to vscode dockerfile and sort env variables

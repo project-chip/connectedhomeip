@@ -4961,6 +4961,25 @@ NS_ASSUME_NONNULL_BEGIN
                                             completionHandler:
                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeNumberOfCredentialsSupportedPerUserWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * CHIPSubscribeParams.
+ */
+- (void)subscribeAttributeNumberOfCredentialsSupportedPerUserWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                                      params:(CHIPSubscribeParams * _Nullable)params
+                                                     subscriptionEstablished:
+                                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                               reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                                 NSError * _Nullable error))reportHandler;
++ (void)readAttributeNumberOfCredentialsSupportedPerUserWithAttributeCache:(CHIPAttributeCacheContainer *)attributeCacheContainer
+                                                                  endpoint:(NSNumber *)endpoint
+                                                                     queue:(dispatch_queue_t)queue
+                                                         completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                               NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeEnableLoggingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
 - (void)writeAttributeEnableLoggingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -21946,6 +21965,7 @@ typedef NS_ENUM(uint8_t, CHIPDoorLockDlStatus) {
     CHIPDoorLockDlStatusDuplicate = 0x02,
     CHIPDoorLockDlStatusOccupied = 0x03,
     CHIPDoorLockDlStatusInvalidField = 0x85,
+    CHIPDoorLockDlStatusResourceExhausted = 0x89,
     CHIPDoorLockDlStatusNotFound = 0x8B,
 };
 
