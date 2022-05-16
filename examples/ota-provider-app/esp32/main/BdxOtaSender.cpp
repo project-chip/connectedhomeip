@@ -82,17 +82,24 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             // end of the transfer.
             sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
-        VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "%s: mExchangeCtx is null", __FUNCTION__));
+        if (mExchangeCtx == nullptr)
+        {
+            return;
+        }
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            ChipLogError(BDX, "SendMessage failed: %s", chip::ErrorStr(err));
+            if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
+            {
+                // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
+                mExchangeCtx = nullptr;
+            }
         }
-        if (event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+        else
         {
-            // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
-            mExchangeCtx = nullptr;
+            ChipLogError(BDX, "SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
+            Reset();
         }
         break;
     }
