@@ -383,6 +383,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
     void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
         VerifyOrReturn(fabric != nullptr);
 
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
@@ -397,6 +398,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
     void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
         VerifyOrReturn(fabric != nullptr);
 
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,

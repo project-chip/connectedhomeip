@@ -438,13 +438,14 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
 
 FabricTable::~FabricTable()
 {
+    // Remove all links to every delegate
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
         FabricTable::Delegate * temp = delegate->next;
+        delegate->next               = nullptr;
         delegate                     = temp;
     }
-    mDelegateListRoot = nullptr;
 }
 
 FabricInfo * FabricTable::FindFabric(P256PublicKeySpan rootPubKey, FabricId fabricId)

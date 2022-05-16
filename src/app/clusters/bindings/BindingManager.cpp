@@ -184,7 +184,8 @@ void BindingManager::FabricRemoved(FabricIndex fabricIndex)
 {
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
 
-    // TODO(#18436): This indiscriminate session releasing can kill unexpected sessions...
+    // TODO(#18436): NOC cluster should handle fabric removal without needing binding manager
+    //               to execute such a release. Currently not done because paths were not tested.
     mInitParams.mCASESessionManager->ReleaseSessionsForFabric(fabricIndex);
 }
 

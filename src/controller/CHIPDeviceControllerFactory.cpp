@@ -167,8 +167,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
-    mFabricTableDelegate = delegate.get();
-    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(mFabricTableDelegate));
+    stateParams.fabricTableDelegate = delegate.get();
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
@@ -310,13 +310,6 @@ void DeviceControllerFactory::Shutdown()
 {
     if (mSystemState != nullptr)
     {
-        // FabricTable is non-owning, so we have delete our delegate
-        if (mFabricTableDelegate != nullptr)
-        {
-            chip::Platform::Delete(mFabricTableDelegate);
-            mFabricTableDelegate = nullptr;
-        }
-
         mSystemState->Release();
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
@@ -329,6 +322,17 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
+
+    if (mFabricTableDelegate != nullptr)
+    {
+        if (mFabrics != nullptr)
+        {
+            mFabrics->RemoveFabricDelegate(mFabricTableDelegate);
+        }
+
+        chip::Platform::Delete(mFabricTableDelegate);
+        mFabricTableDelegate = nullptr;
+    }
 
     if (mCASEServer != nullptr)
     {
