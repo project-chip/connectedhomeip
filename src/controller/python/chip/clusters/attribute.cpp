@@ -85,7 +85,7 @@ OnReportBeginCallback gOnReportEndCallback                           = nullptr;
 
 void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
 {
-    aShouldResubscribe = false;
+    aShouldResubscribe = true;
 }
 
 class ReadClientCallback : public ReadClient::Callback

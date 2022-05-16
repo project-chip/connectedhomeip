@@ -183,10 +183,17 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             return CHIP_ERROR_INTERNAL;
         }
 
+        //
+        // Our session should still be valid, since it had been evicted, all exchanges on that session would have been torn down
+        // as a side-effect. So for us to get here to send a message and still not have a session, something terribly wrong must
+        // have happened.
+        //
+        VerifyOrDie(mSession);
+
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get(), mExchangeId, IsInitiator(),
-                                               GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
-                                               std::move(msgBuf));
+        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId,
+                                               IsInitiator(), GetReliableMessageContext(), reliableTransmissionRequested,
+                                               protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
             CancelResponseTimer();

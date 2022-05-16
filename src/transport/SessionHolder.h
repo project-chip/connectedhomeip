@@ -51,10 +51,10 @@ public:
     void Release();
 
     operator bool() const { return mSession.HasValue(); }
-    SessionHandle Get() const { return SessionHandle{ mSession.Value().Get() }; }
-    Optional<SessionHandle> ToOptional() const
+    Optional<SessionHandle> Get() const
     {
-        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(Get()) : chip::Optional<SessionHandle>::Missing();
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
+                                   : chip::Optional<SessionHandle>::Missing();
     }
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
