@@ -258,7 +258,7 @@ exit:
         err != CHIP_NO_ERROR ? ChipLogError(Zcl, "emberAfMediaInputClusterRenameInputCallback error: %s", err.AsString()) :
                                ChipLogError(Zcl, "MediaInput no name updates feature");
         command->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
-        
+
     }
 
     return true;

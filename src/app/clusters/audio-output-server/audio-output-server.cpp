@@ -190,9 +190,9 @@ exit:
     {
         err != CHIP_NO_ERROR ? ChipLogError(Zcl, "emberAfAudioOutputClusterRenameOutputCallback error: %s", err.AsString()) :
                                ChipLogError(Zcl, "AudioOutput no name updates feature");
-        
+
         command->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
-        
+
     }
 
     return true;
