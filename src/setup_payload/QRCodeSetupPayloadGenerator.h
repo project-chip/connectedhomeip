@@ -112,6 +112,8 @@ public:
      * This function is called to encode the binary data of a payload to a
      * base38 null-terminated string.
      *
+     * The resulting size of the out_buf span will be the size of data written and not including the null terminator.
+     *
      * @param[out] outBuffer
      *                  The buffer to copy the base38 to.
      *
