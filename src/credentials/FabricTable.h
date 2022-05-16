@@ -124,7 +124,6 @@ public:
         return mOperationalKey;
     }
 
-
     /**
      * Sets the P256Keypair used for this fabric, transferring ownership of the
      * key to this object by making a copy via the P256Keypair::Serialize and

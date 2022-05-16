@@ -351,7 +351,7 @@ CHIP_ERROR FabricInfo::SetExternallyOwnedOperationalKeypair(P256Keypair * keyPai
     }
 
     mHasExternallyOwnedOperationalKey = true;
-    mOperationalKey = keyPair;
+    mOperationalKey                   = keyPair;
     return CHIP_NO_ERROR;
 }
 
