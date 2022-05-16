@@ -442,7 +442,7 @@ FabricTable::~FabricTable()
     while (delegate)
     {
         FabricTable::Delegate * temp = delegate->next;
-        delegate = temp;
+        delegate                     = temp;
     }
     mDelegateListRoot = nullptr;
 }
@@ -809,8 +809,8 @@ void FabricTable::RemoveFabricDelegate(FabricTable::Delegate * delegateToRemove)
             if (currentNode->next == delegateToRemove)
             {
                 FabricTable::Delegate * temp = delegateToRemove->next;
-                currentNode->next = temp;
-                delegateToRemove->next = nullptr;
+                currentNode->next            = temp;
+                delegateToRemove->next       = nullptr;
                 return;
             }
 
