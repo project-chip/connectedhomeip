@@ -583,6 +583,8 @@ for generator in target_generators:
 # Simple targets added one by one
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
+ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.SWITCH))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

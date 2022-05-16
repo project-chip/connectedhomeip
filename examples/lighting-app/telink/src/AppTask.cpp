@@ -74,6 +74,7 @@ bool sHaveBLEConnections  = false;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 AppTask AppTask::sAppTask;
 
@@ -236,6 +237,9 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
 
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
+        // Switch context from BLE to Thread
+        BLEManagerImpl sInstance;
+        sInstance.SwitchToIeee802154();
         StartDefaultThreadNetwork();
         LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
     }
