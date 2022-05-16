@@ -1249,7 +1249,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
 
                     if (ptr == nullptr)
                     {
-                        uint32_t defaultValueSizeForBigEndianNudger = 0;
+                        size_t defaultValueSizeForBigEndianNudger = 0;
                         // Bypasses compiler warning about unused variable for little endian platforms.
                         (void) defaultValueSizeForBigEndianNudger;
                         if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
@@ -1259,7 +1259,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                             if (emberAfAttributeSize(am) <= 2)
                             {
                                 ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger = 2;
+                                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
                             }
                             else
                             {
@@ -1272,7 +1272,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                                 !emberAfIsStringAttributeType(am->attributeType))
                             {
                                 ptr                                = (uint8_t *) &(am->defaultValue.defaultValue);
-                                defaultValueSizeForBigEndianNudger = DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT;
+                                defaultValueSizeForBigEndianNudger = sizeof(am->defaultValue.defaultValue);
                             }
                             else
                             {
@@ -1283,10 +1283,12 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // it should be treated as if it is pointing to an array of all zeroes.
 
 #if (BIGENDIAN_CPU)
-                        // The default value for one- and two-byte attributes is stored in an
-                        // uint16_t.  On big-endian platforms, a pointer to the default value of
-                        // a one-byte attribute will point to the wrong byte.  So, for those
-                        // cases, nudge the pointer forward so it points to the correct byte.
+                        // The default value for attributes that are less than or equal to
+                        // defaultValueSizeForBigEndianNudger in bytes are stored in an
+                        // uint32_t.  On big-endian platforms, a pointer to the default value
+                        // of less than defaultValueSizeForBigEndianNudger point to the wrong
+                        // byte.  So, for those cases, nudge the pointer forward so it points
+                        // to the correct byte.
                         if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
                         {
                             ptr += (defaultValueSizeForBigEndianNudger - 1);
