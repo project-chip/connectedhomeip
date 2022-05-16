@@ -125,9 +125,10 @@ public:
     }
 
     /**
-     * Sets the P256Keypair used for this fabric, transferring ownership of the
-     * key to this object by making a copy via the P256Keypair::Serialize and
-     * P256Keypair::Deserialize methods.
+     * Sets the P256Keypair used for this fabric.  This will make a copy of the keypair
+     * via the P256Keypair::Serialize and P256Keypair::Deserialize methods.
+     *
+     * The keyPair argument is safe to deallocate once this method returns.
      *
      * If your P256Keypair does not support serialization, use the
      * `SetExternallyOwnedOperationalKeypair` method instead.
@@ -212,7 +213,8 @@ public:
         if (mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
-            mOperationalKey = nullptr;
+        }
+        mOperationalKey = nullptr;
         }
         ReleaseOperationalCerts();
         mFabricIndex = kUndefinedFabricIndex;
