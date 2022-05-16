@@ -1271,7 +1271,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                             if ((emberAfAttributeSize(am) <= DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT) &&
                                 !emberAfIsStringAttributeType(am->attributeType))
                             {
-                                ptr = (uint8_t *) &(am->defaultValue.defaultValue);
+                                ptr                                = (uint8_t *) &(am->defaultValue.defaultValue);
                                 defaultValueSizeForBigEndianNudger = DEFAULT_VALUE_SIZE_IN_DEFAULT_OR_MAX_MIN_STRUCT;
                             }
                             else
