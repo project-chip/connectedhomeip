@@ -143,16 +143,11 @@ protected:
         chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto commandSender = chip::Platform::MakeUnique<chip::app::CommandSender>(mCallback, exchangeManager, false);
-        VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, chip::NullOptional));
+        chip::app::CommandSender commandSender(mCallback, exchangeManager);
+        ReturnErrorOnFailure(commandSender.AddRequestDataNoTimedCheck(commandPath, value, chip::NullOptional));
 
         chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(chip::SessionHandle(session)));
-        commandSender.release();
-
-        return CHIP_NO_ERROR;
+        return commandSender.SendGroupCommandRequest(chip::SessionHandle(session));
     }
 
     void Shutdown()
@@ -225,16 +220,11 @@ protected:
         chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
         VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        auto writeClient =
-            chip::Platform::MakeUnique<chip::app::WriteClient>(exchangeManager, &mChunkedWriteCallback, chip::NullOptional);
-        VerifyOrReturnError(writeClient != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(writeClient->EncodeAttribute(attributePathParams, value, dataVersion));
+        chip::app::WriteClient writeClient(exchangeManager, &mChunkedWriteCallback, chip::NullOptional);
+        ReturnErrorOnFailure(writeClient.EncodeAttribute(attributePathParams, value, dataVersion));
 
         chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
-        ReturnErrorOnFailure(writeClient->SendWriteRequest(chip::SessionHandle(session)));
-        writeClient.release();
-
-        return CHIP_NO_ERROR;
+        return writeClient.SendWriteRequest(chip::SessionHandle(session));
     }
 
     void Shutdown() { mWriteClient.reset(); }
