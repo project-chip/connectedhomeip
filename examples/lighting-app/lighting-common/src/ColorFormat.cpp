@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "color_format.h"
+#include "ColorFormat.h"
 
 #include <math.h>
 

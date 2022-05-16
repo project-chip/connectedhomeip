@@ -12,34 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/lib.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
 
 config("config") {
-  include_dirs = [ "include" ]
+  include_dirs = [ "." ]
 }
 
-chip_data_model("lighting-common") {
-  zap_file = "lighting-app.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
-  is_server = true
+pkg_config("capi-appfw-service-application") {
+  packages = [ "capi-appfw-service-application" ]
 }
 
-source_set("color-format") {
-  public_configs = [ ":config" ]
+source_set("app-main") {
   sources = [
-    "include/ColorFormat.h",
-    "src/ColorFormat.cpp",
+    "OptionsProxy.cpp",
+    "OptionsProxy.h",
+    "TizenServiceAppMain.cpp",
+    "TizenServiceAppMain.h",
   ]
-}
 
-source_set("lighting-manager") {
-  deps = [ "${chip_root}/src/lib" ]
-  public_configs = [ ":config" ]
-  sources = [
-    "include/LightingManager.h",
-    "src/LightingManager.cpp",
+  defines = []
+
+  public_deps = [
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  public_configs = [
+    ":capi-appfw-service-application",
+    ":config",
   ]
 }

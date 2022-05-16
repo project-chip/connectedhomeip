@@ -23,6 +23,8 @@
 
 #include <functional>
 
+#include <lib/core/CHIPError.h>
+
 class LightingManager
 {
 public:
@@ -30,7 +32,6 @@ public:
     {
         ON_ACTION = 0,
         OFF_ACTION,
-
         INVALID_ACTION
     } Action;
 
@@ -40,7 +41,7 @@ public:
         kState_Off,
     } State;
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsTurnedOn();
     bool InitiateAction(Action_t aAction);
 

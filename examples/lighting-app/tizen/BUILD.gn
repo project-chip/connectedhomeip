@@ -13,33 +13,38 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
 
-config("config") {
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+assert(chip_build_tools)
+
+config("includes") {
   include_dirs = [ "include" ]
 }
 
-chip_data_model("lighting-common") {
-  zap_file = "lighting-app.zap"
+executable("chip-lighting-app") {
+  sources = [
+    "include/CHIPProjectAppConfig.h",
+    "src/main.cpp",
+  ]
 
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
-  is_server = true
+  deps = [
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
+    "${chip_root}/examples/platform/tizen:app-main",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [ "include" ]
+
+  output_dir = root_out_dir
 }
 
-source_set("color-format") {
-  public_configs = [ ":config" ]
-  sources = [
-    "include/ColorFormat.h",
-    "src/ColorFormat.cpp",
-  ]
+group("tizen") {
+  deps = [ ":chip-lighting-app" ]
 }
 
-source_set("lighting-manager") {
-  deps = [ "${chip_root}/src/lib" ]
-  public_configs = [ ":config" ]
-  sources = [
-    "include/LightingManager.h",
-    "src/LightingManager.cpp",
-  ]
+group("default") {
+  deps = [ ":tizen" ]
 }
