@@ -1216,7 +1216,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Determines the maximum number of SRV records that can be processed in parallel.
  *        Affects maximum number of results received for browse requests
  *        (where a single packet may contain multiple SRV entries)
- *        or number of pending resolves that still require a AAAA Ip record
+ *        or number of pending resolves that still require a AAAA IP record
  *        to be resolved.
  */
 #ifndef CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
