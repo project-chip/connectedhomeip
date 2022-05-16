@@ -163,6 +163,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating cc13x2x7_26x2x7-pump-controller
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-controller-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump-controller
 
+# Generating cc13x2x7_26x2x7-shell
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-shell
+
 # Generating cyw30739-cyw930739m2evb_01-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
 
@@ -949,6 +952,13 @@ export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
+# Generating telink-tlsr9518adk80d-light-switch
+bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-light-switch -b tlsr9518adk80d {root}/examples/light-switch-app/telink'
+
 # Generating tizen-arm-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-light
 
@@ -1258,6 +1268,9 @@ ninja -C {out}/cc13x2x7_26x2x7-pump
 
 # Building cc13x2x7_26x2x7-pump-controller
 ninja -C {out}/cc13x2x7_26x2x7-pump-controller
+
+# Building cc13x2x7_26x2x7-shell
+ninja -C {out}/cc13x2x7_26x2x7-shell
 
 # Building cyw30739-cyw930739m2evb_01-light
 ninja -C {out}/cyw30739-cyw930739m2evb_01-light
@@ -1917,6 +1930,9 @@ ninja -C {out}/qpg-shell
 
 # Building telink-tlsr9518adk80d-light
 ninja -C {out}/telink-tlsr9518adk80d-light
+
+# Building telink-tlsr9518adk80d-light-switch
+ninja -C {out}/telink-tlsr9518adk80d-light-switch
 
 # Building tizen-arm-light
 ninja -C {out}/tizen-arm-light

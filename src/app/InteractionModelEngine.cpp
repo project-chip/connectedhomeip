@@ -217,7 +217,7 @@ void InteractionModelEngine::CloseTransactionsFromFabricIndex(FabricIndex aFabri
     });
 }
 
-CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(SubscriptionId aSubscriptionId)
 {
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
@@ -470,7 +470,7 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     ReportDataMessage::Parser report;
     ReturnErrorOnFailure(report.Init(reader));
 
-    uint64_t subscriptionId = 0;
+    SubscriptionId subscriptionId = 0;
     ReturnErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
     ReturnErrorOnFailure(report.ExitContainer());
 

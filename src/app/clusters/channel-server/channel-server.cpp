@@ -162,7 +162,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
-        if (isDelegateNull(delegate, endpoint))
+        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kChannelList))
         {
             return aEncoder.EncodeEmptyList();
         }
@@ -170,7 +170,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::Lineup::Id: {
-        if (isDelegateNull(delegate, endpoint))
+        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kLineupInfo))
         {
             return CHIP_NO_ERROR;
         }

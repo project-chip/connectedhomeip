@@ -1,1 +1,1 @@
-0.5.73 Version bump reason: Add TIZEN_SDK_SYSROOT to vscode dockerfile and sort env variables
+0.5.74 Version bump reason: Telink Thread radio init fixed

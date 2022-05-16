@@ -1,5 +1,7 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *
+ *    Copyright (c) 2022 Texas Instruments Incorporated
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,10 +16,13 @@
  *    limitations under the License.
  */
 
-/ {
-    cpus {
-        cpu0: cpu@0 {
-            clock-frequency = <96000000>;
-        };
-    };
-};
+/**
+ *    @file
+ *      Overrides to default OpenThread configuration.
+ *
+ */
+
+#pragma once
+
+// Use the TI-supplied default platform configuration for remainder
+#include "openthread-core-cc13x2_26x2-config.h"

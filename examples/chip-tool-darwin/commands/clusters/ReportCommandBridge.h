@@ -62,16 +62,15 @@ public:
                                  params:params
                             clientQueue:callbackQueue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+                                 if (error != nil) {
+                                     LogNSError("Error reading attribute", error);
+                                 }
                                  if (values) {
                                      for (id item in values) {
                                          NSLog(@"Response Item: %@", [item description]);
                                      }
                                  }
-                                 if (err != CHIP_NO_ERROR) {
-                                     ChipLogError(chipTool, "Error: %s", chip::ErrorStr(err));
-                                 }
-                                 SetCommandExitStatus(err);
+                                 SetCommandExitStatus(error);
                              }];
         return CHIP_NO_ERROR;
     }
@@ -147,7 +146,7 @@ public:
                                            }
                                        }
                                        if (error || !mWait) {
-                                           SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                                           SetCommandExitStatus(error);
                                        }
                                    }
                          subscriptionEstablished:nil];
@@ -208,7 +207,7 @@ public:
             }
             errorHandler:^(NSError * error) {
                 if (error && !mWait) {
-                    SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+                    SetCommandExitStatus(error);
                 }
             }
             subscriptionEstablished:^() {

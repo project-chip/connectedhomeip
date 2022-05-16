@@ -89,16 +89,15 @@ public:
                            : nil
                              clientQueue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  CHIP_ERROR chipError = [CHIPError errorToCHIPErrorCode:error];
-                                  if (chipError != CHIP_NO_ERROR) {
-                                      ChipLogError(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                  if (error != nil) {
+                                      LogNSError("Error writing attribute", error);
                                   }
                                   if (values) {
                                       for (id item in values) {
                                           NSLog(@"Response Item: %@", [item description]);
                                       }
                                   }
-                                  SetCommandExitStatus(chipError);
+                                  SetCommandExitStatus(error);
                               }];
         return CHIP_NO_ERROR;
     }
