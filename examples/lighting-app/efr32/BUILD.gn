@@ -58,7 +58,7 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
-  # Enables LCD on supported devices
+  # Disable LCD on supported devices
   disable_lcd = false
 
   # Enables LCD Qr Code on supported devices

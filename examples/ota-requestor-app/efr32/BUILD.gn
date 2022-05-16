@@ -45,7 +45,7 @@ declare_args() {
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 
-  # Enables LCD on supported devices
+  # Disable LCD on supported devices
   disable_lcd = false
 
   # Enables LCD Qr Code on supported devices
