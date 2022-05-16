@@ -26,7 +26,9 @@
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
+#ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
 #include <app-common/zap-generated/attribute-id.h>
