@@ -74,6 +74,14 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
                 return false;
             }
 
+            // Look behind has to keep going backwards, otherwise we may
+            // get into an infinite list
+            if (offset >= static_cast<size_t>(mCurrentPosition - mValidData.Start()))
+            {
+                mIsValid = false;
+                return false;
+            }
+
             mLookBehindMax   = offset;
             mCurrentPosition = mValidData.Start() + offset;
         }

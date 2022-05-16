@@ -428,6 +428,7 @@ dropdown
 dryrun
 DS
 duplicative
+DUT
 DV
 dynload
 eabi
@@ -1272,6 +1273,7 @@ timedInteractionTimeoutMs
 TimeFormatLocalization
 timeoutMs
 TimeSynchronization
+Tizen
 TKIP
 tlsr
 TLV
@@ -1288,6 +1290,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TPK
 trackAlloc
 trackFree
 TransferSession

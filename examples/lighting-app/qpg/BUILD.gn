@@ -52,12 +52,10 @@ qpg_sdk("sdk") {
 qpg_executable("lighting_app") {
   output_name = "chip-${qpg_target_ic}-lighting-example.out"
 
-  include_dirs = []
-
   sources = [
-    "${chip_root}/examples/lighting-app/lighting-common/color_format/color_format.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
+    "include/LightingManager.h",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -66,6 +64,7 @@ qpg_executable("lighting_app") {
   deps = [
     ":sdk",
     "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/lighting-app/lighting-common:color-format",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
@@ -81,7 +80,6 @@ qpg_executable("lighting_app") {
   include_dirs = [
     "include",
     "${examples_plat_dir}/ota",
-    "${chip_root}/examples/lighting-app/lighting-common/color_format",
   ]
 
   defines = []

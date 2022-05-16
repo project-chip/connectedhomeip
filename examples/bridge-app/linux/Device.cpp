@@ -183,3 +183,45 @@ void DeviceSwitch::HandleDeviceChange(Device * device, Device::Changed_t changeM
         mChanged_CB(this, (DeviceSwitch::Changed_t) changeMask);
     }
 }
+
+void ComposedDevice::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
+{
+    if (mChanged_CB)
+    {
+        mChanged_CB(this, (ComposedDevice::Changed_t) changeMask);
+    }
+}
+
+void DevicePowerSource::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
+{
+    if (mChanged_CB)
+    {
+        mChanged_CB(this, (DevicePowerSource::Changed_t) changeMask);
+    }
+}
+
+void DevicePowerSource::SetBatChargeLevel(uint8_t aBatChargeLevel)
+{
+    bool changed;
+
+    changed         = aBatChargeLevel != mBatChargeLevel;
+    mBatChargeLevel = aBatChargeLevel;
+
+    if ((changed) && (mChanged_CB))
+    {
+        mChanged_CB(this, kChanged_BatLevel);
+    }
+}
+
+void DevicePowerSource::SetDescription(std::string aDescription)
+{
+    bool changed;
+
+    changed      = aDescription != mDescription;
+    mDescription = aDescription;
+
+    if ((changed) && (mChanged_CB))
+    {
+        mChanged_CB(this, kChanged_Description);
+    }
+}

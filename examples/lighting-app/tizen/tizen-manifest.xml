@@ -4,4 +4,8 @@
     <service-application appid="org.tizen.matter.example.lighting" exec="chip-lighting-app" type="capp" multiple="false" taskmanage="false" nodisplay="true">
         <label>Matter Lighting Example</label>
     </service-application>
+    <privileges>
+        <privilege>http://tizen.org/privilege/bluetooth</privilege>
+    </privileges>
+    <feature name="http://tizen.org/feature/network.bluetooth.le.gatt.server">true</feature>
 </manifest>
