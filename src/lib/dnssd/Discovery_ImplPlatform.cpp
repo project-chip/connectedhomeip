@@ -647,6 +647,11 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
 }
 
+ResolverProxy::~ResolverProxy()
+{
+    Shutdown();
+}
+
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);

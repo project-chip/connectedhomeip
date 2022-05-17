@@ -263,6 +263,9 @@ public:
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
+    OperationalResolveDelegate * Internal_GetOperationalDelegate() { return mOperationalDelegate; }
+    CommissioningResolveDelegate * Internal_GetCommissioningDelegate() { return mCommissioningDelegate; }
+
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
@@ -647,6 +650,13 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
+}
+
+ResolverProxy::~ResolverProxy()
+{
+    gResolver.SetOperationalDelegate(nullptr);
+    gResolver.SetCommissioningDelegate(nullptr);
+    Shutdown();
 }
 
 // Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
