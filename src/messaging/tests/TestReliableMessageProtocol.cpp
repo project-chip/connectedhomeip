@@ -228,7 +228,6 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
 const unsigned theBackoffComplianceTestVectorLength =
     sizeof(theBackoffComplianceTestVector) / sizeof(struct BackoffComplianceTestVector);
 
-
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -281,7 +280,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    BackoffComplianceTestVector *expectedBackoff;
+    BackoffComplianceTestVector * expectedBackoff;
     System::Clock::Timestamp now, startTime;
     System::Clock::Timeout timeoutTime;
 
@@ -315,7 +314,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     // Ensure the exchange stays open after we send (unlike the CheckCloseExchangeAndResendApplicationMessage case), by claiming to
     // expect a response.
     startTime = System::SystemClock().GetMonotonicTimestamp();
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
+    err       = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
@@ -326,7 +325,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // Wait for the initial message to fail (should take 300-375ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
-    now = System::SystemClock().GetMonotonicTimestamp();
+    now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #1  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[0];
@@ -344,7 +343,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // Wait for the 1st retry to fail (should take 300-375ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
-    now = System::SystemClock().GetMonotonicTimestamp();
+    now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #2  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[1];
@@ -362,7 +361,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // Wait for the 2nd retry to fail (should take 480-600msms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
-    now = System::SystemClock().GetMonotonicTimestamp();
+    now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #3  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[2];
@@ -380,7 +379,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // Wait for the 3rd retry to fail (should take 768-960ms)
     ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 5; });
-    now = System::SystemClock().GetMonotonicTimestamp();
+    now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[3];
@@ -1605,7 +1604,6 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // And that there are no un-acked messages left.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
-
 
 void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
 {
