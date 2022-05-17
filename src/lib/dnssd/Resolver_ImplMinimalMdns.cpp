@@ -654,7 +654,8 @@ Resolver & chip::Dnssd::Resolver::Instance()
 
 ResolverProxy::~ResolverProxy()
 {
-    gResolver.SetOperationalDelegate(nullptr);
+    // TODO: this is a hack: resolver proxies used for commissionable discovery
+    //       and they don't interact well with each other.
     gResolver.SetCommissioningDelegate(nullptr);
     Shutdown();
 }
