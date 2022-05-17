@@ -76,7 +76,8 @@ int LoadEntryCallback(const char * name, size_t entrySize, settings_read_cb read
         entry.result = bytesRead > 0 ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    return 0;
+    // Return 1 to stop processing further keys
+    return 1;
 }
 
 int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_read_cb /* readCb */, void * /* cbArg */,
