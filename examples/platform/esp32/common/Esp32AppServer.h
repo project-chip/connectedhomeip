@@ -21,9 +21,6 @@
 #include <app/server/AppDelegate.h>
 #include <stdint.h>
 
-class InitServerHelper
-{
-
-public:
-    static void Init(void (*callback)() = nullptr, AppDelegate * context = nullptr);
-};
+namespace Esp32AppServer {
+void Init(AppDelegate * context = nullptr);
+}

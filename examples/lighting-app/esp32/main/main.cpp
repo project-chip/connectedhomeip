@@ -18,7 +18,7 @@
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
 #include <common/CHIPDeviceManager.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 
 #include "esp_log.h"
 #include "esp_spi_flash.h"
@@ -44,7 +44,7 @@ static void InitServer(intptr_t context)
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
-    InitServerHelper::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 extern "C" void app_main()

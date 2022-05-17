@@ -27,7 +27,7 @@
 #include "nvs_flash.h"
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 
 #include <cmath>
 #include <cstdio>
@@ -49,7 +49,7 @@ static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
-    InitServerHelper::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 extern "C" void app_main()

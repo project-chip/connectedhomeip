@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "InitServerHelpers.h"
+#include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
@@ -42,7 +42,7 @@ ESP32FactoryDataProvider sFactoryDataProvider;
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 } // namespace
 
-void InitServerHelper::Init(void (*callback)(), AppDelegate * sAppDelegate)
+void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -71,8 +71,4 @@ void InitServerHelper::Init(void (*callback)(), AppDelegate * sAppDelegate)
         chip::app::DnssdServer::Instance().StartServer();
     }
 #endif
-    if (callback)
-    {
-        (*callback)();
-    }
 }

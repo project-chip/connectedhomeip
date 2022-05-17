@@ -28,7 +28,7 @@
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
 #include <common/CHIPDeviceManager.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 
 #include <cmath>
 #include <cstdio>
@@ -49,20 +49,16 @@ static const char * TAG = "lock-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 
-static void PostInitServerCallback()
+static void InitServer(intptr_t context)
 {
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     CHIP_ERROR error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed: %s", ErrorStr(error));
     }
-}
-
-static void InitServer(intptr_t context)
-{
-    InitServerHelper::Init(
-        PostInitServerCallback); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 extern "C" void app_main()

@@ -24,7 +24,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
@@ -374,8 +374,10 @@ const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, D
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
-static void PostInitServerCallback()
+static void InitServer(intptr_t context)
 {
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -410,12 +412,6 @@ static void PostInitServerCallback()
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight2DataVersions));
-}
-
-static void InitServer(intptr_t context)
-{
-    InitServerHelper::Init(
-        PostInitServerCallback); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 extern "C" void app_main()

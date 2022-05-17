@@ -18,7 +18,7 @@
 
 #include "DeviceCallbacks.h"
 #include <common/CHIPDeviceManager.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 
 #include "AppTask.h"
 #include "BindingHandler.h"
@@ -39,18 +39,14 @@ static const char * TAG = "light-switch-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 
-static void PostInitServerCallback()
-{
-    InitBindingHandler();
-}
-
 static void InitServer(intptr_t context)
 {
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
-    InitServerHelper::Init(
-        PostInitServerCallback); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
+    InitBindingHandler();
 }
 
 extern "C" void app_main()

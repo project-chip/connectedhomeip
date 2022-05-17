@@ -22,7 +22,7 @@
 #include "nvs_flash.h"
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -60,8 +60,10 @@ chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nul
 chip::Callback::Callback<OnBdxTransferComplete> onTransferCompleteCallback(OnTransferComplete, nullptr);
 chip::Callback::Callback<OnBdxTransferFailed> onTransferFailedCallback(OnTransferFailed, nullptr);
 
-static void PostInitServerCallback()
+static void InitServer(intptr_t context)
 {
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
     BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
     VerifyOrReturn(bdxOtaSender != nullptr, ESP_LOGE(TAG, "bdxOtaSender is nullptr"));
 
@@ -121,12 +123,6 @@ static void PostInitServerCallback()
     OTAProviderCommands & otaProviderCommands = OTAProviderCommands::GetInstance();
     otaProviderCommands.SetExampleOTAProvider(&otaProvider);
     otaProviderCommands.Register();
-}
-
-static void InitServer(intptr_t context)
-{
-    InitServerHelper::Init(
-        PostInitServerCallback); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 } // namespace

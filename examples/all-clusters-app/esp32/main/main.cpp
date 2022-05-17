@@ -39,7 +39,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/util/af.h>
 #include <binding-handler.h>
-#include <common/InitServerHelpers.h>
+#include <common/Esp32AppServer.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -85,8 +85,10 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 } // namespace
 
-static void PostInitServerCallback()
+static void InitServer(intptr_t context)
 {
+    Esp32AppServer::Init(&sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
@@ -94,12 +96,6 @@ static void PostInitServerCallback()
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
-}
-
-static void InitServer(intptr_t context)
-{
-    InitServerHelper::Init(PostInitServerCallback,
-                           &sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 extern "C" void app_main()
