@@ -63,6 +63,8 @@ NSString * const kCHIPNullValueType = @"Null";
 NSString * const kCHIPStructureValueType = @"Structure";
 NSString * const kCHIPArrayValueType = @"Array";
 
+constexpr uint8_t kMaxAllowedPaths = 9;
+
 class NSObjectDataValueCallbackBridge;
 
 @interface CHIPDevice ()
@@ -88,7 +90,6 @@ class NSObjectDataValueCallbackBridge;
 
 @interface CHIPReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
-@property (nonatomic, readwrite) app::AttributePathParams * pathParams;
 @property (nonatomic, readwrite) uint64_t deviceId;
 - (void)onDone;
 @end
@@ -135,10 +136,6 @@ static void PurgeReadClientContainers(uint64_t deviceId, dispatch_queue_t queue,
             if (container.readClientPtr) {
                 Platform::Delete(container.readClientPtr);
                 container.readClientPtr = nullptr;
-            }
-            if (container.pathParams) {
-                Platform::Delete(container.pathParams);
-                container.pathParams = nullptr;
             }
         }
         [listToDelete removeAllObjects];
@@ -201,10 +198,6 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
         Platform::Delete(_readClientPtr);
         _readClientPtr = nullptr;
     }
-    if (_pathParams) {
-        Platform::Delete(_pathParams);
-        _pathParams = nullptr;
-    }
     PurgeCompletedReadClientContainers(_deviceId);
 }
 
@@ -213,10 +206,6 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     if (_readClientPtr) {
         Platform::Delete(_readClientPtr);
         _readClientPtr = nullptr;
-    }
-    if (_pathParams) {
-        Platform::Delete(_pathParams);
-        _pathParams = nullptr;
     }
 }
 @end
@@ -242,6 +231,23 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
 - (chip::DeviceProxy *)internalDevice
 {
     return _cppDevice;
+}
+
+- (NSArray *)convertIdsToNSArray:(id _Nullable)ids
+{
+    NSArray * target = nil;
+    if (ids == nil) {
+        target = [[NSArray alloc] init];
+    } else if ([ids isKindOfClass:[NSNumber class]]) {
+        target = [[NSMutableArray alloc] init];
+        target = [NSArray arrayWithObjects:ids, nil];
+    } else if ([ids isKindOfClass:[NSMutableArray class]]) {
+        target = [ids copy];
+    } else if ([ids isKindOfClass:[NSArray class]]) {
+        target = ids;
+    }
+
+    return target;
 }
 
 typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable error);
@@ -741,12 +747,9 @@ public:
     using OnDoneCallbackType = std::function<void(BufferedReadAttributeCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
-    BufferedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
-        OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+    BufferedReadAttributeCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
         OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr)
-        : mClusterId(aClusterId)
-        , mAttributeId(aAttributeId)
-        , mOnSuccess(aOnSuccess)
+        : mOnSuccess(aOnSuccess)
         , mOnError(aOnError)
         , mOnDone(aOnDone)
         , mOnSubscriptionEstablished(aOnSubscriptionEstablished)
@@ -772,9 +775,6 @@ private:
         VerifyOrDie(!aPath.IsListItemOperation());
 
         VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
-        VerifyOrExit((aPath.mClusterId == mClusterId || mClusterId == kInvalidClusterId)
-                && (aPath.mAttributeId == mAttributeId || mAttributeId == kInvalidAttributeId),
-            err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -810,13 +810,34 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
 };
 
-- (void)readAttributeWithEndpointId:(NSNumber *)endpointId
-                          clusterId:(NSNumber *)clusterId
-                        attributeId:(NSNumber *)attributeId
+- (void)readAttributeWithEndpointId:(id)endpointId
+                          clusterId:(id)clusterId
+                        attributeId:(id)attributeId
                              params:(CHIPReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion
 {
+    NSArray * endpointIds = [self convertIdsToNSArray:endpointId];
+    NSArray * clusterIds = [self convertIdsToNSArray:clusterId];
+    NSArray * attributeIds = [self convertIdsToNSArray:attributeId];
+    if (endpointIds == nil || clusterIds == nil || attributeIds == nil) {
+        dispatch_async(clientQueue, ^{
+            completion(nil, [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        });
+        return;
+    }
+
+    NSUInteger endpointsCount = [endpointIds count];
+    NSUInteger clustersCount = [clusterIds count];
+    NSUInteger attributesCount = [attributeIds count];
+    NSUInteger pathCount = MAX(endpointsCount, MAX(clustersCount, attributesCount));
+    if (pathCount > kMaxAllowedPaths) {
+        dispatch_async(clientQueue, ^{
+            completion(nil, [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        });
+        return;
+    }
+
     new NSObjectDataValueCallbackBridge(
         clientQueue, completion, ^(chip::Callback::Cancelable * success, chip::Callback::Cancelable * failure) {
             auto successFn = chip::Callback::Callback<NSObjectDataValueCallback>::FromCancelable(success);
@@ -849,23 +870,29 @@ private:
                 }
             };
 
-            app::AttributePathParams attributePath;
-            if (endpointId) {
-                attributePath.mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
+            chip::app::AttributePathParams attributePathParams[kMaxAllowedPaths];
+            for (NSUInteger i = 0; i < pathCount; i++) {
+                chip::app::AttributePathParams & path = attributePathParams[static_cast<uint8_t>(i)];
+
+                if (i < endpointsCount) {
+                    path.mEndpointId = static_cast<chip::EndpointId>([endpointIds[i] unsignedShortValue]);
+                }
+
+                if (i < clustersCount) {
+                    path.mClusterId = static_cast<chip::ClusterId>([clusterIds[i] unsignedLongValue]);
+                }
+
+                if (i < attributesCount) {
+                    path.mAttributeId = static_cast<chip::AttributeId>([attributeIds[i] unsignedLongValue]);
+                }
             }
-            if (clusterId) {
-                attributePath.mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
-            }
-            if (attributeId) {
-                attributePath.mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
-            }
-            app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-            CHIP_ERROR err = CHIP_NO_ERROR;
 
             chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
-            readParams.mpAttributePathParamsList = &attributePath;
-            readParams.mAttributePathParamsListSize = 1;
             readParams.mIsFabricFiltered = params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue];
+            readParams.mAttributePathParamsListSize = pathCount;
+            readParams.mpAttributePathParamsList = attributePathParams;
+
+            app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
             auto onDone = [resultArray, resultSuccess, resultFailure, context, successCb, failureCb](
                               BufferedReadAttributeCallback<NSObjectData> * callback) {
@@ -890,18 +917,14 @@ private:
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-                attributePath.mClusterId, attributePath.mAttributeId, onSuccessCb, onFailureCb, onDone, nullptr);
+                onSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
             auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
                 callback -> GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
             VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            err = readClient->SendRequest(readParams);
-
-            if (err != CHIP_NO_ERROR) {
-                return err;
-            }
+            ReturnErrorOnFailure(readClient->SendRequest(readParams));
 
             //
             // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
@@ -910,7 +933,7 @@ private:
             //
             callback->AdoptReadClient(std::move(readClient));
             callback.release();
-            return err;
+            return CHIP_NO_ERROR;
         });
 }
 
@@ -1131,9 +1154,9 @@ exit:
         });
 }
 
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+- (void)subscribeAttributeWithEndpointId:(id _Nullable)endpointId
+                               clusterId:(id _Nullable)clusterId
+                             attributeId:(id _Nullable)attributeId
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(CHIPSubscribeParams * _Nullable)params
@@ -1141,6 +1164,27 @@ exit:
                            reportHandler:(CHIPDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(SubscriptionEstablishedHandler)subscriptionEstablishedHandler
 {
+    NSArray * endpointIds = [self convertIdsToNSArray:endpointId];
+    NSArray * clusterIds = [self convertIdsToNSArray:clusterId];
+    NSArray * attributeIds = [self convertIdsToNSArray:attributeId];
+    if (endpointIds == nil || clusterIds == nil || attributeIds == nil) {
+        dispatch_async(clientQueue, ^{
+            reportHandler(nil, [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        });
+        return;
+    }
+
+    NSUInteger endpointsCount = [endpointIds count];
+    NSUInteger clustersCount = [clusterIds count];
+    NSUInteger attributesCount = [attributeIds count];
+    NSUInteger pathCount = MAX(endpointsCount, MAX(clustersCount, attributesCount));
+    if (pathCount > kMaxAllowedPaths) {
+        dispatch_async(clientQueue, ^{
+            reportHandler(nil, [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        });
+        return;
+    }
+
     dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
         auto onReportCb = [clientQueue, reportHandler](const app::ConcreteAttributePath & attribPath, const NSObjectData & data) {
             id valueObject = data.GetDecodedObject();
@@ -1182,23 +1226,29 @@ exit:
 
         CHIPReadClientContainer * container = [[CHIPReadClientContainer alloc] init];
         container.deviceId = self.cppDevice->GetDeviceId();
-        container.pathParams = Platform::New<app::AttributePathParams>();
-        if (endpointId) {
-            container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointId unsignedShortValue]);
-        }
-        if (clusterId) {
-            container.pathParams->mClusterId = static_cast<chip::ClusterId>([clusterId unsignedLongValue]);
-        }
-        if (attributeId) {
-            container.pathParams->mAttributeId = static_cast<chip::AttributeId>([attributeId unsignedLongValue]);
+
+        chip::app::AttributePathParams attributePathParams[kMaxAllowedPaths];
+        for (NSUInteger i = 0; i < pathCount; i++) {
+            chip::app::AttributePathParams & path = attributePathParams[static_cast<uint8_t>(i)];
+
+            if (i < endpointsCount) {
+                path.mEndpointId = static_cast<chip::EndpointId>([endpointIds[i] unsignedShortValue]);
+            }
+
+            if (i < clustersCount) {
+                path.mClusterId = static_cast<chip::ClusterId>([clusterIds[i] unsignedLongValue]);
+            }
+
+            if (i < attributesCount) {
+                path.mAttributeId = static_cast<chip::AttributeId>([attributeIds[i] unsignedLongValue]);
+            }
         }
 
         app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-        CHIP_ERROR err = CHIP_NO_ERROR;
 
         chip::app::ReadPrepareParams readParams([self internalDevice]->GetSecureSession().Value());
-        readParams.mpAttributePathParamsList = container.pathParams;
-        readParams.mAttributePathParamsListSize = 1;
+        readParams.mpAttributePathParamsList = attributePathParams;
+        readParams.mAttributePathParamsListSize = pathCount;
         readParams.mMinIntervalFloorSeconds = static_cast<uint16_t>([minInterval unsignedShortValue]);
         readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>([maxInterval unsignedShortValue]);
         readParams.mIsFabricFiltered = (params == nil || params.fabricFiltered == nil || [params.fabricFiltered boolValue]);
@@ -1211,12 +1261,12 @@ exit:
         };
 
         auto callback = chip::Platform::MakeUnique<BufferedReadAttributeCallback<NSObjectData>>(
-            container.pathParams->mClusterId, container.pathParams->mAttributeId, onReportCb, onFailureCb, onDone, onEstablishedCb);
+            onReportCb, onFailureCb, onDone, onEstablishedCb);
 
         auto readClient = Platform::New<app::ReadClient>(engine, [self internalDevice]->GetExchangeManager(),
             callback -> GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-        err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+        CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
 
         if (err != CHIP_NO_ERROR) {
             if (reportHandler) {

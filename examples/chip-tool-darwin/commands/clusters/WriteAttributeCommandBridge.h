@@ -53,7 +53,7 @@ public:
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, std::vector<chip::EndpointId> endpoints) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -72,7 +72,7 @@ public:
             return CHIP_ERROR_INTERNAL;
         }
 
-        return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, value);
+        return WriteAttribute::SendCommand(device, endpoints.front(), mClusterId, mAttributeId, value);
     }
 
     CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,

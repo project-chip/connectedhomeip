@@ -175,9 +175,9 @@ extern NSString * const kCHIPArrayValueType;
 /**
  * Read attribute in a designated attribute path
  */
-- (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                          clusterId:(NSNumber * _Nullable)clusterId
-                        attributeId:(NSNumber * _Nullable)attributeId
+- (void)readAttributeWithEndpointId:(id _Nullable)endpointId
+                          clusterId:(id _Nullable)clusterId
+                        attributeId:(id _Nullable)attributeId
                              params:(CHIPReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(CHIPDeviceResponseHandler)completion;
@@ -226,9 +226,9 @@ extern NSString * const kCHIPArrayValueType;
 /**
  * Subscribe an attribute in a designated attribute path
  */
-- (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
-                               clusterId:(NSNumber * _Nullable)clusterId
-                             attributeId:(NSNumber * _Nullable)attributeId
+- (void)subscribeAttributeWithEndpointId:(id _Nullable)endpointId
+                               clusterId:(id _Nullable)clusterId
+                             attributeId:(id _Nullable)attributeId
                              minInterval:(NSNumber *)minInterval
                              maxInterval:(NSNumber *)maxInterval
                                   params:(CHIPSubscribeParams * _Nullable)params

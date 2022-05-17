@@ -31,16 +31,16 @@ public:
     void AddArguments()
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
-        AddArgument("endpoint-id", 0, UINT16_MAX, &mEndPointId);
+        AddArgument("endpoint-id", 0, UINT16_MAX, &mEndPointIds);
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
-    virtual CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endPointId) = 0;
+    virtual CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, std::vector<chip::EndpointId> endPoints) = 0;
 
 private:
     chip::NodeId mNodeId;
-    chip::EndpointId mEndPointId;
+    std::vector<chip::EndpointId> mEndPointIds;
 };

@@ -60,7 +60,7 @@ public:
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, std::vector<chip::EndpointId> endpoints) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -78,7 +78,7 @@ public:
         if (commandFields == nil) {
             return CHIP_ERROR_INTERNAL;
         }
-        return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, commandFields);
+        return ClusterCommand::SendCommand(device, endpoints.front(), mClusterId, mCommandId, commandFields);
     }
 
     CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,

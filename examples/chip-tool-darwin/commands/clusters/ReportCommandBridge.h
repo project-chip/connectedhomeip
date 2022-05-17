@@ -25,17 +25,17 @@ public:
     ReadAttribute()
         : ModelCommand("read-by-id")
     {
-        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
+        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ModelCommand::AddArguments();
     }
 
     ReadAttribute(chip::ClusterId clusterId)
         : ModelCommand("read-by-id")
-        , mClusterId(clusterId)
+        , mClusterIds(1, clusterId)
     {
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ModelCommand::AddArguments();
     }
@@ -50,15 +50,31 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, std::vector<chip::EndpointId> endpoints) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPReadParams * params = [[CHIPReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
+
+        NSMutableArray * endpointIds = [[NSMutableArray alloc] init];
+        for (const auto & endpointId : endpoints) {
+            [endpointIds addObject:[NSNumber numberWithUnsignedShort:endpointId]];
+        }
+
+        NSMutableArray * attributeIds = [[NSMutableArray alloc] init];
+        for (const auto & attributeId : mAttributeIds) {
+            [attributeIds addObject:[NSNumber numberWithUnsignedInteger:attributeId]];
+        }
+
+        NSMutableArray * clusterIds = [[NSMutableArray alloc] init];
+        for (const auto & clusterId : mClusterIds) {
+            [clusterIds addObject:[NSNumber numberWithUnsignedInteger:clusterId]];
+        }
+
         [device
-            readAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                              clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
-                            attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
+            readAttributeWithEndpointId:endpointIds
+                              clusterId:clusterIds
+                            attributeId:attributeIds
                                  params:params
                             clientQueue:callbackQueue
                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -79,8 +95,8 @@ protected:
     chip::Optional<bool> mFabricFiltered;
 
 private:
-    chip::ClusterId mClusterId;
-    chip::AttributeId mAttributeId;
+    std::vector<chip::ClusterId> mClusterIds;
+    std::vector<chip::AttributeId> mAttributeIds;
 };
 
 class SubscribeAttribute : public ModelCommand {
@@ -88,8 +104,8 @@ public:
     SubscribeAttribute()
         : ModelCommand("subscribe-by-id")
     {
-        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterIds);
+        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
@@ -100,9 +116,9 @@ public:
 
     SubscribeAttribute(chip::ClusterId clusterId)
         : ModelCommand("subscribe-by-id")
-        , mClusterId(clusterId)
+        , mClusterIds(1, clusterId)
     {
-        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeId);
+        AddArgument("attribute-id", 0, UINT32_MAX, &mAttributeIds);
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
@@ -125,15 +141,31 @@ public:
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, std::vector<chip::EndpointId> endpoints) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
-        [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
-                                       clusterId:[NSNumber numberWithUnsignedInteger:mClusterId]
-                                     attributeId:[NSNumber numberWithUnsignedInteger:mAttributeId]
+
+        NSMutableArray * endpointIds = [[NSMutableArray alloc] init];
+        for (const auto & endpointId : endpoints) {
+            [endpointIds addObject:[NSNumber numberWithUnsignedShort:endpointId]];
+        }
+
+        NSMutableArray * attributeIds = [[NSMutableArray alloc] init];
+        for (const auto & attributeId : mAttributeIds) {
+            [attributeIds addObject:[NSNumber numberWithUnsignedInteger:attributeId]];
+        }
+
+        NSMutableArray * clusterIds = [[NSMutableArray alloc] init];
+        for (const auto & clusterId : mClusterIds) {
+            [clusterIds addObject:[NSNumber numberWithUnsignedInteger:clusterId]];
+        }
+
+        [device subscribeAttributeWithEndpointId:endpointIds
+                                       clusterId:clusterIds
+                                     attributeId:attributeIds
                                      minInterval:[NSNumber numberWithUnsignedInteger:mMinInterval]
                                      maxInterval:[NSNumber numberWithUnsignedInteger:mMaxInterval]
                                           params:params
@@ -162,8 +194,8 @@ protected:
     bool mWait;
 
 private:
-    chip::ClusterId mClusterId;
-    chip::AttributeId mAttributeId;
+    std::vector<chip::ClusterId> mClusterIds;
+    std::vector<chip::AttributeId> mAttributeIds;
 };
 
 class SubscribeEvent : public ModelCommand {
@@ -180,7 +212,7 @@ public:
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, std::vector<chip::EndpointId> endpoints) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
