@@ -44,7 +44,8 @@ public:
 
     bool Contains(const SessionHandle & session) const
     {
-        return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
+        auto ourSession = ToOptional();
+        return ourSession.HasValue() && ourSession.Value() == session;
     }
 
     void Grab(const SessionHandle & session);

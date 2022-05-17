@@ -75,7 +75,7 @@ SessionHolder & SessionHolder::operator=(SessionHolder && that)
 void SessionHolder::Grab(const SessionHandle & session)
 {
     Release();
-    mSession.Emplace(session.mSession);
+    mSession.Emplace(session.mSession.Value());
     session->AddHolder(*this);
 }
 
