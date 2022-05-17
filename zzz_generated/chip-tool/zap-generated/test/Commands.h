@@ -24174,6 +24174,10 @@ private:
             }
             break;
         case 4:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -24184,6 +24188,10 @@ private:
             }
             break;
         case 5:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -24194,6 +24202,10 @@ private:
             }
             break;
         case 6:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -24204,6 +24216,10 @@ private:
             }
             break;
         case 7:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -24214,6 +24230,10 @@ private:
             }
             break;
         case 8:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -24224,6 +24244,10 @@ private:
             }
             break;
         case 9:
+            if (IsUnsupported(status.mStatus))
+            {
+                return;
+            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -24271,37 +24295,31 @@ private:
         }
         case 4: {
             LogStep(4, "Read the optional attribute: Tolerance");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::Tolerance::Id);
         }
         case 5: {
             LogStep(5, "Read the optional attribute: ScaledValue");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::ScaledValue::Id);
         }
         case 6: {
             LogStep(6, "Read the optional attribute: MinScaledValue");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::MinScaledValue::Id);
         }
         case 7: {
             LogStep(7, "Read the optional attribute: MaxScaledValue");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::MaxScaledValue::Id);
         }
         case 8: {
             LogStep(8, "Read the optional attribute: ScaledTolerance");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::ScaledTolerance::Id);
         }
         case 9: {
             LogStep(9, "Read the optional attribute: Scale");
-            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::Scale::Id);
         }
