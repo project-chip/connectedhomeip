@@ -101,8 +101,13 @@ private:
     uint8_t mLastNetworkIDLen = 0;
 
     Optional<uint64_t> mCurrentOperationBreadcrumb;
+
+    // Commits the breadcrumb value saved in mCurrentOperationBreadcrumb to the breadcrumb attribute in GeneralCommissioning
+    // cluster. Will set mCurrentOperationBreadcrumb to NullOptional.
+    void CommitSavedBreadcrumb();
+
+    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
-    void UpdateBreadcrumb();
 
     // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);

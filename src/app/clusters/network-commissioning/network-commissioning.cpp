@@ -401,7 +401,7 @@ void Instance::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
     GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
 }
 
-void Instance::UpdateBreadcrumb()
+void Instance::CommitSavedBreadcrumb()
 {
     // We rejected the command when there is another ongoing command, so mCurrentOperationBreadcrumb reflects the breadcrumb
     // argument in the only background command.
@@ -503,7 +503,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     commandHandle->AddResponse(mPath, response);
     if (commissioningError == NetworkCommissioningStatus::kSuccess)
     {
-        UpdateBreadcrumb();
+        CommitSavedBreadcrumb();
     }
 }
 
@@ -569,7 +569,7 @@ exit:
     }
     if (status == NetworkCommissioningStatus::kSuccess)
     {
-        UpdateBreadcrumb();
+        CommitSavedBreadcrumb();
     }
     networks->Release();
 }
@@ -632,7 +632,7 @@ exit:
     }
     if (status == NetworkCommissioningStatus::kSuccess)
     {
-        UpdateBreadcrumb();
+        CommitSavedBreadcrumb();
     }
     if (networks != nullptr)
     {
