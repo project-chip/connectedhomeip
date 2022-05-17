@@ -151,11 +151,9 @@ public:
     //
     const DeviceControllerSystemState * GetSystemState() const { return mSystemState; }
 
-    class ControllerFabricDelegate final : public FabricTableDelegate
+    class ControllerFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
-        ControllerFabricDelegate() : FabricTableDelegate(true) {}
-
         CHIP_ERROR Init(SessionManager * sessionManager, Credentials::GroupDataProvider * groupDataProvider)
         {
             VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -166,8 +164,10 @@ public:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
+            (void) fabricTable;
+
             if (mSessionManager != nullptr)
             {
                 mSessionManager->FabricRemoved(fabricIndex);
@@ -178,9 +178,17 @@ public:
             }
         };
 
-        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
 
-        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
 
     private:
         SessionManager * mSessionManager                    = nullptr;

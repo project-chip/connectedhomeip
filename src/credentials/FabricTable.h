@@ -279,36 +279,6 @@ private:
     CHIP_ERROR SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCert);
 };
 
-// Once attribute store has persistence implemented, FabricTable shoud be backed using
-// attribute store so no need for this Delegate API anymore
-// TODO: Reimplement FabricTable to only have one backing store.
-class DLL_EXPORT FabricTableDelegate
-{
-    friend class FabricTable;
-
-public:
-    FabricTableDelegate(bool ownedByFabricTable = false) : mOwnedByFabricTable(ownedByFabricTable) {}
-    virtual ~FabricTableDelegate() {}
-    /**
-     * Gets called when a fabric is deleted from KVS store.
-     **/
-    virtual void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) = 0;
-
-    /**
-     * Gets called when a fabric is loaded into Fabric Table from KVS store.
-     **/
-    virtual void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) = 0;
-
-    /**
-     * Gets called when a fabric in Fabric Table is persisted to KVS store.
-     **/
-    virtual void OnFabricPersistedToStorage(FabricInfo * fabricInfo) = 0;
-
-private:
-    FabricTableDelegate * mNext = nullptr;
-    bool mOwnedByFabricTable    = false;
-};
-
 /**
  * Iterates over valid fabrics within a list
  */
@@ -379,14 +349,42 @@ private:
 class DLL_EXPORT FabricTable
 {
 public:
+    class DLL_EXPORT Delegate
+    {
+    public:
+        Delegate() {}
+        virtual ~Delegate() {}
+
+        /**
+         * Gets called when a fabric is deleted, such as on FabricTable::Delete().
+         **/
+        virtual void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
+        /**
+         * Gets called when a fabric is loaded into Fabric Table from storage, such as
+         * during FabricTable::Init().
+         **/
+        virtual void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
+        /**
+         * Gets called when a fabric in Fabric Table is persisted to storage, such as
+         * on FabricTable::AddNewFabric().
+         **/
+        virtual void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
+        // Intrusive list pointer for FabricTable to manage the entries.
+        Delegate * next = nullptr;
+    };
+
+public:
     FabricTable() {}
     ~FabricTable();
 
-    CHIP_ERROR Store(FabricIndex index);
+    CHIP_ERROR Store(FabricIndex fabricIndex);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
     // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
-    CHIP_ERROR Delete(FabricIndex index);
+    CHIP_ERROR Delete(FabricIndex fabricIndex);
     void DeleteAllFabrics();
 
     /**
@@ -410,7 +408,8 @@ public:
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
-    CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
+    CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
+    void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
 
@@ -455,7 +454,9 @@ private:
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
 
-    FabricTableDelegate * mDelegate = nullptr;
+    // FabricTable::Delegate link to first node, since FabricTable::Delegate is a form
+    // of intrusive linked-list item.
+    FabricTable::Delegate * mDelegateListRoot = nullptr;
 
     // We may not have an mNextAvailableFabricIndex if our table is as large as
     // it can go and is full.

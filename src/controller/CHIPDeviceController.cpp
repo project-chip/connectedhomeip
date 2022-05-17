@@ -225,7 +225,7 @@ CHIP_ERROR DeviceController::Shutdown()
     {
         // Shut down any ongoing CASE session activity we have.  We're going to
         // assume that all sessions for our fabric belong to us here.
-        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(GetCompressedFabricId());
+        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricInfo->GetFabricIndex());
 
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
