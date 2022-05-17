@@ -17,10 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="ZLL" spec="zll-1.0-11-0037-10" dependsOn="zcl-1.0-07-5123-03">
   </domain>
-  <bitmap name="ScenesCopyMode" type="BITMAP8">
-    <cluster code="0x0005"/>
-    <field name="CopyAllScenes" mask="0x01"/>
-  </bitmap>
   <enum name="EnhancedColorMode" type="ENUM8">
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
@@ -55,62 +51,6 @@ limitations under the License.
   </enum>
   <clusterExtension code="0x0000">
     <attribute side="server" code="0x4000" define="SW_BUILD_ID" type="CHAR_STRING" length="16" writable="false" default="" optional="true" introducedIn="zll-1.0-11-0037-10">sw build id</attribute>
-  </clusterExtension>
-  <clusterExtension code="0x0005">
-    <command source="client" code="0x40" name="EnhancedAddScene" response="EnhancedAddSceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eadd">
-      <description>
-        Command description for EnhancedAddScene
-      </description>
-      <arg name="groupId" type="INT16U"/>
-      <arg name="sceneId" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="sceneName" type="CHAR_STRING"/>
-      <arg name="extensionFieldSets" type="SceneExtensionFieldSet" array="true"/>
-    </command>
-    <command source="client" code="0x41" name="EnhancedViewScene" response="EnhancedViewSceneResponse" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes eview">
-      <description>
-        Command description for EnhancedViewScene
-      </description>
-      <arg name="groupId" type="INT16U"/>
-      <arg name="sceneId" type="INT8U"/>
-    </command>
-    <command source="client" code="0x42" name="CopyScene" response="CopySceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl scenes copy">
-      <description>
-        Command description for CopyScene
-      </description>
-      <arg name="mode" type="ScenesCopyMode"/>
-      <arg name="groupIdFrom" type="INT16U"/>
-      <arg name="sceneIdFrom" type="INT8U"/>
-      <arg name="groupIdTo" type="INT16U"/>
-      <arg name="sceneIdTo" type="INT8U"/>
-    </command>
-    <command source="server" code="0x40" name="EnhancedAddSceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" disableDefaultResponse="true">
-      <description>
-        Command description for EnhancedAddSceneResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="INT16U"/>
-      <arg name="sceneId" type="INT8U"/>
-    </command>
-    <command source="server" code="0x41" name="EnhancedViewSceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" disableDefaultResponse="true">
-      <description>
-        Command description for EnhancedViewSceneResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="INT16U"/>
-      <arg name="sceneId" type="INT8U"/>
-      <arg name="transitionTime" type="INT16U"/>
-      <arg name="sceneName" type="CHAR_STRING"/>
-      <arg name="extensionFieldSets" type="SceneExtensionFieldSet" array="true"/>
-    </command>
-    <command source="server" code="0x42" name="CopySceneResponse" optional="true" introducedIn="zll-1.0-11-0037-10" disableDefaultResponse="true">
-      <description>
-        Command description for CopySceneResponse
-      </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="groupIdFrom" type="INT16U"/>
-      <arg name="sceneIdFrom" type="INT8U"/>
-    </command>
   </clusterExtension>
   <clusterExtension code="0x0300">
     <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true" introducedIn="zll-1.0-11-0037-10">enhanced current hue</attribute>
