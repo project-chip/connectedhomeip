@@ -300,11 +300,16 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     char rotatingIdLongString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
     uint8_t rotatingIdLong[chip::Dnssd::kMaxRotatingIdLen];
     size_t rotatingIdLongLen;
-    strcpy(rotatingIdLongString,
-           "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
-    GetRotatingDeviceId(GetSpan(rotatingIdLongString), rotatingIdLong, &rotatingIdLongLen);
+    strcpy(
+        rotatingIdLongString,
+        "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
 
-    printf(" max length %zu, long length %zu\n", chip::Dnssd::kMaxRotatingIdLen, rotatingIdLongLen);
+    const ByteSpan & value = GetSpan(rotatingIdLongString);
+    rotatingIdLongLen      = Encoding::HexToBytes(reinterpret_cast<const char *>(value.data()), value.size(), rotatingIdLong,
+                                                  chip::Dnssd::kMaxRotatingIdLen * 2);
+
+    printf("str len=%zu max length %zu, long length %zu\n", strlen(rotatingIdLongString), chip::Dnssd::kMaxRotatingIdLen,
+           rotatingIdLongLen);
     NL_TEST_ASSERT(inSuite, rotatingIdLongLen > chip::Dnssd::kMaxRotatingIdLen);
 
     // test base case
