@@ -24,6 +24,22 @@
 namespace chip {
 namespace app {
 
+CHIP_ERROR ClusterStateCache::GetElementTLVSize(TLV::TLVReader * apData, size_t & aSize)
+{
+    Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
+    TLV::TLVReader reader;
+    reader.Init(*apData);
+    size_t totalBufSize = reader.GetTotalLength();
+    backingBuffer.Calloc(totalBufSize);
+    VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), totalBufSize);
+    ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), reader));
+    aSize = writer.GetLengthWritten();
+    ReturnErrorOnFailure(writer.Finalize(backingBuffer));
+    backingBuffer.Release();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                                           const StatusIB & aStatus)
 {
@@ -42,16 +58,16 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
 
     if (apData)
     {
-        Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-        uint32_t totalBufSize = apData->GetTotalLength();
-        backingBuffer.Calloc(totalBufSize);
+        size_t elementSize = 0;
+        ReturnErrorOnFailure(GetElementTLVSize(apData, elementSize));
+        Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
+        backingBuffer.Calloc(elementSize);
         VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-        TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), totalBufSize);
+        TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), elementSize);
         ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
-
         ReturnErrorOnFailure(writer.Finalize(backingBuffer));
-        state.Set<Platform::ScopedMemoryBuffer<uint8_t>>(std::move(backingBuffer));
 
+        state.Set<Platform::ScopedMemoryBufferWithSize<uint8_t>>(std::move(backingBuffer));
         //
         // Clear out the committed data version and only set it again once we have received all data for this cluster.
         // Otherwise, we may have incomplete data that looks like it's complete since it has a valid data version.
@@ -204,8 +220,8 @@ CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVRe
         return CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
     }
 
-    reader.Init(attributeState->Get<Platform::ScopedMemoryBuffer<uint8_t>>().Get(),
-                attributeState->Get<Platform::ScopedMemoryBuffer<uint8_t>>().GetSize());
+    reader.Init(attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
+                attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().GetSize());
     return reader.Next();
 }
 
@@ -406,8 +422,8 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
                 else
                 {
                     TLV::TLVReader bufReader;
-                    bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBuffer<uint8_t>>().Get(),
-                                   attributeIter.second.Get<Platform::ScopedMemoryBuffer<uint8_t>>().GetSize());
+                    bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
+                                   attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().GetSize());
                     ReturnOnFailure(bufReader.Next());
                     // Skip to the end of the element.
                     ReturnOnFailure(bufReader.Skip());

@@ -483,7 +483,7 @@ public:
     }
 
 private:
-    using AttributeState = Variant<Platform::ScopedMemoryBuffer<uint8_t>, StatusIB>;
+    using AttributeState = Variant<Platform::ScopedMemoryBufferWithSize<uint8_t>, StatusIB>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
     //
     // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
@@ -590,6 +590,8 @@ private:
     // payload for the filter's cluster.  Applying filters in this order should maximize space savings
     // on the wire if not all filters can be applied.
     void GetSortedFilters(std::vector<std::pair<DataVersionFilter, size_t>> & aVector);
+
+    CHIP_ERROR GetElementTLVSize(TLV::TLVReader * apData, size_t & aSize);
 
     Callback & mCallback;
     NodeState mCache;

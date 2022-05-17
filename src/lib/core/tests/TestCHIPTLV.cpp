@@ -4334,7 +4334,7 @@ static void CheckGetByteView(nlTestSuite * inSuite, void * inContext)
 
 static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    Platform::ScopedMemoryBuffer<uint8_t> buf;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
     CHIP_ERROR err;
 
     buf.Calloc(64);

@@ -25,6 +25,7 @@
 #pragma once
 
 #include <lib/support/CHIPMem.h>
+
 #include <type_traits>
 #include <utility>
 
@@ -56,14 +57,12 @@ public:
         if (this != &other)
         {
             mBuffer       = other.mBuffer;
-            mSize         = other.mSize;
             other.mBuffer = nullptr;
-            other.mSize   = 0;
         }
         return *this;
     }
 
-    ~ScopedMemoryBufferBase() { Free(); }
+    virtual ~ScopedMemoryBufferBase() { Free(); }
 
     /** Check if a buffer is valid */
     explicit operator bool() const { return mBuffer != nullptr; }
@@ -78,13 +77,12 @@ public:
         }
         Impl::MemoryFree(mBuffer);
         mBuffer = nullptr;
-        mSize   = 0;
     }
 
 protected:
     void * Ptr() { return mBuffer; }
     const void * Ptr() const { return mBuffer; }
-    size_t GetSize() const { return mSize; }
+
     /**
      * Releases the undelying buffer. Buffer stops being managed and will not be
      * auto-freed.
@@ -93,7 +91,6 @@ protected:
     {
         void * buffer = mBuffer;
         mBuffer       = nullptr;
-        mSize         = 0;
         return buffer;
     }
 
@@ -101,19 +98,16 @@ protected:
     {
         Free();
         mBuffer = Impl::MemoryAlloc(size);
-        mSize   = size;
     }
 
     void Calloc(size_t elementCount, size_t elementSize)
     {
         Free();
         mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
-        mSize   = elementCount * elementSize;
     }
 
 private:
     void * mBuffer = nullptr;
-    size_t mSize   = 0;
 };
 
 /**
@@ -153,8 +147,6 @@ public:
 
     inline T * Release() { return static_cast<T *>(Base::Release()); }
 
-    inline size_t GetSize() const { return Base::GetSize(); }
-
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
         Base::Calloc(elementCount, sizeof(T));
@@ -166,6 +158,58 @@ public:
         Base::Alloc(size * sizeof(T));
         return *this;
     }
+};
+
+/**
+ * Represents a memory buffer with buffer size allocated using chip::Platform::Memory*Alloc
+ * methods.
+ *
+ * Use for RAII to auto-free after use.
+ */
+template <typename T>
+class ScopedMemoryBufferWithSize : public ScopedMemoryBuffer<T>
+{
+public:
+    ScopedMemoryBufferWithSize() {}
+    ScopedMemoryBufferWithSize(ScopedMemoryBufferWithSize && other) { *this = std::move(other); }
+
+    ScopedMemoryBufferWithSize & operator=(ScopedMemoryBufferWithSize && other)
+    {
+        if (this != &other)
+        {
+            mSize       = other.mSize;
+            other.mSize = 0;
+        }
+        ScopedMemoryBuffer<T>::operator=(std::move(other));
+        return *this;
+    }
+
+    virtual ~ScopedMemoryBufferWithSize() { mSize = 0; }
+
+    inline size_t GetSize() const { return mSize; }
+
+    T * Release()
+    {
+        mSize = 0;
+        return ScopedMemoryBuffer<T>::Release();
+    }
+
+    ScopedMemoryBufferWithSize & Calloc(size_t elementCount)
+    {
+        mSize = elementCount * sizeof(T);
+        ScopedMemoryBuffer<T>::Calloc(elementCount);
+        return *this;
+    }
+
+    ScopedMemoryBufferWithSize & Alloc(size_t size)
+    {
+        mSize = size * sizeof(T);
+        ScopedMemoryBuffer<T>::Alloc(size);
+        return *this;
+    }
+
+private:
+    size_t mSize = 0;
 };
 
 } // namespace Platform

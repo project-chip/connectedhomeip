@@ -969,14 +969,17 @@ public:
     /*
      * Construct and initialize the reader by taking ownership of the provided scoped buffer.
      */
-    ScopedBufferTLVReader(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen) { Init(std::move(buffer), dataLen); }
+    ScopedBufferTLVReader(Platform::ScopedMemoryBufferWithSize<uint8_t> && buffer, size_t dataLen)
+    {
+        Init(std::move(buffer), dataLen);
+    }
 
     ScopedBufferTLVReader() {}
 
     /*
      * Initialize the reader by taking ownership of a passed in scoped buffer.
      */
-    void Init(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen)
+    void Init(Platform::ScopedMemoryBufferWithSize<uint8_t> && buffer, size_t dataLen)
     {
         mBuffer = std::move(buffer);
         TLVReader::Init(mBuffer.Get(), dataLen);
@@ -987,14 +990,14 @@ public:
      * the provided buffer reference. This also re-initializes the reader with
      * a null buffer to prevent further use of the reader.
      */
-    void TakeBuffer(Platform::ScopedMemoryBuffer<uint8_t> & buffer)
+    void TakeBuffer(Platform::ScopedMemoryBufferWithSize<uint8_t> & buffer)
     {
         buffer = std::move(mBuffer);
         TLVReader::Init(nullptr, 0);
     }
 
 private:
-    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
 };
 
 /**
@@ -2256,7 +2259,7 @@ public:
     /*
      * Construct and initialize the writer by taking ownership of the provided scoped buffer.
      */
-    ScopedBufferTLVWriter(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen)
+    ScopedBufferTLVWriter(Platform::ScopedMemoryBufferWithSize<uint8_t> && buffer, size_t dataLen)
     {
         mBuffer = std::move(buffer);
         Init(mBuffer.Get(), dataLen);
@@ -2267,7 +2270,7 @@ public:
      * ownership to the provided buffer reference. This also re-initializes the writer with
      * a null buffer to prevent further inadvertent use of the writer.
      */
-    CHIP_ERROR Finalize(Platform::ScopedMemoryBuffer<uint8_t> & buffer)
+    CHIP_ERROR Finalize(Platform::ScopedMemoryBufferWithSize<uint8_t> & buffer)
     {
         ReturnErrorOnFailure(TLVWriter::Finalize());
         buffer = std::move(mBuffer);
@@ -2276,7 +2279,7 @@ public:
     }
 
 private:
-    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
 };
 
 /**
