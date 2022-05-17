@@ -18,7 +18,9 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
+#include <lib/core/Optional.h>
 #include <lib/support/ReferenceCountedHandle.h>
+#include <transport/SessionSharedPtr.h>
 
 namespace chip {
 
@@ -29,13 +31,15 @@ class Session;
 class SessionHolder;
 
 /** @brief
- *    Non-copyable session reference. All SessionHandles are created within SessionManager. SessionHandle is not
- *    reference *counted, hence it is not allowed to store SessionHandle anywhere except for function arguments and
- *    return values. SessionHandle is short-lived as it is only available as stack variable, so it is never dangling. */
-class SessionHandle
+ *    A non-copyable version of SessionSharedPtr that is always guaranteed to point to a valid Session. This is always
+ *    created within SessionManager.
+ *
+ *    Since this is a strong reference, this should be short-lived and only used as a stack variable.
+ */
+class SessionHandle : protected SessionSharedPtr
 {
 public:
-    SessionHandle(Transport::Session & session) : mSession(session) {}
+    SessionHandle(Transport::Session & session) : SessionSharedPtr(session) {}
     ~SessionHandle() {}
 
     SessionHandle(const SessionHandle &) = delete;
@@ -43,13 +47,13 @@ public:
     SessionHandle(SessionHandle &&)                = default;
     SessionHandle & operator=(SessionHandle &&) = delete;
 
-    bool operator==(const SessionHandle & that) const { return &mSession.Get() == &that.mSession.Get(); }
+    bool operator==(const SessionHandle & that) const { return Get() == that.Get(); }
 
-    Transport::Session * operator->() const { return mSession.operator->(); }
+    Transport::Session * operator->() const { return SessionSharedPtr::operator->(); }
 
 private:
+    // TODO: Remove this once SessionHolder pivots to truly being a weak reference (#18399).
     friend class SessionHolder;
-    ReferenceCountedHandle<Transport::Session> mSession;
 };
 
 } // namespace chip
