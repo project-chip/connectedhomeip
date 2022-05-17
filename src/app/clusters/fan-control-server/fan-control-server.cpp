@@ -134,13 +134,15 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
 
 void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    uint32_t ourFeatureMap;
     bool multiSpeedSupported = false;
 
-    if (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS)
     {
-        if (ourFeatureMap & to_underlying(FanControlFeature::kMultiSpeed))
-            multiSpeedSupported = true;
+        uint32_t ourFeatureMap;
+        if (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS)
+        {
+            if (ourFeatureMap & to_underlying(FanControlFeature::kMultiSpeed))
+                multiSpeedSupported = true;
+        }
     }
 
     switch (attributePath.mAttributeId)
