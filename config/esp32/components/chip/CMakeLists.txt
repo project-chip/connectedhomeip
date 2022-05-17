@@ -101,6 +101,8 @@ endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
+else()
+    chip_gn_arg_append("chip_mdns"                          "\"minimal\"")
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
