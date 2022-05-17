@@ -205,6 +205,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     }
 }
 
+/* Reset() calls bdx::TransferSession::Reset() which sets the output event type to
+ * TransferSession::OutputEventType::kNone. So, bdx::TransferFacilitator::PollForOutput()
+ * will call HandleTransferSessionOutput() with event TransferSession::OutputEventType::kNone.
+ * Since we are ignoring kNone events so, it is okay HandleTransferSessionOutput() being called with event kNone
+ */
 void BdxOtaSender::Reset()
 {
     mFabricIndex.ClearValue();
