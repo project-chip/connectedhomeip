@@ -254,9 +254,9 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
 /**
  * Tests MRP retransmission logic with the following scenario:
- * 
+ *
  *      DUT = sender, PEER = remote device
- * 
+ *
  * 1) DUT configured to use sleepy peer parameters of active = 64ms, idle = 64ms
  * 2) DUT sends message attempt #1 to PEER
  *      - Force PEER to drop message
