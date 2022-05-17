@@ -25,6 +25,19 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 CastingServer * CastingServer::castingServer_ = nullptr;
 
+CastingServer::CastingServer()
+{
+    // generate and set a random uniqueId for generating rotatingId
+    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+    for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
+    {
+        rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
+    }
+
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+    chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+}
+
 CastingServer * CastingServer::GetInstance()
 {
     if (castingServer_ == nullptr)
