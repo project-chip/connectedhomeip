@@ -23,5 +23,11 @@ PORT = 9000
 if sys.platform == 'linux':
     IP = '10.10.10.5'
 
-with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
-    proxy.waitForMessage(sys.argv[1], sys.argv[2:])
+
+def main():
+    with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
+        proxy.waitForMessage(sys.argv[1], sys.argv[2:])
+
+
+if __name__ == "__main__":
+    main()

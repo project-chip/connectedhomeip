@@ -25,15 +25,21 @@ otaImageFilePath = sys.argv[1]
 rawImageFilePath = sys.argv[2]
 rawImageContent = ' '.join(sys.argv[3:])
 
-# Write the raw image content
-with open(rawImageFilePath, 'w') as rawFile:
-    rawFile.write(rawImageContent)
 
-# Add an OTA header to the raw file
-otaImageTool = DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
-cmd = [otaImageTool, 'create', '-v', '0xDEAD', '-p', '0xBEEF', '-vn', '2',
-       '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
-s = subprocess.Popen(cmd)
-s.wait()
-if s.returncode != 0:
-    raise Exception('Cannot create OTA image file')
+def main():
+    # Write the raw image content
+    with open(rawImageFilePath, 'w') as rawFile:
+        rawFile.write(rawImageContent)
+
+    # Add an OTA header to the raw file
+    otaImageTool = DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
+    cmd = [otaImageTool, 'create', '-v', '0xDEAD', '-p', '0xBEEF', '-vn', '2',
+           '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
+    s = subprocess.Popen(cmd)
+    s.wait()
+    if s.returncode != 0:
+        raise Exception('Cannot create OTA image file')
+
+
+if __name__ == "__main__":
+    main()
