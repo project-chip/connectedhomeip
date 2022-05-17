@@ -223,29 +223,29 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
                    pairing.EstablishSession(sessionManager, fabric, Node01_01, context, nullptr, &delegate) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    auto & gLoopback = ctx.GetLoopback();
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
+    auto & loopback = ctx.GetLoopback();
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 1);
 
     // Clear pending packet in CRMP
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = context->GetReliableMessageContext();
     rm->ClearRetransTable(rc);
 
-    gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     CASESession pairing1;
     pairing1.SetGroupDataProvider(&gCommissionerGroupDataProvider);
 
-    gLoopback.mSentMessageCount = 0;
-    gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
-    ExchangeContext * context1  = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
+    loopback.mSentMessageCount = 0;
+    loopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToBob(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(sessionManager, fabric, Node01_01, context1, nullptr, &delegate) ==
                        CHIP_ERROR_BAD_REQUEST);
     ctx.DrainAndServiceIO();
 
-    gLoopback.mMessageSendError = CHIP_NO_ERROR;
+    loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
 void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
@@ -261,8 +261,8 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     ReliableMessageProtocolConfig nonSleepyCommissionerRmpConfig(System::Clock::Milliseconds32(5000),
                                                                  System::Clock::Milliseconds32(300));
 
-    auto & gLoopback            = ctx.GetLoopback();
-    gLoopback.mSentMessageCount = 0;
+    auto & loopback            = ctx.GetLoopback();
+    loopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
@@ -283,7 +283,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                                                         MakeOptional(nonSleepyCommissionerRmpConfig)) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, pairingAccessory.GetRemoteMRPConfig().mIdleRetransTimeout == System::Clock::Milliseconds32(5000));
@@ -315,8 +315,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    auto & gLoopback            = ctx.GetLoopback();
-    gLoopback.mSentMessageCount = 0;
+    auto & loopback            = ctx.GetLoopback();
+    loopback.mSentMessageCount = 0;
 
     // Use the same session manager on both CASE client and server sides to validate that both
     // components may work simultaneously on a single device.
@@ -335,7 +335,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                                                          nullptr, &delegateCommissioner) == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
+    NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     // Validate that secure session is created
@@ -739,12 +739,12 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
         },
     };
 
-    auto & gLoopback = ctx.GetLoopback();
+    auto & loopback = ctx.GetLoopback();
     for (size_t i = 0; i < sizeof(testVectors) / sizeof(testVectors[0]); ++i)
     {
         auto * pairingCommissioner = chip::Platform::New<CASESession>();
         pairingCommissioner->SetGroupDataProvider(&gCommissionerGroupDataProvider);
-        gLoopback.mSentMessageCount = 0;
+        loopback.mSentMessageCount = 0;
         NL_TEST_ASSERT(inSuite,
                        gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetSecureSessionManager(),
                                                                     &gDeviceFabrics, &testVectors[i].responderStorage,
@@ -755,7 +755,7 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
                                                   &testVectors[i].initiatorStorage, &delegateCommissioner);
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(inSuite, establishmentReturnVal == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == testVectors[i].expectedSentMessageCount);
+        NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == testVectors[i].expectedSentMessageCount);
         NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == i + 1);
         SessionHolder & holder = delegateCommissioner.GetSessionHolder();
         NL_TEST_ASSERT(inSuite, bool(holder));
