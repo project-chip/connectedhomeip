@@ -17,13 +17,42 @@ BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
     return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
 }
 
-void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
+BOOL CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
 {
     CFPreferencesSetAppValue((CFStringRef) key, nullptr, (CFStringRef) domain);
-    CFPreferencesAppSynchronize((CFStringRef) domain);
+    CFPreferencesAppSynchronize((CFStringRef) domain)) == true;
+}
+
+id CHIPGetDomainKeyList(NSString * domain)
+{
+    id value
+        = (id) CFBridgingRelease(CFPreferencesCopyKeyList((CFStringRef) domain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost));
+    if (value) {
+        return value;
+    }
+    return nil;
+}
+
+BOOL CHIPClearAllDomain(NSString * domain)
+{
+
+    NSArray * allKeys = CHIPGetDomainKeyList(domain);
+    NSLog(@"Removing keys: %@ %@", allKeys, domain);
+    for (id key in allKeys) {
+        NSLog(@"Removing key: %@", key);
+        if (!CHIPRemoveDomainValueForKey(domain, (NSString *) key)) {
+            return NO;
+        }
+    }
+    return YES;
 }
 
 @implementation CHIPToolPersistentStorageDelegate
+
+- (BOOL)deleteAllStorage
+{
+    return CHIPClearAllDomain(kCHIPToolDefaultsDomain);
+}
 
 // MARK: CHIPPersistentStorageDelegate
 

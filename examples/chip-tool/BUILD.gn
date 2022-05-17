@@ -69,6 +69,7 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
     "config/PersistentStorage.cpp",
+    "commands/storage/StorageManagementCommand.cpp",
   ]
 
   if (config_use_interactive_mode) {
