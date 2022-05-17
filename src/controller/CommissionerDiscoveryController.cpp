@@ -53,7 +53,6 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     mReady = false;
     strncpy(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance));
     mPendingConsent = true;
-    // TODO: print rotating ID
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
     Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingDeviceIdHexBuffer,
                                         RotatingDeviceId::kHexMaxLength);
