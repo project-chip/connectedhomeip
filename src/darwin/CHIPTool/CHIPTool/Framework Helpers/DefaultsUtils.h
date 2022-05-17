@@ -26,7 +26,7 @@ extern NSString * const kFabricIdKey;
 CHIPDeviceController * InitializeCHIP(void);
 CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller);
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
-void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
+BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
 uint64_t CHIPGetNextAvailableDeviceID(void);
 NSString * KeyForPairedDevice(uint64_t id);
@@ -39,6 +39,12 @@ BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallbac
 void CHIPUnpairDeviceWithID(uint64_t deviceId);
 CHIPDevice * CHIPGetDeviceBeingCommissioned(void);
 
-@interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
+NS_ASSUME_NONNULL_BEGIN
 
+@interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
+- (NSData *)storageDataForKey:(NSString *)key;
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
+- (BOOL)removeStorageDataForKey:(NSString *)key;
 @end
+
+NS_ASSUME_NONNULL_END
