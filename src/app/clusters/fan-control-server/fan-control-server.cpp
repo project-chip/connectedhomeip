@@ -171,8 +171,8 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
                                ChipLogError(Zcl, "Failed to write SpeedSetting with error: 0x%02x", status));
 
                 status = SpeedCurrent::Set(attributePath.mEndpointId, 0);
-                    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
-                                   ChipLogError(Zcl, "Failed to write SpeedCurrent with error: 0x%02x", status));
+                VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                               ChipLogError(Zcl, "Failed to write SpeedCurrent with error: 0x%02x", status));
             }
         }
 
