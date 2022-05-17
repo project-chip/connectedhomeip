@@ -6557,7 +6557,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("fan mode sequence", 1, value);
         }
         case FanControl::Attributes::PercentSetting::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("percent setting", 1, value);
         }
@@ -6572,7 +6572,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("speed max", 1, value);
         }
         case FanControl::Attributes::SpeedSetting::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("speed setting", 1, value);
         }

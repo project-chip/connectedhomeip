@@ -10815,7 +10815,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteFanControlSpeedSetting : public WriteAttribute
@@ -10841,7 +10841,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteFanControlRockSetting : public WriteAttribute

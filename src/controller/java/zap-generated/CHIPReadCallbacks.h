@@ -2956,6 +2956,66 @@ private:
     bool keepAlive;
 };
 
+class CHIPFanControlPercentSettingAttributeCallback
+    : public chip::Callback::Callback<CHIPFanControlClusterPercentSettingAttributeCallbackType>
+{
+public:
+    CHIPFanControlPercentSettingAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPFanControlPercentSettingAttributeCallback();
+
+    static void maybeDestroy(CHIPFanControlPercentSettingAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPFanControlPercentSettingAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPFanControlPercentSettingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPFanControlSpeedSettingAttributeCallback
+    : public chip::Callback::Callback<CHIPFanControlClusterSpeedSettingAttributeCallbackType>
+{
+public:
+    CHIPFanControlSpeedSettingAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPFanControlSpeedSettingAttributeCallback();
+
+    static void maybeDestroy(CHIPFanControlSpeedSettingAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPFanControlSpeedSettingAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPFanControlSpeedSettingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPFanControlGeneratedCommandListAttributeCallback
     : public chip::Callback::Callback<CHIPFanControlClusterGeneratedCommandListAttributeCallbackType>
 {

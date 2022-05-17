@@ -8480,8 +8480,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributePercentSettingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
-- (void)writeAttributePercentSettingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributePercentSettingWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePercentSettingWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributePercentSettingWithValue:(NSNumber * _Nullable)value
                                        params:(CHIPWriteParams * _Nullable)params
                             completionHandler:(StatusCompletion)completionHandler;
 /**
@@ -8536,8 +8536,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeSpeedSettingWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeSpeedSettingWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSpeedSettingWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeSpeedSettingWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeSpeedSettingWithValue:(NSNumber * _Nullable)value
                                      params:(CHIPWriteParams * _Nullable)params
                           completionHandler:(StatusCompletion)completionHandler;
 /**
