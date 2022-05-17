@@ -20,7 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPTestStorage : NSObject <CHIPPersistentStorageDelegate>
-- (NSData *)storageDataForKey:(NSString *)key;
+- (nullable NSData *)storageDataForKey:(NSString *)key;
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
 - (BOOL)removeStorageDataForKey:(NSString *)key;
 @end
