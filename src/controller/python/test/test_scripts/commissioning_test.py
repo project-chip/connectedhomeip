@@ -83,7 +83,7 @@ def main():
         dest="nodeid",
         default=1,
         type=int,
-        help="Node ID of the device",
+        help="The Node ID issued to the device",
         metavar="<nodeid>"
     )
     optParser.add_option(
@@ -122,16 +122,16 @@ def main():
               "Failed to finish network commissioning")
 
     if options.deviceAddress:
-        logger.info("Testing key exchange (IP)")
-        FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
-                                       setuppin=20202021,
-                                       nodeid=options.nodeid),
-                  "Failed to finish key exchange")
+        logger.info("Testing commissioning (IP)")
+        FailIfNot(test.TestCommissioning(ip=options.deviceAddress,
+                                         setuppin=20202021,
+                                         nodeid=options.nodeid),
+                  "Failed to finish commissioning")
     elif options.setupPayload:
-        logger.info("Testing key exchange (w/ Setup Payload)")
-        FailIfNot(test.TestKeyExchangeWithSetupPayload(setupPayload=options.setupPayload,
-                                                       nodeid=options.nodeid),
-                  "Failed to finish key exchange")
+        logger.info("Testing commissioning (w/ Setup Payload)")
+        FailIfNot(test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
+                                                         nodeid=options.nodeid),
+                  "Failed to finish commissioning")
     else:
         TestFail("Must provide device address or setup payload to commissioning the device")
 
