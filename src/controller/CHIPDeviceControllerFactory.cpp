@@ -249,11 +249,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-    controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
-    controllerParams.operationalKeypair             = params.operationalKeypair;
-    controllerParams.controllerNOC                  = params.controllerNOC;
-    controllerParams.controllerICAC                 = params.controllerICAC;
-    controllerParams.controllerRCAC                 = params.controllerRCAC;
+    controllerParams.operationalCredentialsDelegate       = params.operationalCredentialsDelegate;
+    controllerParams.operationalKeypair                   = params.operationalKeypair;
+    controllerParams.hasExternallyOwnedOperationalKeypair = params.hasExternallyOwnedOperationalKeypair;
+    controllerParams.controllerNOC                        = params.controllerNOC;
+    controllerParams.controllerICAC                       = params.controllerICAC;
+    controllerParams.controllerRCAC                       = params.controllerRCAC;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
