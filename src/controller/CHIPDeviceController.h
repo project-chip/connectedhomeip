@@ -98,7 +98,7 @@ struct ControllerInitParams
     /**
      * Controls whether or not the operationalKeypair should be owned by the caller.
      * By default, this is false, but if the keypair cannot be serialized, then
-     * setting this to true will allow you to manage this keypair's lifecycle.
+     * setting this to true will allow the caller to manage this keypair's lifecycle.
      */
     bool hasExternallyOwnedOperationalKeypair = false;
 

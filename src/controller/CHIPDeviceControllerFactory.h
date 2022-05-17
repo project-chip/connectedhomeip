@@ -46,6 +46,14 @@ struct SetupParams
     controllerNOC. It's used by controller to establish CASE sessions with devices */
     Crypto::P256Keypair * operationalKeypair = nullptr;
 
+    /**
+     * Controls whether or not the operationalKeypair should be owned by the
+     * caller.  By default, this is false, but if the keypair cannot be
+     * serialized, then setting this to true will allow the caller to manage
+     * this keypair's lifecycle.
+     */
+    bool hasExternallyOwnedOperationalKeypair = false;
+
     /* The following certificates must be in x509 DER format */
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
