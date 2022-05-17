@@ -311,6 +311,327 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
     },
 ]
 
+CD_STRUCT_TEST_CASES = [
+    {
+        "description": 'Valid format_version field set to 1.',
+        "test_folder": 'format_version_1',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The format_version field is missing.',
+        "test_folder": 'format_version_missing',
+        "error_flag": 'format-version-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Invalid format_version field set to 2.',
+        "test_folder": 'format_version_2',
+        "error_flag": 'format-version-wrong',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The vendor_id field is missing.',
+        "test_folder": 'vid_missing',
+        "error_flag": 'vid-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The vendor_id field doesn't match the VID in DAC.",
+        "test_folder": 'vid_mismatch',
+        "error_flag": 'vid-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The product_id_array field is missing.',
+        "test_folder": 'pid_array_missing',
+        "error_flag": 'pid-array-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The product_id_array field is empty TLV array.",
+        "test_folder": 'pid_array_count0',
+        "error_flag": 'pid-array-count0',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The product_id_array field has one PID value which matches the PID value in DAC.",
+        "test_folder": 'pid_array_count01_valid',
+        "error_flag": 'pid-array-count01-valid',
+        "is_success_case": 'true',
+    },
+    {
+        "description": "The product_id_array field has one PID value that doesn't match the PID value in DAC.",
+        "test_folder": 'pid_array_count01_mismatch',
+        "error_flag": 'pid-array-count01-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The product_id_array field has 10 PID values one of which matches the PID value in DAC.",
+        "test_folder": 'pid_array_count10_valid',
+        "error_flag": 'pid-array-count10-valid',
+        "is_success_case": 'true',
+    },
+    {
+        "description": "The product_id_array field has 10 PID values none of which matches the PID value in DAC.",
+        "test_folder": 'pid_array_count10_mismatch',
+        "error_flag": 'pid-array-count10-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The product_id_array field has 100 PID values one of which matches the PID value in DAC.",
+        "test_folder": 'pid_array_count100_valid',
+        "error_flag": 'pid-array-count100-valid',
+        "is_success_case": 'true',
+    },
+    {
+        "description": "The product_id_array field has 100 PID values none of which matches the PID value in DAC.",
+        "test_folder": 'pid_array_count100_mismatch',
+        "error_flag": 'pid-array-count100-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The device_type_id field is missing.",
+        "test_folder": 'device_type_id_missing',
+        "error_flag": 'device-type-id-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The device_type_id field doesn't match the device_type_id value in the DCL entries associated with the VID and PID.",
+        "test_folder": 'device_type_id_mismatch',
+        "error_flag": 'device-type-id-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The certificate_id field is missing.",
+        "test_folder": 'cert_id_missing',
+        "error_flag": 'cert-id-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The certificate_id field doesn't contain a globally unique serial number allocated by the CSA for this CD.",
+        "test_folder": 'cert_id_mismatch',
+        "error_flag": 'cert-id-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The certificate_id field has wrong length.',
+        "test_folder": 'cert_id_len_wrong',
+        "error_flag": 'cert-id-len-wrong',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The security_level field is missing.',
+        "test_folder": 'security_level_missing',
+        "error_flag": 'security-level-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The security_level field is set to invalid value (different from 0).',
+        "test_folder": 'security_level_wrong',
+        "error_flag": 'security-level-wrong',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The security_information field is missing.',
+        "test_folder": 'security_info_missing',
+        "error_flag": 'security-info-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The security_information field is set to invalid value (different from 0).',
+        "test_folder": 'security_info_wrong',
+        "error_flag": 'security-info-wrong',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The version_number field is missing.',
+        "test_folder": 'version_number_missing',
+        "error_flag": 'version-number-missing',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The version_number field matches the VID and PID used in a DeviceSoftwareVersionModel entry in the DCL matching the certification record associated with the product presenting this CD.',
+        "test_folder": 'version_number_match',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": "The version_number field doesn't match the VID and PID used in a DeviceSoftwareVersionModel entry in the DCL matching the certification record associated with the product presenting this CD.",
+        "test_folder": 'version_number_wrong',
+        "error_flag": 'version-number-wrong',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The certification_type field is missing.',
+        "test_folder": 'cert_type_missing',
+        "error_flag": 'cert-type-missing',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The certification_type field is set to invalid value.',
+        "test_folder": 'cert_type_wrong',
+        "error_flag": 'cert-type-wrong',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The dac_origin_vendor_id and dac_origin_product_id fields are not present.',
+        "test_folder": 'dac_origin_vid_pid_missing',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The dac_origin_vendor_id fild is present and dac_origin_product_id fields is not present.',
+        "test_folder": 'dac_origin_vid_present_pid_missing',
+        "error_flag": 'dac-origin-vid-present',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The dac_origin_vendor_id fild is not present and dac_origin_product_id is present.',
+        "test_folder": 'dac_origin_vid_missing_pid_present',
+        "error_flag": 'dac-origin-pid-present',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The dac_origin_vendor_id and dac_origin_product_id fields present and contain the VID and PID values that match the VID and PID found in the DAC Subject DN.',
+        "test_folder": 'dac_origin_vid_pid_present_match',
+        "error_flag": 'dac-origin-vid-pid-present',
+        "is_success_case": 'true',
+    },
+    {
+        "description": "The dac_origin_vendor_id and dac_origin_product_id fields present and the VID value doesn't match the VID found in the DAC Subject DN.",
+        "test_folder": 'dac_origin_vid_pid_present_vid_mismatch',
+        "error_flag": 'dac-origin-vid-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": "The dac_origin_vendor_id and dac_origin_product_id fields present and the PID value doesn't match the PID found in the DAC Subject DN.",
+        "test_folder": 'dac_origin_vid_pid_present_pid_mismatch',
+        "error_flag": 'dac-origin-pid-mismatch',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The optional authorized_paa_list field is not present.',
+        "test_folder": 'authorized_paa_list_missing',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The authorized_paa_list contains one valid PAA which is authorized to sign the PAI.',
+        "test_folder": 'authorized_paa_list_count0',
+        "error_flag": 'authorized-paa-list-count0',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The authorized_paa_list contains one valid PAA which is authorized to sign the PAI.',
+        "test_folder": 'authorized_paa_list_count1_valid',
+        "error_flag": 'authorized-paa-list-count1-valid',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The authorized_paa_list contains two PAAs one of which is valid PAA authorized to sign the PAI.',
+        "test_folder": 'authorized_paa_list_count2_valid',
+        "error_flag": 'authorized-paa-list-count2-valid',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The authorized_paa_list contains three PAAs none of which is a valid PAA authorized to sign the PAI.',
+        "test_folder": 'authorized_paa_list_count3_invalid',
+        "error_flag": 'authorized-paa-list-count3-invalid',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The authorized_paa_list contains ten PAAs one of which is valid PAA authorized to sign the PAI.',
+        "test_folder": 'authorized_paa_list_count10_valid',
+        "error_flag": 'authorized-paa-list-count10-valid',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The authorized_paa_list contains ten PAAs none of which is a valid PAA authorized to sign the PAI.',
+        "test_folder": 'authorized_paa_list_count10_invalid',
+        "error_flag": 'authorized-paa-list-count10-invalid',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Invalid Signer Info version set to v2.',
+        "test_folder": 'signer_info_v2',
+        "error_flag": 'signer-info-v2',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Invalid Signer Info digest algorithm SHA1.',
+        "test_folder": 'signer_info_digest_algo_sha1',
+        "error_flag": 'signer-info-digest-algo',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'The subjectKeyIdentifier contains SKID of a well-known Zigbee Alliance certificate.',
+        "test_folder": 'signer_info_skid_valid',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'The subjectKeyIdentifier contains invalid SKID of a certificate unknown by Zigbee Alliance.',
+        "test_folder": 'signer_info_skid_invalid',
+        "error_flag": 'signer-info-skid',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Valid CMS version set to v3.',
+        "test_folder": 'cms_v3',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Invalid CMS version set to v2.',
+        "test_folder": 'cms_v2',
+        "error_flag": 'cms-v2',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Valid CMS digest algorithm SHA256.',
+        "test_folder": 'cms_digest_algo_sha256',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Invalid CMS digest algorithm SHA1.',
+        "test_folder": 'cms_digest_algo_sha1',
+        "error_flag": 'cms-digest-algo',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Valid CMS signature algorithm ECDSA_WITH_SHA256.',
+        "test_folder": 'cms_sig_algo_ecdsa_with_sha256',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Invalid CMS signature algorithm ECDSA_WITH_SHA1.',
+        "test_folder": 'cms_sig_algo_ecdsa_with_sha1',
+        "error_flag": 'cms-sig-algo',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Valid CMS eContentType pkcs7-data.',
+        "test_folder": 'cms_econtent_type_pkcs7_data',
+        "error_flag": 'no-error',
+        "is_success_case": 'true',
+    },
+    {
+        "description": 'Invalid CMS eContentType is set to Microsoft Authenticode [MSAC] OID = { 1.3.6.1.4.1.311.2.1.4 }.',
+        "test_folder": 'cms_econtent_type_msac',
+        "error_flag": 'cms-econtent-type',
+        "is_success_case": 'false',
+    },
+    {
+        "description": 'Invalid CMS Signature.',
+        "test_folder": 'cms_signature',
+        "error_flag": 'cms-sig',
+        "is_success_case": 'false',
+    },
+]
+
 
 class Names:
     def __init__(self, cert_type: CertType, paa_path, test_case_out_dir):
@@ -352,7 +673,7 @@ class DevCertBuilder:
 
     def make_certs_and_keys(self) -> None:
         """Creates the PEM and DER certs and keyfiles"""
-        error_type_flag = ' -i -e' + self.error_type
+        error_type_flag = ' -I -E' + self.error_type
         subject_name = self.custom_cn_attribute
         vid_flag = ' -V 0x{:X}'.format(self.vid)
         pid_flag = ' -P 0x{:X}'.format(self.pid)
@@ -553,6 +874,43 @@ def main():
 
             # Generate Test Case Data Container in JSON Format
             generate_test_case_vector_json(test_case_out_dir, test_cert, test_case)
+
+    for test_case in CD_STRUCT_TEST_CASES:
+        test_case_out_dir = args.outdir + '/struct_cd_' + test_case["test_folder"]
+        vid = 0xFFF1
+        pid = 0x8000
+
+        # Generate PAI Cert/Key
+        builder = DevCertBuilder(CertType.PAI, 'no-error', args.paapath, test_case_out_dir,
+                                 chipcert, vid, pid, '')
+        builder.make_certs_and_keys()
+
+        # Generate DAC Cert/Key
+        builder = DevCertBuilder(CertType.DAC, 'no-error', args.paapath, test_case_out_dir,
+                                 chipcert, vid, pid, '')
+        builder.make_certs_and_keys()
+
+        # Generate Certification Declaration (CD)
+        vid_flag = ' -V 0x{:X}'.format(vid)
+        pid_flag = ' -p 0x{:X}'.format(pid)
+
+        dac_origin_flag = ' '
+        if test_case["error_flag"] == 'dac-origin-vid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
+            dac_origin_flag += ' -o 0x{:X}'.format(vid)
+        if test_case["error_flag"] == 'dac-origin-pid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
+            dac_origin_flag += ' -r 0x{:X}'.format(pid)
+
+        if test_case["error_flag"] == 'authorized-paa-list-count0' or test_case["error_flag"] == 'authorized-paa-list-count1-valid' or test_case["error_flag"] == 'authorized-paa-list-count2-valid' or test_case["error_flag"] == 'authorized-paa-list-count3-invalid' or test_case["error_flag"] == 'authorized-paa-list-count10-valid' or test_case["error_flag"] == 'authorized-paa-list-count10-invalid':
+            authorized_paa_flag = ' -a ' + args.paapath + 'Cert.pem'
+        else:
+            authorized_paa_flag = ''
+
+        cmd = chipcert + ' gen-cd -I -E ' + test_case["error_flag"] + ' -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
+            ' -f 1 ' + vid_flag + pid_flag + dac_origin_flag + authorized_paa_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+        subprocess.run(cmd, shell=True)
+
+        # Generate Test Case Data Container in JSON Format
+        generate_test_case_vector_json(test_case_out_dir, 'cd', test_case)
 
 
 if __name__ == '__main__':

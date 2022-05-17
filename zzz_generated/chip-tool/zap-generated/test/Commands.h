@@ -217,6 +217,7 @@ public:
         printf("TestBinding\n");
         printf("TestUserLabelCluster\n");
         printf("TestArmFailSafe\n");
+        printf("TestFanControl\n");
         printf("TestMultiAdmin\n");
         printf("Test_TC_SWDIAG_1_1\n");
         printf("Test_TC_SWDIAG_2_1\n");
@@ -50982,6 +50983,349 @@ private:
     }
 };
 
+class TestFanControlSuite : public TestCommand
+{
+public:
+    TestFanControlSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestFanControl", 25, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~TestFanControlSuite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::FanControl::FanModeType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("fanMode", value, 3));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::FanControl::FanModeSequenceType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("fanModeSequence", value, 5));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("percentSetting", value));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 84));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("speedSetting", value));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 84));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("speedCurrent", value, 84));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("percentSetting", value));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 84));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("speedSetting", value));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 73));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("percentSetting", value));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 73));
+            }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("percentCurrent", value, 73));
+            }
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("speedSetting", value));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 73));
+            }
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("percentSetting", value));
+                VerifyOrReturn(CheckValue("percentSetting.Value()", value.Value(), 0));
+            }
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("percentCurrent", value, 0));
+            }
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("speedSetting", value));
+                VerifyOrReturn(CheckValue("speedSetting.Value()", value.Value(), 0));
+            }
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("speedCurrent", value, 0));
+            }
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNull("percentSetting", value));
+            }
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNull("speedSetting", value));
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the commissioned device to be retrieved");
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Write fan mode");
+            chip::app::Clusters::FanControl::FanModeType value;
+            value = static_cast<chip::app::Clusters::FanControl::FanModeType>(3);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id, value);
+        }
+        case 2: {
+            LogStep(2, "Read back fan mode");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id);
+        }
+        case 3: {
+            LogStep(3, "Write fan mode sequence");
+            chip::app::Clusters::FanControl::FanModeSequenceType value;
+            value = static_cast<chip::app::Clusters::FanControl::FanModeSequenceType>(5);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanModeSequence::Id,
+                                  value);
+        }
+        case 4: {
+            LogStep(4, "Read back fan mode sequence");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanModeSequence::Id);
+        }
+        case 5: {
+            LogStep(5, "Write percent setting");
+            chip::app::DataModel::Nullable<uint8_t> value;
+            value.SetNonNull();
+            value.Value() = 84;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id,
+                                  value);
+        }
+        case 6: {
+            LogStep(6, "Read back percent setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        case 7: {
+            LogStep(7, "Read back speed setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+        }
+        case 8: {
+            LogStep(8, "Read back speed current");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
+        }
+        case 9: {
+            LogStep(9, "Write percent setting");
+            chip::app::DataModel::Nullable<uint8_t> value;
+            value.SetNull();
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id,
+                                  value);
+        }
+        case 10: {
+            LogStep(10, "Read back percent setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        case 11: {
+            LogStep(11, "Write speed setting");
+            chip::app::DataModel::Nullable<uint8_t> value;
+            value.SetNonNull();
+            value.Value() = 73;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id, value);
+        }
+        case 12: {
+            LogStep(12, "Read back speed setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+        }
+        case 13: {
+            LogStep(13, "Read back percent setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        case 14: {
+            LogStep(14, "Read back percent current");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
+        }
+        case 15: {
+            LogStep(15, "Write speed setting");
+            chip::app::DataModel::Nullable<uint8_t> value;
+            value.SetNull();
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id, value);
+        }
+        case 16: {
+            LogStep(16, "Read back speed setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+        }
+        case 17: {
+            LogStep(17, "Write fan mode");
+            chip::app::Clusters::FanControl::FanModeType value;
+            value = static_cast<chip::app::Clusters::FanControl::FanModeType>(0);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id, value);
+        }
+        case 18: {
+            LogStep(18, "Read back percent setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        case 19: {
+            LogStep(19, "Read back percent current");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
+        }
+        case 20: {
+            LogStep(20, "Read back speed setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+        }
+        case 21: {
+            LogStep(21, "Read back speed current");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
+        }
+        case 22: {
+            LogStep(22, "Write fan mode");
+            chip::app::Clusters::FanControl::FanModeType value;
+            value = static_cast<chip::app::Clusters::FanControl::FanModeType>(5);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id, value);
+        }
+        case 23: {
+            LogStep(23, "Read back percent setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id);
+        }
+        case 24: {
+            LogStep(24, "Read back speed setting");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class TestMultiAdminSuite : public TestCommand
 {
 public:
@@ -72589,6 +72933,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestBindingSuite>(credsIssuerConfig),
         make_unique<TestUserLabelClusterSuite>(credsIssuerConfig),
         make_unique<TestArmFailSafeSuite>(credsIssuerConfig),
+        make_unique<TestFanControlSuite>(credsIssuerConfig),
         make_unique<TestMultiAdminSuite>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_SWDIAG_2_1Suite>(credsIssuerConfig),
