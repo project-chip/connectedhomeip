@@ -27,6 +27,7 @@ CastingServer * CastingServer::castingServer_ = nullptr;
 
 CastingServer::CastingServer()
 {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // generate and set a random uniqueId for generating rotatingId
     uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
     for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
@@ -36,6 +37,7 @@ CastingServer::CastingServer()
 
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
     chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 }
 
 CastingServer * CastingServer::GetInstance()
