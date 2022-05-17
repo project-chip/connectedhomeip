@@ -57,7 +57,7 @@ tests:
 
     #Issue 18243
     - label: "Read the optional attribute: Tolerance"
-      PICS: PICS_SKIP_SAMPLE_APP
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
@@ -67,7 +67,7 @@ tests:
               maxValue: 2048
 
     - label: "Read the optional attribute: ScaledValue"
-      PICS: PICS_SKIP_SAMPLE_APP
+      optional: true
       command: "readAttribute"
       attribute: "ScaledValue"
       response:
@@ -77,7 +77,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MinScaledValue"
-      PICS: PICS_SKIP_SAMPLE_APP
+      optional: true
       command: "readAttribute"
       attribute: "MinScaledValue"
       response:
@@ -87,7 +87,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: MaxScaledValue"
-      PICS: PICS_SKIP_SAMPLE_APP
+      optional: true
       command: "readAttribute"
       attribute: "MaxScaledValue"
       response:
@@ -97,7 +97,7 @@ tests:
               maxValue: 32767
 
     - label: "Read the optional attribute: ScaledTolerance"
-      PICS: PICS_SKIP_SAMPLE_APP
+      optional: true
       command: "readAttribute"
       attribute: "ScaledTolerance"
       response:
@@ -107,7 +107,7 @@ tests:
               maxValue: 2048
 
     - label: "Read the optional attribute: Scale"
-      PICS: PICS_SKIP_SAMPLE_APP
+      optional: true
       command: "readAttribute"
       attribute: "Scale"
       response:
