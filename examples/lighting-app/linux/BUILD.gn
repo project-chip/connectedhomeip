@@ -88,7 +88,7 @@ executable("chip-lighting-app") {
 
     deps += pw_build_LINK_DEPS
 
-	cflags = [ "-Wno-gnu-designator" ]
+    cflags = [ "-Wno-gnu-designator" ]
 
     include_dirs += [ "${chip_root}/examples/common" ]
   } else {
