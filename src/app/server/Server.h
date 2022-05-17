@@ -333,21 +333,6 @@ private:
                                  static_cast<unsigned>(fabricIndex), err.Format());
                 }
             }
-
-            {
-                // Remove access control entries in reverse order. (It could be
-                // any order, but reverse order will cause less churn in
-                // persistent storage.)
-                size_t count = 0;
-                if (Access::GetAccessControl().GetEntryCount(fabricIndex, count) == CHIP_NO_ERROR)
-                {
-                    while (count)
-                    {
-                        (void) Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --count);
-                    }
-                }
-            }
-            app::EventManagement::GetInstance().FabricRemoved(fabricIndex);
         };
 
         void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
