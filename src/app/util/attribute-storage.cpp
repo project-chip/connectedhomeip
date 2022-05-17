@@ -1258,6 +1258,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                             // attributes still are limited to size of 2-bytes.
                             if (emberAfAttributeSize(am) <= 2)
                             {
+                                static_assert(sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue) == 2,
+                                              "if statement relies on size of max/min defaultValue being 2");
                                 ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
                                 defaultValueSizeForBigEndianNudger =
                                     sizeof(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
@@ -1287,12 +1289,12 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // The default value for attributes that are less than or equal to
                         // defaultValueSizeForBigEndianNudger in bytes are stored in an
                         // uint32_t.  On big-endian platforms, a pointer to the default value
-                        // of less than defaultValueSizeForBigEndianNudger point to the wrong
+                        // of less than defaultValueSizeForBigEndianNudger will point to the wrong
                         // byte.  So, for those cases, nudge the pointer forward so it points
                         // to the correct byte.
                         if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)
                         {
-                            ptr += (defaultValueSizeForBigEndianNudger - 1);
+                            ptr += (defaultValueSizeForBigEndianNudger - emberAfAttributeSize(am));
                         }
 #endif // BIGENDIAN
                     }
