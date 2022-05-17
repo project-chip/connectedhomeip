@@ -137,6 +137,7 @@ void ReliableMessageMgr::ExecuteActions()
             return Loop::Continue;
         }
 
+        entry->sendCount++;
         ChipLogDetail(ExchangeManager,
                       "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
                       " Send Cnt %d",
@@ -277,13 +278,11 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
         if (exchangeMgr)
         {
             // After the first failure notify session manager to refresh device data
-            if (entry->sendCount == 0)
+            if (entry->sendCount == 1)
             {
                 exchangeMgr->GetSessionManager()->RefreshSessionOperationalData(entry->ec->GetSessionHandle());
             }
         }
-        // Update the counters
-        entry->sendCount++;
     }
     else
     {
