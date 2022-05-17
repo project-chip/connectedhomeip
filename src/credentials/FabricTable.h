@@ -74,7 +74,7 @@ public:
 
     ~FabricInfo()
     {
-        if (mOperationalKey != nullptr)
+        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
         }
@@ -111,8 +111,9 @@ public:
 
     Crypto::P256Keypair * GetOperationalKey() const
     {
-        if (mOperationalKey == nullptr)
+        if (!mHasExternallyOwnedOperationalKey && (mOperationalKey == nullptr))
         {
+            // TODO: Refactor the following two cases to go through SetOperationalKey()
 #ifdef ENABLE_HSM_CASE_OPS_KEY
             mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
             mOperationalKey->CreateOperationalKey(mFabricIndex);
@@ -123,7 +124,32 @@ public:
         }
         return mOperationalKey;
     }
+
+    /**
+     * Sets the P256Keypair used for this fabric.  This will make a copy of the keypair
+     * via the P256Keypair::Serialize and P256Keypair::Deserialize methods.
+     *
+     * The keyPair argument is safe to deallocate once this method returns.
+     *
+     * If your P256Keypair does not support serialization, use the
+     * `SetExternallyOwnedOperationalKeypair` method instead.
+     */
     CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
+
+    /**
+     * Sets the P256Keypair used for this fabric, delegating ownership of the
+     * key to the caller. The P256Keypair provided here must be freed later by
+     * the caller of this method if it was allocated dynamically.
+     *
+     * This should be used if your P256Keypair does not support serialization
+     * and deserialization (e.g. your private key is held in a secure element
+     * and cannot be accessed directly), or if you back your operational
+     * private keys by external implementation of the cryptographic interfaces.
+     *
+     * To have the ownership of the key managed for you, use
+     * SetOperationalKeypair instead.
+     */
+    CHIP_ERROR SetExternallyOwnedOperationalKeypair(Crypto::P256Keypair * keyPair);
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
@@ -186,11 +212,12 @@ public:
         mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
 
-        if (mOperationalKey != nullptr)
+        if (mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
-            mOperationalKey = nullptr;
         }
+        mOperationalKey = nullptr;
+
         ReleaseOperationalCerts();
         mFabricIndex = kUndefinedFabricIndex;
     }
@@ -229,6 +256,7 @@ private:
 #else
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
+    bool mHasExternallyOwnedOperationalKey = false;
 
     MutableByteSpan mRootCert;
     MutableByteSpan mICACert;
