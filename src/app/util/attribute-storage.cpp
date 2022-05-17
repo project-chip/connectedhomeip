@@ -1281,10 +1281,10 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // it should be treated as if it is pointing to an array of all zeroes.
 
 #if (BIGENDIAN_CPU)
-                        // The default value for attributes that are less than or equal to
+                        // The default values for attributes that are less than or equal to
                         // defaultValueSizeForBigEndianNudger in bytes are stored in an
                         // uint32_t.  On big-endian platforms, a pointer to the default value
-                        // of less than defaultValueSizeForBigEndianNudger will point to the wrong
+                        // of size less than defaultValueSizeForBigEndianNudger will point to the wrong
                         // byte.  So, for those cases, nudge the pointer forward so it points
                         // to the correct byte.
                         if (emberAfAttributeSize(am) < defaultValueSizeForBigEndianNudger && ptr != NULL)

@@ -110,7 +110,7 @@ union EmberAfDefaultOrMinMaxAttributeValue
      */
     const uint8_t * ptrToDefaultValue;
     /**
-     * Actual default value if the attribute size is 2 bytes or less.
+     * Actual default value if the attribute size is 4 bytes or less.
      */
     uint32_t defaultValue;
     /**
