@@ -14,19 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pty
-import subprocess
 import click
+import coloredlogs
+import datetime
+import logging
 import os
 import pathlib
-import typing
+import pty
 import queue
-import threading
-import sys
-import time
-import datetime
 import shlex
-import logging
+import signal
+import subprocess
+import sys
+import threading
+import time
+import typing
+
+from colorama import Fore, Style
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -58,9 +62,9 @@ def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
 
 def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
     thread_list.append(RedirectQueueThread(process.stdout,
-                                           (f"[{tag}][\33[33mSTDOUT\33[0m]").encode(), queue))
+                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}").encode(), queue))
     thread_list.append(RedirectQueueThread(process.stderr,
-                                           (f"[{tag}][\33[31mSTDERR\33[0m]").encode(), queue))
+                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}").encode(), queue))
 
 
 @click.command()
@@ -75,6 +79,8 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         if retcode != 0:
             raise Exception("Failed to remove /tmp/chip* for factory reset.")
 
+    coloredlogs.install(level='INFO')
+
     log_queue = queue.Queue()
     log_cooking_threads = []
 
@@ -88,21 +94,22 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         DumpProgramOutputToQueue(
-            log_cooking_threads, "\33[34mAPP \33[0m", app_process, log_queue)
+            log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
     script_command = ["/usr/bin/env", "python3", script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s'] + shlex.split(script_args)
     logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
         script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    DumpProgramOutputToQueue(log_cooking_threads, "\33[32mTEST\33[0m",
+    DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
                              test_script_process, log_queue)
 
     test_script_exit_code = test_script_process.wait()
 
     test_app_exit_code = 0
     if app_process:
-        app_process.send_signal(2)
+        logging.warning("Stopping app with SIGINT")
+        app_process.send_signal(signal.SIGINT.value)
         test_app_exit_code = app_process.wait()
 
     # There are some logs not cooked, so we wait until we have processed all logs.
