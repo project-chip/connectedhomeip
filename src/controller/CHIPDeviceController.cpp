@@ -371,13 +371,17 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
         mDeviceAttestationVerifier = Credentials::GetDeviceAttestationVerifier();
         if (mDeviceAttestationVerifier == nullptr)
         {
-            ChipLogError(Controller, "Missing DeviceAttestationVerifier configuration at DeviceCommissioner init and none set with Credentials::SetDeviceAttestationVerifier()!");
+            ChipLogError(Controller,
+                         "Missing DeviceAttestationVerifier configuration at DeviceCommissioner init and none set with "
+                         "Credentials::SetDeviceAttestationVerifier()!");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         else
         {
             // We fell back on a default from singleton accessor.
-            ChipLogProgress(Controller, "*** Missing DeviceAttestationVerifier configuration at DeviceCommissioner init: using global default, consider passing one in CommissionerInitParams.");
+            ChipLogProgress(Controller,
+                            "*** Missing DeviceAttestationVerifier configuration at DeviceCommissioner init: using global default, "
+                            "consider passing one in CommissionerInitParams.");
         }
     }
 
@@ -1072,8 +1076,8 @@ CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan &
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
-    return mDeviceAttestationVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature, dacPubkey,
-                                                                     csrNonce);
+    return mDeviceAttestationVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge,
+                                                                           AttestationSignature, dacPubkey, csrNonce);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
