@@ -116,7 +116,10 @@ public:
         }
         else
         {
-            ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
+            if (delegate != nullptr)
+            {
+                ChipLogProgress(Discovery, "Delaying proxy of operational discovery: missing delegate");
+            }
             mPreInitOperationalDelegate = delegate;
         }
     }
@@ -129,7 +132,10 @@ public:
         }
         else
         {
-            ChipLogError(Discovery, "Delaying proxy of commissioning discovery: missing delegate");
+            if (delegate != nullptr)
+            {
+                ChipLogError(Discovery, "Delaying proxy of commissioning discovery: missing delegate");
+            }
             mPreInitCommissioningDelegate = delegate;
         }
     }
