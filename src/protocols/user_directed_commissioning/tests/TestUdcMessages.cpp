@@ -308,8 +308,8 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     rotatingIdLongLen      = Encoding::HexToBytes(reinterpret_cast<const char *>(value.data()), value.size(), rotatingIdLong,
                                                   chip::Dnssd::kMaxRotatingIdLen * 2);
 
-    printf("str len=%zu max length %zu, long length %zu\n", strlen(rotatingIdLongString), chip::Dnssd::kMaxRotatingIdLen,
-           rotatingIdLongLen);
+    // printf("str len=%zu max length %zu, long length %zu\n", strlen(rotatingIdLongString), chip::Dnssd::kMaxRotatingIdLen,
+    //        rotatingIdLongLen);
     NL_TEST_ASSERT(inSuite, rotatingIdLongLen > chip::Dnssd::kMaxRotatingIdLen);
 
     // test base case
@@ -350,8 +350,8 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
 
     state->SetRotatingId(rotatingIdLong, rotatingIdLongLen);
 
-    printf(" max length %zu, long length %zu, current length %zu\n", chip::Dnssd::kMaxRotatingIdLen, rotatingIdLongLen,
-           state->GetRotatingIdLength());
+    // printf(" max length %zu, long length %zu, current length %zu\n", chip::Dnssd::kMaxRotatingIdLen, rotatingIdLongLen,
+    //        state->GetRotatingIdLength());
     NL_TEST_ASSERT(inSuite, chip::Dnssd::kMaxRotatingIdLen == state->GetRotatingIdLength());
 
     const uint8_t * testRotatingIdLong = state->GetRotatingId();
