@@ -95,6 +95,13 @@ struct ControllerInitParams
        controllerNOC. It's used by controller to establish CASE sessions with devices */
     Crypto::P256Keypair * operationalKeypair = nullptr;
 
+    /**
+     * Controls whether or not the operationalKeypair should be owned by the caller.
+     * By default, this is false, but if the keypair cannot be serialized, then
+     * setting this to true will allow the caller to manage this keypair's lifecycle.
+     */
+    bool hasExternallyOwnedOperationalKeypair = false;
+
     /* The following certificates must be in x509 DER format */
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
@@ -240,6 +247,19 @@ public:
      */
     CHIP_ERROR DisconnectDevice(NodeId nodeId);
 
+    /**
+     * @brief
+     *   Reconfigures a new set of operational credentials to be used with this
+     *   controller given ControllerInitParams state.
+     *
+     * WARNING: This is a low-level method that should only be called directly
+     *          if you know exactly how this will interact with controller state,
+     *          since there are several integrations that do this call for you.
+     *          It can be used for fine-grained dependency injection of a controller's
+     *          NOC and operational keypair.
+     */
+    CHIP_ERROR InitControllerNOCChain(const ControllerInitParams & params);
+
 protected:
     enum class State
     {
@@ -275,8 +295,6 @@ protected:
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
-
-    CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

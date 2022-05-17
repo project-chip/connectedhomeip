@@ -67,7 +67,7 @@ public:
 
     void ReleaseSession(PeerId peerId);
 
-    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
+    void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();
 

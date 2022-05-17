@@ -190,7 +190,7 @@ tests:
 
     #Disabled due to issue 17666
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithQRCode"

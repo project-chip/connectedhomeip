@@ -1408,10 +1408,10 @@ server cluster FanControl = 514 {
 
   attribute FanModeType fanMode = 0;
   attribute FanModeSequenceType fanModeSequence = 1;
-  attribute int8u percentSetting = 2;
+  attribute nullable int8u percentSetting = 2;
   readonly attribute int8u percentCurrent = 3;
   readonly attribute int8u speedMax = 4;
-  attribute int8u speedSetting = 5;
+  attribute nullable int8u speedSetting = 5;
   readonly attribute int8u speedCurrent = 6;
   readonly attribute bitmap8 rockSupport = 7;
   attribute bitmap8 rockSetting = 8;
@@ -3736,8 +3736,7 @@ server cluster WindowCovering = 258 {
   }
 
   request struct GoToLiftPercentageRequest {
-    Percent liftPercentageValue = 0;
-    optional Percent100ths liftPercent100thsValue = 1;
+    Percent100ths liftPercent100thsValue = 0;
   }
 
   request struct GoToTiltValueRequest {
@@ -3745,8 +3744,7 @@ server cluster WindowCovering = 258 {
   }
 
   request struct GoToTiltPercentageRequest {
-    Percent tiltPercentageValue = 0;
-    optional Percent100ths tiltPercent100thsValue = 1;
+    Percent100ths tiltPercent100thsValue = 0;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;
@@ -4307,14 +4305,14 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 0x02;
     ram      attribute percentSetting;
     ram      attribute percentCurrent;
-    ram      attribute speedMax;
+    ram      attribute speedMax default = 100;
     ram      attribute speedSetting;
     ram      attribute speedCurrent;
     ram      attribute rockSupport;
     ram      attribute rockSetting;
     ram      attribute windSupport;
     ram      attribute windSetting;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0x0F;
     ram      attribute clusterRevision default = 2;
   }
 

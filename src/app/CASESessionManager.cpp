@@ -63,9 +63,9 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
+void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
+    mConfig.devicePool->ReleaseDevicesForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()

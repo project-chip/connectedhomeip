@@ -6870,7 +6870,6 @@ class ChipClusters:
                     "commandId": 0x00000005,
                     "commandName": "GoToLiftPercentage",
                     "args": {
-                        "liftPercentageValue": "int",
                         "liftPercent100thsValue": "int",
                     },
                 },
@@ -6885,7 +6884,6 @@ class ChipClusters:
                     "commandId": 0x00000008,
                     "commandName": "GoToTiltPercentage",
                     "args": {
-                        "tiltPercentageValue": "int",
                         "tiltPercent100thsValue": "int",
                     },
                 },

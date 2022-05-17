@@ -4,7 +4,7 @@
 
 @interface CHIPToolKeypair : NSObject <CHIPKeypair>
 - (BOOL)initialize;
-- (NSData *)ECDSA_sign_hash:(NSData *)hash;
+- (NSData *)ECDSA_sign_message_raw:(NSData *)message;
 - (SecKeyRef)pubkey;
 - (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output;
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input;

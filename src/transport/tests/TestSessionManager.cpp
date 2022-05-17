@@ -54,8 +54,6 @@ using namespace chip::TestCerts;
 
 using TestContext = chip::Test::LoopbackTransportManager;
 
-TestContext sContext;
-
 const char PAYLOAD[] = "Hello!";
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
@@ -825,6 +823,8 @@ int Finalize(void * aContext)
  */
 int TestSessionManager()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

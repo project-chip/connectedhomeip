@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 21.5.1. [TC-MC-3.8] Input List Verification
+name: 18.4.4. [TC-MC-3.8] Stop Application Verification
 
 config:
     nodeId: 0x12344321
-    cluster: "Media Input"
+    cluster: "Application Launcher"
     endpoint: 1
 
 tests:
@@ -28,10 +28,25 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # TODO: Enable test and update response value when SDK supports.
-    - label: "Read attribute media input list"
-      disabled: true
-      command: "readAttribute"
-      attribute: "InputList"
+    #Issue 17968
+    - label: "Stop an app with the provided application ID"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "StopApp"
+      arguments:
+          values:
+              - name: "application"
+                value: { catalogVendorId: 1234, applicationId: "HelloWorldApp" }
       response:
-          value: []
+          values:
+              - name: "Status"
+                value: 0
+              - name: "Data"
+                value: "Hello World"
+
+    - label: "Reads the Status attribute"
+      PICS: PICS_SKIP_SAMPLE_APP
+      cluster: "Application Basic"
+      command: "readAttribute"
+      attribute: "Status"
+      response:
+          value: 0

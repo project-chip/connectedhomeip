@@ -521,6 +521,7 @@ function getTests()
 
   const GeneralCommissioning = [
     'Test_TC_GC_1_1',
+    'Test_TC_GC_2_1',
   ];
 
   const Identify = [
@@ -735,6 +736,7 @@ function getTests()
     'TestBinding',
     'TestUserLabelCluster',
     'TestArmFailSafe',
+    'TestFanControl',
   ];
 
   const MultiAdmin = [

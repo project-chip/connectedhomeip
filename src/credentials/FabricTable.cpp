@@ -94,20 +94,6 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
         storage->SyncSetKeyValue(keyAlloc.FabricNOC(mFabricIndex), mNOCCert.data(), static_cast<uint16_t>(mNOCCert.size())));
 
     {
-        Crypto::P256SerializedKeypair serializedOpKey;
-        if (mOperationalKey != nullptr)
-        {
-            ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
-        }
-        else
-        {
-            // Could we just not store it instead?  What would deserialize need
-            // to do then?
-            P256Keypair keypair;
-            ReturnErrorOnFailure(keypair.Initialize());
-            ReturnErrorOnFailure(keypair.Serialize(serializedOpKey));
-        }
-
         uint8_t buf[OpKeyTLVMaxSize()];
         TLV::TLVWriter writer;
         writer.Init(buf);
@@ -117,7 +103,14 @@ CHIP_ERROR FabricInfo::CommitToStorage(PersistentStorageDelegate * storage)
 
         ReturnErrorOnFailure(writer.Put(kOpKeyVersionTag, kOpKeyVersion));
 
-        ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
+        // If key storage is externally managed, key is not stored here,
+        // and when loading is done later, it will be ignored.
+        if (!mHasExternallyOwnedOperationalKey && (mOperationalKey != nullptr))
+        {
+            Crypto::P256SerializedKeypair serializedOpKey;
+            ReturnErrorOnFailure(mOperationalKey->Serialize(serializedOpKey));
+            ReturnErrorOnFailure(writer.Put(kOpKeyDataTag, ByteSpan(serializedOpKey.Bytes(), serializedOpKey.Length())));
+        }
 
         ReturnErrorOnFailure(writer.EndContainer(outerType));
 
@@ -213,27 +206,36 @@ CHIP_ERROR FabricInfo::LoadFromStorage(PersistentStorageDelegate * storage)
         ReturnErrorOnFailure(reader.Get(opKeyVersion));
         VerifyOrReturnError(opKeyVersion == kOpKeyVersion, CHIP_ERROR_VERSION_MISMATCH);
 
-        ReturnErrorOnFailure(reader.Next(kOpKeyDataTag));
-        ByteSpan keyData;
-        ReturnErrorOnFailure(reader.GetByteView(keyData));
-
-        // Unfortunately, we have to copy the data into a P256SerializedKeypair.
-        Crypto::P256SerializedKeypair serializedOpKey;
-        VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
-        serializedOpKey.SetLength(keyData.size());
-
-        if (mOperationalKey == nullptr)
+        CHIP_ERROR err = reader.Next(kOpKeyDataTag);
+        if (err == CHIP_NO_ERROR)
         {
+            ByteSpan keyData;
+            ReturnErrorOnFailure(reader.GetByteView(keyData));
+
+            // Unfortunately, we have to copy the data into a P256SerializedKeypair.
+            Crypto::P256SerializedKeypair serializedOpKey;
+            VerifyOrReturnError(keyData.size() <= serializedOpKey.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
+            serializedOpKey.SetLength(keyData.size());
+
+            if (mOperationalKey == nullptr)
+            {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-            mOperationalKey = chip::Platform::New<P256KeypairHSM>();
+                mOperationalKey = chip::Platform::New<P256KeypairHSM>();
 #else
-            mOperationalKey = chip::Platform::New<P256Keypair>();
+                mOperationalKey = chip::Platform::New<P256Keypair>();
 #endif
+            }
+            VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
+            ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
         }
-        VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(mOperationalKey->Deserialize(serializedOpKey));
+        else
+        {
+            // Key was absent: set mOperationalKey to null, for another caller to set
+            // it. This may happen if externally owned.
+            mOperationalKey = nullptr;
+        }
 
         ReturnErrorOnFailure(reader.ExitContainer(containerType));
         ReturnErrorOnFailure(reader.VerifyEndOfContainer());
@@ -321,6 +323,9 @@ CHIP_ERROR FabricInfo::DeleteFromStorage(PersistentStorageDelegate * storage, Fa
 CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
     VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mHasExternallyOwnedOperationalKey = false;
+
     P256SerializedKeypair serialized;
     ReturnErrorOnFailure(keyPair->Serialize(serialized));
     if (mOperationalKey == nullptr)
@@ -333,6 +338,20 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
     return mOperationalKey->Deserialize(serialized);
+}
+
+CHIP_ERROR FabricInfo::SetExternallyOwnedOperationalKeypair(P256Keypair * keyPair)
+{
+    VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
+    {
+        chip::Platform::Delete(mOperationalKey);
+        mOperationalKey = nullptr;
+    }
+
+    mHasExternallyOwnedOperationalKey = true;
+    mOperationalKey                   = keyPair;
+    return CHIP_NO_ERROR;
 }
 
 void FabricInfo::ReleaseCert(MutableByteSpan & cert)
@@ -438,15 +457,13 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, const ByteSpan & 
 
 FabricTable::~FabricTable()
 {
-    FabricTableDelegate * delegate = mDelegate;
+    // Remove all links to every delegate
+    FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
-        FabricTableDelegate * temp = delegate->mNext;
-        if (delegate->mOwnedByFabricTable)
-        {
-            chip::Platform::Delete(delegate);
-        }
-        delegate = temp;
+        FabricTable::Delegate * temp = delegate->next;
+        delegate->next               = nullptr;
+        delegate                     = temp;
     }
 }
 
@@ -506,26 +523,27 @@ FabricInfo * FabricTable::FindFabricWithCompressedId(CompressedFabricId fabricId
     return nullptr;
 }
 
-CHIP_ERROR FabricTable::Store(FabricIndex index)
+CHIP_ERROR FabricTable::Store(FabricIndex fabricIndex)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     FabricInfo * fabric = nullptr;
 
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    fabric = FindFabricWithIndex(index);
+    fabric = FindFabricWithIndex(fabricIndex);
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = fabric->CommitToStorage(mStorage);
 exit:
-    if (err == CHIP_NO_ERROR && mDelegate != nullptr)
+    if (err == CHIP_NO_ERROR && mDelegateListRoot != nullptr)
     {
-        ChipLogProgress(Discovery, "Fabric (%d) persisted to storage. Calling OnFabricPersistedToStorage", index);
-        FabricTableDelegate * delegate = mDelegate;
+        ChipLogProgress(Discovery, "Fabric (0x%x) persisted to storage. Calling OnFabricPersistedToStorage",
+                        static_cast<unsigned>(fabricIndex));
+        FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
         {
-            delegate->OnFabricPersistedToStorage(fabric);
-            delegate = delegate->mNext;
+            delegate->OnFabricPersistedToStorage(*this, fabricIndex);
+            delegate = delegate->next;
         }
     }
     return err;
@@ -539,12 +557,12 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricInfo * fabric)
     {
         ReturnErrorOnFailure(fabric->LoadFromStorage(mStorage));
 
-        FabricTableDelegate * delegate = mDelegate;
+        FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
         {
-            ChipLogProgress(Discovery, "Fabric (%d) loaded from storage", fabric->GetFabricIndex());
-            delegate->OnFabricRetrievedFromStorage(fabric);
-            delegate = delegate->mNext;
+            ChipLogProgress(Discovery, "Fabric (0x%x) loaded from storage", static_cast<unsigned>(fabric->GetFabricIndex()));
+            delegate->OnFabricRetrievedFromStorage(*this, fabric->GetFabricIndex());
+            delegate = delegate->next;
         }
     }
     return CHIP_NO_ERROR;
@@ -565,7 +583,15 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     ReturnErrorOnFailure(VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, validContext, operationalId,
                                            fabricId, pubkey));
 
-    SetOperationalKeypair(newFabric.GetOperationalKey());
+    if (newFabric.mHasExternallyOwnedOperationalKey)
+    {
+        ReturnErrorOnFailure(SetExternallyOwnedOperationalKeypair(newFabric.GetOperationalKey()));
+    }
+    else
+    {
+        ReturnErrorOnFailure(SetOperationalKeypair(newFabric.GetOperationalKey()));
+    }
+
     SetRootCert(newFabric.mRootCert);
     mOperationalId = operationalId;
     mFabricId      = fabricId;
@@ -669,15 +695,13 @@ CHIP_ERROR FabricTable::AddNewFabricInner(FabricInfo & newFabric, FabricIndex * 
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR FabricTable::Delete(FabricIndex index)
+CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    FabricInfo * fabric      = FindFabricWithIndex(index);
+    FabricInfo * fabric      = FindFabricWithIndex(fabricIndex);
     bool fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
-    CompressedFabricId compressedFabricId =
-        fabricIsInitialized ? fabric->GetPeerId().GetCompressedFabricId() : kUndefinedCompressedFabricId;
-    CHIP_ERROR err = FabricInfo::DeleteFromStorage(mStorage, index); // Delete from storage regardless
+    CHIP_ERROR err           = FabricInfo::DeleteFromStorage(mStorage, fabricIndex); // Delete from storage regardless
     if (!fabricIsInitialized)
     {
         // Make sure to return the error our API promises, not whatever storage
@@ -698,14 +722,14 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
         // and our fabric table was full, so there was no valid next index.  We
         // have a single available index now, though; use it as
         // mNextAvailableFabricIndex.
-        mNextAvailableFabricIndex.SetValue(index);
+        mNextAvailableFabricIndex.SetValue(fabricIndex);
     }
     // If StoreFabricIndexInfo fails here, that's probably OK.  When we try to
     // read things from storage later we will realize there is nothing for this
     // index.
     StoreFabricIndexInfo();
 
-    if (mDelegate != nullptr)
+    if (mDelegateListRoot != nullptr)
     {
         if (mFabricCount == 0)
         {
@@ -714,14 +738,15 @@ CHIP_ERROR FabricTable::Delete(FabricIndex index)
         else
         {
             mFabricCount--;
-            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage", static_cast<unsigned>(index));
+            ChipLogProgress(Discovery, "Fabric (0x%x) deleted. Calling OnFabricDeletedFromStorage",
+                            static_cast<unsigned>(fabricIndex));
         }
 
-        FabricTableDelegate * delegate = mDelegate;
+        FabricTable::Delegate * delegate = mDelegateListRoot;
         while (delegate)
         {
-            delegate->OnFabricDeletedFromStorage(compressedFabricId, index);
-            delegate = delegate->mNext;
+            delegate->OnFabricDeletedFromStorage(*this, fabricIndex);
+            delegate = delegate->next;
         }
     }
     return CHIP_NO_ERROR;
@@ -775,33 +800,63 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::AddFabricDelegate(FabricTableDelegate * delegate)
+CHIP_ERROR FabricTable::AddFabricDelegate(FabricTable::Delegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    for (FabricTableDelegate * iter = mDelegate; iter != nullptr; iter = iter->mNext)
+    for (FabricTable::Delegate * iter = mDelegateListRoot; iter != nullptr; iter = iter->next)
     {
         if (iter == delegate)
         {
             return CHIP_NO_ERROR;
         }
     }
-    delegate->mNext = mDelegate;
-    mDelegate       = delegate;
-    ChipLogDetail(Discovery, "Add fabric pairing table delegate");
+    delegate->next    = mDelegateListRoot;
+    mDelegateListRoot = delegate;
     return CHIP_NO_ERROR;
+}
+
+void FabricTable::RemoveFabricDelegate(FabricTable::Delegate * delegateToRemove)
+{
+    VerifyOrReturn(delegateToRemove != nullptr);
+
+    if (delegateToRemove == mDelegateListRoot)
+    {
+        // Removing head of the list, keep link to next, may
+        // be nullptr.
+        mDelegateListRoot = mDelegateListRoot->next;
+    }
+    else
+    {
+        // Removing some other item: check if next, and
+        // remove the link, keeping its neighbour.
+        FabricTable::Delegate * currentNode = mDelegateListRoot;
+
+        while (currentNode)
+        {
+            if (currentNode->next == delegateToRemove)
+            {
+                FabricTable::Delegate * temp = delegateToRemove->next;
+                currentNode->next            = temp;
+                delegateToRemove->next       = nullptr;
+                return;
+            }
+
+            currentNode = currentNode->next;
+        }
+    }
 }
 
 namespace {
 // Increment a fabric index in a way that ensures that it stays in the valid
 // range [kMinValidFabricIndex, kMaxValidFabricIndex].
-FabricIndex NextFabricIndex(FabricIndex index)
+FabricIndex NextFabricIndex(FabricIndex fabricIndex)
 {
-    if (index == kMaxValidFabricIndex)
+    if (fabricIndex == kMaxValidFabricIndex)
     {
         return kMinValidFabricIndex;
     }
 
-    return static_cast<FabricIndex>(index + 1);
+    return static_cast<FabricIndex>(fabricIndex + 1);
 }
 } // anonymous namespace
 
