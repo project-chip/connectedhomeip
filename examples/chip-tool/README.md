@@ -160,7 +160,7 @@ The client will send a single command packet and then exit.
 
     ```
     $ chip-tool groups add-group GroupId GroupName node-id/group-id endpoint-id
-    $ chip-tool groups add-group 0x4141  Light     1234             1
+    $ chip-tool groups add-group 0x4141 Light 1234 1
     ```
 
 3. Add group Keyset to device
@@ -176,8 +176,8 @@ The client will send a single command packet and then exit.
 
 4. Bind Key to group
     ```
-    $ chip-tool groupkeymanagement write group-key-map attr-value                                                    node-id/group-id endpoint-id
-    $ chip-tool groupkeymanagement write group-key-map '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234             0
+    $ chip-tool groupkeymanagement write group-key-map attr-value node-id/group-id endpoint-id
+    $ chip-tool groupkeymanagement write group-key-map '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
     ```
 
 ## Configuring the client for Group Commands
@@ -204,8 +204,8 @@ To add a group
 To add a keyset
 
     ```
-    $ chip-tool groupsettings add-keysets keysetId keyPolicy validityTime       EpochKey
-    $ chip-tool groupsettings add-keysets 0xAAAA   0         0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+    $ chip-tool groupsettings add-keysets keysetId keyPolicy validityTime EpochKey
+    $ chip-tool groupsettings add-keysets 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
     ```
 
 Take note that the epoch key must be in hex form with the 'hex:' prefix
