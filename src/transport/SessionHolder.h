@@ -53,7 +53,8 @@ public:
     operator bool() const { return mSession.HasValue(); }
     Optional<SessionHandle> Get() const
     {
-        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get()) : chip::Optional<SessionHandle>::Missing();
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
+                                   : chip::Optional<SessionHandle>::Missing();
     }
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }

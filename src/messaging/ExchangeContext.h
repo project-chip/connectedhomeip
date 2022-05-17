@@ -156,8 +156,9 @@ public:
 
     ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSessionHandle() const {
-	    VerifyOrDie(mSession);
+    SessionHandle GetSessionHandle() const
+    {
+        VerifyOrDie(mSession);
         auto sessionHandle = mSession.Get();
         return std::move(sessionHandle.Value());
     }
