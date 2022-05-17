@@ -40,7 +40,7 @@ class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::CommissioningR
 {
 public:
     AbstractDnssdDiscoveryController() {}
-    ~AbstractDnssdDiscoveryController() override {}
+    ~AbstractDnssdDiscoveryController() override { mDNSResolver.Shutdown(); }
 
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 

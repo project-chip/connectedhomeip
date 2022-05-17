@@ -79,6 +79,7 @@ class ResolverProxy : public Resolver
 {
 public:
     ResolverProxy() {}
+    ~ResolverProxy() override { Shutdown(); }
 
     // Resolver interface.
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint = nullptr) override
