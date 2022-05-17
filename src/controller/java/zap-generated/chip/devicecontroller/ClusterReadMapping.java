@@ -3563,7 +3563,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readPercentSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readPercentSettingAttribute(
+                      (ChipClusters.FanControlCluster.PercentSettingAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlPercentSettingCommandParams);
@@ -3599,7 +3600,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readSpeedSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readSpeedSettingAttribute(
+                      (ChipClusters.FanControlCluster.SpeedSettingAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlSpeedSettingCommandParams);

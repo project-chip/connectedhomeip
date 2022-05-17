@@ -21153,10 +21153,10 @@ class FanControl(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeType),
                 ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceType),
-                ClusterObjectFieldDescriptor(Label="percentSetting", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="percentSetting", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="percentCurrent", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="speedMax", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="speedSetting", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="speedSetting", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="speedCurrent", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="rockSupport", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="rockSetting", Tag=0x00000008, Type=typing.Optional[uint]),
@@ -21171,10 +21171,10 @@ class FanControl(Cluster):
 
     fanMode: 'FanControl.Enums.FanModeType' = None
     fanModeSequence: 'FanControl.Enums.FanModeSequenceType' = None
-    percentSetting: 'uint' = None
+    percentSetting: 'typing.Union[Nullable, uint]' = None
     percentCurrent: 'uint' = None
     speedMax: 'typing.Optional[uint]' = None
-    speedSetting: 'typing.Optional[uint]' = None
+    speedSetting: 'typing.Union[None, Nullable, uint]' = None
     speedCurrent: 'typing.Optional[uint]' = None
     rockSupport: 'typing.Optional[uint]' = None
     rockSetting: 'typing.Optional[uint]' = None
@@ -21252,9 +21252,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class PercentCurrent(ClusterAttributeDescriptor):
@@ -21300,9 +21300,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class SpeedCurrent(ClusterAttributeDescriptor):
