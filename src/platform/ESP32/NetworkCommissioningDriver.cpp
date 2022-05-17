@@ -217,7 +217,8 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
                              reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
 
     err = DeviceLayer::SystemLayer().StartTimer(
-        static_cast<System::Clock::Timeout>(kWiFiConnectNetworkTimeoutSeconds * secToMiliSec), ConnectWifiNetworkTimeout, NULL);
+        static_cast<System::Clock::Timeout>((kWiFiConnectNetworkTimeoutSeconds - 1) * secToMiliSec), ConnectWifiNetworkTimeout,
+        NULL);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)
