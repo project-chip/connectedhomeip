@@ -106,6 +106,9 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
     test_script_exit_code = test_script_process.wait()
 
+    if test_script_exit_code != 0:
+        logging.error("Test script exited with error %r" % test_script_exit_code)
+
     test_app_exit_code = 0
     if app_process:
         logging.warning("Stopping app with SIGINT")
