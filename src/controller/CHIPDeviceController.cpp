@@ -1518,7 +1518,8 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     }
 
     if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != device->GetDeviceId()) {
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != device->GetDeviceId())
+    {
         // Not the device we are trying to commission.
         return;
     }
