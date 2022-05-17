@@ -1540,8 +1540,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
-    VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                   ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
     // Ensure that commissioning stage advancement is done based on seeing an error.
     if (error == CHIP_NO_ERROR)
