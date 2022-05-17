@@ -43,7 +43,7 @@ namespace {
 
 bool gWriteNullFromInernal = false;
 
-EmberAfStatus ClearFanModeAttribute(const ConcreteAttributePath & attributePath)
+EmberAfStatus SetFanModeToOff(EndpointId endpointId)
 {
     FanModeType currentFanMode;
     EmberAfStatus status = FanMode::Get(attributePath.mEndpointId, &currentFanMode);
