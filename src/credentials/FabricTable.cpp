@@ -595,7 +595,8 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // TODO: Should verify that pubkey matches operationalKey's public key.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/8433 -- Should verify that pubkey matches operationalKey's
+    // public key.
 
     if (newFabric.mHasExternallyOwnedOperationalKey)
     {

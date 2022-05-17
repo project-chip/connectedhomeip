@@ -210,7 +210,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertificate(id<CHIPKe
 
     if (fabricId != nil) {
         FabricId fabric = [fabricId unsignedLongLongValue];
-        VerifyOrReturnError(fabric != kUndefinedFabricId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabric));
     }
 
@@ -261,7 +261,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(GetIssuerId(issuerId)));
     if (fabricId != nil) {
         FabricId fabric = [fabricId unsignedLongLongValue];
-        VerifyOrReturnError(fabric != kUndefinedFabricId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId(fabric));
     }
 
@@ -301,7 +301,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateOperationalCertificate(id
     }
 
     FabricId fabric = [fabricId unsignedLongLongValue];
-    VerifyOrReturnError(fabric != kUndefinedFabricId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
 
     NodeId node = [nodeId unsignedLongLongValue];
     VerifyOrReturnError(IsOperationalNodeId(node), CHIP_ERROR_INVALID_ARGUMENT);

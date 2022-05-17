@@ -36,7 +36,7 @@ using namespace chip;
         return nil;
     }
 
-    if (fabricId == chip::kUndefinedFabricId) {
+    if (!IsValidFabricId(fabricId)) {
         CHIP_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricId);
         return nil;
     }
@@ -68,15 +68,11 @@ using namespace chip;
             return nil;
         }
 
-        FabricId fabricId;
-        NodeId unused;
+        FabricId fabricId = kUndefinedFabricId;
+        NodeId unused = kUndefinedNodeId;
         err = Credentials::ExtractNodeIdFabricIdFromOpCert(tlvOpCert, &unused, &fabricId);
         if (err != CHIP_NO_ERROR) {
             CHIP_LOG_ERROR("Unable to extract fabric id from operational certificate: %s", ErrorStr(err));
-            return nil;
-        }
-        if (fabricId == chip::kUndefinedFabricId) {
-            CHIP_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricId);
             return nil;
         }
         _fabricId = fabricId;
@@ -112,8 +108,8 @@ using namespace chip;
 
 @end
 
-// Conver a ByteSpan representing a Matter TLV certificate into NSData holding a
-// DER X.509 certificate.  Returns nil on failures.
+// Convert a ByteSpan representing a Matter TLV certificate into NSData holding
+// a DER X.509 certificate.  Returns nil on failures.
 static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 {
     uint8_t buf[Controller::kMaxCHIPDERCertLength];
