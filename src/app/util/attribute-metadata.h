@@ -100,8 +100,6 @@ typedef struct
 union EmberAfDefaultOrMinMaxAttributeValue
 {
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
-    // Previouly defaultValue size was uint16_t. This is here for that legacy code
-    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(static_cast<uint32_t>(val)) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(uint32_t val) : defaultValue(val) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}
 
