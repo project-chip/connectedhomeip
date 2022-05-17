@@ -62,9 +62,9 @@ def RedirectQueueThread(fp, tag, queue) -> threading.Thread:
 
 def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, queue: queue.Queue):
     thread_list.append(RedirectQueueThread(process.stdout,
-                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}").encode(), queue))
+                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), queue))
     thread_list.append(RedirectQueueThread(process.stderr,
-                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}").encode(), queue))
+                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode(), queue))
 
 
 @click.command()
@@ -73,7 +73,8 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
 @click.option("--app-args", type=str, default='', help='The extra arguments passed to the device.')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT, 'src', 'controller', 'python', 'test', 'test_scripts', 'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='', help='Path to the test script to use, omit to use the default test script (mobile-device-test.py).')
-def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str):
+@click.option("--script-gdb", is_flag=True, help='Run script through gdb')
+def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
     if factoryreset:
         retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
         if retcode != 0:
@@ -96,8 +97,22 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
-    script_command = ["/usr/bin/env", "python3", script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+
+    # command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {}".format(
+    #         os.path.join(
+    #             CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
+    #         ethernet_ip,
+    #         os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
+
+
+    script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s'] + shlex.split(script_args)
+
+    if script_gdb:
+        script_command = "gdb -batch -return-child-result -q -ex run -ex bt --args python3".split() + script_command
+    else:
+        script_command = "/usr/bin/env python3".split + script_command
+
     logging.info(f"Execute: {script_command}")
     test_script_process = subprocess.Popen(
         script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
