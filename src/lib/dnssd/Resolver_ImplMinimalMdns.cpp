@@ -263,9 +263,6 @@ public:
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
-    OperationalResolveDelegate * Internal_GetOperationalDelegate() { return mOperationalDelegate; }
-    CommissioningResolveDelegate * Internal_GetCommissioningDelegate() { return mCommissioningDelegate; }
-
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
