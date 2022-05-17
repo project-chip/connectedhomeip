@@ -1112,7 +1112,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController
             alertControllerWithTitle:@"Device Attestation"
-                             message:@"Device Attestion failed for device under commissioning. Do you wish to continue pairing?"
+                             message:@"Device Attestation failed for device under commissioning. Do you wish to continue pairing?"
                       preferredStyle:UIAlertControllerStyleAlert];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"No"

@@ -122,6 +122,10 @@ struct CommissionerInitParams : public ControllerInitParams
 {
     DevicePairingDelegate * pairingDelegate     = nullptr;
     CommissioningDelegate * defaultCommissioner = nullptr;
+    // Device attestation verifier instance for the commissioning.
+    // If null, the globally set attestation verifier (e.g. from GetDeviceAttestationVerifier()
+    // singleton) will be used.
+    Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
 };
 
 /**
@@ -803,6 +807,7 @@ private:
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
     Credentials::AttestationVerificationResult mAttestationResult;
+    Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 };
 
 } // namespace Controller
