@@ -306,7 +306,7 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
 
     const ByteSpan & value = GetSpan(rotatingIdLongString);
     rotatingIdLongLen      = Encoding::HexToBytes(reinterpret_cast<const char *>(value.data()), value.size(), rotatingIdLong,
-                                                  chip::Dnssd::kMaxRotatingIdLen * 2);
+                                             chip::Dnssd::kMaxRotatingIdLen * 2);
 
     // printf("str len=%zu max length %zu, long length %zu\n", strlen(rotatingIdLongString), chip::Dnssd::kMaxRotatingIdLen,
     //        rotatingIdLongLen);
