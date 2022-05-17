@@ -19130,11 +19130,13 @@ private:
         }
         case 1: {
             LogStep(1, "Hide Input Status Command");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value);
         }
         case 2: {
             LogStep(2, "Show Input Status Command");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value);
         }
@@ -19202,10 +19204,7 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                {
-                    auto iter_0 = value.begin();
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("inputList", iter_0, 0));
-                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         default:
@@ -19235,6 +19234,7 @@ private:
         }
         case 2: {
             LogStep(2, "Rename Input Command");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("A1garbage: not in length on purpose", 2);
@@ -19242,6 +19242,7 @@ private:
         }
         case 3: {
             LogStep(3, "Rename Input Command");
+            VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("A2garbage: not in length on purpose", 2);
