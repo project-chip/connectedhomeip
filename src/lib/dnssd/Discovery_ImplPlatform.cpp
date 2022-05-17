@@ -349,6 +349,7 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 void DiscoveryImplPlatform::Shutdown()
 {
     VerifyOrReturn(mDnssdInitialized);
+    mResolverProxy.Shutdown();
     ChipDnssdShutdown();
 }
 
