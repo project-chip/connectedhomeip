@@ -40,6 +40,7 @@ if (NOT CMAKE_BUILD_EARLY_EXPANSION)
         if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
             message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
         endif()
+        set(is_debug FALSE)
     endif()
 endif()
 
