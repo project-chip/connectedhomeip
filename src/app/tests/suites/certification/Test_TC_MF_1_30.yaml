@@ -57,55 +57,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 50000
-
-    - label: "Wait for commissioning Window to 301 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50000
-
-    - label: "Wait for commissioning Window to 301 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50000
-
-    - label: "Wait for commissioning Window to 301 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50000
-
-    - label: "Wait for commissioning Window to 301 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50000
-
-    - label: "Wait for commissioning Window to 301 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 50000
-
-    - label: "Wait for commissioning Window to 301 seconds"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 1000
+                value: 301000
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
