@@ -97,13 +97,11 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
         DumpProgramOutputToQueue(
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
-
     # command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {}".format(
     #         os.path.join(
     #             CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_test.py"),
     #         ethernet_ip,
     #         os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))
-
 
     script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
                       '--log-format', '%(message)s'] + shlex.split(script_args)
