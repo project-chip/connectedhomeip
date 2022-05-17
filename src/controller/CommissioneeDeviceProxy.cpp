@@ -47,7 +47,7 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
 {
     VerifyOrReturnError(mSecureSession, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mSecureSession.Get().HasValue(), CHIP_ERROR_MISSING_SECURE_SESSION);
+    VerifyOrReturnError(mSecureSession, CHIP_ERROR_MISSING_SECURE_SESSION);
     return commandObj->SendCommandRequest(mSecureSession.Get().Value(), timeout);
 }
 

@@ -184,11 +184,18 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
 
         //
-        // Our session should still be valid, since it had been evicted, all exchanges on that session would have been torn down
-        // as a side-effect. So for us to get here to send a message and still not have a session, something terribly wrong must
-        // have happened.
+        // It is possible that we might have evicted a session as a side-effect of processing an inbound message on this exchange.
+        // We cannot proceed any further sending a message since we don't have an attached session, so let's error out.
         //
-        VerifyOrDie(mSession);
+        // This should not happen to well-behaved logic attempting to sending messages on exchanges, so let's print out a warning
+        // to ensure it alerts someone to fixing their logic...
+        //
+        if (!mSession)
+        {
+            ChipLogError(ExchangeManager,
+                         "WARNING: We shouldn't be sending a message on an exchange that has no attached session...");
+            return CHIP_ERROR_MISSING_SECURE_SESSION;
+        }
 
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
         CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId,

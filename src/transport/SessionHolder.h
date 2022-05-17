@@ -53,6 +53,12 @@ public:
     operator bool() const { return mSession.HasValue(); }
     Optional<SessionHandle> Get() const
     {
+        //
+        // We cannot return mSession directly even if Optional<SessionHandle> is internally composed of the same bits,
+        // since they are not actually equivalent type-wise, and SessionHandle does not permit copy-construction.
+        //
+        // So, construct a new Optional<SessionHandle> from the underlying Transport::Session reference.
+        //
         return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
                                    : chip::Optional<SessionHandle>::Missing();
     }
