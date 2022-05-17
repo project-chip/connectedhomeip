@@ -297,8 +297,8 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
     GetRotatingDeviceId(GetSpan(rotatingIdString), rotatingId, &rotatingIdLen);
 
     // create a Rotating ID longer than kMaxRotatingIdLen
-    char rotatingIdLongString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1];
-    uint8_t rotatingIdLong[chip::Dnssd::kMaxRotatingIdLen];
+    char rotatingIdLongString[chip::Dnssd::kMaxRotatingIdLen * 4 + 1];
+    uint8_t rotatingIdLong[chip::Dnssd::kMaxRotatingIdLen * 2];
     size_t rotatingIdLongLen;
     strcpy(
         rotatingIdLongString,
