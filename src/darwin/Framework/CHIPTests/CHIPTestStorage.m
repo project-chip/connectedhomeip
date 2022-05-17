@@ -22,7 +22,7 @@
 
 @implementation CHIPTestStorage
 
-- (NSData *)storageDataForKey:(NSString *)key
+- (nullable NSData *)storageDataForKey:(NSString *)key
 {
     return _values[key];
 }

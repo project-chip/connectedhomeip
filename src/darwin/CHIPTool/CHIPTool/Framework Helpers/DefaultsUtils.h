@@ -18,15 +18,17 @@
 #import <CHIP/CHIP.h>
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString * const kCHIPToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
 
-CHIPDeviceController * InitializeCHIP(void);
-CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller);
-id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
-BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
+CHIPDeviceController * _Nullable InitializeCHIP(void);
+CHIPDeviceController * _Nullable CHIPRestartController(CHIPDeviceController * controller);
+id _Nullable CHIPGetDomainValueForKey(NSString * domain, NSString * key);
+BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id _Nullable value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
 uint64_t CHIPGetNextAvailableDeviceID(void);
 NSString * KeyForPairedDevice(uint64_t id);
@@ -37,12 +39,10 @@ BOOL CHIPIsDevicePaired(uint64_t id);
 BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler);
 BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler);
 void CHIPUnpairDeviceWithID(uint64_t deviceId);
-CHIPDevice * CHIPGetDeviceBeingCommissioned(void);
-
-NS_ASSUME_NONNULL_BEGIN
+CHIPDevice * _Nullable CHIPGetDeviceBeingCommissioned(void);
 
 @interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
-- (NSData *)storageDataForKey:(NSString *)key;
+- (nullable NSData *)storageDataForKey:(NSString *)key;
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key;
 - (BOOL)removeStorageDataForKey:(NSString *)key;
 @end
