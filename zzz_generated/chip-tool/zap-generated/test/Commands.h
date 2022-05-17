@@ -71507,7 +71507,7 @@ private:
 class Test_TC_MF_1_29Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_29Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_29", 11, credsIssuerConfig)
+    Test_TC_MF_1_29Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_29", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -71552,30 +71552,6 @@ private:
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
@@ -71619,47 +71595,11 @@ private:
         case 3: {
             LogStep(3, "Wait for commissioning Window to 301 seconds");
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
+            value.ms = 301000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
-            LogStep(4, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 5: {
-            LogStep(5, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 6: {
-            LogStep(6, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 7: {
-            LogStep(7, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 8: {
-            LogStep(8, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 9: {
-            LogStep(9, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 10: {
-            LogStep(10, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
+            LogStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                  AdministratorCommissioning::Attributes::WindowStatus::Id);
         }
@@ -71671,7 +71611,7 @@ private:
 class Test_TC_MF_1_30Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_30Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_30", 11, credsIssuerConfig)
+    Test_TC_MF_1_30Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_30", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -71715,30 +71655,6 @@ private:
             shouldContinue = true;
             break;
         case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
@@ -71792,47 +71708,11 @@ private:
         case 3: {
             LogStep(3, "Wait for commissioning Window to 301 seconds");
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
+            value.ms = 301000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
-            LogStep(4, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 5: {
-            LogStep(5, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 6: {
-            LogStep(6, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 7: {
-            LogStep(7, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 8: {
-            LogStep(8, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 50000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 9: {
-            LogStep(9, "Wait for commissioning Window to 301 seconds");
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 1000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 10: {
-            LogStep(10, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
+            LogStep(4, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                  AdministratorCommissioning::Attributes::WindowStatus::Id);
         }
