@@ -42,6 +42,9 @@ BLE_ERROR_REMOTE_DEVICE_DISCONNECTED = 12
 
 FAKE_CONN_OBJ_VALUE = 12121212
 
+# Number of bytes in service data payload
+SERVICE_DATA_LEN = 8
+
 
 def VoidPtrToUUIDString(ptr, len):
     try:
@@ -365,7 +368,7 @@ class BleDeviceIdentificationInfo:
 
 
 def ParseServiceData(data):
-    if len(data) != 7:
+    if len(data) != SERVICE_DATA_LEN:
         return None
     return BleDeviceIdentificationInfo(
         int(data[0]),
