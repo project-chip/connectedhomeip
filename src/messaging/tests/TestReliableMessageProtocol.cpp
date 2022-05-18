@@ -175,9 +175,9 @@ public:
 struct BackoffComplianceTestVector
 {
     uint8_t sendCount;
-    System::Clock::Timestamp backoffBase;
-    System::Clock::Timestamp backoffMin;
-    System::Clock::Timestamp backoffMax;
+    System::Clock::Timeout backoffBase;
+    System::Clock::Timeout backoffMin;
+    System::Clock::Timeout backoffMax;
 };
 
 struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
