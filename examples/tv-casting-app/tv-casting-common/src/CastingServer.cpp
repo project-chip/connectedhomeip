@@ -35,7 +35,7 @@ CastingServer::CastingServer()
         rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
     }
 
-    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+    ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
     chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 }
