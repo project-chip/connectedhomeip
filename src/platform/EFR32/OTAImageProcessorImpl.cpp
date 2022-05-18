@@ -25,6 +25,8 @@ extern "C" {
 #include "platform/emlib/inc/em_bus.h" // For CORE_CRITICAL_SECTION
 }
 
+#include "EFR32Config.h"
+
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
 
@@ -49,7 +51,9 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 }
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    // Delay HandleApply() to give KVS time to store the data in StoreCurrentUpdateInfo()
+    ChipLogError(SoftwareUpdate, "Scheduling HandleApply");
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(EFR32_KVS_SAVE_DELAY_SECONDS + 1), HandleApply, nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -175,7 +179,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
-void OTAImageProcessorImpl::HandleApply(intptr_t context)
+void OTAImageProcessorImpl::HandleApply(chip::System::Layer * systemLayer, void *context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
