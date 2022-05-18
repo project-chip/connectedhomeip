@@ -82,7 +82,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             // end of the transfer.
             sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
-        if (mExchangeCtx == nullptr)
+        VerifyOrReturn(mExchangeCtx != nullptr);
         {
             return;
         }
