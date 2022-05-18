@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,17 @@
  *
  */
 
-#include "commands/common/Commands.h"
+#include "../common/CHIPCommandStorageDelegate.h"
 
-#include "commands/pairing/Commands.h"
+#include "StorageManagementCommand.h"
 
-#include "commands/storage/Commands.h"
+static CHIPToolPersistentStorageDelegate * storage = nil;
 
-#include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
-
-int main(int argc, const char * argv[])
+CHIP_ERROR StorageClearAll::Run()
 {
-    Commands commands;
-    registerCommandsPairing(commands);
-    registerCommandsStorage(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
-    return commands.Run(argc, (char **) argv);
+    storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+    if (![storage deleteAllStorage]) {
+        return CHIP_ERROR_INTERNAL;
+    }
+    return CHIP_NO_ERROR;
 }

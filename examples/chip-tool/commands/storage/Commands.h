@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2020 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,16 @@
  *
  */
 
-#include "commands/common/Commands.h"
+#pragma once
 
-#include "commands/pairing/Commands.h"
+#include "StorageManagementCommand.h"
+#include <commands/common/Commands.h>
 
-#include "commands/storage/Commands.h"
-
-#include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
-
-int main(int argc, const char * argv[])
+void registerCommandsStorage(Commands & commands)
 {
-    Commands commands;
-    registerCommandsPairing(commands);
-    registerCommandsStorage(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
-    return commands.Run(argc, (char **) argv);
+    const char * clusterName = "storage";
+
+    commands_list clusterCommands = { make_unique<StorageClearAll>() };
+
+    commands.Register(clusterName, clusterCommands);
 }

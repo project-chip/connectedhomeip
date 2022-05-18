@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +16,16 @@
  *
  */
 
-#include "commands/common/Commands.h"
+#pragma once
 
-#include "commands/pairing/Commands.h"
+#include "../common/CHIPCommandBridge.h"
 
-#include "commands/storage/Commands.h"
+#include <commands/common/Command.h>
 
-#include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
-
-int main(int argc, const char * argv[])
+class StorageClearAll : public Command
 {
-    Commands commands;
-    registerCommandsPairing(commands);
-    registerCommandsStorage(commands);
-    registerCommandsTests(commands);
-    registerClusters(commands);
-    return commands.Run(argc, (char **) argv);
-}
+public:
+    StorageClearAll() : Command("clear-all") {}
+
+    CHIP_ERROR Run() override;
+};
