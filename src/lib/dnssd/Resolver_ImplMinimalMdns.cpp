@@ -25,6 +25,7 @@
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/QueryBuilder.h>
 #include <lib/dnssd/minimal_mdns/RecordData.h>
@@ -132,6 +133,8 @@ void PacketParser::OnResource(ResourceType type, const ResourceData & data)
     {
         return;
     }
+
+    mdns::Minimal::Logging::LogReceivedResource(data);
 
     switch (mParsingState)
     {
@@ -471,6 +474,8 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
         .SetType(QType::ANY)            //
         .SetAnswerViaUnicast(firstSend) //
         ;
+
+    mdns::Minimal::Logging::LogSendingQuery(query);
     builder.AddQuery(query);
 
     return CHIP_NO_ERROR;
@@ -493,6 +498,7 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
         .SetAnswerViaUnicast(firstSend) //
         ;
 
+    mdns::Minimal::Logging::LogSendingQuery(query);
     builder.AddQuery(query);
 
     return CHIP_NO_ERROR;
@@ -510,6 +516,7 @@ CHIP_ERROR MinMdnsResolver::BuildQuery(QueryBuilder & builder, const ActiveResol
         .SetAnswerViaUnicast(firstSend) //
         ;
 
+    mdns::Minimal::Logging::LogSendingQuery(query);
     builder.AddQuery(query);
 
     return CHIP_NO_ERROR;
