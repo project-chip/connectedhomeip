@@ -113,6 +113,17 @@ void LogReceivedResource(const mdns::Minimal::ResourceData & data)
                     name.Fit() ? "" : "...");
 }
 
+void LogFoundOperationalSrvRecord(const chip::PeerId & peerId)
+{
+    ChipLogProgress(Discovery, "MINMDNS:     Operational SRV for " ChipLogFormatX64 "-" ChipLogFormatX64,
+                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+}
+
+void LogFoundCommissionSrvRecord(const char * instance)
+{
+    ChipLogProgress(Discovery, "MINMDNS:     Commission SRV for instance %s", instance);
+}
+
 } // namespace Logging
 } // namespace Minimal
 } // namespace mdns

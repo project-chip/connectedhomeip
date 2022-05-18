@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/core/PeerId.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
 
@@ -31,10 +32,15 @@ namespace Logging {
 void LogSendingQuery(const mdns::Minimal::Query & query);
 void LogReceivedResource(const mdns::Minimal::ResourceData & data);
 
+void LogFoundOperationalSrvRecord(const chip::PeerId & peerId);
+void LogFoundCommissionSrvRecord(const char * instance);
+
 #else
 
 inline void LogSendingQuery(const mdns::Minimal::Query & query) {}
 inline void LogReceivedResource(const mdns::Minimal::ResourceData & data) {}
+inline void LogFoundOperationalSrvRecord(const chip::PeerId & peerId) {}
+inline void LogFoundCommissionSrvRecord(const char * instance) {}
 
 #endif
 
