@@ -38,7 +38,7 @@ class SessionHolder;
  *
  * Just because a Session is refcounted does not mean it actually gets destroyed upon reaching a count of 0.
  * UnauthenticatedSession and SecureSession have different logic that gets invoked when the count hits 0.
- * 
+ *
  * This should really only be used during session setup by the entity setting up the session.
  * Once setup, the session should transfer ownership to the SessionManager at which point,
  * all clients in the system should only be holding SessionWeakPtrs (SessionWeakPtr doesn't exist yet, but once #18399 is complete, SessionHolder
