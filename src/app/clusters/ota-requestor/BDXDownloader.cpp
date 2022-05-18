@@ -226,6 +226,17 @@ void BDXDownloader::PollTransferSession()
     } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
 }
 
+void BDXDownloader::CleanupOnError(OTAChangeReasonEnum reason)
+{
+    Reset();
+    mBdxTransfer.Reset();
+    SetState(State::kIdle, reason);
+    if (mImageProcessor)
+    {
+        mImageProcessor->Abort();
+    }
+}
+
 CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent)
 {
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -266,20 +277,15 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
-        mBdxTransfer.Reset();
-        ReturnErrorOnFailure(mImageProcessor->Abort());
+        CleanupOnError(OTAChangeReasonEnum::kFailure);
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "TransferSession error");
-        Reset();
-        mBdxTransfer.Reset();
-        ReturnErrorOnFailure(mImageProcessor->Abort());
+        CleanupOnError(OTAChangeReasonEnum::kFailure);
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
-        Reset();
-        mBdxTransfer.Reset();
-        ReturnErrorOnFailure(mImageProcessor->Abort());
+        CleanupOnError(OTAChangeReasonEnum::kTimeOut);
         break;
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kAckReceived:
