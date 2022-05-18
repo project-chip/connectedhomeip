@@ -5358,8 +5358,8 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ActiveLocale                                                      | 0x0001 |
-| * SupportedLocales                                                  | 0x0002 |
+| * ActiveLocale                                                      | 0x0000 |
+| * SupportedLocales                                                  | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5384,12 +5384,12 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002B, 0x00000001, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002B, 0x00000000, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002B, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002B, 0x00000000, mValue);
     }
 
 private:

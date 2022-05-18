@@ -973,8 +973,8 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2255,7 +2255,7 @@ endpoint 0 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 }
 
