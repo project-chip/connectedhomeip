@@ -55,3 +55,6 @@ lark
 stringcase
 
 cryptography
+
+# python unit tests
+colorama

@@ -60,13 +60,9 @@ enum class ServiceNameType
 };
 
 // Common prefix to check for all operational/commissioner/commissionable name parts
-constexpr QNamePart kOperationalSuffix[]           = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-constexpr QNamePart kCommissionableSuffix[]        = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
-constexpr QNamePart kCommissionerSuffix[]          = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
-constexpr QNamePart kCommissionableSubTypeSuffix[] = { kSubtypeServiceNamePart, kCommissionableServiceName, kCommissionProtocol,
-                                                       kLocalDomain };
-constexpr QNamePart kCommissionerSubTypeSuffix[]   = { kSubtypeServiceNamePart, kCommissionerServiceName, kCommissionProtocol,
-                                                     kLocalDomain };
+constexpr QNamePart kOperationalSuffix[]    = { kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+constexpr QNamePart kCommissionableSuffix[] = { kCommissionableServiceName, kCommissionProtocol, kLocalDomain };
+constexpr QNamePart kCommissionerSuffix[]   = { kCommissionerServiceName, kCommissionProtocol, kLocalDomain };
 
 ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
 {
@@ -98,18 +94,6 @@ ServiceNameType ComputeServiceNameType(SerializedQNameIterator name)
     }
 
     return ServiceNameType::kInvalid;
-}
-
-/// Checks if the name is of the form <something>._sub._matter(c|d)._udp.local
-bool IsCommissionSubtype(SerializedQNameIterator name)
-{
-    if (!name.Next() || !name.IsValid())
-    {
-        // subtype should be a prefix
-        return false;
-    }
-
-    return (name == kCommissionerSubTypeSuffix) || (name == kCommissionableSubTypeSuffix);
 }
 
 /// Automatically resets a IncrementalResolver to inactive in its destructor
@@ -207,6 +191,17 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
     case ServiceNameType::kCommissioner:
     case ServiceNameType::kCommissionable:
         mSpecificResolutionData.Set<CommissionNodeData>();
+
+        {
+            // Commission addresses start with instance name
+            SerializedQNameIterator nameCopy = name;
+            if (!nameCopy.Next() || !nameCopy.IsValid())
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            Platform::CopyString(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, nameCopy.Value());
+        }
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -235,7 +230,7 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
     return flags;
 }
 
-CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange packetRange)
+CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const ResourceData & data, BytesRange packetRange)
 {
     MATTER_TRACE_EVENT_SCOPE("Incremental resolver record parsing"); // measure until loop finished
 
@@ -246,8 +241,6 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
 
     switch (data.GetType())
     {
-    case QType::PTR:
-        return OnPtrRecord(data, packetRange);
     case QType::TXT:
         if (data.GetName() != mRecordName.Get())
         {
@@ -268,7 +261,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        return OnIpAddress(addr);
+        return OnIpAddress(interface, addr);
     }
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
@@ -283,57 +276,13 @@ CHIP_ERROR IncrementalResolver::OnRecord(const ResourceData & data, BytesRange p
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        return OnIpAddress(addr);
+        return OnIpAddress(interface, addr);
     }
     case QType::SRV: // SRV handled on creation, ignored for 'additional data'
     default:
         // Other types not interesting during parsing
         return CHIP_NO_ERROR;
     }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR IncrementalResolver::OnPtrRecord(const ResourceData & data, BytesRange packetRange)
-{
-    // Here we handle subtype expectations. Data is of the form:
-    // <subtype>._sub._mattrc._udp.local or
-    // <subtype>._sub._mattrd._udp.local
-    //
-    // If these hold, then we have to check if PTR points at the current record and
-    // if yes, the subtype matches and information can be extracted.
-
-    if (!IsActiveCommissionParse())
-    {
-        MATTER_TRACE_EVENT_INSTANT("PTR for non-commission");
-        return CHIP_NO_ERROR;
-    }
-
-    if (!IsCommissionSubtype(data.GetName()))
-    {
-        MATTER_TRACE_EVENT_INSTANT("PTR without a commission subtype");
-        return CHIP_NO_ERROR;
-    }
-
-    SerializedQNameIterator qname;
-
-    if (!ParsePtrRecord(data.GetData(), packetRange, &qname))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (qname != mRecordName.Get())
-    {
-        MATTER_TRACE_EVENT_INSTANT("PTR not applicable");
-        return CHIP_NO_ERROR;
-    }
-
-    // TODO: why are we not validating the string here? what is the purpose
-    // of copying and preserving the instance name here?
-    Platform::CopyString(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, qname.Value());
-
-    // TODO: nothing is done with the sub name here. The instance name could be
-    //       fetched from the SRV record, so why are we processing PTR records?
 
     return CHIP_NO_ERROR;
 }
@@ -360,11 +309,22 @@ CHIP_ERROR IncrementalResolver::OnTxtRecord(const ResourceData & data, BytesRang
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IncrementalResolver::OnIpAddress(const Inet::IPAddress & addr)
+CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr)
 {
     if (mCommonResolutionData.numIPs >= ArraySize(mCommonResolutionData.ipAddress))
     {
         return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (!mCommonResolutionData.interfaceId.IsPresent())
+    {
+        mCommonResolutionData.interfaceId = interface;
+    }
+    else if (mCommonResolutionData.interfaceId != interface)
+    {
+        // IP addresses received from multiple packets over different interfaces.
+        // Processing is assumed per single interface.
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     mCommonResolutionData.ipAddress[mCommonResolutionData.numIPs++] = addr;

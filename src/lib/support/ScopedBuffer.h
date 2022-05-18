@@ -142,7 +142,7 @@ public:
     inline T * Get() { return static_cast<T *>(Base::Ptr()); }
     inline T & operator[](size_t index) { return Get()[index]; }
 
-    inline const T * Get() const { return static_cast<T *>(Base::Ptr()); }
+    inline const T * Get() const { return static_cast<const T *>(Base::Ptr()); }
     inline const T & operator[](size_t index) const { return Get()[index]; }
 
     inline T * Release() { return static_cast<T *>(Base::Release()); }

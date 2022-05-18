@@ -106,9 +106,11 @@ public:
     /// Providing a data that is not relevant to the current parser is not considered and error,
     /// however if the resource fails parsing completely an error will be returned.
     ///
-    /// [data] represents the record and [packetRange] represents the range of valid bytes within
-    /// the packet for the purpose of QName parsing
-    CHIP_ERROR OnRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
+    ///
+    /// [data] represents the record received via [interface] and [packetRange] represents the range
+    /// of valid bytes within the packet for the purpose of QName parsing
+    CHIP_ERROR OnRecord(Inet::InterfaceId interface, const mdns::Minimal::ResourceData & data,
+                        mdns::Minimal::BytesRange packetRange);
 
     /// Return what additional data is required until the object can be extracted
     ///
@@ -116,11 +118,17 @@ public:
     /// to be processed.
     RequiredInformationFlags GetMissingRequiredInformation() const;
 
-    /// Fetch the server name set by `InitializeParsing`
+    /// Fetch the target host name set by `InitializeParsing`
     ///
     /// VALIDITY: Data references internal storage of this object and is valid as long
     ///           as this object is valid and InitializeParsing is not called again.
     mdns::Minimal::SerializedQNameIterator GetTargetHostName() const { return mTargetHostName.Get(); }
+
+    /// Fetch the record name set by `InitializeParsing`.
+    ///
+    /// VALIDITY: Data references internal storage of this object and is valid as long
+    ///           as this object is valid and InitializeParsing is not called again.
+    mdns::Minimal::SerializedQNameIterator GetRecordName() const { return mRecordName.Get(); }
 
     /// Take the current value of the object and clear it once returned.
     ///
@@ -148,11 +156,6 @@ public:
 private:
     /// Notify that a PTR record can be parsed.
     ///
-    /// Input data MUST have GetType() == QType::PTR
-    CHIP_ERROR OnPtrRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
-
-    /// Notify that a PTR record can be parsed.
-    ///
     /// Input data MUST have GetType() == QType::TXT
     CHIP_ERROR OnTxtRecord(const mdns::Minimal::ResourceData & data, mdns::Minimal::BytesRange packetRange);
 
@@ -162,7 +165,7 @@ private:
     /// addresses.
     ///
     /// Prerequisite: IP address belongs to the right nost name
-    CHIP_ERROR OnIpAddress(const Inet::IPAddress & addr);
+    CHIP_ERROR OnIpAddress(Inet::InterfaceId interface, const Inet::IPAddress & addr);
 
     using ParsedRecordSpecificData = Variant<OperationalNodeData, CommissionNodeData>;
 
