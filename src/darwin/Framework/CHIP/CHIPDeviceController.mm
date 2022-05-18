@@ -611,21 +611,6 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
 }
 
-- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId
-{
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
-    if (![self isRunning]) {
-        [self checkForError:errorCode logMsg:kErrorNotRunning error:nil];
-        return;
-    }
-    dispatch_sync(_chipWorkQueue, ^{
-        if ([self isRunning]) {
-            errorCode = self.cppCommissioner->UpdateDevice(deviceID);
-            CHIP_LOG_ERROR("Update device address returned: %s", chip::ErrorStr(errorCode));
-        }
-    });
-}
-
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     dispatch_async(_chipWorkQueue, ^{
