@@ -169,7 +169,7 @@ config BT_BUF_ACL_TX_SIZE
 
 config BT_RX_STACK_SIZE
     int
-    default 1120
+    default 1200
 
 # Enable NFC support
 
@@ -182,6 +182,11 @@ config CHIP_OTA_REQUESTOR
     default y
 
 config CHIP_QSPI_NOR
+    bool
+    default y
+
+# Enable extended discovery
+config CHIP_EXTENDED_DISCOVERY
     bool
     default y
 

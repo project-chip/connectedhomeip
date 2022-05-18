@@ -17,25 +17,42 @@
  */
 
 #pragma once
-#import <CHIP/CHIPDeviceController.h>
+#import <CHIP/CHIP.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
+#include <map>
+#include <string>
 
 #pragma once
+
+constexpr const char kIdentityAlpha[] = "alpha";
+constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityGamma[] = "gamma";
 
 class CHIPCommandBridge : public Command
 {
 public:
-    CHIPCommandBridge(const char * commandName) : Command(commandName) {}
-
-    CHIPCommandBridge(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommandBridge(commandName) {}
+    CHIPCommandBridge(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
 
+    // Will convert error to a CHIP_ERROR and call SetCommandExitStatus with the
+    // result.  If a log string is provided, will log that plus the string
+    // representation of the CHIP_ERROR.
+    void SetCommandExitStatus(NSError * error, const char * logString = nullptr);
+
     void SetCommandExitStatus(CHIP_ERROR status)
     {
+#if CHIP_CONFIG_ERROR_SOURCE
+        // If there is a filename in the status makes a copy of the filename as the pointer may be released
+        // when the autorelease pool is drained.
+        strncpy(mCommandExitStatusFilename, status.GetFile(), sizeof(mCommandExitStatusFilename));
+        mCommandExitStatusFilename[sizeof(mCommandExitStatusFilename) - 1] = '\0';
+        mCommandExitStatus = chip::ChipError(status.AsInteger(), mCommandExitStatusFilename, status.GetLine());
+#else
         mCommandExitStatus = status;
+#endif // CHIP_CONFIG_ERROR_SOURCE
         ShutdownCommissioner();
         StopWaiting();
     }
@@ -56,10 +73,16 @@ protected:
     // loop has been stopped.
     virtual void Shutdown() {}
 
-    void SetIdentity(const char * name);
+    void SetIdentity(const char * identity);
 
     // This method returns the commissioner instance to be used for running the command.
     CHIPDeviceController * CurrentCommissioner();
+
+    CHIPDeviceController * GetCommissioner(const char * identity);
+
+    // Will log the given string and given error (as progress if success, error
+    // if failure).
+    void LogNSError(const char * logString, NSError * error);
 
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
@@ -67,15 +90,22 @@ private:
     CHIP_ERROR ShutdownCommissioner();
     uint16_t CurrentCommissionerIndex();
 
+#if CHIP_CONFIG_ERROR_SOURCE
+    char mCommandExitStatusFilename[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+#endif // CHIP_CONFIG_ERROR_SOURCE
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();
-    CHIPDeviceController * mController;
 
-#if CONFIG_USE_SEPARATE_EVENTLOOP
+    // Our three controllers: alpha, beta, gamma.
+    std::map<std::string, CHIPDeviceController *> mControllers;
+
+    // The current controller; the one the current command should be using.
+    CHIPDeviceController * mCurrentController;
+
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
+    chip::Optional<char *> mCommissionerName;
     bool mWaitingForResponse{ true };
-#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 };

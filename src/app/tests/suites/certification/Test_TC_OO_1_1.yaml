@@ -33,85 +33,56 @@ tests:
       attribute: "ClusterRevision"
       response:
           value: 4
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 3
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
-          value: 4
-
+    #issue 17495
     - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
+          value: [0, 16384, 16385, 16386, 16387]
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
+    - label:
+          "Read EventList attribute from the DUT and Verify that the DUT
+          response provides a list of supported events."
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "AcceptedCommandList"
+      PICS: OO_LT
       response:
+          value: [0, 1, 2, 64, 65, 66]
           constraints:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: []
           constraints:
               type: list
 
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
+      PICS: OO_LT
       response:
           value: 1
-
-    - label: "Read the optional global attribute : FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
           constraints:
               type: map32
-
-    - label: "write the default values to optional global attribute: FeatureMap"
-      command: "writeAttribute"
-      attribute: "FeatureMap"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 1

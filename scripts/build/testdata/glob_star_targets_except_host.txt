@@ -22,6 +22,7 @@ cc13x2x7_26x2x7-lock-ftd
 cc13x2x7_26x2x7-lock-mtd
 cc13x2x7_26x2x7-pump
 cc13x2x7_26x2x7-pump-controller
+cc13x2x7_26x2x7-shell
 cyw30739-cyw930739m2evb_01-light
 cyw30739-cyw930739m2evb_01-lock
 cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging
@@ -46,6 +47,16 @@ esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 esp32-qemu-tests
+imx-all-clusters-app
+imx-all-clusters-app-release
+imx-chip-tool
+imx-chip-tool-release
+imx-lighting-app
+imx-lighting-app-release
+imx-ota-provider-app
+imx-ota-provider-app-release
+imx-thermostat
+imx-thermostat-release
 infineon-p6-all-clusters
 infineon-p6-light
 infineon-p6-lock
@@ -78,4 +89,5 @@ qpg-lock
 qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
+telink-tlsr9518adk80d-light-switch
 tizen-arm-light

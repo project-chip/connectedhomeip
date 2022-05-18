@@ -53,8 +53,6 @@
 
 namespace chip {
 
-class PairingSession;
-
 /**
  * @brief
  *  Tracks ownership of a encrypted packet buffer.
@@ -158,8 +156,8 @@ public:
 
     // Test-only: create a session on the fly.
     CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
-                                            uint16_t peerSessionId, FabricIndex fabric, const Transport::PeerAddress & peerAddress,
-                                            CryptoContext::SessionRole role);
+                                            uint16_t peerSessionId, FabricIndex fabricIndex,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
 
     /**
      * @brief
@@ -173,6 +171,7 @@ public:
 
     void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(const ScopedNodeId & node);
+    void ExpireAllPairingsForPeerExceptPending(const ScopedNodeId & node);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
     void ExpireAllPASEPairings();
 
@@ -231,15 +230,14 @@ public:
 
     //
     // Find an existing secure session given a peer's scoped NodeId and a type of session to match against.
-    // If matching against all types of sessions is desired, kUndefined should be passed into type.
+    // If matching against all types of sessions is desired, NullOptional should be passed into type.
     //
     // If a valid session is found, an Optional<SessionHandle> with the value set to the SessionHandle of the session
     // is returned. Otherwise, an Optional<SessionHandle> with no value set is returned.
     //
     //
-    Optional<SessionHandle>
-    FindSecureSessionForNode(ScopedNodeId peerNodeId,
-                             Transport::SecureSession::Type type = Transport::SecureSession::Type::kUndefined);
+    Optional<SessionHandle> FindSecureSessionForNode(ScopedNodeId peerNodeId,
+                                                     const Optional<Transport::SecureSession::Type> & type = NullOptional);
 
     using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
     CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);

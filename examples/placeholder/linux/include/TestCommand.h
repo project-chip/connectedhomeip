@@ -28,6 +28,7 @@
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -38,7 +39,8 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public PICSChecker,
+class TestCommand : public TestRunner,
+                    public PICSChecker,
                     public LogCommands,
                     public DiscoveryCommands,
                     public DelayCommands,
@@ -46,10 +48,10 @@ class TestCommand : public PICSChecker,
                     public ConstraintsChecker
 {
 public:
-    TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
+    TestCommand(const char * commandName, uint16_t testsCount) :
+        TestRunner(commandName, testsCount), mCommandPath(0, 0, 0), mAttributePath(0, 0, 0)
+    {}
     virtual ~TestCommand() {}
-
-    virtual void NextTest() = 0;
 
     void SetCommandExitStatus(CHIP_ERROR status)
     {
@@ -77,15 +79,15 @@ public:
         }
         else
         {
-            Exit(chip::ErrorStr(err));
+            Exit(chip::ErrorStr(err), err);
         }
         return CHIP_NO_ERROR;
     }
 
-    void Exit(std::string message) override
+    void Exit(std::string message, CHIP_ERROR err) override
     {
-        ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
-        SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+        LogEnd(message, err);
+        SetCommandExitStatus(err);
     }
 
     static void ScheduleNextTest(intptr_t context)
@@ -139,17 +141,33 @@ public:
 
     std::atomic_bool isRunning{ true };
 
+    CHIP_ERROR WaitAttribute(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId)
+    {
+        ClearAttributeAndCommandPaths();
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: %d, Attribute: %d]", endpointId, clusterId, attributeId);
+        mAttributePath = chip::app::ConcreteAttributePath(endpointId, clusterId, attributeId);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR WaitCommand(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId)
+    {
+        ClearAttributeAndCommandPaths();
+        ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: %d, Command: %d]", endpointId, clusterId, commandId);
+        mCommandPath = chip::app::ConcreteCommandPath(endpointId, clusterId, commandId);
+        return CHIP_NO_ERROR;
+    }
+
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     void SetIdentity(const char * name){};
-    void Wait(){};
 
     /////////// DelayCommands Interface /////////
     void OnWaitForMs() override { NextTest(); }
 
-    CHIP_ERROR WaitForCommissioning() override
+    CHIP_ERROR WaitForCommissioning(const char * identity,
+                                    const chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type & value) override
     {
         isRunning = false;
         return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));

@@ -188,6 +188,44 @@ private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
     EventNumber & GetEventMin() { return mEventMin; }
 
+    enum class ReadHandlerFlags : uint8_t
+    {
+        // mHoldReport is used to prevent subscription data delivery while we are
+        // waiting for the min reporting interval to elapse.  If we have to send a
+        // report immediately due to an urgent event being queued,
+        // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
+        HoldReport = (1 << 0),
+
+        // mHoldSync is used to prevent subscription empty report delivery while we
+        // are waiting for the max reporting interval to elaps.  When mHoldSync
+        // becomes false, we are allowed to send an empty report to keep the
+        // subscription alive on the client.
+        HoldSync = (1 << 1),
+
+        // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during
+        // sending last chunked message.
+        ChunkedReport = (1 << 2),
+
+        // Tracks whether we're in the initial phase of receiving priming
+        // reports, which is always true for reads and true for subscriptions
+        // prior to receiving a subscribe response.
+        PrimingReports     = (1 << 3),
+        ActiveSubscription = (1 << 4),
+        FabricFiltered     = (1 << 5),
+
+        // For subscriptions, we record the dirty set generation when we started to generate the last report.
+        // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
+        // has a meaningful value while IsReporting() is true.
+        //
+        // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
+        // chunk of the current report.  Anything that was dirty with a generation earlier than
+        // mPreviousReportsBeginGeneration has had its value sent to the client.
+        ForceDirty = (1 << 6),
+
+        // Don't need the response for report data if true
+        SuppressResponse = (1 << 7),
+    };
+
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadInitialRequest
@@ -217,7 +255,11 @@ private:
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
     bool IsIdle() const { return mState == HandlerState::Idle; }
-    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (IsDirty() || !mHoldSync); }
+    bool IsReportable() const
+    {
+        return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldReport) &&
+            (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldSync));
+    }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
@@ -232,38 +274,59 @@ private:
     bool CheckEventClean(EventManagement & aEventManager);
 
     bool IsType(InteractionType type) const { return (mInteractionType == type); }
-    bool IsChunkedReport() const { return mIsChunkedReport; }
+    bool IsChunkedReport() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
     // Is reporting indicates whether we are in the middle of a series chunks. As we will set mIsChunkedReport on the first chunk
     // and clear that flag on the last chunk, we can use mIsChunkedReport to indicate this state.
-    bool IsReporting() const { return mIsChunkedReport; }
-    bool IsPriming() const { return mIsPrimingReports; }
-    bool IsActiveSubscription() const { return mActiveSubscription; }
-    bool IsFabricFiltered() const { return mIsFabricFiltered; }
+    bool IsReporting() const { return mFlags.Has(ReadHandlerFlags::ChunkedReport); }
+    bool IsPriming() const { return mFlags.Has(ReadHandlerFlags::PrimingReports); }
+    bool IsActiveSubscription() const { return mFlags.Has(ReadHandlerFlags::ActiveSubscription); }
+    bool IsFabricFiltered() const { return mFlags.Has(ReadHandlerFlags::FabricFiltered); }
     CHIP_ERROR OnSubscribeRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    void GetSubscriptionId(uint64_t & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
+    void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
     /**
      * Notify the read handler that a set of attribute paths has been marked dirty.
      */
     void SetDirty(const AttributePathParams & aAttributeChanged);
-    bool IsDirty() const { return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mForceDirty; }
-    void ClearDirty() { mForceDirty = false; }
+    bool IsDirty() const
+    {
+        return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
+    }
+    void ClearDirty() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
 
-    NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+    NodeId GetInitiatorNodeId() const
+    {
+        auto session = GetSession();
+        return session == nullptr ? kUndefinedNodeId : session->GetPeerNodeId();
+    }
 
-    const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
+    FabricIndex GetAccessingFabricIndex() const
+    {
+        auto session = GetSession();
+        return session == nullptr ? kUndefinedFabricIndex : session->GetFabricIndex();
+    }
+
+    Transport::SecureSession * GetSession() const;
+    SubjectDescriptor GetSubjectDescriptor() const { return GetSession()->GetSubjectDescriptor(); }
+
+    auto GetSubscriptionStartGeneration() const { return mSubscriptionStartGeneration; }
 
     void UnblockUrgentEventDelivery()
     {
-        mHoldReport = false;
-        mForceDirty = true;
+        mFlags.Clear(ReadHandlerFlags::HoldReport);
+        mFlags.Set(ReadHandlerFlags::ForceDirty);
     }
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
     uint32_t GetLastWrittenEventsBytes() const { return mLastWrittenEventsBytes; }
+
+    // Returns the number of interested paths, including wildcard and concrete paths.
+    size_t GetAttributePathCount() const { return mpAttributePathList == nullptr ? 0 : mpAttributePathList->Count(); };
+    size_t GetEventPathCount() const { return mpEventPathList == nullptr ? 0 : mpEventPathList->Count(); };
+    size_t GetDataVersionFilterCount() const { return mpDataVersionFilterList == nullptr ? 0 : mpDataVersionFilterList->Count(); };
+
     CHIP_ERROR SendStatusReport(Protocols::InteractionModel::Status aStatus);
 
     friend class TestReadInteraction;
@@ -277,11 +340,11 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
-    enum class HandlerState
+    enum class HandlerState : uint8_t
     {
         Idle,                   ///< The handler has been initialized and is ready
-        GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
-                                ///< report.
+        GeneratingReports,      ///< The handler has is now capable of generating reports and may generate one immediately
+                                ///< or later when other criteria are satisfied (e.g hold-off for min reporting interval).
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
@@ -323,52 +386,7 @@ private:
 
     const char * GetStateStr() const;
 
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-
-    // Don't need the response for report data if true
-    bool mSuppressResponse = false;
-
-    // Current Handler state
-    HandlerState mState                                     = HandlerState::Idle;
-    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
-    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
-    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
-
-    PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
-
-    EventNumber mEventMin = 0;
-
-    // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
-    EventNumber mLastScheduledEventNumber      = 0;
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    ManagementCallback & mManagementCallback;
-
-    // Tracks whether we're in the initial phase of receiving priming
-    // reports, which is always true for reads and true for subscriptions
-    // prior to receiving a subscribe response.
-    bool mIsPrimingReports              = true;
-    InteractionType mInteractionType    = InteractionType::Read;
-    uint64_t mSubscriptionId            = 0;
-    uint16_t mMinIntervalFloorSeconds   = 0;
-    uint16_t mMaxIntervalCeilingSeconds = 0;
-    SessionHolder mSessionHandle;
-    // mHoldReport is used to prevent subscription data delivery while we are
-    // waiting for the min reporting interval to elapse.  If we have to send a
-    // report immediately due to an urgent event being queued,
-    // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
-    bool mHoldReport         = false;
-    bool mActiveSubscription = false;
-    // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during sending
-    // last chunked message.
-    bool mIsChunkedReport                                    = false;
-    NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
-    bool mIsFabricFiltered                                   = false;
-    // mHoldSync is used to prevent subscription empty report delivery while we
-    // are waiting for the max reporting interval to elaps.  When mHoldSync
-    // becomes false, we are allowed to send an empty report to keep the
-    // subscription alive on the client.
-    bool mHoldSync = false;
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
     // marked dirty.
@@ -382,14 +400,7 @@ private:
     // cluster instead of the beginning of the whole report in SetDirty, without
     // permanently missing dirty any paths.
     uint64_t mDirtyGeneration = 0;
-    // For subscriptions, we record the dirty set generation when we started to generate the last report.
-    // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
-    // has a meaningful value while IsReporting() is true.
-    //
-    // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we send the last
-    // chunk of the current report.  Anything that was dirty with a generation earlier than
-    // mPreviousReportsBeginGeneration has had its value sent to the client.
-    bool mForceDirty = false;
+
     // For subscriptions, we record the timestamp when we started to generate the last report.
     // The mCurrentReportsBeginGeneration records the timestamp for the current report, which won;t be used for checking if this
     // ReadHandler is dirty.
@@ -413,10 +424,41 @@ private:
      * should generate report on timeout reached.
      */
 
+    // When we don't have enough resources for a new subscription, the oldest subscription might be evicted by interaction model
+    // engine, the "oldest" subscription is the subscription with the smallest generation.
+    uint64_t mSubscriptionStartGeneration = 0;
+
+    SubscriptionId mSubscriptionId      = 0;
+    uint16_t mMinIntervalFloorSeconds   = 0;
+    uint16_t mMaxIntervalCeilingSeconds = 0;
+
+    EventNumber mEventMin = 0;
+
+    // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
+    EventNumber mLastScheduledEventNumber = 0;
+
+    // TODO: We should shutdown the transaction when the session expires.
+    SessionHolder mSessionHandle;
+
+    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+
+    ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
+    ObjectList<EventPathParams> * mpEventPathList           = nullptr;
+    ObjectList<DataVersionFilter> * mpDataVersionFilterList = nullptr;
+
+    ManagementCallback & mManagementCallback;
+
     uint32_t mLastWrittenEventsBytes = 0;
-    SubjectDescriptor mSubjectDescriptor;
+
     // The detailed encoding state for a single attribute, used by list chunking feature.
+    // The size of AttributeEncoderState is 2 bytes for now.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
+
+    // Current Handler state
+    HandlerState mState            = HandlerState::Idle;
+    PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
+    BitFlags<ReadHandlerFlags> mFlags;
+    InteractionType mInteractionType = InteractionType::Read;
 };
 } // namespace app
 } // namespace chip

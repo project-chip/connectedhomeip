@@ -68,7 +68,8 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
     VerifyOrReturnError(mState == State::NeedsAddress || mState == State::Initialized, false);
 
     ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricInfo->GetFabricIndex());
-    auto sessionHandle = mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, Transport::SecureSession::Type::kCASE);
+    auto sessionHandle =
+        mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
     if (sessionHandle.HasValue())
     {
         ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
@@ -161,13 +162,13 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
-    mMRPConfig = config;
+    mRemoteMRPConfig = config;
 
     // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by CASE session protocol messages that include MRP parameters.
     if (mCASEClient)
     {
-        mCASEClient->SetMRPIntervals(mMRPConfig);
+        mCASEClient->SetRemoteMRPIntervals(mRemoteMRPConfig);
     }
 
     if (mState == State::NeedsAddress)
@@ -190,22 +191,10 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
             return CHIP_NO_ERROR;
         }
 
-        mSecureSession.Get()->AsSecureSession()->SetPeerAddress(addr);
+        mSecureSession.Get().Value()->AsSecureSession()->SetPeerAddress(addr);
     }
 
     return err;
-}
-
-bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
-{
-    if (mState == State::Uninitialized || mState == State::NeedsAddress)
-    {
-        return false;
-    }
-
-    addr = mDeviceAddress.GetIPAddress();
-    port = mDeviceAddress.GetPort();
-    return true;
 }
 
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
@@ -215,7 +204,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
                               mFabricInfo, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, this);
+    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mRemoteMRPConfig, this);
     if (err != CHIP_NO_ERROR)
     {
         CleanupCASEClient();
@@ -316,7 +305,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
     if (mSecureSession)
     {
-        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
+        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get().Value());
     }
     MoveToState(State::Initialized);
 

@@ -80,16 +80,13 @@ public:
     static constexpr Key kConfigKey_Spake2pVerifier       = K32WConfigKey(kPDMId_ChipFactory, 0x0B);
 
     // CHIP Config Keys
-    static constexpr Key kConfigKey_FabricId           = K32WConfigKey(kPDMId_ChipConfig, 0x00);
     static constexpr Key kConfigKey_ServiceConfig      = K32WConfigKey(kPDMId_ChipConfig, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = K32WConfigKey(kPDMId_ChipConfig, 0x02);
     static constexpr Key kConfigKey_ServiceId          = K32WConfigKey(kPDMId_ChipConfig, 0x03);
-    static constexpr Key kConfigKey_FabricSecret       = K32WConfigKey(kPDMId_ChipConfig, 0x04);
     static constexpr Key kConfigKey_LastUsedEpochKeyId = K32WConfigKey(kPDMId_ChipConfig, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = K32WConfigKey(kPDMId_ChipConfig, 0x06);
     static constexpr Key kConfigKey_RegulatoryLocation = K32WConfigKey(kPDMId_ChipConfig, 0x07);
     static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
-    static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
     static constexpr Key kConfigKey_UniqueId           = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_SoftwareVersion    = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
     static constexpr Key kConfigKey_FirstRunOfOTAImage = K32WConfigKey(kPDMId_ChipConfig, 0x0C);

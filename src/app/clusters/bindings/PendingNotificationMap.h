@@ -21,11 +21,46 @@
 
 namespace chip {
 
+/**
+ * Application callback function when a context used in PendingNotificationEntry will not be needed and should be
+ * released.
+ */
+using PendingNotificationContextReleaseHandler = void (*)(void * context);
+
+class PendingNotificationContext
+{
+public:
+    PendingNotificationContext(void * context, PendingNotificationContextReleaseHandler contextReleaseHandler) :
+        mContext(context), mPendingNotificationContextReleaseHandler(contextReleaseHandler)
+    {}
+    void * GetContext() { return mContext; };
+    uint32_t GetConsumersNumber() { return mConsumersNumber; }
+    void IncrementConsumersNumber() { mConsumersNumber++; }
+    void DecrementConsumersNumber()
+    {
+        VerifyOrDie(mConsumersNumber > 0);
+        if (--mConsumersNumber == 0)
+        {
+            // Release the context only if there is no pending notification pointing to us.
+            if (mPendingNotificationContextReleaseHandler != nullptr)
+            {
+                mPendingNotificationContextReleaseHandler(mContext);
+            }
+            Platform::Delete(this);
+        }
+    }
+
+private:
+    void * mContext;
+    uint32_t mConsumersNumber = 0;
+    PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
+};
+
 struct PendingNotificationEntry
 {
 public:
     uint8_t mBindingEntryId;
-    void * mContext;
+    PendingNotificationContext * mContext;
 };
 
 // The pool for all the pending comands.
@@ -67,7 +102,7 @@ public:
 
     CHIP_ERROR FindLRUConnectPeer(FabricIndex * fabric, NodeId * node);
 
-    void AddPendingNotification(uint8_t bindingEntryId, void * context);
+    void AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
 
     void RemoveEntry(uint8_t bindingEntryId);
 
@@ -77,9 +112,20 @@ public:
 
     void RemoveAllEntriesForFabric(FabricIndex fabric);
 
+    void RegisterPendingNotificationContextReleaseHandler(PendingNotificationContextReleaseHandler handler)
+    {
+        mPendingNotificationContextReleaseHandler = handler;
+    }
+
+    PendingNotificationContext * NewPendingNotificationContext(void * context)
+    {
+        return Platform::New<PendingNotificationContext>(context, mPendingNotificationContextReleaseHandler);
+    };
+
 private:
     uint8_t mPendingBindingEntries[kMaxPendingNotifications];
-    void * mPendingContexts[kMaxPendingNotifications];
+    PendingNotificationContext * mPendingContexts[kMaxPendingNotifications];
+    PendingNotificationContextReleaseHandler mPendingNotificationContextReleaseHandler;
 
     uint8_t mNumEntries = 0;
 };

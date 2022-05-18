@@ -89,7 +89,7 @@ public:
     // ===== Members for internal use by other Device Layer components.
 
     CHIP_ERROR CommissioningComplete(NodeId peerNodeId, FabricIndex accessingFabricIndex);
-    CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
+    CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
     CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
     void SetSwitchDelegate(SwitchDeviceControlDelegate * delegate) { mSwitchDelegate = delegate; }

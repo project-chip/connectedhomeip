@@ -40,7 +40,10 @@ CHIP_ERROR ClusterPathIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
@@ -68,7 +71,7 @@ CHIP_ERROR ClusterPathIB::Parser::CheckSchemaValidity() const
             {
                 EndpointId endpoint;
                 reader.Get(endpoint);
-                PRETTY_PRINT("\tEndpoint = 0x%" PRIx16 ",", endpoint);
+                PRETTY_PRINT("\tEndpoint = 0x%x,", endpoint);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

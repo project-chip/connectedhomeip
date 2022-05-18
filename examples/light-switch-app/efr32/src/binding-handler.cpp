@@ -132,6 +132,13 @@ void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, DevicePro
     }
 }
 
+void LightSwitchContextReleaseHandler(void * context)
+{
+    VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "LightSwitchContextReleaseHandler: context is null"));
+
+    Platform::Delete(static_cast<BindingCommandData *>(context));
+}
+
 #ifdef ENABLE_CHIP_SHELL
 
 /********************************************************
@@ -384,6 +391,7 @@ void InitBindingHandlerInternal(intptr_t arg)
     chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
 } // namespace
@@ -398,8 +406,6 @@ void SwitchWorkerFunction(intptr_t context)
 
     BindingCommandData * data = reinterpret_cast<BindingCommandData *>(context);
     BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
-
-    Platform::Delete(data);
 }
 
 void BindingWorkerFunction(intptr_t context)

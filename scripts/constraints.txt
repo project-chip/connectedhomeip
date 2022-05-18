@@ -25,6 +25,8 @@ brotli==1.0.9
     # via flask-compress
 cbor==1.0.0
     # via -r requirements.txt
+cbor2==5.4.0
+    # via -r requirements.txt
 certifi==2021.5.30
     # via requests
 cffi==1.14.5
@@ -114,6 +116,8 @@ jinja2==3.0.1
     # via
     #   flask
     #   mbed-tools
+jsonschema==4.4.0
+    # via -r requirements.txt
 junit-xml==1.9
     # via mbed-os-tools
 kconfiglib==13.7.1

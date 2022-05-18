@@ -25,7 +25,7 @@ concurrency:
 jobs:
     nrfconnect:
         name: nRF Connect SDK
-        timeout-minutes: 120
+        timeout-minutes: 125
 
         env:
             BUILD_TYPE: nrfconnect
@@ -34,12 +34,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.64
+            image: connectedhomeip/chip-build-nrf-platform:0.5.73
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -174,7 +174,7 @@ jobs:
                     examples/pump-controller-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

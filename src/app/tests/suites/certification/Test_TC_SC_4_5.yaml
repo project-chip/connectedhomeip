@@ -24,47 +24,53 @@ tests:
     - label:
           "TH is instructed to start advertising two or more services using
           DNS-SD"
-      verification:
-          "1. On the raspi controller, publish matter service, using below
-          command $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696
-          _matter._tcp 22222 CRI=3000 CRA=4000 T=0"
+      verification: |
+          1. On the raspi controller, publish matter service, using below command
+
+          $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 CRI=3000 CRA=4000 T=0
       disabled: true
 
     - label:
           "By any means, DUT is instructed to perform an unicast UDP query to
           the DNS-SD Discovery Proxy on TH for services"
-      verification:
-          "1. Proviosion the node(accessory/device) to thread network 2. Open
-          the matter shell in the SDK and run resolve command, Verify if the
-          device detects the published IP address and the Common Txt Key/Value
-          Pairs , as advertised in the service. Ref below example. uart:~$
-          matter dns resolve 9791300599901692208 10360380464321857174 Resolving
-          ... uart:~$ I: 127317 [DIS]Node ID resolved for 0x8FC7772401CD0696 to
-          [fd7b:a81b:9770:0:dea6:32ff:fe8d:7072]:22222 DNS resolve for
-          87E1B004E235A130-8FC7772401CD0696 succeeded: Hostname:
-          ubuntuserverAcce IP address: fd7b:a81b:9770:0:dea6:32ff:fe8d:7072
-          Port: 22222 MRP retry interval (idle): 3000ms MRP retry interval
-          (active): 4000ms Supports TCP: no"
+      verification: |
+          1. Proviosion the node(accessory/device) to thread network
+
+          2. Open the matter shell in the SDK and run resolve command, Verify if the device detects the published IP address and the Common Txt Key/Value Pairs , as advertised in the service. Ref below example.
+
+
+          uart:~$ matter dns resolve 9791300599901692208 10360380464321857174
+          Resolving ...
+          uart:~$ I: 127317 [DIS]Node ID resolved for 0x8FC7772401CD0696 to [fd7b:a81b:9770:0:dea6:32ff:fe8d:7072]:22222
+          DNS resolve for 87E1B004E235A130-8FC7772401CD0696 succeeded:
+             Hostname: ubuntuserverAcce
+             IP address: fd7b:a81b:9770:0:dea6:32ff:fe8d:7072
+             Port: 22222
+             MRP retry interval (idle): 3000ms
+             MRP retry interval (active): 4000ms
+             Supports TCP: no
       disabled: true
 
     - label: "TH performs a change in one of the services configured at step 1"
-      verification:
-          "1. On the raspi controller, publish matter service chanding the T
-          value 1, using below command $avahi-publish-service
-          87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 CRI=3000 CRA=4000
-          T=1"
+      verification: |
+          1. On the raspi controller, publish matter service chanding the T value 1, using below command
+
+          $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 CRI=3000 CRA=4000 T=1
       disabled: true
 
     - label: "DUT must receive a notification with new data"
-      verification:
-          "1. Open the matter shell in the SDK and run resolve command, Verify
-          if the device detects updated values in the service, i..e Support TCP
-          is '1'(Yes) uart:~$ matter dns resolve 9791300599901692208
-          10360380464321857174 Resolving ... uart:~$ I: 542364 [DIS]Node ID
-          resolved for 0x8FC7772401CD0696 to
-          [fd7b:a81b:9770:0:dea6:32ff:fe8d:7072]:22222 DNS resolve for
-          87E1B004E235A130-8FC7772401CD0696 succeeded: Hostname:
-          ubuntuserverAcce IP address: fd7b:a81b:9770:0:dea6:32ff:fe8d:7072
-          Port: 22222 MRP retry interval (idle): 3000ms MRP retry interval
-          (active): 4000ms Supports TCP: yes"
+      verification: |
+          1. Open the matter shell in the SDK and run resolve command, Verify if the device detects updated values in the service, i..e Support TCP is '1'(Yes)
+
+
+          uart:~$ matter dns resolve 9791300599901692208 10360380464321857174
+          Resolving ...
+          uart:~$ I: 542364 [DIS]Node ID resolved for 0x8FC7772401CD0696 to [fd7b:a81b:9770:0:dea6:32ff:fe8d:7072]:22222
+          DNS resolve for 87E1B004E235A130-8FC7772401CD0696 succeeded:
+             Hostname: ubuntuserverAcce
+             IP address: fd7b:a81b:9770:0:dea6:32ff:fe8d:7072
+             Port: 22222
+             MRP retry interval (idle): 3000ms
+             MRP retry interval (active): 4000ms
+             Supports TCP: yes
       disabled: true

@@ -34,20 +34,8 @@ tests:
       response:
           constraints:
               type: int16
-
-    - label: "Write the default values to mandatory attribute: MeasuredValue"
-      command: "writeAttribute"
-      attribute: "MeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MeasuredValue"
-      command: "readAttribute"
-      attribute: "MeasuredValue"
-      response:
-          value: 0
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the mandatory attribute constraints: MinMeasuredValue"
       command: "readAttribute"
@@ -55,20 +43,8 @@ tests:
       response:
           constraints:
               type: int16
-
-    - label: "Write the default values to mandatory attribute: MinMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MinMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MinMeasuredValue"
-      command: "readAttribute"
-      attribute: "MinMeasuredValue"
-      response:
-          value: 0
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the mandatory attribute constraints: MaxMeasuredValue"
       command: "readAttribute"
@@ -76,157 +52,66 @@ tests:
       response:
           constraints:
               type: int16
+              minValue: -32768
+              maxValue: 32767
 
-    - label: "Write the default values to mandatory attribute: MaxMeasuredValue"
-      command: "writeAttribute"
-      attribute: "MaxMeasuredValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory attribute: MaxMeasuredValue"
-      command: "readAttribute"
-      attribute: "MaxMeasuredValue"
-      response:
-          value: 0
-
-    #disabled due to issue #13442
+    #Issue 18243
     - label: "Read the optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: 0
+              maxValue: 2048
 
-    - label: "Write the default values to optional attribute: Tolerance"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Tolerance"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: Tolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          value: 0
-
-    #Following attributes are based on the value of the extended feature in the cluster feature map
     - label: "Read the optional attribute: ScaledValue"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ScaledValue"
       response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: ScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "ScaledValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: ScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledValue"
-      response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the optional attribute: MinScaledValue"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "MinScaledValue"
       response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: MinScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "MinScaledValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: MinScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MinScaledValue"
-      response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the optional attribute: MaxScaledValue"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "MaxScaledValue"
       response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: MaxScaledValue"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "MaxScaledValue"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: MaxScaledValue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "MaxScaledValue"
-      response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: -32768
+              maxValue: 32767
 
     - label: "Read the optional attribute: ScaledTolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ScaledTolerance"
       response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: ScaledTolerance"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "ScaledTolerance"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: ScaledTolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ScaledTolerance"
-      response:
-          value: 0
+          constraints:
+              type: int16
+              minValue: 0
+              maxValue: 2048
 
     - label: "Read the optional attribute: Scale"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Scale"
       response:
-          value: 0
-
-    - label: "Write the default values to optional attribute: Scale"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Scale"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back optional attribute: Scale"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Scale"
-      response:
-          value: 0
+          constraints:
+              type: int8
+              minValue: -127
+              maxValue: 127

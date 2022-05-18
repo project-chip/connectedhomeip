@@ -124,7 +124,7 @@ public:
          *
          * @param[in] aSubscriptionId The identifier of the subscription that was established.
          */
-        virtual void OnSubscriptionEstablished(uint64_t aSubscriptionId) {}
+        virtual void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) {}
 
         /**
          * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
@@ -181,6 +181,17 @@ public:
                                                          bool & aEncodedDataVersionList)
         {
             aEncodedDataVersionList = false;
+            return CHIP_NO_ERROR;
+        }
+
+        /*
+         * Get highest received event number.
+         * If the application does not want to filter events by event number, it should call ClearValue() on aEventNumber
+         * and return CHIP_NO_ERROR.  An error return from this function will fail the entire read client interaction.
+         */
+        virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber)
+        {
+            aEventNumber.ClearValue();
             return CHIP_NO_ERROR;
         }
     };
@@ -301,7 +312,7 @@ private:
         SubscriptionActive,        ///< The client is maintaining subscription
     };
 
-    bool IsMatchingClient(uint64_t aSubscriptionId)
+    bool IsMatchingClient(SubscriptionId aSubscriptionId)
     {
         return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
     }
@@ -361,6 +372,7 @@ private:
 
     void StopResubscription();
     void ClearActiveSubscriptionState();
+    CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
@@ -371,12 +383,11 @@ private:
     bool mPendingMoreChunks             = false;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
-    uint64_t mSubscriptionId            = 0;
+    SubscriptionId mSubscriptionId      = 0;
     NodeId mPeerNodeId                  = kUndefinedNodeId;
     FabricIndex mFabricIndex            = kUndefinedFabricIndex;
     InteractionType mInteractionType    = InteractionType::Read;
     Timestamp mEventTimestamp;
-    EventNumber mEventMin                    = 0;
     bool mSawAttributeReportsInCurrentReport = false;
 
     ReadClient * mpNext                 = nullptr;

@@ -28,7 +28,7 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionReleaseDelegate, public IntrusiveListNodeBase
+class SessionHolder : public SessionDelegate, public IntrusiveListNodeBase
 {
 public:
     SessionHolder() {}
@@ -39,7 +39,7 @@ public:
     SessionHolder & operator=(const SessionHolder &);
     SessionHolder & operator=(SessionHolder && that);
 
-    // Implement SessionReleaseDelegate
+    // Implement SessionDelegate
     void OnSessionReleased() override { Release(); }
 
     bool Contains(const SessionHandle & session) const
@@ -51,10 +51,16 @@ public:
     void Release();
 
     operator bool() const { return mSession.HasValue(); }
-    SessionHandle Get() const { return SessionHandle{ mSession.Value().Get() }; }
-    Optional<SessionHandle> ToOptional() const
+    Optional<SessionHandle> Get() const
     {
-        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(Get()) : chip::Optional<SessionHandle>::Missing();
+        //
+        // We cannot return mSession directly even if Optional<SessionHandle> is internally composed of the same bits,
+        // since they are not actually equivalent type-wise, and SessionHandle does not permit copy-construction.
+        //
+        // So, construct a new Optional<SessionHandle> from the underlying Transport::Session reference.
+        //
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
+                                   : chip::Optional<SessionHandle>::Missing();
     }
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
@@ -67,11 +73,8 @@ private:
 class SessionHolderWithDelegate : public SessionHolder
 {
 public:
-    SessionHolderWithDelegate(SessionReleaseDelegate & delegate) : mDelegate(delegate) {}
-    SessionHolderWithDelegate(const SessionHandle & handle, SessionReleaseDelegate & delegate) : mDelegate(delegate)
-    {
-        Grab(handle);
-    }
+    SessionHolderWithDelegate(SessionDelegate & delegate) : mDelegate(delegate) {}
+    SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : mDelegate(delegate) { Grab(handle); }
     operator bool() const { return SessionHolder::operator bool(); }
 
     void OnSessionReleased() override
@@ -83,7 +86,7 @@ public:
     }
 
 private:
-    SessionReleaseDelegate & mDelegate;
+    SessionDelegate & mDelegate;
 };
 
 } // namespace chip

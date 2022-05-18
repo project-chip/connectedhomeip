@@ -149,15 +149,15 @@ void PlatformManagerImpl::WiFIIPChangeListener()
                             continue;
                         }
 
+                        char ipStrBuf[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+                        inet_ntop(AF_INET, RTA_DATA(routeInfo), ipStrBuf, sizeof(ipStrBuf));
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name, ipStrBuf);
+
                         ChipDeviceEvent event;
                         event.Type                            = DeviceEventType::kInternetConnectivityChange;
                         event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
                         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-                        inet_ntop(AF_INET, RTA_DATA(routeInfo), event.InternetConnectivityChange.address,
-                                  sizeof(event.InternetConnectivityChange.address));
-
-                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
-                                      event.InternetConnectivityChange.address);
+                        VerifyOrDie(chip::Inet::IPAddress::FromString(ipStrBuf, event.InternetConnectivityChange.ipAddress));
 
                         CHIP_ERROR status = PlatformMgr().PostEvent(&event);
                         if (status != CHIP_NO_ERROR)

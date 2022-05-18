@@ -72,7 +72,8 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err);
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
 
-CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricIndex, NodeId subject)
+CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
+                                                             FabricIndex fabricIndex, NodeId subject)
 {
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(Access::GetAccessControl().PrepareEntry(entry));
@@ -80,12 +81,10 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(FabricIndex fabricI
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kAdminister));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(nullptr, entry));
+    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry));
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
                    fabricIndex, ChipLogValueX64(subject));
-
-    // TODO: event notification for newly created ACL entry
 
     return CHIP_NO_ERROR;
 }
@@ -166,7 +165,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
             fabricDescriptor.fabricIndex = fabricInfo.GetFabricIndex();
             fabricDescriptor.nodeId      = fabricInfo.GetPeerId().GetNodeId();
-            fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
+            fabricDescriptor.vendorId    = static_cast<chip::VendorId>(fabricInfo.GetVendorId());
             fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
 
             fabricDescriptor.label = fabricInfo.GetFabricLabel();
@@ -301,7 +300,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
             FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
             VerifyOrReturn(fabricInfo != nullptr);
 
-            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
+            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
         }
 
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
@@ -355,18 +354,17 @@ void fabricListChanged()
 // only that should be modifed to perosst/read/write fabrics.
 // TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
 // logic.
-class OpCredsFabricTableDelegate : public FabricTableDelegate
+class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricIndex) override
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
                        static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
-        // The Leave event SHOULD be emitted by a Node prior to permanently
-        // leaving the Fabric.
+        // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
             // If Basic cluster is implemented on this endpoint
@@ -378,25 +376,53 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                 ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
             }
         }
+
+        // Try to send the queued events as soon as possible. If the just emitted leave event won't
+        // be sent this time, it will likely not be delivered at all for the following reasons:
+        // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
+        //   the leave event will be cancelled.
+        // - removing the fabric removes all associated access control entries, so generating
+        //   subsequent reports containing the leave event will fail the access control check.
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
+        EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
+        // Remove access control entries in reverse order (it could be any order, but reverse order
+        // will cause less churn in persistent storage).
+        size_t aclCount = 0;
+        if (Access::GetAccessControl().GetEntryCount(fabricIndex, aclCount) == CHIP_NO_ERROR)
+        {
+            while (aclCount)
+            {
+                (void) Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --aclCount);
+            }
+        }
     }
 
     // Gets called when a fabric is loaded into the FabricTable from storage
-    void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
+        VerifyOrReturn(fabric != nullptr);
+
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 
     // Gets called when a fabric in FabricTable is persisted to storage
-    void OnFabricPersistedToStorage(FabricInfo * fabric) override
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
+        VerifyOrReturn(fabric != nullptr);
+
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
-                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
+                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
@@ -468,7 +494,6 @@ exit:
     {
         SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kSuccess, fabricBeingRemoved, CharSpan());
 
-        // Use a more direct getter for FabricIndex from commandObj
         chip::Messaging::ExchangeContext * ec = commandObj->GetExchangeContext();
         FabricIndex currentFabricIndex        = commandObj->GetAccessingFabricIndex();
         if (currentFabricIndex == fabricBeingRemoved)
@@ -658,11 +683,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         SuccessOrExit(err);
     }
 
-    // Keep this after other possible failures, so it doesn't need to be rolled back in case of
-    // subsequent failures. This should only typically fail if there is no space for the new entry.
-    err = CreateAccessControlEntryForNewFabricAdministrator(fabricIndex, commandData.caseAdminNode);
-    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
-
     // Set the Identity Protection Key (IPK)
     VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
                  nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_ARGUMENT));
@@ -697,6 +717,12 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
         err = secureSession->AdoptFabricIndex(fabricIndex);
         VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
     }
+
+    // Creating the initial ACL must occur after the PASE session has adopted the fabric index
+    // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
+    err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), fabricIndex,
+                                                            commandData.caseAdminNode);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
     app::DnssdServer::Instance().AdvertiseOperational();

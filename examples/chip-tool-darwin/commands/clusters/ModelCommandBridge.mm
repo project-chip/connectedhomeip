@@ -16,10 +16,7 @@
  *
  */
 
-#import <CHIP/CHIPError_Internal.h>
-
 #include "ModelCommandBridge.h"
-#include <app/InteractionModelEngine.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -32,15 +29,23 @@ CHIP_ERROR ModelCommand::RunCommand()
     [CurrentCommissioner() getConnectedDevice:mNodeId
                                         queue:callbackQueue
                             completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                                CHIP_ERROR err = CHIP_NO_ERROR;
-                                if (error) {
-                                    err = [CHIPError errorToCHIPErrorCode:error];
+                                if (error != nil) {
+                                    SetCommandExitStatus(error, "Error getting connected device");
+                                    return;
+                                }
+
+                                CHIP_ERROR err;
+                                if (device == nil) {
+                                    err = CHIP_ERROR_INTERNAL;
                                 } else {
                                     err = SendCommand(device, mEndPointId);
                                 }
 
-                                ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(err));
-                                VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
+                                if (err != CHIP_NO_ERROR) {
+                                    ChipLogError(chipTool, "Error: %s", chip::ErrorStr(err));
+                                    SetCommandExitStatus(err);
+                                    return;
+                                }
                             }];
     return CHIP_NO_ERROR;
 }

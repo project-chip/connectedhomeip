@@ -66,7 +66,7 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
     const char * salt = "Test Salt";
     CryptoContext channel2;
     NL_TEST_ASSERT(inSuite,
-                   channel2.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
+                   channel2.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
                                             CryptoContext::SessionInfoType::kSessionEstablishment,
                                             CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 }
@@ -99,7 +99,7 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
 
     const char * salt = "Test Salt";
     NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
+                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
@@ -137,7 +137,7 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
+                   channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, channel.Encrypt(plain_text, sizeof(plain_text), encrypted, nonce, packetHeader, mac) == CHIP_NO_ERROR);
@@ -149,7 +149,7 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
                    channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac) ==
                        CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     NL_TEST_ASSERT(inSuite,
-                   channel2.InitFromKeyPair(keypair2, keypair.Pubkey(), ByteSpan((const uint8_t *) salt, sizeof(salt)),
+                   channel2.InitFromKeyPair(keypair2, keypair.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
                                             CryptoContext::SessionInfoType::kSessionEstablishment,
                                             CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
 

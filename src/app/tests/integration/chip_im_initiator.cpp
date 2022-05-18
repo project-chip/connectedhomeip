@@ -134,7 +134,7 @@ public:
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
                      const chip::app::StatusIB * apStatus) override
     {}
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override
     {
         if (mReadClient->IsSubscriptionType())
         {
@@ -266,7 +266,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(gSession.Get(), chip::MakeOptional(gMessageTimeout));
+    err = commandSender->SendCommandRequest(gSession.Get().Value(), chip::MakeOptional(gMessageTimeout));
     SuccessOrExit(err);
 
     gCommandCount++;
@@ -302,7 +302,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(gSession.Get(), chip::MakeOptional(gMessageTimeout));
+    err = commandSender->SendCommandRequest(gSession.Get().Value(), chip::MakeOptional(gMessageTimeout));
     SuccessOrExit(err);
     gCommandCount++;
     commandSender.release();
@@ -330,7 +330,7 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::ReadPrepareParams readPrepareParams(gSession.Get());
+    chip::app::ReadPrepareParams readPrepareParams(gSession.Get().Value());
     readPrepareParams.mTimeout                     = gMessageTimeout;
     readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -367,7 +367,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient & apWriteClient)
 
     SuccessOrExit(err = apWriteClient.EncodeAttribute(
                       chip::app::AttributePathParams(2 /* endpoint */, 3 /* cluster */, 4 /* attribute */), true));
-    SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get().Value(), gMessageTimeout));
 
     gWriteCount++;
 
@@ -384,7 +384,7 @@ CHIP_ERROR SendSubscribeRequest()
     CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    chip::app::ReadPrepareParams readPrepareParams(gSession.Get());
+    chip::app::ReadPrepareParams readPrepareParams(gSession.Get().Value());
     chip::app::EventPathParams * eventPathParams           = new chip::app::EventPathParams[2];
     chip::app::AttributePathParams * attributePathParams   = new chip::app::AttributePathParams[1];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
@@ -717,7 +717,7 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gFabricTable);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.

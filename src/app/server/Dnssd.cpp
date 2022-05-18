@@ -47,7 +47,7 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kDnssdPlatformInitialized
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-        || event->Type == DeviceLayer::DeviceEventType::kSEDPollingIntervalChange
+        || event->Type == DeviceLayer::DeviceEventType::kSEDIntervalChange
 #endif
     )
     {
@@ -206,7 +206,7 @@ CHIP_ERROR DnssdServer::ScheduleDiscoveryExpiration()
     {
         return CHIP_NO_ERROR;
     }
-    ChipLogDetail(Discovery, "Scheduling discovery timeout in %" PRId16 "s", mDiscoveryTimeoutSecs);
+    ChipLogDetail(Discovery, "Scheduling discovery timeout in %ds", mDiscoveryTimeoutSecs);
 
     mDiscoveryExpiration = mTimeSource.GetMonotonicTimestamp() + System::Clock::Seconds16(mDiscoveryTimeoutSecs);
 

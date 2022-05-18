@@ -58,9 +58,17 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = true
+  # Disable LCD on supported devices
+  disable_lcd = false
 }
+
+declare_args() {
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = !disable_lcd
+}
+
+# qr code cannot be true if lcd is disabled
+assert(!(disable_lcd && show_qr_code))
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
@@ -73,10 +81,8 @@ if (chip_enable_wifi) {
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
+  disable_lcd = true
 }
-
-# Enables LCD on supported devices
-lcd_on = show_qr_code
 
 # WiFi settings
 if (chip_enable_wifi) {
@@ -103,7 +109,7 @@ if (chip_enable_wifi) {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -161,8 +167,10 @@ efr32_executable("light_switch_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -235,7 +243,7 @@ efr32_executable("light_switch_app") {
     }
   }
 
-  if (lcd_on) {
+  if (!disable_lcd) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {

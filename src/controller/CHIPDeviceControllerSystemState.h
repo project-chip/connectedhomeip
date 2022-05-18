@@ -74,6 +74,7 @@ struct DeviceControllerSystemStateParams
     System::Layer * systemLayer                                   = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -86,11 +87,11 @@ struct DeviceControllerSystemStateParams
     SessionManager * sessionMgr                                   = nullptr;
     Messaging::ExchangeManager * exchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
-    FabricTable * fabricTable                                     = nullptr;
     CASEServer * caseServer                                       = nullptr;
     CASESessionManager * caseSessionManager                       = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
     CASEClientPool * caseClientPool                               = nullptr;
+    FabricTable::Delegate * fabricTableDelegate                   = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -109,7 +110,7 @@ public:
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
         mCASEServer(params.caseServer), mCASESessionManager(params.caseSessionManager),
         mOperationalDevicePool(params.operationalDevicePool), mCASEClientPool(params.caseClientPool),
-        mGroupDataProvider(params.groupDataProvider)
+        mGroupDataProvider(params.groupDataProvider), mFabricTableDelegate(params.fabricTableDelegate)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -158,6 +159,7 @@ public:
 #endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
+    void SetTempFabricTable(FabricTable * tempFabricTable) { mTempFabricTable = tempFabricTable; }
 
 private:
     DeviceControllerSystemState(){};
@@ -178,6 +180,12 @@ private:
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
+    FabricTable::Delegate * mFabricTableDelegate                   = nullptr;
+
+    // If mTempFabricTable is not null, it was created during
+    // DeviceControllerFactory::InitSystemState and needs to be
+    // freed during shutdown
+    FabricTable * mTempFabricTable = nullptr;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 

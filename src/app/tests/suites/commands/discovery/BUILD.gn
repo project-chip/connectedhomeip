@@ -18,6 +18,8 @@ import("//build_overrides/chip.gni")
 static_library("discovery") {
   output_name = "libDiscoveryCommands"
 
+  include_dirs = [ "${chip_root}/zzz_generated/app-common" ]
+
   sources = [
     "DiscoveryCommands.cpp",
     "DiscoveryCommands.h",

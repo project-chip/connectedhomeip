@@ -93,11 +93,6 @@ static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolu
     return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
 }
 
-static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
-{
-    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
-}
-
 static OperationalState ValueToOperationalState(uint8_t value)
 {
     switch (value)
@@ -376,6 +371,11 @@ bool IsPercent100thsValid(NPercent100ths percent100ths)
     }
 
     return true;
+}
+
+uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+{
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
@@ -844,14 +844,10 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::GoToLiftPercentage::DecodableType & commandData)
 {
-    auto & liftPercentageValue    = commandData.liftPercentageValue;
-    auto & liftPercent100thsValue = commandData.liftPercent100thsValue;
-    Percent100ths liftPercent100ths =
-        liftPercent100thsValue.ValueOr(static_cast<Percent100ths>(liftPercentageValue * WC_PERCENT100THS_COEF));
+    Percent100ths percent100ths = commandData.liftPercent100thsValue;
+    EndpointId endpoint         = commandPath.mEndpointId;
 
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u%% %u command received", liftPercentageValue, liftPercent100ths);
+    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u command received", percent100ths);
 
     EmberAfStatus status = GetMotionLockStatus(endpoint);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
@@ -863,9 +859,9 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 
     if (HasFeaturePaLift(endpoint))
     {
-        if (IsPercent100thsValid(liftPercent100ths))
+        if (IsPercent100thsValid(percent100ths))
         {
-            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, liftPercent100ths);
+            Attributes::TargetPositionLiftPercent100ths::Set(endpoint, percent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else
@@ -922,14 +918,10 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::GoToTiltPercentage::DecodableType & commandData)
 {
-    auto & tiltPercentageValue    = commandData.tiltPercentageValue;
-    auto & tiltPercent100thsValue = commandData.tiltPercent100thsValue;
-    Percent100ths tiltPercent100ths =
-        tiltPercent100thsValue.ValueOr(static_cast<Percent100ths>(tiltPercentageValue * WC_PERCENT100THS_COEF));
+    Percent100ths percent100ths = commandData.tiltPercent100thsValue;
+    EndpointId endpoint         = commandPath.mEndpointId;
 
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u%% %u command received", tiltPercentageValue, tiltPercent100ths);
+    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u command received", percent100ths);
 
     EmberAfStatus status = GetMotionLockStatus(endpoint);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
@@ -941,9 +933,9 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 
     if (HasFeaturePaTilt(endpoint))
     {
-        if (IsPercent100thsValid(tiltPercent100ths))
+        if (IsPercent100thsValid(percent100ths))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, tiltPercent100ths);
+            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, percent100ths);
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
         }
         else

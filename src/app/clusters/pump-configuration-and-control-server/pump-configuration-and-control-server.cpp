@@ -24,6 +24,7 @@
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::PumpConfigurationAndControl;
 using namespace chip::app::Clusters::PumpConfigurationAndControl::Attributes;
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
@@ -40,15 +41,15 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
     switch (attributePath.mAttributeId)
     {
     case ControlMode::Id: {
-        uint8_t value;
-        ControlMode::Get(attributePath.mEndpointId, &value);
-        EffectiveControlMode::Set(attributePath.mEndpointId, value);
+        PumpControlMode controlMode;
+        ControlMode::Get(attributePath.mEndpointId, &controlMode);
+        EffectiveControlMode::Set(attributePath.mEndpointId, controlMode);
     }
     break;
     case OperationMode::Id: {
-        uint8_t value;
-        OperationMode::Get(attributePath.mEndpointId, &value);
-        EffectiveOperationMode::Set(attributePath.mEndpointId, value);
+        PumpOperationMode operationMode;
+        OperationMode::Get(attributePath.mEndpointId, &operationMode);
+        EffectiveOperationMode::Set(attributePath.mEndpointId, operationMode);
     }
     break;
     default:

@@ -26,31 +26,49 @@
 
 const Start = {
   name : 'Start',
-  arguments : [ { 'name' : 'discriminator', type : 'INT16U' } ],
-  response : { arguments : [] }
+  arguments : [
+    { 'name' : 'registerKey', type : 'CHAR_STRING', isOptional : true },
+    { 'name' : 'discriminator', type : 'INT16U', isOptional : true }, { 'name' : 'port', type : 'INT16U', isOptional : true },
+    { 'name' : 'kvs', type : 'CHAR_STRING', isOptional : true },
+    { 'name' : 'minCommissioningTimeout', type : 'INT16U', isOptional : true },
+    // OTA provider specific arguments
+    { 'name' : 'filepath', type : 'CHAR_STRING', isOptional : true },
+    // OTA requestor specific arguments
+    { 'name' : 'otaDownloadPath', type : 'CHAR_STRING', isOptional : true }
+  ],
 };
 
 const Stop = {
   name : 'Stop',
-  arguments : [],
-  response : { arguments : [] }
+  arguments : [ { 'name' : 'registerKey', type : 'CHAR_STRING', isOptional : true } ],
 };
 
 const Reboot = {
   name : 'Reboot',
-  arguments : [ { 'name' : 'discriminator', type : 'INT16U' } ],
-  response : { arguments : [] }
+  arguments : [ { 'name' : 'registerKey', type : 'CHAR_STRING', isOptional : true } ],
 };
 
 const FactoryReset = {
   name : 'FactoryReset',
-  arguments : [],
-  response : { arguments : [] }
+  arguments : [ { 'name' : 'registerKey', type : 'CHAR_STRING', isOptional : true } ],
+};
+
+const CreateOtaImage = {
+  name : 'CreateOtaImage',
+  arguments : [
+    { 'name' : 'otaImageFilePath', type : 'CHAR_STRING' }, { 'name' : 'rawImageFilePath', type : 'CHAR_STRING' },
+    { 'name' : 'rawImageContent', type : 'CHAR_STRING' }
+  ],
+};
+
+const CompareFiles = {
+  name : 'CompareFiles',
+  arguments : [ { 'name' : 'file1', type : 'CHAR_STRING' }, { 'name' : 'file2', type : 'CHAR_STRING' } ],
 };
 
 const SystemCommands = {
   name : 'SystemCommands',
-  commands : [ Start, Stop, Reboot, FactoryReset ],
+  commands : [ Start, Stop, Reboot, FactoryReset, CreateOtaImage, CompareFiles ],
 };
 
 //

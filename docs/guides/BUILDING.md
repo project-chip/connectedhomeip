@@ -7,7 +7,7 @@ that generates inputs to [ninja](https://ninja-build.org/).
 Tested on:
 
 -   macOS 10.15
--   Debian 10
+-   Debian 11
 -   Ubuntu 20.04 LTS
 
 Build system features:
@@ -45,7 +45,7 @@ satisfied with the following:
 ```
 sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
 ### Installing prerequisites on macOS

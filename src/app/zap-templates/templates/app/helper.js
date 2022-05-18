@@ -28,6 +28,7 @@ const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+const TestHelper      = require('../../common/ClusterTestGeneration.js');
 
 zclHelper['isEvent'] = function(db, event_name, packageId) {
     return queryEvents
@@ -45,60 +46,6 @@ const kGlobalAttributes = [
   0xfffc, // ClusterRevision
   0xfffd, // FeatureMap
 ];
-
-// TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
-//      of having to call this method separately.
-function asReadType(type)
-{
-  if (StringHelper.isShortString(type)) {
-    return 'String';
-  }
-
-  if (StringHelper.isLongString(type)) {
-    return 'LongString';
-  }
-
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-        return 'Int8u';
-      case 'int8_t':
-        return 'Int8s';
-      case 'uint8_t':
-        return 'Int8u';
-      case 'int16_t':
-        return 'Int16s';
-      case 'uint16_t':
-        return 'Int16u';
-      case 'int24_t':
-        return 'Int24s';
-      case 'uint24_t':
-        return 'Int24u';
-      case 'int32_t':
-        return 'Int32s';
-      case 'uint32_t':
-        return 'Int32u';
-      case 'int64_t':
-        return 'Int64s';
-      case 'uint64_t':
-        return 'Int64u';
-      default:
-        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-        throw error;
-      }
-    })
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
-  return templateUtil.templatePromise(this.global, promise)
-}
 
 //  Endpoint-config specific helpers
 // these helpers are a Hot fix for the "GENERATED_FUNCTIONS" problem
@@ -128,6 +75,7 @@ var endpointClusterWithAttributeChanged = [
   'Identify',
   'Pump Configuration and Control',
   'Window Covering',
+  'Fan Control',
 ];
 var endpointClusterWithPreAttribute = [
   'IAS Zone',
@@ -136,6 +84,7 @@ var endpointClusterWithPreAttribute = [
   'Time Format Localization',
   'Localization Configuration',
   'Mode Select',
+  'Fan Control',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
@@ -194,7 +143,8 @@ function chip_endpoint_generated_functions()
 
 function chip_endpoint_generated_commands_list(options)
 {
-  let ret = [];
+  let ret   = [];
+  let index = 0;
   this.clusterList.forEach((c) => {
     let acceptedCommands  = [];
     let generatedCommands = [];
@@ -202,22 +152,26 @@ function chip_endpoint_generated_commands_list(options)
     c.commands.forEach((cmd) => {
       if (cmd.mask.includes('incoming_server')) {
         acceptedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
-      }
-      if (cmd.mask.includes('incoming_client')) {
-        generatedCommands.push(`${cmd.commandId} /* ${cmd.name} */`);
+        if (cmd.responseId !== null) {
+          generatedCommands.push(`${cmd.responseId} /* ${cmd.responseName} */`);
+        }
       }
     });
+
+    generatedCommands = [...new Set(generatedCommands) ].sort();
 
     if (acceptedCommands.length > 0 || generatedCommands.length > 0) {
       ret.push({ text : `  /* ${c.comment} */\\` });
     }
     if (acceptedCommands.length > 0) {
       acceptedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text : `  /*   client_generated */ \\\n  ${acceptedCommands.join(', \\\n  ')}, \\` });
+      ret.push({ text : `  /*   AcceptedCommandList (index=${index}) */ \\\n  ${acceptedCommands.join(', \\\n  ')}, \\` });
+      index += acceptedCommands.length;
     }
     if (generatedCommands.length > 0) {
       generatedCommands.push('chip::kInvalidCommandId /* end of list */')
-      ret.push({ text : `  /*   server_generated */ \\\n  ${generatedCommands.join(', \\\n  ')}, \\` });
+      ret.push({ text : `  /*   GeneratedCommandList (index=${index})*/ \\\n  ${generatedCommands.join(', \\\n  ')}, \\` });
+      index += generatedCommands.length;
     }
   })
   return templateUtil.collectBlocks(ret, options, this);
@@ -270,8 +224,17 @@ function chip_endpoint_cluster_list()
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
 
-    let acceptedCommands  = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_server') ? 1 : 0))), 0);
-    let generatedCommands = c.commands.reduce(((acc, cmd) => (acc + (cmd.mask.includes('incoming_client') ? 1 : 0))), 0);
+    let acceptedCommands     = 0;
+    let generatedCommandList = [];
+    c.commands.forEach((cmd) => {
+      if (cmd.mask.includes('incoming_server')) {
+        acceptedCommands++;
+        if (cmd.responseId !== null) {
+          generatedCommandList.push(cmd.responseId);
+        }
+      }
+    });
+    let generatedCommands = new Set(generatedCommandList).size;
 
     let acceptedCommandsListVal  = "nullptr";
     let generatedCommandsListVal = "nullptr";
@@ -324,43 +287,13 @@ function chip_endpoint_data_version_count()
 
 //  End of Endpoint-config specific helpers
 
-function asPrintFormat(type)
+async function asNativeType(type)
 {
-  if (StringHelper.isString(type)) {
-    return '%s';
-  }
-
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'bool':
-        return '%d';
-      case 'int8_t':
-        return '%d';
-      case 'uint8_t':
-        return '%u';
-      case 'int16_t':
-        return '%" PRId16 "';
-      case 'uint16_t':
-        return '%" PRIu16 "';
-      case 'int24_t':
-        return '%" PRId32 "';
-      case 'uint24_t':
-        return '%" PRIu32 "';
-      case 'int32_t':
-        return '%" PRId32 "';
-      case 'uint32_t':
-        return '%" PRIu32 "';
-      case 'int64_t':
-        return '%" PRId64 "';
-      case 'uint64_t':
-        return '%" PRIu64 "';
-      default:
-        return '%p';
-      }
+      return ChipTypesHelper.asBasicType(zclType);
     })
   }
 
@@ -371,56 +304,72 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypedLiteral(value, type)
+async function asTypedExpression(value, type)
 {
   const valueIsANumber = !isNaN(value);
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      const basicType = ChipTypesHelper.asBasicType(zclType);
-      switch (basicType) {
-      case 'int32_t':
-        return value + (valueIsANumber ? 'L' : '');
-      case 'int64_t':
-        return value + (valueIsANumber ? 'LL' : '');
-      case 'uint16_t':
-        return value + (valueIsANumber ? 'U' : '');
-      case 'uint32_t':
-        return value + (valueIsANumber ? 'UL' : '');
-      case 'uint64_t':
-        return value + (valueIsANumber ? 'ULL' : '');
-      case 'float':
-        if (!valueIsANumber) {
-          return value;
-        }
-        if (value == Infinity || value == -Infinity) {
-          return `${(value < 0) ? '-' : ''}INFINITY`
-        }
-        // If the number looks like an integer, append ".0" to the end;
-        // otherwise adding an "f" suffix makes compilers complain.
-        value = value.toString();
-        if (value.match(/^[0-9]+$/)) {
-          value = value + ".0";
-        }
-        return value + 'f';
-      default:
-        if (!valueIsANumber) {
-          return value;
-        }
-        if (value == Infinity || value == -Infinity) {
-          return `${(value < 0) ? '-' : ''}INFINITY`
-        }
-        return value;
-      }
-    })
+  if (!value || valueIsANumber) {
+    return asTypedLiteral.call(this, value, type);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
-    console.log(err);
-    throw err;
-  });
-  return templateUtil.templatePromise(this.global, promise)
+  const tokens = value.split(' ');
+  if (tokens.length < 2) {
+    return asTypedLiteral.call(this, value, type);
+  }
+
+  value = tokens
+              .map(token => {
+                if (!TestHelper.chip_tests_variables_has.call(this, token)) {
+                  return token;
+                }
+
+                if (!TestHelper.chip_tests_variables_is_nullable.call(this, token)) {
+                  return token;
+                }
+
+                return `${token}.Value()`;
+              })
+              .join(' ');
+
+  const resultType = await asNativeType.call(this, type);
+  return `static_cast<${resultType}>(${value})`;
+}
+
+async function asTypedLiteral(value, type)
+{
+  const valueIsANumber = !isNaN(value);
+  if (!valueIsANumber) {
+    return value;
+  }
+
+  const basicType = await asNativeType.call(this, type);
+  switch (basicType) {
+  case 'int32_t':
+    return value + 'L';
+  case 'int64_t':
+    return value + 'LL';
+  case 'uint16_t':
+    return value + 'U';
+  case 'uint32_t':
+    return value + 'UL';
+  case 'uint64_t':
+    return value + 'ULL';
+  case 'float':
+    if (value == Infinity || value == -Infinity) {
+      return `${(value < 0) ? '-' : ''}INFINITY`
+    }
+    // If the number looks like an integer, append ".0" to the end;
+    // otherwise adding an "f" suffix makes compilers complain.
+    value = value.toString();
+    if (value.match(/^[0-9]+$/)) {
+      value = value + ".0";
+    }
+    return value + 'f';
+  default:
+    if (value == Infinity || value == -Infinity) {
+      return `${(value < 0) ? '-' : ''}INFINITY`
+    }
+    return value;
+  }
 }
 
 function hasSpecificAttributes(options)
@@ -515,10 +464,20 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     }
 
     if (types.isEnum) {
+      // Catching baseline enums and converting them into 'uint[size]_t'
+      let s = type.toLowerCase().match(/^enum(\d+)$/);
+      if (s) {
+        return 'uint' + s[1] + '_t';
+      }
       return ns + type;
     }
 
     if (types.isBitmap) {
+      // Catching baseline bitmaps and converting them into 'uint[size]_t'
+      let s = type.toLowerCase().match(/^bitmap(\d+)$/);
+      if (s) {
+        return 'uint' + s[1] + '_t';
+      }
       return 'chip::BitFlags<' + ns + type + '>';
     }
 
@@ -590,6 +549,10 @@ async function _zapTypeToPythonClusterObjectType(type, options)
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
+      // Catching baseline enums and converting them into 'uint'
+      if (type.toLowerCase().match(/^enum\d+$/g)) {
+        return 'uint';
+      }
       return ns + '.Enums.' + type;
     }
 
@@ -849,15 +812,54 @@ async function if_is_fabric_scoped_struct(type, options)
   return options.inverse(this);
 }
 
+// check if a value is numerically 0 for the purpose of default value
+// interpretation. Note that this does NOT check for data type, so assumes
+// a string of 'false' is 0 because boolean false is 0.
+function isNonZeroValue(value)
+{
+  if (!value) {
+    return false;
+  }
+
+  if (value === '0') {
+    return false;
+  }
+
+  // Hex value usage is inconsistent in XML. It looks we have
+  // all of 0x0, 0x00, 0x0000 so support all here.
+  if (value.match(/^0x0+$/)) {
+    return false;
+  }
+
+  // boolean 0 is false. We do not do a type check here
+  // so if anyone defaults a string to 'false' this will be wrong.
+  if (value === 'false') {
+    return false;
+  }
+
+  return true;
+}
+
+// Check if the default value is non-zero
+// Generally does string checks for empty strings, numeric or hex zeroes or
+// boolean values.
+async function if_is_non_zero_default(value, options)
+{
+  if (isNonZeroValue(value)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+}
+
 //
 // Module exports
 //
-exports.asPrintFormat                         = asPrintFormat;
-exports.asReadType                            = asReadType;
 exports.chip_endpoint_generated_functions     = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list            = chip_endpoint_cluster_list
 exports.chip_endpoint_data_version_count      = chip_endpoint_data_version_count;
 exports.chip_endpoint_generated_commands_list = chip_endpoint_generated_commands_list
+exports.asTypedExpression                     = asTypedExpression;
 exports.asTypedLiteral                        = asTypedLiteral;
 exports.asLowerCamelCase                      = asLowerCamelCase;
 exports.asUpperCamelCase                      = asUpperCamelCase;
@@ -872,4 +874,5 @@ exports.getPythonFieldDefault                 = getPythonFieldDefault;
 exports.incrementDepth                        = incrementDepth;
 exports.zcl_events_fields_by_event_name       = zcl_events_fields_by_event_name;
 exports.zcl_commands_that_need_timed_invoke   = zcl_commands_that_need_timed_invoke;
-exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct
+exports.if_is_fabric_scoped_struct            = if_is_fabric_scoped_struct;
+exports.if_is_non_zero_default                = if_is_non_zero_default;

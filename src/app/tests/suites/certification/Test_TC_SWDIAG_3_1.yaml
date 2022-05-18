@@ -33,13 +33,12 @@ tests:
       PICS: CR_RESETWATERMARKS
 
     - label: "Reads a list of ThreadMetrics struct attribute from DUT."
-      disabled: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
       response:
-          # TODO: Say something about the values?
-          value: {}
+          constraints:
+              type: list
 
     #issue #830
     - label: "Reads CurrentHeapUsed attribute value from DUT"

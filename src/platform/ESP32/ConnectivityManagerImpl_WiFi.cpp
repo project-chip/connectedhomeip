@@ -24,6 +24,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
@@ -661,6 +662,13 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     PlatformMgr().PostEventOrDie(&event);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+    }
 
     UpdateInternetConnectivityState();
 }
@@ -674,6 +682,70 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     PlatformMgr().PostEventOrDie(&event);
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    uint16_t reason                    = NetworkCommissioning::ESPWiFiDriver::GetInstance().GetLastDisconnectReason();
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+
+    switch (reason)
+    {
+    case WIFI_REASON_ASSOC_TOOMANY:
+    case WIFI_REASON_NOT_ASSOCED:
+    case WIFI_REASON_ASSOC_NOT_AUTHED:
+    case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+    case WIFI_REASON_GROUP_CIPHER_INVALID:
+    case WIFI_REASON_UNSUPP_RSN_IE_VERSION:
+    case WIFI_REASON_AKMP_INVALID:
+    case WIFI_REASON_CIPHER_SUITE_REJECTED:
+    case WIFI_REASON_PAIRWISE_CIPHER_INVALID:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WIFI_REASON_NOT_AUTHED:
+    case WIFI_REASON_MIC_FAILURE:
+    case WIFI_REASON_IE_IN_4WAY_DIFFERS:
+    case WIFI_REASON_INVALID_RSN_IE_CAP:
+    case WIFI_REASON_INVALID_PMKID:
+    case WIFI_REASON_802_1X_AUTH_FAILED:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    case WIFI_REASON_NO_AP_FOUND:
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+    case WIFI_REASON_BEACON_TIMEOUT:
+    case WIFI_REASON_AUTH_EXPIRE:
+    case WIFI_REASON_AUTH_LEAVE:
+    case WIFI_REASON_ASSOC_LEAVE:
+    case WIFI_REASON_ASSOC_EXPIRE:
+        break;
+
+    default:
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+        }
+        break;
+    }
+
+    if (delegate)
+    {
+        delegate->OnDisconnectionDetected(reason);
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+    }
 
     UpdateInternetConnectivityState();
 }
@@ -939,10 +1011,11 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
-        addr.ToString(event.InternetConnectivityChange.address);
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        event.InternetConnectivityChange.ipAddress = addr;
+
         PlatformMgr().PostEventOrDie(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)

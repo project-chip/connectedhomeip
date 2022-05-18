@@ -23,149 +23,30 @@ config:
 tests:
     - label:
           "DUT sends a subscription request message to the target node/reference
-          device for a single attribute of data type bool."
-      verification:
-          "1. The subscripbe tests sudo ./chip-tool tests TestSubscribe_OnOff 1
-          , can be a good example how controller subscribes and DUT responds to.
-          TH here is all-cluster/lighting app that the the DUT can subscribe to.
-          1. Verify the on refernce application receives Subscription request
-          Msg [1635857801.163357][2764:2764] CHIP:DMG: IM RH moving to
-          [Initialized] [1635857801.163395][2764:2764] CHIP:DMG:
-          SubscribeRequest = [1635857801.163428][2764:2764] CHIP:DMG: {
-          [1635857801.163456][2764:2764] CHIP:DMG: AttributePathList =
-          [1635857801.163490][2764:2764] CHIP:DMG: [
-          [1635857801.163522][2764:2764] CHIP:DMG: AttributePath =
-          [1635857801.163561][2764:2764] CHIP:DMG: {
-          [1635857801.163597][2764:2764] CHIP:DMG: NodeId = 0x1,
-          [1635857801.163636][2764:2764] CHIP:DMG: EndpointId = 0x0,
-          [1635857801.163682][2764:2764] CHIP:DMG: ClusterId = 0x6,
-          [1635857801.163724][2764:2764] CHIP:DMG: FieldTag = 0x0000_000 0,
-          [1635857801.163760][2764:2764] CHIP:DMG: }
-          [1635857801.163799][2764:2764] CHIP:DMG:
-          [1635857801.163833][2764:2764] CHIP:DMG: ],
-          [1635857801.163875][2764:2764] CHIP:DMG:
-          [1635857801.163918][2764:2764] CHIP:DMG: MinIntervalSeconds = 0xa,
-          [1635857801.163953][2764:2764] CHIP:DMG: kMaxInterval = 0x12c,
-          [1635857801.163986][2764:2764] CHIP:DMG: KeepSubscriptions = false,
-          [1635857801.164017][2764:2764] CHIP:DMG: }shed pending ack for
-          MessageCounter:1608870265 on exchange 54981i
-          [1635857801.183800][3508:3513] CHIP:EM: Received message of type 0x5
-          with protocolId (0, 1) and MessageCounter:1 on exchange 54982i
-          [1635857801.183869][3508:3513] CHIP:EM: Rxd Ack; Removing
-          MessageCounter:0 from Retrans Table on exchange 54982i
-          [1635857801.183905][3508:3513] CHIP:EM: Removed CHIP MessageCounter:0
-          from RetransTable on exchange 54982i [1635857801.183960][3508:3513]
-          CHIP:DMG: ReportData = [1635857801.183997][3508:3513] CHIP:DMG: {
-          [1635857801.184032][3508:3513] CHIP:DMG: SubscriptionId =
-          0xf94fde1c9a9a2d6f, [1635857801.184069][3508:3513] CHIP:DMG:
-          AttributeDataList = [1635857801.184106][3508:3513] CHIP:DMG: [
-          [1635857801.184142][3508:3513] CHIP:DMG: AttributeDataElement =
-          [1635857801.184193][3508:3513] CHIP:DMG: {
-          [1635857801.184231][3508:3513] CHIP:DMG: AttributePath =
-          [1635857801.184271][3508:3513] CHIP:DMG: {
-          [1635857801.184321][3508:3513] CHIP:DMG: NodeId = 0x1,
-          [1635857801.184376][3508:3513] CHIP:DMG: EndpointId = 0x0,
-          [1635857801.184425][3508:3513] CHIP:DMG: ClusterId = 0x6,
-          [1635857801.184478][3508:3513] CHIP:DMG: FieldTag = 0x0000_0000,
-          [1635857801.184523][3508:3513] CHIP:DMG: }
-          [1635857801.184578][3508:3513] CHIP:DMG:
-          [1635857801.184624][3508:3513] CHIP:DMG: Status = 0x86,
-          [1635857801.184666][3508:3513] CHIP:DMG: },
-          [1635857801.184710][3508:3513] CHIP:DMG:
-          [1635857801.184744][3508:3513] CHIP:DMG: ],
-          [1635857801.184785][3508:3513] CHIP:DMG:
-          [1635857801.184817][3508:3513] CHIP:DMG: }
-          [1635857801.184920][3508:3513] CHIP:ZCL: ReadAttributesResponse:
-          [1635857801.184951][3508:3513] CHIP:ZCL: ClusterId: 0x0000_0006
-          [1635857801.184984][3508:3513] CHIP:ZCL: attributeId: 0x0000_0000
-          [1635857801.185015][3508:3513] CHIP:ZCL: status: UnsupportedAttribute
-          (0x0086) [1635857801.185066][3508:3513] CHIP:DMG: Client[0] moving to
-          [AwaitingSubscribeResponse] [1635857801.185114][3508:3513] CHIP:EM:
-          Piggybacking Ack for MessageCounter:1 on exchange: 54982i
-          [1635857801.185187][3508:3513] CHIP:IN: Prepared encrypted message
-          0xaaaaf2abf810 to 0x0000000000000001 of type 0x1 and protocolId (0, 1)
-          on exchange 54982i with MessageCounter:1.
-          [1635857801.185243][3508:3513] CHIP:IN: Sending encrypted msg
-          0xaaaaf2abf810 with MessageCounter:1 to 0x0000000000000001 at
-          monotonic time: 2817379 msec [1635857801.186590][3508:3513] CHIP:EM:
-          Received message of type 0x4 with protocolId (0, 1) and
-          MessageCounter:2 on exchange 54982i [1635857801.186661][3508:3513]
-          CHIP:EM: Rxd Ack; Removing MessageCounter:1 from Retrans Table on
-          exchange 54982i [1635857801.186702][3508:3513] CHIP:EM: Removed CHIP
-          MessageCounter:1 from RetransTable on exchange 54982i
-          [1635857801.186760][3508:3513] CHIP:DMG: SubscribeResponse =
-          [1635857801.186801][3508:3513] CHIP:DMG: {
-          [1635857801.186839][3508:3513] CHIP:DMG: SubscriptionId =
-          0xf94fde1c9a9a2d6f, [1635857801.186882][3508:3513] CHIP:DMG:
-          MinIntervalFloorSeconds = 0xa, [1635857801.186922][3508:3513]
-          CHIP:DMG: MaxIntervalCeilingSeconds = 0x12c,
-          [1635857801.186960][3508:3513] CHIP:DMG: }
-          [1635857801.187006][3508:3513] CHIP:ZCL: SubscribeResponse:
-          [1635857801.187040][3508:3513] CHIP:ZCL: SubscriptionId:
-          0xf94fde1c9a9a2d6f [1635857801.187073][3508:3513] CHIP:ZCL:
-          ApplicationIdentifier: 0 [1635857801.187106][3508:3513] CHIP:ZCL:
-          status: EMBER_ZCL_STATUS_SUCCESS (0x00) [1635857801.187144][3508:3513]
-          CHIP:TOO: Default Success Response [1635857801.187207][3508:3513]
-          CHIP:DMG: Client[0] moving to [SubscriptionActive]
-          [1635857801.187251][3508:3513] CHIP:EM: Sending Standalone Ack for
-          MessageCounter:2 on exchange 54982i [1635857801.187320][3508:3513]
-          CHIP:IN: Prepared encrypted message 0xffff737ed930 to
-          0x0000000000000001 of type 0x10 and protocolId (0, 0) on exchange
-          54982i with MessageCounter:2. [1635857801.187377][3508:3513] CHIP:IN:
-          Sending encrypted msg 0xffff737ed930 with MessageCounter:2 to
-          0x0000000000000001 at monotonic time: 2817381 msec
-          [1635857801.187496][3508:3513] CHIP:EM: Flushed pending ack for
-          MessageCounter:2 on exchange 54982i [1635857801.187720][3508:3508]
-          CHIP:CTL: Shutting down the commissioner
-          [1635857801.187783][3508:3508] CHIP:CTL: Shutting down the controller
-          [1635857801.190092][3508:3508] CHIP:CTL: Shutting down the System
-          State, this will teardown the CHIP Stack
-          [1635857801.190156][3508:3508] CHIP:SPT: VerifyOrDie failure at
-          ../third_party/connectedhomeip/src/messaging/ExchangeContext.cpp:211:
-          mExchangeMgr != nullptr && GetReferenceCount() > 0"
+          device for a single attribute of any data type supported."
+      verification: |
+          sudo ./chip-tool onoff  subscribe on-time   0 100 0 1 1
+
+          TH Side
+          [1650620003.657208][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620003.657272][2221:2221] CHIP:DMG: {
+          [1650620003.657310][2221:2221] CHIP:DMG:         Status = 0x0,
+          [1650620003.657346][2221:2221] CHIP:DMG:         InteractionModelRevision = 1
+          [1650620003.657380][2221:2221] CHIP:DMG: }
       disabled: true
 
     - label:
           "DUT sends the subscription request message to TH TH sends a report
           data DUT sends the status response back to TH"
-      verification:
-          "TH here is all-cluster/lighting app that the the DUT can subscribe
-          to. 1. Verify the on refernce application receives Subscription
-          request Msg [1633048577.053891][19753:19753] CHIP:DMG: IM RH moving to
-          [Initialized] [1633048577.053928][19753:19753] CHIP:DMG:
-          SubscribeRequest = [1633048577.053951][19753:19753] CHIP:DMG: {
-          [1633048577.053972][19753:19753] CHIP:DMG: AttributePathList =
-          [1633048577.053997][19753:19753] CHIP:DMG: [
-          [1633048577.054020][19753:19753] CHIP:DMG: AttributePath =
-          [1633048577.054052][19753:19753] CHIP:DMG: {
-          [1633048577.054083][19753:19753] CHIP:DMG: NodeId = 0xbc5c01,
-          [1633048577.054118][19753:19753] CHIP:DMG: EndpointId = 0x0,
-          [1633048577.054152][19753:19753] CHIP:DMG: ClusterId = 0x6,
-          [1633048577.054185][19753:19753] CHIP:DMG: FieldTag = 0x0,
-          [1633048577.054269][19753:19753] CHIP:DMG: }
-          [1633048577.054304][19753:19753] CHIP:DMG:
-          [1633048577.054330][19753:19753] CHIP:DMG: ],
-          [1633048577.054407][19753:19753] CHIP:DMG:
-          [1633048577.054432][19753:19753] CHIP:DMG: MinIntervalSeconds = 0xa,
-          [1633048577.054487][19753:19753] CHIP:DMG: kMaxInterval = 0x12c,
-          [1633048577.054512][19753:19753] CHIP:DMG: } 3. Verify on the DUT (if
-          DUT supports log) that you recieve response data
-          [1633048577.057997][19753:19753] CHIP:EM: Removed CHIP
-          MessageCounter:0000000D from RetransTable
-          [1633048577.058036][19753:19753] CHIP:DMG: StatusResponse =
-          [1633048577.058060][19753:19753] CHIP:DMG: {
-          [1633048577.058081][19753:19753] CHIP:DMG: Status = 0x0,
-          [1633048577.058102][19753:19753] CHIP:DMG: }
-          [1633048577.058126][19753:19753] CHIP:DMG: In state
-          AwaitingReportResponse, receive status response, status code is 0 4.
-          On the controller(DUT) we get the SubscribeResponse, make sure
-          SubscriptionId is same as in above step 2.
-          [1633066406.050309][1602230:1602238] CHIP:DMG: SubscribeResponse =
-          [1633066406.050347][1602230:1602238] CHIP:DMG: {
-          [1633066406.050381][1602230:1602238] CHIP:DMG: SubscriptionId =
-          0x81c9743c808f7049, [1633066406.050424][1602230:1602238] CHIP:DMG:
-          MinIntervalFloorSeconds = 0xa, [1633066406.050460][1602230:1602238]
-          CHIP:DMG: MaxIntervalCeilin"
+      verification: |
+          '' ./chip-tool levelcontrol subscribe  on-level 0 100 0 1 1
+          TH side
+          [1650620108.691178][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620108.691207][2221:2221] CHIP:DMG: {
+          [1650620108.691231][2221:2221] CHIP:DMG: 	Status = 0x0,
+          [1650620108.691256][2221:2221] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650620108.691279][2221:2221] CHIP:DMG: }
+          [1650620108.691304][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
       disabled: true
 
     - label:
@@ -173,47 +54,42 @@ tests:
           an attribute of data type boolean. Modify that attribute on the TH. TH
           should send the modified data to the DUT. Repeat the above steps
           multiple times (3 times)."
-      verification:
-          "1. Activate the subscription on the DUT 2. Modify the attribute value
-          on the TH by sending below cmd Ex: chip-device-ctrl > ./chip-tool
-          onoff off 1 0 3. Wait 10 secs (as we gave the 10 sec Min interval in
-          the above cmd) You should recieve ReadAttributesResponse with
-          ReportData [1633065482.893594][1591764:1591772] CHIP:DMG: ReportData =
-          [1633065482.893622][1591764:1591772] CHIP:DMG: {
-          [1633065482.893647][1591764:1591772] CHIP:DMG: SubscriptionId =
-          0x1b46258c2ba9407b, [1633065482.893671][1591764:1591772] CHIP:DMG:
-          AttributeDataList = [1633065482.893697][1591764:1591772] CHIP:DMG: [
-          [1633065482.893720][1591764:1591772] CHIP:DMG: AttributeDataElement =
-          [1633065482.893771][1591764:1591772] CHIP:DMG: {
-          [1633065482.893802][1591764:1591772] CHIP:DMG: AttributePath =
-          [1633065482.893838][1591764:1591772] CHIP:DMG: {
-          [1633065482.893874][1591764:1591772] CHIP:DMG: NodeId = 0x0,
-          [1633065482.893911][1591764:1591772] CHIP:DMG: EndpointId = 0x1,
-          [1633065482.893948][1591764:1591772] CHIP:DMG: ClusterId = 0x6,
-          [1633065482.893983][1591764:1591772] CHIP:DMG: FieldTag = 0x0,
-          [1633065482.894016][1591764:1591772] CHIP:DMG: }
-          [1633065482.894055][1591764:1591772] CHIP:DMG:
-          [1633065482.894091][1591764:1591772] CHIP:DMG: Data = false,
-          [1633065482.894125][1591764:1591772] CHIP:DMG: DataElementVersion =
-          0x0, [1633065482.894156][1591764:1591772] CHIP:DMG: },
-          [1633065482.894188][1591764:1591772] CHIP:DMG:
-          [1633065482.894211][1591764:1591772] CHIP:DMG: ],
-          [1633065482.894239][1591764:1591772] CHIP:DMG:
-          [1633065482.894260][1591764:1591772] CHIP:DMG: }
-          [1633065482.894712][1591764:1591772] CHIP:ZCL: ReadAttributesResponse:
-          [1633065482.894752][1591764:1591772] CHIP:ZCL: ClusterId: 0x0000_0006
-          [1633065482.894779][1591764:1591772] CHIP:ZCL:
-          IMReadReportAttributesResponseCallback: Missing success callback
-          [1633065482.894799][1591764:1591772] CHIP:ZCL:
-          IMReadReportAttributesResponseCallback: Missing TLV Data Filter 4. On
-          teh server side (all-cluster app) you should recieve Status response,
-          Status code 0x0 [1633066022.932308][21226:21226] CHIP:DMG:
-          StatusResponse = [1633066022.932366][21226:21226] CHIP:DMG: {
-          [1633066022.932416][21226:21226] CHIP:DMG: Status = 0x0,
-          [1633066022.932468][21226:21226] CHIP:DMG: } 5. After the report
-          received, Repeat step2 with different values , like on and then off
-          and then on , you should get ReadAttributesResponse with ReportData
-          like mentioned in step3."
+      verification: |
+          In case of chip tool, here is an example command to use
+          '' ./chip-tool basic write local-config-disabled 1 1 0
+           '' ./chip-tool basic subscribe local-config-disabled 0 100  1 0
+
+          [1650620484.058559][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620484.058598][2221:2221] CHIP:DMG: {
+          [1650620484.058632][2221:2221] CHIP:DMG:         Status = 0x0,
+          [1650620484.058669][2221:2221] CHIP:DMG:         InteractionModelRevision = 1
+          [1650620484.058703][2221:2221] CHIP:DMG: }
+          [1650620484.058738][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+          Verify the above command multiple times by changing attribute value(3 times)
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type string. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times). 3"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool basic write  node-label 1 1 0
+          '' ./chip-tool basic subscribe node-label 0 100 0  1 0
+          [1650620543.500119][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620543.500147][2221:2221] CHIP:DMG: {
+          [1650620543.500172][2221:2221] CHIP:DMG: 	Status = 0x0,
+          [1650620543.500198][2221:2221] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650620543.500222][2221:2221] CHIP:DMG: }
+          [1650620543.500248][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+
+          Verify the above command multiple times by changing attribute value(3 times)
       disabled: true
 
     - label:
@@ -221,9 +97,40 @@ tests:
           an attribute of data type unsigned integer. Modify that attribute on
           the TH. TH should send the modified data to the DUT. Repeat the above
           steps multiple times (3 times)."
-      verification:
-          "1. Pick a cluster that has unsigned integer attribute and repeat the
-          above step"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
+          '' ./chip-tool any subscribe-by-id 0x0008 0x0010 0 100 0 1 1
+          [1650620581.445609][2221:2221] CHIP:DMG: StatusResponseMessage =
+          [1650620581.445659][2221:2221] CHIP:DMG: {
+          [1650620581.445701][2221:2221] CHIP:DMG: 	Status = 0x0,
+          [1650620581.445746][2221:2221] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650620581.445789][2221:2221] CHIP:DMG: }
+          [1650620581.445833][2221:2221] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+          Verify the above command multiple times by changing attribute value(3 times)
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type signed integer. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      verification: |
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 1 1 1
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 4 1 1
+          sudo ./chip-tool any write-by-id 0x0008 0x0010 5 1 1
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type Floating Point. Modify that attribute on the
+          TH. TH should send the modified data to the DUT. Repeat the above
+          steps multiple times (3 times)."
+      verification: |
+          DUT implementation required to verify read an attribute of data type floating point
       disabled: true
 
     - label:
@@ -232,19 +139,43 @@ tests:
           of the maximum interval. After the maximum interval, TH sends a report
           data with the subscription id created during the subscription
           activation."
-      verification:
-          "1. configure the max interval timeout for few seconds on the DUT 2.
-          create a situation that the accessory cant reach controller for 20
-          secs (like removing ethernet cable ..etc) 3. After the timer expiry we
-          should see the repor on the controller like below >
-          [1633722365.411081][731663:731671] CHIP:DMG: Subscription Liveness
-          timeout with peer node 0xbc614e, shutting down
-          [1633722365.411147][731663:731671] CHIP:ZCL: ReadAttributesResponse:
-          [1633722365.411168][731663:731671] CHIP:ZCL: ClusterId: 0x0000_0000
-          [1633722365.411193][731663:731671] CHIP:ZCL:
-          IMReadReportAttributesResponseCallback: Missing success callback
-          [1633722365.411214][731663:731671] CHIP:ZCL:
-          IMReadReportAttributesResponseCallback: Missing TLV Data Filter
-          [1633722365.411242][731663:731671] CHIP:DMG: Client[0] moving to
-          [UNINIT] 4."
+      verification: |
+          This is not testable in normal scenario, and needs to be tested as part of Unit test. his test step to be removed from the manual execution.
+      disabled: true
+
+    - label:
+          "DUT sends a subscription request message to the target node/reference
+          device for multiple attributes(3 attributes)."
+      verification: |
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-pressure 0 100 0 1 1
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-speed 0 100 0 1 1
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-flow 0 100 0 1 1
+          ''  ./chip-tool pumpconfigurationandcontrol subscribe min-const-pressure 0 100 0 1 1
+      disabled: true
+
+    - label:
+          "Activate the subscription between the DUT and the TH for an attribute
+          Force the TH to send a report data with no data and Suppress Response
+          set to True"
+      verification: |
+          This is not testable in normal scenario, and needs to be tested as part of Unit test. his test step to be removed from the manual execution.
+      disabled: true
+
+    - label:
+          "[OPTIONAL] Activate the subscription between the DUT and the TH for
+          an attribute of data type list. Modify that attribute on the TH. TH
+          should send the modified data to the DUT. Repeat the above steps
+          multiple times (3 times)."
+      verification: |
+          '' ./chip-tool modeselect subscribe supported-modes 0 100 0 1 1
+          '' ./chip-tool modeselect subscribe supported-modes 1 100 0 1 1
+          '' ./chip-tool modeselect subscribe supported-modes 2 100 0 1 1
+      disabled: true
+
+    - label:
+          "DUT sends a subscription request message to the TH for a single
+          attribute of any data type supported. Reboot the DUT."
+      verification: |
+          '' ./chip-tool pumpconfigurationandcontrol subscribe max-speed 0 100 0 1 1
+          after reboot the DUT verify once that the  TH does not send a report data message to the DUT
       disabled: true

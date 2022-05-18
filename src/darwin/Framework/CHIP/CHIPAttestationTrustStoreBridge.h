@@ -22,9 +22,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 class CHIPAttestationTrustStoreBridge : public chip::Credentials::AttestationTrustStore {
 public:
+    CHIPAttestationTrustStoreBridge(NSArray<NSData *> * paaCerts)
+        : mPaaCerts(paaCerts)
+    {
+    }
     ~CHIPAttestationTrustStoreBridge() {};
-
-    void Init(NSArray<NSData *> * paaCerts);
 
     CHIP_ERROR GetProductAttestationAuthorityCert(
         const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const override;

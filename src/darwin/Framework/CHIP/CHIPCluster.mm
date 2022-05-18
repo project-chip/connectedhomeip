@@ -17,6 +17,7 @@
 
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
+#import "NSDataSpanConversion.h"
 
 using namespace ::chip;
 
@@ -50,7 +51,7 @@ using namespace ::chip;
 
 - (chip::ByteSpan)asByteSpan:(NSData *)value
 {
-    return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length);
+    return AsByteSpan(value);
 }
 
 - (chip::CharSpan)asCharSpan:(NSString *)value
@@ -58,6 +59,17 @@ using namespace ::chip;
     return chip::CharSpan(static_cast<const char *>([value dataUsingEncoding:NSUTF8StringEncoding].bytes),
         [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
+@end
+
+@implementation CHIPWriteParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedWriteTimeoutMs = nil;
+    }
+    return self;
+}
+
 @end
 
 @implementation CHIPReadParams

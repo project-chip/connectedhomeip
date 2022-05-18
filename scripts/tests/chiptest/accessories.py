@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import logging
 import sys
 import threading
 from xmlrpc.server import SimpleXMLRPCServer
@@ -48,6 +49,9 @@ class AppsRegister:
     def removeAll(self):
         self.__accessories = {}
 
+    def get(self, name):
+        return self.__accessories[name]
+
     def kill(self, name):
         accessory = self.__accessories[name]
         if accessory:
@@ -57,10 +61,13 @@ class AppsRegister:
         for accessory in self.__accessories.values():
             accessory.kill()
 
-    def start(self, name, discriminator):
+    def start(self, name, args):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.start(discriminator)
+            # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
+            # key-value pair, e.g. [option1, value1, option2, value2, ...]
+            options = self.__createCommandLineOptions(args)
+            return accessory.start(options)
         return False
 
     def stop(self, name):
@@ -69,10 +76,10 @@ class AppsRegister:
             return accessory.stop()
         return False
 
-    def reboot(self, name, discriminator):
+    def reboot(self, name):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.stop() and accessory.start(discriminator)
+            return accessory.stop() and accessory.start()
         return False
 
     def factoryResetAll(self):
@@ -85,16 +92,12 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
-    def waitForCommissionableAdvertisement(self, name):
+    def waitForMessage(self, name, message):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.waitForCommissionableAdvertisement()
-        return False
-
-    def waitForOperationalAdvertisement(self, name):
-        accessory = self.__accessories[name]
-        if accessory:
-            return accessory.waitForOperationalAdvertisement()
+            # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
+            # comprise the entire message to wait for
+            return accessory.waitForMessage(' '.join(message))
         return False
 
     def __startXMLRPCServer(self):
@@ -104,15 +107,23 @@ class AppsRegister:
         self.server.register_function(self.stop, 'stop')
         self.server.register_function(self.reboot, 'reboot')
         self.server.register_function(self.factoryReset, 'factoryReset')
-        self.server.register_function(
-            self.waitForCommissionableAdvertisement,
-            'waitForCommissionableAdvertisement')
-        self.server.register_function(
-            self.waitForOperationalAdvertisement,
-            'waitForOperationalAdvertisement')
+        self.server.register_function(self.waitForMessage, 'waitForMessage')
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
     def __stopXMLRPCServer(self):
         self.server.shutdown()
+
+    def __createCommandLineOptions(self, args):
+        if not args:
+            return {}
+
+        # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
+        if (len(args) % 2) != 0:
+            logging.warning("Unexpected command line options %r - not key/value pairs (odd length)" % (args,))
+            return {}
+
+        # Create a dictionary from the key-value pair list
+        options = {args[i]: args[i+1] for i in range(0, len(args), 2)}
+        return options

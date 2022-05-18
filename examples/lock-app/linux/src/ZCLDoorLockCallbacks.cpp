@@ -42,10 +42,12 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
     return LockManager::Instance().GetCredential(endpointId, credentialIndex, credentialType, credential);
 }
 
-bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
+                                        chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
                                         DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
-    return LockManager::Instance().SetCredential(endpointId, credentialIndex, credentialStatus, credentialType, credentialData);
+    return LockManager::Instance().SetCredential(endpointId, credentialIndex, creator, modifier, credentialStatus, credentialType,
+                                                 credentialData);
 }
 
 DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex,
@@ -74,8 +76,8 @@ DlStatus emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t y
     return LockManager::Instance().GetSchedule(endpointId, yearDayIndex, userIndex, schedule);
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
     if (attributePath.mClusterId == DoorLock::Id)

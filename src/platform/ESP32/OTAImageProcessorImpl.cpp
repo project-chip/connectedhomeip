@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include "OTAImageProcessorImpl.h"
@@ -37,6 +38,35 @@ void HandleRestart(Layer * systemLayer, void * appState)
     esp_restart();
 }
 } // namespace
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return false;
+    }
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != requestor->GetTargetVersion())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {

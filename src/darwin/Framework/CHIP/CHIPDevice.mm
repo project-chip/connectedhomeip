@@ -21,6 +21,7 @@
 #import "CHIPCluster.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
+#import "CHIPEventTLVValueDecoder_Internal.h"
 #import "CHIPLogging.h"
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -74,6 +75,15 @@ class NSObjectDataValueCallbackBridge;
 
 @interface CHIPAttributeReport ()
 - (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value error:(nullable NSError *)error;
+@end
+
+@interface CHIPEventReport ()
+- (instancetype)initWithPath:(const ConcreteEventPath &)path
+                 eventNumber:(NSNumber *)eventNumber
+                    priority:(NSNumber *)priority
+                   timestamp:(NSNumber *)timestamp
+                       value:(nullable id)value
+                       error:(nullable NSError *)error;
 @end
 
 @interface CHIPReadClientContainer : NSObject
@@ -235,24 +245,31 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
 }
 
 typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable error);
+typedef void (^DataReportCallback)(NSArray * value);
+typedef void (^ErrorCallback)(NSError * error);
 
 namespace {
 
 class SubscriptionCallback final : public ClusterStateCache::Callback {
 public:
-    SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
-        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler)
+    SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
+        ErrorCallback errorCallback, SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler)
         : mQueue(queue)
-        , mReportCallback(reportCallback)
+        , mAttributeReportCallback(attributeReportCallback)
+        , mEventReportCallback(eventReportCallback)
+        , mErrorCallback(errorCallback)
         , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
         , mBufferedReadAdapter(*this)
     {
     }
 
-    SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
-        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, void (^onDoneHandler)(void))
+    SubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
+        ErrorCallback errorCallback, SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler,
+        void (^onDoneHandler)(void))
         : mQueue(queue)
-        , mReportCallback(reportCallback)
+        , mAttributeReportCallback(attributeReportCallback)
+        , mEventReportCallback(eventReportCallback)
+        , mErrorCallback(errorCallback)
         , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
         , mBufferedReadAdapter(*this)
         , mOnDoneHandler(onDoneHandler)
@@ -270,6 +287,8 @@ private:
 
     void OnReportEnd() override;
 
+    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
+
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     void OnError(CHIP_ERROR aError) override;
@@ -278,7 +297,7 @@ private:
 
     void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override;
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override;
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 
     void ReportError(CHIP_ERROR err);
     void ReportError(const StatusIB & status);
@@ -286,12 +305,15 @@ private:
 
 private:
     dispatch_queue_t mQueue;
-    // We set mReportCallback to nil when queueing error reports, so we
+    DataReportCallback _Nullable mAttributeReportCallback = nil;
+    DataReportCallback _Nullable mEventReportCallback = nil;
+    // We set mErrorCallback to nil when queueing error reports, so we
     // make sure to only report one error.
-    ReportCallback _Nullable mReportCallback = nil;
+    ErrorCallback _Nullable mErrorCallback = nil;
     SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler;
     BufferedReadCallback mBufferedReadAdapter;
-    NSMutableArray * _Nullable mReports = nil;
+    NSMutableArray * _Nullable mAttributeReports = nil;
+    NSMutableArray * _Nullable mEventReports = nil;
 
     // Our lifetime management is a little complicated.  On error we
     // attempt to delete the ReadClient, but asynchronously.  While
@@ -301,7 +323,7 @@ private:
     //
     // To handle this, enforce the following rules:
     //
-    // 1) We guarantee that mReportCallback is only invoked with an error once.
+    // 1) We guarantee that mErrorCallback is only invoked with an error once.
     // 2) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
@@ -321,21 +343,51 @@ private:
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
+    [self subscribeWithQueue:queue
+        minInterval:minInterval
+        maxInterval:maxInterval
+        params:params
+        cacheContainer:attributeCacheContainer
+        attributeReportHandler:^(NSArray * _Nullable value) {
+            reportHandler(value, nil);
+        }
+        eventReportHandler:^(NSArray * _Nullable value) {
+            ; // do nothing
+        }
+        errorHandler:^(NSError * _Nullable error) {
+            reportHandler(nil, error);
+        }
+        subscriptionEstablished:subscriptionEstablishedHandler];
+}
+
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+                     params:(nullable CHIPSubscribeParams *)params
+             cacheContainer:(CHIPAttributeCacheContainer * _Nullable)attributeCacheContainer
+     attributeReportHandler:(void (^)(NSArray * value))attributeReportHandler
+         eventReportHandler:(void (^)(NSArray * value))eventReportHandler
+               errorHandler:(void (^)(NSError * error))errorHandler
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
+{
     DeviceProxy * device = [self internalDevice];
     if (!device) {
         dispatch_async(queue, ^{
-            reportHandler(nil, [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+            errorHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
     }
 
-    // Wildcard endpoint, cluster, attribute.
+    // Wildcard endpoint, cluster, attribute, event.
     auto attributePath = std::make_unique<AttributePathParams>();
+    auto eventPath = std::make_unique<EventPathParams>();
     ReadPrepareParams readParams(device->GetSecureSession().Value());
     readParams.mMinIntervalFloorSeconds = minInterval;
     readParams.mMaxIntervalCeilingSeconds = maxInterval;
     readParams.mpAttributePathParamsList = attributePath.get();
     readParams.mAttributePathParamsListSize = 1;
+    readParams.mpEventPathParamsList = eventPath.get();
+    readParams.mEventPathParamsListSize = 1;
     readParams.mKeepSubscriptions
         = (params != nil) && (params.keepPreviousSubscriptions != nil) && [params.keepPreviousSubscriptions boolValue];
 
@@ -344,17 +396,19 @@ private:
     std::unique_ptr<ClusterStateCache> attributeCache;
     if (attributeCacheContainer) {
         __weak CHIPAttributeCacheContainer * weakPtr = attributeCacheContainer;
-        callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler, ^{
-            CHIPAttributeCacheContainer * container = weakPtr;
-            if (container) {
-                container.cppAttributeCache = nullptr;
-            }
-        });
+        callback = std::make_unique<SubscriptionCallback>(
+            queue, attributeReportHandler, eventReportHandler, errorHandler, subscriptionEstablishedHandler, ^{
+                CHIPAttributeCacheContainer * container = weakPtr;
+                if (container) {
+                    container.cppAttributeCache = nullptr;
+                }
+            });
         attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
         readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
             attributeCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
     } else {
-        callback = std::make_unique<SubscriptionCallback>(queue, reportHandler, subscriptionEstablishedHandler);
+        callback = std::make_unique<SubscriptionCallback>(
+            queue, attributeReportHandler, eventReportHandler, errorHandler, subscriptionEstablishedHandler);
         readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
             callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
     }
@@ -365,12 +419,13 @@ private:
     } else {
         // SendAutoResubscribeRequest cleans up the params, even on failure.
         attributePath.release();
+        eventPath.release();
         err = readClient->SendAutoResubscribeRequest(std::move(readParams));
     }
 
     if (err != CHIP_NO_ERROR) {
         dispatch_async(queue, ^{
-            reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
+            errorHandler([CHIPError errorForCHIPErrorCode:err]);
         });
 
         return;
@@ -736,7 +791,7 @@ private:
 
     void OnDone() override { mOnDone(this); }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         if (mOnSubscriptionEstablished) {
             mOnSubscriptionEstablished();
@@ -1259,6 +1314,26 @@ exit:
 }
 @end
 
+@implementation CHIPEventPath
+- (instancetype)initWithPath:(const ConcreteEventPath &)path
+{
+    if (self = [super init]) {
+        _endpoint = @(path.mEndpointId);
+        _cluster = @(path.mClusterId);
+        _event = @(path.mEventId);
+    }
+    return self;
+}
+
++ (instancetype)eventPathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId eventId:(NSNumber *)eventId
+{
+    ConcreteEventPath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterId unsignedLongValue]), static_cast<chip::EventId>([eventId unsignedLongValue]));
+
+    return [[CHIPEventPath alloc] initWithPath:path];
+}
+@end
+
 @implementation CHIPCommandPath
 - (instancetype)initWithPath:(const ConcreteCommandPath &)path
 {
@@ -1291,19 +1366,86 @@ exit:
 }
 @end
 
+@implementation CHIPEventReport
+- (instancetype)initWithPath:(const ConcreteEventPath &)path
+                 eventNumber:(NSNumber *)eventNumber
+                    priority:(NSNumber *)priority
+                   timestamp:(NSNumber *)timestamp
+                       value:(nullable id)value
+                       error:(nullable NSError *)error
+{
+    if (self = [super init]) {
+        _path = [[CHIPEventPath alloc] initWithPath:path];
+        _eventNumber = eventNumber;
+        _priority = priority;
+        _timestamp = timestamp;
+        _value = value;
+        _error = error;
+    }
+    return self;
+}
+@end
+
 namespace {
-void SubscriptionCallback::OnReportBegin() { mReports = [NSMutableArray new]; }
+void SubscriptionCallback::OnReportBegin()
+{
+    mAttributeReports = [NSMutableArray new];
+    mEventReports = [NSMutableArray new];
+}
 
 void SubscriptionCallback::OnReportEnd()
 {
-    __block NSArray * reports = mReports;
-    mReports = nil;
-    if (mReportCallback) {
+    __block NSArray * attributeReports = mAttributeReports;
+    mAttributeReports = nil;
+    __block NSArray * eventReports = mEventReports;
+    mEventReports = nil;
+    if (mAttributeReportCallback && attributeReports.count) {
         dispatch_async(mQueue, ^{
-            mReportCallback(reports, nil);
+            mAttributeReportCallback(attributeReports);
+        });
+    }
+    if (mEventReportCallback && eventReports.count) {
+        dispatch_async(mQueue, ^{
+            mEventReportCallback(eventReports);
         });
     }
     // Else we have a pending error already.
+}
+
+void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+{
+    id _Nullable value = nil;
+    NSError * _Nullable error = nil;
+    if (apStatus != nullptr) {
+        error = [CHIPError errorForIMStatus:*apStatus];
+    } else if (apData == nullptr) {
+        error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+    } else {
+        CHIP_ERROR err;
+        value = CHIPDecodeEventPayload(aEventHeader.mPath, *apData, &err);
+        if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH) {
+            // We don't know this event; just skip it.
+            return;
+        }
+
+        if (err != CHIP_NO_ERROR) {
+            value = nil;
+            error = [CHIPError errorForCHIPErrorCode:err];
+        }
+    }
+
+    if (mEventReports == nil) {
+        // Never got a OnReportBegin?  Not much to do other than tear things down.
+        ReportError(CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    [mEventReports addObject:[[CHIPEventReport alloc] initWithPath:aEventHeader.mPath
+                                                       eventNumber:@(aEventHeader.mEventNumber)
+                                                          priority:@((uint8_t) aEventHeader.mPriorityLevel)
+                                                         timestamp:@(aEventHeader.mTimestamp.mValue)
+                                                             value:value
+                                                             error:error]];
 }
 
 void SubscriptionCallback::OnAttributeData(
@@ -1334,13 +1476,13 @@ void SubscriptionCallback::OnAttributeData(
         }
     }
 
-    if (mReports == nil) {
+    if (mAttributeReports == nil) {
         // Never got a OnReportBegin?  Not much to do other than tear things down.
         ReportError(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value error:error]];
+    [mAttributeReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value error:error]];
 }
 
 void SubscriptionCallback::OnError(CHIP_ERROR aError) { ReportError([CHIPError errorForCHIPErrorCode:aError]); }
@@ -1378,7 +1520,7 @@ void SubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPreparePa
     }
 }
 
-void SubscriptionCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
+void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
     if (mSubscriptionEstablishedHandler) {
         dispatch_async(mQueue, mSubscriptionEstablishedHandler);
@@ -1401,13 +1543,15 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
         return;
     }
 
-    __block ReportCallback callback = mReportCallback;
+    __block ErrorCallback callback = mErrorCallback;
     __block auto * myself = this;
-    mReportCallback = nil;
+    mErrorCallback = nil;
+    mAttributeReportCallback = nil;
+    mEventReportCallback = nil;
     __auto_type onDoneHandler = mOnDoneHandler;
     mOnDoneHandler = nil;
     dispatch_async(mQueue, ^{
-        callback(nil, err);
+        callback(err);
         if (onDoneHandler) {
             onDoneHandler();
         }

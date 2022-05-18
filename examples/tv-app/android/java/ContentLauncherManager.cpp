@@ -85,7 +85,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
         response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
@@ -106,7 +106,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContentUrl");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mLaunchUrlMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
@@ -140,7 +140,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
         response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);

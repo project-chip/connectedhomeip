@@ -34,9 +34,11 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <setup_payload/SetupPayload.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+
 struct LinuxDeviceOptions
 {
-    chip::SetupPayload payload;
+    chip::PayloadContents payload;
     chip::Optional<uint16_t> discriminator;
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
@@ -53,8 +55,9 @@ struct LinuxDeviceOptions
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
     bool traceStreamToLogEnabled        = false;
     chip::Optional<std::string> traceStreamFilename;
+    chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
 
     static LinuxDeviceOptions & GetInstance();
 };
 
-CHIP_ERROR ParseArguments(int argc, char * argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
+CHIP_ERROR ParseArguments(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);

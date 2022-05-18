@@ -36,7 +36,6 @@ public:
 
 private:
     id<CHIPPersistentStorageDelegate> mDelegate;
-
     dispatch_queue_t mWorkQueue;
 };
 

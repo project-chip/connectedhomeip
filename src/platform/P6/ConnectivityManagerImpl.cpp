@@ -280,6 +280,7 @@ void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_d
     case CY_WCM_EVENT_DISCONNECTED:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_DISCONNECTED");
         ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Disconnecting);
+        NetworkCommissioning::P6WiFiDriver::GetInstance().SetLastDisconnectReason(WLC_E_SUP_DEAUTH);
         break;
     case CY_WCM_EVENT_IP_CHANGED:
         ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_IP_CHANGED");
@@ -323,6 +324,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
+        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::P6WiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
 }
 
@@ -655,10 +657,10 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
-        addr.ToString(event.InternetConnectivityChange.address);
+        event.Type                                 = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4      = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6      = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+        event.InternetConnectivityChange.ipAddress = addr;
         PlatformMgr().PostEventOrDie(&event);
 
         if (haveIPv4Conn != hadIPv4Conn)

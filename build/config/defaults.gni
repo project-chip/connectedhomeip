@@ -79,6 +79,10 @@ declare_args() {
   # Defaults fuzzing configs.
   default_configs_fuzzing = [ "${build_root}/config/compiler:fuzzing_default" ]
 
+  # Defaults coverage configs.
+  default_configs_coverage =
+      [ "${build_root}/config/compiler:coverage_default" ]
+
   # Defaults target-specific configs.
   default_configs_target = [ "${build_root}/config/compiler:target_default" ]
 
@@ -108,6 +112,7 @@ default_configs += default_configs_runtime
 default_configs += default_configs_aliasing
 default_configs += default_configs_sanitize
 default_configs += default_configs_fuzzing
+default_configs += default_configs_coverage
 default_configs += default_configs_target
 default_configs += default_configs_dead_code
 default_configs += default_configs_extra

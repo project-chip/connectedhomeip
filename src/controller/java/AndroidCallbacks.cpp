@@ -244,11 +244,14 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     // Convert TLV to JSON
     Json::Value json;
     err = TlvToJson(readerForJson, json);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, err));
+
     UtfString jsonString(env, JsonToString(json).c_str());
 
     // Create AttributeState object
     jclass attributeStateCls;
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/AttributeState", attributeStateCls);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find AttributeState class"));
     VerifyOrReturn(attributeStateCls != nullptr, ChipLogError(Controller, "Could not find AttributeState class"));
     chip::JniClass attributeStateJniCls(attributeStateCls);
     jmethodID attributeStateCtor = env->GetMethodID(attributeStateCls, "<init>", "(Ljava/lang/Object;[BLjava/lang/String;)V");
@@ -261,7 +264,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     jmethodID addAttributeMethod;
     err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addAttribute",
                                                   "(IJJLchip/devicecontroller/model/AttributeState;)V", &addAttributeMethod);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addAttribute method"));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addAttribute method"));
     env->CallVoidMethod(mNodeStateObj, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), attributeStateObj);
     VerifyOrReturnError(!env->ExceptionCheck(), env->ExceptionDescribe());
@@ -298,7 +301,7 @@ void ReportCallback::OnDone()
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }
 
-void ReportCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
+void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
     JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
 }

@@ -18,9 +18,11 @@
 
 #include "network-commissioning.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -247,34 +249,34 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
     {
-        if (!req.ssid.HasValue())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-        const auto nullableSSID = req.ssid.Value();
         ByteSpan ssid;
-        if (!nullableSSID.IsNull())
+        if (req.ssid.HasValue())
         {
-            ssid = nullableSSID.Value();
-            if (ssid.empty())
+            const auto & nullableSSID = req.ssid.Value();
+            if (!nullableSSID.IsNull())
             {
-                // Normalize the zero value to null ByteSpan.
-                // Spec 7.17.1. Empty string is an equivalent of null.
-                ssid = ByteSpan();
+                ssid = nullableSSID.Value();
+                if (ssid.empty())
+                {
+                    // Normalize empty span value to null ByteSpan.
+                    // Spec 7.17.1. Empty string is an equivalent of null.
+                    ssid = ByteSpan();
+                }
             }
         }
-        if (!(ssid.size() <= DeviceLayer::Internal::kMaxWiFiSSIDLength))
+        if (ssid.size() > DeviceLayer::Internal::kMaxWiFiSSIDLength)
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
             return;
         }
-        mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
+        mCurrentOperationBreadcrumb = req.breadcrumb;
+        mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
     }
     else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
     {
-        mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
+        mCurrentOperationBreadcrumb = req.breadcrumb;
+        mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
         mpDriver.Get<ThreadDriver *>()->ScanNetworks(this);
     }
     else
@@ -364,6 +366,10 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    {
+        UpdateBreadcrumb(req.breadcrumb);
+    }
 }
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
@@ -383,6 +389,24 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
         mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    {
+        UpdateBreadcrumb(req.breadcrumb);
+    }
+}
+
+void Instance::UpdateBreadcrumb(const Optional<uint64_t> & breadcrumb)
+{
+    VerifyOrReturn(breadcrumb.HasValue());
+    GeneralCommissioning::SetBreadcrumb(breadcrumb.Value());
+}
+
+void Instance::CommitSavedBreadcrumb()
+{
+    // We rejected the command when there is another ongoing command, so mCurrentOperationBreadcrumb reflects the breadcrumb
+    // argument in the only background command.
+    UpdateBreadcrumb(mCurrentOperationBreadcrumb);
+    mCurrentOperationBreadcrumb.ClearValue();
 }
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
@@ -401,6 +425,10 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     response.networkingStatus = mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    {
+        UpdateBreadcrumb(req.breadcrumb);
+    }
 }
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
@@ -416,8 +444,8 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 
     mConnectingNetworkIDLen = static_cast<uint8_t>(req.networkID.size());
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
-
-    mAsyncCommandHandle = CommandHandler::Handle(&ctx.mCommandHandler);
+    mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
+    mCurrentOperationBreadcrumb = req.breadcrumb;
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
 
@@ -433,6 +461,10 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     response.networkingStatus = mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText);
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    {
+        UpdateBreadcrumb(req.breadcrumb);
+    }
 }
 
 void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
@@ -469,6 +501,10 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
     commandHandle->AddResponse(mPath, response);
+    if (commissioningError == NetworkCommissioningStatus::kSuccess)
+    {
+        CommitSavedBreadcrumb();
+    }
 }
 
 void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseIterator * networks)
@@ -531,6 +567,10 @@ exit:
     {
         ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
     }
+    if (status == NetworkCommissioningStatus::kSuccess)
+    {
+        CommitSavedBreadcrumb();
+    }
     networks->Release();
 }
 
@@ -589,6 +629,10 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
+    }
+    if (status == NetworkCommissioningStatus::kSuccess)
+    {
+        CommitSavedBreadcrumb();
     }
     if (networks != nullptr)
     {

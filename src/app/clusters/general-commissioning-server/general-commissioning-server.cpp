@@ -183,6 +183,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
         {
             // Force the timer to expire immediately.
             failSafeContext.ForceFailSafeTimerExpiry();
+            // Don't set the breadcrumb, since expiring the failsafe should
+            // reset it anyway.
             response.errorCode = CommissioningError::kOk;
             commandObj->AddResponse(commandPath, response);
         }
@@ -191,6 +193,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             CheckSuccess(
                 failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                 Failure);
+            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
             response.errorCode = CommissioningError::kOk;
             commandObj->AddResponse(commandPath, response);
         }
@@ -239,6 +242,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             CheckSuccess(server->CommissioningComplete(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
                          Failure);
 
+            Breadcrumb::Set(commandPath.mEndpointId, 0);
             response.errorCode = CommissioningError::kOk;
         }
     }
@@ -254,19 +258,68 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 {
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-
-    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.newRegulatoryConfig), commandData.countryCode,
-                                             commandData.breadcrumb),
-                 Failure);
-
     Commands::SetRegulatoryConfigResponse::Type response;
-    response.errorCode = CommissioningError::kOk;
+
+    if (commandData.newRegulatoryConfig > RegulatoryLocationType::kIndoorOutdoor)
+    {
+        response.errorCode = CommissioningError::kValueOutsideRange;
+        response.debugText = commandData.countryCode;
+    }
+    else
+    {
+        uint8_t locationCapability;
+        uint8_t location = to_underlying(commandData.newRegulatoryConfig);
+
+        CheckSuccess(ConfigurationMgr().GetLocationCapability(locationCapability), Failure);
+
+        // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
+        // either the Indoor or Outdoor fixed value in LocationCapability.
+        if ((locationCapability != to_underlying(RegulatoryLocationType::kIndoorOutdoor)) && (location != locationCapability))
+        {
+            response.errorCode = CommissioningError::kValueOutsideRange;
+            response.debugText = commandData.countryCode;
+        }
+        else
+        {
+            CheckSuccess(server->SetRegulatoryConfig(location, commandData.countryCode), Failure);
+            Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
+            response.errorCode = CommissioningError::kOk;
+        }
+    }
+
     commandObj->AddResponse(commandPath, response);
 
     return true;
 }
 
+namespace {
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
+    {
+        // Spec says to reset Breadcrumb attribute to 0.
+        Breadcrumb::Set(0, 0);
+    }
+}
+
+} // anonymous namespace
+
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
+    Breadcrumb::Set(0, 0);
     registerAttributeAccessOverride(&gAttrAccess);
+    DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace GeneralCommissioning {
+void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
+{
+    Breadcrumb::Set(0, breadcrumb);
+}
+} // namespace GeneralCommissioning
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -34,7 +34,6 @@
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -49,15 +48,13 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = Test::LoopbackMessagingContext<>;
+using TestContext = Test::LoopbackMessagingContext;
 
 enum : uint8_t
 {
     kMsgType_TEST1 = 1,
     kMsgType_TEST2 = 2,
 };
-
-TestContext sContext;
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
@@ -251,7 +248,7 @@ nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on
@@ -263,6 +260,8 @@ nlTestSuite sSuite =
  */
 int TestExchangeMgr()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

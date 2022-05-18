@@ -74,7 +74,7 @@ public:
 
     ~FabricInfo()
     {
-        if (mOperationalKey != nullptr)
+        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
         }
@@ -109,21 +109,33 @@ public:
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey() const
-    {
-        if (mOperationalKey == nullptr)
-        {
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->CreateOperationalKey(mFabricIndex);
-#else
-            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-            mOperationalKey->Initialize();
-#endif
-        }
-        return mOperationalKey;
-    }
+    Crypto::P256Keypair * GetOperationalKey() const { return mOperationalKey; }
+
+    /**
+     * Sets the P256Keypair used for this fabric.  This will make a copy of the keypair
+     * via the P256Keypair::Serialize and P256Keypair::Deserialize methods.
+     *
+     * The keyPair argument is safe to deallocate once this method returns.
+     *
+     * If your P256Keypair does not support serialization, use the
+     * `SetExternallyOwnedOperationalKeypair` method instead.
+     */
     CHIP_ERROR SetOperationalKeypair(const Crypto::P256Keypair * keyPair);
+
+    /**
+     * Sets the P256Keypair used for this fabric, delegating ownership of the
+     * key to the caller. The P256Keypair provided here must be freed later by
+     * the caller of this method if it was allocated dynamically.
+     *
+     * This should be used if your P256Keypair does not support serialization
+     * and deserialization (e.g. your private key is held in a secure element
+     * and cannot be accessed directly), or if you back your operational
+     * private keys by external implementation of the cryptographic interfaces.
+     *
+     * To have the ownership of the key managed for you, use
+     * SetOperationalKeypair instead.
+     */
+    CHIP_ERROR SetExternallyOwnedOperationalKeypair(Crypto::P256Keypair * keyPair);
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
@@ -168,8 +180,14 @@ public:
         return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
+    // Verifies credentials, using this fabric info's root certificate.
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,
                                  PeerId & nocPeerId, FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
+
+    // Verifies credentials, using the provided root certificate.
+    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                        Credentials::ValidationContext & context, PeerId & nocPeerId, FabricId & fabricId,
+                                        Crypto::P256PublicKey & nocPubkey);
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -180,11 +198,12 @@ public:
         mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
 
-        if (mOperationalKey != nullptr)
+        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
-            mOperationalKey = nullptr;
         }
+        mOperationalKey = nullptr;
+
         ReleaseOperationalCerts();
         mFabricIndex = kUndefinedFabricIndex;
     }
@@ -192,15 +211,14 @@ public:
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
     /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
-       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       root public key of the provided root certificate. The generated compressed ID is returned via compressedPeerId
        output parameter */
-    CHIP_ERROR GeneratePeerId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
+    static CHIP_ERROR GeneratePeerId(const ByteSpan & rcac, FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId);
 
     friend class FabricTable;
 
     // Test-only, build a fabric using given root cert and NOC
-    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nodePubKey,
-                                   ByteSpan nodePrivateKey);
+    CHIP_ERROR TestOnlyBuildFabric(ByteSpan rootCert, ByteSpan icacCert, ByteSpan nocCert, ByteSpan nocKey);
 
 private:
     static constexpr size_t MetadataTLVMaxSize()
@@ -224,6 +242,7 @@ private:
 #else
     mutable Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
+    bool mHasExternallyOwnedOperationalKey = false;
 
     MutableByteSpan mRootCert;
     MutableByteSpan mICACert;
@@ -244,52 +263,6 @@ private:
     }
 
     CHIP_ERROR SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCert);
-
-    struct StorableFabricInfo
-    {
-        uint8_t mFabricIndex;
-        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
-
-        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
-        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
-
-        Crypto::P256SerializedKeypair mOperationalKey;
-        uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
-        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
-        char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
-    };
-};
-
-// Once attribute store has persistence implemented, FabricTable shoud be backed using
-// attribute store so no need for this Delegate API anymore
-// TODO: Reimplement FabricTable to only have one backing store.
-class DLL_EXPORT FabricTableDelegate
-{
-    friend class FabricTable;
-
-public:
-    FabricTableDelegate(bool ownedByFabricTable = false) : mOwnedByFabricTable(ownedByFabricTable) {}
-    virtual ~FabricTableDelegate() {}
-    /**
-     * Gets called when a fabric is deleted from KVS store.
-     **/
-    virtual void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) = 0;
-
-    /**
-     * Gets called when a fabric is loaded into Fabric Table from KVS store.
-     **/
-    virtual void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) = 0;
-
-    /**
-     * Gets called when a fabric in Fabric Table is persisted to KVS store.
-     **/
-    virtual void OnFabricPersistedToStorage(FabricInfo * fabricInfo) = 0;
-
-private:
-    FabricTableDelegate * mNext = nullptr;
-    bool mOwnedByFabricTable    = false;
 };
 
 /**
@@ -362,14 +335,42 @@ private:
 class DLL_EXPORT FabricTable
 {
 public:
+    class DLL_EXPORT Delegate
+    {
+    public:
+        Delegate() {}
+        virtual ~Delegate() {}
+
+        /**
+         * Gets called when a fabric is deleted, such as on FabricTable::Delete().
+         **/
+        virtual void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
+        /**
+         * Gets called when a fabric is loaded into Fabric Table from storage, such as
+         * during FabricTable::Init().
+         **/
+        virtual void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
+        /**
+         * Gets called when a fabric in Fabric Table is persisted to storage, such as
+         * on FabricTable::AddNewFabric().
+         **/
+        virtual void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) = 0;
+
+        // Intrusive list pointer for FabricTable to manage the entries.
+        Delegate * next = nullptr;
+    };
+
+public:
     FabricTable() {}
     ~FabricTable();
 
-    CHIP_ERROR Store(FabricIndex index);
+    CHIP_ERROR Store(FabricIndex fabricIndex);
     CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
     // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
-    CHIP_ERROR Delete(FabricIndex index);
+    CHIP_ERROR Delete(FabricIndex fabricIndex);
     void DeleteAllFabrics();
 
     /**
@@ -384,12 +385,17 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
+    // This is same as AddNewFabric, but skip duplicate fabric check, because we have multiple nodes belongs to the same fabric in
+    // test-cases
+    CHIP_ERROR AddNewFabricForTest(FabricInfo & newFabric, FabricIndex * outputIndex);
+
     FabricInfo * FindFabric(Credentials::P256PublicKeySpan rootPubKey, FabricId fabricId);
     FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
     FabricInfo * FindFabricWithCompressedId(CompressedFabricId fabricId);
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
-    CHIP_ERROR AddFabricDelegate(FabricTableDelegate * delegate);
+    CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
+    void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
     uint8_t FabricCount() const { return mFabricCount; }
 
@@ -429,10 +435,14 @@ private:
      */
     CHIP_ERROR ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader);
 
+    CHIP_ERROR AddNewFabricInner(FabricInfo & fabric, FabricIndex * assignedIndex);
+
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     PersistentStorageDelegate * mStorage = nullptr;
 
-    FabricTableDelegate * mDelegate = nullptr;
+    // FabricTable::Delegate link to first node, since FabricTable::Delegate is a form
+    // of intrusive linked-list item.
+    FabricTable::Delegate * mDelegateListRoot = nullptr;
 
     // We may not have an mNextAvailableFabricIndex if our table is as large as
     // it can go and is full.

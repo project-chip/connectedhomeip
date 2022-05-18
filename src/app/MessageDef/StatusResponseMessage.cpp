@@ -16,6 +16,9 @@
 
 #include "StatusResponseMessage.h"
 #include "MessageDefHelper.h"
+#include "protocols/interaction_model/Constants.h"
+
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -33,7 +36,10 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Tag::kStatus):
@@ -42,9 +48,9 @@ CHIP_ERROR StatusResponseMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t status;
+                uint8_t status;
                 ReturnErrorOnFailure(reader.Get(status));
-                PRETTY_PRINT("\tStatus = 0x%" PRIx16 ",", status);
+                PRETTY_PRINT("\tStatus = " ChipLogFormatIMStatus ",", ChipLogValueIMStatus(static_cast<Status>(status)));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

@@ -112,6 +112,26 @@ async function loadEndpoints()
   return result;
 }
 
+async function loadAllClusters(packageId)
+{
+  const { db, sessionId } = this.global;
+
+  let allClusters = await zclQuery.selectAllClusters(db, packageId);
+  // To match what loadClusters does, sort by cluster name (not cluster code).
+  allClusters.sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name == b.name) {
+      return 0;
+    }
+    return 1;
+  });
+  let serverClusters = allClusters.map(cluster => ({...cluster, side : 'server', enabled : true }));
+  let clientClusters = allClusters.map(cluster => ({...cluster, side : 'client', enabled : true }));
+  return serverClusters.concat(clientClusters);
+}
+
 async function loadClusters()
 {
   const { db, sessionId } = this.global;
@@ -147,15 +167,68 @@ function loadCommandArguments(command, packageId)
   });
 }
 
+async function loadAllCommands(packageId)
+{
+  const { db, sessionId } = this.global;
+  let cmds                = await queryCommand.selectAllCommandsWithClusterInfo(db, [ packageId ]);
+  // For each command, include it twice: once as outgoing for its source, once
+  // as incoming for its destination.
+  let outgoing = cmds.map(cmd => ({...cmd, incoming : false, outgoing : true, clusterSide : cmd.source }));
+  let incoming = cmds.map(
+      cmd => ({...cmd, incoming : true, outgoing : false, clusterSide : (cmd.source == 'server' ? 'client' : 'server') }));
+  let commands = Promise.resolve(outgoing.concat(incoming));
+  return loadCommandsCommon.call(this, packageId, commands);
+}
+
 function loadCommands(packageId)
 {
   const { db, sessionId } = this.global;
-  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
-      .then(endpointTypes => queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
-      .then(endpointTypesAndClusters => queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
-                db, endpointTypesAndClusters, true))
-      .then(commands => Promise.all(commands.map(command => loadCommandResponse.call(this, command, packageId))))
+  let cmds                = queryEndpointType.selectEndpointTypeIds(db, sessionId)
+                 .then(endpointTypes => queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
+                 .then(endpointTypesAndClusters => queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
+                           db, endpointTypesAndClusters, true));
+
+  return loadCommandsCommon.call(this, packageId, cmds);
+}
+
+// commandsPromise is a promise for an array of commands.
+function loadCommandsCommon(packageId, commandsPromise)
+{
+  return commandsPromise.then(commands => Promise.all(commands.map(command => loadCommandResponse.call(this, command, packageId))))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
+}
+
+async function loadAllAttributes(packageId)
+{
+  // The 'server' side is enforced here, because the list of attributes is used to generate client global
+  // commands to retrieve server side attributes.
+  const { db, sessionId } = this.global;
+  let attrs               = await zclQuery.selectAllAttributesBySide(db, 'server', [ packageId ]);
+  const globalAttrs       = attrs.filter(attr => attr.clusterRef == null);
+  // Exclude global attributes for now, since we will add them ourselves for
+  // all clusters.
+  attrs = attrs.filter(attr => attr.clusterRef != null);
+  // selectAllAttributesBySide sets clusterRef, not clusterId, so manually
+  // set the latter here.
+  attrs.forEach(attr => attr.clusterId = attr.clusterRef);
+
+  const clusters = await zclQuery.selectAllClusters(db, packageId);
+  for (let cluster of clusters) {
+    for (let globalAttr of globalAttrs) {
+      attrs.push({...globalAttr, clusterId : cluster.id });
+    }
+  }
+  // selectAllAttributesBySide includes optionality information, which we
+  // don't want here, because the types of the attributes are not in fact
+  // optionals for our purposes.
+  attrs.forEach(attr => delete attr.isOptional);
+  // Treat all attributes that could be reportable as reportable.
+  attrs.forEach(attr => {
+    if (attr.isReportable) {
+      attr.includedReportable = true;
+    }
+  });
+  return attrs.sort((a, b) => a.code - b.code);
 }
 
 function loadAttributes(packageId)
@@ -176,24 +249,37 @@ function loadAttributes(packageId)
   //.then(attributes => Promise.all(attributes.map(attribute => types.typeSizeAttribute(db, packageId, attribute))
 }
 
-function loadEvents(packageId)
+async function loadAllEvents(packageId)
 {
   const { db, sessionId } = this.global;
-  return queryEvent.selectAllEvents(db, packageId)
-      .then(events => { return queryEndpointType.selectEndpointTypeIds(db, sessionId)
-                    .then(endpointTypes => Promise.all(
-                              endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
-                    .then(clusters => clusters.flat(3))
-                    .then(clusters => {
-                      events.forEach(event => {
-                        const cluster = clusters.find(cluster => cluster.code == event.clusterCode && cluster.side == 'client');
-                        if (cluster) {
-                          event.clusterId   = cluster.clusterId;
-                          event.clusterName = cluster.name;
-                        }
-                      });
-                      return events.filter(event => clusters.find(cluster => cluster.code == event.clusterCode));
-                    }) })
+  let clusters            = await zclQuery.selectAllClusters(db, packageId);
+  return loadEventsCommon.call(this, packageId, clusters);
+}
+
+async function loadEvents(packageId)
+{
+  const { db, sessionId } = this.global;
+  let clusters            = await queryEndpointType.selectEndpointTypeIds(db, sessionId)
+                     .then(endpointTypes => Promise.all(
+                               endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
+                     .then(clusters => clusters.flat(3));
+  return loadEventsCommon.call(this, packageId, clusters);
+}
+
+// clusters is an array of clusters (not a promise).
+function loadEventsCommon(packageId, clusters)
+{
+  const { db, sessionId } = this.global;
+  return queryEvent.selectAllEvents(db, packageId).then(events => {
+    events.forEach(event => {
+      const cluster = clusters.find(cluster => cluster.code == event.clusterCode);
+      if (cluster) {
+        event.clusterId   = cluster.clusterId;
+        event.clusterName = cluster.name;
+      }
+    });
+    return events.filter(event => clusters.find(cluster => cluster.code == event.clusterCode));
+  });
 }
 
 function loadGlobalAttributes(packageId)
@@ -333,13 +419,13 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
   const enumItem = getEnum(enums, itemType);
   if (enumItem) {
     item.isEnum = true;
-    itemType    = enumItem.type;
+    itemType    = 'enum' + enumItem.size * 8;
   }
 
   const bitmap = getBitmap(bitmaps, itemType);
   if (bitmap) {
     item.isBitmap = true;
-    itemType      = bitmap.type;
+    itemType      = 'bitmap' + bitmap.size * 8;
   }
 
   const atomic = getAtomic(atomics, itemType);
@@ -473,8 +559,8 @@ function enhancedAttributes(attributes, globalAttributes, types)
   attributes.forEach(attribute => {
     enhancedItem(attribute, types);
     attribute.isGlobalAttribute     = globalAttributes.includes(attribute.code);
-    attribute.isWritableAttribute   = attribute.isWritable === 1;
-    attribute.isReportableAttribute = attribute.includedReportable === 1;
+    attribute.isWritableAttribute   = !!attribute.isWritable;
+    attribute.isReportableAttribute = !!attribute.includedReportable;
     attribute.chipCallback          = asChipCallback(attribute);
     attribute.isComplex             = attribute.isList || attribute.isStruct || attribute.isArray;
   });
@@ -602,7 +688,11 @@ Clusters._computeUsedStructureNames = async function(structs) {
   this._used_structure_names = new Set(this._cluster_structures.usedStructures.keys())
 }
 
-Clusters.init = async function(context) {
+/**
+ * If includeAll is true, all events/commands/attributes will be included, not
+ * just the ones enabled in the ZAP configuration.
+ */
+Clusters.init = async function(context, includeAll) {
   if (this.ready.running)
   {
     return this.ready;
@@ -621,11 +711,13 @@ Clusters.init = async function(context) {
   const promises = [
     Promise.all(loadTypes),
     loadEndpoints.call(context),
-    loadClusters.call(context),
-    loadCommands.call(context, packageId),
-    loadAttributes.call(context, packageId),
+    // For now just always use loadClusters, because we have a bunch of things
+    // defined in our XML that are not actually part of Matter.
+    (includeAll ? loadClusters : loadClusters).call(context, packageId),
+    (includeAll ? loadAllCommands : loadCommands).call(context, packageId),
+    (includeAll ? loadAllAttributes : loadAttributes).call(context, packageId),
     loadGlobalAttributes.call(context, packageId),
-    loadEvents.call(context, packageId),
+    (includeAll ? loadAllEvents : loadEvents).call(context, packageId),
   ];
 
   let [types, endpoints, clusters, commands, attributes, globalAttributes, events] = await Promise.all(promises);
@@ -654,13 +746,13 @@ function asBlocks(promise, options)
   return promise.then(data => templateUtil.collectBlocks(data, options, this))
 }
 
-function ensureClusters(context)
+function ensureClusters(context, includeAll = false)
 {
   // Kick off Clusters initialization.  This is async, but that's fine: all the
   // getters on Clusters wait on that initialziation to complete.
   ensureState(context, "Don't have a context");
 
-  Clusters.init(context);
+  Clusters.init(context, includeAll);
   return Clusters;
 }
 

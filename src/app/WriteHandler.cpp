@@ -306,9 +306,6 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
-        // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
-
         err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
         SuccessOrExit(err);
 
@@ -424,9 +421,6 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
-        // cluster info will be invalid / wildcard, it is safe to ignore CHIP_END_OF_TLV.
-
         err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
         SuccessOrExit(err);
 
@@ -445,8 +439,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         }
 
         ChipLogDetail(DataManagement,
-                      "Received group attribute write for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                      " attribute=" ChipLogFormatMEI,
+                      "Received group attribute write for Group=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
                       groupId, ChipLogValueMEI(dataAttributePath.mClusterId), ChipLogValueMEI(dataAttributePath.mAttributeId));
 
         iterator = groupDataProvider->IterateEndpoints(fabric);
@@ -499,7 +492,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             if (InteractionModelEngine::GetInstance()->HasConflictWriteRequests(this, dataAttributePath))
             {
                 ChipLogDetail(DataManagement,
-                              "Writing attribute endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI
+                              "Writing attribute endpoint=%u Cluster=" ChipLogFormatMEI " attribute=" ChipLogFormatMEI
                               " is conflict with other write transactions.",
                               mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                               ChipLogValueMEI(dataAttributePath.mAttributeId));
@@ -512,7 +505,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             }
 
             ChipLogDetail(DataManagement,
-                          "Processing group attribute write for endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                          "Processing group attribute write for endpoint=%u Cluster=" ChipLogFormatMEI
                           " attribute=" ChipLogFormatMEI,
                           mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                           ChipLogValueMEI(dataAttributePath.mAttributeId));
@@ -525,7 +518,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
-                             "WriteSingleClusterData Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
+                             "WriteSingleClusterData Endpoint=%u Cluster=" ChipLogFormatMEI " Attribute =" ChipLogFormatMEI
                              " failed: %" CHIP_ERROR_FORMAT,
                              mapping.endpoint_id, ChipLogValueMEI(dataAttributePath.mClusterId),
                              ChipLogValueMEI(dataAttributePath.mAttributeId), err.Format());
@@ -644,6 +637,18 @@ exit:
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const Protocols::InteractionModel::Status aStatus)
 {
     return AddStatus(aPath, StatusIB(aStatus));
+}
+
+CHIP_ERROR WriteHandler::AddClusterSpecificSuccess(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
+{
+    using Protocols::InteractionModel::Status;
+    return AddStatus(aPath, StatusIB(Status::Success, aClusterStatus));
+}
+
+CHIP_ERROR WriteHandler::AddClusterSpecificFailure(const ConcreteDataAttributePath & aPath, ClusterStatus aClusterStatus)
+{
+    using Protocols::InteractionModel::Status;
+    return AddStatus(aPath, StatusIB(Status::Failure, aClusterStatus));
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus)

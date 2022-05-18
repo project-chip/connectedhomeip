@@ -154,6 +154,10 @@
     63, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    4, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     3, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
     3, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     3, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
@@ -186,6 +190,10 @@
     1, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     3, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     4, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    0, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    3, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    4, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    5, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     0, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
     1, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     64, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \
@@ -218,6 +226,10 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroup, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveGroup, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: RemoveAllGroups, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Groups, Command: AddGroupIfIdentifying, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: Identify, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: IdentifyQuery, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Identify, Command: TriggerEffect, Privilege: manage */ \

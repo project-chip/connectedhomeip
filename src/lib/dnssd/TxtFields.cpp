@@ -195,7 +195,7 @@ TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 
 } // namespace Internal
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, CommissionNodeData & nodeData)
 {
     TxtFieldKey keyType = Internal::GetTxtFieldKey(key);
     switch (keyType)
@@ -225,32 +225,23 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
-        break;
-    case TxtFieldKey::kTcpSupported:
-        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
-        break;
     default:
         break;
     }
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData)
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData)
 {
     switch (Internal::GetTxtFieldKey(key))
     {
-    case TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
+    case TxtFieldKey::kSleepyIdleInterval:
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
+    case TxtFieldKey::kSleepyActiveInterval:
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
     case TxtFieldKey::kTcpSupported:
-        nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:
         break;

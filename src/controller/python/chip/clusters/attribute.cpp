@@ -69,7 +69,7 @@ using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::
                                          chip::EventId eventId, chip::EventNumber eventNumber, uint8_t priority, uint64_t timestamp,
                                          uint8_t timestampType, uint8_t * data, uint32_t dataLen,
                                          std::underlying_type_t<Protocols::InteractionModel::Status> imstatus);
-using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, uint64_t subscriptionId);
+using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, SubscriptionId subscriptionId);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
 using OnReportBeginCallback             = void (*)(PyObject * appContext);
@@ -82,6 +82,11 @@ OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
 OnReportBeginCallback gOnReportEndCallback                           = nullptr;
+
+void PythonResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & aNextSubscriptionIntervalMsec, bool & aShouldResubscribe)
+{
+    aShouldResubscribe = true;
+}
 
 class ReadClientCallback : public ReadClient::Callback
 {
@@ -131,7 +136,7 @@ public:
                                      to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
     {
         gOnSubscriptionEstablishedCallback(mAppContext, aSubscriptionId);
     }
@@ -223,6 +228,7 @@ struct __attribute__((packed)) PyReadAttributeParams
     uint32_t maxInterval; // MaxInterval in subscription request
     bool isSubscription;
     bool isFabricFiltered;
+    bool keepSubscriptions;
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
@@ -441,6 +447,8 @@ chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClien
         {
             params.mMinIntervalFloorSeconds   = pyParams.minInterval;
             params.mMaxIntervalCeilingSeconds = pyParams.maxInterval;
+            params.mKeepSubscriptions         = pyParams.keepSubscriptions;
+            params.mResubscribePolicy         = PythonResubscribePolicy;
             attributePaths.release();
             eventPaths.release();
             err = readClient->SendAutoResubscribeRequest(std::move(params));

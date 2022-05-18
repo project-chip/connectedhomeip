@@ -19,6 +19,22 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/zcl_structs}}
+
+{{#zcl_events}}
+@implementation CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_event_fields}}
+    {{>init_struct_member label=name type=type cluster=parent.parent.name}}
+    {{/zcl_event_fields}}
+  }
+  return self;
+}
+@end
+
+{{/zcl_events}}
+
 {{/zcl_clusters}}
 
 NS_ASSUME_NONNULL_END

@@ -53,9 +53,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -89,7 +89,7 @@ public:
     }
 
 private:
-    chip::MonotonicallyIncreasingCounter mEventCounter;
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -176,7 +176,7 @@ nlTestSuite sSuite =
 {
     "TestEventOverflow",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

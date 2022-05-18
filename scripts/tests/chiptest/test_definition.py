@@ -15,6 +15,7 @@
 
 import logging
 import os
+import sys
 import threading
 import time
 import typing
@@ -35,15 +36,20 @@ class App:
         self.runner = runner
         self.command = command
         self.cv_stopped = threading.Condition()
-        self.stopped = False
+        self.stopped = True
         self.lastLogIndex = 0
+        self.kvsPathSet = {'/tmp/chip_kvs'}
+        self.options = None
 
-    def start(self, discriminator):
+    def start(self, options=None):
         if not self.process:
+            # Cache command line options to be used for reboots
+            if options:
+                self.options = options
             # Make sure to assign self.process before we do any operations that
             # might fail, so attempts to kill us on failure actually work.
             self.process, self.outpipe, errpipe = self.__startServer(
-                self.runner, self.command, discriminator)
+                self.runner, self.command)
             self.waitForAnyAdvertisement()
             self.__updateSetUpCode()
             with self.cv_stopped:
@@ -64,31 +70,17 @@ class App:
             return True
         return False
 
-    def reboot(self, discriminator):
-        if self.process:
-            self.stop()
-            self.start(discriminator)
-            return True
-        return False
-
     def factoryReset(self):
-        storage = '/tmp/chip_kvs'
-        if os.path.exists(storage):
-            os.unlink(storage)
-
+        for kvs in self.kvsPathSet:
+            if os.path.exists(kvs):
+                os.unlink(kvs)
         return True
 
     def waitForAnyAdvertisement(self):
         self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
-    def waitForCommissionableAdvertisement(self):
-        self.__waitFor("mDNS service published: _matterc._udp",
-                       self.process, self.outpipe)
-        return True
-
-    def waitForOperationalAdvertisement(self):
-        self.__waitFor("mDNS service published: _matter._tcp",
-                       self.process, self.outpipe)
+    def waitForMessage(self, message):
+        self.__waitFor(message, self.process, self.outpipe)
         return True
 
     def kill(self):
@@ -97,6 +89,10 @@ class App:
 
     def wait(self, timeout=None):
         while True:
+            # If the App was never started, wait cannot be called on the process
+            if self.process == None:
+                time.sleep(0.1)
+                continue
             code = self.process.wait(timeout)
             with self.cv_stopped:
                 if not self.stopped:
@@ -107,12 +103,18 @@ class App:
                 while self.stopped:
                     self.cv_stopped.wait()
 
-    def __startServer(self, runner, command, discriminator):
-        logging.debug(
-            'Executing application under test with discriminator %s.' %
-            discriminator)
-        app_cmd = command + ['--discriminator', str(discriminator)]
-        app_cmd = app_cmd + ['--interface-id', str(-1)]
+    def __startServer(self, runner, command):
+        app_cmd = command + ['--interface-id', str(-1)]
+
+        if not self.options:
+            logging.debug('Executing application under test with default args')
+        else:
+            logging.debug('Executing application under test with the following args:')
+            for key, value in self.options.items():
+                logging.debug('   %s: %s' % (key, value))
+                app_cmd = app_cmd + [key, value]
+                if key == '--KVS':
+                    self.kvsPathSet.add(value)
         return runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe):
@@ -146,6 +148,7 @@ class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
     LOCK = auto()
+    OTA = auto()
 
 
 @dataclass
@@ -153,7 +156,12 @@ class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
     lock_app: typing.List[str]
+    ota_provider_app: typing.List[str]
+    ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
+
+    def items(self):
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app]
 
 
 @dataclass
@@ -209,14 +217,35 @@ class TestDefinition:
 
         try:
             if self.target == TestTarget.ALL_CLUSTERS:
-                app_cmd = paths.all_clusters_app
+                target_app = paths.all_clusters_app
             elif self.target == TestTarget.TV:
-                app_cmd = paths.tv_app
+                target_app = paths.tv_app
             elif self.target == TestTarget.LOCK:
-                app_cmd = paths.lock_app
+                target_app = paths.lock_app
+            elif self.target == TestTarget.OTA:
+                target_app = paths.ota_requestor_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
+
+            for path in paths.items():
+                # Do not add chip-tool to the register
+                if path == paths.chip_tool:
+                    continue
+
+                # For the app indicated by self.target, give it the 'default' key to add to the register
+                if path == target_app:
+                    key = 'default'
+                else:
+                    key = os.path.basename(path[-1])
+
+                app = App(runner, path)
+                # Add the App to the register immediately, so if it fails during
+                # start() we will be able to clean things up properly.
+                apps_register.add(key, app)
+                # Remove server application storage (factory reset),
+                # so it will be commissionable again.
+                app.factoryReset()
 
             tool_cmd = paths.chip_tool
 
@@ -231,24 +260,22 @@ class TestDefinition:
                 if os.path.exists(f):
                     os.unlink(f)
 
-            app = App(runner, app_cmd)
-            # Add the App to the register immediately, so if it fails during
-            # start() we will be able to clean things up properly.
-            apps_register.add("default", app)
-            # Remove server application storage (factory reset),
-            # so it will be commissionable again.
-            app.factoryReset()
-            app.start(str(randrange(1, 4096)))
+            # Only start and pair the default app
+            app = apps_register.get('default')
+            app.start()
+            pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
+            if sys.platform != 'darwin':
+                pairing_cmd.append('--paa-trust-store-path')
+                pairing_cmd.append(DEVELOPMENT_PAA_LIST)
+            runner.RunSubprocess(pairing_cmd,
+                                 name='PAIR', dependencies=[apps_register])
 
+            test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
+            if sys.platform != 'darwin':
+                test_cmd.append('--paa-trust-store-path')
+                test_cmd.append(DEVELOPMENT_PAA_LIST)
             runner.RunSubprocess(
-                tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode] +
-                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST],
-                name='PAIR', dependencies=[apps_register])
-
-            runner.RunSubprocess(
-                tool_cmd + ['tests', self.run_name] +
-                ['--paa-trust-store-path', DEVELOPMENT_PAA_LIST] +
-                ['--PICS', pics_file],
+                test_cmd,
                 name='TEST', dependencies=[apps_register])
 
         except Exception:

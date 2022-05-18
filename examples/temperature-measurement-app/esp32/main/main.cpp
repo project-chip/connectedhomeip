@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -27,16 +26,13 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include <app/server/Server.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include <cmath>
 #include <cstdio>
 #include <string>
 #include <vector>
-
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #include <lib/support/ErrorStr.h>
 
@@ -45,29 +41,16 @@
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
 
 const char * TAG = "temperature-measurement-app";
 
-static DeviceCallbacks EchoCallbacks;
-
-namespace {
-
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    sWiFiNetworkCommissioningInstance.Init();
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
-
-} // namespace
 
 extern "C" void app_main()
 {
@@ -107,7 +90,4 @@ extern "C" void app_main()
     }
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 }

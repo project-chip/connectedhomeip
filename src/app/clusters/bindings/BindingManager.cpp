@@ -19,12 +19,13 @@
 #include <app/util/binding-table.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 namespace {
 
-class BindingFabricTableDelegate : public chip::FabricTableDelegate
+class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 {
-    void OnFabricDeletedFromStorage(chip::CompressedFabricId compressedFabricId, chip::FabricIndex fabricIndex)
+    void OnFabricDeletedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
     {
         chip::BindingTable & bindingTable = chip::BindingTable::GetInstance();
         auto iter                         = bindingTable.begin();
@@ -39,14 +40,14 @@ class BindingFabricTableDelegate : public chip::FabricTableDelegate
                 ++iter;
             }
         }
-        chip::BindingManager::GetInstance().FabricRemoved(compressedFabricId, fabricIndex);
+        chip::BindingManager::GetInstance().FabricRemoved(fabricIndex);
     }
 
     // Intentionally left blank
-    void OnFabricRetrievedFromStorage(chip::FabricInfo * fabricInfo) {}
+    void OnFabricRetrievedFromStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 
     // Intentionally left blank
-    void OnFabricPersistedToStorage(chip::FabricInfo * fabricInfo) {}
+    void OnFabricPersistedToStorage(chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
 };
 
 BindingFabricTableDelegate gFabricTableDelegate;
@@ -160,7 +161,7 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
         {
             fabricToRemove = entry.fabricIndex;
             nodeToRemove   = entry.nodeId;
-            mBoundDeviceChangedHandler(entry, device, pendingNotification.mContext);
+            mBoundDeviceChangedHandler(entry, device, pendingNotification.mContext->GetContext());
         }
     }
     mPendingNotificationMap.RemoveAllEntriesForNode(fabricToRemove, nodeToRemove);
@@ -179,16 +180,25 @@ void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR err
     mInitParams.mCASESessionManager->ReleaseSession(peerId);
 }
 
-void BindingManager::FabricRemoved(CompressedFabricId compressedFabricId, FabricIndex fabricIndex)
+void BindingManager::FabricRemoved(FabricIndex fabricIndex)
 {
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
-    mInitParams.mCASESessionManager->ReleaseSessionsForFabric(compressedFabricId);
+
+    // TODO(#18436): NOC cluster should handle fabric removal without needing binding manager
+    //               to execute such a release. Currently not done because paths were not tested.
+    mInitParams.mCASESessionManager->ReleaseSessionsForFabric(fabricIndex);
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
+
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
+    VerifyOrReturnError(bindingContext != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    bindingContext->IncrementConsumersNumber();
 
     for (auto iter = BindingTable::GetInstance().begin(); iter != BindingTable::GetInstance().end(); ++iter)
     {
@@ -203,21 +213,26 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 if (peerDevice != nullptr && peerDevice->IsConnected())
                 {
                     // We already have an active connection
-                    mBoundDeviceChangedHandler(*iter, peerDevice, context);
+                    mBoundDeviceChangedHandler(*iter, peerDevice, bindingContext->GetContext());
                 }
                 else
                 {
-                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), context);
-                    ReturnErrorOnFailure(EstablishConnection(iter->fabricIndex, iter->nodeId));
+                    mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                    error = EstablishConnection(iter->fabricIndex, iter->nodeId);
+                    SuccessOrExit(error == CHIP_NO_ERROR);
                 }
             }
             else if (iter->type == EMBER_MULTICAST_BINDING)
             {
-                mBoundDeviceChangedHandler(*iter, nullptr, context);
+                mBoundDeviceChangedHandler(*iter, nullptr, bindingContext->GetContext());
             }
         }
     }
-    return CHIP_NO_ERROR;
+
+exit:
+    bindingContext->DecrementConsumersNumber();
+
+    return error;
 }
 
 } // namespace chip

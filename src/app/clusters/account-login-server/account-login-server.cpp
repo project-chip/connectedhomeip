@@ -58,11 +58,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "AccountLogin returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "AccountLogin returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetAccountLoginDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "AccountLogin NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogProgress(Zcl, "AccountLogin NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, AccountLogin::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
@@ -72,7 +72,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Account Login has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Account Login has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;

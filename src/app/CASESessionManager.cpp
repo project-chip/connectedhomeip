@@ -31,8 +31,6 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
 CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    Dnssd::ResolvedNodeData resolutionData;
-
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
                   ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
@@ -65,9 +63,9 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-void CASESessionManager::ReleaseSessionsForFabric(CompressedFabricId compressedFabricId)
+void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.devicePool->ReleaseDevicesForFabric(compressedFabricId);
+    mConfig.devicePool->ReleaseDevicesForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
@@ -81,11 +79,6 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();
     return CHIP_NO_ERROR;
-}
-
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session) const
-{
-    return mConfig.devicePool->FindDevice(session);
 }
 
 OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const

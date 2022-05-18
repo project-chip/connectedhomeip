@@ -537,8 +537,8 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
  * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
  * @param[in] asn1_sig ASN.1 DER signature input
  * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer. Size must be at
- * least >= `2 * fe_length_bytes`. On CHIP_NO_ERROR, the out_asn1_sig buffer will be re-assigned
- * to have the correct size based on variable-length output.
+ * least >= `2 * fe_length_bytes`. On CHIP_NO_ERROR, the out_raw_sig buffer will be re-assigned
+ * to have the correct size (2 * fe_length_bytes).
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig);
@@ -1351,12 +1351,6 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKe
                                       uint64_t & compressedFabricId);
 
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
-
-CHIP_ERROR LoadCertsFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);
-
-CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, uint32_t n_cert);
-
-CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
 
 enum class CertificateChainValidationResult
 {

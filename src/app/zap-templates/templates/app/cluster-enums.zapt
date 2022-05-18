@@ -20,7 +20,7 @@ namespace {{asUpperCamelCase name}} {
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 {{/if}}
 // Enum for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
+enum class {{asType label}} : {{asUnderlyingZclType name}} {
 {{#zcl_enum_items}}
 k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{/zcl_enum_items}}
@@ -34,7 +34,7 @@ using {{asType label}} = EmberAf{{asType label}};
 {{#zcl_bitmaps}}
 
 // Bitmap for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
+enum class {{asType label}} : {{asUnderlyingZclType name}} {
 {{#zcl_bitmap_items}}
 k{{asUpperCamelCase label}} = {{asHex mask}},
 {{/zcl_bitmap_items}}

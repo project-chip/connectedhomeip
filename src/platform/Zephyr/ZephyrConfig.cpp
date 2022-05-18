@@ -63,17 +63,13 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pSalt           = CONFIG_
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pVerifier       = CONFIG_KEY(NAMESPACE_FACTORY "verifier");
 // Keys stored in the chip config namespace
 // NOTE: update sAllResettableConfigKeys definition when adding a new entry below
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricId           = CONFIG_KEY(NAMESPACE_CONFIG "fabric-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceConfig      = CONFIG_KEY(NAMESPACE_CONFIG "service-config");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_PairedAccountId    = CONFIG_KEY(NAMESPACE_CONFIG "account-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceId          = CONFIG_KEY(NAMESPACE_CONFIG "service-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_FabricSecret       = CONFIG_KEY(NAMESPACE_CONFIG "fabric-secret");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_GroupKeyIndex      = CONFIG_KEY(NAMESPACE_CONFIG "group-key-index");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId = CONFIG_KEY(NAMESPACE_CONFIG "last-ek-id");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_UniqueId           = CONFIG_KEY(NAMESPACE_CONFIG "unique-id");
 
 // Keys stored in the counters namespace
@@ -84,12 +80,10 @@ const ZephyrConfig::Key ZephyrConfig::kCounterKey_TotalOperationalHours = CONFIG
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = {
-    ZephyrConfig::kConfigKey_FabricId,           ZephyrConfig::kConfigKey_ServiceConfig,
-    ZephyrConfig::kConfigKey_PairedAccountId,    ZephyrConfig::kConfigKey_ServiceId,
-    ZephyrConfig::kConfigKey_FabricSecret,       ZephyrConfig::kConfigKey_GroupKeyIndex,
-    ZephyrConfig::kConfigKey_LastUsedEpochKeyId, ZephyrConfig::kConfigKey_FailSafeArmed,
-    ZephyrConfig::kConfigKey_RegulatoryLocation, ZephyrConfig::kConfigKey_CountryCode,
-    ZephyrConfig::kConfigKey_Breadcrumb,
+    ZephyrConfig::kConfigKey_ServiceConfig, ZephyrConfig::kConfigKey_PairedAccountId,
+    ZephyrConfig::kConfigKey_ServiceId,     ZephyrConfig::kConfigKey_LastUsedEpochKeyId,
+    ZephyrConfig::kConfigKey_FailSafeArmed, ZephyrConfig::kConfigKey_RegulatoryLocation,
+    ZephyrConfig::kConfigKey_CountryCode,
 };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function
@@ -114,14 +108,16 @@ int ConfigValueCallback(const char * name, size_t configSize, settings_read_cb r
     {
         request.result     = CHIP_ERROR_BUFFER_TOO_SMALL;
         request.configSize = configSize;
-        return 0;
+        return 1;
     }
 
     // Found requested key
     const ssize_t bytesRead = readCb(cbArg, request.destination, request.bufferSize);
     request.result          = bytesRead > 0 ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     request.configSize      = bytesRead > 0 ? bytesRead : 0;
-    return 0;
+
+    // Return 1 to stop processing further keys
+    return 1;
 }
 
 // Read configuration value of maximum size `bufferSize` and store the actual size in `configSize`.

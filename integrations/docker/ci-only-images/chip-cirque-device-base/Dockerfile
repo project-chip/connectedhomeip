@@ -11,8 +11,9 @@ RUN mkdir /app
 
 WORKDIR /app
 
-# TODO: Use multi stage build for smaller image size.
+RUN apt-cache policy
 
+# TODO: Use multi stage build for smaller image size.
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   avahi-daemon=0.7-4ubuntu7.1 \
@@ -20,11 +21,11 @@ RUN apt-get update \
   ca-certificates=20210119~20.04.2 \
   dhcpcd5=7.1.0-2build1 \
   gdb=9.2-0ubuntu1~20.04.1 \
-  git=1:2.25.1-1ubuntu3.3 \
+  git=1:2.25.1-1ubuntu3.4 \
   iproute2=5.5.0-1ubuntu1 \
   libavahi-client3=0.7-4ubuntu7.1 \
   libcairo2-dev=1.16.0-4ubuntu1 \
-  libdbus-1-dev=1.12.16-2ubuntu2.1 \
+  libdbus-1-dev=1.12.16-2ubuntu2.2 \
   libgif-dev=5.1.9-1 \
   libgirepository1.0-dev=1.64.1-1~ubuntu20.04.1 \
   libglib2.0-dev=2.64.6-1~ubuntu20.04.4 \
@@ -42,7 +43,6 @@ RUN apt-get update \
   && git submodule update --init --depth=1 \
   && ./script/bootstrap \
   && ./script/setup \
-  && chmod 644 /etc/bind/named.conf.options \
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   git psmisc ninja-build cmake wget libreadline-dev libncurses-dev libcpputest-dev \
   libavahi-common-dev libavahi-client-dev libboost-dev libboost-filesystem-dev \

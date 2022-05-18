@@ -80,12 +80,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                           setuppin=20202021,
                                           nodeid=1))
     FailIfNot(ok, "Failed to commission multi-fabric")
-    #
-    # The server will crash if we are aborting / closing it too fast.
-    # Issue: #15987
-    # logger.info("Testing closing sessions")
-    # FailIfNot(test.TestCloseSession(nodeid=device_nodeid),
-    #           "Failed to close sessions")
+
+    logger.info("Testing closing sessions")
+    FailIfNot(test.TestCloseSession(nodeid=device_nodeid), "Failed to close sessions")
 
 
 @base.test_case

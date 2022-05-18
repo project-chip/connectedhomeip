@@ -30,20 +30,23 @@ CHIP_ERROR TestCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestCommand::WaitForCommissionee(chip::NodeId nodeId)
+CHIP_ERROR TestCommand::WaitForCommissionee(const char * identity,
+                                            const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
 {
     chip::FabricIndex fabricIndex;
 
-    ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+    ReturnErrorOnFailure(GetCommissioner(identity).GetFabricIndex(&fabricIndex));
 
     //
     // There's a chance the commissionee may have rebooted before this call here as part of a test flow
     // or is just starting out fresh outright. Let's make sure we're not re-using any cached CASE sessions
     // that will now be stale and mismatched with the peer, causing subsequent interactions to fail.
     //
-    CurrentCommissioner().SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(nodeId, fabricIndex));
+    GetCommissioner(identity).SessionMgr()->ExpireAllPairings(chip::ScopedNodeId(value.nodeId, fabricIndex));
 
-    return CurrentCommissioner().GetConnectedDevice(nodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    SetIdentity(identity);
+    return GetCommissioner(identity).GetConnectedDevice(value.nodeId, &mOnDeviceConnectedCallback,
+                                                        &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
@@ -66,18 +69,44 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
     LogErrorOnFailure(command->ContinueOnChipMainThread(error));
 }
 
-void TestCommand::Exit(std::string message)
+void TestCommand::ExitAsync(intptr_t context)
 {
-    ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
-    SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+    auto testCommand = reinterpret_cast<TestCommand *>(context);
+    testCommand->InteractionModel::Shutdown();
+    testCommand->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
-void TestCommand::ThrowFailureResponse(CHIP_ERROR error)
+void TestCommand::Exit(std::string message, CHIP_ERROR err)
 {
-    Exit(std::string("Expecting success response but got a failure response: ") + chip::ErrorStr(error));
+    mContinueProcessing = false;
+
+    LogEnd(message, err);
+
+    if (CHIP_NO_ERROR == err)
+    {
+        InteractionModel::Shutdown();
+        SetCommandExitStatus(err);
+    }
+    else
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(ExitAsync, reinterpret_cast<intptr_t>(this));
+    }
 }
 
-void TestCommand::ThrowSuccessResponse()
+CHIP_ERROR TestCommand::ContinueOnChipMainThread(CHIP_ERROR err)
 {
-    Exit("Expecting failure response but got a success response");
+    if (mContinueProcessing == false)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (CHIP_NO_ERROR == err)
+    {
+        chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+        value.ms = 0;
+        return WaitForMs(GetIdentity().c_str(), value);
+    }
+
+    Exit(chip::ErrorStr(err), err);
+    return CHIP_NO_ERROR;
 }

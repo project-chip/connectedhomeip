@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
-#include "BoltLockManager.h"
+#include "LockManager.h"
 #include "sl_simple_button_instances.h"
 
 #include "FreeRTOS.h"
@@ -38,6 +38,7 @@
 #define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
+#define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
 
 class AppTask
 {
@@ -46,7 +47,7 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
-    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
+    void ActionRequest(int32_t aActor, LockManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
     void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
@@ -56,8 +57,8 @@ private:
 
     CHIP_ERROR Init();
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction);
+    static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(LockManager::Action_t aAction);
 
     void CancelTimer(void);
 

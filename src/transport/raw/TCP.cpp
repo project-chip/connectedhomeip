@@ -224,14 +224,11 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     // Ensures sufficient active connections size exist
     VerifyOrReturnError(mUsedEndPointCount < mActiveConnectionsSize, CHIP_ERROR_NO_MEMORY);
 
-    Inet::TCPEndPoint * endPoint = nullptr;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    Inet::TCPEndPoint * endPoint = nullptr;
     ReturnErrorOnFailure(mListenSocket->GetEndPointManager().NewEndPoint(&endPoint));
     auto EndPointDeletor = [](Inet::TCPEndPoint * e) { e->Free(); };
     std::unique_ptr<Inet::TCPEndPoint, decltype(EndPointDeletor)> endPointHolder(endPoint, EndPointDeletor);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 
     endPoint->mAppState            = reinterpret_cast<void *>(this);
     endPoint->OnDataReceived       = OnTcpReceive;
@@ -247,11 +244,12 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     VerifyOrReturnError(mPendingPackets.CreateObject(addr, std::move(msg)) != nullptr, CHIP_ERROR_NO_MEMORY);
     mUsedEndPointCount++;
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
     endPointHolder.release();
-#endif
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,

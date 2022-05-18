@@ -79,11 +79,15 @@ CHIP_ERROR PendingNotificationMap::FindLRUConnectPeer(FabricIndex * fabric, Node
     return CHIP_ERROR_NOT_FOUND;
 }
 
-void PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, void * context)
+void PendingNotificationMap::AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context)
 {
     RemoveEntry(bindingEntryId);
     mPendingBindingEntries[mNumEntries] = bindingEntryId;
     mPendingContexts[mNumEntries]       = context;
+    if (context)
+    {
+        context->IncrementConsumersNumber();
+    }
     mNumEntries++;
 }
 
@@ -97,6 +101,10 @@ void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
             mPendingContexts[newEntryCount]       = mPendingContexts[i];
             newEntryCount++;
+        }
+        else if (mPendingContexts[i] != nullptr)
+        {
+            mPendingContexts[i]->DecrementConsumersNumber();
         }
     }
     mNumEntries = newEntryCount;
@@ -114,6 +122,10 @@ void PendingNotificationMap::RemoveAllEntriesForNode(FabricIndex fabric, NodeId 
             mPendingContexts[newEntryCount]       = mPendingContexts[i];
             newEntryCount++;
         }
+        else if (mPendingContexts[i] != nullptr)
+        {
+            mPendingContexts[i]->DecrementConsumersNumber();
+        }
     }
     mNumEntries = newEntryCount;
 }
@@ -129,6 +141,10 @@ void PendingNotificationMap::RemoveAllEntriesForFabric(FabricIndex fabric)
             mPendingBindingEntries[newEntryCount] = mPendingBindingEntries[i];
             mPendingContexts[newEntryCount]       = mPendingContexts[i];
             newEntryCount++;
+        }
+        else if (mPendingContexts[i] != nullptr)
+        {
+            mPendingContexts[i]->DecrementConsumersNumber();
         }
     }
     mNumEntries = newEntryCount;

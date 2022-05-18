@@ -742,7 +742,7 @@ class AsyncWriteTransaction:
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32, c_uint16, c_uint32, c_uint32, c_uint8, c_void_p, c_size_t)
-_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
+_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint32)
 _OnReadEventDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint64, c_uint8, c_uint64, c_uint8, c_void_p, c_size_t, c_uint8)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
@@ -857,10 +857,11 @@ _ReadParams = construct.Struct(
     "MaxInterval" / construct.Int32ul,
     "IsSubscription" / construct.Flag,
     "IsFabricFiltered" / construct.Flag,
+    "KeepSubscriptions" / construct.Flag,
 )
 
 
-def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True, keepSubscriptions: bool = False) -> int:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -940,6 +941,7 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
         params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
         params.IsSubscription = True
+        params.KeepSubscriptions = keepSubscriptions
     params.IsFabricFiltered = fabricFiltered
     params = _ReadParams.build(params)
 

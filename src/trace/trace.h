@@ -17,6 +17,16 @@
 
 #pragma once
 
+namespace chip {
+void InitializeTracing();
+} // namespace chip
+
+#if defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE
+
+#include "trace/MatterCustomTrace.h"
+
+#else // MATTER_CUSTOM_TRACE
+
 #if defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
 
 /* ignore GCC Wconversion warnings for pigweed */
@@ -69,3 +79,5 @@
 #define MATTER_TRACE_EVENT_FUNCTION_FLAG(...) _MATTER_TRACE_EVENT_DISABLE(__VA_ARGS__)
 
 #endif // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
+
+#endif // defined(MATTER_CUSTOM_TRACE) && MATTER_CUSTOM_TRACE

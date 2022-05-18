@@ -45,22 +45,28 @@ declare_args() {
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 
-  # Enables LCD Qr Code on supported devices
-  show_qr_code = true
+  # Disable LCD on supported devices
+  disable_lcd = false
 }
+
+declare_args() {
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = !disable_lcd
+}
+
+# qr code cannot be true if lcd is disabled
+assert(!(disable_lcd && show_qr_code))
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
 if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
+  disable_lcd = true
 }
-
-# Enables LCD on supported devices
-lcd_on = show_qr_code
 
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -125,7 +131,7 @@ efr32_executable("ota_requestor_app") {
     ]
   }
 
-  if (lcd_on) {
+  if (!disable_lcd) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
     defines += [ "DISPLAY_ENABLED" ]
     if (show_qr_code) {

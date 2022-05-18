@@ -28,6 +28,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 using namespace chip;
 using namespace chip::ArgParser;
 
@@ -277,7 +279,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         if ((saltVector.size() < chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length) ||
             (saltVector.size() > chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length))
         {
-            PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
+            PrintArgError("%s: ERROR: argument %s not in range [%u, %u]\n", aProgram, aName,
                           chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length, chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
             retval = false;
             break;
@@ -302,7 +304,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
         if (serializedVerifier.size() != chip::Crypto::kSpake2p_VerifierSerialized_Length)
         {
-            PrintArgError("%s: ERROR: argument %s should contain base64 for a %zu bytes octet string \n", aProgram, aName,
+            PrintArgError("%s: ERROR: argument %s should contain base64 for a %u bytes octet string \n", aProgram, aName,
                           chip::Crypto::kSpake2p_VerifierSerialized_Length);
             retval = false;
             break;
@@ -323,7 +325,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         if ((iterCount < chip::Crypto::kSpake2p_Min_PBKDF_Iterations) || (iterCount > chip::Crypto::kSpake2p_Max_PBKDF_Iterations))
         {
-            PrintArgError("%s: ERROR: argument %s not in range [%zu, %zu]\n", aProgram, aName,
+            PrintArgError("%s: ERROR: argument %s not in range [%u, %u]\n", aProgram, aName,
                           chip::Crypto::kSpake2p_Min_PBKDF_Iterations, chip::Crypto::kSpake2p_Max_PBKDF_Iterations);
             retval = false;
             break;
@@ -388,7 +390,7 @@ OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS",
 OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr, nullptr };
 } // namespace
 
-CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)
+CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptions)
 {
     // Index 0 is for the general Linux options
     uint8_t optionSetIndex = 1;
@@ -413,5 +415,9 @@ CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
+    if (gDeviceOptions.dacProvider == nullptr)
+    {
+        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+    }
     return gDeviceOptions;
 }

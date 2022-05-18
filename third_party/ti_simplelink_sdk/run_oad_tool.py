@@ -10,6 +10,7 @@ Run with:
     python run_oad_tool.py <path to TI SimpleLinkSdk> <root out dir> <exe base name> <pem file> <bim hexfile>
 """
 
+import os
 import sys
 import subprocess
 import json
@@ -35,13 +36,13 @@ proc_call += [
     'ccs',
     root_out_dir,
     '7',
-    '-hex1', hex_file,
+    '-hex1', os.path.relpath(hex_file, root_out_dir),
     '-k', pem_file,
     '-o', sys.argv[3]
 ]
 
 # run oad_tool to fill in the header
-subprocess.call(proc_call)
+subprocess.check_call(proc_call)
 
 # merge binary executable with bim hex file
 ota_image = intelhex.IntelHex()

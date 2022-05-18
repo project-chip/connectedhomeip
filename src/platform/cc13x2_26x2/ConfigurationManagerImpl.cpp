@@ -67,7 +67,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<CC13X2_26X2Config>::Init();
 
-exit:
     return err;
 }
 

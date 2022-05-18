@@ -3770,6 +3770,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("credentialExists", indent + 1, value.credentialExists));
     ReturnErrorOnFailure(DataModelLogger::LogValue("userIndex", indent + 1, value.userIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("creatorFabricIndex", indent + 1, value.creatorFabricIndex));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("lastModifiedFabricIndex", indent + 1, value.lastModifiedFabricIndex));
     ReturnErrorOnFailure(DataModelLogger::LogValue("nextCredentialIndex", indent + 1, value.nextCredentialIndex));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -4267,9 +4269,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(
-        chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32,
-        path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId), path.mDataVersion.ValueOr(0));
+    ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Attribute " ChipLogFormatMEI " DataVersion: %" PRIu32,
+                    path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId),
+                    path.mDataVersion.ValueOr(0));
 
     switch (path.mClusterId)
     {
@@ -5631,6 +5633,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CredentialRulesSupport", 1, value);
         }
+        case DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfCredentialsSupportedPerUser", 1, value);
+        }
         case DoorLock::Attributes::EnableLogging::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -6540,17 +6547,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case FanControl::Attributes::FanMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::FanControl::FanModeType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode", 1, value);
         }
         case FanControl::Attributes::FanModeSequence::Id: {
-            uint8_t value;
+            chip::app::Clusters::FanControl::FanModeSequenceType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("fan mode sequence", 1, value);
         }
         case FanControl::Attributes::PercentSetting::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("percent setting", 1, value);
         }
@@ -6565,7 +6572,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("speed max", 1, value);
         }
         case FanControl::Attributes::SpeedSetting::Id: {
-            uint8_t value;
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("speed setting", 1, value);
         }
@@ -8106,67 +8113,67 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case PumpConfigurationAndControl::Attributes::MaxPressure::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxPressure", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxSpeed::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxSpeed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxFlow::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxFlow", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MinConstPressure::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinConstPressure", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxConstPressure::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxConstPressure", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MinCompPressure::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinCompPressure", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxCompPressure::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxCompPressure", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MinConstSpeed::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinConstSpeed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxConstSpeed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MinConstFlow::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinConstFlow", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxConstFlow::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxConstFlow", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MinConstTemp::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MinConstTemp", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::MaxConstTemp::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxConstTemp", 1, value);
         }
@@ -8176,22 +8183,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EffectiveOperationMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EffectiveControlMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::Capacity::Id: {
-            int16_t value;
+            chip::app::DataModel::Nullable<int16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Capacity", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::Speed::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Speed", 1, value);
         }
@@ -8201,7 +8208,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LifetimeRunningHours", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::Power::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Power", 1, value);
         }
@@ -8211,12 +8218,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LifetimeEnergyConsumed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::OperationMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::ControlMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ControlMode", 1, value);
         }
@@ -8257,17 +8264,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case RelativeHumidityMeasurement::Attributes::MeasuredValue::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("measured value", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("min measured value", 1, value);
         }
         case RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("max measured value", 1, value);
         }
@@ -10039,7 +10046,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
 
 CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Command " ChipLogFormatMEI, path.mEndpointId,
+    ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Command " ChipLogFormatMEI, path.mEndpointId,
                     ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId));
 
     switch (path.mClusterId)
@@ -10498,8 +10505,8 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
 
 CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data)
 {
-    ChipLogProgress(chipTool, "Endpoint: %" PRIu16 " Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI,
-                    header.mPath.mEndpointId, ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
+    ChipLogProgress(chipTool, "Endpoint: %u Cluster: " ChipLogFormatMEI " Event " ChipLogFormatMEI, header.mPath.mEndpointId,
+                    ChipLogValueMEI(header.mPath.mClusterId), ChipLogValueMEI(header.mPath.mEventId));
 
     ChipLogProgress(chipTool, "\t Event number: %" PRIu64, header.mEventNumber);
 

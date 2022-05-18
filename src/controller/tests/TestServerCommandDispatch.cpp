@@ -184,8 +184,6 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
 
     responseDirective = kSendDataResponse;
 
-    ctx.EnableAsyncDispatch();
-
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
                                            onFailureCb);
 
@@ -402,7 +400,7 @@ nlTestSuite sSuite =
 {
     "TestCommands",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

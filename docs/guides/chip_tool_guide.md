@@ -391,6 +391,40 @@ $ ./chip-tool basic
 This section contains a general list of various CHIP Tool commands and options,
 not limited to commissioning procedure and cluster interaction.
 
+### Interactive mode versus single command mode
+
+By default, chip-tool runs in single command mode where if any single command
+does not complete within a certain timeout period, chip-tool will exit with a
+timeout error.
+
+Example of error:
+
+```
+[1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
+```
+
+This timeout can be modified for any command execution by supplying the optional
+`--timeout` parameter, which takes a value in seconds, with the maximum being
+65535 seconds.
+
+Example of command:
+
+```
+$ ./chip-tool otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0 --timeout 65535
+```
+
+For commands such as event subscriptions that need to run for an extended period
+of time, chip-tool can be started in interactive mode first before running the
+command. In interactive mode, there will be no timeout and multiple commands can
+be issued.
+
+Example of command:
+
+```
+$ ./chip-tool interactive start
+otasoftwareupdaterequestor subscribe-event state-transition 5 10 ${NODE_ID} 0
+```
+
 ### Printing all supported clusters
 
 To print all clusters supported by the CHIP Tool, run the following command:
@@ -622,6 +656,27 @@ $ ./chip-tool tests <test_name>
 In this command:
 
 -   _<test_name\>_ is the name of the particular test.
+
+#### Example: running `TestClusters` test
+
+As an example of running one test suite test:
+
+```
+# Clean initialization of state.
+rm -fr /tmp/chip_*
+
+# In a shell window, start the DUT device.
+./out/debug/standalone/chip-all-clusters-app
+
+# In a second shell window, pair the DUT with chip-tool.
+./out/debug/standalone/chip-tool pairing onnetwork 333221 20202021
+
+# Now run the test
+./out/debug/standalone/chip-tool tests TestCluster --nodeId 333221
+```
+
+Developer details on how the test suite is structured can be found
+[here](../../src/app/tests/suites/README.md).
 
 ### Parsing the setup payload
 

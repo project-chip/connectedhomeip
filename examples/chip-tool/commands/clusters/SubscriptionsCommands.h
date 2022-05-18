@@ -36,7 +36,7 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 private:
-    uint64_t mSubscriptionId;
+    chip::SubscriptionId mSubscriptionId;
 };
 
 class ShutdownSubscriptions : public CHIPCommand

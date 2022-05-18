@@ -53,20 +53,20 @@ limitations under the License.
     <define>FAN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FAN_MODE" type="ENUM8" min="0x00" max="0x06" writable="true" default="0x00" optional="false">fan mode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="ENUM8" min="0x00" max="0x04" writable="true" default="0x02" optional="false">fan mode sequence</attribute>
-    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0x00" max="0x64" writable="true" default="0x00" optional="false">percent setting</attribute>
-    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0x00" max="0x64" writable="false" default="0x00" optional="false">percent current</attribute>
-    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="0x01" max="0x64" writable="false" default="0x00" optional="true">speed max</attribute>
-    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0x00" max="0x64" writable="true" default="0x00" optional="true">speed setting</attribute>
-    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0x00" max="0x64" writable="false" default="0x00" optional="true">speed current</attribute>
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">fan mode</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">fan mode sequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">percent setting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">percent current</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">speed max</attribute>
+    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">speed setting</attribute>
+    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">speed current</attribute>
     <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">rock support</attribute> 
     <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">rock setting</attribute>
     <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">wind support</attribute>
     <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">wind setting</attribute>                            
   </cluster>
   <!-- Fan Control Cluster data types -->  
-  <enum name="FanMode" type="ENUM8">
+  <enum name="FanModeType" type="ENUM8">
     <cluster code="0x0202"/>
     <item name="Off" value="0x00"/>
     <item name="Low" value="0x01"/>
@@ -76,7 +76,7 @@ limitations under the License.
     <item name="Auto" value="0x05"/>
     <item name="Smart" value="0x06"/>
   </enum>
-  <enum name="FanModeSequence" type="ENUM8">
+  <enum name="FanModeSequenceType" type="ENUM8">
     <cluster code="0x0202"/>
     <item name="Off/Low/Med/High" value="0x00"/>
     <item name="Off/Low/High" value="0x01"/>

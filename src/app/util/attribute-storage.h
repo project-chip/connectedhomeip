@@ -205,12 +205,11 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoin
                                         const EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
-void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);
+void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     uint8_t clientServerMask, EmberAfAttributeType attributeType, uint16_t size,
-                                                     uint8_t * value);
+                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
 // Calls the default response callback for a specific cluster.
 // with the EMBER_NULL_MANUFACTURER_CODE
@@ -268,9 +267,12 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 // An optional device type list can be passed in as well. If provided, the memory
 // backing the list needs to remain allocated until this dynamic endpoint is cleared.
 //
+// An optional parent endpoint id should be passed for child endpoints of composed device.
+//
 EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                         const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                        chip::Span<const EmberAfDeviceType> deviceTypeList = {});
+                                        chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                        chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 

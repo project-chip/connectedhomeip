@@ -35,32 +35,58 @@ namespace System {
 namespace Clock {
 
 namespace Internal {
+
 ClockImpl gClockImpl;
+
 } // namespace Internal
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
+namespace {
+
+// Last known UTC time in Unix format.
+#ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME
+Microseconds64 gRealTime = Seconds64(CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME);
+#else
+Microseconds64 gRealTime = Seconds64(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD);
+#endif
+
+// Monotonic time of setting the last known UTC time.
+Microseconds64 gRealTimeSetTime;
+
+} // namespace
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     return Microseconds64(k_ticks_to_us_floor64(k_uptime_ticks()));
 }
 
-Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     return Milliseconds64(k_uptime_get());
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    aCurTime = GetMonotonicMicroseconds64() - gRealTimeSetTime + gRealTime;
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    Microseconds64 curTimeUs;
+
+    ReturnErrorOnFailure(GetClock_RealTime(curTimeUs));
+    aCurTime = std::chrono::duration_cast<Milliseconds64>(curTimeUs);
+
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    gRealTime        = aNewCurTime;
+    gRealTimeSetTime = GetMonotonicMicroseconds64();
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clock

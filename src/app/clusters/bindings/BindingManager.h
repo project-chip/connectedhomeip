@@ -40,6 +40,12 @@ namespace chip {
  */
 using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry & binding, DeviceProxy * peer_device, void * context);
 
+/**
+ * Application callback function when a context used in NotifyBoundClusterChanged will not be needed and should be
+ * released.
+ */
+using BoundDeviceContextReleaseHandler = PendingNotificationContextReleaseHandler;
+
 struct BindingManagerInitParams
 {
     FabricTable * mFabricTable               = nullptr;
@@ -70,6 +76,16 @@ public:
 
     void RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler handler) { mBoundDeviceChangedHandler = handler; }
 
+    /*
+     * Registers handler that will be called when context used in NotifyBoundClusterChanged will not be needed and could be
+     * released.
+     *
+     */
+    void RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler handler)
+    {
+        mPendingNotificationMap.RegisterPendingNotificationContextReleaseHandler(handler);
+    }
+
     CHIP_ERROR Init(const BindingManagerInitParams & params);
 
     /*
@@ -88,7 +104,7 @@ public:
      * Notifies the BindingManager that a fabric is removed from the device
      *
      */
-    void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
+    void FabricRemoved(FabricIndex fabricIndex);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.

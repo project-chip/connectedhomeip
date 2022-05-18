@@ -278,6 +278,12 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
             .paaVendorId  = paaVidPid.mVendorId.ValueOr(VendorId::NotSpecified),
         };
 
+        MutableByteSpan paaSKID(deviceInfo.paaSKID);
+        VerifyOrExit(ExtractSKIDFromX509Cert(paaDerBuffer, paaSKID) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+        VerifyOrExit(paaSKID.size() == sizeof(deviceInfo.paaSKID),
+                     attestationError = AttestationVerificationResult::kPaaFormatInvalid);
+
         VerifyOrExit(DeconstructAttestationElements(info.attestationElementsBuffer, certificationDeclarationSpan,
                                                     attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan,
                                                     vendorReserved) == CHIP_NO_ERROR,
@@ -382,6 +388,14 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
             VerifyOrReturnError(cdElementsDecoder.IsProductIdIn(certDeclBuffer, deviceInfo.paiProductId),
                                 AttestationVerificationResult::kCertificationDeclarationInvalidProductId);
         }
+    }
+
+    if (cdContent.authorizedPAAListPresent)
+    {
+        // The Subject Key Id of the PAA SHALL match one of the values present in the authorized_paa_list
+        // in the Certification Declaration.
+        VerifyOrReturnError(cdElementsDecoder.HasAuthorizedPAA(certDeclBuffer, ByteSpan(deviceInfo.paaSKID)),
+                            AttestationVerificationResult::kCertificationDeclarationInvalidPAA);
     }
 
     return AttestationVerificationResult::kSuccess;
