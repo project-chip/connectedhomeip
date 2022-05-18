@@ -479,8 +479,8 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
 
     // Cluster LocalizationConfiguration attributes
-    kMatterClusterLocalizationConfigurationAttributeActiveLocaleID = 0x00000001,
-    kMatterClusterLocalizationConfigurationAttributeSupportedLocalesID = 0x00000002,
+    kMatterClusterLocalizationConfigurationAttributeActiveLocaleID = 0x00000000,
+    kMatterClusterLocalizationConfigurationAttributeSupportedLocalesID = 0x00000001,
     kMatterClusterLocalizationConfigurationAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
     kMatterClusterLocalizationConfigurationAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
     kMatterClusterLocalizationConfigurationAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
