@@ -21,11 +21,11 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/BLEManager.h>
 #include <platform/webos/ConnectivityUtils.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
 #include <platform/webos/WirelessDefs.h>
-#include <platform/internal/BLEManager.h>
 
 #include <cstdlib>
 #include <new>

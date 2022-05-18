@@ -27,13 +27,13 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <new>
-#include <platform/internal/BLEManager.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/internal/BLEManager.h>
 
 #include <cassert>
+#include <iomanip>
 #include <type_traits>
 #include <utility>
-#include <iomanip>
 
 #include "MainLoop.h"
 #include <pbnjson.h>
@@ -52,8 +52,8 @@ namespace Internal {
 
 namespace {
 
-static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
-static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(10);
+static constexpr unsigned kNewConnectionScanTimeoutMs   = 10000;
+static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -229,8 +229,8 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
-    mIsCentral = aIsCentral;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    mIsCentral     = aIsCentral;
 
     return err;
 }
@@ -394,12 +394,12 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return 20;
 }
 
-bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle *sh, LSMessage *message, void *userData)
+bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * message, void * userData)
 {
     BLEConnection * conn = nullptr;
     conn                 = (BLEConnection *) userData;
 
-    jvalue_ref parsedObj = {0};
+    jvalue_ref parsedObj     = { 0 };
     jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
 
     if (!input_schema)
@@ -413,7 +413,7 @@ bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle *sh, LSMessage *messag
     if (jis_null(parsedObj))
         return true;
 
-    const char *payload = jvalue_tostring(parsedObj, input_schema);
+    const char * payload = jvalue_tostring(parsedObj, input_schema);
 
     pbnjson::JValue jvalue = pbnjson::JDomParser::fromString(std::string(payload));
 
@@ -427,9 +427,10 @@ bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle *sh, LSMessage *messag
 
             pbnjson::JValue value = jvalue["changed"]["value"];
 
-            uint8_t* values = (uint8_t*)malloc(sizeof(uint8_t) * value["bytes"].arraySize());
+            uint8_t * values = (uint8_t *) malloc(sizeof(uint8_t) * value["bytes"].arraySize());
 
-            for (int i = 0; i < value["bytes"].arraySize(); i++) {
+            for (int i = 0; i < value["bytes"].arraySize(); i++)
+            {
                 values[i] = value["bytes"][i].asNumber<int32_t>();
             }
 
@@ -440,12 +441,12 @@ bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle *sh, LSMessage *messag
     return true;
 }
 
-bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle *sh, LSMessage *message, void *userData)
+bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle * sh, LSMessage * message, void * userData)
 {
     BLEConnection * conn = nullptr;
     conn                 = (BLEConnection *) userData;
 
-    jvalue_ref parsedObj = {0};
+    jvalue_ref parsedObj     = { 0 };
     jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
 
     if (!input_schema)
@@ -459,7 +460,7 @@ bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle *sh, LSMessage *message
     if (jis_null(parsedObj))
         return false;
 
-    const char *payload = jvalue_tostring(parsedObj, input_schema);
+    const char * payload = jvalue_tostring(parsedObj, input_schema);
 
     ChipLogProgress(DeviceLayer, "gattWriteDescriptorValueCb payload is %s", payload);
     sInstance.HandleSubscribeOpComplete(conn, true);
@@ -467,7 +468,7 @@ bool BLEManagerImpl::gattWriteDescriptorValueCb(LSHandle *sh, LSMessage *message
     return true;
 }
 
-bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint8_t *svcId, const uint8_t *charId)
+bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId)
 {
     pbnjson::JValue valueForMonitor = pbnjson::JObject();
 
@@ -487,7 +488,8 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint
         return false;
     }
 
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/monitorCharacteristics", valueForMonitor.stringify().c_str(), gattMonitorCharateristicsCb,  bleConnObj, NULL, NULL);
+    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/monitorCharacteristics", valueForMonitor.stringify().c_str(),
+                 gattMonitorCharateristicsCb, bleConnObj, NULL, NULL);
 
     sleep(2);
 
@@ -500,12 +502,15 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint
 
     bool subscribe = true; // current is true.
 
-    pbnjson::JValue valueParam = pbnjson::JObject();
+    pbnjson::JValue valueParam               = pbnjson::JObject();
     pbnjson::JValue bytesForDescriptorJArray = pbnjson::JArray(); // "bytes": [ ]
-    if (subscribe) {
+    if (subscribe)
+    {
         bytesForDescriptorJArray.append(2);
         bytesForDescriptorJArray.append(0);
-    } else {
+    }
+    else
+    {
         bytesForDescriptorJArray.append(0);
         bytesForDescriptorJArray.append(0);
     }
@@ -515,7 +520,8 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint
 
     ChipLogProgress(Ble, "SubscribeCharacteristicToWebOS Param : valueForDescriptor  %s", valueForDescriptor.stringify().c_str());
 
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeDescriptorValue", valueForDescriptor.stringify().c_str(), gattWriteDescriptorValueCb,  bleConnObj, NULL, NULL);
+    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeDescriptorValue", valueForDescriptor.stringify().c_str(),
+                 gattWriteDescriptorValueCb, bleConnObj, NULL, NULL);
 
     if (ret != 1)
         return false;
@@ -526,8 +532,8 @@ bool BLEManagerImpl::SubscribeCharacteristicToWebOS(void *bleConnObj, const uint
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     bool result = false;
-    result = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                                      static_cast<const uint8_t *>(charId->bytes));
+    result      = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
+                                            static_cast<const uint8_t *>(charId->bytes));
     return result;
 }
 
@@ -550,12 +556,12 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     return true;
 }
 
-bool BLEManagerImpl::gattWriteValueCb(LSHandle *sh, LSMessage *message, void *userData)
+bool BLEManagerImpl::gattWriteValueCb(LSHandle * sh, LSMessage * message, void * userData)
 {
     BLEConnection * conn = nullptr;
     conn                 = (BLEConnection *) userData;
 
-    jvalue_ref parsedObj = {0};
+    jvalue_ref parsedObj     = { 0 };
     jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
 
     if (!input_schema)
@@ -569,7 +575,7 @@ bool BLEManagerImpl::gattWriteValueCb(LSHandle *sh, LSMessage *message, void *us
     if (jis_null(parsedObj))
         return true;
 
-    const char *payload = jvalue_tostring(parsedObj, input_schema);
+    const char * payload = jvalue_tostring(parsedObj, input_schema);
 
     ChipLogProgress(DeviceLayer, "gattWriteValueCb payload is %s", payload);
     sInstance.HandleWriteComplete(conn);
@@ -577,14 +583,15 @@ bool BLEManagerImpl::gattWriteValueCb(LSHandle *sh, LSMessage *message, void *us
     return true;
 }
 
-bool BLEManagerImpl::SendWriteRequestToWebOS(void *bleConnObj, const uint8_t *svcId, const uint8_t *charId, const uint8_t *pBuf, uint32_t pBufDataLen)
+bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * svcId, const uint8_t * charId, const uint8_t * pBuf,
+                                             uint32_t pBufDataLen)
 {
     BLEConnection * conn = (BLEConnection *) bleConnObj;
     std::ostringstream cvt;
 
-    for (int i = 0; i < (int)pBufDataLen; i++)
+    for (int i = 0; i < (int) pBufDataLen; i++)
     {
-        cvt << std::hex << std::setfill('0') << std::setw(2) << (int)pBuf[i];
+        cvt << std::hex << std::setfill('0') << std::setw(2) << (int) pBuf[i];
     }
 
     pbnjson::JValue values = pbnjson::JObject();
@@ -593,30 +600,38 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void *bleConnObj, const uint8_t *sv
 
     ChipLogProgress(Ble, "SendWriteRequestToWebOS Param : value %s", values.stringify().c_str());
 
-    std::string clientId = values["clientId"].asString();
+    std::string clientId  = values["clientId"].asString();
     std::string valueType = "bytes";
-    std::string value = values["data"].asString();
+    std::string value     = values["data"].asString();
 
-    pbnjson::JValue param = pbnjson::JObject();
+    pbnjson::JValue param      = pbnjson::JObject();
     pbnjson::JValue valueParam = pbnjson::JObject();
     param.put("clientId", clientId);
     param.put("service", std::string(CHIP_BLE_GATT_SERVICE));
     param.put("characteristic", std::string(CHIP_BLE_GATT_CHAR_WRITE));
 
-    if (valueType == "byte") {
-        valueParam.put("bytes", pbnjson::JArray{std::stoi(value)});
-    } else if (valueType == "bytes") {
+    if (valueType == "byte")
+    {
+        valueParam.put("bytes", pbnjson::JArray{ std::stoi(value) });
+    }
+    else if (valueType == "bytes")
+    {
         pbnjson::JValue bytesJArray = JArray(); // "bytes": [ ]
         std::vector<char> bytes;
-        for (int i = 0; i < (int)value.length(); i += 2) {
+        for (int i = 0; i < (int) value.length(); i += 2)
+        {
             std::string byteString = value.substr(i, 2);
-            char c = (char) strtol(byteString.c_str(), NULL, 16);
+            char c                 = (char) strtol(byteString.c_str(), NULL, 16);
             bytesJArray.append(c);
         }
         valueParam.put("bytes", bytesJArray);
-    } else if (valueType == "string") {
+    }
+    else if (valueType == "string")
+    {
         valueParam.put("string", value);
-    } else {
+    }
+    else
+    {
     }
     param.put("value", valueParam);
 
@@ -630,7 +645,8 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void *bleConnObj, const uint8_t *sv
         return false;
     }
 
-    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeCharacteristicValue", param.stringify().c_str(), gattWriteValueCb,  conn, NULL, NULL);
+    ret = LSCall(mLSHandle, "luna://com.webos.service.bluetooth2/gatt/writeCharacteristicValue", param.stringify().c_str(),
+                 gattWriteValueCb, conn, NULL, NULL);
 
     VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "Failed to write characteristic . ret [%d]", ret));
 
@@ -646,7 +662,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
 {
     bool result = false;
     result = SendWriteRequestToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes), static_cast<const uint8_t *>(charId->bytes),
-                                pBuf->Start(), pBuf->DataLength());
+                                     pBuf->Start(), pBuf->DataLength());
 
     return result;
 }
@@ -664,7 +680,6 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     ChipLogError(Ble, "SendReadRBluezonse: Not implemented");
     return true;
 }
-
 
 void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
 {
@@ -791,9 +806,7 @@ exit:
     }
 }
 
-void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId) {}
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)
 {
@@ -961,7 +974,6 @@ void BLEManagerImpl::OnChipScanComplete(void)
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 
-
 void BLEManagerImpl::OnScanComplete()
 {
     if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
@@ -975,9 +987,9 @@ void BLEManagerImpl::OnScanComplete()
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 
-bool BLEManagerImpl::gattGetServiceCb(LSHandle *sh, LSMessage *message, void *userData)
+bool BLEManagerImpl::gattGetServiceCb(LSHandle * sh, LSMessage * message, void * userData)
 {
-    jvalue_ref parsedObj = {0};
+    jvalue_ref parsedObj     = { 0 };
     jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
 
     if (!input_schema)
@@ -991,8 +1003,7 @@ bool BLEManagerImpl::gattGetServiceCb(LSHandle *sh, LSMessage *message, void *us
     if (jis_null(parsedObj))
         return true;
 
-    const char *payload = jvalue_tostring(parsedObj, input_schema);
-
+    const char * payload = jvalue_tostring(parsedObj, input_schema);
 
     ChipLogProgress(DeviceLayer, "gattGetServiceCb payload is %s", payload);
 
@@ -1001,9 +1012,9 @@ bool BLEManagerImpl::gattGetServiceCb(LSHandle *sh, LSMessage *message, void *us
     return true;
 }
 
-bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userData)
+bool BLEManagerImpl::gattConnectCb(LSHandle * sh, LSMessage * message, void * userData)
 {
-    jvalue_ref parsedObj = {0};
+    jvalue_ref parsedObj     = { 0 };
     jschema_ref input_schema = jschema_parse(j_cstr_to_buffer("{}"), DOMOPT_NOOPT, NULL);
 
     if (!input_schema)
@@ -1017,19 +1028,18 @@ bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userD
     if (jis_null(parsedObj))
         return true;
 
-    const char *payload = jvalue_tostring(parsedObj, input_schema);
-
+    const char * payload = jvalue_tostring(parsedObj, input_schema);
 
     ChipLogProgress(DeviceLayer, "gattConnectCb payload is %s", payload);
 
-    jvalue_ref clientIdObj = {0};
+    jvalue_ref clientIdObj = { 0 };
     if (jobject_get_exists(parsedObj, J_CSTR_TO_BUF("clientId"), &clientIdObj))
     {
         raw_buffer clientId_buf = jstring_get(clientIdObj);
-        char *clientId = g_strdup(clientId_buf.m_str);
+        char * clientId         = g_strdup(clientId_buf.m_str);
         jstring_free_buffer(clientId_buf);
 
-        printf ("clientId : %s \n", clientId);
+        printf("clientId : %s \n", clientId);
 
         if (sInstance.mClientId != nullptr)
         {
@@ -1040,14 +1050,14 @@ bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userD
         g_free(clientId);
     }
 
-    jvalue_ref addressObj = {0};
+    jvalue_ref addressObj = { 0 };
     if (jobject_get_exists(parsedObj, J_CSTR_TO_BUF("address"), &addressObj))
     {
         raw_buffer address_buf = jstring_get(addressObj);
-        char *address = g_strdup(address_buf.m_str);
+        char * address         = g_strdup(address_buf.m_str);
         jstring_free_buffer(address_buf);
 
-        printf ("address : %s \n", address);
+        printf("address : %s \n", address);
 
         if (sInstance.mRemoteAddress != nullptr)
         {
@@ -1056,7 +1066,6 @@ bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userD
         sInstance.mRemoteAddress = g_strdup(address);
 
         g_free(address);
-
     }
 
     if (sInstance.mLSHandle == nullptr)
@@ -1066,13 +1075,14 @@ bool BLEManagerImpl::gattConnectCb(LSHandle *sh, LSMessage *message, void *userD
     }
     sleep(1);
     char ls2Param[100];
-    snprintf(ls2Param, 100, "{\"address\":\"%s\"}",sInstance.mRemoteAddress);
+    snprintf(ls2Param, 100, "{\"address\":\"%s\"}", sInstance.mRemoteAddress);
 
     ChipLogProgress(DeviceLayer, "getService: Addr [%s]", sInstance.mRemoteAddress);
 
     int ret = 0;
 
-    ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/getServices", ls2Param, gattGetServiceCb, NULL, NULL, NULL);
+    ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/getServices", ls2Param, gattGetServiceCb, NULL,
+                 NULL, NULL);
 
     VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "Failed to get GATT service . ret [%d]", ret));
 
@@ -1097,12 +1107,12 @@ gboolean BLEManagerImpl::ConnectChipThing(gpointer userData)
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", address);
 
     char ls2Param[100];
-    snprintf(ls2Param, 100, "{\"address\":\"%s\"}",address);
+    snprintf(ls2Param, 100, "{\"address\":\"%s\"}", address);
 
-    ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/connect", ls2Param, gattConnectCb, userData, NULL, NULL);
+    ret = LSCall(sInstance.mLSHandle, "luna://com.webos.service.bluetooth2/gatt/connect", ls2Param, gattConnectCb, userData, NULL,
+                 NULL);
 
     VerifyOrExit(ret == 1, ChipLogError(DeviceLayer, "Failed to create GATT client. ret [%d]", ret));
-
 
     ChipLogProgress(DeviceLayer, "GATT Connect Issued");
 exit:
@@ -1134,7 +1144,7 @@ void BLEManagerImpl::ConnectHandler(const char * address)
     g_source_unref(idleSource);
 }
 
-void BLEManagerImpl::OnChipDeviceScanned(char* address)
+void BLEManagerImpl::OnChipDeviceScanned(char * address)
 {
     ChipLogProgress(DeviceLayer, "New device scanned: %s", address);
 
@@ -1162,7 +1172,7 @@ void BLEManagerImpl::OnChipDeviceScanned(char* address)
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
-     ConnectHandler(address);
+    ConnectHandler(address);
 }
 
 } // namespace Internal

@@ -40,10 +40,10 @@ class ChipDeviceScannerDelegate
 public:
     virtual ~ChipDeviceScannerDelegate() {}
 
-    virtual void OnChipDeviceScanned(char* address) = 0;
+    virtual void OnChipDeviceScanned(char * address) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnScanComplete() = 0;
+    virtual void OnScanComplete()     = 0;
     virtual void OnChipScanComplete() = 0;
 };
 
@@ -53,7 +53,7 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner(LSHandle *handle, ChipDeviceScannerDelegate * delegate);
+    ChipDeviceScanner(LSHandle * handle, ChipDeviceScannerDelegate * delegate);
     ChipDeviceScanner(ChipDeviceScannerDelegate * delegate);
 
     ChipDeviceScanner(ChipDeviceScanner &&)      = default;
@@ -71,14 +71,14 @@ public:
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
-    static std::unique_ptr<ChipDeviceScanner> Create(LSHandle *handle, ChipDeviceScannerDelegate * delegate);
+    static std::unique_ptr<ChipDeviceScanner> Create(LSHandle * handle, ChipDeviceScannerDelegate * delegate);
     static std::unique_ptr<ChipDeviceScanner> Create(ChipDeviceScannerDelegate * delegate);
 
 private:
-    static void printFoundChipDevice(const jvalue_ref& scanRecord, const std::string& address);
-    static bool deviceGetstatusCb(LSHandle *sh, LSMessage *message, void *ctx);
-    static bool startDiscoveryCb(LSHandle *sh, LSMessage *message, void *ctx);
-    static bool cancelDiscoveryCb(LSHandle *sh, LSMessage *message, void *ctx);
+    static void printFoundChipDevice(const jvalue_ref & scanRecord, const std::string & address);
+    static bool deviceGetstatusCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static bool startDiscoveryCb(LSHandle * sh, LSMessage * message, void * ctx);
+    static bool cancelDiscoveryCb(LSHandle * sh, LSMessage * message, void * ctx);
 
     static gboolean TimerExpiredCb(gpointer user_data);
     static gboolean TriggerScan(GMainLoop * mainLoop, gpointer userData);
@@ -87,14 +87,13 @@ private:
     static int MainLoopStartScan(ChipDeviceScanner * self);
     static int MainLoopStopScan(ChipDeviceScanner * self);
 
-    LSHandle *mLSHandle                   = nullptr;
+    LSHandle * mLSHandle                  = nullptr;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
     GMainLoop * mAsyncLoop                = nullptr;
-
 };
 
 } // namespace Internal
