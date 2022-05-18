@@ -1449,7 +1449,7 @@
           "attributes": [
             {
               "name": "ActiveLocale",
-              "code": 1,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "char_string",
@@ -1465,7 +1465,7 @@
             },
             {
               "name": "SupportedLocales",
-              "code": 2,
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "array",
