@@ -46,9 +46,16 @@ const WaitForOperationalAdvertisement = {
   name : 'WaitForOperationalAdvertisement',
 };
 
-const name = 'DelayCommands';
-const commands =
-    [ WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForCommissionableAdvertisement, WaitForOperationalAdvertisement ];
+const WaitForMessage = {
+  name : 'WaitForMessage',
+  arguments : [ { type : 'CHAR_STRING', name : 'registerKey', isOptional : true }, { type : 'CHAR_STRING', name : 'message' } ],
+};
+
+const name     = 'DelayCommands';
+const commands = [
+  WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForCommissionableAdvertisement, WaitForOperationalAdvertisement,
+  WaitForMessage
+];
 
 const DelayCommands = {
   name,

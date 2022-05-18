@@ -64,7 +64,7 @@ class AppsRegister:
     def start(self, name, args):
         accessory = self.__accessories[name]
         if accessory:
-            # The args param comes directly from the sys.argv[1:] of Start.py and should contain a list of strings in
+            # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
             # key-value pair, e.g. [option1, value1, option2, value2, ...]
             options = self.__createCommandLineOptions(args)
             return accessory.start(options)
@@ -104,6 +104,14 @@ class AppsRegister:
             return accessory.waitForOperationalAdvertisement()
         return False
 
+    def waitForMessage(self, name, message):
+        accessory = self.__accessories[name]
+        if accessory:
+            # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
+            # comprise the entire message to wait for
+            return accessory.waitForMessage(' '.join(message))
+        return False
+
     def __startXMLRPCServer(self):
         self.server = SimpleXMLRPCServer((IP, PORT))
 
@@ -117,6 +125,9 @@ class AppsRegister:
         self.server.register_function(
             self.waitForOperationalAdvertisement,
             'waitForOperationalAdvertisement')
+        self.server.register_function(
+            self.waitForMessage,
+            'waitForMessage')
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()

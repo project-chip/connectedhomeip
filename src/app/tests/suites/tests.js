@@ -28,8 +28,7 @@ function disable(testName)
 
 // clang-format off
 
-function getManualTests()
-{
+function getManualTests() {
   const DeviceDiscovery = [
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
@@ -451,8 +450,7 @@ function getManualTests()
   return tests;
 }
 
-function getTests()
-{
+function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
   ];
@@ -604,6 +602,10 @@ function getTests()
     'Test_TC_MF_1_5',
     'Test_TC_MF_1_6',
     'Test_TC_MF_1_15',
+  ];
+
+  const OTASoftwareUpdate = [
+    'OTA_SuccessfulTransfer',
   ];
 
   const OnOff = [
@@ -785,6 +787,7 @@ function getTests()
     MediaControl,
     ModeSelect,
     MultipleFabrics,
+    OTASoftwareUpdate,
     OccupancySensing,
     OnOff,
     PowerSource,

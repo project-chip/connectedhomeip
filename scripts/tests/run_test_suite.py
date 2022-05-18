@@ -172,6 +172,12 @@ def cmd_list(context):
     '--lock-app',
     help='what lock app to use')
 @click.option(
+    '--ota-provider-app',
+    help='what ota provider app to use')
+@click.option(
+    '--ota-requestor-app',
+    help='what ota requestor app to use')
+@click.option(
     '--tv-app',
     help='what tv app to use')
 @click.option(
@@ -180,7 +186,7 @@ def cmd_list(context):
     default="src/app/tests/suites/certification/ci-pics-values",
     help='PICS file to use for test runs.')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, tv_app, pics_file):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, pics_file):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -188,6 +194,12 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, tv_app, pics_file):
 
     if lock_app is None:
         lock_app = FindBinaryPath('chip-lock-app')
+
+    if ota_provider_app is None:
+        ota_provider_app = FindBinaryPath('chip-ota-provider-app')
+
+    if ota_requestor_app is None:
+        ota_requestor_app = FindBinaryPath('chip-ota-requestor-app')
 
     if tv_app is None:
         tv_app = FindBinaryPath('chip-tv-app')
@@ -197,6 +209,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, tv_app, pics_file):
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
         lock_app=[lock_app],
+        ota_provider_app=[ota_provider_app],
+        ota_requestor_app=[ota_requestor_app],
         tv_app=[tv_app]
     )
 
