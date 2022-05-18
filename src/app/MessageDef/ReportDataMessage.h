@@ -40,11 +40,11 @@ namespace app {
 namespace ReportDataMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse    = 0,
-    kSubscriptionId      = 1,
-    kAttributeReportIBs  = 2,
-    kEventReports        = 3,
-    kMoreChunkedMessages = 4,
+    kSubscriptionId      = 0,
+    kAttributeReportIBs  = 1,
+    kEventReports        = 2,
+    kMoreChunkedMessages = 3,
+    kSuppressResponse    = 4,
 };
 
 class Parser : public MessageParser
