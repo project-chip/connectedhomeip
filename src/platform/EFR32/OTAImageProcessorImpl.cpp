@@ -17,8 +17,8 @@
  */
 
 #include "OTAImageProcessorImpl.h"
-#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 extern "C" {
 #include "platform/bootloader/api/btl_interface.h"
@@ -53,7 +53,8 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     // Delay HandleApply() to give KVS time to store the data in StoreCurrentUpdateInfo()
     ChipLogError(SoftwareUpdate, "Scheduling HandleApply");
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(EFR32_KVS_SAVE_DELAY_SECONDS + 1), HandleApply, nullptr);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(EFR32_KVS_SAVE_DELAY_SECONDS + 1), HandleApply,
+                                                nullptr);
     return CHIP_NO_ERROR;
 }
 
@@ -179,7 +180,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
-void OTAImageProcessorImpl::HandleApply(chip::System::Layer * systemLayer, void *context)
+void OTAImageProcessorImpl::HandleApply(chip::System::Layer * systemLayer, void * context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
