@@ -190,7 +190,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
             }
         }
 
-        LogFoundOperationalSrvRecord(mSpecificResolutionData.Get<OperationalNodeData>().peerId);
+        LogFoundOperationalSrvRecord(mSpecificResolutionData.Get<OperationalNodeData>().peerId, mTargetHostName.Get());
         break;
     case ServiceNameType::kCommissioner:
     case ServiceNameType::kCommissionable:
@@ -207,7 +207,7 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
             Platform::CopyString(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, nameCopy.Value());
         }
 
-        LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName);
+        LogFoundCommissionSrvRecord(mSpecificResolutionData.Get<CommissionNodeData>().instanceName, mTargetHostName.Get());
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -334,6 +334,9 @@ CHIP_ERROR IncrementalResolver::OnIpAddress(Inet::InterfaceId interface, const I
     }
 
     mCommonResolutionData.ipAddress[mCommonResolutionData.numIPs++] = addr;
+
+    LogFoundIPAddress(mTargetHostName.Get(), addr);
+
     return CHIP_NO_ERROR;
 }
 

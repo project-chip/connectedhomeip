@@ -113,15 +113,29 @@ void LogReceivedResource(const mdns::Minimal::ResourceData & data)
                     name.Fit() ? "" : "...");
 }
 
-void LogFoundOperationalSrvRecord(const chip::PeerId & peerId)
+void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minimal::SerializedQNameIterator & targetHost)
 {
-    ChipLogProgress(Discovery, "MINMDNS:     Operational SRV for " ChipLogFormatX64 "-" ChipLogFormatX64,
-                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+    QNameString host(targetHost);
+
+    ChipLogProgress(Discovery, "MINMDNS:     Operational SRV for " ChipLogFormatX64 "-" ChipLogFormatX64 ": %s",
+                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), host.c_str());
 }
 
-void LogFoundCommissionSrvRecord(const char * instance)
+void LogFoundCommissionSrvRecord(const char * instance, const mdns::Minimal::SerializedQNameIterator & targetHost)
 {
-    ChipLogProgress(Discovery, "MINMDNS:     Commission SRV for instance %s", instance);
+    QNameString host(targetHost);
+
+    ChipLogProgress(Discovery, "MINMDNS:     Commission SRV for instance %s: %s", instance, host.c_str());
+}
+
+void LogFoundIPAddress(const mdns::Minimal::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr)
+{
+    QNameString host(targetHost);
+    char ipBuff[chip::Inet::IPAddress::kMaxStringLength];
+
+    addr.ToString(ipBuff);
+
+    ChipLogProgress(Discovery, "MINMDNS:     IP address %s found for %s%s", ipBuff, host.c_str(), host.Fit() ? "" : "...");
 }
 
 } // namespace Logging

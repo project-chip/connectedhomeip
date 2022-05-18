@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <inet/IPAddress.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
 #include <lib/dnssd/minimal_mdns/Query.h>
@@ -31,16 +32,17 @@ namespace Logging {
 
 void LogSendingQuery(const mdns::Minimal::Query & query);
 void LogReceivedResource(const mdns::Minimal::ResourceData & data);
-
-void LogFoundOperationalSrvRecord(const chip::PeerId & peerId);
-void LogFoundCommissionSrvRecord(const char * instance);
+void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minimal::SerializedQNameIterator & targetHost);
+void LogFoundCommissionSrvRecord(const char * instance, const mdns::Minimal::SerializedQNameIterator & targetHost);
+void LogFoundIPAddress(const mdns::Minimal::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr);
 
 #else
 
 inline void LogSendingQuery(const mdns::Minimal::Query & query) {}
 inline void LogReceivedResource(const mdns::Minimal::ResourceData & data) {}
-inline void LogFoundOperationalSrvRecord(const chip::PeerId & peerId) {}
-inline void LogFoundCommissionSrvRecord(const char * instance) {}
+inline void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minimal::SerializedQNameIterator & targetHost) {}
+inline void LogFoundCommissionSrvRecord(const char * instance, const mdns::Minimal::SerializedQNameIterator & targetHost) {}
+inline void LogFoundIPAddress(const mdns::Minimal::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr) {}
 
 #endif
 
