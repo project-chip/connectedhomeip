@@ -2742,7 +2742,7 @@
               "side": "server",
               "type": "RegulatoryLocationType",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -2758,7 +2758,7 @@
               "side": "server",
               "type": "RegulatoryLocationType",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -5439,7 +5439,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -5455,7 +5455,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -12580,7 +12580,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -13200,11 +13200,11 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -13216,11 +13216,11 @@
               "side": "server",
               "type": "array",
               "included": 0,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -24645,6 +24645,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ],
-  "log": []
+  ]
 }
