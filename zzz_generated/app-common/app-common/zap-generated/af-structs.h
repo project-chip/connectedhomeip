@@ -23,8 +23,6 @@
 #include <stdint.h>
 
 #include <app/util/basic-types.h>
-#include <lib/core/GroupId.h>
-#include <lib/core/NodeId.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
