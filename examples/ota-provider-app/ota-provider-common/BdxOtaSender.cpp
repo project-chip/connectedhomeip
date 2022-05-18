@@ -82,10 +82,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             // end of the transfer.
             sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
-        if (mExchangeCtx == nullptr)
-        {
-            return;
-        }
+        VerifyOrReturn(mExchangeCtx != nullptr);
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
 
