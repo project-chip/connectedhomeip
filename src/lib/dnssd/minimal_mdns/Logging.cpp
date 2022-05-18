@@ -24,6 +24,8 @@ namespace Logging {
 
 namespace {
 
+#if CHIP_PROGRESS_LOGGING
+
 const char * QueryTypeToString(mdns::Minimal::QType type)
 {
     // NOTE: not all values are handled, only things that matter
@@ -49,6 +51,8 @@ const char * QueryTypeToString(mdns::Minimal::QType type)
         return buff;
     }
 }
+
+#endif
 
 class QNameString
 {
