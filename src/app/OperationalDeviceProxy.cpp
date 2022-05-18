@@ -191,7 +191,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
             return CHIP_NO_ERROR;
         }
 
-        mSecureSession.Get()->AsSecureSession()->SetPeerAddress(addr);
+        mSecureSession.Get().Value()->AsSecureSession()->SetPeerAddress(addr);
     }
 
     return err;
@@ -305,7 +305,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
     if (mSecureSession)
     {
-        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
+        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get().Value());
     }
     MoveToState(State::Initialized);
 
