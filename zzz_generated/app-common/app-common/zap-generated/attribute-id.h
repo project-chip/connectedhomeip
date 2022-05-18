@@ -334,8 +334,8 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_ACTIVE_LOCALE_ATTRIBUTE_ID (0x0001)
-#define ZCL_SUPPORTED_LOCALES_ATTRIBUTE_ID (0x0002)
+#define ZCL_ACTIVE_LOCALE_ATTRIBUTE_ID (0x0000)
+#define ZCL_SUPPORTED_LOCALES_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Time Format Localization
 

@@ -14,14 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import filecmp
 import sys
-import xmlrpc.client
 
-IP = '127.0.0.1'
-PORT = 9000
+file1 = sys.argv[1]
+file2 = sys.argv[2]
 
-if sys.platform == 'linux':
-    IP = '10.10.10.5'
 
-with xmlrpc.client.ServerProxy('http://' + IP + ':' + str(PORT) + '/', allow_none=True) as proxy:
-    proxy.waitForOperationalAdvertisement('default')
+def main():
+    if filecmp.cmp(file1, file2, shallow=False) is False:
+        raise Exception('Files %s and %s do not match' % (file1, file2))
+
+
+if __name__ == "__main__":
+    main()

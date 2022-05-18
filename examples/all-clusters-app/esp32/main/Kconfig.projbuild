@@ -108,11 +108,6 @@ menu "Demo"
         help
             Each board has a status led, define its pin number.
 
-    config DEINIT_BLE_ON_COMMISSIONING_COMPLETE
-	bool "Disable and DeInit BLE on commissioning complete"
-	default y
-	help 
-             Disable and deinit BLE and reclaim all its memory, once the commissioning is successful and Commissioning complete event is received in the application.	
 endmenu
 
 menu "PW RPC Debug channel"

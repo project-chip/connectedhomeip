@@ -50,6 +50,11 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return gResolver;
 }
 
+ResolverProxy::~ResolverProxy()
+{
+    Shutdown();
+}
+
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

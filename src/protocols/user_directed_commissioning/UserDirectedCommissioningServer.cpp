@@ -173,7 +173,6 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
         client->SetLongDiscriminator(nodeData.commissionData.longDiscriminator);
         client->SetVendorId(nodeData.commissionData.vendorId);
         client->SetProductId(nodeData.commissionData.productId);
-        client->SetDeviceName(nodeData.commissionData.deviceName);
         client->SetRotatingId(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.

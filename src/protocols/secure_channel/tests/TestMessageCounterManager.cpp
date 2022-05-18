@@ -48,7 +48,6 @@ using namespace chip::Messaging;
 using namespace chip::Protocols;
 
 using TestContext = chip::Test::LoopbackMessagingContext;
-TestContext sContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -169,6 +168,8 @@ int Finalize(void * aContext)
  */
 int TestMessageCounterManager()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

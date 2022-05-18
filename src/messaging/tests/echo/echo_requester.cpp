@@ -255,7 +255,7 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, gSession.Get());
+    err = gEchoClient.Init(&gExchangeManager, gSession.Get().Value());
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

@@ -27,6 +27,7 @@ const char * getScriptsFolder()
 } // namespace
 
 constexpr size_t kCommandMaxLen    = 256;
+constexpr size_t kArgumentMaxLen   = 128;
 constexpr const char * kDefaultKey = "default";
 
 CHIP_ERROR SystemCommands::Start(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Start::Type & value)
@@ -68,18 +69,25 @@ CHIP_ERROR SystemCommands::Start(const char * identity, const chip::app::Cluster
 
     if (value.kvs.HasValue())
     {
-        VerifyOrReturnError(value.kvs.Value().size() < 128, CHIP_ERROR_INVALID_ARGUMENT);
-        builder.Add(" --KVS ");
-        char kvs[128];
-        memset(kvs, '\0', sizeof(kvs));
-        strncpy(kvs, value.kvs.Value().data(), value.kvs.Value().size());
-        builder.Add(kvs);
+        AddSystemCommandArgument(builder, "--KVS", value.kvs.Value());
     }
 
     if (value.minCommissioningTimeout.HasValue())
     {
         builder.Add(" --min_commissioning_timeout ");
         builder.Add(value.minCommissioningTimeout.Value());
+    }
+
+    // OTA provider specific arguments
+    if (value.filepath.HasValue())
+    {
+        AddSystemCommandArgument(builder, "--filepath", value.filepath.Value());
+    }
+
+    // OTA requstor specific arguments
+    if (value.otaDownloadPath.HasValue())
+    {
+        AddSystemCommandArgument(builder, "--otaDownloadPath", value.otaDownloadPath.Value());
     }
 
     VerifyOrReturnError(builder.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -106,6 +114,42 @@ CHIP_ERROR SystemCommands::FactoryReset(const char * identity,
     return RunInternal(scriptName, value.registerKey);
 }
 
+CHIP_ERROR SystemCommands::CreateOtaImage(const char * identity,
+                                          const chip::app::Clusters::SystemCommands::Commands::CreateOtaImage::Type & value)
+{
+    VerifyOrReturnError(!value.rawImageContent.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!value.rawImageFilePath.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!value.otaImageFilePath.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const char * scriptDir            = getScriptsFolder();
+    constexpr const char * scriptName = "CreateOtaImage.py";
+
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %.*s %.*s %.*s", scriptDir, scriptName,
+                                 static_cast<int>(value.otaImageFilePath.size()), value.otaImageFilePath.data(),
+                                 static_cast<int>(value.rawImageFilePath.size()), value.rawImageFilePath.data(),
+                                 static_cast<int>(value.rawImageContent.size()), value.rawImageContent.data()) >= 0,
+                        CHIP_ERROR_INTERNAL);
+    return RunInternal(command);
+}
+
+CHIP_ERROR SystemCommands::CompareFiles(const char * identity,
+                                        const chip::app::Clusters::SystemCommands::Commands::CompareFiles::Type & value)
+{
+    VerifyOrReturnError(!value.file1.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!value.file2.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const char * scriptDir            = getScriptsFolder();
+    constexpr const char * scriptName = "CompareFiles.py";
+
+    char command[128];
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %.*s %.*s", scriptDir, scriptName,
+                                 static_cast<int>(value.file1.size()), value.file1.data(), static_cast<int>(value.file2.size()),
+                                 value.file2.data()) >= 0,
+                        CHIP_ERROR_INTERNAL);
+    return RunInternal(command);
+}
+
 CHIP_ERROR SystemCommands::RunInternal(const char * scriptName, const chip::Optional<chip::CharSpan> registerKey)
 {
     const char * scriptDir        = getScriptsFolder();
@@ -123,4 +167,21 @@ CHIP_ERROR SystemCommands::RunInternal(const char * command)
 {
     VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
     return ContinueOnChipMainThread(CHIP_NO_ERROR);
+}
+
+CHIP_ERROR SystemCommands::AddSystemCommandArgument(chip::StringBuilderBase & builder, const char * argName,
+                                                    const chip::CharSpan & argValue)
+{
+    VerifyOrReturnError(argValue.size() < kArgumentMaxLen, CHIP_ERROR_INVALID_ARGUMENT);
+
+    builder.Add(" ");
+    builder.Add(argName);
+    builder.Add(" ");
+
+    char arg[kArgumentMaxLen];
+    memset(arg, 0, sizeof(arg));
+    strncpy(arg, argValue.data(), argValue.size());
+    builder.Add(arg);
+
+    return CHIP_NO_ERROR;
 }

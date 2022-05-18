@@ -284,8 +284,9 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
     PopulateInitParams(commissionerParams, params);
 
     // Set commissioner-specific fields not in ControllerInitParams
-    commissionerParams.pairingDelegate     = params.pairingDelegate;
-    commissionerParams.defaultCommissioner = params.defaultCommissioner;
+    commissionerParams.pairingDelegate           = params.pairingDelegate;
+    commissionerParams.defaultCommissioner       = params.defaultCommissioner;
+    commissionerParams.deviceAttestationVerifier = params.deviceAttestationVerifier;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
     return err;

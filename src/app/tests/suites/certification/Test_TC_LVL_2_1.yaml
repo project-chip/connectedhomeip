@@ -113,14 +113,7 @@ tests:
           constraints:
               type: uint16
 
-    #Disabled due to issue - #13414
-    - label: "Reads the OnLevel attribute "
-      disabled: true
-      command: "readAttribute"
-      attribute: "on level"
-      response:
-          value: null
-
+    #Issue 13414
     - label: "Reads the OnLevel attribute "
       command: "readAttribute"
       attribute: "on level"
@@ -128,14 +121,7 @@ tests:
           constraints:
               type: uint8
 
-    #Disabled due to issue - #13414
-    - label: "Reads the OnTransitionTime attribute "
-      disabled: true
-      command: "readAttribute"
-      attribute: "on transition time"
-      response:
-          value: null
-
+    #Issue 13414
     - label: "Reads the OnTransitionTime attribute "
       command: "readAttribute"
       attribute: "on transition time"
@@ -143,14 +129,7 @@ tests:
           constraints:
               type: uint16
 
-    #Disabled due to issue - #13414
-    - label: "Reads the OffTransitionTime attribute "
-      disabled: true
-      command: "readAttribute"
-      attribute: "off transition time"
-      response:
-          value: null
-
+    #Issue 13414
     - label: "Reads the OffTransitionTime attribute "
       command: "readAttribute"
       attribute: "off transition time"
@@ -173,10 +152,10 @@ tests:
           constraints:
               type: map8
 
-    #Disabled due to issue - #13414
+    #Issue 13414
     - label: "Reads the StartUpCurrentLevel attribute "
-      disabled: true
       command: "readAttribute"
       attribute: "start up current level"
       response:
-          value: null
+          constraints:
+              type: uint8

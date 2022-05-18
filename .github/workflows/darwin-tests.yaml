@@ -89,6 +89,8 @@ jobs:
                         --target darwin-x64-chip-tool-darwin-${BUILD_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
                         --target darwin-x64-lock-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -104,6 +106,8 @@ jobs:
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files

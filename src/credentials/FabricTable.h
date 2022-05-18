@@ -109,21 +109,7 @@ public:
 
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey() const
-    {
-        if (!mHasExternallyOwnedOperationalKey && (mOperationalKey == nullptr))
-        {
-            // TODO: Refactor the following two cases to go through SetOperationalKey()
-#ifdef ENABLE_HSM_CASE_OPS_KEY
-            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->CreateOperationalKey(mFabricIndex);
-#else
-            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
-            mOperationalKey->Initialize();
-#endif
-        }
-        return mOperationalKey;
-    }
+    Crypto::P256Keypair * GetOperationalKey() const { return mOperationalKey; }
 
     /**
      * Sets the P256Keypair used for this fabric.  This will make a copy of the keypair
@@ -212,7 +198,7 @@ public:
         mVendorId       = VendorId::NotSpecified;
         mFabricLabel[0] = '\0';
 
-        if (mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
+        if (!mHasExternallyOwnedOperationalKey && mOperationalKey != nullptr)
         {
             chip::Platform::Delete(mOperationalKey);
         }

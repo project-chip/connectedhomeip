@@ -23,6 +23,7 @@
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/minimal_mdns/core/HeapQName.h>
 #include <lib/support/Variant.h>
 #include <system/SystemClock.h>
 
@@ -61,6 +62,12 @@ public:
             Resolve(chip::PeerId id) : peerId(id) {}
         };
 
+        struct IpResolve
+        {
+            HeapQName hostName;
+            IpResolve(HeapQName && host) : hostName(std::move(host)) {}
+        };
+
         ScheduledAttempt() {}
         ScheduledAttempt(const chip::PeerId & peer, bool first) :
             resolveData(chip::InPlaceTemplateType<Resolve>(), peer), firstSend(first)
@@ -68,6 +75,11 @@ public:
         ScheduledAttempt(const chip::Dnssd::DiscoveryFilter discoveryFilter, const chip::Dnssd::DiscoveryType type, bool first) :
             resolveData(chip::InPlaceTemplateType<Browse>(), discoveryFilter, type), firstSend(first)
         {}
+
+        ScheduledAttempt(IpResolve && ipResolve, bool first) :
+            resolveData(chip::InPlaceTemplateType<IpResolve>(), ipResolve), firstSend(first)
+        {}
+
         bool operator==(const ScheduledAttempt & other) const { return Matches(other) && other.firstSend == firstSend; }
         bool Matches(const ScheduledAttempt & other) const
         {
@@ -99,9 +111,25 @@ public:
 
                 return a.peerId == b.peerId;
             }
+
+            if (resolveData.Is<IpResolve>())
+            {
+                if (!other.resolveData.Is<IpResolve>())
+                {
+                    return false;
+                }
+                auto & a = resolveData.Get<IpResolve>();
+                auto & b = other.resolveData.Get<IpResolve>();
+
+                return a.hostName == b.hostName;
+            }
             return false;
         }
 
+        bool MatchesIpResolve(SerializedQNameIterator hostName) const
+        {
+            return resolveData.Is<IpResolve>() && (hostName == resolveData.Get<IpResolve>().hostName.Content());
+        }
         bool Matches(const chip::PeerId & peer) const
         {
             return resolveData.Is<Resolve>() && (resolveData.Get<Resolve>().peerId == peer);
@@ -146,15 +174,18 @@ public:
                 return false;
             }
         }
+
         bool IsEmpty() const { return !resolveData.Valid(); }
         bool IsResolve() const { return resolveData.Is<Resolve>(); }
         bool IsBrowse() const { return resolveData.Is<Browse>(); }
+        bool IsIpResolve() const { return resolveData.Is<IpResolve>(); }
         void Clear() { resolveData = DataType(); }
 
         const Browse & BrowseData() const { return resolveData.Get<Browse>(); }
         const Resolve & ResolveData() const { return resolveData.Get<Resolve>(); }
+        const IpResolve & IpResolveData() const { return resolveData.Get<IpResolve>(); }
 
-        using DataType = chip::Variant<Browse, Resolve>;
+        using DataType = chip::Variant<Browse, Resolve, IpResolve>;
 
         DataType resolveData;
 
@@ -171,6 +202,7 @@ public:
     /// Mark a resolution as a success, removing it from the internal list
     void Complete(const chip::PeerId & peerId);
     void Complete(const chip::Dnssd::DiscoveredNodeData & data);
+    void CompleteIpResolution(SerializedQNameIterator targetHostName);
 
     /// Mark that a resolution is pending, adding it to the internal list
     ///
@@ -178,6 +210,7 @@ public:
     /// by NextScheduled (potentially with others as well)
     void MarkPending(const chip::PeerId & peerId);
     void MarkPending(const chip::Dnssd::DiscoveryFilter & filter, const chip::Dnssd::DiscoveryType type);
+    void MarkPending(ScheduledAttempt::IpResolve && resolve);
 
     // Get minimum time until the next pending reply is required.
     //
@@ -193,6 +226,10 @@ public:
     //  - there is NO sorting implied by this call. Returned value will be
     //    any peer that needs a new request sent
     chip::Optional<ScheduledAttempt> NextScheduled();
+
+    /// Check if any of the pending queries are for the given host name for
+    /// IP resolution.
+    bool IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const;
 
 private:
     struct RetryEntry
@@ -211,7 +248,7 @@ private:
         //      least a factor of two
         chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
     };
-    void MarkPending(const ScheduledAttempt & attempt);
+    void MarkPending(ScheduledAttempt && attempt);
     chip::System::Clock::ClockBase * mClock;
     RetryEntry mRetryQueue[kRetryQueueSize];
 };

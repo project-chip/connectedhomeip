@@ -206,6 +206,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_TLV_TAG_NOT_FOUND.AsInteger():
         desc = "TLV tag not found";
         break;
+    case CHIP_ERROR_MISSING_SECURE_SESSION.AsInteger():
+        desc = "Missing secure session";
+        break;
     case CHIP_ERROR_INVALID_PATH_LIST.AsInteger():
         desc = "Invalid TLV path list";
         break;

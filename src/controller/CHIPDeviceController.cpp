@@ -363,6 +363,26 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     mPairingDelegate = params.pairingDelegate;
+
+    // Configure device attestation validation
+    mDeviceAttestationVerifier = params.deviceAttestationVerifier;
+    if (mDeviceAttestationVerifier == nullptr)
+    {
+        mDeviceAttestationVerifier = Credentials::GetDeviceAttestationVerifier();
+        if (mDeviceAttestationVerifier == nullptr)
+        {
+            ChipLogError(Controller,
+                         "Missing DeviceAttestationVerifier configuration at DeviceCommissioner init and none set with "
+                         "Credentials::SetDeviceAttestationVerifier()!");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // We fell back on a default from singleton accessor.
+        ChipLogProgress(Controller,
+                        "*** Missing DeviceAttestationVerifier configuration at DeviceCommissioner init: using global default, "
+                        "consider passing one in CommissionerInitParams.");
+    }
+
     if (params.defaultCommissioner != nullptr)
     {
         mDefaultCommissioner = params.defaultCommissioner;
@@ -1030,10 +1050,9 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::Device
 {
     MATTER_TRACE_EVENT_SCOPE("ValidateAttestationInfo", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceAttestationVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
-
-    dac_verifier->VerifyAttestationInformation(info, &mDeviceAttestationInformationVerificationCallback);
+    mDeviceAttestationVerifier->VerifyAttestationInformation(info, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 
@@ -1045,8 +1064,7 @@ CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan &
 {
     MATTER_TRACE_EVENT_SCOPE("ValidateCSR", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-    DeviceAttestationVerifier * dacVerifier = GetDeviceAttestationVerifier();
+    VerifyOrReturnError(mDeviceAttestationVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     P256PublicKey dacPubkey;
     ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(dac, dacPubkey));
@@ -1056,8 +1074,8 @@ CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan &
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
-    return dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature, dacPubkey,
-                                                            csrNonce);
+    return mDeviceAttestationVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge,
+                                                                           AttestationSignature, dacPubkey, csrNonce);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
@@ -1510,32 +1528,25 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+    if (commissioner->mCommissioningStage != CommissioningStage::kFindOperational)
     {
-        if (commissioner->mDeviceBeingCommissioned != nullptr &&
-            commissioner->mDeviceBeingCommissioned->GetDeviceId() == device->GetDeviceId() &&
-            commissioner->mCommissioningDelegate != nullptr)
-        {
-            CommissioningDelegate::CommissioningReport report;
-            report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
-            commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-        }
+        // This call is definitely not us finding our commissionee device.
+        // This is presumably us trying to re-establish CASE on MRP failure.
+        return;
     }
-    else
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr ||
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != device->GetDeviceId())
     {
-        if (commissioner->mPairingDelegate != nullptr)
-        {
-            commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
-        }
-        // Only release the PASE session if we're not commissioning. If we're commissioning, we're going to hold onto that PASE
-        // session until we send the commissioning complete command just in case it fails and we need to go back to the PASE
-        // connection to re-setup the network. This is unlikely, given that we just connected over the operational network, but is
-        // required by the spec.
-        CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
-        if (commissionee != nullptr)
-        {
-            commissioner->ReleaseCommissioneeDevice(commissionee);
-        }
+        // Not the device we are trying to commission.
+        return;
+    }
+
+    if (commissioner->mCommissioningDelegate != nullptr)
+    {
+        CommissioningDelegate::CommissioningReport report;
+        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
+        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     }
 }
 
@@ -1547,8 +1558,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
-    VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                   ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
     // Ensure that commissioning stage advancement is done based on seeing an error.
     if (error == CHIP_NO_ERROR)
@@ -1561,10 +1570,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         commissioner->mCommissioningDelegate != nullptr)
     {
         commissioner->CommissioningStageComplete(error);
-    }
-    else
-    {
-        commissioner->mPairingDelegate->OnPairingComplete(error);
     }
     commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
 }

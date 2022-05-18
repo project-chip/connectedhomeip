@@ -26,6 +26,8 @@ const char * getScriptsFolder()
 }
 } // namespace
 
+constexpr const char * kDefaultKey = "default";
+
 CHIP_ERROR DelayCommands::WaitForMs(const char * identity,
                                     const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
 {
@@ -39,25 +41,21 @@ void DelayCommands::OnWaitForMsFn(chip::System::Layer * systemLayer, void * cont
     command->OnWaitForMs();
 }
 
-CHIP_ERROR DelayCommands::WaitForCommissionableAdvertisement(
-    const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionableAdvertisement::Type & value)
+CHIP_ERROR DelayCommands::WaitForMessage(const char * identity,
+                                         const chip::app::Clusters::DelayCommands::Commands::WaitForMessage::Type & value)
 {
+    VerifyOrReturnError(!value.message.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
     const char * scriptDir            = getScriptsFolder();
-    constexpr const char * scriptName = "WaitForCommissionableAdvertisement.py";
+    constexpr const char * scriptName = "WaitForMessage.py";
+    const char * registerKeyValue     = value.registerKey.HasValue() ? value.registerKey.Value().data() : kDefaultKey;
+    const size_t registerKeyLen       = value.registerKey.HasValue() ? value.registerKey.Value().size() : strlen(kDefaultKey);
 
     char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
-    return RunInternal(command);
-}
-
-CHIP_ERROR DelayCommands::WaitForOperationalAdvertisement(
-    const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForOperationalAdvertisement::Type & value)
-{
-    const char * scriptDir            = getScriptsFolder();
-    constexpr const char * scriptName = "WaitForOperationalAdvertisement.py";
-
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s %.*s %.*s", scriptDir, scriptName,
+                                 static_cast<int>(registerKeyLen), registerKeyValue, static_cast<int>(value.message.size()),
+                                 value.message.data()) >= 0,
+                        CHIP_ERROR_INTERNAL);
     return RunInternal(command);
 }
 

@@ -103,8 +103,6 @@ private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
-TestContext sContext;
-
 class TestEventGenerator : public chip::app::EventLoggingDelegate
 {
 public:
@@ -2622,6 +2620,7 @@ nlTestSuite sSuite =
 
 int TestReadInteraction()
 {
+    TestContext sContext;
     nlTestRunner(&sSuite, &sContext);
     return (nlTestRunnerStats(&sSuite));
 }
