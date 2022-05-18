@@ -110,7 +110,7 @@ tests:
     - label: "Commission second accessory from alpha"
       identity: "alpha"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"

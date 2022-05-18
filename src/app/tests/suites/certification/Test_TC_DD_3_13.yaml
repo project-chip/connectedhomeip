@@ -55,7 +55,7 @@ tests:
           the commissioning process."
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234 34970112332
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
           ...
           [1646267353060] [53689:29437234] CHIP: [TOO] Device commissioning completed with success
 
@@ -98,7 +98,7 @@ tests:
           the commissioning process."
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234 34970112332
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
           ...
           [1646267665776] [53714:29441244] CHIP: [TOO] Device commissioning completed with success
 
@@ -141,7 +141,7 @@ tests:
           the commissioning process."
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234 34970112332
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
           ...
           [1646267353060] [53689:29437234] CHIP: [TOO] Device commissioning completed with success
 
@@ -184,7 +184,7 @@ tests:
           the commissioning process."
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234 34970112332
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
           ...
           [1646267665776] [53714:29441244] CHIP: [TOO] Device commissioning completed with success
 
@@ -228,7 +228,7 @@ tests:
           process."
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing manualcode 1234 34970112332
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 34970112332
           ...
           [1646267665776] [53714:29441244] CHIP: [TOO] Device commissioning completed with success
 

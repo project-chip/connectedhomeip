@@ -36,7 +36,7 @@ tests:
           to complete the commissioning process."
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
 
           ...
 
@@ -76,7 +76,7 @@ tests:
           complete the commissioning process using BLE"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
 
           ...
 
@@ -116,7 +116,7 @@ tests:
           commissioning process using IP Network"
       verification: |
           DUT Commissioner:
-          sudo ./examples/chip-tool/out/debug/chip-tool pairing qrcode 1234 MT:-24J042C00KA0648G00
+          sudo ./examples/chip-tool/out/debug/chip-tool pairing code 1234 MT:-24J042C00KA0648G00
 
           ...
 
