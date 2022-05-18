@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,15 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#pragma once
+
+#include <app/server/AppDelegate.h>
 #include <stdint.h>
-class OTAHelpers
-{
-public:
-    static OTAHelpers & Instance(void)
-    {
-        static OTAHelpers sInitOTA;
-        return sInitOTA;
-    }
-    static constexpr uint32_t kInitOTARequestorDelaySec = 3;
-    void InitOTARequestor(void);
-};
+
+namespace Esp32AppServer {
+void Init(AppDelegate * context = nullptr);
+}
