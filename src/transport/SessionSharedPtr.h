@@ -18,8 +18,8 @@
 #pragma once
 
 #include <access/SubjectDescriptor.h>
-#include <lib/support/ReferenceCountedHandle.h>
 #include <lib/core/Optional.h>
+#include <lib/support/ReferenceCountedHandle.h>
 
 namespace chip {
 
@@ -41,8 +41,8 @@ class SessionHolder;
  *
  * This should really only be used during session setup by the entity setting up the session.
  * Once setup, the session should transfer ownership to the SessionManager at which point,
- * all clients in the system should only be holding SessionWeakPtrs (SessionWeakPtr doesn't exist yet, but once #18399 is complete, SessionHolder
- * will become SessionWeakPtr).
+ * all clients in the system should only be holding SessionWeakPtrs (SessionWeakPtr doesn't exist yet, but once #18399 is complete,
+ * SessionHolder will become SessionWeakPtr).
  *
  * This is copy-constructible.
  *
@@ -51,13 +51,9 @@ class SessionSharedPtr
 {
 public:
     SessionSharedPtr() {}
-    SessionSharedPtr(Transport::Session & session) {
-        mSession.Emplace(session);
-    }
+    SessionSharedPtr(Transport::Session & session) { mSession.Emplace(session); }
 
-    SessionSharedPtr(const SessionSharedPtr & session) {
-        Grab(session);
-    }
+    SessionSharedPtr(const SessionSharedPtr & session) { Grab(session); }
 
     /*
      * Add ourselves as a shared owner on the passed in session (if it points to
@@ -65,33 +61,27 @@ public:
      * session object can now be free'ed safely without impacting the underlying
      * Session.
      */
-    void operator=(const SessionSharedPtr & session) {
-        Grab(session);
-    }
+    void operator=(const SessionSharedPtr & session) { Grab(session); }
 
     /*
      * If we're currently pointing to a valid session, remove ourselves
      * as a shared owner of that session. If there are no more shared owners
      * on that session, that session MAY be reclaimed.
      */
-    void Release() {
-        mSession.ClearValue();
-    }
+    void Release() { mSession.ClearValue(); }
 
     /*
      * Assume shared ownership of the provided session.
      */
-    void Grab(Transport::Session &session) {
-        mSession.Emplace(session);
-    }
+    void Grab(Transport::Session & session) { mSession.Emplace(session); }
 
-    Transport::Session* operator->() const {
-        return Get();
-    }
+    Transport::Session * operator->() const { return Get(); }
 
 protected:
-    Transport::Session* Get() const {
-        if (mSession.HasValue()) {
+    Transport::Session * Get() const
+    {
+        if (mSession.HasValue())
+        {
             return &mSession.Value().Get();
         }
 
@@ -99,9 +89,11 @@ protected:
     }
 
 private:
-    void Grab(const SessionSharedPtr & session) {
-        auto *underlyingSession = session.Get();
-        if (underlyingSession) {
+    void Grab(const SessionSharedPtr & session)
+    {
+        auto * underlyingSession = session.Get();
+        if (underlyingSession)
+        {
             mSession.Emplace(*underlyingSession);
         }
     }
