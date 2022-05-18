@@ -25,6 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
 #include <platform/Ameba/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
@@ -61,6 +62,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
