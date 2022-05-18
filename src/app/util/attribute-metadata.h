@@ -104,8 +104,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}
 
     /**
-     * Points to data if size is string or more than 4 bytes.
-     * If size is string or more than 4 bytes, and this value is NULL,
+     * Points to data if the attribute type is a string or the size of the data is more than 4 bytes.
+     * If the attribute type is a string or the data size is more than 4 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     const uint8_t * ptrToDefaultValue;
