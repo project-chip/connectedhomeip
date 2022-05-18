@@ -34,23 +34,18 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
 
     if (mResolver == nullptr)
     {
-#if CONFIG_DEVICE_LAYER
-        mDNSResolver.Shutdown(); // reset if already inited
-        ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
-#endif
-        mDNSResolver.SetCommissioningDelegate(this);
-        return mDNSResolver.FindCommissioners(discoveryFilter);
+        mResolver = &chip::Dnssd::Resolver::Instance();
     }
 
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(mResolver->Init(DeviceLayer::UDPEndPointManager()));
-#endif
+    mResolver->SetCommissioningDelegate(this);
     return mResolver->FindCommissioners(discoveryFilter);
 }
 
 CommissionableNodeController::~CommissionableNodeController()
 {
-    mDNSResolver.SetCommissioningDelegate(nullptr);
+    // TODO: Uniqueness guarantee of CommissionableNodeController is not obvious.
+    //       Multiplexing of finding commissioning nodes should be done in some other way.
+    mResolver->SetCommissioningDelegate(nullptr);
 }
 
 const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)

@@ -40,7 +40,7 @@ class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::CommissioningR
 {
 public:
     AbstractDnssdDiscoveryController() {}
-    ~AbstractDnssdDiscoveryController() override { mDNSResolver.Shutdown(); }
+    ~AbstractDnssdDiscoveryController() override {}
 
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
@@ -50,7 +50,6 @@ protected:
     const Dnssd::DiscoveredNodeData * GetDiscoveredNode(int idx);
     virtual DiscoveredNodeList GetDiscoveredNodes()    = 0;
     DeviceDiscoveryDelegate * mDeviceDiscoveryDelegate = nullptr;
-    Dnssd::ResolverProxy mDNSResolver;
 };
 
 } // namespace Controller
