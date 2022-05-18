@@ -593,17 +593,17 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidPublicKey;
     }
-    if (err == CHIP_ERROR_INVALID_FABRIC_INDEX || err == CHIP_ERROR_WRONG_NODE_ID)
+    if (err == CHIP_ERROR_WRONG_NODE_ID)
     {
         return OperationalCertStatus::kInvalidNodeOpId;
     }
-    if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
-        err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
-        err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
-        err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED || err == CHIP_ERROR_CERT_NOT_TRUSTED ||
-        err == CHIP_ERROR_WRONG_CERT_DN)
+    if (err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT)
     {
         return OperationalCertStatus::kInvalidNOC;
+    }
+    if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        return OperationalCertStatus::kMissingCsr;
     }
     if (err == CHIP_ERROR_NO_MEMORY)
     {
@@ -612,6 +612,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     if (err == CHIP_ERROR_FABRIC_EXISTS)
     {
         return OperationalCertStatus::kFabricConflict;
+    }
+    if (err == CHIP_ERROR_INVALID_FABRIC_INDEX)
+    {
+        return OperationalCertStatus::kInvalidFabricIndex;
     }
 
     return OperationalCertStatus::kInvalidNOC;
