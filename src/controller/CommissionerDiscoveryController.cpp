@@ -27,6 +27,7 @@
  */
 #include <controller/CommissionerDiscoveryController.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
@@ -52,11 +53,15 @@ void CommissionerDiscoveryController::OnUserDirectedCommissioningRequest(UDCClie
     mReady = false;
     strncpy(mCurrentInstance, state.GetInstanceName(), sizeof(mCurrentInstance));
     mPendingConsent = true;
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    Encoding::BytesToUppercaseHexString(state.GetRotatingId(), state.GetRotatingIdLength(), rotatingDeviceIdHexBuffer,
+                                        RotatingDeviceId::kHexMaxLength);
+
     ChipLogDetail(Controller,
                   "------PROMPT USER: %s is requesting permission to cast to this TV, approve? [" ChipLogFormatMEI
-                  "," ChipLogFormatMEI ",%s]",
+                  "," ChipLogFormatMEI ",%s,%s]",
                   state.GetDeviceName(), ChipLogValueMEI(state.GetVendorId()), ChipLogValueMEI(state.GetProductId()),
-                  state.GetInstanceName());
+                  state.GetInstanceName(), rotatingDeviceIdHexBuffer);
     if (mUserPrompter != nullptr)
     {
         mUserPrompter->PromptForCommissionOKPermission(state.GetVendorId(), state.GetProductId(), state.GetDeviceName());

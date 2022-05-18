@@ -639,16 +639,22 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounte
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan)
+{
+    ReturnErrorCodeIf(uniqueIdSpan.size() != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(mRotatingDeviceIdUniqueId, uniqueIdSpan.data(), kRotatingDeviceIDUniqueIDLength);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     static_assert(kRotatingDeviceIDUniqueIDLength >= kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
-    constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
-
-    ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(sizeof(uniqueId) != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
-    uniqueIdSpan = uniqueIdSpan.SubSpan(0, sizeof(uniqueId));
+    ReturnErrorCodeIf(sizeof(mRotatingDeviceIdUniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(sizeof(mRotatingDeviceIdUniqueId) != kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(uniqueIdSpan.data(), mRotatingDeviceIdUniqueId, sizeof(mRotatingDeviceIdUniqueId));
+    uniqueIdSpan = uniqueIdSpan.SubSpan(0, sizeof(mRotatingDeviceIdUniqueId));
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
