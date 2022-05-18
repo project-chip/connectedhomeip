@@ -52,7 +52,7 @@ const char * QueryTypeToString(mdns::Minimal::QType type)
     }
 }
 
-#endif
+#endif // CHIP_PROGRESS_LOGGING
 
 class QNameString
 {
