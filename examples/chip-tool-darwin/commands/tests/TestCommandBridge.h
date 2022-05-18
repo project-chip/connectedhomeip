@@ -442,7 +442,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
     }
-    if (CHIP_ERROR_INVALID_FABRIC_ID == err) {
+    if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
         return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
     }
 

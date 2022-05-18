@@ -1448,13 +1448,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR               CHIP_CORE_ERROR(0x70)
 
 /**
- *  @def CHIP_ERROR_INVALID_FABRIC_ID
+ *  @def CHIP_ERROR_INVALID_FABRIC_INDEX
  *
  *  @brief
- *    A fabric id is invalid.
+ *    A fabric index is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_FABRIC_ID                           CHIP_CORE_ERROR(0x71)
+#define CHIP_ERROR_INVALID_FABRIC_INDEX                        CHIP_CORE_ERROR(0x71)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_CONNECTIONS

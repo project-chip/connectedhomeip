@@ -37,7 +37,7 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
     if (fabric == nullptr)
     {
         ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
-        return CHIP_ERROR_INVALID_FABRIC_ID;
+        return CHIP_ERROR_INVALID_FABRIC_INDEX;
     }
 
     PeerId peerID = fabric->GetPeerIdForNode(nodeId);
