@@ -4046,7 +4046,7 @@ endpoint 0 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 }
 
@@ -4417,7 +4417,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OccupancySensing {
