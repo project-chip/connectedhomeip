@@ -1528,32 +1528,25 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+    if (commissioner->mCommissioningStage != CommissioningStage::kFindOperational)
     {
-        if (commissioner->mDeviceBeingCommissioned != nullptr &&
-            commissioner->mDeviceBeingCommissioned->GetDeviceId() == device->GetDeviceId() &&
-            commissioner->mCommissioningDelegate != nullptr)
-        {
-            CommissioningDelegate::CommissioningReport report;
-            report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
-            commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-        }
+        // This call is definitely not us finding our commissionee device.
+        // This is presumably us trying to re-establish CASE on MRP failure.
+        return;
     }
-    else
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr ||
+        commissioner->mDeviceBeingCommissioned->GetDeviceId() != device->GetDeviceId())
     {
-        if (commissioner->mPairingDelegate != nullptr)
-        {
-            commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
-        }
-        // Only release the PASE session if we're not commissioning. If we're commissioning, we're going to hold onto that PASE
-        // session until we send the commissioning complete command just in case it fails and we need to go back to the PASE
-        // connection to re-setup the network. This is unlikely, given that we just connected over the operational network, but is
-        // required by the spec.
-        CommissioneeDeviceProxy * commissionee = commissioner->FindCommissioneeDevice(device->GetDeviceId());
-        if (commissionee != nullptr)
-        {
-            commissioner->ReleaseCommissioneeDevice(commissionee);
-        }
+        // Not the device we are trying to commission.
+        return;
+    }
+
+    if (commissioner->mCommissioningDelegate != nullptr)
+    {
+        CommissioningDelegate::CommissioningReport report;
+        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
+        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     }
 }
 
@@ -1565,8 +1558,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
     VerifyOrReturn(commissioner != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
-    VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                   ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
 
     // Ensure that commissioning stage advancement is done based on seeing an error.
     if (error == CHIP_NO_ERROR)
@@ -1579,10 +1570,6 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
         commissioner->mCommissioningDelegate != nullptr)
     {
         commissioner->CommissioningStageComplete(error);
-    }
-    else
-    {
-        commissioner->mPairingDelegate->OnPairingComplete(error);
     }
     commissioner->mSystemState->CASESessionMgr()->ReleaseSession(peerId);
 }
