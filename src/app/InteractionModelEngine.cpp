@@ -742,7 +742,7 @@ bool InteractionModelEngine::EnsureResourceForSubscription(FabricIndex aFabricIn
     return true;
 }
 
-bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
+CHIP_ERROR InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apReadHandler)
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && !CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
@@ -759,6 +759,15 @@ bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apR
     size_t activeReadHandlersOnCurrentFabric = 0;
 
     // It is safe to use & here since this function will be called on current stack.
+    if (apReadHandler->GetAttributePathCount() > kReservedPathsPerReadRequest ||
+        apReadHandler->GetEventPathCount() > kReservedPathsPerReadRequest ||
+        apReadHandler->GetDataVersionFilterCount() > kReservedPathsPerReadRequest)
+    {
+        // Doesn't matter how many other reads are in progress; we are not
+        // going to handle this request.
+        return (allowUnlimited ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(PathsExhausted));
+    }
+
     mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
         if (handler->GetAccessingFabricIndex() == currentFabricIndex && handler->IsType(ReadHandler::InteractionType::Read))
         {
@@ -770,13 +779,10 @@ bool InteractionModelEngine::CanEstablishReadTransaction(const ReadHandler * apR
     // The incoming read handler here is also counted above.
     if (activeReadHandlersOnCurrentFabric > kReservedReadHandlersPerFabricForReadRequests)
     {
-        return allowUnlimited;
+        return (allowUnlimited ? CHIP_NO_ERROR : CHIP_IM_GLOBAL_STATUS(Busy));
     }
 
-    return (apReadHandler->GetAttributePathCount() <= kReservedPathsPerReadRequest &&
-            apReadHandler->GetEventPathCount() <= kReservedPathsPerReadRequest &&
-            apReadHandler->GetDataVersionFilterCount() <= kReservedPathsPerReadRequest) ||
-        allowUnlimited;
+    return CHIP_NO_ERROR;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
