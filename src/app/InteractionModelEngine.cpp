@@ -372,16 +372,13 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         }
     }
 
-    size_t handlerPoolCapacity = mReadHandlers.Capacity();
-
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    size_t handlerPoolCapacity = mReadHandlers.Capacity();
     if (mReadHandlerCapacityOverride != -1)
     {
         handlerPoolCapacity = (size_t) mReadHandlerCapacityOverride;
     }
-#endif
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
     if ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 0)
     {
         aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
