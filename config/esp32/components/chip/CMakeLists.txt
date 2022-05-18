@@ -40,6 +40,7 @@ if (NOT CMAKE_BUILD_EARLY_EXPANSION)
         if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
             message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
         endif()
+        set(is_debug FALSE)
     endif()
 endif()
 
@@ -101,6 +102,8 @@ endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
+else()
+    chip_gn_arg_append("chip_mdns"                          "\"minimal\"")
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)

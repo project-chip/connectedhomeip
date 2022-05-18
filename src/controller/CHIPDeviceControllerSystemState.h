@@ -91,6 +91,7 @@ struct DeviceControllerSystemStateParams
     CASESessionManager * caseSessionManager                       = nullptr;
     OperationalDevicePool * operationalDevicePool                 = nullptr;
     CASEClientPool * caseClientPool                               = nullptr;
+    FabricTable::Delegate * fabricTableDelegate                   = nullptr;
 };
 
 // A representation of the internal state maintained by the DeviceControllerFactory
@@ -109,7 +110,7 @@ public:
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
         mCASEServer(params.caseServer), mCASESessionManager(params.caseSessionManager),
         mOperationalDevicePool(params.operationalDevicePool), mCASEClientPool(params.caseClientPool),
-        mGroupDataProvider(params.groupDataProvider)
+        mGroupDataProvider(params.groupDataProvider), mFabricTableDelegate(params.fabricTableDelegate)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -179,6 +180,7 @@ private:
     OperationalDevicePool * mOperationalDevicePool                 = nullptr;
     CASEClientPool * mCASEClientPool                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider            = nullptr;
+    FabricTable::Delegate * mFabricTableDelegate                   = nullptr;
 
     // If mTempFabricTable is not null, it was created during
     // DeviceControllerFactory::InitSystemState and needs to be

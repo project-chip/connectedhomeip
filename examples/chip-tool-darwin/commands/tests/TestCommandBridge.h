@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommandBridge.h"
 #include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
@@ -30,7 +31,6 @@
 #include <zap-generated/cluster/CHIPTestClustersObjc.h>
 
 #import <CHIP/CHIP.h>
-#import <CHIP/CHIPDevice_Internal.h>
 #import <CHIP/CHIPError_Internal.h>
 
 class TestCommandBridge;
@@ -60,6 +60,7 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ConstraintsChecker,
                           public PICSChecker,
                           public DelayCommands,
+                          public LogCommands,
                           public SystemCommands {
 public:
     TestCommandBridge(const char * _Nonnull commandName)
@@ -100,17 +101,6 @@ public:
         SetCommandExitStatus(err);
     }
 
-    void Log(const char * _Nullable identity, const chip::app::Clusters::LogCommands::Commands::Log::Type & value)
-    {
-        NSLog(@"%.*s", static_cast<int>(value.message.size()), value.message.data());
-        NextTest();
-    }
-
-    void UserPrompt(const char * _Nullable identity, const chip::app::Clusters::LogCommands::Commands::UserPrompt::Type & value)
-    {
-        NextTest();
-    }
-
     /////////// DelayCommands Interface /////////
     void OnWaitForMs() override
     {
@@ -141,8 +131,10 @@ public:
         [controller getConnectedDevice:value.nodeId
                                  queue:mCallbackQueue
                      completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                         CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-                         VerifyOrReturn(CHIP_NO_ERROR == err, SetCommandExitStatus(err));
+                         if (error != nil) {
+                             SetCommandExitStatus(error);
+                             return;
+                         }
 
                          mConnectedDevices[identity] = device;
                          NextTest();

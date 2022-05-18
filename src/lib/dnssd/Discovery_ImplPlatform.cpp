@@ -349,7 +349,9 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
 void DiscoveryImplPlatform::Shutdown()
 {
     VerifyOrReturn(mDnssdInitialized);
+    mResolverProxy.Shutdown();
     ChipDnssdShutdown();
+    mDnssdInitialized = false;
 }
 
 void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError)
@@ -644,6 +646,11 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = type;
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+}
+
+ResolverProxy::~ResolverProxy()
+{
+    Shutdown();
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)

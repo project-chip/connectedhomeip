@@ -54,7 +54,8 @@ public:
         kState_UnlockCompleted,
     } State;
 
-    CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state);
+    CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
+                    uint8_t maxNumberOfCredentialsPerUser);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -103,7 +104,8 @@ private:
 
     char mUserName[DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[DOOR_LOCK_MAX_CREDENTIAL_SIZE];
-    DlCredential mCredentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
+    chip::Platform::ScopedMemoryBuffer<DlCredential> mCredentials;
+    uint8_t mMaxCredentialsPerUser;
 
     static LockManager sLock;
 };

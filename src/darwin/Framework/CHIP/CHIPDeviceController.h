@@ -94,7 +94,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                               error:(NSError * __autoreleasing *)error;
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
-- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
 - (nullable CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
 - (BOOL)getConnectedDevice:(uint64_t)deviceID

@@ -20,6 +20,8 @@
 
 #include "commands/pairing/Commands.h"
 
+#include "commands/storage/Commands.h"
+
 #include <zap-generated/cluster/Commands.h>
 #include <zap-generated/test/Commands.h>
 
@@ -27,6 +29,7 @@ int main(int argc, const char * argv[])
 {
     Commands commands;
     registerCommandsPairing(commands);
+    registerCommandsStorage(commands);
     registerCommandsTests(commands);
     registerClusters(commands);
     return commands.Run(argc, (char **) argv);

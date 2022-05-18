@@ -22,16 +22,21 @@ from .builder import Builder
 
 class TelinkApp(Enum):
     LIGHT = auto()
+    SWITCH = auto()
 
     def ExampleName(self):
         if self == TelinkApp.LIGHT:
             return 'lighting-app'
+        elif self == TelinkApp.SWITCH:
+            return 'light-switch-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == TelinkApp.LIGHT:
             return 'chip-telink-lighting-example'
+        elif self == TelinkApp.SWITCH:
+            return 'chip-telink-light-switch-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -51,7 +56,7 @@ class TelinkBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
-                 app: TelinkApp = TelinkApp.LIGHT,
+                 app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard.TLSR9518ADK80D):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app

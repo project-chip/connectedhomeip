@@ -115,8 +115,9 @@ tests:
               - name: "message"
                 value: "Operate on device to set OnOff attribute manually to on"
 
+    # Skipped this step because the above test need manual input
     - label: "Check on/off attribute value is true after on command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "OnOff"
       response:
@@ -131,8 +132,9 @@ tests:
                 value:
                     "Operate on device to set OnOff attribute manually to off"
 
+    # Skipped the step because the above test need manual input
     - label: "Check on/off attribute value is false after off command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "OnOff"
       response:

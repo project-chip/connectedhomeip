@@ -91,11 +91,6 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId
-{
-    CHIP_LOG_ERROR("CHIPDevice doesn't support updateDevice:fabricId: over XPC");
-}
-
 - (nullable CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
 {
     CHIP_LOG_ERROR("CHIPDevice doesn't support getDeviceBeingCommissioned over XPC");

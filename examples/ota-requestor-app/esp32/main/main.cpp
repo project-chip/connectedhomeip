@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "app/util/af-enums.h"
 #include "app/util/af.h"
@@ -28,38 +27,22 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/Server.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
-
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include <lib/support/ErrorStr.h>
 
 using namespace ::chip;
 using namespace ::chip::System;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
 
 namespace {
 const char * TAG = "ota-requester-app";
-static DeviceCallbacks EchoCallbacks;
-
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    sWiFiNetworkCommissioningInstance.Init();
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 } // namespace

@@ -107,15 +107,16 @@ public:
 private:
     ObjectList<AttributePathParams> * mpAttributePath;
 
+    ConcreteAttributePath mOutputPath;
+
     uint16_t mEndpointIndex, mEndEndpointIndex;
+    uint16_t mAttributeIndex, mEndAttributeIndex;
+
     // Note: should use decltype(EmberAfEndpointType::clusterCount) here, but af-types is including app specific generated files.
     uint8_t mClusterIndex, mEndClusterIndex;
-    uint16_t mAttributeIndex, mEndAttributeIndex;
     // For dealing with global attributes that are not part of the attribute
     // metadata.
     uint8_t mGlobalAttributeIndex, mGlobalAttributeEndIndex;
-
-    ConcreteAttributePath mOutputPath;
 
     /**
      * Prepare*IndexRange will update mBegin*Index and mEnd*Index variables.

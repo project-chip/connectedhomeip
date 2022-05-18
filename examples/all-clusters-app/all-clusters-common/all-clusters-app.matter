@@ -898,6 +898,7 @@ server cluster DoorLock = 257 {
     kDuplicate = 2;
     kOccupied = 3;
     kInvalidField = 133;
+    kResourceExhausted = 137;
     kNotFound = 139;
   }
 
@@ -1179,6 +1180,7 @@ server cluster DoorLock = 257 {
   readonly attribute int8u maxRFIDCodeLength = 25;
   readonly attribute int8u minRFIDCodeLength = 26;
   readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
+  readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
   attribute access(write: manage) int8u soundVolume = 36;
@@ -1296,7 +1298,9 @@ server cluster DoorLock = 257 {
   response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
+    nullable fabric_idx creatorFabricIndex = 2;
+    nullable fabric_idx lastModifiedFabricIndex = 3;
+    nullable INT16U nextCredentialIndex = 4;
   }
 
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
@@ -1404,10 +1408,10 @@ server cluster FanControl = 514 {
 
   attribute FanModeType fanMode = 0;
   attribute FanModeSequenceType fanModeSequence = 1;
-  attribute int8u percentSetting = 2;
+  attribute nullable int8u percentSetting = 2;
   readonly attribute int8u percentCurrent = 3;
   readonly attribute int8u speedMax = 4;
-  attribute int8u speedSetting = 5;
+  attribute nullable int8u speedSetting = 5;
   readonly attribute int8u speedCurrent = 6;
   readonly attribute bitmap8 rockSupport = 7;
   attribute bitmap8 rockSetting = 8;
@@ -1576,6 +1580,10 @@ server cluster GeneralDiagnostics = 51 {
   readonly attribute ENUM8 activeHardwareFaults[] = 5;
   readonly attribute ENUM8 activeRadioFaults[] = 6;
   readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2019,8 +2027,8 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3525,6 +3533,10 @@ server cluster TimeFormatLocalization = 44 {
   attribute HourFormat hourFormat = 0;
   attribute CalendarType activeCalendarType = 1;
   readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -3732,8 +3744,7 @@ server cluster WindowCovering = 258 {
   }
 
   request struct GoToLiftPercentageRequest {
-    Percent liftPercentageValue = 0;
-    optional Percent100ths liftPercent100thsValue = 1;
+    Percent100ths liftPercent100thsValue = 0;
   }
 
   request struct GoToTiltValueRequest {
@@ -3741,8 +3752,7 @@ server cluster WindowCovering = 258 {
   }
 
   request struct GoToTiltPercentageRequest {
-    Percent tiltPercentageValue = 0;
-    optional Percent100ths tiltPercent100thsValue = 1;
+    Percent100ths tiltPercent100thsValue = 0;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;
@@ -3833,6 +3843,10 @@ endpoint 0 {
     persist  attribute hourFormat;
     persist  attribute activeCalendarType;
     callback attribute supportedCalendarTypes;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -3893,6 +3907,10 @@ endpoint 0 {
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4044,7 +4062,7 @@ endpoint 0 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 }
 
@@ -4199,6 +4217,7 @@ endpoint 1 {
     ram      attribute maxRFIDCodeLength default = 20;
     ram      attribute minRFIDCodeLength default = 10;
     ram      attribute credentialRulesSupport default = 1;
+    ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute language default = "en";
     ram      attribute autoRelockTime default = 60;
     ram      attribute soundVolume;
@@ -4302,14 +4321,14 @@ endpoint 1 {
     ram      attribute fanModeSequence default = 0x02;
     ram      attribute percentSetting;
     ram      attribute percentCurrent;
-    ram      attribute speedMax;
+    ram      attribute speedMax default = 100;
     ram      attribute speedSetting;
     ram      attribute speedCurrent;
     ram      attribute rockSupport;
     ram      attribute rockSetting;
     ram      attribute windSupport;
     ram      attribute windSetting;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0x0F;
     ram      attribute clusterRevision default = 2;
   }
 
@@ -4414,7 +4433,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OccupancySensing {

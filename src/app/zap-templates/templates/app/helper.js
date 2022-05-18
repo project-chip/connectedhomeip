@@ -75,6 +75,7 @@ var endpointClusterWithAttributeChanged = [
   'Identify',
   'Pump Configuration and Control',
   'Window Covering',
+  'Fan Control',
 ];
 var endpointClusterWithPreAttribute = [
   'IAS Zone',
@@ -83,6 +84,7 @@ var endpointClusterWithPreAttribute = [
   'Time Format Localization',
   'Localization Configuration',
   'Mode Select',
+  'Fan Control',
 ];
 var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 

@@ -47,7 +47,8 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
 {
     VerifyOrReturnError(mSecureSession, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mSecureSession.Get(), timeout);
+    VerifyOrReturnError(mSecureSession, CHIP_ERROR_MISSING_SECURE_SESSION);
+    return commandObj->SendCommandRequest(mSecureSession.Get().Value(), timeout);
 }
 
 void CommissioneeDeviceProxy::OnSessionReleased()
@@ -60,7 +61,7 @@ CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
     ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
     if (mSecureSession)
     {
-        mSessionManager->ExpirePairing(mSecureSession.Get());
+        mSessionManager->ExpirePairing(mSecureSession.Get().Value());
     }
     mState = ConnectionState::NotConnected;
     mPairing.Clear();
@@ -87,7 +88,7 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
         return CHIP_NO_ERROR;
     }
 
-    Transport::SecureSession * secureSession = mSecureSession.Get()->AsSecureSession();
+    Transport::SecureSession * secureSession = mSecureSession.Get().Value()->AsSecureSession();
     secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;

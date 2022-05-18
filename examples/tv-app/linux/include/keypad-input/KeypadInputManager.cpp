@@ -52,6 +52,42 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
     case CecKeyCodeType::kRootMenu:
         response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
         break;
+    case CecKeyCodeType::kSetupMenu:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kEnter:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumber0OrNumber10:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers1:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers2:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers3:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers4:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers5:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers6:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers7:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers8:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
+    case CecKeyCodeType::kNumbers9:
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kSuccess;
+        break;
     default:
         response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kUnsupportedKey;
     }

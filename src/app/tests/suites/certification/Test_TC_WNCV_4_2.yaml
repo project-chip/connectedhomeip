@@ -113,7 +113,6 @@ tests:
     - label:
           "3c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
           from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: "WNCV_PA_TL && WNCV_TL"
@@ -125,7 +124,6 @@ tests:
           "3d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
       command: "readAttribute"
-      disabled: true
       attribute: "CurrentPositionTiltPercentage"
       PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
       response:
@@ -156,7 +154,6 @@ tests:
     - label:
           "4c: If (PA & TL) TH reads TargetPositionTiltPercent100ths attribute
           from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       PICS: "WNCV_PA_TL && WNCV_TL"
@@ -184,7 +181,6 @@ tests:
     - label:
           "5c: If (PA & TL) TH reads CurrentPositionTiltPercent100ths attribute
           from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       PICS: "WNCV_PA_TL && WNCV_TL"
@@ -195,7 +191,6 @@ tests:
     - label:
           "5d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
-      disabled: true
       PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"

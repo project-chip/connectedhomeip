@@ -28,56 +28,68 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12190 as per spec default value is 5 but expecting 3
     - label: "read the global attribute: ClusterRevision"
-      disabled: true
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 5
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    - label: "Read the global attribute: AttributeList"
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-
+    ##if condition needed #Issue 10988
     - label: "Read the optional global attribute constraints: FeatureMap"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
+          value: 1
           constraints:
               type: map32
+
+    #if condition needed #Issue 10988
+    - label: "Read the global attribute: AttributeList"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
+          constraints:
+              type: list
+
+    #issue #15011 disabled steps below Global attributes missing from YAML framework
+    - label: "Read the global attribute: EventList"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 17971
+    - label: "Read the global attribute: AcceptedCommandList"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue 17971
+    - label: "Read the global attribute: GeneratedCommandList"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

@@ -310,3 +310,16 @@ void MatterGeneralCommissioningPluginServerInitCallback()
     registerAttributeAccessOverride(&gAttrAccess);
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace GeneralCommissioning {
+void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb)
+{
+    Breadcrumb::Set(0, breadcrumb);
+}
+} // namespace GeneralCommissioning
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -22,8 +22,8 @@ import("${cyw30739_sdk_build_root}/cyw30739_sdk.gni")
 cyw30739_project_dir = "${chip_root}/examples/lock-app/cyw30739"
 
 declare_args() {
-  setupPinCode = 0
-  setupDiscriminator = 0
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
 }
 
 cyw30739_sdk("sdk") {

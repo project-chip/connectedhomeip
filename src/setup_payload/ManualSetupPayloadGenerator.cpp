@@ -151,6 +151,10 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(Mutab
 
     int checkDigit = Verhoeff10::CharToVal(Verhoeff10::ComputeCheckChar(outBuffer.data()));
     ReturnErrorOnFailure(decimalStringWithPadding(outBuffer.SubSpan(offset, 2), static_cast<uint32_t>(checkDigit)));
+    offset += 1;
+
+    // Reduce outBuffer span size to be the size of written data and to not include null-terminator.
+    outBuffer.reduce_size(offset);
 
     return CHIP_NO_ERROR;
 }

@@ -944,6 +944,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
 #define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT "U1BBS0UyUCBLZXkgU2FsdA=="
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT_DEFAULT
 #endif
 
 /**
@@ -955,6 +956,20 @@
  *   The value is base-64 encoded string.
  */
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+
+#if CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE != 20202021
+#error "Non-default Spake2+ passcode configured but verifier left unchanged"
+#endif
+
+#if CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT != 1000
+#error "Non-default Spake2+ iteration count configured but verifier left unchanged"
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT_DEFAULT
+#error "Non-default Spake2+ salt configured but verifier left unchanged"
+#endif
+
+// Generated with: spake2p gen-verifier -o - -i 1000 -s "SPAKE2P Key Salt" -p 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER                                                                               \
     "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/"  \
     "NH6Rmzw=="

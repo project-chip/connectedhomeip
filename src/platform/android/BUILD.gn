@@ -57,6 +57,7 @@ static_library("android") {
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/trace",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

@@ -479,8 +479,8 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID = kMatterClusterGlobalAttributeClusterRevisionID,
 
     // Cluster LocalizationConfiguration attributes
-    kMatterClusterLocalizationConfigurationAttributeActiveLocaleID = 0x00000001,
-    kMatterClusterLocalizationConfigurationAttributeSupportedLocalesID = 0x00000002,
+    kMatterClusterLocalizationConfigurationAttributeActiveLocaleID = 0x00000000,
+    kMatterClusterLocalizationConfigurationAttributeSupportedLocalesID = 0x00000001,
     kMatterClusterLocalizationConfigurationAttributeGeneratedCommandListID = kMatterClusterGlobalAttributeGeneratedCommandListID,
     kMatterClusterLocalizationConfigurationAttributeAcceptedCommandListID = kMatterClusterGlobalAttributeAcceptedCommandListID,
     kMatterClusterLocalizationConfigurationAttributeAttributeListID = kMatterClusterGlobalAttributeAttributeListID,
@@ -880,6 +880,7 @@ typedef NS_ENUM(uint32_t, MatterClusterAttributeIDType) {
     kMatterClusterDoorLockAttributeMaxRFIDCodeLengthID = 0x00000019,
     kMatterClusterDoorLockAttributeMinRFIDCodeLengthID = 0x0000001A,
     kMatterClusterDoorLockAttributeCredentialRulesSupportID = 0x0000001B,
+    kMatterClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID = 0x0000001C,
     kMatterClusterDoorLockAttributeEnableLoggingID = 0x00000020,
     kMatterClusterDoorLockAttributeLanguageID = 0x00000021,
     kMatterClusterDoorLockAttributeLEDSettingsID = 0x00000022,

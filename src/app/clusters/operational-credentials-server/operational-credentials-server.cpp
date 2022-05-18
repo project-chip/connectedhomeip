@@ -300,7 +300,7 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
             FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
             VerifyOrReturn(fabricInfo != nullptr);
 
-            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetCompressedId());
+            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
         }
 
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
@@ -354,18 +354,17 @@ void fabricListChanged()
 // only that should be modifed to perosst/read/write fabrics.
 // TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricTable
 // logic.
-class OpCredsFabricTableDelegate : public FabricTableDelegate
+class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnFabricDeletedFromStorage(CompressedFabricId compressedFabricId, FabricIndex fabricIndex) override
+    void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
                        static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
-        // The Leave event SHOULD be emitted by a Node prior to permanently
-        // leaving the Fabric.
+        // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
         for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
         {
             // If Basic cluster is implemented on this endpoint
@@ -377,11 +376,35 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
                 ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
             }
         }
+
+        // Try to send the queued events as soon as possible. If the just emitted leave event won't
+        // be sent this time, it will likely not be delivered at all for the following reasons:
+        // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
+        //   the leave event will be cancelled.
+        // - removing the fabric removes all associated access control entries, so generating
+        //   subsequent reports containing the leave event will fail the access control check.
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
+        EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
+        // Remove access control entries in reverse order (it could be any order, but reverse order
+        // will cause less churn in persistent storage).
+        size_t aclCount = 0;
+        if (Access::GetAccessControl().GetEntryCount(fabricIndex, aclCount) == CHIP_NO_ERROR)
+        {
+            while (aclCount)
+            {
+                (void) Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, --aclCount);
+            }
+        }
     }
 
     // Gets called when a fabric is loaded into the FabricTable from storage
-    void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
+    void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
+        VerifyOrReturn(fabric != nullptr);
+
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
@@ -391,8 +414,12 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     }
 
     // Gets called when a fabric in FabricTable is persisted to storage
-    void OnFabricPersistedToStorage(FabricInfo * fabric) override
+    void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
+        // Safety check, but should not happen by the code paths involved
+        VerifyOrReturn(fabric != nullptr);
+
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",

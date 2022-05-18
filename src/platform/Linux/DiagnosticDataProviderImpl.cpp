@@ -266,14 +266,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 #endif
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::SetCurrentHeapHighWatermark(uint64_t heapHighWatermark)
-{
-    // On Linux, the write operation is non-op since we always rely on the mallinfo system
-    // function to get the current heap memory.
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
     // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the

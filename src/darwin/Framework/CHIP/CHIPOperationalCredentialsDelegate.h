@@ -84,8 +84,19 @@ public:
         SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
         NSData * _Nullable __autoreleasing * _Nonnull intermediateCert);
 
+    // Generate an operational DER-encoded X.509 certificate for the given
+    // signing certificate and operational public key, using the given fabric
+    // id, node id, and CATs.
+    static CHIP_ERROR GenerateOperationalCertificate(id<CHIPKeypair> signingKeypair, NSData * signingCertificate,
+        SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
+        NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert);
+
 private:
     static bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
+
+    static CHIP_ERROR GenerateNOC(chip::Crypto::P256Keypair & signingKeypair, NSData * signingCertificate, chip::NodeId nodeId,
+        chip::FabricId fabricId, const chip::CATValues & cats, const chip::Crypto::P256PublicKey & pubkey,
+        chip::MutableByteSpan & noc);
 
     ChipP256KeypairPtr mIssuerKey;
 

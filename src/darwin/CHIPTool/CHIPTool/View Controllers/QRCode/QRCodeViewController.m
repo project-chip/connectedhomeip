@@ -671,40 +671,6 @@
     }
 }
 
-- (void)onAddNetworkResponse:(NSError *)error
-{
-    if (error != nil) {
-        NSLog(@"Error adding network: %@", error);
-        return;
-    }
-
-    __auto_type * params = [[CHIPNetworkCommissioningClusterConnectNetworkParams alloc] init];
-
-    NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
-    params.networkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-    params.breadcrumb = @(0);
-
-    __weak typeof(self) weakSelf = self;
-    [_cluster connectNetworkWithParams:params
-                     completionHandler:^(CHIPNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable response,
-                         NSError * _Nullable err) {
-                         // TODO: connectNetworkWithParams returns status in its
-                         // response, not via the NSError!
-                         [weakSelf onConnectNetworkResponse:err];
-                     }];
-}
-
-- (void)onConnectNetworkResponse:(NSError *)error
-{
-    if (error != nil) {
-        NSLog(@"Error enabling network: %@", error);
-    }
-
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
-    CHIPDeviceController * controller = InitializeCHIP();
-    [controller updateDevice:deviceId fabricId:0];
-}
-
 - (void)onCommissioningComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
@@ -1112,7 +1078,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController * alertController = [UIAlertController
             alertControllerWithTitle:@"Device Attestation"
-                             message:@"Device Attestion failed for device under commissioning. Do you wish to continue pairing?"
+                             message:@"Device Attestation failed for device under commissioning. Do you wish to continue pairing?"
                       preferredStyle:UIAlertControllerStyleAlert];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"No"

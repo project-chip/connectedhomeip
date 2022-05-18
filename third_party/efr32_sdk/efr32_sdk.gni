@@ -179,7 +179,7 @@ template("efr32_sdk") {
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.lcd_on) && invoker.lcd_on)) {
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
       defines += [ "CONFIG_ENABLE_UART" ]
 
       _include_dirs += [
@@ -484,7 +484,8 @@ template("efr32_sdk") {
     # USART sources files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
         chip_build_libshell || enable_openthread_cli ||
-        (defined(invoker.show_qr_code) && invoker.show_qr_code)) {
+        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
       sources += [
         "${efr32_sdk_root}/matter/efr32/${efr32_family}/sl_uartdrv_init.c",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/src/uartdrv.c",
@@ -512,7 +513,7 @@ template("efr32_sdk") {
     }
 
     if ((defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.lcd_on) && invoker.lcd_on)) {
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd)) {
       sources += [
         "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
         "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",

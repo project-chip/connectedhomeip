@@ -69,7 +69,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -113,7 +115,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -138,7 +142,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -165,7 +171,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -196,7 +204,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -229,7 +239,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -261,7 +273,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * testKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params1 = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params1 = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params1);
+
     params1.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller1 = [factory startControllerOnNewFabric:params1];
@@ -270,7 +284,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     // Now try to start a new controller with the same root but a
     // different fabric id.
-    __auto_type * params2 = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:2 ipk:testKeys.ipk];
+    __auto_type * params2 = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:2 ipk:testKeys.ipk];
+    XCTAssertNotNil(params2);
+
     params2.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller2 = [factory startControllerOnNewFabric:params2];
@@ -311,7 +327,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * root3 = [MTRCertificates generateRootCertificate:testKeys issuerId:@2 fabricId:@1 error:nil];
     XCTAssertNotNil(root3);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root1;
 
@@ -374,7 +392,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * root2 = [MTRCertificates generateRootCertificate:testKeys issuerId:@1 fabricId:@2 error:nil];
     XCTAssertNotNil(root2);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Try to start controller when fabric id in root cert subject does not match provided fabric id.
@@ -428,7 +448,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
     XCTAssertNotNil(root);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:signerKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:signerKeys
+                                                                                    fabricId:1
+                                                                                         ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root;
 
@@ -468,7 +492,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Try to start controller when there is an ICA and the ICA cert does not match signing key.
@@ -478,7 +504,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNil(controller);
 
     // Now start controller with the signing key matching the intermediate cert.
-    params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:intermediateKeys fabricId:1 ipk:rootKeys.ipk];
+    params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys fabricId:1 ipk:rootKeys.ipk];
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate;
@@ -507,7 +533,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(rootKeys);
 
     // Invalid fabric ID.
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:0 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:0 ipk:rootKeys.ipk];
     XCTAssertNil(params);
 
     [factory shutdown];
@@ -527,7 +553,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     // Invalid vendor ID ("standard").
     params.vendorId = @(0);
 
@@ -551,7 +579,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
@@ -589,7 +619,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Bring up with node id 17.
@@ -642,7 +674,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
     __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
     XCTAssertNotNil(rootKeys);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Try to bring up with node id 0.
@@ -698,7 +732,9 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Create a new fabric without the ICA.
@@ -713,7 +749,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller isRunning]);
 
     // Now start controller on the same fabric but using the ICA.
-    params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:intermediateKeys fabricId:1 ipk:rootKeys.ipk];
+    params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys fabricId:1 ipk:rootKeys.ipk];
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate;
@@ -758,7 +794,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:intermediateKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
+                                                                                    fabricId:1
+                                                                                         ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Create a new fabric without the ICA.
@@ -774,7 +814,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller isRunning]);
 
     // Now start controller on the same fabric but without using the ICA.
-    params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root;
     controller = [factory startControllerOnExistingFabric:params];
@@ -829,9 +869,11 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                              error:nil];
     XCTAssertNotNil(intermediate2);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:intermediateKeys1
-                                                                             fabricId:1
-                                                                                  ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys1
+                                                                                    fabricId:1
+                                                                                         ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Create a new fabric without the first ICA.
@@ -847,7 +889,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([controller isRunning]);
 
     // Now start controller on the same fabric but using the second ICA.
-    params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:intermediateKeys2 fabricId:1 ipk:rootKeys.ipk];
+    params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys2 fabricId:1 ipk:rootKeys.ipk];
     params.vendorId = @(kTestVendorId);
     params.rootCertificate = root;
     params.intermediateCertificate = intermediate2;
@@ -891,13 +933,310 @@ static uint16_t kTestVendorId = 0xFFF1u;
                                                                             error:nil];
     XCTAssertNotNil(intermediate);
 
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:intermediateKeys fabricId:1 ipk:rootKeys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:intermediateKeys
+                                                                                    fabricId:1
+                                                                                         ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
     params.vendorId = @(kTestVendorId);
 
     // Pass in an intermediate but no root.  Should fail.
     params.intermediateCertificate = intermediate;
     CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
     XCTAssertNil(controller);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerProvideFullCertChain
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    XCTAssertNotNil(root);
+
+    __auto_type * intermediateKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(intermediateKeys);
+
+    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
+                                                                  rootCertificate:root
+                                                            intermediatePublicKey:intermediateKeys.pubkey
+                                                                         issuerId:nil
+                                                                         fabricId:nil
+                                                                            error:nil];
+    XCTAssertNotNil(intermediate);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * operational = [MTRCertificates generateOperationalCertificate:intermediateKeys
+                                                             signingCertificate:intermediate
+                                                           operationalPublicKey:operationalKeys.pubkey
+                                                                       fabricId:@123
+                                                                         nodeId:@456
+                                                          caseAuthenticatedTags:nil
+                                                                          error:nil];
+    XCTAssertNotNil(operational);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
+                                                                          operationalCertificate:operational
+                                                                         intermediateCertificate:intermediate
+                                                                                 rootCertificate:root
+                                                                                             ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
+    params.vendorId = @(kTestVendorId);
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects([controller controllerNodeId], @456);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // Trying to bring up another new fabric with the same root and NOC should fail.
+    controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNil(controller);
+
+    // Trying to bring up the same fabric should succeed.
+    controller = [factory startControllerOnExistingFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects([controller controllerNodeId], @456);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerProvideCertChainNoICA
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    XCTAssertNotNil(root);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * operational = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                             signingCertificate:root
+                                                           operationalPublicKey:operationalKeys.pubkey
+                                                                       fabricId:@123
+                                                                         nodeId:@456
+                                                          caseAuthenticatedTags:nil
+                                                                          error:nil];
+    XCTAssertNotNil(operational);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
+                                                                          operationalCertificate:operational
+                                                                         intermediateCertificate:nil
+                                                                                 rootCertificate:root
+                                                                                             ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
+    params.vendorId = @(kTestVendorId);
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects([controller controllerNodeId], @456);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerCertChainFabricMismatchRoot
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:@111 error:nil];
+    XCTAssertNotNil(root);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * operational = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                             signingCertificate:root
+                                                           operationalPublicKey:operationalKeys.pubkey
+                                                                       fabricId:@123
+                                                                         nodeId:@456
+                                                          caseAuthenticatedTags:nil
+                                                                          error:nil];
+    XCTAssertNotNil(operational);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
+                                                                          operationalCertificate:operational
+                                                                         intermediateCertificate:nil
+                                                                                 rootCertificate:root
+                                                                                             ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
+    params.vendorId = @(kTestVendorId);
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNil(controller);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerCertChainFabricMismatchIntermediate
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * root = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:@123 error:nil];
+    XCTAssertNotNil(root);
+
+    __auto_type * intermediateKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(intermediateKeys);
+
+    __auto_type * intermediate = [MTRCertificates generateIntermediateCertificate:rootKeys
+                                                                  rootCertificate:root
+                                                            intermediatePublicKey:intermediateKeys.pubkey
+                                                                         issuerId:nil
+                                                                         fabricId:@111
+                                                                            error:nil];
+    XCTAssertNotNil(intermediate);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * operational = [MTRCertificates generateOperationalCertificate:intermediateKeys
+                                                             signingCertificate:intermediate
+                                                           operationalPublicKey:operationalKeys.pubkey
+                                                                       fabricId:@123
+                                                                         nodeId:@456
+                                                          caseAuthenticatedTags:nil
+                                                                          error:nil];
+    XCTAssertNotNil(operational);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithOperationalKeypair:operationalKeys
+                                                                          operationalCertificate:operational
+                                                                         intermediateCertificate:intermediate
+                                                                                 rootCertificate:root
+                                                                                             ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
+    params.vendorId = @(kTestVendorId);
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNil(controller);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerExternallyProvidedOperationalKey
+{
+    __auto_type * factory = [MatterControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[CHIPTestStorage alloc] init];
+    __auto_type * factoryParams = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:rootKeys fabricId:1 ipk:rootKeys.ipk];
+    XCTAssertNotNil(params);
+
+    params.vendorId = @(kTestVendorId);
+    params.operationalKeypair = operationalKeys;
+
+    CHIPDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    __auto_type nodeId = [controller controllerNodeId];
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // Trying to bring up the same fabric without specifying the operational
+    // keypair should now fail, because we won't know what operational keys to
+    // use.
+    params.operationalKeypair = nil;
+    controller = [factory startControllerOnExistingFabric:params];
+    XCTAssertNil(controller);
+
+    // But bringing up the controller with provided operational keys should
+    // work, and have the same node id.
+    params.operationalKeypair = operationalKeys;
+    controller = [factory startControllerOnExistingFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // And bringing up the controller with a different provided operational key
+    // should work too.
+    __auto_type * newOperationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(newOperationalKeys);
+
+    params.operationalKeypair = newOperationalKeys;
+    controller = [factory startControllerOnExistingFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    XCTAssertEqualObjects([controller controllerNodeId], nodeId);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
 
     [factory shutdown];
     XCTAssertFalse([factory isRunning]);
