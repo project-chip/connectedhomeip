@@ -68,7 +68,7 @@ public:
     virtual void Retain()  = 0;
     virtual void Release() = 0;
 
-    virtual bool IsActiveSession() const { return true; }
+    virtual bool IsActiveSession() const = 0;
 
     virtual ScopedNodeId GetPeer() const                               = 0;
     virtual ScopedNodeId GetLocalScopedNodeId() const                  = 0;

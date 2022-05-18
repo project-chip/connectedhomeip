@@ -41,6 +41,8 @@ public:
     void Retain() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Retain(); }
     void Release() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Release(); }
 
+    bool IsActiveSession() const override { return true; }
+
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
     const char * GetSessionTypeString() const override { return "incoming group"; };
@@ -94,6 +96,8 @@ public:
 
     void Retain() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Retain(); }
     void Release() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
 
     Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
 #if CHIP_PROGRESS_LOGGING
