@@ -76,7 +76,7 @@ following states:
 2. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
+    ${CHIP_TOOL_DIR}/chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
     ```
 
     here:

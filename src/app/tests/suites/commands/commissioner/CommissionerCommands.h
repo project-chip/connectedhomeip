@@ -33,10 +33,8 @@ public:
     virtual CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err)                              = 0;
     virtual chip::Controller::DeviceCommissioner & GetCommissioner(const char * identity)    = 0;
 
-    CHIP_ERROR PairWithQRCode(const char * identity,
-                              const chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type & value);
-    CHIP_ERROR PairWithManualCode(const char * identity,
-                                  const chip::app::Clusters::CommissionerCommands::Commands::PairWithManualCode::Type & value);
+    CHIP_ERROR PairWithCode(const char * identity,
+                            const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value);
     CHIP_ERROR Unpair(const char * identity, const chip::app::Clusters::CommissionerCommands::Commands::Unpair::Type & value);
 
     /////////// DevicePairingDelegate Interface /////////

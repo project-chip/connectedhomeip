@@ -263,7 +263,7 @@ class TestDefinition:
             # Only start and pair the default app
             app = apps_register.get('default')
             app.start()
-            pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
+            pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
             if sys.platform != 'darwin':
                 pairing_cmd.append('--paa-trust-store-path')
                 pairing_cmd.append(DEVELOPMENT_PAA_LIST)
