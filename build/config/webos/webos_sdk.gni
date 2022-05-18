@@ -13,5 +13,5 @@
 # limitations under the License.
 
 declare_args() {
-  sysroot_webos = ""
+  webos_sysroot = ""
 }

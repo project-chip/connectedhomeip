@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("${build_root}/config/webos/webos_sdk.gni")
 
 sysroot = webos_sysroot
