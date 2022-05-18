@@ -33,9 +33,10 @@ namespace app {
 namespace InvokeRequestMessage {
 enum class Tag : uint8_t
 {
-    kSuppressResponse = 0,
-    kTimedRequest     = 1,
-    kInvokeRequests   = 2,
+    kInteractionId    = 0,
+    kSuppressResponse = 1,
+    kTimedRequest     = 2,
+    kInvokeRequests   = 3,
 };
 
 class Parser : public MessageParser
