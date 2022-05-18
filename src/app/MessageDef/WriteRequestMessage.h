@@ -40,7 +40,6 @@ enum class Tag : uint8_t
     kTimedRequest        = 1,
     kWriteRequests       = 2,
     kMoreChunkedMessages = 3,
-    kFabricFiltered      = 4,
 };
 
 class Parser : public MessageParser
