@@ -87,7 +87,7 @@ CHIPDeviceController * InitializeCHIP(void)
             return;
         }
 
-        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys fabricId:1 ipk:keys.ipk];
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
         params.vendorId = @(kTestVendorId);
 
         // We're not sure whether we have a fabric configured already; try as if
@@ -113,7 +113,7 @@ CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys fabricId:1 ipk:keys.ipk];
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
 
     sController = [[MatterControllerFactory sharedInstance] startControllerOnExistingFabric:params];
 

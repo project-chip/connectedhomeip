@@ -324,10 +324,16 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
     VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mHasExternallyOwnedOperationalKey = false;
-
     P256SerializedKeypair serialized;
     ReturnErrorOnFailure(keyPair->Serialize(serialized));
+
+    if (mHasExternallyOwnedOperationalKey)
+    {
+        // Drop it, so we will allocate an internally owned one.
+        mOperationalKey                   = nullptr;
+        mHasExternallyOwnedOperationalKey = false;
+    }
+
     if (mOperationalKey == nullptr)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
@@ -583,13 +589,22 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
     ReturnErrorOnFailure(VerifyCredentials(newFabric.mNOCCert, newFabric.mICACert, newFabric.mRootCert, validContext, operationalId,
                                            fabricId, pubkey));
 
+    auto * operationalKey = newFabric.GetOperationalKey();
+    if (operationalKey == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/8433 -- Should verify that pubkey matches operationalKey's
+    // public key.
+
     if (newFabric.mHasExternallyOwnedOperationalKey)
     {
-        ReturnErrorOnFailure(SetExternallyOwnedOperationalKeypair(newFabric.GetOperationalKey()));
+        ReturnErrorOnFailure(SetExternallyOwnedOperationalKeypair(operationalKey));
     }
     else
     {
-        ReturnErrorOnFailure(SetOperationalKeypair(newFabric.GetOperationalKey()));
+        ReturnErrorOnFailure(SetOperationalKeypair(operationalKey));
     }
 
     SetRootCert(newFabric.mRootCert);
