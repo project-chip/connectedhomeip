@@ -376,13 +376,11 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
                          "Credentials::SetDeviceAttestationVerifier()!");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else
-        {
-            // We fell back on a default from singleton accessor.
-            ChipLogProgress(Controller,
-                            "*** Missing DeviceAttestationVerifier configuration at DeviceCommissioner init: using global default, "
-                            "consider passing one in CommissionerInitParams.");
-        }
+
+        // We fell back on a default from singleton accessor.
+        ChipLogProgress(Controller,
+                        "*** Missing DeviceAttestationVerifier configuration at DeviceCommissioner init: using global default, "
+                        "consider passing one in CommissionerInitParams.");
     }
 
     if (params.defaultCommissioner != nullptr)
