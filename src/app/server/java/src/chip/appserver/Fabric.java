@@ -19,16 +19,24 @@ package chip.appserver;
 
 public class Fabric {
 
-    public int vendorId;
-    public long fabricId;
-    public long nodeId;
-    public short fabricIndex;
-    public String label;
+  public int vendorId;
+  public long fabricId;
+  public long nodeId;
+  public short fabricIndex;
+  public String label;
 
-    @Override
-    public String toString() {
-        return "Fabric [fabricId=" + fabricId + ", fabricIndex=" + fabricIndex + ", label=" + label + ", nodeId="
-                + nodeId + ", vendorId=" + vendorId + "]";
-    }
-
+  @Override
+  public String toString() {
+    return "Fabric [fabricId="
+        + fabricId
+        + ", fabricIndex="
+        + fabricIndex
+        + ", label="
+        + label
+        + ", nodeId="
+        + nodeId
+        + ", vendorId="
+        + vendorId
+        + "]";
+  }
 }
