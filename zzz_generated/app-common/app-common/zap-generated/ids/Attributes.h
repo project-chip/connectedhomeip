@@ -1299,11 +1299,11 @@ namespace LocalizationConfiguration {
 namespace Attributes {
 
 namespace ActiveLocale {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace ActiveLocale
 
 namespace SupportedLocales {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace SupportedLocales
 
 namespace GeneratedCommandList {
