@@ -59,6 +59,7 @@ android_library("java") {
   sources = [
     "src/chip/appserver/ChipAppServer.java",
     "src/chip/appserver/ChipAppServerException.java",
+    "src/chip/appserver/Fabric.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

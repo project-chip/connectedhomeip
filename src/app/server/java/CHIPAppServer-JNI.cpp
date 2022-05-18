@@ -137,6 +137,18 @@ JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
     return JNI_TRUE;
 }
 
+JNI_METHOD(jint, getFabricCount)(JNIEnv * env, jobject self)
+{
+    uint8_t count = 0;
+    GetFabricCount(count);
+    return count;
+}
+
+JNI_METHOD(jobject, getFabricList)(JNIEnv * env, jobject self)
+{
+    return ReadFabricList(env, self);
+}
+
 void * IOThreadAppMain(void * arg)
 {
     JNIEnv * env;

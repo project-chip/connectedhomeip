@@ -22,6 +22,10 @@
 
 CHIP_ERROR ChipAndroidAppInit(void);
 
+void GetFabricCount(uint8_t & count);
+
+jobject ReadFabricList(JNIEnv * env, jobject self);
+
 void ChipAndroidAppShutdown(void);
 
 jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved);

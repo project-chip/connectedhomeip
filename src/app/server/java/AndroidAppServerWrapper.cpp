@@ -22,6 +22,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <iostream>
+#include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -74,4 +75,37 @@ void ChipAndroidAppShutdown(void)
 {
     chip::Server::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
+}
+
+void GetFabricCount(uint8_t & count)
+{
+    count = chip::Server::GetInstance().GetFabricTable().FabricCount();
+}
+
+jobject ReadFabricList(JNIEnv * env, jobject self)
+{
+    jobject jFabricList;
+    JniReferences::GetInstance().CreateArrayList(jFabricList);
+    for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
+    {
+        if (!fabricInfo.IsInitialized())
+            continue;
+        jclass jFabricCls       = env->FindClass("chip/appserver/Fabric");
+        jmethodID jFabricMethod = env->GetMethodID(jFabricCls, "<init>", "()V");
+        jobject jFabric         = env->NewObject(jFabricCls, jFabricMethod);
+        jfieldID jvendorId      = env->GetFieldID(jFabricCls, "vendorId", "I");
+        jfieldID jfabricId      = env->GetFieldID(jFabricCls, "fabricId", "J");
+        jfieldID jnodeId        = env->GetFieldID(jFabricCls, "nodeId", "J");
+        jfieldID jfabricIndex   = env->GetFieldID(jFabricCls, "fabricIndex", "S");
+        jfieldID jlabel         = env->GetFieldID(jFabricCls, "label", "Ljava/lang/String;");
+        env->SetIntField(jFabric, jvendorId, fabricInfo.GetVendorId());
+        env->SetLongField(jFabric, jfabricId, fabricInfo.GetFabricId());
+        env->SetLongField(jFabric, jnodeId, fabricInfo.GetNodeId());
+        env->SetShortField(jFabric, jfabricIndex, fabricInfo.GetFabricIndex());
+        UtfString jLabelStr(env, fabricInfo.GetFabricLabel());
+        env->SetObjectField(jFabric, jlabel, jLabelStr.jniValue());
+
+        JniReferences::GetInstance().AddToList(jFabricList, jFabric);
+    }
+    return jFabricList;
 }

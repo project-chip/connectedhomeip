@@ -17,17 +17,18 @@
  */
 package chip.appserver;
 
-import java.util.List;
+public class Fabric {
 
-/** Controller to interact with the CHIP device. */
-public class ChipAppServer {
-  private static final String TAG = ChipAppServer.class.getSimpleName();
+    public int vendorId;
+    public long fabricId;
+    public long nodeId;
+    public short fabricIndex;
+    public String label;
 
-  public native boolean startApp();
+    @Override
+    public String toString() {
+        return "Fabric [fabricId=" + fabricId + ", fabricIndex=" + fabricIndex + ", label=" + label + ", nodeId="
+                + nodeId + ", vendorId=" + vendorId + "]";
+    }
 
-  public native boolean stopApp();
-
-  public native int getFabricCount();
-
-  public native List<Fabric> getFabricList();
 }
