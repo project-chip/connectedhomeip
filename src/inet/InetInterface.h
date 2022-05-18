@@ -540,15 +540,13 @@ private:
     int mCurAddrIndex   = -1;
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-    otIp6AddressInfo * mAddrInfoList;
-    int mCurAddrIndex;
-    InterfaceIterator mIntfIter;
+    const otNetifAddress * mNetifAddrList;
+    const otNetifAddress * mCurAddr;
 #endif // #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 inline InterfaceIterator::InterfaceIterator(void) {}
-inline InterfaceAddressIterator::InterfaceAddressIterator(void) {}
 inline InterfaceIterator::~InterfaceIterator()               = default;
 inline InterfaceAddressIterator::~InterfaceAddressIterator() = default;
 inline bool InterfaceIterator::HasCurrent(void)

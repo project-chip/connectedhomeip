@@ -145,6 +145,15 @@ CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
     return CommitConfig(mName);
 }
 
+CHIP_ERROR PersistentStorage::SyncClearAll()
+{
+    ChipLogProgress(chipTool, "Clearing %s storage", kDefaultSectionName);
+    auto section = mConfig.sections[kDefaultSectionName];
+    section.clear();
+    mConfig.sections[kDefaultSectionName] = section;
+    return CommitConfig(mName);
+}
+
 CHIP_ERROR PersistentStorage::CommitConfig(const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

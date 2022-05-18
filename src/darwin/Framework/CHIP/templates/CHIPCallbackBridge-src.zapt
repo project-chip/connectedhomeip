@@ -1,6 +1,5 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
 #import "CHIPCallbackBridge_internal.h"
 #import "CHIPStructsObjc.h"
 #import "CHIPCommandPayloadsObjc.h"
@@ -38,7 +37,7 @@
 {{#>CHIPCallbackBridge type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/CHIPCallbackBridge}}
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#chip_server_cluster_attributes}}
 {{#if isArray}}
 {{#>CHIPCallbackBridge ns=parent.name                                }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/CHIPCallbackBridge}}
@@ -46,14 +45,14 @@
   {{#if_is_struct type}}
   {{#>CHIPCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}StructAttributeCallback{{/CHIPCallbackBridge}}
   {{/if_is_struct}}
-  {{#if_is_bitmap type}}
+  {{#if_is_strongly_typed_bitmap type}}
   {{#>CHIPCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}AttributeCallback{{/CHIPCallbackBridge}}
-  {{/if_is_bitmap}}
+  {{/if_is_strongly_typed_bitmap}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_responses}}
 {{#>CHIPCallbackBridge partial-type="Command"                        }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/CHIPCallbackBridge}}
 {{/chip_cluster_responses}}
@@ -65,5 +64,3 @@
 {{#>CHIPCallbackBridge type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/CHIPCallbackBridge}}
 {{/zcl_enums}}
 {{/zcl_clusters}}
-
-{{/if}}

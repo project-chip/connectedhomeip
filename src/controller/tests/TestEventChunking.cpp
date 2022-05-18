@@ -54,9 +54,9 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 class TestContext : public chip::Test::AppContext
 {
 public:
-    static int InitializeAsync(void * context)
+    static int Initialize(void * context)
     {
-        if (AppContext::InitializeAsync(context) != SUCCESS)
+        if (AppContext::Initialize(context) != SUCCESS)
             return FAILURE;
 
         auto * ctx = static_cast<TestContext *>(context);
@@ -90,7 +90,7 @@ public:
     }
 
 private:
-    MonotonicallyIncreasingCounter mEventCounter;
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
 };
 
 uint32_t gIterationCount = 0;
@@ -154,7 +154,7 @@ public:
 
     void OnReportEnd() override { mOnReportEnd = true; }
 
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mOnSubscriptionEstablished = true; }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablished = true; }
 
     uint32_t mAttributeCount        = 0;
     uint32_t mEventCount            = 0;
@@ -326,7 +326,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
-    readParams.mEventNumber             = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     // Since we will always read from the first event, we only generate event once.
 
@@ -397,7 +397,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
@@ -476,7 +476,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     readParams.mAttributePathParamsListSize = 1;
     readParams.mpEventPathParamsList        = &eventPath;
     readParams.mEventPathParamsListSize     = 1;
-    readParams.mEventNumber                 = firstEventNumber;
+    readParams.mEventNumber.SetValue(firstEventNumber);
 
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
@@ -534,7 +534,7 @@ nlTestSuite sSuite =
 {
     "TestEventChunking",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on

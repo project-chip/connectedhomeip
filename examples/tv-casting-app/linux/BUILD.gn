@@ -23,9 +23,10 @@ assert(chip_build_tools)
 executable("chip-tv-casting-app") {
   sources = [
     "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
-    "Casting.h",
     "CastingShellCommands.cpp",
     "CastingShellCommands.h",
+    "CastingUtils.cpp",
+    "CastingUtils.h",
     "main.cpp",
   ]
 
@@ -35,7 +36,11 @@ executable("chip-tv-casting-app") {
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
   ]
+
+  include_dirs =
+      [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
 
   cflags = [ "-Wconversion" ]
 

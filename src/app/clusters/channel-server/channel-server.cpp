@@ -76,11 +76,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "Channel returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Channel returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetChannelDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogProgress(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
@@ -90,7 +90,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Channel has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Channel has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -162,7 +162,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
-        if (isDelegateNull(delegate, endpoint))
+        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kChannelList))
         {
             return aEncoder.EncodeEmptyList();
         }
@@ -170,7 +170,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::Lineup::Id: {
-        if (isDelegateNull(delegate, endpoint))
+        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kLineupInfo))
         {
             return CHIP_NO_ERROR;
         }

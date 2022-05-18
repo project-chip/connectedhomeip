@@ -106,7 +106,8 @@ void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
 
 std::string JsonToString(Json::Value & json)
 {
-    Json::StyledWriter writer;
+    Json::FastWriter writer;
+    writer.omitEndingLineFeed();
     return writer.write(json);
 }
 

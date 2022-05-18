@@ -45,7 +45,6 @@ constexpr const char kIdentityNull[] = "null-fabric-commissioner";
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::DeviceProxy;
     using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
@@ -62,7 +61,6 @@ public:
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath);
         AddArgument("commissioner-name", &mCommissionerName);
         AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId);
-        AddArgument("commissioner-fabricid", 0, UINT64_MAX, &mCommissionerNodeId);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -108,6 +106,8 @@ protected:
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 
+    ChipDeviceCommissioner & GetCommissioner(const char * identity);
+
 private:
     CHIP_ERROR MaybeSetUpStack();
     CHIP_ERROR MaybeTearDownStack();
@@ -119,7 +119,6 @@ private:
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
-    chip::Optional<chip::FabricId> mCommissionerFabricId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
 

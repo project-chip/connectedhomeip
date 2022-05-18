@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING<16> label = 0;
-    CHAR_STRING<16> value = 1;
+    char_string<16> label = 0;
+    char_string<16> value = 1;
 }
 
 client cluster AccessControl = 31 {
@@ -30,7 +30,7 @@ client cluster AccessControl = 31 {
   struct AccessControlEntry {
     Privilege privilege = 1;
     AuthMode authMode = 2;
-    nullable INT64U subjects[] = 3;
+    nullable int64u subjects[] = 3;
     nullable Target targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
@@ -42,7 +42,7 @@ client cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    OCTET_STRING<128> data = 1;
+    octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
 
@@ -95,7 +95,7 @@ server cluster AccessControl = 31 {
   struct AccessControlEntry {
     Privilege privilege = 1;
     AuthMode authMode = 2;
-    nullable INT64U subjects[] = 3;
+    nullable int64u subjects[] = 3;
     nullable Target targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
@@ -107,7 +107,7 @@ server cluster AccessControl = 31 {
   }
 
   struct ExtensionEntry {
-    OCTET_STRING<128> data = 1;
+    octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
 
@@ -200,7 +200,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfo {
-    INT16U failSafeExpiryLengthSeconds = 0;
+    int16u failSafeExpiryLengthSeconds = 0;
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
@@ -222,17 +222,17 @@ server cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 2;
   }
 
-  response struct ArmFailSafeResponse {
+  response struct ArmFailSafeResponse = 1 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct SetRegulatoryConfigResponse {
+  response struct SetRegulatoryConfigResponse = 3 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
-  response struct CommissioningCompleteResponse {
+  response struct CommissioningCompleteResponse = 5 {
     CommissioningError errorCode = 0;
     CHAR_STRING debugText = 1;
   }
@@ -243,8 +243,8 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -288,28 +288,28 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct NetworkInfo {
-    OCTET_STRING<32> networkID = 0;
-    BOOLEAN connected = 1;
+    octet_string<32> networkID = 0;
+    boolean connected = 1;
   }
 
   struct WiFiInterfaceScanResult {
     WiFiSecurity security = 0;
-    OCTET_STRING<32> ssid = 1;
-    OCTET_STRING<6> bssid = 2;
-    INT16U channel = 3;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
     WiFiBand wiFiBand = 4;
-    INT8S rssi = 5;
+    int8s rssi = 5;
   }
 
   struct ThreadInterfaceScanResult {
-    INT16U panId = 0;
-    INT64U extendedPanId = 1;
-    CHAR_STRING<16> networkName = 2;
-    INT16U channel = 3;
-    INT8U version = 4;
-    OCTET_STRING<8> extendedAddress = 5;
-    INT8S rssi = 6;
-    INT8U lqi = 7;
+    int16u panId = 0;
+    int64u extendedPanId = 1;
+    char_string<16> networkName = 2;
+    int16u channel = 3;
+    int8u version = 4;
+    octet_string<8> extendedAddress = 5;
+    int8s rssi = 6;
+    int8u lqi = 7;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
@@ -355,20 +355,20 @@ server cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
-  response struct ScanNetworksResponse {
+  response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
-  response struct NetworkConfigResponse {
+  response struct NetworkConfigResponse = 5 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     optional INT8U networkIndex = 2;
   }
 
-  response struct ConnectNetworkResponse {
+  response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatus networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
@@ -426,7 +426,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
-  response struct QueryImageResponse {
+  response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING imageURI = 2;
@@ -437,7 +437,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING metadataForRequestor = 7;
   }
 
-  response struct ApplyUpdateResponse {
+  response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
   }
@@ -462,17 +462,17 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct NOCStruct {
-    OCTET_STRING noc = 1;
-    nullable OCTET_STRING icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
     fabric_idx fabricIndex = 254;
   }
 
   struct FabricDescriptor {
-    OCTET_STRING<65> rootPublicKey = 1;
-    INT16U vendorId = 2;
-    FABRIC_ID fabricId = 3;
-    NODE_ID nodeId = 4;
-    CHAR_STRING<32> label = 5;
+    octet_string<65> rootPublicKey = 1;
+    vendor_id vendorId = 2;
+    fabric_id fabricId = 3;
+    node_id nodeId = 4;
+    char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -501,7 +501,7 @@ server cluster OperationalCredentials = 62 {
     optional OCTET_STRING ICACValue = 1;
     OCTET_STRING IPKValue = 2;
     NODE_ID caseAdminNode = 3;
-    INT16U adminVendorId = 4;
+    VENDOR_ID adminVendorId = 4;
   }
 
   request struct UpdateFabricLabelRequest {
@@ -516,21 +516,21 @@ server cluster OperationalCredentials = 62 {
     OCTET_STRING rootCertificate = 0;
   }
 
-  response struct AttestationResponse {
+  response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
     OCTET_STRING signature = 1;
   }
 
-  response struct CertificateChainResponse {
+  response struct CertificateChainResponse = 3 {
     OCTET_STRING certificate = 0;
   }
 
-  response struct CSRResponse {
+  response struct CSRResponse = 5 {
     OCTET_STRING NOCSRElements = 0;
     OCTET_STRING attestationSignature = 1;
   }
 
-  response struct NOCResponse {
+  response struct NOCResponse = 8 {
     OperationalCertStatus statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
@@ -580,15 +580,100 @@ server cluster UserLabel = 65 {
 
 endpoint 0 {
   binding cluster AccessControl;
-  server  cluster AccessControl;
-  server  cluster Basic;
-  server  cluster FixedLabel;
-  server  cluster GeneralCommissioning;
-  server  cluster LocalizationConfiguration;
-  server  cluster NetworkCommissioning;
-  server  cluster OtaSoftwareUpdateProvider;
-  server  cluster OperationalCredentials;
-  server  cluster TimeFormatLocalization;
-  server  cluster UserLabel;
+
+  server cluster AccessControl {
+    callback attribute acl;
+    callback attribute extension;
+    callback attribute subjectsPerAccessControlEntry default = 4;
+    callback attribute targetsPerAccessControlEntry default = 3;
+    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute attributeList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster Basic {
+    callback attribute dataModelRevision default = 10;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute productID;
+    persist  attribute nodeLabel;
+    callback attribute location default = "XX";
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    persist  attribute localConfigDisabled;
+    ram      attribute reachable default = 1;
+    callback attribute uniqueID;
+    callback attribute capabilityMinima;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OtaSoftwareUpdateProvider {
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LocalizationConfiguration {
+    persist  attribute activeLocale default = "en-US";
+    callback attribute supportedLocales;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TimeFormatLocalization {
+    persist  attribute hourFormat;
+    persist  attribute activeCalendarType;
+    callback attribute supportedCalendarTypes;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster GeneralCommissioning {
+    ram      attribute breadcrumb;
+    callback attribute basicCommissioningInfo;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection default = 1;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster NetworkCommissioning {
+    ram      attribute maxNetworks;
+    callback attribute networks;
+    ram      attribute scanMaxTimeSeconds;
+    ram      attribute connectMaxTimeSeconds;
+    ram      attribute interfaceEnabled;
+    ram      attribute lastNetworkingStatus;
+    ram      attribute lastNetworkID;
+    ram      attribute lastConnectErrorValue;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OperationalCredentials {
+    callback attribute NOCs;
+    callback attribute fabrics;
+    callback attribute supportedFabrics;
+    callback attribute commissionedFabrics;
+    callback attribute trustedRootCertificates;
+    callback attribute currentFabricIndex;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute clusterRevision default = 1;
+  }
 }
+
 

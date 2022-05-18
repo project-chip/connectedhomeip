@@ -40,7 +40,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
     LaunchResponseType response;
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::StatusEnum::kSuccess;
+    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -51,11 +51,27 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
 
     string contentUrlString(contentUrl.data(), contentUrl.size());
     string displayStringString(displayString.data(), displayString.size());
+    string providerNameString(brandingInformation.providerName.data(), brandingInformation.providerName.size());
+
+    ChipLogProgress(
+        Zcl, "ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=%s DisplayString=%s BrandingInformation.ProviderName=%s",
+        contentUrlString.c_str(), displayStringString.c_str(), providerNameString.c_str());
 
     // TODO: Insert code here
     LaunchResponseType response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::StatusEnum::kSuccess;
+    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+
+    // Handle test cases
+    if (contentUrlString == "https://badurl")
+    {
+        response.status = ContentLauncher::ContentLaunchStatusEnum::kUrlNotAvailable;
+    }
+    else if (contentUrlString == "https://csa-iot.org/badauth")
+    {
+        response.status = ContentLauncher::ContentLaunchStatusEnum::kAuthFailed;
+    }
+
     helper.Success(response);
 }
 

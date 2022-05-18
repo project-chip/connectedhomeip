@@ -25,6 +25,7 @@
 #import <CHIP/CHIPDeviceAttestationDelegate.h>
 #import <CHIP/CHIPDeviceController+XPC.h>
 #import <CHIP/CHIPDeviceController.h>
+#import <CHIP/CHIPDeviceControllerStartupParams.h>
 #import <CHIP/CHIPDevicePairingDelegate.h>
 #import <CHIP/CHIPError.h>
 #import <CHIP/CHIPKeypair.h>
@@ -34,6 +35,8 @@
 #import <CHIP/CHIPSetupPayload.h>
 #import <CHIP/CHIPStructsObjc.h>
 #import <CHIP/CHIPThreadOperationalDataset.h>
+#import <CHIP/MTRCertificates.h>
+#import <CHIP/MatterClusterConstants.h>
 #import <CHIP/MatterControllerFactory.h>
 
 #import <Foundation/Foundation.h>

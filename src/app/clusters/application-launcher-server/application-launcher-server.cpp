@@ -27,6 +27,7 @@
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -65,11 +66,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "ApplicationLauncher returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "ApplicationLauncher returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetApplicationLauncherDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "ApplicationLauncher NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogProgress(Zcl, "ApplicationLauncher NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
@@ -79,7 +80,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Application Launcher has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Application Launcher has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -102,6 +103,20 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     else
     {
     }
+}
+
+bool HasFeature(chip::EndpointId endpoint, ApplicationLauncherFeature feature)
+{
+    bool hasFeature     = false;
+    uint32_t featureMap = 0;
+
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        hasFeature = (featureMap & chip::to_underlying(feature));
+    }
+
+    return hasFeature;
 }
 
 // this attribute should only be enabled for app platform instance (endpoint 1)
@@ -232,7 +247,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
                 LauncherResponseType response;
                 const char * buf = "data";
                 response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = StatusEnum::kAppNotAvailable;
+                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -313,7 +328,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
                 LauncherResponseType response;
                 const char * buf = "data";
                 response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = StatusEnum::kAppNotAvailable;
+                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -396,7 +411,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
                 LauncherResponseType response;
                 const char * buf = "data";
                 response.data    = ByteSpan(from_const_char(buf), strlen(buf));
-                response.status  = StatusEnum::kAppNotAvailable;
+                response.status  = ApplicationLauncherStatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }

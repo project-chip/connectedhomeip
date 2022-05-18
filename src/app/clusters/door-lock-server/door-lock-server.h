@@ -60,8 +60,6 @@ static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of 
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
     DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
 
-static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5; /**< Maximum number of supported credentials by a single user. */
-
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
 
@@ -92,6 +90,7 @@ public:
     bool GetNumberOfRFIDCredentialsSupported(chip::EndpointId endpointId, uint16_t & numberOfRFIDCredentials);
     bool GetNumberOfWeekDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfWeekDaySchedulesPerUser);
     bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
+    bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
 
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
@@ -209,8 +208,8 @@ private:
     DlStatus createCredential(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                               uint16_t credentialIndex, DlCredentialType credentialType,
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              Nullable<uint16_t> userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
-                              uint16_t & createdUserIndex);
+                              Nullable<uint16_t> userIndex, const Nullable<DlUserStatus> & userStatus,
+                              Nullable<DlUserType> userType, uint16_t & createdUserIndex);
     DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                                   uint16_t credentialIndex, DlCredentialType credentialType,
                                   const EmberAfPluginDoorLockCredentialInfo & existingCredential,
@@ -218,7 +217,7 @@ private:
     DlStatus modifyCredential(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
                               uint16_t credentialIndex, DlCredentialType credentialType,
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
-                              uint16_t userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType);
+                              uint16_t userIndex, const Nullable<DlUserStatus> & userStatus, Nullable<DlUserType> userType);
 
     EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
                                   DlCredentialType credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
@@ -288,9 +287,9 @@ private:
      * @param opSuccess     flags if operation was successfull or not
      */
     void SendLockOperationEvent(chip::EndpointId endpointId, DlLockOperationType opType, DlOperationSource opSource,
-                                DlOperationError opErr, Nullable<uint16_t> userId, Nullable<chip::FabricIndex> fabricIdx,
-                                Nullable<chip::NodeId> nodeId, LockOpCredentials * credList, size_t credListSize,
-                                bool opSuccess = true);
+                                DlOperationError opErr, const Nullable<uint16_t> & userId,
+                                const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
+                                LockOpCredentials * credList, size_t credListSize, bool opSuccess = true);
 
     /**
      * @brief Schedule auto relocking with a given timeout
@@ -374,9 +373,11 @@ enum class DlCredentialStatus : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;       /**< Indicates if credential slot is occupied or not. */
-    DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;   /**< Credential data bytes. */
+    DlCredentialStatus status;        /**< Indicates if credential slot is occupied or not. */
+    DlCredentialType credentialType;  /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;    /**< Credential data bytes. */
+    chip::FabricIndex createdBy;      /**< ID of the fabric that created the user. */
+    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 };
 
 /**
@@ -717,6 +718,8 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
  * @param credentialIndex Index of the credential to access. It is guaranteed to be within limits declared in the spec for
  *                         particular credential type. Starts from 1 for all credential types except Programming PIN -- in that case
  *                         it could only be equal to 0.
+ * @param creator Fabric ID that created the user. Could be kUndefinedFabricIndex (0).
+ * @param modifier Fabric ID that was last to modify the user. Could be kUndefinedFabricIndex (0).
  * @param credentialStatus New status of the credential slot (occupied/available). DlCredentialStatus::kAvailable means that the
  *                         credential must be deleted.
  * @param credentialType Type of the credential (PIN, RFID, etc.).
@@ -726,5 +729,6 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
  * @retval true, if credential pointed by \p credentialIndex of type \p credentialType was successfully changed in the database.
  * @retval false, if error occurred.
  */
-bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
+                                        chip::FabricIndex modifier, DlCredentialStatus credentialStatus,
                                         DlCredentialType credentialType, const chip::ByteSpan & credentialData);

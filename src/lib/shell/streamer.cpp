@@ -57,6 +57,7 @@ ssize_t ENFORCE_FORMAT(2, 0) streamer_vprintf(streamer_t * self, const char * fm
 
     // vsnprintf doesn't return negative numbers as long as the length it's
     // passed fits in INT_MAX.
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     static_assert(sizeof(buf) <= INT_MAX, "Return value cast not valid");
     len = static_cast<unsigned int>(vsnprintf(buf, sizeof(buf), fmt, ap));
     if (len >= sizeof(buf))

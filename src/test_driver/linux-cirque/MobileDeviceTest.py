@@ -48,7 +48,7 @@ DEVICE_CONFIG = {
         'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
-        'traffic_control': {'latencyMs': 100},
+        'traffic_control': {'latencyMs': 25},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device1': {
@@ -57,7 +57,7 @@ DEVICE_CONFIG = {
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
-        'traffic_control': {'latencyMs': 100},
+        'traffic_control': {'latencyMs': 25},
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
 }

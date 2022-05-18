@@ -18,7 +18,8 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "Utils.h"
+#include "LEDUtil.h"
+#include "binding-handler.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -124,6 +125,11 @@ CHIP_ERROR AppTask::Init()
     {
         LOG_ERR("dk_buttons_init() failed");
         return chip::System::MapErrorZephyr(ret);
+    }
+    err = InitBindingHandlers();
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("InitBindingHandlers() failed");
     }
 
     // Initialize timer user data

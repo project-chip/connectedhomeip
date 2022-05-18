@@ -81,11 +81,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = ContentAppPlatform::GetInstance().GetContentApp(endpoint);
     if (app != nullptr)
     {
-        ChipLogError(Zcl, "Content Launcher returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Content Launcher returning ContentApp delegate for endpoint:%u", endpoint);
         return app->GetContentLauncherDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "Content Launcher NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogProgress(Zcl, "Content Launcher NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ContentLauncher::Id);
     return ((ep == 0xFFFF || ep >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
@@ -95,7 +95,7 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Content Launcher has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "Content Launcher has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -219,7 +219,9 @@ bool emberAfContentLauncherClusterLaunchContentCallback(CommandHandler * command
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kContentSearch),
+                 err = CHIP_ERROR_INCORRECT_STATE);
     {
         delegate->HandleLaunchContent(responder, decodableParameterList, autoplay, data.HasValue() ? data.Value() : CharSpan());
     }
@@ -252,7 +254,8 @@ bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj,
     app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true && HasFeature(endpoint, ContentLauncherFeature::kURLPlayback),
+                 err = CHIP_ERROR_INCORRECT_STATE);
     {
         delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
                                   brandingInformation.HasValue() ? brandingInformation.Value()

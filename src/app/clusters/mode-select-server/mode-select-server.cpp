@@ -106,7 +106,6 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
         return false;
     }
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
-    // TODO: Implement application logic
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -142,13 +141,13 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
             // value when the server is supplied with power, except if the OnMode attribute is null.
             if (emberAfContainsServer(endpointId, OnOff::Id) &&
-                emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id, true) &&
-                emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, true))
+                emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+                emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = 0;
                 if (Attributes::OnMode::Get(endpointId, onMode) == EMBER_ZCL_STATUS_SUCCESS &&
-                    emberAfIsNonVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id, true) &&
+                    emberAfIsNonVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
                     OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
@@ -190,8 +189,8 @@ namespace {
  */
 inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 {
-    return emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id, true) &&
-        emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id, true);
+    return emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::CurrentMode::Id) &&
+        emberAfIsNonVolatileAttribute(endpointId, ModeSelect::Id, Attributes::StartUpMode::Id);
 }
 
 } // namespace

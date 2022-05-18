@@ -67,7 +67,7 @@ public:
 
     void ReleaseSession(PeerId peerId);
 
-    void ReleaseSessionsForFabric(CompressedFabricId compressedFabricId);
+    void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();
 
@@ -82,7 +82,6 @@ public:
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
 
 private:
-    OperationalDeviceProxy * FindSession(const SessionHandle & session) const;
     void ReleaseSession(OperationalDeviceProxy * device) const;
 
     CASESessionManagerConfig mConfig;

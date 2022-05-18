@@ -30,12 +30,7 @@ constexpr System::Clock::Seconds32 kUserConsentPollInterval = System::Clock::Sec
 
 bool ExtendedOTARequestorDriver::CanConsent()
 {
-    bool localConfigDisabled = false;
-    VerifyOrdo(DeviceLayer::ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR,
-               ChipLogProgress(SoftwareUpdate, "Failed to get local config disabled, assuming not disabled"));
-
-    // User consent delegation SHALL NOT be used if a Node is configured with the LocalConfigDisabled attribute set to True
-    return localConfigDisabled == false;
+    return mUserConsentDelegate != nullptr;
 }
 
 void ExtendedOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
@@ -105,12 +100,7 @@ void ExtendedOTARequestorDriver::HandleUserConsentState(chip::ota::UserConsentSt
     switch (userConsentState)
     {
     case chip::ota::UserConsentState::kGranted:
-        ScheduleDelayedAction(
-            mDelayedActionTime,
-            [](System::Layer *, void * context) {
-                static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->DownloadUpdate();
-            },
-            this);
+        ScheduleDelayedAction(mDelayedActionTime, DownloadUpdateTimerHandler, this);
         break;
 
     case chip::ota::UserConsentState::kDenied:

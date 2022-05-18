@@ -342,10 +342,11 @@ class ChipDeviceController():
     def ResolveNode(self, nodeid):
         self.CheckIsActive()
 
-        return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_UpdateDevice(
-                self.devCtrl, nodeid)
-        )
+        try:
+            self.GetConnectedDeviceSync(nodeid, allowPASE=False)
+            return 0
+        except ChipStackError as ex:
+            return ex.err
 
     def GetAddressAndPort(self, nodeid):
         self.CheckIsActive()
@@ -479,7 +480,7 @@ class ChipDeviceController():
 
         return self._Cluster
 
-    def GetConnectedDeviceSync(self, nodeid):
+    def GetConnectedDeviceSync(self, nodeid, allowPASE=True):
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
@@ -496,12 +497,12 @@ class ChipDeviceController():
                 print("Failed in getting the connected device: {}".format(err))
                 raise self._ChipStack.ErrorToException(err)
 
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-            self.devCtrl, nodeid, byref(returnDevice)))
-        if res == 0:
-            # TODO: give users more contrtol over whether they want to send this command over a PASE established connection
-            print('Using PASE connection')
-            return returnDevice
+        if allowPASE:
+            res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+                self.devCtrl, nodeid, byref(returnDevice)))
+            if res == 0:
+                print('Using PASE connection')
+                return returnDevice
 
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, DeviceAvailableCallback))
@@ -706,7 +707,7 @@ class ChipDeviceController():
         typing.Tuple[int,
                      typing.Type[ClusterObjects.ClusterEvent], int]
     ]] = None,
-            returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+            returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True, keepSubscriptions: bool = False):
         '''
         Read a list of attributes and/or events from a target node
 
@@ -756,7 +757,7 @@ class ChipDeviceController():
             v) for v in events] if events else None
 
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject, subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered))
+            lambda: ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject, subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -772,7 +773,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True):
+    ]], dataVersionFilters: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True, keepSubscriptions: bool = False):
         '''
         Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
 
@@ -798,7 +799,7 @@ class ChipDeviceController():
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        res = await self.Read(nodeid, attributes=attributes, dataVersionFilters=dataVersionFilters, returnClusterObject=returnClusterObject, reportInterval=reportInterval, fabricFiltered=fabricFiltered)
+        res = await self.Read(nodeid, attributes=attributes, dataVersionFilters=dataVersionFilters, returnClusterObject=returnClusterObject, reportInterval=reportInterval, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
@@ -816,7 +817,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-    ]], reportInterval: typing.Tuple[int, int] = None):
+    ]], reportInterval: typing.Tuple[int, int] = None, keepSubscriptions: bool = False):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
@@ -839,7 +840,7 @@ class ChipDeviceController():
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        res = await self.Read(nodeid=nodeid, events=events, reportInterval=reportInterval)
+        res = await self.Read(nodeid=nodeid, events=events, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
@@ -1018,10 +1019,6 @@ class ChipDeviceController():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
-
-            self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
-                c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]

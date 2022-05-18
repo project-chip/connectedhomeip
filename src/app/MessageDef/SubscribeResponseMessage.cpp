@@ -33,7 +33,10 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
@@ -43,7 +46,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint64_t subscriptionId;
+                SubscriptionId subscriptionId;
                 ReturnErrorOnFailure(reader.Get(subscriptionId));
                 PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
             }
@@ -58,7 +61,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t minIntervalFloorSeconds;
                 ReturnErrorOnFailure(reader.Get(minIntervalFloorSeconds));
-                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%" PRIx16 ",", minIntervalFloorSeconds);
+                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%x,", minIntervalFloorSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -71,7 +74,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
             {
                 uint16_t maxIntervalCeilingSeconds;
                 ReturnErrorOnFailure(reader.Get(maxIntervalCeilingSeconds));
-                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%" PRIx16 ",", maxIntervalCeilingSeconds);
+                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%x,", maxIntervalCeilingSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -105,7 +108,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(uint64_t * const apSubscribeId) const
+CHIP_ERROR SubscribeResponseMessage::Parser::GetSubscriptionId(SubscriptionId * const apSubscribeId) const
 {
     return GetUnsignedInteger(to_underlying(Tag::kSubscriptionId), apSubscribeId);
 }
@@ -120,7 +123,7 @@ CHIP_ERROR SubscribeResponseMessage::Parser::GetMaxIntervalCeilingSeconds(uint16
     return GetUnsignedInteger(to_underlying(Tag::kMaxIntervalCeilingSeconds), apMaxIntervalCeilingSeconds);
 }
 
-SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const uint64_t aSubscribeId)
+SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::SubscriptionId(const chip::SubscriptionId aSubscribeId)
 {
     if (mError == CHIP_NO_ERROR)
     {

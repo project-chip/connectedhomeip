@@ -27,19 +27,16 @@
 const PairWithQRCode = {
   name : 'PairWithQRCode',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
-  response : { arguments : [] }
 };
 
 const PairWithManualCode = {
   name : 'PairWithManualCode',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'CHAR_STRING', name : 'payload' } ],
-  response : { arguments : [] }
 };
 
 const Unpair = {
   name : 'Unpair',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
-  response : { arguments : [] }
 };
 
 const name     = 'CommissionerCommands';

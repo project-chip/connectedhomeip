@@ -5,4 +5,5 @@
 # And some specific generated files
 src/controller/python/chip/clusters/CHIPClusters.py linguist-generated
 src/controller/python/chip/clusters/Objects.py linguist-generated
-src/darwin/Framework/CHIPTests/CHIPClustersTests.m linguist-generated
+# Let bat file use CRLF linebreak
+**/*.bat eol=crlf

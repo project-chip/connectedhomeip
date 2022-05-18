@@ -246,10 +246,10 @@ Top level key to define a YAML test: [test](#property-test)
     [tests.js](../../../../examples/placeholder/linux/apps/app1/tests.js)
 
 -   chip-tool(darwin) tests:
-    [tests.js](../../../../examples/chip-tool-darwin/templates/tests.js)
+    [tests.js](../../../../examples/chip-tool-darwin/templates/tests/tests.js)
 
 -   chip-tool tests:
-    [tests.js](../../../../examples/chip-tool/templates/tests.js)
+    [tests.js](../../../../examples/chip-tool/templates/tests/tests.js)
 
     ```javascript
     // Manual test definitions. Does not run in CI.

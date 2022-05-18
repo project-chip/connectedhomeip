@@ -17,8 +17,7 @@
  */
 
 #include "PairingDelegateBridge.h"
-#import <CHIP/CHIPCommissioningParameters.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <CHIP/CHIP.h>
 
 @interface CHIPToolPairingDelegate ()
 @end
@@ -42,35 +41,27 @@
 
 - (void)onPairingComplete:(NSError *)error
 {
-    NSError * __block commissionError;
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-    if (err != CHIP_NO_ERROR) {
-        _commandBridge->SetCommandExitStatus(err);
+    if (error != nil) {
+        _commandBridge->SetCommandExitStatus(error);
         return;
     }
-    ChipLogProgress(chipTool, "Pairing Complete: %s", chip::ErrorStr(err));
+    ChipLogProgress(chipTool, "Pairing Complete");
+    NSError * commissionError;
     [_commissioner commissionDevice:_deviceID commissioningParams:_params error:&commissionError];
-    err = [CHIPError errorToCHIPErrorCode:commissionError];
-    if (err != CHIP_NO_ERROR) {
-        _commandBridge->SetCommandExitStatus(err);
+    if (commissionError != nil) {
+        _commandBridge->SetCommandExitStatus(commissionError);
         return;
     }
 }
 
 - (void)onPairingDeleted:(NSError *)error
 {
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-    ChipLogProgress(chipTool, "Pairing Delete: %s", chip::ErrorStr(err));
-
-    _commandBridge->SetCommandExitStatus(err);
+    _commandBridge->SetCommandExitStatus(error, "Pairing Delete");
 }
 
 - (void)onCommissioningComplete:(NSError *)error
 {
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
-    ChipLogProgress(chipTool, "Pairing Commissioning Complete: %s", chip::ErrorStr(err));
-
-    _commandBridge->SetCommandExitStatus(err);
+    _commandBridge->SetCommandExitStatus(error, "Pairing Commissioning Complete");
 }
 
 @end

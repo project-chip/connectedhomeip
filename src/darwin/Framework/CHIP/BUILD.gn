@@ -41,6 +41,9 @@ static_library("framework") {
     "CHIPDeviceConnectionBridge.mm",
     "CHIPDeviceController.h",
     "CHIPDeviceController.mm",
+    "CHIPDeviceControllerStartupParams.h",
+    "CHIPDeviceControllerStartupParams.mm",
+    "CHIPDeviceControllerStartupParams_Internal.h",
     "CHIPDeviceController_Internal.h",
     "CHIPDevicePairingDelegate.h",
     "CHIPDevicePairingDelegateBridge.h",
@@ -63,6 +66,8 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
+    "MTRCertificates.h",
+    "MTRCertificates.mm",
     "MatterControllerFactory.h",
     "MatterControllerFactory.mm",
     "MatterControllerFactory_Internal.h",
@@ -72,8 +77,10 @@ static_library("framework") {
     "zap-generated/CHIPClustersObjc.mm",
     "zap-generated/CHIPCommandPayloadsObjc.h",
     "zap-generated/CHIPCommandPayloadsObjc.mm",
+    "zap-generated/CHIPEventTLVValueDecoder.mm",
     "zap-generated/CHIPStructsObjc.h",
     "zap-generated/CHIPStructsObjc.mm",
+    "zap-generated/MatterClusterConstants.h",
   ]
 
   public_deps = [

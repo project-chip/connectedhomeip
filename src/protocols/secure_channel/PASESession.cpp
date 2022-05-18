@@ -69,24 +69,17 @@ PASESession::~PASESession()
     Clear();
 }
 
+void PASESession::OnSessionReleased()
+{
+    Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+}
+
 void PASESession::Finish()
 {
     mPairingComplete = true;
-
-    Transport::PeerAddress address = mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
-
-    // Discard the exchange so that Clear() doesn't try closing it. The exchange will handle that.
-    DiscardExchange();
-
-    CHIP_ERROR err = ActivateSecureSession(address);
-    if (err == CHIP_NO_ERROR)
-    {
-        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
-    }
-    else
-    {
-        mDelegate->OnSessionEstablishmentError(err);
-    }
+    PairingSession::Finish();
 }
 
 void PASESession::Clear()
@@ -110,29 +103,6 @@ void PASESession::Clear()
     mKeLen           = sizeof(mKe);
     mPairingComplete = false;
     PairingSession::Clear();
-    CloseExchange();
-}
-
-void PASESession::CloseExchange()
-{
-    if (mExchangeCtxt != nullptr)
-    {
-        mExchangeCtxt->Close();
-        mExchangeCtxt = nullptr;
-    }
-}
-
-void PASESession::DiscardExchange()
-{
-    if (mExchangeCtxt != nullptr)
-    {
-        // Make sure the exchange doesn't try to notify us when it closes,
-        // since we might be dead by then.
-        mExchangeCtxt->SetDelegate(nullptr);
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
-        // exchange will handle that.
-        mExchangeCtxt = nullptr;
-    }
 }
 
 CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode, SessionEstablishmentDelegate * delegate)

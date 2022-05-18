@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CHIPPersistentStorageDelegate;
 @protocol CHIPKeypair;
 @class CHIPDeviceController;
+@class CHIPDeviceControllerStartupParams;
 
 @interface MatterControllerFactoryParams : NSObject
 /*
@@ -56,42 +57,9 @@ NS_ASSUME_NONNULL_BEGIN
  * connections.  Defaults to NO.
  */
 @property (nonatomic) BOOL startServer;
-/*
- * Path to a file to use for backing our KVS storage.  This should not
- * be used, generally; it will be removed soon.  Defaults to nil.
- */
-@property (strong, nonatomic, nullable) NSString * kvsPath;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<CHIPPersistentStorageDelegate>)storageDelegate;
-@end
-
-@interface CHIPDeviceControllerStartupParams : NSObject
-/*
- * Vendor ID (allocated by the Connectivity Standards Alliance) for
- * this controller.  Must be set by consumer.
- */
-@property (nonatomic) uint16_t vendorId;
-/*
- * Root CA keypair that identifies (via its public key) the fabric.  Nullable
- * for now, but that will change.
- */
-@property (strong, nonatomic, nullable) id<CHIPKeypair> rootCAKeypair;
-/*
- * Fabric id for the controller.  Must be set to a nonzero value.
- */
-@property (nonatomic) uint64_t fabricId;
-/*
- * IPK to use for the controller's fabric.  Allowed to be null when
- * starting a controller on an existing fabric.
- */
-@property (strong, nonatomic, nullable) NSData * ipk;
-
-- (instancetype)init NS_UNAVAILABLE;
-// TODO The keypair should not be nullable, but we need to sort out
-// CHIPClustersTests and CHIPTool use of these APIs first.
-- (instancetype)initWithKeypair:(_Nullable id<CHIPKeypair>)rootCAKeypair;
-
 @end
 
 @interface MatterControllerFactory : NSObject

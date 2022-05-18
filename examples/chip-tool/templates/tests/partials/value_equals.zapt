@@ -13,7 +13,7 @@
       else
       {
         VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
-        {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=(concat expected ".Value()") isNullable=false depth=(incrementDepth depth)}}
+        {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=(concat expected ".Value()") isNullable=false keepAsExpected=true depth=(incrementDepth depth)}}
       }
     {{else}}
       VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
@@ -51,10 +51,11 @@
   {{else}}
     VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
+      {{else if keepAsExpected}}{{expected}}
       {{else if (isOctetString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}})
       {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})
       {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
-      {{else}}{{asTypedLiteral expected type}}
+      {{else}}{{asTypedExpression expected type}}
       {{/if}}
     ));
   {{/if_is_struct}}

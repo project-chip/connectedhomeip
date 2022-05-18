@@ -43,28 +43,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
 /**
- * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
- *
- * Enables the use of a hard-coded default serial number if none
- * is found in CHIP NV storage.
- */
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
- *
- * 0xFFF1: Test vendor.
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
- *
- * 0x8011: example pump-app
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x800A
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
  * The hardware version number assigned to device or product by the device vendor.  This
@@ -75,15 +53,13 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
+ * Values set by args.gni:
+ * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+ * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
- *
- * A string identifying the software version running on the device.
- * CHIP currently expects the software version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0d1"
-#endif
+
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
@@ -97,7 +73,7 @@
  * Enables synchronizing the device's real time clock with a remote CHIP Time service
  * using the CHIP Time Sync protocol.
  */
-//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
+// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
@@ -105,6 +81,8 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+#define MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED 1
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -125,5 +103,27 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
+
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ *
+ * TODO: (#17080) 1 should be OK since almost all commands are synchronous, should be some larger number after we resolved the issue
+ * of the large memory footprint of ReadHandler.
+ */
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 1
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ *
+ * TODO: (#17080) 1 should be OK since most write requests can be synchronous (not chunked), should be some larger number after we
+ * resolved the issue of the large memory footprint of ReadHandler.
+ */
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 1
 
 #endif // CHIP_PROJECT_CONFIG_H

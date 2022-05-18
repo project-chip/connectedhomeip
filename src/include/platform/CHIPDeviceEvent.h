@@ -25,6 +25,7 @@
 #pragma once
 #include <stdint.h>
 
+#include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -161,11 +162,11 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
-     * SED Polling Interval Change
+     * SED Interval Change
      *
-     * Signals a change to the sleepy end device polling interval.
+     * Signals a change to the sleepy end device interval.
      */
-    kSEDPollingIntervalChange,
+    kSEDIntervalChange,
 
     /**
      * Security Session Established
@@ -373,7 +374,14 @@ struct ChipDeviceEvent final
         {
             ConnectivityChange IPv4;
             ConnectivityChange IPv6;
-            char address[INET6_ADDRSTRLEN];
+            // WARNING: There used to be `char address[INET6_ADDRSTRLEN]` here and it is
+            //          deprecated/removed since it was too large and only used for logging.
+            //          Consider not relying on ipAddress field either since the platform
+            //          layer *does not actually validate* that the actual internet is reachable
+            //          before issuing this event *and* there may be multiple addresses
+            //          (especially IPv6) so it's recommended to use `ChipDevicePlatformEvent`
+            //          instead and do something that is better for your platform.
+            chip::Inet::IPAddress ipAddress;
         } InternetConnectivityChange;
         struct
         {

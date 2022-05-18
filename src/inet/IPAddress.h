@@ -120,6 +120,7 @@ union SockAddr
  * @details
  *  The CHIP Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
+ *
  */
 class DLL_EXPORT IPAddress
 {
@@ -141,8 +142,7 @@ public:
     static constexpr uint16_t kMaxStringLength = OT_IP6_ADDRESS_STRING_SIZE;
 #endif
 
-    IPAddress()                        = default;
-    IPAddress(const IPAddress & other) = default;
+    IPAddress() = default;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     explicit IPAddress(const ip6_addr_t & ipv6Addr);
@@ -323,15 +323,6 @@ public:
      * @retval false Otherwise
      */
     bool operator!=(const IPAddress & other) const;
-
-    /**
-     * @brief   Conventional assignment operator.
-     *
-     * @param[in]   other   The address to copy.
-     *
-     * @return  A reference to this object.
-     */
-    IPAddress & operator=(const IPAddress & other);
 
     /**
      * @brief   Emit the IP address in conventional text presentation format.
@@ -556,7 +547,7 @@ public:
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     otIp6Address ToIPv6() const;
-    static IPAddress FromOtAddr(otIp6Address & address);
+    static IPAddress FromOtAddr(const otIp6Address & address);
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
     /**
@@ -666,6 +657,8 @@ public:
      */
     static IPAddress Any;
 };
+
+static_assert(std::is_trivial<IPAddress>::value, "IPAddress is not trivial");
 
 } // namespace Inet
 } // namespace chip

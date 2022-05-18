@@ -22,11 +22,14 @@ from .gn import GnBuilder
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     CHIP_TOOL = auto()
+    CHIP_TOOL_DARWIN = auto()
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
     ADDRESS_RESOLVE = auto()
     TV_APP = auto()
+    TV_CASTING_APP = auto()
+    LIGHT = auto()
     LOCK = auto()
     TESTS = auto()
     SHELL = auto()
@@ -41,6 +44,8 @@ class HostApp(Enum):
             return 'all-clusters-app/linux'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
+        elif self == HostApp.CHIP_TOOL_DARWIN:
+            return 'chip-tool-darwin'
         elif self == HostApp.THERMOSTAT:
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
@@ -49,6 +54,10 @@ class HostApp(Enum):
             return 'minimal-mdns'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.TV_CASTING_APP:
+            return 'tv-casting-app/linux'
+        elif self == HostApp.LIGHT:
+            return 'lighting-app/linux'
         elif self == HostApp.LOCK:
             return 'lock-app/linux'
         elif self == HostApp.SHELL:
@@ -71,6 +80,9 @@ class HostApp(Enum):
         elif self == HostApp.CHIP_TOOL:
             yield 'chip-tool'
             yield 'chip-tool.map'
+        elif self == HostApp.CHIP_TOOL_DARWIN:
+            yield 'chip-tool-darwin'
+            yield 'chip-tool-darwin.map'
         elif self == HostApp.THERMOSTAT:
             yield 'thermostat-app'
             yield 'thermostat-app.map'
@@ -89,6 +101,12 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.TV_CASTING_APP:
+            yield 'chip-tv-casting-app'
+            yield 'chip-tv-casting-app.map'
+        elif self == HostApp.LIGHT:
+            yield 'chip-lighting-app'
+            yield 'chip-lighting-app.map'
         elif self == HostApp.LOCK:
             yield 'chip-lock-app'
             yield 'chip-lock-app.map'
@@ -158,7 +176,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 test_group=False, use_libfuzzer=False, use_clang=False, interactive_mode=True,
+                 use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -189,10 +207,6 @@ class HostBuilder(GnBuilder):
         if not interactive_mode:
             self.extra_gn_options.append('config_use_interactive_mode=false')
 
-        if test_group:
-            self.extra_gn_options.append(
-                'chip_enable_group_messaging_tests=true')
-
         if use_libfuzzer:
             self.extra_gn_options.append('is_libfuzzer=true')
 
@@ -201,6 +215,11 @@ class HostBuilder(GnBuilder):
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
+
+        if extra_tests:
+            # Flag for testing purpose
+            self.extra_gn_options.append(
+                'chip_im_force_fabric_quota_check=true')
 
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')

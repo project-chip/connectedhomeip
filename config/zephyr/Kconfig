@@ -139,6 +139,12 @@ config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 	help
 	  Enables Thread Sleepy End Device support in Matter.
 
+config CHIP_THREAD_SSED
+	  bool "Enable Thread Synchronized Sleepy End Device support"
+	  depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+	  help
+		Enables Thread Synchronized Sleepy End Device support in Matter.
+
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA requestor"
 	help
@@ -203,6 +209,13 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 
 endif
 
+config CHIP_FIRMWARE_BUILD_UNIX_TIME
+	bool "Make Unix time of compilation available in source code"
+	default y
+	help
+	  When enabled, the Unix time of the firmware build is exposed to the
+	  source code and used to initialize the last known UTC time.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y
@@ -237,6 +250,12 @@ config CHIP_OTA_IMAGE_INCLUDE_MCUBOOT
 	  option can be enabled if the device supports the bootloader update.
 
 endif
+
+config CHIP_EXTENDED_DISCOVERY
+	bool "Enable extended discovery"
+	help
+	  Enables the device to advertise commissionable service when not in the
+	  commissioning mode.
 
 module = MATTER
 module-str = Matter

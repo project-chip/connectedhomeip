@@ -19,8 +19,6 @@
 
 static chip::ByteSpan asByteSpan(NSData * value) { return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length); }
 
-void CHIPAttestationTrustStoreBridge::Init(NSArray<NSData *> * paaCerts) { mPaaCerts = paaCerts; }
-
 CHIP_ERROR CHIPAttestationTrustStoreBridge::GetProductAttestationAuthorityCert(
     const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const
 {

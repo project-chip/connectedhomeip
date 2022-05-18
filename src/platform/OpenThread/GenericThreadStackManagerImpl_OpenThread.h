@@ -101,9 +101,9 @@ protected:
     void _UpdateNetworkStatus();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
 #endif
 
     bool _HaveMeshConnectivity(void);
@@ -157,9 +157,9 @@ private:
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    ConnectivityManager::SEDPollingConfig mPollingConfig;
-    ConnectivityManager::SEDPollingMode mPollingMode = ConnectivityManager::SEDPollingMode::Idle;
-    uint32_t mFastPollingConsumers                   = 0;
+    ConnectivityManager::SEDIntervalsConfig mIntervalsConfig;
+    ConnectivityManager::SEDIntervalMode mIntervalsMode = ConnectivityManager::SEDIntervalMode::Idle;
+    uint32_t mActiveModeConsumers                       = 0;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -171,21 +171,13 @@ private:
         static constexpr uint8_t kDefaultDomainNameSize  = 20;
         static constexpr uint8_t kMaxDomainNameSize      = 32;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
+        // SRP is used for both operational and commissionable services, so buffers sizes must be worst case.
         static constexpr size_t kSubTypeMaxNumber   = Dnssd::Common::kSubTypeMaxNumber;
         static constexpr size_t kSubTypeTotalLength = Dnssd::Common::kSubTypeTotalLength;
         static constexpr size_t kTxtMaxNumber =
             std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
         static constexpr size_t kTxtTotalValueLength = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                 Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
-#else
-        // Thread only supports operational discovery.
-        static constexpr size_t kSubTypeMaxNumber    = Dnssd::Operational::kSubTypeMaxNumber;
-        static constexpr size_t kSubTypeTotalLength  = Dnssd::Operational::kSubTypeTotalLength;
-        static constexpr size_t kTxtMaxNumber        = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
-        static constexpr size_t kTxtTotalValueLength = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
-#endif
 
         static constexpr size_t kServiceBufferSize = Dnssd::Common::kInstanceNameMaxLength + 1 + // add null-terminator
             Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                            // add null-terminator
@@ -271,7 +263,7 @@ private:
     void OnJoinerComplete(otError aError);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR SetSEDPollingMode(ConnectivityManager::SEDPollingMode pollingType);
+    CHIP_ERROR SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType);
 #endif
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }

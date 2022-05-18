@@ -1,6 +1,6 @@
 # Command Details
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 {{#chip_cluster_commands}}
 {{#first}}
 <details><summary>{{parent.name}}</summary><p>

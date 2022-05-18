@@ -46,12 +46,20 @@ struct SetupParams
     controllerNOC. It's used by controller to establish CASE sessions with devices */
     Crypto::P256Keypair * operationalKeypair = nullptr;
 
+    /**
+     * Controls whether or not the operationalKeypair should be owned by the
+     * caller.  By default, this is false, but if the keypair cannot be
+     * serialized, then setting this to true will allow the caller to manage
+     * this keypair's lifecycle.
+     */
+    bool hasExternallyOwnedOperationalKeypair = false;
+
     /* The following certificates must be in x509 DER format */
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    uint16_t controllerVendorId;
+    chip::VendorId controllerVendorId;
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
@@ -78,6 +86,7 @@ struct FactoryInitParams
     Credentials::GroupDataProvider * groupDataProvider            = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    FabricTable * fabricTable                                     = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -150,11 +159,9 @@ public:
     //
     const DeviceControllerSystemState * GetSystemState() const { return mSystemState; }
 
-    class ControllerFabricDelegate final : public FabricTableDelegate
+    class ControllerFabricDelegate final : public chip::FabricTable::Delegate
     {
     public:
-        ControllerFabricDelegate() : FabricTableDelegate(true) {}
-
         CHIP_ERROR Init(SessionManager * sessionManager, Credentials::GroupDataProvider * groupDataProvider)
         {
             VerifyOrReturnError(sessionManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -165,8 +172,10 @@ public:
             return CHIP_NO_ERROR;
         };
 
-        void OnFabricDeletedFromStorage(CompressedFabricId compressedId, FabricIndex fabricIndex) override
+        void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
+            (void) fabricTable;
+
             if (mSessionManager != nullptr)
             {
                 mSessionManager->FabricRemoved(fabricIndex);
@@ -177,9 +186,17 @@ public:
             }
         };
 
-        void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+        void OnFabricRetrievedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
 
-        void OnFabricPersistedToStorage(FabricInfo * fabricInfo) override { (void) fabricInfo; }
+        void OnFabricPersistedToStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
+        {
+            (void) fabricTable;
+            (void) fabricIndex;
+        }
 
     private:
         SessionManager * mSessionManager                    = nullptr;

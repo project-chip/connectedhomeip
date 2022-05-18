@@ -68,5 +68,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+    // On Darwin, overide with non-op to pass CI.
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

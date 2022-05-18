@@ -193,7 +193,7 @@ void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 
 void PlatformManagerImpl::HandleTimerEvent(void)
 {
-    const CHIP_ERROR err = static_cast<System::LayerImplLwIP &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+    const CHIP_ERROR err = static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandlePlatformTimer %ld", err.AsInteger());

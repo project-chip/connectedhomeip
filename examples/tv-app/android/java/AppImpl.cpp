@@ -351,8 +351,18 @@ CHIP_ERROR ContentAppFactoryImpl::ConvertToPlatformCatalogVendorApp(const Catalo
     std::string appId(sourceApp.applicationId);
     if (appId == "applicationId")
     {
-        // test case passes "applicationId", map this to our test suite app
+        // regression test case passes "applicationId", map this to our test suite app
         Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "1111");
+    }
+    else if (appId == "exampleid")
+    {
+        // cert test case passes "exampleid", map this to our test suite app
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "1");
+    }
+    else if (appId == "exampleString")
+    {
+        // cert test case passes "exampleString", map this to our test suite app
+        Platform::CopyString(destinationApp->applicationId, sizeof(destinationApp->applicationId), "65521");
     }
     else
     {

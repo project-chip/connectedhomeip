@@ -83,6 +83,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+constexpr uint16_t kMaxConnectRetries = 4;
+
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint);
 
 namespace {
@@ -1735,25 +1737,48 @@ bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 
 struct ConnectParams
 {
-    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint) {}
+    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint), mNumRetries(0) {}
     BluezDevice1 * mDevice;
     BluezEndpoint * mEndpoint;
+    uint16_t mNumRetries;
 };
 
-static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer)
+static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams)
 {
-    BluezDevice1 * device = BLUEZ_DEVICE1(aObject);
-    GError * error        = nullptr;
-    gboolean success      = bluez_device1_call_connect_finish(device, aResult, &error);
+    BluezDevice1 * device  = BLUEZ_DEVICE1(aObject);
+    GError * error         = nullptr;
+    gboolean success       = bluez_device1_call_connect_finish(device, aResult, &error);
+    ConnectParams * params = static_cast<ConnectParams *>(apParams);
+
+    assert(params != nullptr);
 
     if (!success)
     {
-        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s", error->message);
+        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s (%d)", error->message, error->code);
+
+        // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
+        // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
+        // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
+        // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
+        // D-Bus method, or else `Connect()` returns immediately without any effect.
+        if (g_error_matches(error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && params->mNumRetries++ < kMaxConnectRetries)
+        {
+            // Clear the error before usage in subsequent call.
+            g_clear_error(&error);
+
+            bluez_device1_call_disconnect_sync(device, nullptr, &error);
+            bluez_device1_call_connect(device, params->mEndpoint->mpConnectCancellable, ConnectDeviceDone, params);
+            ExitNow();
+        }
+
         BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
-        ExitNow();
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "ConnectDevice complete");
     }
 
-    ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+    chip::Platform::Delete(params);
 
 exit:
     if (error != nullptr)
@@ -1769,9 +1794,8 @@ static gboolean ConnectDeviceImpl(ConnectParams * apParams)
     assert(endpoint != nullptr);
 
     g_cancellable_reset(endpoint->mpConnectCancellable);
-    bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, nullptr);
+    bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, apParams);
     g_object_unref(device);
-    chip::Platform::Delete(apParams);
 
     return G_SOURCE_REMOVE;
 }

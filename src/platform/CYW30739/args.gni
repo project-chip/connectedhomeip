@@ -44,7 +44,8 @@ chip_system_config_locking = "none"
 chip_system_config_use_lwip = true
 chip_system_config_use_sockets = false
 
-is_debug = false
+optimize_debug_level = "s"
+lwip_debug = false
 default_configs_optimize = [ "$dir_pw_build:optimize_size" ]
 
 chip_build_tests = false

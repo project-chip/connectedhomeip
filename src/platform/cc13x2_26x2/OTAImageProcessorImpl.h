@@ -35,7 +35,7 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
-    bool IsFirstImageRun() override { return false; }
+    bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
@@ -62,6 +62,13 @@ private:
     uint16_t mMetaPage;
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
+
+    struct fixedOtaHeader
+    {
+        uint32_t fileIdentifier;
+        uint64_t totalSize;
+        uint32_t headerSize;
+    } PACK_STRUCT_STRUCT mFixedOtaHeader;
 };
 
 } // namespace chip

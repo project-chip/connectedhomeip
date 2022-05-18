@@ -16,20 +16,15 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/examples/chip-tool/chip-tool.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
 assert(chip_build_tools)
 
-declare_args() {
-  # Use a separate eventloop for CHIP tasks
-  config_use_separate_eventloop = true
-  config_use_interactive_mode = true
-  config_enable_yaml_tests = true
-}
-
 config("config") {
   include_dirs = [
     ".",
+    "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
   ]
@@ -57,7 +52,6 @@ static_library("chip-tool-utils") {
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
-    "commands/common/CommandInvoker.h",
     "commands/common/Commands.cpp",
     "commands/common/CredentialIssuerCommands.h",
     "commands/discover/DiscoverCommand.cpp",
@@ -74,6 +68,7 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
+    "commands/storage/StorageManagementCommand.cpp",
     "config/PersistentStorage.cpp",
   ]
 
@@ -90,6 +85,7 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/app/tests/suites/commands/commissioner",
     "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/app/tests/suites/commands/log",
     "${chip_root}/src/app/tests/suites/commands/system",
     "${chip_root}/src/app/tests/suites/pics",

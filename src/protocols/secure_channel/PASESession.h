@@ -35,11 +35,10 @@
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
+#include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
-#include <transport/PairingSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -78,6 +77,13 @@ public:
     {
         return ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex);
     }
+
+    ScopedNodeId GetLocalScopedNodeId() const override
+    {
+        // For PASE, source is always the undefined node ID
+        return ScopedNodeId();
+    }
+
     CATValues GetPeerCATs() const override { return CATValues(); };
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
@@ -172,6 +178,9 @@ public:
 
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
+    //// SessionDelegate ////
+    void OnSessionReleased() override;
+
 private:
     enum Spake2pErrorType : uint8_t
     {
@@ -201,18 +210,7 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    // TODO: pull up Finish to PairingSession class
     void Finish();
-
-    void CloseExchange();
-
-    /**
-     * Clear our reference to our exchange context pointer so that it can close
-     * itself at some later time.
-     */
-    void DiscardExchange();
-
-    SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
 
@@ -234,8 +232,6 @@ private:
     uint32_t mIterationCount = 0;
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
-
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
 
     struct Spake2pErrorMsg
     {

@@ -57,19 +57,6 @@ bool IPAddress::operator!=(const IPAddress & other) const
     return Addr[0] != other.Addr[0] || Addr[1] != other.Addr[1] || Addr[2] != other.Addr[2] || Addr[3] != other.Addr[3];
 }
 
-IPAddress & IPAddress::operator=(const IPAddress & other)
-{
-    if (this != &other)
-    {
-        Addr[0] = other.Addr[0];
-        Addr[1] = other.Addr[1];
-        Addr[2] = other.Addr[2];
-        Addr[3] = other.Addr[3];
-    }
-
-    return *this;
-}
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
@@ -283,7 +270,7 @@ otIp6Address IPAddress::ToIPv6() const
     return otAddr;
 }
 
-IPAddress IPAddress::FromOtAddr(otIp6Address & address)
+IPAddress IPAddress::FromOtAddr(const otIp6Address & address)
 {
     IPAddress addr;
     static_assert(sizeof(address.mFields.m32) == sizeof(addr), "otIp6Address size mismatch");

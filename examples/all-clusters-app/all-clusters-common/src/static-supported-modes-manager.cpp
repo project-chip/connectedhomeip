@@ -62,7 +62,7 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
         }
     }
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", mode);
-    return EMBER_ZCL_STATUS_INVALID_VALUE;
+    return EMBER_ZCL_STATUS_INVALID_COMMAND;
 }
 
 const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()

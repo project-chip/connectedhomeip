@@ -1,0 +1,51 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    100.2.7. [TC-DL-2.7] Verification for the following Commands - Set User
+    Status, Get User Status , Get User Status Response [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Verify that DUT sends a SUCCESS response"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/15776
+      disabled: true
+
+    - label: "TH send Get User Status command to DUT with User ID as 3"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH send Set User Status command to DUT for setting the User Status as
+          3 for User ID as 3"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Get User Status command to DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends Get User Status command to DUT with the User ID as '3f4'"
+      verification: |
+
+      disabled: true

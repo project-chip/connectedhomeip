@@ -21,6 +21,7 @@ from chip.clusters.Attribute import AttributePath, AttributeReadResult, Attribut
 from chip.clusters.Types import NullValue
 import chip.interaction_model
 import asyncio
+import random
 
 import base
 
@@ -55,6 +56,18 @@ class NetworkCommissioningTests:
     def __init__(self, devCtrl, nodeid):
         self._devCtrl = devCtrl
         self._nodeid = nodeid
+        self._last_breadcrumb = random.randint(1, 1 << 48)
+
+    async def must_verify_breadcrumb(self):
+        res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)], returnClusterObject=True)
+        if self._last_breadcrumb is not None:
+            if self._last_breadcrumb != res[0][Clusters.GeneralCommissioning].breadcrumb:
+                raise AssertionError(
+                    f"Breadcrumb attribute mismatch! Expect {self._last_breadcrumb} got {res[0][Clusters.GeneralCommissioning].breadcrumb}")
+
+    def with_breadcrumb(self) -> int:
+        self._last_breadcrumb += 1
+        return self._last_breadcrumb
 
     def log_interface_basic_info(self, values):
         logger.info(f"The interface supports {values.maxNetworks} networks.")
@@ -129,11 +142,12 @@ class NetworkCommissioningTests:
         # Scan networks
         logger.info(f"Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=0)
+            ssid=b'', breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        await self.must_verify_breadcrumb()
 
         # Arm the failsafe before making network config changes
         logger.info(f"Arming the failsafe")
@@ -149,17 +163,18 @@ class NetworkCommissioningTests:
         if len(networkList) != 0:
             logger.info(f"Removing existing network")
             req = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
-                networkID=networkList[0].networkID, breadcrumb=0)
+                networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             logger.info(f"Received response: {res}")
             if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
+            await self.must_verify_breadcrumb()
 
         # Add first network
         logger.info(f"Adding first test network")
         req = Clusters.NetworkCommissioning.Commands.AddOrUpdateWiFiNetwork(
-            ssid=TEST_WIFI_SSID.encode(), credentials=TEST_WIFI_PASS.encode(), breadcrumb=0)
+            ssid=TEST_WIFI_SSID.encode(), credentials=TEST_WIFI_PASS.encode(), breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
@@ -167,6 +182,7 @@ class NetworkCommissioningTests:
         if res.networkIndex != 0:
             raise AssertionError(
                 f"Unexpected result: {res.networkIndex} (should be 0)")
+        await self.must_verify_breadcrumb()
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
@@ -181,12 +197,13 @@ class NetworkCommissioningTests:
 
         logger.info(f"Connect to a network")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
-            networkID=TEST_WIFI_SSID.encode(), breadcrumb=0)
+            networkID=TEST_WIFI_SSID.encode(), breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Got response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info(f"Device connected to a network.")
+        await self.must_verify_breadcrumb()
 
         # Disarm the failsafe
         logger.info(f"Disarming the failsafe")
@@ -259,11 +276,12 @@ class NetworkCommissioningTests:
         # Scan networks
         logger.info(f"Scan networks")
         req = Clusters.NetworkCommissioning.Commands.ScanNetworks(
-            ssid=b'', breadcrumb=0)
+            ssid=b'', breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
+        await self.must_verify_breadcrumb()
 
         # Arm the failsafe before making network config changes
         logger.info(f"Arming the failsafe")
@@ -279,17 +297,18 @@ class NetworkCommissioningTests:
         if len(networkList) != 0:
             logger.info(f"Removing existing network")
             req = Clusters.NetworkCommissioning.Commands.RemoveNetwork(
-                networkID=networkList[0].networkID, breadcrumb=0)
+                networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             logger.info(f"Received response: {res}")
             if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
+            await self.must_verify_breadcrumb()
 
         # Add first network
         logger.info(f"Adding first test network")
         req = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
-            operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=0)
+            operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
@@ -297,6 +316,7 @@ class NetworkCommissioningTests:
         if res.networkIndex != 0:
             raise AssertionError(
                 f"Unexpected result: {res.networkIndex} (should be 0)")
+        await self.must_verify_breadcrumb()
 
         logger.info(f"Check network list")
         res = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(endpointId, Clusters.NetworkCommissioning.Attributes.Networks)], returnClusterObject=True)
@@ -311,12 +331,13 @@ class NetworkCommissioningTests:
 
         logger.info(f"Connect to a network")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
-            networkID=TEST_THREAD_NETWORK_IDS[0], breadcrumb=0)
+            networkID=TEST_THREAD_NETWORK_IDS[0], breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Got response: {res}")
         if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info(f"Device connected to a network.")
+        await self.must_verify_breadcrumb()
 
         # Disarm the failsafe
         logger.info(f"Disarming the failsafe")

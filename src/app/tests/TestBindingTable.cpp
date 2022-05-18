@@ -135,7 +135,7 @@ void TestPersistentStorage(nlTestSuite * aSuite, void * aContext)
     chip::TestPersistentStorageDelegate testStorage;
     BindingTable table;
     chip::DefaultStorageKeyAllocator key;
-    chip::Optional<chip::ClusterId> cluster      = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(6));
+    chip::Optional<chip::ClusterId> cluster = chip::MakeOptional<chip::ClusterId>(static_cast<chip::ClusterId>(UINT16_MAX + 6));
     std::vector<EmberBindingTableEntry> expected = {
         EmberBindingTableEntry::ForNode(0, 0, 0, 0, NullOptional),
         EmberBindingTableEntry::ForNode(1, 1, 0, 0, cluster),

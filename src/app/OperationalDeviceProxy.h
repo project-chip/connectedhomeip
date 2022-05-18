@@ -29,7 +29,6 @@
 #include <app/CASEClient.h>
 #include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
-#include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/address_resolve/AddressResolve.h>
@@ -85,7 +84,7 @@ typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ER
  *    - Expose to consumers the secure session for talking to the device.
  */
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
-                                          public SessionReleaseDelegate,
+                                          public SessionDelegate,
                                           public SessionEstablishmentDelegate,
                                           public AddressResolve::NodeListener
 {
@@ -154,7 +153,7 @@ public:
     {
         mDeviceAddress = ToPeerAddress(nodeResolutionData);
 
-        mMRPConfig = nodeResolutionData.GetMRPConfig();
+        mRemoteMRPConfig = nodeResolutionData.resolutionData.GetMRPConfig();
 
         if (mState == State::NeedsAddress)
         {
@@ -179,17 +178,11 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
-
-    uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
     CHIP_ERROR ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
-
-    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
@@ -202,12 +195,12 @@ public:
         // For all other addresses, we should rely on the device's routing table to route messages sent.
         // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
         // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        if (nodeData.mAddress[0].IsIPv6LinkLocal())
+        if (nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal())
         {
-            interfaceId = nodeData.mInterfaceId;
+            interfaceId = nodeData.resolutionData.interfaceId;
         }
 
-        return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
+        return Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port, interfaceId);
     }
 
     /**
@@ -258,8 +251,6 @@ private:
     State mState = State::Uninitialized;
 
     SessionHolderWithDelegate mSecureSession;
-
-    uint8_t mSequenceNumber = 0;
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;

@@ -65,19 +65,34 @@ void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & dat
     }
 }
 
+void ActiveResolveAttempts::CompleteIpResolution(SerializedQNameIterator targetHostName)
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.MatchesIpResolve(targetHostName))
+        {
+            item.attempt.Clear();
+            return;
+        }
+    }
+}
+
 void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
 {
-    ScheduledAttempt attempt(peerId, /* firstSend */ true);
-    MarkPending(attempt);
+    MarkPending(ScheduledAttempt(peerId, /* firstSend */ true));
 }
 
 void ActiveResolveAttempts::MarkPending(const chip::Dnssd::DiscoveryFilter & filter, const chip::Dnssd::DiscoveryType type)
 {
-    ScheduledAttempt attempt(filter, type, /* firstSend */ true);
-    MarkPending(attempt);
+    MarkPending(ScheduledAttempt(filter, type, /* firstSend */ true));
 }
 
-void ActiveResolveAttempts::MarkPending(const ScheduledAttempt & attempt)
+void ActiveResolveAttempts::MarkPending(ScheduledAttempt::IpResolve && resolve)
+{
+    MarkPending(ScheduledAttempt(std::move(resolve), /* firstSend */ true));
+}
+
+void ActiveResolveAttempts::MarkPending(ScheduledAttempt && attempt)
 {
     // Strategy when picking the peer id to use:
     //   1 if a matching peer id is already found, use that one
@@ -209,6 +224,29 @@ Optional<ActiveResolveAttempts::ScheduledAttempt> ActiveResolveAttempts::NextSch
     }
 
     return Optional<ScheduledAttempt>::Missing();
+}
+
+bool ActiveResolveAttempts::IsWaitingForIpResolutionFor(SerializedQNameIterator hostName) const
+{
+    for (auto & entry : mRetryQueue)
+    {
+        if (entry.attempt.IsEmpty())
+        {
+            continue; // not a pending item
+        }
+
+        if (!entry.attempt.IsIpResolve())
+        {
+            continue;
+        }
+
+        if (hostName == entry.attempt.IpResolveData().hostName.Content())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace Minimal

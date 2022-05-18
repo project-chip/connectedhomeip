@@ -18,6 +18,7 @@ name:
 
 config:
     nodeId: 0x12344321
+    timeout: 300
     nodeIdForDuplicateCommissioning:
         type: NODE_ID
         defaultValue: 0x11
@@ -36,9 +37,15 @@ config:
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
-    - label: "Reboot target device"
+    - label: "Stop target device"
       cluster: "SystemCommands"
-      command: "Reboot"
+      command: "Stop"
+
+    - label:
+          "Start target device with the provided discriminator for basic
+          commissioning advertisement"
+      cluster: "SystemCommands"
+      command: "Start"
       arguments:
           values:
               - name: "discriminator"
@@ -51,6 +58,111 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Wait for PIXIT_COMM_WIN(180) + 10"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for PIXIT_COMM_WIN(180) + 10"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for PIXIT_COMM_WIN(180) + 10"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 54000
+
+    - label: "Wait for PIXIT_COMM_WIN(180) + 10"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 28000
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithQRCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE
+
+    - label: "TH_CR1 revokes the commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "RevokeCommissioning"
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
+
+    - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
+      identity: "alpha"
+      cluster: "Basic"
+      command: "writeAttribute"
+      attribute: "NodeLabel"
+      arguments:
+          value: "chiptest"
+
+    - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
+      identity: "alpha"
+      cluster: "Basic"
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "chiptest"
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
@@ -82,64 +194,6 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
-    - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-
-    - label: "TH_CR1 revokes the commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
-      command: "RevokeCommissioning"
-      timedInteractionTimeoutMs: 10000
-
-    - label: "TH_CR2 starts a commissioning process on DUT_CE"
-      identity: "beta"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId2
-
-    - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
-      identity: "alpha"
-      cluster: "Basic"
-      command: "writeAttribute"
-      attribute: "NodeLabel"
-      arguments:
-          value: "chiptest"
-
-    - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
-      identity: "alpha"
-      cluster: "Basic"
-      command: "readAttribute"
-      attribute: "NodeLabel"
-      response:
-          value: "chiptest"
-
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      identity: "alpha"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "CommissioningTimeout"
-                value: 180
-
-    - label: "TH_CR2 starts a commissioning process on DUT_CE"
-      identity: "beta"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId2
-
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"
       cluster: "CommissionerCommands"
@@ -150,14 +204,5 @@ tests:
                 value: nodeId3
               - name: "payload"
                 value: payload
-
-    - label: "Wait for the commissioned device to be retrieved for gamma"
-      identity: "gamma"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId3
       response:
           error: FAILURE

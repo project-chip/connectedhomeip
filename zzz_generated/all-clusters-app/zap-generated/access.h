@@ -73,6 +73,10 @@
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
@@ -132,6 +136,10 @@
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
@@ -191,6 +199,10 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
+    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: view */ \
@@ -243,6 +255,10 @@
     8, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
+    512, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
@@ -293,6 +309,10 @@
     16384, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    21, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
+    23, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
+    32, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
+    33, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
     21, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
     22, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
     23, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
@@ -343,6 +363,10 @@
     kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: start up current level, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min heat setpoint limit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: max heat setpoint limit, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: min cool setpoint limit, Privilege: manage */ \
@@ -363,6 +387,11 @@
     60, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     60, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     60, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    257, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
@@ -409,6 +438,11 @@
     0, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     1, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     2, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    11, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    12, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    13, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    14, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    15, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     26, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     27, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
     29, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \
@@ -455,6 +489,11 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: AdministratorCommissioning, Command: RevokeCommissioning, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearWeekDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetYearDaySchedule, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetYearDaySchedule, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetUser, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetUser, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearUser, Privilege: administer */ \

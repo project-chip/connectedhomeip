@@ -33,7 +33,6 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
-#include <transport/TransportMgr.h>
 
 namespace chip {
 namespace Messaging {
@@ -227,12 +226,12 @@ private:
     uint16_t mNextKeyId;
     State mState;
 
-    SessionManager * mSessionManager;
-    ReliableMessageMgr mReliableMessageMgr;
-
     FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
+
+    SessionManager * mSessionManager;
+    ReliableMessageMgr mReliableMessageMgr;
 
     UnsolicitedMessageHandlerSlot UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
 
@@ -240,8 +239,7 @@ private:
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
-                           const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                           System::PacketBufferHandle && msgBuf) override;
+                           DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf) override;
 };
 
 } // namespace Messaging

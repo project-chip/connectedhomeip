@@ -278,7 +278,7 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
 
 bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData) const
 {
-    if (nodeData.commissioningMode == 0)
+    if (nodeData.commissionData.commissioningMode == 0)
     {
         return false;
     }
@@ -286,9 +286,9 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     switch (currentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShortDiscriminator:
-        return ((nodeData.longDiscriminator >> 8) & 0x0F) == currentFilter.code;
+        return ((nodeData.commissionData.longDiscriminator >> 8) & 0x0F) == currentFilter.code;
     case Dnssd::DiscoveryFilterType::kLongDiscriminator:
-        return nodeData.longDiscriminator == currentFilter.code;
+        return nodeData.commissionData.longDiscriminator == currentFilter.code;
     default:
         return false;
     }
@@ -309,8 +309,10 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());
 
-    Inet::InterfaceId interfaceId      = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId : Inet::InterfaceId::Null();
-    Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port, interfaceId);
+    Inet::InterfaceId interfaceId =
+        nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.resolutionData.interfaceId : Inet::InterfaceId::Null();
+    Transport::PeerAddress peerAddress =
+        Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port, interfaceId);
     mDiscoveredParameters[kIPTransport] = RendezvousParameters().SetPeerAddress(peerAddress);
     ConnectToDiscoveredDevice();
 }

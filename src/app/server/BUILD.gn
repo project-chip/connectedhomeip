@@ -15,21 +15,11 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
-# Move this inside the GroupDataProvider once implemented Issue #11075
-declare_args() {
-  #Enable Multicast listenening on HardCoded IPV6 address for Test suite
-  chip_enable_group_messaging_tests = false
-}
-
 config("server_config") {
   defines = []
 
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
-  }
-
-  if (chip_enable_group_messaging_tests) {
-    defines += [ "CHIP_ENABLE_GROUP_MESSAGING_TESTS" ]
   }
 }
 
@@ -37,9 +27,13 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "AclStorage.cpp",
+    "AclStorage.h",
     "CommissioningModeProvider.h",
     "CommissioningWindowManager.cpp",
     "CommissioningWindowManager.h",
+    "DefaultAclStorage.cpp",
+    "DefaultAclStorage.h",
     "Dnssd.cpp",
     "Dnssd.h",
     "EchoHandler.cpp",

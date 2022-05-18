@@ -27,36 +27,24 @@
 const WaitForMs = {
   name : 'WaitForMs',
   arguments : [ { type : 'INT32U', name : 'ms' } ],
-  response : { arguments : [] }
 };
 
 const WaitForCommissioning = {
   name : 'WaitForCommissioning',
-  arguments : [],
-  response : { arguments : [] }
 };
 
 const WaitForCommissionee = {
   name : 'WaitForCommissionee',
   arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
-  response : { arguments : [] }
 };
 
-const WaitForCommissionableAdvertisement = {
-  name : 'WaitForCommissionableAdvertisement',
-  arguments : [],
-  response : { arguments : [] }
+const WaitForMessage = {
+  name : 'WaitForMessage',
+  arguments : [ { type : 'CHAR_STRING', name : 'registerKey', isOptional : true }, { type : 'CHAR_STRING', name : 'message' } ],
 };
 
-const WaitForOperationalAdvertisement = {
-  name : 'WaitForOperationalAdvertisement',
-  arguments : [],
-  response : { arguments : [] }
-};
-
-const name = 'DelayCommands';
-const commands =
-    [ WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForCommissionableAdvertisement, WaitForOperationalAdvertisement ];
+const name     = 'DelayCommands';
+const commands = [ WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForMessage ];
 
 const DelayCommands = {
   name,

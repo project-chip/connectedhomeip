@@ -76,7 +76,10 @@ private:
     }
 
     void OnDone() override { return mCallback.OnDone(); }
-    void OnSubscriptionEstablished(uint64_t aSubscriptionId) override { mCallback.OnSubscriptionEstablished(aSubscriptionId); }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    {
+        mCallback.OnSubscriptionEstablished(aSubscriptionId);
+    }
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
     {
@@ -90,6 +93,10 @@ private:
         return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList);
     }
 
+    virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber) override
+    {
+        return mCallback.GetHighestReceivedEventNumber(aEventNumber);
+    }
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
      * the reader is positioned into that buffer and add it to our buffered list for tracking.

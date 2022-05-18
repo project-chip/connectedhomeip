@@ -21,17 +21,17 @@ namespace chip {
 
 CASEClient::CASEClient(const CASEClientInitParams & params) : mInitParams(params) {}
 
-void CASEClient::SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig)
+void CASEClient::SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & remoteMRPConfig)
 {
-    mCASESession.SetRemoteMRPConfig(mrpConfig);
+    mCASESession.SetRemoteMRPConfig(remoteMRPConfig);
 }
 
 CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
-                                        const ReliableMessageProtocolConfig & mrpConfig, SessionEstablishmentDelegate * delegate)
+                                        const ReliableMessageProtocolConfig & remoteMRPConfig,
+                                        SessionEstablishmentDelegate * delegate)
 {
     // Create a UnauthenticatedSession for CASE pairing.
-    // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
-    Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(peerAddress, mrpConfig);
+    Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(peerAddress, remoteMRPConfig);
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
 
     // Allocate the exchange immediately before calling CASESession::EstablishSession.

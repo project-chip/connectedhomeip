@@ -55,6 +55,28 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     SuccessOrExit(err);
     err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipCounters);
     SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric1);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric2);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric3);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric4);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace2(AmebaConfig::kConfigNamespace_ChipFabric5);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipACL);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipAttributes);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipBindingTable);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOTA);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipDNS);
+    SuccessOrExit(err);
+    err = AmebaConfig::EnsureNamespace(AmebaConfig::kConfigNamespace_ChipOthers);
+    SuccessOrExit(err);
 
     if (AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_RebootCount))
     {

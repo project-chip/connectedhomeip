@@ -189,6 +189,41 @@ class ClusterObjectTests:
 
     @classmethod
     @base.test_case
+    async def TestSubscribeZeroMinInterval(cls, devCtrl):
+        '''
+        This validates receiving subscription reports for two attributes at a time in quick succession after issuing a command that results in attribute side-effects.
+        Specifically, it relies on the fact that the second attribute is changed in a different execution context than the first. This ensures that we pick-up the first
+        attribute change and generate a notification, and validating that shortly after that, we generate a second report for the second change.
+
+        This is done using subscriptions with a min reporting interval of 0 to ensure timely notification of the above. An On() command is sent to the OnOff cluster
+        which should simultaneously set the state to On as well as set the level to 254.
+        '''
+        logger.info("Test Subscription With MinInterval of 0")
+        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[Clusters.OnOff, Clusters.LevelControl], reportInterval=(0, 60))
+        data = sub.GetAttributes()
+
+        logger.info("Sending off command")
+
+        req = Clusters.OnOff.Commands.Off()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+        logger.info("Sending on command")
+
+        req = Clusters.OnOff.Commands.On()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+        # Wait for the report containing both attributes to arrive to us.
+        await asyncio.sleep(2)
+
+        logger.info("Checking read back value is indeed 254")
+
+        if (data[1][Clusters.LevelControl][Clusters.LevelControl.Attributes.CurrentLevel] != 254):
+            raise ValueError("Current Level should have been 254")
+
+        sub.Shutdown()
+
+    @classmethod
+    @base.test_case
     async def TestReadAttributeRequests(cls, devCtrl):
         '''
         Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
@@ -515,6 +550,7 @@ class ClusterObjectTests:
             await cls.TestReadEventRequests(devCtrl, 1)
             await cls.TestReadWriteAttributeRequestsWithVersion(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
+            await cls.TestSubscribeZeroMinInterval(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
             await cls.TestMixedReadAttributeAndEvents(devCtrl)
             # Note: Write will change some attribute values, always put it after read tests

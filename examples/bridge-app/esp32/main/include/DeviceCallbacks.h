@@ -23,19 +23,15 @@
  *
  **/
 
-#include "CHIPDeviceManager.h"
-#include <app/util/af-types.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/CommonDeviceCallbacks.h>
 
-class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
+class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
 public:
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                             uint8_t mask, uint8_t type, uint16_t size, uint8_t * value);
+                                             uint8_t type, uint16_t size, uint8_t * value);
 
 private:
-    void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

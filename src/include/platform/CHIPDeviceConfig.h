@@ -126,23 +126,23 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
+ * CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
  *
- * The default amount of time in milliseconds that the sleepy end device will use as a slow-polling interval.
+ * The default amount of time in milliseconds that the sleepy end device will use as an idle interval.
  * This interval is used by the device to periodically wake up and poll the data in the idle mode.
  */
-#ifndef CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000_ms32
+#ifndef CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL 5000_ms32
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
+ * CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
  *
- * The default amount of time in milliseconds that the sleepy end device will use as a fast-polling interval.
+ * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
  * This interval is used by the device to periodically wake up and poll the data in the active mode.
  */
-#ifndef CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL
-#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 200_ms32
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32
 #endif
 
 // -------------------- Device Identification Configuration --------------------
@@ -500,7 +500,7 @@
  * CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
  *
  * A prefix string used in forming the BLE device name.  The remainder of the name
- * consists of the final two bytes of the device's chip node id in hex.
+ * typically contains the setup discriminator as a 4-digit decimal number.
  *
  * NOTE: The device layer limits the total length of a device name to 16 characters.
  * However, due to other data sent in CHIPoBLE advertise packets, the device name
@@ -689,6 +689,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SSED
+ *
+ * Enable support for Thread Synchronized Sleepy End Device behavior.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SSED
+#define CHIP_DEVICE_CONFIG_THREAD_SSED 0
 #endif
 
 /**
@@ -934,6 +944,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT
 #define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT "U1BBS0UyUCBLZXkgU2FsdA=="
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT_DEFAULT
 #endif
 
 /**
@@ -945,6 +956,20 @@
  *   The value is base-64 encoded string.
  */
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER
+
+#if CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE != 20202021
+#error "Non-default Spake2+ passcode configured but verifier left unchanged"
+#endif
+
+#if CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT != 1000
+#error "Non-default Spake2+ iteration count configured but verifier left unchanged"
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT_DEFAULT
+#error "Non-default Spake2+ salt configured but verifier left unchanged"
+#endif
+
+// Generated with: spake2p gen-verifier -o - -i 1000 -s "SPAKE2P Key Salt" -p 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER                                                                               \
     "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/"  \
     "NH6Rmzw=="
