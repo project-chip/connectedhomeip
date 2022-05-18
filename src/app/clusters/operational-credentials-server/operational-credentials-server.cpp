@@ -364,8 +364,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
     // Gets called when a fabric is deleted from KVS store
     void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
-                       static_cast<unsigned>(fabricIndex));
+        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was deleted from fabric storage.", static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
@@ -410,10 +409,10 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         VerifyOrReturn(fabric != nullptr);
 
         ChipLogProgress(Zcl,
-                       "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
-                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
-                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
+                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
+                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
+                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 
@@ -425,10 +424,10 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         VerifyOrReturn(fabric != nullptr);
 
         ChipLogProgress(Zcl,
-                       "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
-                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
-                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
-                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
+                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
+                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
+                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 };
@@ -736,12 +735,12 @@ exit:
 
     if (nocResponse != OperationalCertStatus::kSuccess)
     {
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT "). Status %d", err.Format(), to_underlying(nocResponse));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT "). Status %d", err.Format(),
+                     to_underlying(nocResponse));
     }
     else
     {
-        ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC",
-                       static_cast<unsigned>(fabricIndex));
+        ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(fabricIndex));
     }
 
     return true;
@@ -803,7 +802,8 @@ exit:
 
     if (nocResponse != OperationalCertStatus::kSuccess)
     {
-        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT"). Sending Status %d", err.Format(), to_underlying(nocResponse));
+        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT "). Sending Status %d", err.Format(),
+                     to_underlying(nocResponse));
     }
     else
     {
@@ -843,8 +843,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     }
     else
     {
-        ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d",
-                       static_cast<int>(certificateType));
+        ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d", static_cast<int>(certificateType));
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
