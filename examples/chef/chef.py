@@ -295,11 +295,12 @@ def main(argv: Sequence[str]) -> None:
             shell.run_cmd("idf.py build")
         elif options.build_target == "nrfconnect":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
+            nrf_build_cmds = ["west build -b nrf52840dk_nrf52840"]
             if options.do_clean:
-                # shell.run_cmd(f"rm -rf {paths['rootSampleFolder']}/nrfconnect/build")
-                shell.run_cmd("west build -b nrf52840dk_nrf52840")
-            else:
-                shell.run_cmd("west build -b nrf52840dk_nrf52840")
+                nrf_build_cmds.append("-p always")
+            if options.do_rpc:
+                nrf_build_cmds.append("-- -DOVERLAY_CONFIG=rpc.overlay")
+            shell.run_cmd(" ".join(nrf_build_cmds))
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
@@ -341,7 +342,7 @@ def main(argv: Sequence[str]) -> None:
         elif options.build_target == "nrfconnect":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/nrfconnect")
             if options.do_erase:
-                shell.run_cmd("rm -rf build")
+                shell.run_cmd("west flash --erase")
             else:
                 shell.run_cmd("west flash")
 
