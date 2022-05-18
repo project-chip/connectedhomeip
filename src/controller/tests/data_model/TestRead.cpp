@@ -206,7 +206,6 @@ public:
     static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionAlteredReportingIntervals(nlTestSuite * apSuite, void * apContext);
-    static void TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
@@ -1334,63 +1333,6 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx                        = *static_cast<TestContext *>(apContext);
-    auto sessionHandle                       = ctx.GetSessionBobToAlice();
-    uint32_t numSuccessCalls                 = 0;
-    uint32_t numFailureCalls                 = 0;
-    uint32_t numSubscriptionEstablishedCalls = 0;
-
-    responseDirective = kSendDataResponse;
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
-        numSuccessCalls++;
-    };
-
-    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
-    // not safe to do so.
-    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        numFailureCalls++;
-
-        NL_TEST_ASSERT(apSuite, aError == CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-        NL_TEST_ASSERT(apSuite, attributePath == nullptr);
-    };
-
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
-        numSubscriptionEstablishedCalls++;
-    };
-
-    //
-    // Artifically limit the capacity to 2 ReadHandlers. This will also validate reservation of handlers for Reads,
-    // since the second subscription below should fail correctly.
-    //
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(2);
-    NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(apSuite,
-                   Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                       onSubscriptionEstablishedCb, false, true) == CHIP_NO_ERROR);
-
-    ctx.DrainAndServiceIO();
-
-    NL_TEST_ASSERT(apSuite, numSuccessCalls == 1);
-    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 1);
-    // Resubscription is happening for second subscribe call
-    NL_TEST_ASSERT(apSuite, numFailureCalls == 0);
-
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
-
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-}
-
 void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx        = *static_cast<TestContext *>(apContext);
@@ -1944,7 +1886,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_MultipleReads", TestReadInteraction::TestReadHandler_MultipleReads),
     NL_TEST_DEF("TestReadHandler_OneSubscribeMultipleReads", TestReadInteraction::TestReadHandler_OneSubscribeMultipleReads),
     NL_TEST_DEF("TestReadHandler_TwoSubscribesMultipleReads", TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads),
-    NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleSubscriptions", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_SubscriptionAlteredReportingIntervals", TestReadInteraction::TestReadHandler_SubscriptionAlteredReportingIntervals),
