@@ -56,8 +56,9 @@ CHIP_ERROR ModelCommand::RunCommand()
     }
 
     PeerId peerID = fabric->GetPeerIdForNode(mNodeId);
-    return server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
-                                                                   &mOnDeviceConnectionFailureCallback);
+    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
+                                                            &mOnDeviceConnectionFailureCallback);
+    return CHIP_NO_ERROR;
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
