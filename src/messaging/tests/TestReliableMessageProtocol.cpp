@@ -282,7 +282,8 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     BackoffComplianceTestVector * expectedBackoff;
     System::Clock::Timestamp now, startTime;
-    System::Clock::Timeout timeoutTime;
+    System::Clock::Timeout timeoutTime, margin;
+    margin = System::Clock::Timeout(5);
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -329,8 +330,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #1  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[0];
-    NL_TEST_ASSERT(inSuite, timeoutTime > expectedBackoff->backoffMin);
-    NL_TEST_ASSERT(inSuite, timeoutTime < expectedBackoff->backoffMax);
+    NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
     startTime = System::SystemClock().GetMonotonicTimestamp();
     ctx.DrainAndServiceIO();
@@ -347,8 +347,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #2  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[1];
-    NL_TEST_ASSERT(inSuite, timeoutTime > expectedBackoff->backoffMin);
-    NL_TEST_ASSERT(inSuite, timeoutTime < expectedBackoff->backoffMax);
+    NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
     startTime = System::SystemClock().GetMonotonicTimestamp();
     ctx.DrainAndServiceIO();
@@ -365,8 +364,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #3  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[2];
-    NL_TEST_ASSERT(inSuite, timeoutTime > expectedBackoff->backoffMin);
-    NL_TEST_ASSERT(inSuite, timeoutTime < expectedBackoff->backoffMax);
+    NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
     startTime = System::SystemClock().GetMonotonicTimestamp();
     ctx.DrainAndServiceIO();
@@ -383,8 +381,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %d ms", timeoutTime.count());
     expectedBackoff = &theBackoffComplianceTestVector[3];
-    NL_TEST_ASSERT(inSuite, timeoutTime > expectedBackoff->backoffMin);
-    NL_TEST_ASSERT(inSuite, timeoutTime < expectedBackoff->backoffMax);
+    NL_TEST_ASSERT(inSuite, timeoutTime >= expectedBackoff->backoffMin - margin);
 
     // Trigger final transmission
     ctx.DrainAndServiceIO();
