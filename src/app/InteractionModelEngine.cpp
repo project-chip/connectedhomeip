@@ -381,15 +381,6 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     }
 #endif
 
-    // Reserve the last ReadHandler for ReadInteraction
-    if (aInteractionType == ReadHandler::InteractionType::Subscribe && ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 1) &&
-        !HasActiveRead())
-    {
-        ChipLogDetail(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
-        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
-        return CHIP_NO_ERROR;
-    }
-
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     if ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 0)
     {

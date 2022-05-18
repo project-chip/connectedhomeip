@@ -1631,7 +1631,7 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, SessionHandle sessionHa
 
 void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext)
 {
-    // Note: We cannot use ctx.DrainAndServiceIO() since the infinity read will make DrainAndServiceIO never returns.
+    // Note: We cannot use ctx.DrainAndServiceIO() since the infinity read will make DrainAndServiceIO never return.
     using namespace SubscriptionPathQuotaHelpers;
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
@@ -1642,7 +1642,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
 
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
-    // Here, we setup two background infinity read requests to simulate parallen Read + Subscriptions.
+    // Here, we set up two background infinity read requests to simulate parallel Read + Subscriptions.
     // We don't care about the data read, we only care about the existence of such read transactions.
     TestReadCallback readCallback;
     TestReadCallback readCallbackFabric2;
