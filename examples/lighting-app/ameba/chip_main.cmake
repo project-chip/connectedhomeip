@@ -28,7 +28,7 @@ list(
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/IMClusterCommandHandler.cpp
 
-    ${chip_dir}/examples/lighting-app/lighting-common/color_format/color_format.cpp
+    ${chip_dir}/examples/lighting-app/lighting-common/src/ColorFormat.cpp
 
     ${chip_dir}/examples/lighting-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/lighting-app/ameba/main/DeviceCallbacks.cpp
@@ -57,7 +57,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/lighting-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/lighting-app/lighting-common
-    ${chip_dir}/examples/lighting-app/lighting-common/color_format
+    ${chip_dir}/examples/lighting-app/lighting-common/include
     ${chip_dir}/examples/lighting-app/ameba/main/include
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

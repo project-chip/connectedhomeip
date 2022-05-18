@@ -342,10 +342,11 @@ class ChipDeviceController():
     def ResolveNode(self, nodeid):
         self.CheckIsActive()
 
-        return self._ChipStack.CallAsync(
-            lambda: self._dmLib.pychip_DeviceController_UpdateDevice(
-                self.devCtrl, nodeid)
-        )
+        try:
+            self.GetConnectedDeviceSync(nodeid, allowPASE=False)
+            return 0
+        except ChipStackError as ex:
+            return ex.err
 
     def GetAddressAndPort(self, nodeid):
         self.CheckIsActive()
@@ -479,7 +480,7 @@ class ChipDeviceController():
 
         return self._Cluster
 
-    def GetConnectedDeviceSync(self, nodeid):
+    def GetConnectedDeviceSync(self, nodeid, allowPASE=True):
         self.CheckIsActive()
 
         returnDevice = c_void_p(None)
@@ -496,12 +497,12 @@ class ChipDeviceController():
                 print("Failed in getting the connected device: {}".format(err))
                 raise self._ChipStack.ErrorToException(err)
 
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
-            self.devCtrl, nodeid, byref(returnDevice)))
-        if res == 0:
-            # TODO: give users more contrtol over whether they want to send this command over a PASE established connection
-            print('Using PASE connection')
-            return returnDevice
+        if allowPASE:
+            res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+                self.devCtrl, nodeid, byref(returnDevice)))
+            if res == 0:
+                print('Using PASE connection')
+                return returnDevice
 
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, DeviceAvailableCallback))
@@ -1018,10 +1019,6 @@ class ChipDeviceController():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
-
-            self._dmLib.pychip_DeviceController_UpdateDevice.argtypes = [
-                c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_UpdateDevice.restype = c_uint32
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]

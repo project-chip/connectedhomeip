@@ -107,12 +107,14 @@ CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
 
 SessionHandle MessagingContext::GetSessionBobToAlice()
 {
-    return mSessionBobToAlice.Get();
+    auto sessionHandle = mSessionBobToAlice.Get();
+    return std::move(sessionHandle.Value());
 }
 
 SessionHandle MessagingContext::GetSessionAliceToBob()
 {
-    return mSessionAliceToBob.Get();
+    auto sessionHandle = mSessionAliceToBob.Get();
+    return std::move(sessionHandle.Value());
 }
 
 SessionHandle MessagingContext::GetSessionBobToFriends()
@@ -122,12 +124,18 @@ SessionHandle MessagingContext::GetSessionBobToFriends()
 
 void MessagingContext::ExpireSessionBobToAlice()
 {
-    mSessionManager.ExpirePairing(mSessionBobToAlice.Get());
+    if (mSessionBobToAlice)
+    {
+        mSessionManager.ExpirePairing(mSessionBobToAlice.Get().Value());
+    }
 }
 
 void MessagingContext::ExpireSessionAliceToBob()
 {
-    mSessionManager.ExpirePairing(mSessionAliceToBob.Get());
+    if (mSessionAliceToBob)
+    {
+        mSessionManager.ExpirePairing(mSessionAliceToBob.Get().Value());
+    }
 }
 
 void MessagingContext::ExpireSessionBobToFriends()

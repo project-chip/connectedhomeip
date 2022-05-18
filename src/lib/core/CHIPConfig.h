@@ -1211,6 +1211,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MINMDNS_DYNAMIC_OPERATIONAL_RESPONDER_LIST
 
 /*
+ * @def CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
+ *
+ * @brief Determines the maximum number of SRV records that can be processed in parallel.
+ *        Affects maximum number of results received for browse requests
+ *        (where a single packet may contain multiple SRV entries)
+ *        or number of pending resolves that still require a AAAA IP record
+ *        to be resolved.
+ */
+#ifndef CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
+#define CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES 2
+#endif // CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
+
+/*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
  * @brief This buffer will used for holding debug text when handling synchronous invokes (AddOrUpdate / Reorder / Remove). Since we

@@ -973,8 +973,8 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1060,6 +1060,7 @@ server cluster MediaPlayback = 1286 {
   readonly attribute single playbackSpeed = 4;
   readonly attribute nullable int64u seekRangeEnd = 5;
   readonly attribute nullable int64u seekRangeStart = 6;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SkipForwardRequest {
@@ -2254,7 +2255,7 @@ endpoint 0 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 }
 
@@ -2282,7 +2283,7 @@ endpoint 1 {
     callback attribute channelList;
     callback attribute lineup;
     callback attribute currentChannel;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2305,13 +2306,14 @@ endpoint 1 {
   }
 
   server cluster KeypadInput {
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0007;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ContentLauncher {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2383,13 +2385,14 @@ endpoint 3 {
     ram      attribute playbackSpeed;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ContentLauncher {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 

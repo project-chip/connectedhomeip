@@ -182,7 +182,7 @@ public:
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 

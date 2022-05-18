@@ -81,6 +81,8 @@ CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf)
     if (out_idx < out_buf.size())
     {
         out_buf.data()[out_idx] = '\0';
+        // Reduce output span size to be the size of written data and to not include null-terminator.
+        out_buf.reduce_size(out_idx);
     }
     else
     {

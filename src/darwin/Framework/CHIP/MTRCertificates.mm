@@ -86,6 +86,32 @@ struct AutoPlatformMemory {
     return intermediate;
 }
 
++ (nullable NSData *)generateOperationalCertificate:(id<CHIPKeypair>)signingKeypair
+                                 signingCertificate:(NSData *)signingCertificate
+                               operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                           fabricId:(NSNumber *)fabricId
+                                             nodeId:(NSNumber *)nodeId
+                              caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error
+{
+    NSLog(@"Generating operational certificate");
+
+    AutoPlatformMemory platformMemory;
+
+    NSData * opcert = nil;
+    CHIP_ERROR err = CHIPOperationalCredentialsDelegate::GenerateOperationalCertificate(
+        signingKeypair, signingCertificate, operationalPublicKey, fabricId, nodeId, caseAuthenticatedTags, &opcert);
+    if (error) {
+        *error = [CHIPError errorForCHIPErrorCode:err];
+    }
+
+    if (err != CHIP_NO_ERROR) {
+        NSLog(@"Generating operational certificate failed: %s", ErrorStr(err));
+    }
+
+    return opcert;
+}
+
 + (BOOL)keypair:(id<CHIPKeypair>)keypair matchesCertificate:(NSData *)certificate
 {
     P256PublicKey keypairPubKey;

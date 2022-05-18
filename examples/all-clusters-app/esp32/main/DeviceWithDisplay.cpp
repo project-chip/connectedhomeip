@@ -17,6 +17,7 @@
  */
 
 #include "DeviceWithDisplay.h"
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #if CONFIG_HAVE_DISPLAY
 using namespace ::chip;
@@ -651,8 +652,11 @@ esp_err_t InitM5Stack(std::string qrCodeText)
 
 void InitDeviceDisplay()
 {
-    std::string qrCodeText;
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan qrCodeText(qrCodeBuffer);
 
+    // Get QR Code and emulate its content using NFC tag
     GetQRCode(qrCodeText, chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
     // Initialize the display device.
@@ -681,12 +685,12 @@ void InitDeviceDisplay()
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-    InitM5Stack(qrCodeText);
+    InitM5Stack(qrCodeText.data());
 
 #elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
 
     // Display the QR Code
-    QRCodeScreen qrCodeScreen(qrCodeText);
+    QRCodeScreen qrCodeScreen(qrCodeText.data());
     qrCodeScreen.Display();
 
 #endif

@@ -56,4 +56,140 @@
     XCTAssertNotNil(intermediateCert);
 }
 
+- (void)testGenerateOperationalCertNoIntermediate
+{
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * cats = [[NSMutableArray alloc] initWithCapacity:3];
+    [cats addObject:@1];
+    [cats addObject:@2];
+    [cats addObject:@3];
+
+    __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                                 signingCertificate:rootCert
+                                                               operationalPublicKey:operationalKeys.pubkey
+                                                                           fabricId:@1
+                                                                             nodeId:@1
+                                                              caseAuthenticatedTags:cats
+                                                                              error:nil];
+    XCTAssertNotNil(operationalCert);
+}
+
+- (void)testGenerateOperationalCertWithIntermediate
+{
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * intermediateKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(intermediateKeys);
+
+    __auto_type * intermediateCert = [MTRCertificates generateIntermediateCertificate:rootKeys
+                                                                      rootCertificate:rootCert
+                                                                intermediatePublicKey:intermediateKeys.pubkey
+                                                                             issuerId:nil
+                                                                             fabricId:nil
+                                                                                error:nil];
+    XCTAssertNotNil(intermediateCert);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:intermediateKeys
+                                                                 signingCertificate:intermediateCert
+                                                               operationalPublicKey:operationalKeys.pubkey
+                                                                           fabricId:@1
+                                                                             nodeId:@1
+                                                              caseAuthenticatedTags:nil
+                                                                              error:nil];
+    XCTAssertNotNil(operationalCert);
+}
+
+- (void)testGenerateOperationalCertErrorCases
+{
+    __auto_type * rootKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * rootCert = [MTRCertificates generateRootCertificate:rootKeys issuerId:nil fabricId:nil error:nil];
+    XCTAssertNotNil(rootCert);
+
+    __auto_type * operationalKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * cats = [[NSMutableArray alloc] initWithCapacity:4];
+    [cats addObject:@1];
+    [cats addObject:@2];
+    [cats addObject:@3];
+    [cats addObject:@4];
+
+    // Check basic case works
+    __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                                 signingCertificate:rootCert
+                                                               operationalPublicKey:operationalKeys.pubkey
+                                                                           fabricId:@1
+                                                                             nodeId:@1
+                                                              caseAuthenticatedTags:nil
+                                                                              error:nil];
+    XCTAssertNotNil(operationalCert);
+
+    // CATs too long
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.pubkey
+                                                             fabricId:@1
+                                                               nodeId:@1
+                                                caseAuthenticatedTags:cats
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // Signing key mismatch
+    operationalCert = [MTRCertificates generateOperationalCertificate:operationalKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.pubkey
+                                                             fabricId:@1
+                                                               nodeId:@1
+                                                caseAuthenticatedTags:nil
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // Invalid fabric id
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.pubkey
+                                                             fabricId:@0
+                                                               nodeId:@1
+                                                caseAuthenticatedTags:nil
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // Undefined node id
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.pubkey
+                                                             fabricId:@1
+                                                               nodeId:@0
+                                                caseAuthenticatedTags:nil
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // Non-operational node id
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.pubkey
+                                                             fabricId:@1
+                                                               nodeId:@(0xFFFFFFFFFFFFFFFFLLU)
+                                                caseAuthenticatedTags:nil
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+}
+
 @end

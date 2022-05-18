@@ -104,7 +104,7 @@ public:
      * Notifies the BindingManager that a fabric is removed from the device
      *
      */
-    void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
+    void FabricRemoved(FabricIndex fabricIndex);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.

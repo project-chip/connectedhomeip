@@ -100,12 +100,7 @@ void ExtendedOTARequestorDriver::HandleUserConsentState(chip::ota::UserConsentSt
     switch (userConsentState)
     {
     case chip::ota::UserConsentState::kGranted:
-        ScheduleDelayedAction(
-            mDelayedActionTime,
-            [](System::Layer *, void * context) {
-                static_cast<ExtendedOTARequestorDriver *>(context)->mRequestor->DownloadUpdate();
-            },
-            this);
+        ScheduleDelayedAction(mDelayedActionTime, DownloadUpdateTimerHandler, this);
         break;
 
     case chip::ota::UserConsentState::kDenied:

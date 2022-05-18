@@ -301,7 +301,7 @@ void ReportCallback::OnDone()
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }
 
-void ReportCallback::OnSubscriptionEstablished(uint64_t aSubscriptionId)
+void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
     JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
 }

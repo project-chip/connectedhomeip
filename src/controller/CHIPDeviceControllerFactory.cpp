@@ -167,7 +167,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
     ReturnErrorOnFailure(delegate->Init(stateParams.sessionMgr, stateParams.groupDataProvider));
-    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(delegate.get()));
+    stateParams.fabricTableDelegate = delegate.get();
+    ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();
 
     ReturnErrorOnFailure(stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr,
@@ -248,11 +249,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
-    controllerParams.operationalCredentialsDelegate = params.operationalCredentialsDelegate;
-    controllerParams.operationalKeypair             = params.operationalKeypair;
-    controllerParams.controllerNOC                  = params.controllerNOC;
-    controllerParams.controllerICAC                 = params.controllerICAC;
-    controllerParams.controllerRCAC                 = params.controllerRCAC;
+    controllerParams.operationalCredentialsDelegate       = params.operationalCredentialsDelegate;
+    controllerParams.operationalKeypair                   = params.operationalKeypair;
+    controllerParams.hasExternallyOwnedOperationalKeypair = params.hasExternallyOwnedOperationalKeypair;
+    controllerParams.controllerNOC                        = params.controllerNOC;
+    controllerParams.controllerICAC                       = params.controllerICAC;
+    controllerParams.controllerRCAC                       = params.controllerRCAC;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -282,8 +284,9 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
     PopulateInitParams(commissionerParams, params);
 
     // Set commissioner-specific fields not in ControllerInitParams
-    commissionerParams.pairingDelegate     = params.pairingDelegate;
-    commissionerParams.defaultCommissioner = params.defaultCommissioner;
+    commissionerParams.pairingDelegate           = params.pairingDelegate;
+    commissionerParams.defaultCommissioner       = params.defaultCommissioner;
+    commissionerParams.deviceAttestationVerifier = params.deviceAttestationVerifier;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
     return err;
@@ -321,6 +324,17 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
+
+    if (mFabricTableDelegate != nullptr)
+    {
+        if (mFabrics != nullptr)
+        {
+            mFabrics->RemoveFabricDelegate(mFabricTableDelegate);
+        }
+
+        chip::Platform::Delete(mFabricTableDelegate);
+        mFabricTableDelegate = nullptr;
+    }
 
     if (mCASEServer != nullptr)
     {

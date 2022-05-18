@@ -102,7 +102,7 @@ void InteractionModel::OnDone()
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }
 
-void InteractionModel::OnSubscriptionEstablished(uint64_t subscriptionId)
+void InteractionModel::OnSubscriptionEstablished(SubscriptionId subscriptionId)
 {
     ContinueOnChipMainThread(CHIP_NO_ERROR);
 }

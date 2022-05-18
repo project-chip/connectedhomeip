@@ -28,93 +28,73 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue #12190 as per spec default value is 3 but expecting 1
-    - label: "read the global attribute: ClusterRevision"
-      disabled: true
+    - label: "TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 3
-
-    - label: "Read the global attribute constraints: ClusterRevision"
-      command: "readAttribute"
-      attribute: "ClusterRevision"
-      response:
           constraints:
               type: uint16
 
-    - label:
-          "write the default values to mandatory global attribute:
-          ClusterRevision"
-      command: "writeAttribute"
-      attribute: "ClusterRevision"
-      arguments:
-          value: 3
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back global attribute: ClusterRevision"
-      disabled: true
+    - label: "TH reads the FeatureMap attribute from the DUT"
       command: "readAttribute"
-      attribute: "ClusterRevision"
+      attribute: "FeatureMap"
       response:
-          value: 3
+          value: 0
+          constraints:
+              type: map32
 
-    - label: "Read the global attribute: AttributeList"
+    #if condition needed #Issue 10988
+    - label: "TH reads the AttributeList attribute from the DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
+          value:
+              [
+                  0,
+                  1,
+                  2,
+                  17,
+                  18,
+                  19,
+                  32,
+                  65528,
+                  65529,
+                  65530,
+                  65531,
+                  65532,
+                  65533,
+              ]
           constraints:
               type: list
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
-    - label: "Read the global attribute: EventList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
+    #issue #15011 disabled steps below Global attributes missing from YAML framework
+    - label: "TH reads the EventList attribute from the DUT"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "TH reads the GeneratedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
+          value: []
           constraints:
               type: list
-
-    - label: "read the optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-
-    - label: "read the optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: map32
-
-    - label: "write the default values to optional global attribute: FeatureMap"
-      command: "writeAttribute"
-      attribute: "FeatureMap"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "reads back optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-          constraints:
-              type: map32

@@ -27,6 +27,7 @@
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -102,6 +103,20 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     else
     {
     }
+}
+
+bool HasFeature(chip::EndpointId endpoint, ApplicationLauncherFeature feature)
+{
+    bool hasFeature     = false;
+    uint32_t featureMap = 0;
+
+    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+    if (EMBER_ZCL_STATUS_SUCCESS == status)
+    {
+        hasFeature = (featureMap & chip::to_underlying(feature));
+    }
+
+    return hasFeature;
 }
 
 // this attribute should only be enabled for app platform instance (endpoint 1)

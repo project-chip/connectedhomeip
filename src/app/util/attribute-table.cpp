@@ -363,6 +363,13 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // to the cluster that the attribute lives in.
         EmberAfStatus status =
             emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+
+        // Ignore the following write operation and return success
+        if (status == EMBER_ZCL_STATUS_WRITE_IGNORED)
+        {
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             return status;

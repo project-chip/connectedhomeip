@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  * issuer id is used.
  *
  * If fabricId is not nil, it will be included in the subject DN of the
- * certificate.
+ * certificate.  In this case it must be a valid Matter fabric id.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
  * issuer id is used.
  *
  * If fabricId is not nil, it will be included in the subject DN of the
- * certificate.
+ * certificate.  In this case it must be a valid Matter fabric id.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
@@ -65,6 +65,35 @@ NS_ASSUME_NONNULL_BEGIN
                                             issuerId:(nullable NSNumber *)issuerId
                                             fabricId:(nullable NSNumber *)fabricId
                                                error:(NSError * __autoreleasing _Nullable * _Nullable)error;
+
+/**
+ * Generate an X.509 DER encoded certificate that has the
+ * right fields to be a valid Matter operational certificate.
+ *
+ * signingKeypair and signingCertificate are the root or intermediate that is
+ * signing the operational certificate.
+ *
+ * nodeId and fabricId are expected to be 64-bit unsigned integers.
+ *
+ * nodeId must be a valid Matter operational node id.
+ *
+ * fabricId must be a valid Matter fabric id.
+ *
+ * caseAuthenticatedTags may be nil to indicate no CASE Authenticated Tags
+ * should be used.  If caseAuthenticatedTags is not nil, it must have length at
+ * most 3 and the values in the array are expected to be 32-bit unsigned Case
+ * Authenticated Tag values.
+ *
+ * On failure returns nil and if "error" is not null sets *error to the relevant
+ * error.
+ */
++ (nullable NSData *)generateOperationalCertificate:(id<CHIPKeypair>)signingKeypair
+                                 signingCertificate:(NSData *)signingCertificate
+                               operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                           fabricId:(NSNumber *)fabricId
+                                             nodeId:(NSNumber *)nodeId
+                              caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                              error:(NSError * __autoreleasing _Nullable * _Nullable)error;
 
 /**
  * Check whether the given keypair's public key matches the given certificate's

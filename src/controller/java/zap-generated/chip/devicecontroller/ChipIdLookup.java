@@ -919,6 +919,9 @@ public final class ChipIdLookup {
       if (attributeId == 26L) {
         return "MinRFIDCodeLength";
       }
+      if (attributeId == 28L) {
+        return "NumberOfCredentialsSupportedPerUser";
+      }
       if (attributeId == 33L) {
         return "Language";
       }
@@ -1393,10 +1396,10 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 43L) {
-      if (attributeId == 1L) {
+      if (attributeId == 0L) {
         return "ActiveLocale";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "SupportedLocales";
       }
       if (attributeId == 65528L) {
