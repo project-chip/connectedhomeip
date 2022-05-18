@@ -79,16 +79,6 @@ class App:
     def waitForAnyAdvertisement(self):
         self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
-    def waitForCommissionableAdvertisement(self):
-        self.__waitFor("mDNS service published: _matterc._udp",
-                       self.process, self.outpipe)
-        return True
-
-    def waitForOperationalAdvertisement(self):
-        self.__waitFor("mDNS service published: _matter._tcp",
-                       self.process, self.outpipe)
-        return True
-
     def waitForMessage(self, message):
         self.__waitFor(message, self.process, self.outpipe)
         return True

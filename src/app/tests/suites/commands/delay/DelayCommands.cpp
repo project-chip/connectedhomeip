@@ -41,28 +41,6 @@ void DelayCommands::OnWaitForMsFn(chip::System::Layer * systemLayer, void * cont
     command->OnWaitForMs();
 }
 
-CHIP_ERROR DelayCommands::WaitForCommissionableAdvertisement(
-    const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionableAdvertisement::Type & value)
-{
-    const char * scriptDir            = getScriptsFolder();
-    constexpr const char * scriptName = "WaitForCommissionableAdvertisement.py";
-
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
-    return RunInternal(command);
-}
-
-CHIP_ERROR DelayCommands::WaitForOperationalAdvertisement(
-    const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForOperationalAdvertisement::Type & value)
-{
-    const char * scriptDir            = getScriptsFolder();
-    constexpr const char * scriptName = "WaitForOperationalAdvertisement.py";
-
-    char command[128];
-    VerifyOrReturnError(snprintf(command, sizeof(command), "%s%s", scriptDir, scriptName) >= 0, CHIP_ERROR_INTERNAL);
-    return RunInternal(command);
-}
-
 CHIP_ERROR DelayCommands::WaitForMessage(const char * identity,
                                          const chip::app::Clusters::DelayCommands::Commands::WaitForMessage::Type & value)
 {

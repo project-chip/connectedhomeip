@@ -38,24 +38,13 @@ const WaitForCommissionee = {
   arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
 };
 
-const WaitForCommissionableAdvertisement = {
-  name : 'WaitForCommissionableAdvertisement',
-};
-
-const WaitForOperationalAdvertisement = {
-  name : 'WaitForOperationalAdvertisement',
-};
-
 const WaitForMessage = {
   name : 'WaitForMessage',
   arguments : [ { type : 'CHAR_STRING', name : 'registerKey', isOptional : true }, { type : 'CHAR_STRING', name : 'message' } ],
 };
 
 const name     = 'DelayCommands';
-const commands = [
-  WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForCommissionableAdvertisement, WaitForOperationalAdvertisement,
-  WaitForMessage
-];
+const commands = [ WaitForMs, WaitForCommissioning, WaitForCommissionee, WaitForMessage ];
 
 const DelayCommands = {
   name,
