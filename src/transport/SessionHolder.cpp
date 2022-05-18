@@ -74,24 +74,31 @@ SessionHolder & SessionHolder::operator=(SessionHolder && that)
     return *this;
 }
 
-void SessionHolder::GrabPairing(const SessionHandle & session)
+bool SessionHolder::GrabPairing(const SessionHandle & session)
 {
     Release();
-    if (session->IsSecureSession() && session->AsSecureSession()->IsPairing())
-    {
-        mSession.Emplace(session.mSession);
-        session->AddHolder(*this);
-    }
+
+    if (!session->IsSecureSession())
+        return false;
+
+    if (!session->AsSecureSession()->IsPairing())
+        return false;
+
+    mSession.Emplace(session.mSession);
+    session->AddHolder(*this);
+    return true;
 }
 
-void SessionHolder::Grab(const SessionHandle & session)
+bool SessionHolder::Grab(const SessionHandle & session)
 {
     Release();
-    if (session->IsActiveSession())
-    {
-        mSession.Emplace(session.mSession);
-        session->AddHolder(*this);
-    }
+
+    if (!session->IsActiveSession())
+        return false;
+
+    mSession.Emplace(session.mSession);
+    session->AddHolder(*this);
+    return true;
 }
 
 void SessionHolder::Release()
