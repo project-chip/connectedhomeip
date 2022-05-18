@@ -2848,6 +2848,10 @@ namespace CredentialRulesSupport {
 static constexpr AttributeId Id = 0x0000001B;
 } // namespace CredentialRulesSupport
 
+namespace NumberOfCredentialsSupportedPerUser {
+static constexpr AttributeId Id = 0x0000001C;
+} // namespace NumberOfCredentialsSupportedPerUser
+
 namespace EnableLogging {
 static constexpr AttributeId Id = 0x00000020;
 } // namespace EnableLogging

@@ -89,6 +89,10 @@ class App:
                        self.process, self.outpipe)
         return True
 
+    def waitForMessage(self, message):
+        self.__waitFor(message, self.process, self.outpipe)
+        return True
+
     def kill(self):
         if self.process:
             self.process.kill()
@@ -154,6 +158,7 @@ class TestTarget(Enum):
     ALL_CLUSTERS = auto()
     TV = auto()
     LOCK = auto()
+    OTA = auto()
 
 
 @dataclass
@@ -161,10 +166,12 @@ class ApplicationPaths:
     chip_tool: typing.List[str]
     all_clusters_app: typing.List[str]
     lock_app: typing.List[str]
+    ota_provider_app: typing.List[str]
+    ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.tv_app]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app]
 
 
 @dataclass
@@ -225,6 +232,8 @@ class TestDefinition:
                 target_app = paths.tv_app
             elif self.target == TestTarget.LOCK:
                 target_app = paths.lock_app
+            elif self.target == TestTarget.OTA:
+                target_app = paths.ota_requestor_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")

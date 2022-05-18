@@ -419,13 +419,13 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
   const enumItem = getEnum(enums, itemType);
   if (enumItem) {
     item.isEnum = true;
-    itemType    = enumItem.type;
+    itemType    = 'enum' + enumItem.size * 8;
   }
 
   const bitmap = getBitmap(bitmaps, itemType);
   if (bitmap) {
     item.isBitmap = true;
-    itemType      = bitmap.type;
+    itemType      = 'bitmap' + bitmap.size * 8;
   }
 
   const atomic = getAtomic(atomics, itemType);

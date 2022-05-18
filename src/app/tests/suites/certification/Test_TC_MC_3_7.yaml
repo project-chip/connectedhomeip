@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 21.4.2. [TC-MC-3.6] Current App Verification
+name: 18.4.3. [TC-MC-3.7] Launch Application Verification
 
 config:
     nodeId: 0x12344321
@@ -28,75 +28,55 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # TODO: Update the corresponding values when feature is supported
+    #Issue 17969
     - label: "Launch an app with the provided a application ID"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "LaunchApp"
       arguments:
           values:
-              - name: "data"
+              - name: "Data"
                 value: "Hello World"
-              - name: "catalogVendorId"
-                value: 1234
-              - name: "applicationId"
-                value: "HelloWorldApp"
-
-    - label: "Reads the Status attribute"
-      disabled: true
-      cluster: "Application Basic"
-      command: "readAttribute"
-      attribute: "Status"
+              - name: "application"
+                value: { catalogVendorId: 1234, applicationId: "HelloWorldApp" }
       response:
-          value: 1
-
-    # TODO: Update the corresponding values when feature is supported
-    - label: "Stop an app with the provided application ID"
-      disabled: true
-      command: "StopApp"
-      arguments:
           values:
-              - name: "applicationId"
-                value: "HelloWorldApp"
+              - name: "Status"
+                value: 1
+              - name: "Data"
+                value: "Hello World"
 
-    # TODO: Update the corresponding values when feature is supported
-    - label: "Launch an app with the provided a application ID"
-      disabled: true
+    - label:
+          "TH sends a LaunchApp command to DUT to launch an app which is not
+          available"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "LaunchApp"
       arguments:
           values:
               - name: "data"
                 value: "Hello World"
-              - name: "catalogVendorId"
-                value: 1234
-              - name: "applicationId"
-                value: "NonAvailableApp"
+              - name: "application"
+                value:
+                    { catalogVendorId: 1234, applicationId: "NonAvailableApp" }
       response:
-          error: APP_NOT_AVAILABLE
+          values:
+              - name: "Status"
+                value: 1
+              - name: "Data"
+                value: "Hello World"
 
-    # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "LaunchApp"
       arguments:
           values:
               - name: "data"
                 value: "Hello World"
-              - name: "catalogVendorId"
-                value: 1234
-              - name: "applicationId"
-                value: "HelloWorldApp"
-
-    # TODO: Update the corresponding values when feature is supported
-    - label: "Launch an app with the provided a application ID"
-      disabled: true
-      command: "LaunchApp"
-      arguments:
-          values:
-              - name: "data"
-                value: "Hello World"
-              - name: "catalogVendorId"
-                value: 1234
-              - name: "applicationId"
-                value: "HelloWorldApp2"
+              - name: "application"
+                value:
+                    { catalogVendorId: 1234, applicationId: "HelloWorldApp2" }
       response:
-          error: SYSTEM_BUSY
+          values:
+              - name: "Status"
+                value: 2
+              - name: "Data"
+                value: "Hello World"

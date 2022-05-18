@@ -60,7 +60,7 @@ CHIP_ERROR ModelCommand::RunCommand()
                                                                    &mOnDeviceConnectionFailureCallback);
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectedFn");
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);

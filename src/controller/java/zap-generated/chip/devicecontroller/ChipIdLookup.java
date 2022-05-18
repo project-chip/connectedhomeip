@@ -919,6 +919,9 @@ public final class ChipIdLookup {
       if (attributeId == 26L) {
         return "MinRFIDCodeLength";
       }
+      if (attributeId == 28L) {
+        return "NumberOfCredentialsSupportedPerUser";
+      }
       if (attributeId == 33L) {
         return "Language";
       }

@@ -43,6 +43,7 @@ typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;
+typedef uint32_t SubscriptionId;
 
 constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr EndpointId kInvalidEndpointId     = 0xFFFF;

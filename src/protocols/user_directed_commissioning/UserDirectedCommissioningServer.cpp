@@ -107,18 +107,20 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
 
 void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)
 {
-    if (nodeData.numIPs == 0)
+    if (nodeData.resolutionData.numIPs == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s", nodeData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no IP addresses returned for instance name=%s",
+                     nodeData.commissionData.instanceName);
         return;
     }
-    if (nodeData.port == 0)
+    if (nodeData.resolutionData.port == 0)
     {
-        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s", nodeData.instanceName);
+        ChipLogError(AppServer, "OnCommissionableNodeFound no port returned for instance name=%s",
+                     nodeData.commissionData.instanceName);
         return;
     }
 
-    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
+    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.commissionData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
         ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s old_state=%d new_state=%d", client->GetInstanceName(),
@@ -128,46 +130,50 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 #if INET_CONFIG_ENABLE_IPV4
         // prefer IPv4 if its an option
         bool foundV4 = false;
-        for (unsigned i = 0; i < nodeData.numIPs; ++i)
+        for (unsigned i = 0; i < nodeData.resolutionData.numIPs; ++i)
         {
-            if (nodeData.ipAddress[i].IsIPv4())
+            if (nodeData.resolutionData.ipAddress[i].IsIPv4())
             {
                 foundV4 = true;
-                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
+                client->SetPeerAddress(
+                    chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[i], nodeData.resolutionData.port));
                 break;
             }
         }
         // use IPv6 as last resort
         if (!foundV4)
         {
-            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+            client->SetPeerAddress(
+                chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
         }
 #else  // INET_CONFIG_ENABLE_IPV4
        // if we only support V6, then try to find a v6 address
         bool foundV6 = false;
-        for (unsigned i = 0; i < nodeData.numIPs; ++i)
+        for (unsigned i = 0; i < nodeData.resolutionData.numIPs; ++i)
         {
-            if (nodeData.ipAddress[i].IsIPv6())
+            if (nodeData.resolutionData.ipAddress[i].IsIPv6())
             {
                 foundV6 = true;
-                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
+                client->SetPeerAddress(
+                    chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[i], nodeData.resolutionData.port));
                 break;
             }
         }
         // last resort, try with what we have
         if (!foundV6)
         {
-            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s", nodeData.instanceName);
-            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+            ChipLogError(AppServer, "OnCommissionableNodeFound no v6 returned for instance name=%s",
+                         nodeData.commissionData.instanceName);
+            client->SetPeerAddress(
+                chip::Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port));
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        client->SetDeviceName(nodeData.deviceName);
-        client->SetLongDiscriminator(nodeData.longDiscriminator);
-        client->SetVendorId(nodeData.vendorId);
-        client->SetProductId(nodeData.productId);
-        client->SetDeviceName(nodeData.deviceName);
-        client->SetRotatingId(nodeData.rotatingId, nodeData.rotatingIdLen);
+        client->SetDeviceName(nodeData.commissionData.deviceName);
+        client->SetLongDiscriminator(nodeData.commissionData.longDiscriminator);
+        client->SetVendorId(nodeData.commissionData.vendorId);
+        client->SetProductId(nodeData.commissionData.productId);
+        client->SetRotatingId(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)

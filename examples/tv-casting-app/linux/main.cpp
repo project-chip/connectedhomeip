@@ -99,7 +99,7 @@ CHIP_ERROR ProcessClusterCommand(int argc, char ** argv)
 {
     if (!CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->IsInitialized())
     {
-        CastingServer::GetInstance()->SetDefaultFabricIndex();
+        CastingServer::GetInstance()->SetDefaultFabricIndex(HandleCommissioningCompleteCallback);
     }
     gCommands.Run(argc, argv);
     return CHIP_NO_ERROR;

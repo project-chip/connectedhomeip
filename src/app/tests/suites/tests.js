@@ -28,8 +28,7 @@ function disable(testName)
 
 // clang-format off
 
-function getManualTests()
-{
+function getManualTests() {
   const DeviceDiscovery = [
     'Test_TC_DD_1_5',
     'Test_TC_DD_1_6',
@@ -318,8 +317,6 @@ function getManualTests()
 
   const DoorLock = [
     'Test_TC_DL_2_1',
-    'Test_TC_DL_2_2',
-    'Test_TC_DL_2_4',
     'Test_TC_DL_2_5',
     'Test_TC_DL_2_6',
     'Test_TC_DL_2_7',
@@ -397,8 +394,6 @@ function getManualTests()
   ];
 
   const ThreadNetworkDiagnostics = [
-    'Test_TC_DIAG_TH_NW_2_2',
-    'Test_TC_DIAG_TH_NW_2_3',
     'Test_TC_DIAG_TH_NW_2_6',
     'Test_TC_DIAG_TH_NW_2_7',
     'Test_TC_DIAG_TH_NW_2_8',
@@ -455,8 +450,7 @@ function getManualTests()
   return tests;
 }
 
-function getTests()
-{
+function getTests() {
   const AccessControl = [
     'TestAccessControlCluster',
   ];
@@ -525,6 +519,7 @@ function getTests()
 
   const GeneralCommissioning = [
     'Test_TC_GC_1_1',
+    'Test_TC_GC_2_1',
   ];
 
   const Identify = [
@@ -609,6 +604,10 @@ function getTests()
     'Test_TC_MF_1_15',
   ];
 
+  const OTASoftwareUpdate = [
+    'OTA_SuccessfulTransfer',
+  ];
+
   const OnOff = [
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
@@ -675,6 +674,8 @@ function getTests()
   const ThreadNetworkDiagnostics = [
     'Test_TC_DIAG_TH_NW_1_1',
     'Test_TC_DIAG_TH_NW_1_2',
+    'Test_TC_DIAG_TH_NW_2_2',
+    'Test_TC_DIAG_TH_NW_2_3',
   ];
 
   const WiFiNetworkDiagnostics = [
@@ -737,6 +738,7 @@ function getTests()
     'TestBinding',
     'TestUserLabelCluster',
     'TestArmFailSafe',
+    'TestFanControl',
   ];
 
   const MultiAdmin = [
@@ -757,7 +759,9 @@ function getTests()
     'DL_UsersAndCredentials',
     'DL_LockUnlock',
     'DL_Schedules',
-    'Test_TC_DL_1_3',
+    'Test_TC_DL_2_2',
+    'Test_TC_DL_2_3',
+    'Test_TC_DL_2_4',
   ];
 
   const Groups = [
@@ -783,6 +787,7 @@ function getTests()
     MediaControl,
     ModeSelect,
     MultipleFabrics,
+    OTASoftwareUpdate,
     OccupancySensing,
     OnOff,
     PowerSource,

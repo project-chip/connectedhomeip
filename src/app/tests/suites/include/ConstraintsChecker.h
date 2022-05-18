@@ -269,6 +269,24 @@ protected:
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
+    template <typename T>
+    bool CheckConstraintNotValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
+                                 const chip::app::DataModel::Nullable<T> & expected)
+    {
+        if (expected.IsNull() && current.IsNull())
+        {
+            Exit(std::string(itemName) + " got null for both values, but expected not equal");
+            return false;
+        }
+
+        if (expected.IsNull() != current.IsNull())
+        {
+            return true;
+        }
+
+        return CheckConstraintNotValue(itemName, current.Value(), expected.Value());
+    }
+
     template <typename T, typename U, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
@@ -285,6 +303,12 @@ protected:
     bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
         return CheckConstraintNotValue(itemName, chip::to_underlying(current), expected);
+    }
+
+    template <typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    bool CheckConstraintNotValue(const char * itemName, T current, T expected)
+    {
+        return CheckConstraintNotValue(itemName, chip::to_underlying(current), chip::to_underlying(expected));
     }
 
     template <typename T>

@@ -2,8 +2,7 @@
 
 #pragma once
 
-#import <CHIP/CHIPDevice.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <CHIP/CHIP.h>
 
 #include <cstdint>
 #include <string>
@@ -30,14 +29,13 @@ class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterC
 public:
     {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{asDelimitedCommand name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
-        (void)mRequest; // Might not be used if we have no complex args
         {{#chip_cluster_command_arguments}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
-        AddArgument("{{asUpperCamelCase label}}", &m{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}
-        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
         {{/chip_cluster_command_arguments}}
         ClusterCommand::AddArguments();
@@ -49,37 +47,10 @@ public:
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase clusterName}} * cluster = [[CHIP{{asUpperCamelCase clusterName}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         __auto_type * params = [[CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase name}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         {{#chip_cluster_command_arguments}}
-        {{#if_chip_complex}}
-        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asStructPropertyName label)) cluster=parent.clusterName type=type depth=0}}
-        {{else if (isOctetString type)}} 
-            {{#if isOptional}}
-                if (m{{asUpperCamelCase label}}.HasValue()) {
-            {{/if}}
-                params.{{asStructPropertyName label}} = [[NSData alloc] initWithBytes:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.data() length:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.size()];
-            {{#if isOptional}}
-            } 
-            {{/if}}
-        {{else if (isString type)}}
-            {{#if isOptional}}
-                if (m{{asUpperCamelCase label}}.HasValue()) {
-            {{/if}}
-                 params.{{asStructPropertyName label}} = [[NSString alloc] initWithBytes:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.data() length:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}.size() encoding:NSUTF8StringEncoding];
-            {{#if isOptional}}
-                } 
-            {{/if}}
-        {{else}}
-            {{#if isOptional}}
-                 if (m{{asUpperCamelCase label}}.HasValue()) {
-            {{/if}}
-                 params.{{asStructPropertyName label}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:m{{asUpperCamelCase label}}{{#if isOptional}}.Value(){{/if}}];
-            {{#if isOptional}}
-                } 
-            {{/if}}
-        {{/if_chip_complex}}
+        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.clusterName type=type depth=0}}
         {{/chip_cluster_command_arguments}}
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -92,29 +63,26 @@ public:
             {{else}}
                 ^(NSError * _Nullable error) {
             {{/if}}
-                    chipError = [CHIPError errorToCHIPErrorCode:error];
                     responsesNeeded--;
-                    if (chipError != CHIP_NO_ERROR) {
-                        mError = chipError;
-                        ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                    if (error != nil) {
+                        mError = error;
+                        LogNSError("Error", error);
                     }
                     if (responsesNeeded == 0) {
                         SetCommandExitStatus(mError);
                     }
                 }];
         }
-        return chipError;
+        return CHIP_NO_ERROR;
     }
 
 private:
+    {{#if (hasArguments)}}
     chip::app::Clusters::{{asUpperCamelCase clusterName}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
+    {{/if}}
     {{#chip_cluster_command_arguments}}
     {{#if_chip_complex}}
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
-    {{else if (isString type)}}
-    {{#if isOptional}}chip::Optional<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} m{{asUpperCamelCase label}};
-    {{else}}
-    {{#if isOptional}}chip::Optional<{{chipType}}>{{else}}{{chipType}}{{/if}} m{{asUpperCamelCase label}};
     {{/if_chip_complex}}
     {{/chip_cluster_command_arguments}}
 };
@@ -144,7 +112,6 @@ public:
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block err = CHIP_NO_ERROR;
         {{#if_is_fabric_scoped_struct type}}
         CHIPReadParams * params = [[CHIPReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
@@ -157,14 +124,12 @@ public:
         {{~/if_is_fabric_scoped_struct~}}
         ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
-        err = [CHIPError errorToCHIPErrorCode:error];
-
         if (error != nil) {
-          ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} read Error: %s", chip::ErrorStr(err));
+          LogNSError("{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} read Error", error);
         }
-        SetCommandExitStatus(err);
+        SetCommandExitStatus(error);
          }];
-        return err;
+        return CHIP_NO_ERROR;
     }
 
 };
@@ -197,9 +162,9 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIP_ERROR __block chipError = CHIP_NO_ERROR;
         CHIPWriteParams * params = [[CHIPWriteParams alloc] init];
         params.timedWriteTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
+        params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         {{#if_chip_complex}}
         {{asObjectiveCType type parent.name}} value;
         {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
@@ -212,13 +177,12 @@ public:
         {{/if_chip_complex}}
 
         [cluster writeAttribute{{asUpperCamelCase name}}WithValue:value params:params completionHandler:^(NSError * _Nullable error) {
-            chipError = [CHIPError errorToCHIPErrorCode:error];
             if (error != nil) {
-              ChipLogError(chipTool, "{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} write Error: %s", chip::ErrorStr(chipError));
+              LogNSError("{{asUpperCamelCase parent.name}} {{asUpperCamelCase name}} write Error", error);
             }
-            SetCommandExitStatus(chipError);
+            SetCommandExitStatus(error);
             }];
-        return chipError;
+        return CHIP_NO_ERROR;
     }
 
 private:
@@ -261,7 +225,7 @@ public:
                                 subscriptionEstablished: nullptr reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response %@", [value description]);
         if (error || !mWait){
-            SetCommandExitStatus([CHIPError errorToCHIPErrorCode:error]);
+            SetCommandExitStatus(error);
         }
          }];
 

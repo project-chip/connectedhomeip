@@ -17,15 +17,20 @@
  */
 
 #include "TvCastingApp-JNI.h"
+#include "CallbackHelper.h"
+#include "CastingServer.h"
 #include "JNIDACProvider.h"
+
 #include <app/server/Server.h>
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/InetInterface.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 
@@ -96,14 +101,76 @@ JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint durat
 {
     ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
 
-    Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-    CHIP_ERROR err =
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(System::Clock::Seconds16(duration));
+    CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "GetCommissioningWindowManager failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
     return true;
+}
+
+JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject, jstring addressJStr, jint port)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD sendUserDirectedCommissioningRequest called with port %d", port);
+    Inet::IPAddress addressInet;
+    JniUtfString addressJniString(env, addressJStr);
+    if (Inet::IPAddress::FromString(addressJniString.c_str(), addressInet) == false)
+    {
+        ChipLogError(AppServer, "Failed to parse IP address");
+        return false;
+    }
+
+    chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::FromIPAddress(addressInet);
+    chip::Transport::PeerAddress peerAddress =
+        chip::Transport::PeerAddress::UDP(addressInet, static_cast<uint16_t>(port), interfaceId);
+    CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(peerAddress);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingServer::SendUserDirectedCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
+}
+
+JNI_METHOD(jboolean, discoverCommissioners)(JNIEnv *, jobject)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD discoverCommissioners called");
+    CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingServer::DiscoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return true;
+}
+
+JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCompleteHandler)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD initServer called");
+    CHIP_ERROR err = SetUpMatterCallbackHandler(env, jCommissioningCompleteHandler, gCommissioningCompleteHandler);
+    if (err == CHIP_NO_ERROR)
+    {
+        CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
+        return true;
+    }
+    else
+    {
+        ChipLogError(AppServer, "initServer error: %s", err.AsString());
+        return false;
+    }
+}
+
+JNI_METHOD(void, contentLauncherLaunchURL)(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr)
+{
+    ChipLogProgress(AppServer, "JNI_METHOD contentLauncherLaunchURL called");
+    const char * nativeContentUrl        = env->GetStringUTFChars(contentUrl, 0);
+    const char * nativeContentDisplayStr = env->GetStringUTFChars(contentDisplayStr, 0);
+
+    CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr);
+
+    env->ReleaseStringUTFChars(contentUrl, nativeContentUrl);
+    env->ReleaseStringUTFChars(contentDisplayStr, nativeContentDisplayStr);
 }

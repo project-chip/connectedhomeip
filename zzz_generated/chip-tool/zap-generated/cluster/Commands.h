@@ -237,7 +237,7 @@ public:
 
     ~WritePowerConfigurationMainsAlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000010, mValue);
     }
@@ -264,7 +264,7 @@ public:
 
     ~WritePowerConfigurationMainsVoltageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000011, mValue);
     }
@@ -291,7 +291,7 @@ public:
 
     ~WritePowerConfigurationMainsVoltageMaxThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000012, mValue);
     }
@@ -318,7 +318,7 @@ public:
 
     ~WritePowerConfigurationMainsVoltageDwellTrip() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000013, mValue);
     }
@@ -345,7 +345,7 @@ public:
 
     ~WritePowerConfigurationBatteryManufacturer() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000030, mValue);
     }
@@ -372,7 +372,7 @@ public:
 
     ~WritePowerConfigurationBatterySize() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000031, mValue);
     }
@@ -399,7 +399,7 @@ public:
 
     ~WritePowerConfigurationBatteryAhrRating() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000032, mValue);
     }
@@ -426,7 +426,7 @@ public:
 
     ~WritePowerConfigurationBatteryQuantity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000033, mValue);
     }
@@ -453,7 +453,7 @@ public:
 
     ~WritePowerConfigurationBatteryRatedVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000034, mValue);
     }
@@ -480,7 +480,7 @@ public:
 
     ~WritePowerConfigurationBatteryAlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000035, mValue);
     }
@@ -507,7 +507,7 @@ public:
 
     ~WritePowerConfigurationBatteryVoltageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000036, mValue);
     }
@@ -534,7 +534,7 @@ public:
 
     ~WritePowerConfigurationBatteryVoltageThreshold1() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000037, mValue);
     }
@@ -561,7 +561,7 @@ public:
 
     ~WritePowerConfigurationBatteryVoltageThreshold2() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000038, mValue);
     }
@@ -588,7 +588,7 @@ public:
 
     ~WritePowerConfigurationBatteryVoltageThreshold3() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000039, mValue);
     }
@@ -615,7 +615,7 @@ public:
 
     ~WritePowerConfigurationBatteryPercentageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003A, mValue);
     }
@@ -642,7 +642,7 @@ public:
 
     ~WritePowerConfigurationBatteryPercentageThreshold1() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003B, mValue);
     }
@@ -669,7 +669,7 @@ public:
 
     ~WritePowerConfigurationBatteryPercentageThreshold2() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003C, mValue);
     }
@@ -696,7 +696,7 @@ public:
 
     ~WritePowerConfigurationBatteryPercentageThreshold3() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000003D, mValue);
     }
@@ -723,7 +723,7 @@ public:
 
     ~WritePowerConfigurationBattery2Manufacturer() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000050, mValue);
     }
@@ -750,7 +750,7 @@ public:
 
     ~WritePowerConfigurationBattery2Size() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000051, mValue);
     }
@@ -777,7 +777,7 @@ public:
 
     ~WritePowerConfigurationBattery2AhrRating() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000052, mValue);
     }
@@ -804,7 +804,7 @@ public:
 
     ~WritePowerConfigurationBattery2Quantity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000053, mValue);
     }
@@ -831,7 +831,7 @@ public:
 
     ~WritePowerConfigurationBattery2RatedVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000054, mValue);
     }
@@ -858,7 +858,7 @@ public:
 
     ~WritePowerConfigurationBattery2AlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000055, mValue);
     }
@@ -885,7 +885,7 @@ public:
 
     ~WritePowerConfigurationBattery2VoltageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000056, mValue);
     }
@@ -912,7 +912,7 @@ public:
 
     ~WritePowerConfigurationBattery2VoltageThreshold1() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000057, mValue);
     }
@@ -939,7 +939,7 @@ public:
 
     ~WritePowerConfigurationBattery2VoltageThreshold2() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000058, mValue);
     }
@@ -966,7 +966,7 @@ public:
 
     ~WritePowerConfigurationBattery2VoltageThreshold3() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000059, mValue);
     }
@@ -993,7 +993,7 @@ public:
 
     ~WritePowerConfigurationBattery2PercentageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005A, mValue);
     }
@@ -1020,7 +1020,7 @@ public:
 
     ~WritePowerConfigurationBattery2PercentageThreshold1() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005B, mValue);
     }
@@ -1047,7 +1047,7 @@ public:
 
     ~WritePowerConfigurationBattery2PercentageThreshold2() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005C, mValue);
     }
@@ -1074,7 +1074,7 @@ public:
 
     ~WritePowerConfigurationBattery2PercentageThreshold3() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000005D, mValue);
     }
@@ -1101,7 +1101,7 @@ public:
 
     ~WritePowerConfigurationBattery3Manufacturer() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000070, mValue);
     }
@@ -1128,7 +1128,7 @@ public:
 
     ~WritePowerConfigurationBattery3Size() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000071, mValue);
     }
@@ -1155,7 +1155,7 @@ public:
 
     ~WritePowerConfigurationBattery3AhrRating() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000072, mValue);
     }
@@ -1182,7 +1182,7 @@ public:
 
     ~WritePowerConfigurationBattery3Quantity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000073, mValue);
     }
@@ -1209,7 +1209,7 @@ public:
 
     ~WritePowerConfigurationBattery3RatedVoltage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000074, mValue);
     }
@@ -1236,7 +1236,7 @@ public:
 
     ~WritePowerConfigurationBattery3AlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000075, mValue);
     }
@@ -1263,7 +1263,7 @@ public:
 
     ~WritePowerConfigurationBattery3VoltageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000076, mValue);
     }
@@ -1290,7 +1290,7 @@ public:
 
     ~WritePowerConfigurationBattery3VoltageThreshold1() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000077, mValue);
     }
@@ -1317,7 +1317,7 @@ public:
 
     ~WritePowerConfigurationBattery3VoltageThreshold2() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000078, mValue);
     }
@@ -1344,7 +1344,7 @@ public:
 
     ~WritePowerConfigurationBattery3VoltageThreshold3() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x00000079, mValue);
     }
@@ -1371,7 +1371,7 @@ public:
 
     ~WritePowerConfigurationBattery3PercentageMinThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007A, mValue);
     }
@@ -1398,7 +1398,7 @@ public:
 
     ~WritePowerConfigurationBattery3PercentageThreshold1() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007B, mValue);
     }
@@ -1425,7 +1425,7 @@ public:
 
     ~WritePowerConfigurationBattery3PercentageThreshold2() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007C, mValue);
     }
@@ -1452,7 +1452,7 @@ public:
 
     ~WritePowerConfigurationBattery3PercentageThreshold3() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000001, 0x0000007D, mValue);
     }
@@ -1503,7 +1503,7 @@ public:
 
     ~WriteDeviceTemperatureConfigurationDeviceTempAlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000010, mValue);
     }
@@ -1530,7 +1530,7 @@ public:
 
     ~WriteDeviceTemperatureConfigurationLowTempThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000011, mValue);
     }
@@ -1557,7 +1557,7 @@ public:
 
     ~WriteDeviceTemperatureConfigurationHighTempThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000012, mValue);
     }
@@ -1584,7 +1584,7 @@ public:
 
     ~WriteDeviceTemperatureConfigurationLowTempDwellTripPoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000013, mValue);
     }
@@ -1611,7 +1611,7 @@ public:
 
     ~WriteDeviceTemperatureConfigurationHighTempDwellTripPoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000002, 0x00000014, mValue);
     }
@@ -1657,7 +1657,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -1686,7 +1686,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -1717,7 +1717,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
@@ -1747,7 +1747,7 @@ public:
 
     ~WriteIdentifyIdentifyTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000003, 0x00000000, mValue);
     }
@@ -1796,7 +1796,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -1826,7 +1826,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -1857,7 +1857,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -1888,7 +1888,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -1917,7 +1917,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -1949,7 +1949,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -2015,7 +2015,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -2048,7 +2048,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -2079,7 +2079,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -2109,7 +2109,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -2140,7 +2140,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -2172,7 +2172,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -2203,7 +2203,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -2238,7 +2238,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
@@ -2271,7 +2271,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000041) on endpoint %u", endpointIds.at(0));
 
@@ -2305,7 +2305,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000042) on endpoint %u", endpointIds.at(0));
 
@@ -2360,7 +2360,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -2389,7 +2389,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -2418,7 +2418,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -2449,7 +2449,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
@@ -2479,7 +2479,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %u", endpointIds.at(0));
 
@@ -2511,7 +2511,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %u", endpointIds.at(0));
 
@@ -2541,7 +2541,7 @@ public:
 
     ~WriteOnOffOnTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00004001, mValue);
     }
@@ -2567,7 +2567,7 @@ public:
 
     ~WriteOnOffOffWaitTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00004002, mValue);
     }
@@ -2593,7 +2593,7 @@ public:
 
     ~WriteOnOffStartUpOnOff() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000006, 0x00004003, mValue);
     }
@@ -2637,7 +2637,7 @@ public:
 
     ~WriteOnOffSwitchConfigurationSwitchActions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000007, 0x00000010, mValue);
     }
@@ -2703,7 +2703,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -2736,7 +2736,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -2770,7 +2770,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -2801,7 +2801,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -2833,7 +2833,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -2864,7 +2864,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -2896,7 +2896,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -2925,7 +2925,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -2955,7 +2955,7 @@ public:
 
     ~WriteLevelControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x0000000F, mValue);
     }
@@ -2982,7 +2982,7 @@ public:
 
     ~WriteLevelControlOnOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000010, mValue);
     }
@@ -3008,7 +3008,7 @@ public:
 
     ~WriteLevelControlOnLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000011, mValue);
     }
@@ -3035,7 +3035,7 @@ public:
 
     ~WriteLevelControlOnTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000012, mValue);
     }
@@ -3062,7 +3062,7 @@ public:
 
     ~WriteLevelControlOffTransitionTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000013, mValue);
     }
@@ -3089,7 +3089,7 @@ public:
 
     ~WriteLevelControlDefaultMoveRate() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00000014, mValue);
     }
@@ -3116,7 +3116,7 @@ public:
 
     ~WriteLevelControlStartUpCurrentLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000008, 0x00004000, mValue);
     }
@@ -3163,7 +3163,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -3192,7 +3192,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -3221,7 +3221,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -3250,7 +3250,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000009) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -3305,7 +3305,7 @@ public:
 
     ~WriteTimeTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000000, mValue);
     }
@@ -3331,7 +3331,7 @@ public:
 
     ~WriteTimeTimeStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000001, mValue);
     }
@@ -3357,7 +3357,7 @@ public:
 
     ~WriteTimeTimeZone() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000002, mValue);
     }
@@ -3383,7 +3383,7 @@ public:
 
     ~WriteTimeDstStart() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000003, mValue);
     }
@@ -3409,7 +3409,7 @@ public:
 
     ~WriteTimeDstEnd() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000004, mValue);
     }
@@ -3435,7 +3435,7 @@ public:
 
     ~WriteTimeDstShift() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000005, mValue);
     }
@@ -3461,7 +3461,7 @@ public:
 
     ~WriteTimeValidUntilTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000A, 0x00000009, mValue);
     }
@@ -3511,7 +3511,7 @@ public:
 
     ~WriteBinaryInputBasicActiveText() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000004, mValue);
     }
@@ -3538,7 +3538,7 @@ public:
 
     ~WriteBinaryInputBasicDescription() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x0000001C, mValue);
     }
@@ -3565,7 +3565,7 @@ public:
 
     ~WriteBinaryInputBasicInactiveText() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x0000002E, mValue);
     }
@@ -3592,7 +3592,7 @@ public:
 
     ~WriteBinaryInputBasicOutOfService() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000051, mValue);
     }
@@ -3619,7 +3619,7 @@ public:
 
     ~WriteBinaryInputBasicPresentValue() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000055, mValue);
     }
@@ -3646,7 +3646,7 @@ public:
 
     ~WriteBinaryInputBasicReliability() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000000F, 0x00000067, mValue);
     }
@@ -3702,7 +3702,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -3732,7 +3732,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -3766,7 +3766,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -3799,7 +3799,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -3833,7 +3833,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -3868,7 +3868,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -3901,7 +3901,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -3932,7 +3932,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -3966,7 +3966,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001A) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -3996,7 +3996,7 @@ public:
 
     ~WritePowerProfileScheduleMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001A, 0x00000004, mValue);
     }
@@ -4047,7 +4047,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -4076,7 +4076,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -4109,7 +4109,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -4140,7 +4140,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -4170,7 +4170,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -4201,7 +4201,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000001B) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -4282,7 +4282,7 @@ public:
 
     ~WriteBindingBinding() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001E, 0x00000000, mValue);
     }
@@ -4332,7 +4332,7 @@ public:
 
     ~WriteAccessControlAcl() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001F, 0x00000000, mValue);
     }
@@ -4361,7 +4361,7 @@ public:
 
     ~WriteAccessControlExtension() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000001F, 0x00000001, mValue);
     }
@@ -4417,7 +4417,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -4446,7 +4446,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -4477,7 +4477,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -4508,7 +4508,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000020) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -4539,7 +4539,7 @@ public:
 
     ~WritePollControlCheckInInterval() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000000, mValue);
     }
@@ -4566,7 +4566,7 @@ public:
 
     ~WritePollControlFastPollTimeout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000020, 0x00000003, mValue);
     }
@@ -4625,7 +4625,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -4658,7 +4658,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -4689,7 +4689,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -4722,7 +4722,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -4753,7 +4753,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -4784,7 +4784,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -4817,7 +4817,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -4848,7 +4848,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -4879,7 +4879,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -4912,7 +4912,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -4943,7 +4943,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
@@ -4976,7 +4976,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
@@ -5045,7 +5045,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -5075,7 +5075,7 @@ public:
 
     ~WriteBasicNodeLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000005, mValue);
     }
@@ -5101,7 +5101,7 @@ public:
 
     ~WriteBasicLocation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000006, mValue);
     }
@@ -5128,7 +5128,7 @@ public:
 
     ~WriteBasicLocalConfigDisabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000028, 0x00000010, mValue);
     }
@@ -5180,7 +5180,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -5214,7 +5214,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -5246,7 +5246,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -5304,7 +5304,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -5335,7 +5335,7 @@ public:
 
     ~WriteOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002A, 0x00000000, mValue);
     }
@@ -5382,7 +5382,7 @@ public:
 
     ~WriteLocalizationConfigurationActiveLocale() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002B, 0x00000001, mValue);
     }
@@ -5427,7 +5427,7 @@ public:
 
     ~WriteTimeFormatLocalizationHourFormat() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002C, 0x00000000, mValue);
     }
@@ -5454,7 +5454,7 @@ public:
 
     ~WriteTimeFormatLocalizationActiveCalendarType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002C, 0x00000001, mValue);
     }
@@ -5497,7 +5497,7 @@ public:
 
     ~WriteUnitLocalizationTemperatureUnit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002D, 0x00000000, mValue);
     }
@@ -5610,7 +5610,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -5643,7 +5643,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -5673,7 +5673,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -5704,7 +5704,7 @@ public:
 
     ~WriteGeneralCommissioningBreadcrumb() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000030, 0x00000000, mValue);
     }
@@ -5761,7 +5761,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -5794,7 +5794,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -5826,7 +5826,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -5858,7 +5858,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -5890,7 +5890,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -5923,7 +5923,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -5954,7 +5954,7 @@ public:
 
     ~WriteNetworkCommissioningInterfaceEnabled() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000031, 0x00000004, mValue);
     }
@@ -5999,7 +5999,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6077,7 +6077,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6187,7 +6187,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6249,7 +6249,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6304,7 +6304,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6383,7 +6383,7 @@ public:
 
     ~WriteBridgedDeviceBasicNodeLabel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000039, 0x00000005, mValue);
     }
@@ -6460,7 +6460,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6491,7 +6491,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -6521,7 +6521,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -6582,7 +6582,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6613,7 +6613,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -6643,7 +6643,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -6677,7 +6677,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -6708,7 +6708,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -6739,7 +6739,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -6770,7 +6770,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
@@ -6801,7 +6801,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
@@ -6832,7 +6832,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %u", endpointIds.at(0));
 
@@ -6886,7 +6886,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -6917,7 +6917,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -6948,7 +6948,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -6979,7 +6979,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003F) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -7011,7 +7011,7 @@ public:
 
     ~WriteGroupKeyManagementGroupKeyMap() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000003F, 0x00000000, mValue);
     }
@@ -7073,7 +7073,7 @@ public:
 
     ~WriteUserLabelLabelList() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000041, 0x00000000, mValue);
     }
@@ -7184,7 +7184,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -7214,7 +7214,7 @@ public:
 
     ~WriteModeSelectStartUpMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000004, mValue);
     }
@@ -7240,7 +7240,7 @@ public:
 
     ~WriteModeSelectOnMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000050, 0x00000005, mValue);
     }
@@ -7286,7 +7286,7 @@ public:
 
     ~WriteShadeConfigurationStatus() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000100, 0x00000002, mValue);
     }
@@ -7313,7 +7313,7 @@ public:
 
     ~WriteShadeConfigurationClosedLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000100, 0x00000010, mValue);
     }
@@ -7339,7 +7339,7 @@ public:
 
     ~WriteShadeConfigurationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000100, 0x00000011, mValue);
     }
@@ -7409,6 +7409,7 @@ private:
 | * MaxRFIDCodeLength                                                 | 0x0019 |
 | * MinRFIDCodeLength                                                 | 0x001A |
 | * CredentialRulesSupport                                            | 0x001B |
+| * NumberOfCredentialsSupportedPerUser                               | 0x001C |
 | * EnableLogging                                                     | 0x0020 |
 | * Language                                                          | 0x0021 |
 | * LEDSettings                                                       | 0x0022 |
@@ -7461,7 +7462,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -7491,7 +7492,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -7523,7 +7524,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -7553,7 +7554,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -7586,7 +7587,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -7616,7 +7617,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -7646,7 +7647,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -7675,7 +7676,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -7706,7 +7707,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -7736,7 +7737,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
@@ -7773,7 +7774,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
@@ -7805,7 +7806,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %u", endpointIds.at(0));
 
@@ -7837,7 +7838,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %u", endpointIds.at(0));
 
@@ -7871,7 +7872,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %u", endpointIds.at(0));
 
@@ -7903,7 +7904,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %u", endpointIds.at(0));
 
@@ -7935,7 +7936,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %u", endpointIds.at(0));
 
@@ -7969,7 +7970,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %u", endpointIds.at(0));
 
@@ -8000,7 +8001,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %u", endpointIds.at(0));
 
@@ -8031,7 +8032,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %u", endpointIds.at(0));
 
@@ -8062,7 +8063,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %u", endpointIds.at(0));
 
@@ -8092,7 +8093,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %u", endpointIds.at(0));
 
@@ -8125,7 +8126,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %u", endpointIds.at(0));
 
@@ -8155,7 +8156,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %u", endpointIds.at(0));
 
@@ -8185,7 +8186,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %u", endpointIds.at(0));
 
@@ -8215,7 +8216,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %u", endpointIds.at(0));
 
@@ -8251,7 +8252,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %u", endpointIds.at(0));
 
@@ -8281,7 +8282,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %u", endpointIds.at(0));
 
@@ -8311,7 +8312,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %u", endpointIds.at(0));
 
@@ -8347,7 +8348,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %u", endpointIds.at(0));
 
@@ -8379,7 +8380,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %u", endpointIds.at(0));
 
@@ -8411,7 +8412,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %u", endpointIds.at(0));
 
@@ -8443,7 +8444,7 @@ public:
 
     ~WriteDoorLockDoorOpenEvents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000004, mValue);
     }
@@ -8470,7 +8471,7 @@ public:
 
     ~WriteDoorLockDoorClosedEvents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000005, mValue);
     }
@@ -8496,7 +8497,7 @@ public:
 
     ~WriteDoorLockOpenPeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000006, mValue);
     }
@@ -8522,7 +8523,7 @@ public:
 
     ~WriteDoorLockEnableLogging() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000020, mValue);
     }
@@ -8548,7 +8549,7 @@ public:
 
     ~WriteDoorLockLanguage() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000021, mValue);
     }
@@ -8574,7 +8575,7 @@ public:
 
     ~WriteDoorLockLEDSettings() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000022, mValue);
     }
@@ -8600,7 +8601,7 @@ public:
 
     ~WriteDoorLockAutoRelockTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000023, mValue);
     }
@@ -8626,7 +8627,7 @@ public:
 
     ~WriteDoorLockSoundVolume() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000024, mValue);
     }
@@ -8652,7 +8653,7 @@ public:
 
     ~WriteDoorLockOperatingMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000025, mValue);
     }
@@ -8679,7 +8680,7 @@ public:
 
     ~WriteDoorLockEnableLocalProgramming() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000028, mValue);
     }
@@ -8706,7 +8707,7 @@ public:
 
     ~WriteDoorLockEnableOneTouchLocking() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000029, mValue);
     }
@@ -8733,7 +8734,7 @@ public:
 
     ~WriteDoorLockEnableInsideStatusLED() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000002A, mValue);
     }
@@ -8760,7 +8761,7 @@ public:
 
     ~WriteDoorLockEnablePrivacyModeButton() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000002B, mValue);
     }
@@ -8787,7 +8788,7 @@ public:
 
     ~WriteDoorLockLocalProgrammingFeatures() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x0000002C, mValue);
     }
@@ -8814,7 +8815,7 @@ public:
 
     ~WriteDoorLockWrongCodeEntryLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000030, mValue);
     }
@@ -8841,7 +8842,7 @@ public:
 
     ~WriteDoorLockUserCodeTemporaryDisableTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000031, mValue);
     }
@@ -8868,7 +8869,7 @@ public:
 
     ~WriteDoorLockSendPINOverTheAir() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000032, mValue);
     }
@@ -8895,7 +8896,7 @@ public:
 
     ~WriteDoorLockRequirePINforRemoteOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000033, mValue);
     }
@@ -8922,7 +8923,7 @@ public:
 
     ~WriteDoorLockExpiringUserTimeout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000035, mValue);
     }
@@ -8948,7 +8949,7 @@ public:
 
     ~WriteDoorLockAlarmMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000040, mValue);
     }
@@ -8975,7 +8976,7 @@ public:
 
     ~WriteDoorLockKeypadOperationEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000041, mValue);
     }
@@ -9002,7 +9003,7 @@ public:
 
     ~WriteDoorLockRemoteOperationEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000042, mValue);
     }
@@ -9029,7 +9030,7 @@ public:
 
     ~WriteDoorLockManualOperationEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000043, mValue);
     }
@@ -9056,7 +9057,7 @@ public:
 
     ~WriteDoorLockRFIDOperationEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000044, mValue);
     }
@@ -9083,7 +9084,7 @@ public:
 
     ~WriteDoorLockKeypadProgrammingEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000045, mValue);
     }
@@ -9110,7 +9111,7 @@ public:
 
     ~WriteDoorLockRemoteProgrammingEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000046, mValue);
     }
@@ -9137,7 +9138,7 @@ public:
 
     ~WriteDoorLockRFIDProgrammingEventMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000101, 0x00000047, mValue);
     }
@@ -9206,7 +9207,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -9235,7 +9236,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -9264,7 +9265,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -9295,7 +9296,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -9322,12 +9323,11 @@ public:
     WindowCoveringGoToLiftPercentage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("go-to-lift-percentage", credsIssuerConfig)
     {
-        AddArgument("LiftPercentageValue", 0, UINT8_MAX, &mRequest.liftPercentageValue);
         AddArgument("LiftPercent100thsValue", 0, UINT16_MAX, &mRequest.liftPercent100thsValue);
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -9358,7 +9358,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -9385,12 +9385,11 @@ public:
     WindowCoveringGoToTiltPercentage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("go-to-tilt-percentage", credsIssuerConfig)
     {
-        AddArgument("TiltPercentageValue", 0, UINT8_MAX, &mRequest.tiltPercentageValue);
         AddArgument("TiltPercent100thsValue", 0, UINT16_MAX, &mRequest.tiltPercent100thsValue);
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -9420,7 +9419,7 @@ public:
 
     ~WriteWindowCoveringMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000102, 0x00000017, mValue);
     }
@@ -9474,7 +9473,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -9504,7 +9503,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -9535,7 +9534,7 @@ public:
 
     ~WriteBarrierControlBarrierOpenEvents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000004, mValue);
     }
@@ -9562,7 +9561,7 @@ public:
 
     ~WriteBarrierControlBarrierCloseEvents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000005, mValue);
     }
@@ -9589,7 +9588,7 @@ public:
 
     ~WriteBarrierControlBarrierCommandOpenEvents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000006, mValue);
     }
@@ -9616,7 +9615,7 @@ public:
 
     ~WriteBarrierControlBarrierCommandCloseEvents() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000007, mValue);
     }
@@ -9643,7 +9642,7 @@ public:
 
     ~WriteBarrierControlBarrierOpenPeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000008, mValue);
     }
@@ -9670,7 +9669,7 @@ public:
 
     ~WriteBarrierControlBarrierClosePeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000103, 0x00000009, mValue);
     }
@@ -9752,7 +9751,7 @@ public:
 
     ~WritePumpConfigurationAndControlLifetimeRunningHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000015, mValue);
     }
@@ -9779,7 +9778,7 @@ public:
 
     ~WritePumpConfigurationAndControlLifetimeEnergyConsumed() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000017, mValue);
     }
@@ -9806,7 +9805,7 @@ public:
 
     ~WritePumpConfigurationAndControlOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000020, mValue);
     }
@@ -9833,7 +9832,7 @@ public:
 
     ~WritePumpConfigurationAndControlControlMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000200, 0x00000021, mValue);
     }
@@ -9924,7 +9923,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -9958,7 +9957,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -9991,7 +9990,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -10021,7 +10020,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -10051,7 +10050,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -10082,7 +10081,7 @@ public:
 
     ~WriteThermostatHvacSystemTypeConfiguration() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000009, mValue);
     }
@@ -10109,7 +10108,7 @@ public:
 
     ~WriteThermostatLocalTemperatureCalibration() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000010, mValue);
     }
@@ -10136,7 +10135,7 @@ public:
 
     ~WriteThermostatOccupiedCoolingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000011, mValue);
     }
@@ -10163,7 +10162,7 @@ public:
 
     ~WriteThermostatOccupiedHeatingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000012, mValue);
     }
@@ -10190,7 +10189,7 @@ public:
 
     ~WriteThermostatUnoccupiedCoolingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000013, mValue);
     }
@@ -10217,7 +10216,7 @@ public:
 
     ~WriteThermostatUnoccupiedHeatingSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000014, mValue);
     }
@@ -10244,7 +10243,7 @@ public:
 
     ~WriteThermostatMinHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000015, mValue);
     }
@@ -10271,7 +10270,7 @@ public:
 
     ~WriteThermostatMaxHeatSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000016, mValue);
     }
@@ -10298,7 +10297,7 @@ public:
 
     ~WriteThermostatMinCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000017, mValue);
     }
@@ -10325,7 +10324,7 @@ public:
 
     ~WriteThermostatMaxCoolSetpointLimit() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000018, mValue);
     }
@@ -10352,7 +10351,7 @@ public:
 
     ~WriteThermostatMinSetpointDeadBand() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000019, mValue);
     }
@@ -10378,7 +10377,7 @@ public:
 
     ~WriteThermostatRemoteSensing() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000001A, mValue);
     }
@@ -10405,7 +10404,7 @@ public:
 
     ~WriteThermostatControlSequenceOfOperation() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000001B, mValue);
     }
@@ -10431,7 +10430,7 @@ public:
 
     ~WriteThermostatSystemMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x0000001C, mValue);
     }
@@ -10458,7 +10457,7 @@ public:
 
     ~WriteThermostatTemperatureSetpointHold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000023, mValue);
     }
@@ -10485,7 +10484,7 @@ public:
 
     ~WriteThermostatTemperatureSetpointHoldDuration() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000024, mValue);
     }
@@ -10512,7 +10511,7 @@ public:
 
     ~WriteThermostatThermostatProgrammingOperationMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000025, mValue);
     }
@@ -10538,7 +10537,7 @@ public:
 
     ~WriteThermostatAcType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000040, mValue);
     }
@@ -10564,7 +10563,7 @@ public:
 
     ~WriteThermostatAcCapacity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000041, mValue);
     }
@@ -10591,7 +10590,7 @@ public:
 
     ~WriteThermostatAcRefrigerantType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000042, mValue);
     }
@@ -10618,7 +10617,7 @@ public:
 
     ~WriteThermostatAcCompressorType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000043, mValue);
     }
@@ -10644,7 +10643,7 @@ public:
 
     ~WriteThermostatAcErrorCode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000044, mValue);
     }
@@ -10671,7 +10670,7 @@ public:
 
     ~WriteThermostatAcLouverPosition() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000045, mValue);
     }
@@ -10698,7 +10697,7 @@ public:
 
     ~WriteThermostatAcCapacityFormat() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000201, 0x00000047, mValue);
     }
@@ -10750,7 +10749,7 @@ public:
 
     ~WriteFanControlFanMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000000, mValue);
     }
@@ -10777,7 +10776,7 @@ public:
 
     ~WriteFanControlFanModeSequence() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000001, mValue);
     }
@@ -10804,7 +10803,7 @@ public:
 
     ~WriteFanControlPercentSetting() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000002, mValue);
     }
@@ -10815,7 +10814,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteFanControlSpeedSetting : public WriteAttribute
@@ -10830,7 +10829,7 @@ public:
 
     ~WriteFanControlSpeedSetting() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000005, mValue);
     }
@@ -10841,7 +10840,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteFanControlRockSetting : public WriteAttribute
@@ -10856,7 +10855,7 @@ public:
 
     ~WriteFanControlRockSetting() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000008, mValue);
     }
@@ -10882,7 +10881,7 @@ public:
 
     ~WriteFanControlWindSetting() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000202, 0x0000000A, mValue);
     }
@@ -10932,7 +10931,7 @@ public:
 
     ~WriteDehumidificationControlRhDehumidificationSetpoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000010, mValue);
     }
@@ -10959,7 +10958,7 @@ public:
 
     ~WriteDehumidificationControlRelativeHumidityMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000011, mValue);
     }
@@ -10986,7 +10985,7 @@ public:
 
     ~WriteDehumidificationControlDehumidificationLockout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000012, mValue);
     }
@@ -11013,7 +11012,7 @@ public:
 
     ~WriteDehumidificationControlDehumidificationHysteresis() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000013, mValue);
     }
@@ -11040,7 +11039,7 @@ public:
 
     ~WriteDehumidificationControlDehumidificationMaxCool() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000014, mValue);
     }
@@ -11067,7 +11066,7 @@ public:
 
     ~WriteDehumidificationControlRelativeHumidityDisplay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000203, 0x00000015, mValue);
     }
@@ -11112,7 +11111,7 @@ public:
 
     ~WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000204, 0x00000000, mValue);
     }
@@ -11139,7 +11138,7 @@ public:
 
     ~WriteThermostatUserInterfaceConfigurationKeypadLockout() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000204, 0x00000001, mValue);
     }
@@ -11166,7 +11165,7 @@ public:
 
     ~WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000204, 0x00000002, mValue);
     }
@@ -11282,7 +11281,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -11315,7 +11314,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -11349,7 +11348,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -11383,7 +11382,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -11416,7 +11415,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -11450,7 +11449,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -11485,7 +11484,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -11519,7 +11518,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -11552,7 +11551,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -11586,7 +11585,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -11620,7 +11619,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
@@ -11655,7 +11654,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %u", endpointIds.at(0));
 
@@ -11689,7 +11688,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %u", endpointIds.at(0));
 
@@ -11724,7 +11723,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %u", endpointIds.at(0));
 
@@ -11759,7 +11758,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %u", endpointIds.at(0));
 
@@ -11795,7 +11794,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %u", endpointIds.at(0));
 
@@ -11826,7 +11825,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %u", endpointIds.at(0));
 
@@ -11862,7 +11861,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %u", endpointIds.at(0));
 
@@ -11899,7 +11898,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %u", endpointIds.at(0));
 
@@ -11930,7 +11929,7 @@ public:
 
     ~WriteColorControlColorControlOptions() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000000F, mValue);
     }
@@ -11956,7 +11955,7 @@ public:
 
     ~WriteColorControlWhitePointX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000030, mValue);
     }
@@ -11982,7 +11981,7 @@ public:
 
     ~WriteColorControlWhitePointY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000031, mValue);
     }
@@ -12008,7 +12007,7 @@ public:
 
     ~WriteColorControlColorPointRX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000032, mValue);
     }
@@ -12034,7 +12033,7 @@ public:
 
     ~WriteColorControlColorPointRY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000033, mValue);
     }
@@ -12061,7 +12060,7 @@ public:
 
     ~WriteColorControlColorPointRIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000034, mValue);
     }
@@ -12087,7 +12086,7 @@ public:
 
     ~WriteColorControlColorPointGX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000036, mValue);
     }
@@ -12113,7 +12112,7 @@ public:
 
     ~WriteColorControlColorPointGY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000037, mValue);
     }
@@ -12140,7 +12139,7 @@ public:
 
     ~WriteColorControlColorPointGIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00000038, mValue);
     }
@@ -12166,7 +12165,7 @@ public:
 
     ~WriteColorControlColorPointBX() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000003A, mValue);
     }
@@ -12192,7 +12191,7 @@ public:
 
     ~WriteColorControlColorPointBY() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000003B, mValue);
     }
@@ -12219,7 +12218,7 @@ public:
 
     ~WriteColorControlColorPointBIntensity() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x0000003C, mValue);
     }
@@ -12246,7 +12245,7 @@ public:
 
     ~WriteColorControlStartUpColorTemperatureMireds() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000300, 0x00004010, mValue);
     }
@@ -12303,7 +12302,7 @@ public:
 
     ~WriteBallastConfigurationMinLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000010, mValue);
     }
@@ -12329,7 +12328,7 @@ public:
 
     ~WriteBallastConfigurationMaxLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000011, mValue);
     }
@@ -12356,7 +12355,7 @@ public:
 
     ~WriteBallastConfigurationPowerOnLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000012, mValue);
     }
@@ -12383,7 +12382,7 @@ public:
 
     ~WriteBallastConfigurationPowerOnFadeTime() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000013, mValue);
     }
@@ -12410,7 +12409,7 @@ public:
 
     ~WriteBallastConfigurationIntrinsicBallastFactor() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000014, mValue);
     }
@@ -12437,7 +12436,7 @@ public:
 
     ~WriteBallastConfigurationBallastFactorAdjustment() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000015, mValue);
     }
@@ -12463,7 +12462,7 @@ public:
 
     ~WriteBallastConfigurationLampType() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000030, mValue);
     }
@@ -12490,7 +12489,7 @@ public:
 
     ~WriteBallastConfigurationLampManufacturer() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000031, mValue);
     }
@@ -12517,7 +12516,7 @@ public:
 
     ~WriteBallastConfigurationLampRatedHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000032, mValue);
     }
@@ -12544,7 +12543,7 @@ public:
 
     ~WriteBallastConfigurationLampBurnHours() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000033, mValue);
     }
@@ -12571,7 +12570,7 @@ public:
 
     ~WriteBallastConfigurationLampAlarmMode() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000034, mValue);
     }
@@ -12598,7 +12597,7 @@ public:
 
     ~WriteBallastConfigurationLampBurnHoursTripPoint() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000301, 0x00000035, mValue);
     }
@@ -12753,7 +12752,7 @@ public:
 
     ~WriteOccupancySensingPirOccupiedToUnoccupiedDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000010, mValue);
     }
@@ -12780,7 +12779,7 @@ public:
 
     ~WriteOccupancySensingPirUnoccupiedToOccupiedDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000011, mValue);
     }
@@ -12807,7 +12806,7 @@ public:
 
     ~WriteOccupancySensingPirUnoccupiedToOccupiedThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000012, mValue);
     }
@@ -12834,7 +12833,7 @@ public:
 
     ~WriteOccupancySensingUltrasonicOccupiedToUnoccupiedDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000020, mValue);
     }
@@ -12861,7 +12860,7 @@ public:
 
     ~WriteOccupancySensingUltrasonicUnoccupiedToOccupiedDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000021, mValue);
     }
@@ -12888,7 +12887,7 @@ public:
 
     ~WriteOccupancySensingUltrasonicUnoccupiedToOccupiedThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000022, mValue);
     }
@@ -12915,7 +12914,7 @@ public:
 
     ~WriteOccupancySensingPhysicalContactOccupiedToUnoccupiedDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000030, mValue);
     }
@@ -12942,7 +12941,7 @@ public:
 
     ~WriteOccupancySensingPhysicalContactUnoccupiedToOccupiedDelay() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000031, mValue);
     }
@@ -12969,7 +12968,7 @@ public:
 
     ~WriteOccupancySensingPhysicalContactUnoccupiedToOccupiedThreshold() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000406, 0x00000032, mValue);
     }
@@ -13592,7 +13591,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -13622,7 +13621,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -13653,7 +13652,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000500) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -13683,7 +13682,7 @@ public:
 
     ~WriteIasZoneIasCieAddress() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000010, mValue);
     }
@@ -13710,7 +13709,7 @@ public:
 
     ~WriteIasZoneCurrentZoneSensitivityLevel() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000500, 0x00000013, mValue);
     }
@@ -13763,7 +13762,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -13796,7 +13795,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -13826,7 +13825,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -13855,7 +13854,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -13884,7 +13883,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -13913,7 +13912,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -13944,7 +13943,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -13973,7 +13972,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -14003,7 +14002,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -14036,7 +14035,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000501) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -14087,7 +14086,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14117,7 +14116,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000502) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -14147,7 +14146,7 @@ public:
 
     ~WriteIasWdMaxDuration() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000502, 0x00000000, mValue);
     }
@@ -14210,7 +14209,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14242,7 +14241,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -14272,7 +14271,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -14322,7 +14321,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14384,7 +14383,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14413,7 +14412,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -14442,7 +14441,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -14471,7 +14470,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -14500,7 +14499,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -14529,7 +14528,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -14558,7 +14557,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -14587,7 +14586,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -14617,7 +14616,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -14647,7 +14646,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -14677,7 +14676,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
@@ -14728,7 +14727,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14757,7 +14756,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -14786,7 +14785,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -14817,7 +14816,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -14862,7 +14861,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14908,7 +14907,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14960,7 +14959,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -14994,7 +14993,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -15027,7 +15026,7 @@ public:
 
     ~WriteContentLauncherSupportedStreamingProtocols() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050A, 0x00000001, mValue);
     }
@@ -15072,7 +15071,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -15103,7 +15102,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -15155,7 +15154,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -15187,7 +15186,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -15219,7 +15218,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -15251,7 +15250,7 @@ public:
 
     ~WriteApplicationLauncherCurrentApp() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050C, 0x00000001, mValue);
     }
@@ -15320,7 +15319,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -15351,7 +15350,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -15380,7 +15379,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -15529,7 +15528,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -15558,7 +15557,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -15587,7 +15586,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -15617,7 +15616,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %u", endpointIds.at(0));
 
@@ -15649,7 +15648,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %u", endpointIds.at(0));
 
@@ -15680,7 +15679,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000005) on endpoint %u", endpointIds.at(0));
 
@@ -15717,7 +15716,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000006) on endpoint %u", endpointIds.at(0));
 
@@ -15754,7 +15753,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %u", endpointIds.at(0));
 
@@ -15786,7 +15785,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %u", endpointIds.at(0));
 
@@ -15818,7 +15817,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %u", endpointIds.at(0));
 
@@ -15851,7 +15850,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %u", endpointIds.at(0));
 
@@ -15883,7 +15882,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %u", endpointIds.at(0));
 
@@ -15915,7 +15914,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %u", endpointIds.at(0));
 
@@ -15948,7 +15947,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %u", endpointIds.at(0));
 
@@ -15981,7 +15980,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %u", endpointIds.at(0));
 
@@ -16012,7 +16011,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %u", endpointIds.at(0));
 
@@ -16057,7 +16056,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000010) on endpoint %u", endpointIds.at(0));
 
@@ -16102,7 +16101,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %u", endpointIds.at(0));
 
@@ -16133,7 +16132,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %u", endpointIds.at(0));
 
@@ -16164,7 +16163,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %u", endpointIds.at(0));
 
@@ -16197,7 +16196,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %u", endpointIds.at(0));
 
@@ -16228,7 +16227,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000015) on endpoint %u", endpointIds.at(0));
 
@@ -16258,7 +16257,7 @@ public:
 
     ~WriteTestClusterBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000000, mValue);
     }
@@ -16284,7 +16283,7 @@ public:
 
     ~WriteTestClusterBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000001, mValue);
     }
@@ -16310,7 +16309,7 @@ public:
 
     ~WriteTestClusterBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000002, mValue);
     }
@@ -16336,7 +16335,7 @@ public:
 
     ~WriteTestClusterBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000003, mValue);
     }
@@ -16362,7 +16361,7 @@ public:
 
     ~WriteTestClusterBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000004, mValue);
     }
@@ -16388,7 +16387,7 @@ public:
 
     ~WriteTestClusterInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000005, mValue);
     }
@@ -16414,7 +16413,7 @@ public:
 
     ~WriteTestClusterInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000006, mValue);
     }
@@ -16440,7 +16439,7 @@ public:
 
     ~WriteTestClusterInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000007, mValue);
     }
@@ -16466,7 +16465,7 @@ public:
 
     ~WriteTestClusterInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000008, mValue);
     }
@@ -16492,7 +16491,7 @@ public:
 
     ~WriteTestClusterInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000009, mValue);
     }
@@ -16518,7 +16517,7 @@ public:
 
     ~WriteTestClusterInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000A, mValue);
     }
@@ -16544,7 +16543,7 @@ public:
 
     ~WriteTestClusterInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000B, mValue);
     }
@@ -16570,7 +16569,7 @@ public:
 
     ~WriteTestClusterInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000C, mValue);
     }
@@ -16596,7 +16595,7 @@ public:
 
     ~WriteTestClusterInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000D, mValue);
     }
@@ -16622,7 +16621,7 @@ public:
 
     ~WriteTestClusterInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000E, mValue);
     }
@@ -16648,7 +16647,7 @@ public:
 
     ~WriteTestClusterInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000000F, mValue);
     }
@@ -16674,7 +16673,7 @@ public:
 
     ~WriteTestClusterInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000010, mValue);
     }
@@ -16700,7 +16699,7 @@ public:
 
     ~WriteTestClusterInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000011, mValue);
     }
@@ -16726,7 +16725,7 @@ public:
 
     ~WriteTestClusterInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000012, mValue);
     }
@@ -16752,7 +16751,7 @@ public:
 
     ~WriteTestClusterInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000013, mValue);
     }
@@ -16778,7 +16777,7 @@ public:
 
     ~WriteTestClusterInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000014, mValue);
     }
@@ -16804,7 +16803,7 @@ public:
 
     ~WriteTestClusterEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000015, mValue);
     }
@@ -16830,7 +16829,7 @@ public:
 
     ~WriteTestClusterEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000016, mValue);
     }
@@ -16856,7 +16855,7 @@ public:
 
     ~WriteTestClusterFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000017, mValue);
     }
@@ -16882,7 +16881,7 @@ public:
 
     ~WriteTestClusterFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000018, mValue);
     }
@@ -16908,7 +16907,7 @@ public:
 
     ~WriteTestClusterOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000019, mValue);
     }
@@ -16935,7 +16934,7 @@ public:
 
     ~WriteTestClusterListInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001A, mValue);
     }
@@ -16963,7 +16962,7 @@ public:
 
     ~WriteTestClusterListOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001B, mValue);
     }
@@ -16991,7 +16990,7 @@ public:
 
     ~WriteTestClusterListStructOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001C, mValue);
     }
@@ -17020,7 +17019,7 @@ public:
 
     ~WriteTestClusterLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001D, mValue);
     }
@@ -17046,7 +17045,7 @@ public:
 
     ~WriteTestClusterCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001E, mValue);
     }
@@ -17073,7 +17072,7 @@ public:
 
     ~WriteTestClusterLongCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000001F, mValue);
     }
@@ -17099,7 +17098,7 @@ public:
 
     ~WriteTestClusterEpochUs() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000020, mValue);
     }
@@ -17125,7 +17124,7 @@ public:
 
     ~WriteTestClusterEpochS() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000021, mValue);
     }
@@ -17151,7 +17150,7 @@ public:
 
     ~WriteTestClusterVendorId() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000022, mValue);
     }
@@ -17178,7 +17177,7 @@ public:
 
     ~WriteTestClusterListNullablesAndOptionalsStruct() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000023, mValue);
     }
@@ -17207,7 +17206,7 @@ public:
 
     ~WriteTestClusterEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000024, mValue);
     }
@@ -17234,7 +17233,7 @@ public:
 
     ~WriteTestClusterStructAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000025, mValue);
     }
@@ -17262,7 +17261,7 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000026, mValue);
     }
@@ -17289,7 +17288,7 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000027, mValue);
     }
@@ -17316,7 +17315,7 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000028, mValue);
     }
@@ -17343,7 +17342,7 @@ public:
 
     ~WriteTestClusterRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000029, mValue);
     }
@@ -17370,7 +17369,7 @@ public:
 
     ~WriteTestClusterListLongOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002A, mValue);
     }
@@ -17398,7 +17397,7 @@ public:
 
     ~WriteTestClusterListFabricScoped() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000002B, mValue);
     }
@@ -17427,7 +17426,7 @@ public:
 
     ~WriteTestClusterTimedWriteBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000030, mValue);
     }
@@ -17454,7 +17453,7 @@ public:
 
     ~WriteTestClusterGeneralErrorBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000031, mValue);
     }
@@ -17481,7 +17480,7 @@ public:
 
     ~WriteTestClusterClusterErrorBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00000032, mValue);
     }
@@ -17507,7 +17506,7 @@ public:
 
     ~WriteTestClusterUnsupported() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x000000FF, mValue);
     }
@@ -17534,7 +17533,7 @@ public:
 
     ~WriteTestClusterNullableBoolean() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004000, mValue);
     }
@@ -17561,7 +17560,7 @@ public:
 
     ~WriteTestClusterNullableBitmap8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004001, mValue);
     }
@@ -17588,7 +17587,7 @@ public:
 
     ~WriteTestClusterNullableBitmap16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004002, mValue);
     }
@@ -17615,7 +17614,7 @@ public:
 
     ~WriteTestClusterNullableBitmap32() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004003, mValue);
     }
@@ -17642,7 +17641,7 @@ public:
 
     ~WriteTestClusterNullableBitmap64() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004004, mValue);
     }
@@ -17668,7 +17667,7 @@ public:
 
     ~WriteTestClusterNullableInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004005, mValue);
     }
@@ -17695,7 +17694,7 @@ public:
 
     ~WriteTestClusterNullableInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004006, mValue);
     }
@@ -17722,7 +17721,7 @@ public:
 
     ~WriteTestClusterNullableInt24u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004007, mValue);
     }
@@ -17749,7 +17748,7 @@ public:
 
     ~WriteTestClusterNullableInt32u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004008, mValue);
     }
@@ -17776,7 +17775,7 @@ public:
 
     ~WriteTestClusterNullableInt40u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004009, mValue);
     }
@@ -17803,7 +17802,7 @@ public:
 
     ~WriteTestClusterNullableInt48u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400A, mValue);
     }
@@ -17830,7 +17829,7 @@ public:
 
     ~WriteTestClusterNullableInt56u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400B, mValue);
     }
@@ -17857,7 +17856,7 @@ public:
 
     ~WriteTestClusterNullableInt64u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400C, mValue);
     }
@@ -17883,7 +17882,7 @@ public:
 
     ~WriteTestClusterNullableInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400D, mValue);
     }
@@ -17910,7 +17909,7 @@ public:
 
     ~WriteTestClusterNullableInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400E, mValue);
     }
@@ -17937,7 +17936,7 @@ public:
 
     ~WriteTestClusterNullableInt24s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000400F, mValue);
     }
@@ -17964,7 +17963,7 @@ public:
 
     ~WriteTestClusterNullableInt32s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004010, mValue);
     }
@@ -17991,7 +17990,7 @@ public:
 
     ~WriteTestClusterNullableInt40s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004011, mValue);
     }
@@ -18018,7 +18017,7 @@ public:
 
     ~WriteTestClusterNullableInt48s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004012, mValue);
     }
@@ -18045,7 +18044,7 @@ public:
 
     ~WriteTestClusterNullableInt56s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004013, mValue);
     }
@@ -18072,7 +18071,7 @@ public:
 
     ~WriteTestClusterNullableInt64s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004014, mValue);
     }
@@ -18098,7 +18097,7 @@ public:
 
     ~WriteTestClusterNullableEnum8() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004015, mValue);
     }
@@ -18125,7 +18124,7 @@ public:
 
     ~WriteTestClusterNullableEnum16() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004016, mValue);
     }
@@ -18152,7 +18151,7 @@ public:
 
     ~WriteTestClusterNullableFloatSingle() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004017, mValue);
     }
@@ -18179,7 +18178,7 @@ public:
 
     ~WriteTestClusterNullableFloatDouble() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004018, mValue);
     }
@@ -18206,7 +18205,7 @@ public:
 
     ~WriteTestClusterNullableOctetString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004019, mValue);
     }
@@ -18233,7 +18232,7 @@ public:
 
     ~WriteTestClusterNullableCharString() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x0000401E, mValue);
     }
@@ -18260,7 +18259,7 @@ public:
 
     ~WriteTestClusterNullableEnumAttr() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004024, mValue);
     }
@@ -18287,7 +18286,7 @@ public:
 
     ~WriteTestClusterNullableStruct() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004025, mValue);
     }
@@ -18315,7 +18314,7 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt8u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004026, mValue);
     }
@@ -18342,7 +18341,7 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt8s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004027, mValue);
     }
@@ -18369,7 +18368,7 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt16u() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004028, mValue);
     }
@@ -18396,7 +18395,7 @@ public:
 
     ~WriteTestClusterNullableRangeRestrictedInt16s() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000050F, 0x00004029, mValue);
     }
@@ -18439,7 +18438,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -18473,7 +18472,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -18504,7 +18503,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on endpoint %u", endpointIds.at(0));
 
@@ -18589,7 +18588,7 @@ public:
 
     ~WriteMeterIdentificationCustomerName() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B01, 0x00000005, mValue);
     }
@@ -18630,7 +18629,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B02) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -18679,7 +18678,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -18709,7 +18708,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B03) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -18884,7 +18883,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000000) on endpoint %u", endpointIds.at(0));
 
@@ -18917,7 +18916,7 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000B04) command (0x00000001) on endpoint %u", endpointIds.at(0));
 
@@ -18948,7 +18947,7 @@ public:
 
     ~WriteElectricalMeasurementAverageRmsVoltageMeasurementPeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000511, mValue);
     }
@@ -18975,7 +18974,7 @@ public:
 
     ~WriteElectricalMeasurementAverageRmsUnderVoltageCounter() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000513, mValue);
     }
@@ -19002,7 +19001,7 @@ public:
 
     ~WriteElectricalMeasurementRmsExtremeOverVoltagePeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000514, mValue);
     }
@@ -19029,7 +19028,7 @@ public:
 
     ~WriteElectricalMeasurementRmsExtremeUnderVoltagePeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000515, mValue);
     }
@@ -19056,7 +19055,7 @@ public:
 
     ~WriteElectricalMeasurementRmsVoltageSagPeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000516, mValue);
     }
@@ -19083,7 +19082,7 @@ public:
 
     ~WriteElectricalMeasurementRmsVoltageSwellPeriod() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000517, mValue);
     }
@@ -19110,7 +19109,7 @@ public:
 
     ~WriteElectricalMeasurementOverloadAlarmsMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000700, mValue);
     }
@@ -19137,7 +19136,7 @@ public:
 
     ~WriteElectricalMeasurementAcOverloadAlarmsMask() {}
 
-    CHIP_ERROR SendCommand(ChipDevice * device, std::vector<chip::EndpointId> endpointIds) override
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x00000B04, 0x00000800, mValue);
     }
@@ -22096,12 +22095,14 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "number-of-year-day-schedules-supported-per-user",
                                    Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-holiday-schedules-supported", Attributes::NumberOfHolidaySchedulesSupported::Id,
-                                   credsIssuerConfig),                                                                           //
-        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig),   //
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "number-of-credentials-supported-per-user",
+                                   Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),                           //
@@ -22198,7 +22199,9 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id,
-                                        credsIssuerConfig),                                                         //
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "number-of-credentials-supported-per-user",
+                                        Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),         //

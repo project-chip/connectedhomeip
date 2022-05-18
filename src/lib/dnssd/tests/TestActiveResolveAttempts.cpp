@@ -126,7 +126,7 @@ void TestSingleBrowseAddRemove(nlTestSuite * inSuite, void * inContext)
 
     // once complete, nothing to schedule
     Dnssd::DiscoveredNodeData data;
-    data.longDiscriminator = 1234;
+    data.commissionData.longDiscriminator = 1234;
     attempts.Complete(data);
     NL_TEST_ASSERT(inSuite, !attempts.GetTimeUntilNextExpectedResponse().HasValue());
     NL_TEST_ASSERT(inSuite, !attempts.NextScheduled().HasValue());
@@ -242,7 +242,7 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
 
     for (Optional<ActiveResolveAttempts::ScheduledAttempt> s = attempts.NextScheduled(); s.HasValue(); s = attempts.NextScheduled())
     {
-        NL_TEST_ASSERT(inSuite, s.Value().peerId.GetNodeId() != 9999);
+        NL_TEST_ASSERT(inSuite, s.Value().ResolveData().peerId.GetNodeId() != 9999);
     }
 
     // Still have active pending items (queue is full)
@@ -266,7 +266,7 @@ void TestLRU(nlTestSuite * inSuite, void * inContext)
         Optional<ActiveResolveAttempts::ScheduledAttempt> s = attempts.NextScheduled();
         while (s.HasValue())
         {
-            NL_TEST_ASSERT(inSuite, s.Value().peerId.GetNodeId() != 9999);
+            NL_TEST_ASSERT(inSuite, s.Value().ResolveData().peerId.GetNodeId() != 9999);
             s = attempts.NextScheduled();
         }
     }
@@ -375,7 +375,7 @@ void TestCombination(nlTestSuite * inSuite, void * inContext)
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
     Dnssd::DiscoveredNodeData data;
-    data.longDiscriminator = 1234;
+    data.commissionData.longDiscriminator = 1234;
     attempts.Complete(data);
 
     NL_TEST_ASSERT(inSuite, !attempts.GetTimeUntilNextExpectedResponse().HasValue());

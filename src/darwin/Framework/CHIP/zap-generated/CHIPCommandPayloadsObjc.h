@@ -4563,6 +4563,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nullable userIndex;
 
+@property (strong, nonatomic) NSNumber * _Nullable creatorFabricIndex;
+
+@property (strong, nonatomic) NSNumber * _Nullable lastModifiedFabricIndex;
+
 @property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4683,9 +4687,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPWindowCoveringClusterGoToLiftPercentageParams : NSObject
 
-@property (strong, nonatomic) NSNumber * _Nonnull liftPercentageValue;
-
-@property (strong, nonatomic) NSNumber * _Nullable liftPercent100thsValue;
+@property (strong, nonatomic) NSNumber * _Nonnull liftPercent100thsValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4727,9 +4729,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface CHIPWindowCoveringClusterGoToTiltPercentageParams : NSObject
 
-@property (strong, nonatomic) NSNumber * _Nonnull tiltPercentageValue;
-
-@property (strong, nonatomic) NSNumber * _Nullable tiltPercent100thsValue;
+@property (strong, nonatomic) NSNumber * _Nonnull tiltPercent100thsValue;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

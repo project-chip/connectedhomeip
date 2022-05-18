@@ -2642,6 +2642,10 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = nil;
 
+        _creatorFabricIndex = nil;
+
+        _lastModifiedFabricIndex = nil;
+
         _nextCredentialIndex = nil;
         _timedInvokeTimeoutMs = nil;
     }
@@ -2702,9 +2706,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _liftPercentageValue = @(0);
-
-        _liftPercent100thsValue = nil;
+        _liftPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2726,9 +2728,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _tiltPercentageValue = @(0);
-
-        _tiltPercent100thsValue = nil;
+        _tiltPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;

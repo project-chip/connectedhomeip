@@ -120,7 +120,10 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
+}
 
+void InvalidReferencing(nlTestSuite * inSuite, void * inContext)
+{
     {
         // Truncated before the end (but seemingly valid in case of error)
         // does NOT use AsSerializedQName (because out of range)
@@ -130,9 +133,39 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
+
     {
         // Infinite recursion
         static const uint8_t kData[] = "\03test\xc0\x00";
+        SerializedQNameIterator it   = AsSerializedQName(kData);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
+    }
+
+    {
+        // Infinite recursion by referencing own element (inside the stream)
+        static const uint8_t kData[] = "\03test\xc0\x05";
+        SerializedQNameIterator it   = AsSerializedQName(kData);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
+    }
+
+    {
+        // Infinite recursion by referencing own element at the start
+        static const uint8_t kData[] = "\xc0\x00";
+        SerializedQNameIterator it   = AsSerializedQName(kData);
+
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
+    }
+
+    {
+        // Reference that goes forwad instead of backward
+        static const uint8_t kData[] = "\03test\xc0\x07";
         SerializedQNameIterator it   = AsSerializedQName(kData);
 
         NL_TEST_ASSERT(inSuite, it.Next());
@@ -279,6 +312,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CaseInsensitiveSerializedCompare", CaseInsensitiveSerializedCompare),
     NL_TEST_DEF("CaseInsensitiveFullQNameCompare", CaseInsensitiveFullQNameCompare),
     NL_TEST_DEF("SerializedCompare", SerializedCompare),
+    NL_TEST_DEF("InvalidReferencing", InvalidReferencing),
 
     NL_TEST_SENTINEL()
 };

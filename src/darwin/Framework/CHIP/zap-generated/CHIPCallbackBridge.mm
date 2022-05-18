@@ -7639,7 +7639,7 @@ void CHIPOperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(v
             CHIPOperationalCredentialsClusterFabricDescriptor * newElement_0;
             newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
             newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data() length:entry_0.rootPublicKey.size()];
-            newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+            newElement_0.vendorId = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorId)];
             newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
             newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
@@ -12023,6 +12023,20 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
             response.userIndex = nil;
         } else {
             response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
+        }
+    }
+    {
+        if (data.creatorFabricIndex.IsNull()) {
+            response.creatorFabricIndex = nil;
+        } else {
+            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
+        }
+    }
+    {
+        if (data.lastModifiedFabricIndex.IsNull()) {
+            response.lastModifiedFabricIndex = nil;
+        } else {
+            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
         }
     }
     {

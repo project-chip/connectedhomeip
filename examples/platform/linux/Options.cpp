@@ -390,7 +390,7 @@ OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS",
 OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr, nullptr };
 } // namespace
 
-CHIP_ERROR ParseArguments(int argc, char * argv[], OptionSet * customOptions)
+CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptions)
 {
     // Index 0 is for the general Linux options
     uint8_t optionSetIndex = 1;

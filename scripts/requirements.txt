@@ -26,6 +26,8 @@ mobly
 west>=0.12.0
 intelhex
 cbor
+cbor2
+jsonschema
 
 # happy tests
 lockfile
@@ -53,3 +55,6 @@ lark
 stringcase
 
 cryptography
+
+# python unit tests
+colorama

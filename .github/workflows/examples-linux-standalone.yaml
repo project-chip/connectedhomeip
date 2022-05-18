@@ -34,12 +34,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.64
+            image: connectedhomeip/chip-build:0.5.73
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -103,6 +103,17 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug tv-app \
                     out/tv_app_debug/chip-tv-app \
+                    /tmp/bloat_reports/
+            - name: Build example Standalone TV Casting App
+              timeout-minutes: 10
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-tv-casting-app \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug tv-casting-app \
+                    out/linux-x64-tv-casting-app/chip-tv-casting-app \
                     /tmp/bloat_reports/
             - name: Build example lighting app with RPCs
               timeout-minutes: 10

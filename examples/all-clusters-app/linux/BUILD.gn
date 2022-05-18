@@ -17,15 +17,13 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
 
 source_set("chip-all-clusters-common") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
-    "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
-    "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
-    "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
     "AppOptions.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
@@ -39,10 +37,8 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/lock-app/linux/include",
-  ]
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   cflags = [ "-Wconversion" ]
 
@@ -51,12 +47,27 @@ source_set("chip-all-clusters-common") {
   }
 }
 
+source_set("chip-lock-app-common") {
+  sources = [
+    "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
+    "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
+  ]
+
+  deps = [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
+
+  include_dirs = [ "${chip_root}/examples/lock-app/linux/include" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
 if (is_libfuzzer) {
   executable("chip-all-clusters-app-fuzzing") {
     sources = [ "fuzzing-main.cpp" ]
 
     deps = [
       ":chip-all-clusters-common",
+      ":chip-lock-app-common",
       "${chip_root}/examples/platform/linux:app-main",
     ]
 
@@ -70,6 +81,7 @@ if (is_libfuzzer) {
 
     deps = [
       ":chip-all-clusters-common",
+      ":chip-lock-app-common",
       "${chip_root}/examples/platform/linux:app-main",
     ]
 
@@ -79,6 +91,23 @@ if (is_libfuzzer) {
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
     output_dir = root_out_dir
+  }
+
+  if (chip_device_platform == "darwin") {
+    action("codesign") {
+      script = "entitlements/codesign.py"
+      public_deps = [ ":chip-all-clusters-app" ]
+
+      args = [
+        "--target_path",
+        rebase_path("${root_build_dir}/chip-all-clusters-app", root_build_dir),
+        "--log_path",
+        rebase_path("${root_build_dir}/codesign_log.txt", root_build_dir),
+      ]
+
+      output_name = "codesign_log.txt"
+      outputs = [ "${root_build_dir}/${output_name}" ]
+    }
   }
 }
 

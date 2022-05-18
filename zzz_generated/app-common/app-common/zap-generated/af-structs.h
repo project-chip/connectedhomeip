@@ -266,7 +266,7 @@ typedef struct _ExtensionEntry
 typedef struct _FabricDescriptor
 {
     chip::ByteSpan RootPublicKey;
-    uint16_t VendorId;
+    chip::VendorId VendorId;
     chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::CharSpan Label;
@@ -450,7 +450,7 @@ typedef struct _ProviderLocation
 typedef struct _ReadAttributeStatusRecord
 {
     chip::AttributeId attributeId;
-    chip::Protocols::InteractionModel::Status status;
+    uint8_t status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } ReadAttributeStatusRecord;
@@ -609,7 +609,7 @@ typedef struct _WriteAttributeRecord
 // Struct for WriteAttributeStatusRecord
 typedef struct _WriteAttributeStatusRecord
 {
-    chip::Protocols::InteractionModel::Status status;
+    uint8_t status;
     chip::AttributeId attributeId;
 } WriteAttributeStatusRecord;
 
@@ -626,7 +626,7 @@ typedef struct _WriteStructuredAttributeRecord
 // Struct for WriteStructuredAttributeStatusRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
-    chip::Protocols::InteractionModel::Status status;
+    uint8_t status;
     chip::AttributeId attributeId;
     uint8_t indicator;
     /* TYPE WARNING: array array defaults to */ uint8_t * indicies;

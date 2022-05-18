@@ -26,7 +26,7 @@ public class DiscoveredNodeData {
   private int rotatingIdLen;
   private short pairingHint;
   private String pairingInstruction;
-  private short port;
+  private int port;
   private int numIPs;
   private List<InetAddress> ipAddresses;
 
@@ -46,6 +46,10 @@ public class DiscoveredNodeData {
         }
       }
     }
+
+    this.port = serviceInfo.getPort();
+    this.ipAddresses = Arrays.asList(serviceInfo.getHost());
+    this.numIPs = 1;
   }
 
   public String getHostName() {
@@ -144,11 +148,11 @@ public class DiscoveredNodeData {
     this.pairingInstruction = pairingInstruction;
   }
 
-  public short getPort() {
+  public int getPort() {
     return port;
   }
 
-  public void setPort(short port) {
+  public void setPort(int port) {
     this.port = port;
   }
 

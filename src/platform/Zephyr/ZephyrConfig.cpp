@@ -108,14 +108,16 @@ int ConfigValueCallback(const char * name, size_t configSize, settings_read_cb r
     {
         request.result     = CHIP_ERROR_BUFFER_TOO_SMALL;
         request.configSize = configSize;
-        return 0;
+        return 1;
     }
 
     // Found requested key
     const ssize_t bytesRead = readCb(cbArg, request.destination, request.bufferSize);
     request.result          = bytesRead > 0 ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     request.configSize      = bytesRead > 0 ? bytesRead : 0;
-    return 0;
+
+    // Return 1 to stop processing further keys
+    return 1;
 }
 
 // Read configuration value of maximum size `bufferSize` and store the actual size in `configSize`.

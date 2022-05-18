@@ -28,52 +28,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # TODO: Update the corresponding values when feature is supported
-    - label: "Launch an app with the provided a application ID"
-      disabled: true
-      command: "LaunchApp"
-      arguments:
-          values:
-              - name: "data"
-                value: "Hello World"
-              - name: "catalogVendorId"
-                value: 1234
-              - name: "applicationId"
-                value: "HelloWorldApp"
-
-    # TODO: Update response value to correspond with catalog vendor ID
-    - label: "Read Current catalog vendor id attribute."
-      disabled: true
-      command: "readAttribute"
-      attribute: "catalog vendor id"
-      response:
-          value: 1234
-      constraints:
-          type: uint16
-
-    # TODO: Update response value to correspond with application ID
+    #Issue 17967
     - label: "Read Current App ID attribute."
-      disabled: true
-      command: "readAttribute"
-      attribute: "application id"
-      response:
-          value: "HelloWorldApp"
-          constraints:
-              type: string
-
-    # TODO: Update the corresponding values when feature is supported
-    - label: "Stop an app with the provided application ID"
-      disabled: true
-      command: "StopApp"
-      arguments:
-          values:
-              - name: "applicationId"
-                value: "HelloWorldApp"
-
-    # TODO: Update response value to correspond with application ID
-    - label: "Read Current App ID attribute."
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentApp"
       response:
           value: null
+          constraints:
+              type: ApplicationEP

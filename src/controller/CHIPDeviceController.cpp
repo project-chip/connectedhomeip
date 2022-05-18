@@ -127,7 +127,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mVendorId = params.controllerVendorId;
     if (params.operationalKeypair != nullptr || !params.controllerNOC.empty() || !params.controllerRCAC.empty())
     {
-        ReturnErrorOnFailure(ProcessControllerNOCChain(params));
+        ReturnErrorOnFailure(InitControllerNOCChain(params));
 
         if (params.enableServerInteractions)
         {
@@ -144,7 +144,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParams & params)
+CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams & params)
 {
     FabricInfo newFabric;
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength;
@@ -152,7 +152,15 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     Credentials::P256PublicKeySpan rootPublicKey;
     FabricId fabricId;
 
-    ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
+    if (params.hasExternallyOwnedOperationalKeypair)
+    {
+        ReturnErrorOnFailure(newFabric.SetExternallyOwnedOperationalKeypair(params.operationalKeypair));
+    }
+    else
+    {
+        ReturnErrorOnFailure(newFabric.SetOperationalKeypair(params.operationalKeypair));
+    }
+
     newFabric.SetVendorId(params.controllerVendorId);
 
     ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
@@ -184,6 +192,9 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     if (mFabricInfo != nullptr)
     {
         ReturnErrorOnFailure(mFabricInfo->SetFabricInfo(newFabric));
+        // Store the new fabric info, since we might now have new certificates
+        // and whatnot.
+        ReturnErrorOnFailure(params.systemState->Fabrics()->Store(mFabricInfo->GetFabricIndex()));
     }
     else
     {
@@ -214,7 +225,7 @@ CHIP_ERROR DeviceController::Shutdown()
     {
         // Shut down any ongoing CASE session activity we have.  We're going to
         // assume that all sessions for our fabric belong to us here.
-        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(GetCompressedFabricId());
+        mSystemState->CASESessionMgr()->ReleaseSessionsForFabric(mFabricInfo->GetFabricIndex());
 
         // TODO: The CASE session manager does not shut down existing CASE
         // sessions.  It just shuts down any ongoing CASE session establishment
@@ -352,6 +363,26 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     mPairingDelegate = params.pairingDelegate;
+
+    // Configure device attestation validation
+    mDeviceAttestationVerifier = params.deviceAttestationVerifier;
+    if (mDeviceAttestationVerifier == nullptr)
+    {
+        mDeviceAttestationVerifier = Credentials::GetDeviceAttestationVerifier();
+        if (mDeviceAttestationVerifier == nullptr)
+        {
+            ChipLogError(Controller,
+                         "Missing DeviceAttestationVerifier configuration at DeviceCommissioner init and none set with "
+                         "Credentials::SetDeviceAttestationVerifier()!");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // We fell back on a default from singleton accessor.
+        ChipLogProgress(Controller,
+                        "*** Missing DeviceAttestationVerifier configuration at DeviceCommissioner init: using global default, "
+                        "consider passing one in CommissionerInitParams.");
+    }
+
     if (params.defaultCommissioner != nullptr)
     {
         mDefaultCommissioner = params.defaultCommissioner;
@@ -1019,10 +1050,9 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const Credentials::Device
 {
     MATTER_TRACE_EVENT_SCOPE("ValidateAttestationInfo", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceAttestationVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
-
-    dac_verifier->VerifyAttestationInformation(info, &mDeviceAttestationInformationVerificationCallback);
+    mDeviceAttestationVerifier->VerifyAttestationInformation(info, &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 
@@ -1034,8 +1064,7 @@ CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan &
 {
     MATTER_TRACE_EVENT_SCOPE("ValidateCSR", "DeviceCommissioner");
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-    DeviceAttestationVerifier * dacVerifier = GetDeviceAttestationVerifier();
+    VerifyOrReturnError(mDeviceAttestationVerifier != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     P256PublicKey dacPubkey;
     ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(dac, dacPubkey));
@@ -1045,8 +1074,8 @@ CHIP_ERROR DeviceCommissioner::ValidateCSR(DeviceProxy * proxy, const ByteSpan &
         proxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
-    return dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature, dacPubkey,
-                                                            csrNonce);
+    return mDeviceAttestationVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge,
+                                                                           AttestationSignature, dacPubkey, csrNonce);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)

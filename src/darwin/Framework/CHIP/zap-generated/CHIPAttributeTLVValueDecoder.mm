@@ -4177,6 +4177,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
             return value;
         }
+        case Attributes::NumberOfCredentialsSupportedPerUser::Id: {
+            using TypeInfo = Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
         case Attributes::EnableLogging::Id: {
             using TypeInfo = Attributes::EnableLogging::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -6338,8 +6349,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::PercentCurrent::Id: {
@@ -6371,8 +6386,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::SpeedCurrent::Id: {
@@ -10282,7 +10301,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     newElement_0 = [CHIPOperationalCredentialsClusterFabricDescriptor new];
                     newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data()
                                                                 length:entry_0.rootPublicKey.size()];
-                    newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
+                    newElement_0.vendorId = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorId)];
                     newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
                     newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
                     newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()

@@ -2096,6 +2096,12 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000001C: {
+                    "attributeName": "NumberOfCredentialsSupportedPerUser",
+                    "attributeId": 0x0000001C,
+                    "type": "int",
+                    "reportable": True,
+                },
                 0x00000021: {
                     "attributeName": "Language",
                     "attributeId": 0x00000021,
@@ -6858,7 +6864,6 @@ class ChipClusters:
                     "commandId": 0x00000005,
                     "commandName": "GoToLiftPercentage",
                     "args": {
-                        "liftPercentageValue": "int",
                         "liftPercent100thsValue": "int",
                     },
                 },
@@ -6873,7 +6878,6 @@ class ChipClusters:
                     "commandId": 0x00000008,
                     "commandName": "GoToTiltPercentage",
                     "args": {
-                        "tiltPercentageValue": "int",
                         "tiltPercent100thsValue": "int",
                     },
                 },

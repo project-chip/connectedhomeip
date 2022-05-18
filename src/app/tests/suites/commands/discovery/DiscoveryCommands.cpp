@@ -141,37 +141,38 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
     nodeData.LogDetail();
 
     chip::DiscoveryCommandResponse data;
-    data.hostName           = chip::CharSpan(nodeData.hostName, strlen(nodeData.hostName));
-    data.instanceName       = chip::CharSpan(nodeData.instanceName, strlen(nodeData.instanceName));
-    data.longDiscriminator  = nodeData.longDiscriminator;
-    data.shortDiscriminator = ((nodeData.longDiscriminator >> 8) & 0x0F);
-    data.vendorId           = nodeData.vendorId;
-    data.productId          = nodeData.productId;
-    data.commissioningMode  = nodeData.commissioningMode;
-    data.deviceType         = nodeData.deviceType;
-    data.deviceName         = chip::CharSpan(nodeData.deviceName, strlen(nodeData.deviceName));
-    data.rotatingId         = chip::ByteSpan(nodeData.rotatingId, nodeData.rotatingIdLen);
-    data.rotatingIdLen      = nodeData.rotatingIdLen;
-    data.pairingHint        = nodeData.pairingHint;
-    data.pairingInstruction = chip::CharSpan(nodeData.pairingInstruction, strlen(nodeData.pairingInstruction));
-    data.supportsTcp        = nodeData.supportsTcp;
-    data.port               = nodeData.port;
+    data.hostName           = chip::CharSpan(nodeData.resolutionData.hostName, strlen(nodeData.resolutionData.hostName));
+    data.instanceName       = chip::CharSpan(nodeData.commissionData.instanceName, strlen(nodeData.commissionData.instanceName));
+    data.longDiscriminator  = nodeData.commissionData.longDiscriminator;
+    data.shortDiscriminator = ((nodeData.commissionData.longDiscriminator >> 8) & 0x0F);
+    data.vendorId           = nodeData.commissionData.vendorId;
+    data.productId          = nodeData.commissionData.productId;
+    data.commissioningMode  = nodeData.commissionData.commissioningMode;
+    data.deviceType         = nodeData.commissionData.deviceType;
+    data.deviceName         = chip::CharSpan(nodeData.commissionData.deviceName, strlen(nodeData.commissionData.deviceName));
+    data.rotatingId         = chip::ByteSpan(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen);
+    data.rotatingIdLen      = nodeData.commissionData.rotatingIdLen;
+    data.pairingHint        = nodeData.commissionData.pairingHint;
+    data.pairingInstruction =
+        chip::CharSpan(nodeData.commissionData.pairingInstruction, strlen(nodeData.commissionData.pairingInstruction));
+    data.supportsTcp = nodeData.resolutionData.supportsTcp;
+    data.port        = nodeData.resolutionData.port;
 
-    if (!chip::CanCastTo<uint8_t>(nodeData.numIPs))
+    if (!chip::CanCastTo<uint8_t>(nodeData.resolutionData.numIPs))
     {
         ChipLogError(chipTool, "Too many ips.");
         return;
     }
-    data.numIPs = static_cast<uint8_t>(nodeData.numIPs);
+    data.numIPs = static_cast<uint8_t>(nodeData.resolutionData.numIPs);
 
-    if (nodeData.mrpRetryIntervalIdle.HasValue())
+    if (nodeData.resolutionData.mrpRetryIntervalIdle.HasValue())
     {
-        data.mrpRetryIntervalIdle.SetValue(nodeData.mrpRetryIntervalIdle.Value().count());
+        data.mrpRetryIntervalIdle.SetValue(nodeData.resolutionData.mrpRetryIntervalIdle.Value().count());
     }
 
-    if (nodeData.mrpRetryIntervalActive.HasValue())
+    if (nodeData.resolutionData.mrpRetryIntervalActive.HasValue())
     {
-        data.mrpRetryIntervalActive.SetValue(nodeData.mrpRetryIntervalActive.Value().count());
+        data.mrpRetryIntervalActive.SetValue(nodeData.resolutionData.mrpRetryIntervalActive.Value().count());
     }
 
     chip::app::StatusIB status;
