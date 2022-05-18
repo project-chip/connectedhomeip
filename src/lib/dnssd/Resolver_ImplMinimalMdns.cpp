@@ -134,8 +134,6 @@ void PacketParser::OnResource(ResourceType type, const ResourceData & data)
         return;
     }
 
-    mdns::Minimal::Logging::LogReceivedResource(data);
-
     switch (mParsingState)
     {
     case RecordParsingState::kSrvInitialization: {
@@ -143,10 +141,16 @@ void PacketParser::OnResource(ResourceType type, const ResourceData & data)
         {
             return;
         }
+        mdns::Minimal::Logging::LogReceivedResource(data);
         ParseSRVResource(data);
         break;
     }
     case RecordParsingState::kRecordParsing:
+        if (data.GetType() != QType::SRV)
+        {
+            // SRV packets logged during 'SrvInitialization' phase
+            mdns::Minimal::Logging::LogReceivedResource(data);
+        }
         ParseResource(data);
         break;
     case RecordParsingState::kIdle:
