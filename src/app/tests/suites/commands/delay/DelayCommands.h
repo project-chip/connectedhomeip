@@ -44,11 +44,6 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     };
     CHIP_ERROR WaitForMs(const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value);
-    CHIP_ERROR WaitForCommissionableAdvertisement(
-        const char * identity,
-        const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionableAdvertisement::Type & value);
-    CHIP_ERROR WaitForOperationalAdvertisement(
-        const char * identity, const chip::app::Clusters::DelayCommands::Commands::WaitForOperationalAdvertisement::Type & value);
     // Wait for any message specified by value.message for the application specified by value.registerKey
     // If the message is never seen, a timeout would occur
     CHIP_ERROR WaitForMessage(const char * identity,

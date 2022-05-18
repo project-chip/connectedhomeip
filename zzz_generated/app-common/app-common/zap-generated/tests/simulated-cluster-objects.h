@@ -269,76 +269,6 @@ struct WaitForCommissioneeCommand
     }
 };
 
-struct WaitForCommissionableAdvertisementCommand
-{
-
-    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-    {
-        chip::TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVType outer;
-        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
-            {
-            default:
-                break;
-            }
-        }
-
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-struct WaitForOperationalAdvertisementCommand
-{
-
-    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-    {
-        chip::TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVType outer;
-        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
-            {
-            default:
-                break;
-            }
-        }
-
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-        return CHIP_NO_ERROR;
-    }
-};
-
 struct WaitForMessageCommand
 {
     Optional<chip::CharSpan> registerKey;
@@ -1291,12 +1221,6 @@ using Type = struct WaitForCommissioningCommand;
 }
 namespace WaitForCommissionee {
 using Type = struct WaitForCommissioneeCommand;
-}
-namespace WaitForCommissionableAdvertisement {
-using Type = struct WaitForCommissionableAdvertisementCommand;
-}
-namespace WaitForOperationalAdvertisement {
-using Type = struct WaitForOperationalAdvertisementCommand;
 }
 namespace WaitForMessage {
 using Type = struct WaitForMessageCommand;
