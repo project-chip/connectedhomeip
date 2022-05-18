@@ -96,7 +96,6 @@ function getManualTests() {
     'Test_TC_DM_1_2',
     'Test_TC_DM_1_4',
     'Test_TC_DM_2_1',
-    'Test_TC_DM_2_3',
     'Test_TC_DM_2_4',
     'Test_TC_DM_3_2',
     'Test_TC_DM_3_4',
