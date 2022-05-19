@@ -168,16 +168,25 @@ public:
     CHIP_ERROR GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**
-     *   This function finds the device corresponding to deviceId, and establishes a secure connection with it.
-     *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
-     *   callback. If it fails to establish the connection, it calls `onError` callback.
+     * This function finds the device corresponding to deviceId, and establishes
+     * a CASE session with it.
+     *
+     * Once the CASE session is successfully established the `onConnectedDevice`
+     * callback is called. This can happen before GetConnectedDevice returns if
+     * there is an existing CASE session.
+     *
+     * If a CASE sessions fails to be established, the `onError` callback will
+     * be called.  This can also happen before GetConnectedDevice returns.
+     *
+     * An error return from this function means that neither callback has been
+     * called yet, and neither callback will be called in the future.
      */
     CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection,
-                                                                      onFailure);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        return CHIP_NO_ERROR;
     }
 
     /**

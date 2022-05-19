@@ -137,6 +137,9 @@ private:
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+
+    // Used to keep track of synchronous failures from FindOrEstablishSession.
+    CHIP_ERROR mLastSessionEstablishmentError;
 };
 
 } // namespace chip

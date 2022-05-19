@@ -28,9 +28,6 @@ class OperationalDeviceProxyPoolDelegate
 public:
     virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) = 0;
 
-    virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId,
-                                              const Dnssd::ResolvedNodeData & nodeResolutionData) = 0;
-
     virtual void Release(OperationalDeviceProxy * device) = 0;
 
     virtual OperationalDeviceProxy * FindDevice(PeerId peerId) = 0;
@@ -51,12 +48,6 @@ public:
     OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) override
     {
         return mDevicePool.CreateObject(params, peerId);
-    }
-
-    OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId,
-                                      const Dnssd::ResolvedNodeData & nodeResolutionData) override
-    {
-        return mDevicePool.CreateObject(params, peerId, nodeResolutionData);
     }
 
     void Release(OperationalDeviceProxy * device) override { mDevicePool.ReleaseObject(device); }
