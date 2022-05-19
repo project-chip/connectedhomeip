@@ -121,7 +121,8 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(
+    const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;

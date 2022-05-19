@@ -36,7 +36,8 @@ CHIP_ERROR CHIPP256KeypairNativeBridge::Deserialize(P256SerializedKeypair & inpu
     return mKeypairBase.Deserialize(input);
 }
 
-CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
+CHIP_ERROR CHIPP256KeypairNativeBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length,
+                                                       P256ECDSASignature & out_signature) const
 {
     return mKeypairBase.ECDSA_sign_msg(msg, msg_length, out_signature);
 }
