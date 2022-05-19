@@ -910,7 +910,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.label", "label", value.isMember("label")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.mode", "mode", value.isMember("mode")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.semanticTag", "semanticTag", value.isMember("semanticTag")));
+        ComplexArgumentParser::EnsureMemberExist("ModeOptionStruct.semanticTags", "semanticTags", value.isMember("semanticTags")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
@@ -919,8 +919,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mode");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.mode, value["mode"]));
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "semanticTag");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.semanticTag, value["semanticTag"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "semanticTags");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.semanticTags, value["semanticTags"]));
 
     return CHIP_NO_ERROR;
 }
@@ -929,7 +929,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::M
 {
     ComplexArgumentParser::Finalize(request.label);
     ComplexArgumentParser::Finalize(request.mode);
-    ComplexArgumentParser::Finalize(request.semanticTag);
+    ComplexArgumentParser::Finalize(request.semanticTags);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & request,

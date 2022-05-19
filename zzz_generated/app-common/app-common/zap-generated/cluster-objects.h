@@ -16948,31 +16948,6 @@ public:
 } // namespace BooleanState
 namespace ModeSelect {
 namespace Structs {
-namespace ModeOptionStruct {
-enum class Fields
-{
-    kLabel       = 0,
-    kMode        = 1,
-    kSemanticTag = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    uint8_t mode         = static_cast<uint8_t>(0);
-    uint32_t semanticTag = static_cast<uint32_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ModeOptionStruct
 namespace SemanticTag {
 enum class Fields
 {
@@ -16996,6 +16971,39 @@ public:
 using DecodableType = Type;
 
 } // namespace SemanticTag
+namespace ModeOptionStruct {
+enum class Fields
+{
+    kLabel        = 0,
+    kMode         = 1,
+    kSemanticTags = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::List<const Structs::SemanticTag::Type> semanticTags;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::DecodableList<Structs::SemanticTag::DecodableType> semanticTags;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace ModeOptionStruct
 } // namespace Structs
 
 namespace Commands {

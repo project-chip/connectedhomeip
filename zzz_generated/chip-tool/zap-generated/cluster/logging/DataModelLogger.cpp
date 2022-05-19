@@ -946,10 +946,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("SemanticTag", indent + 1, value.semanticTag);
+        CHIP_ERROR err = LogValue("SemanticTags", indent + 1, value.semanticTags);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SemanticTag'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SemanticTags'");
             return err;
         }
     }

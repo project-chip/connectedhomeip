@@ -12287,7 +12287,30 @@ using namespace chip::app::Clusters;
                         auto element_0 = (CHIPModeSelectClusterModeOptionStruct *) value[i_0];
                         listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
                         listHolder_0->mList[i_0].mode = element_0.mode.unsignedCharValue;
-                        listHolder_0->mList[i_0].semanticTag = element_0.semanticTag.unsignedIntValue;
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].semanticTags)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (element_0.semanticTags.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.semanticTags.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < element_0.semanticTags.count; ++i_2) {
+                                    if (![element_0.semanticTags[i_2] isKindOfClass:[CHIPModeSelectClusterSemanticTag class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (CHIPModeSelectClusterSemanticTag *) element_0.semanticTags[i_2];
+                                    listHolder_2->mList[i_2].mfgCode = element_2.mfgCode.unsignedShortValue;
+                                    listHolder_2->mList[i_2].value = element_2.value.unsignedShortValue;
+                                }
+                                listHolder_0->mList[i_0].semanticTags
+                                    = ListType_2(listHolder_2->mList, element_0.semanticTags.count);
+                            } else {
+                                listHolder_0->mList[i_0].semanticTags = ListType_2();
+                            }
+                        }
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
