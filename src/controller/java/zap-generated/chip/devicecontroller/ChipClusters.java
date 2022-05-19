@@ -19982,14 +19982,14 @@ public class ChipClusters {
         Integer numberOfTransitionsForSequence,
         Integer dayOfWeekForSequence,
         Integer modeForSequence,
-        ArrayList<Integer> payload) {
+        ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition> transitions) {
       setWeeklySchedule(
           chipClusterPtr,
           callback,
           numberOfTransitionsForSequence,
           dayOfWeekForSequence,
           modeForSequence,
-          payload,
+          transitions,
           null);
     }
 
@@ -19998,7 +19998,7 @@ public class ChipClusters {
         Integer numberOfTransitionsForSequence,
         Integer dayOfWeekForSequence,
         Integer modeForSequence,
-        ArrayList<Integer> payload,
+        ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition> transitions,
         int timedInvokeTimeoutMs) {
       setWeeklySchedule(
           chipClusterPtr,
@@ -20006,7 +20006,7 @@ public class ChipClusters {
           numberOfTransitionsForSequence,
           dayOfWeekForSequence,
           modeForSequence,
-          payload,
+          transitions,
           timedInvokeTimeoutMs);
     }
 
@@ -20042,7 +20042,7 @@ public class ChipClusters {
         Integer numberOfTransitionsForSequence,
         Integer dayOfWeekForSequence,
         Integer modeForSequence,
-        ArrayList<Integer> payload,
+        ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition> transitions,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void setpointRaiseLower(
@@ -20069,9 +20069,17 @@ public class ChipClusters {
           Integer numberOfTransitionsForSequence,
           Integer dayOfWeekForSequence,
           Integer modeForSequence,
-          ArrayList<Integer> payload);
+          ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition> transitions);
 
       void onError(Exception error);
+    }
+
+    public interface LocalTemperatureAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -20082,12 +20090,12 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readLocalTemperatureAttribute(IntegerAttributeCallback callback) {
+    public void readLocalTemperatureAttribute(LocalTemperatureAttributeCallback callback) {
       readLocalTemperatureAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeLocalTemperatureAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        LocalTemperatureAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeLocalTemperatureAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -20351,10 +20359,13 @@ public class ChipClusters {
     }
 
     private native void readLocalTemperatureAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, LocalTemperatureAttributeCallback callback);
 
     private native void subscribeLocalTemperatureAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        LocalTemperatureAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readAbsMinHeatSetpointLimitAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

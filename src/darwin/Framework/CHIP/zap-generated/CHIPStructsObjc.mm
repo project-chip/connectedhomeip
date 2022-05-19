@@ -1310,6 +1310,21 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPThermostatClusterThermostatScheduleTransition
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _transitionTime = @(0);
+
+        _heatSetpoint = nil;
+
+        _coolSetpoint = nil;
+    }
+    return self;
+}
+@end
+
 @implementation CHIPIasAceClusterIasAceZoneStatusResult
 - (instancetype)init
 {

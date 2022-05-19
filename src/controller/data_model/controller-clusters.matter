@@ -3798,7 +3798,13 @@ client cluster Thermostat = 513 {
     kAutomode = 0x20;
   }
 
-  readonly attribute int16s localTemperature = 0;
+  struct ThermostatScheduleTransition {
+    int16u transitionTime = 0;
+    nullable int16s heatSetpoint = 1;
+    nullable int16s coolSetpoint = 2;
+  }
+
+  readonly attribute nullable int16s localTemperature = 0;
   readonly attribute int16s absMinHeatSetpointLimit = 3;
   readonly attribute int16s absMaxHeatSetpointLimit = 4;
   readonly attribute int16s absMinCoolSetpointLimit = 5;
@@ -3825,10 +3831,10 @@ client cluster Thermostat = 513 {
   }
 
   request struct SetWeeklyScheduleRequest {
-    ENUM8 numberOfTransitionsForSequence = 0;
+    INT8U numberOfTransitionsForSequence = 0;
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
-    INT8U payload[] = 3;
+    ThermostatScheduleTransition transitions[] = 3;
   }
 
   request struct GetWeeklyScheduleRequest {
@@ -3837,15 +3843,15 @@ client cluster Thermostat = 513 {
   }
 
   response struct GetWeeklyScheduleResponse = 0 {
-    ENUM8 numberOfTransitionsForSequence = 0;
+    INT8U numberOfTransitionsForSequence = 0;
     DayOfWeek dayOfWeekForSequence = 1;
     ModeForSequence modeForSequence = 2;
-    INT8U payload[] = 3;
+    ThermostatScheduleTransition transitions[] = 3;
   }
 
   response struct GetRelayStatusLogResponse = 1 {
     INT16U timeOfDay = 0;
-    BITMAP16 relayStatus = 1;
+    BITMAP8 relayStatus = 1;
     INT16S localTemperature = 2;
     INT8U humidityInPercentage = 3;
     INT16S setpoint = 4;
