@@ -1051,6 +1051,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for commissionee");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -1898,6 +1899,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -1910,6 +1912,7 @@ private:
         case 2: {
             LogStep(2, "Read the global attribute : FeatureMap");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -1924,6 +1927,7 @@ private:
         case 4: {
             LogStep(4, "Read the global attribute: EventList");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -2077,6 +2081,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -2093,6 +2098,7 @@ private:
         }
         case 3: {
             LogStep(3, "Write the default values to mandatory non-global attribute: OutOfService");
+            ListFreer listFreer;
             bool value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), BinaryInputBasic::Id,
@@ -2110,6 +2116,7 @@ private:
         }
         case 6: {
             LogStep(6, "Write the default values to mandatory non-global attribute: PresentValue");
+            ListFreer listFreer;
             bool value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), BinaryInputBasic::Id,
@@ -2132,6 +2139,7 @@ private:
         }
         case 10: {
             LogStep(10, "Write the default values to mandatory non-global attribute: StatusFlags");
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), BinaryInputBasic::Id,
@@ -2268,6 +2276,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -2452,6 +2461,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -2475,6 +2485,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -2496,6 +2507,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -2580,6 +2592,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -2701,6 +2714,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -2719,6 +2733,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -2856,6 +2871,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -2872,6 +2888,7 @@ private:
         }
         case 3: {
             LogStep(3, "write the default values to mandatory global attribute: ClusterRevision");
+            ListFreer listFreer;
             uint16_t value;
             value = 5U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ClusterRevision::Id,
@@ -2891,6 +2908,7 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -2912,6 +2930,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -3590,6 +3609,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -4166,12 +4186,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -4188,6 +4210,7 @@ private:
         }
         case 4: {
             LogStep(4, "Move to hue shortest distance command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 150;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
@@ -4201,6 +4224,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4212,6 +4236,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4223,6 +4248,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4234,6 +4260,7 @@ private:
         }
         case 11: {
             LogStep(11, "Move to hue longest distance command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 200;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(1);
@@ -4247,6 +4274,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4258,6 +4286,7 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4269,6 +4298,7 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4280,6 +4310,7 @@ private:
         }
         case 18: {
             LogStep(18, "Move to hue up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 250;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(2);
@@ -4293,6 +4324,7 @@ private:
         }
         case 19: {
             LogStep(19, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4304,6 +4336,7 @@ private:
         }
         case 21: {
             LogStep(21, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4315,6 +4348,7 @@ private:
         }
         case 23: {
             LogStep(23, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4326,6 +4360,7 @@ private:
         }
         case 25: {
             LogStep(25, "Move to hue down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHue::Type value;
             value.hue             = 225;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(3);
@@ -4339,6 +4374,7 @@ private:
         }
         case 26: {
             LogStep(26, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4350,6 +4386,7 @@ private:
         }
         case 28: {
             LogStep(28, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4361,6 +4398,7 @@ private:
         }
         case 30: {
             LogStep(30, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4372,6 +4410,7 @@ private:
         }
         case 32: {
             LogStep(32, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -4655,12 +4694,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -4677,6 +4718,7 @@ private:
         }
         case 4: {
             LogStep(4, "Move hue up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate            = 50;
@@ -4689,6 +4731,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 140ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 140UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4700,6 +4743,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 145ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 145UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4711,6 +4755,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 150ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 150UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4722,6 +4767,7 @@ private:
         }
         case 11: {
             LogStep(11, "Move hue stop command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate            = 50;
@@ -4734,6 +4780,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 140ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 140UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4745,6 +4792,7 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 145ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 145UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4756,6 +4804,7 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 150ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 150UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4767,6 +4816,7 @@ private:
         }
         case 18: {
             LogStep(18, "Move hue down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
             value.rate            = 50;
@@ -4779,6 +4829,7 @@ private:
         }
         case 19: {
             LogStep(19, "Wait 140ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 140UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4790,6 +4841,7 @@ private:
         }
         case 21: {
             LogStep(21, "Wait 145ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 145UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4801,6 +4853,7 @@ private:
         }
         case 23: {
             LogStep(23, "Wait 150ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 150UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4812,6 +4865,7 @@ private:
         }
         case 25: {
             LogStep(25, "Move hue stop command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate            = 50;
@@ -4824,6 +4878,7 @@ private:
         }
         case 26: {
             LogStep(26, "Wait 140ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 140UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4835,6 +4890,7 @@ private:
         }
         case 28: {
             LogStep(28, "Wait 145ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 145UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4846,6 +4902,7 @@ private:
         }
         case 30: {
             LogStep(30, "Wait 150ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 150UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -4857,6 +4914,7 @@ private:
         }
         case 32: {
             LogStep(32, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -4994,12 +5052,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -5016,6 +5076,7 @@ private:
         }
         case 4: {
             LogStep(4, "Step hue up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
             value.stepSize        = 5;
@@ -5029,6 +5090,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 25ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 25UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5040,6 +5102,7 @@ private:
         }
         case 7: {
             LogStep(7, "Step hue down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
             value.stepSize        = 5;
@@ -5053,6 +5116,7 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 25ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 25UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5064,6 +5128,7 @@ private:
         }
         case 10: {
             LogStep(10, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -5212,12 +5277,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -5234,6 +5301,7 @@ private:
         }
         case 4: {
             LogStep(4, "Move to saturation command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type value;
             value.saturation      = 90;
             value.transitionTime  = 10U;
@@ -5246,6 +5314,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 6ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 6UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5257,6 +5326,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 8ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 8UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5268,6 +5338,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5279,6 +5350,7 @@ private:
         }
         case 11: {
             LogStep(11, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -5652,12 +5724,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -5674,6 +5748,7 @@ private:
         }
         case 4: {
             LogStep(4, "Move saturation up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
             value.rate            = 5;
@@ -5686,6 +5761,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5697,6 +5773,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5708,6 +5785,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5719,6 +5797,7 @@ private:
         }
         case 11: {
             LogStep(11, "Move saturation down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
             value.rate            = 5;
@@ -5731,6 +5810,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5742,6 +5822,7 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5753,6 +5834,7 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5764,6 +5846,7 @@ private:
         }
         case 18: {
             LogStep(18, "Move saturation up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
             value.rate            = 5;
@@ -5776,6 +5859,7 @@ private:
         }
         case 19: {
             LogStep(19, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5787,6 +5871,7 @@ private:
         }
         case 21: {
             LogStep(21, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5798,6 +5883,7 @@ private:
         }
         case 23: {
             LogStep(23, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5809,6 +5895,7 @@ private:
         }
         case 25: {
             LogStep(25, "Move saturation stop command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
             value.rate            = 5;
@@ -5821,6 +5908,7 @@ private:
         }
         case 26: {
             LogStep(26, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5832,6 +5920,7 @@ private:
         }
         case 28: {
             LogStep(28, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5843,6 +5932,7 @@ private:
         }
         case 30: {
             LogStep(30, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5854,6 +5944,7 @@ private:
         }
         case 32: {
             LogStep(32, "Move saturation down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
             value.rate            = 5;
@@ -5866,6 +5957,7 @@ private:
         }
         case 33: {
             LogStep(33, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5877,6 +5969,7 @@ private:
         }
         case 35: {
             LogStep(35, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5888,6 +5981,7 @@ private:
         }
         case 37: {
             LogStep(37, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5899,6 +5993,7 @@ private:
         }
         case 39: {
             LogStep(39, "Move saturation stop command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
             value.rate            = 5;
@@ -5911,6 +6006,7 @@ private:
         }
         case 40: {
             LogStep(40, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5922,6 +6018,7 @@ private:
         }
         case 42: {
             LogStep(42, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5933,6 +6030,7 @@ private:
         }
         case 44: {
             LogStep(44, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -5944,6 +6042,7 @@ private:
         }
         case 46: {
             LogStep(46, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -6081,12 +6180,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -6103,6 +6204,7 @@ private:
         }
         case 4: {
             LogStep(4, "Step saturation up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepSaturation::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(1);
             value.stepSize        = 15;
@@ -6116,6 +6218,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -6127,6 +6230,7 @@ private:
         }
         case 7: {
             LogStep(7, "Step saturation down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepSaturation::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::SaturationStepMode>(3);
             value.stepSize        = 20;
@@ -6140,6 +6244,7 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -6151,6 +6256,7 @@ private:
         }
         case 10: {
             LogStep(10, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -6291,12 +6397,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -6318,6 +6426,7 @@ private:
         }
         case 5: {
             LogStep(5, "Move To current hue and saturation command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type value;
             value.hue             = 40;
             value.saturation      = 160;
@@ -6331,6 +6440,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -6347,6 +6457,7 @@ private:
         }
         case 9: {
             LogStep(9, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -6487,12 +6598,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -6514,6 +6627,7 @@ private:
         }
         case 5: {
             LogStep(5, "Move to Color command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToColor::Type value;
             value.colorX          = 200U;
             value.colorY          = 300U;
@@ -6527,6 +6641,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 20ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 20UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -6543,6 +6658,7 @@ private:
         }
         case 9: {
             LogStep(9, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -6706,12 +6822,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -6733,6 +6851,7 @@ private:
         }
         case 5: {
             LogStep(5, "Move Color command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColor::Type value;
             value.rateX           = 15;
             value.rateY           = 20;
@@ -6745,6 +6864,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 150ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 150UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -6761,6 +6881,7 @@ private:
         }
         case 9: {
             LogStep(9, "Stop Move Step command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
             value.optionsOverride = 0;
@@ -6781,6 +6902,7 @@ private:
         }
         case 12: {
             LogStep(12, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -6921,12 +7043,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -6948,6 +7072,7 @@ private:
         }
         case 5: {
             LogStep(5, "Step Color command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColor::Type value;
             value.stepX           = 15;
             value.stepY           = 20;
@@ -6961,6 +7086,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -6977,6 +7103,7 @@ private:
         }
         case 9: {
             LogStep(9, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -7097,12 +7224,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -7119,6 +7248,7 @@ private:
         }
         case 4: {
             LogStep(4, "Move To Color Temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type value;
             value.colorTemperature = 100U;
             value.transitionTime   = 10U;
@@ -7131,6 +7261,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7142,6 +7273,7 @@ private:
         }
         case 7: {
             LogStep(7, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -7431,12 +7563,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -7453,6 +7587,7 @@ private:
         }
         case 4: {
             LogStep(4, "Move up color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate                    = 10U;
@@ -7467,6 +7602,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 90ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 90UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7478,6 +7614,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 95ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 95UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7489,6 +7626,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7500,6 +7638,7 @@ private:
         }
         case 11: {
             LogStep(11, "Move down color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
             value.rate                    = 20U;
@@ -7514,6 +7653,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 190ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 190UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7525,6 +7665,7 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 195ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 195UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7536,6 +7677,7 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 200ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 200UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7547,6 +7689,7 @@ private:
         }
         case 18: {
             LogStep(18, "Move up color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate                    = 10U;
@@ -7561,6 +7704,7 @@ private:
         }
         case 19: {
             LogStep(19, "Stop Color Temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate                    = 10U;
@@ -7575,6 +7719,7 @@ private:
         }
         case 20: {
             LogStep(20, "Wait 90ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 90UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7586,6 +7731,7 @@ private:
         }
         case 22: {
             LogStep(22, "Wait 95ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 95UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7597,6 +7743,7 @@ private:
         }
         case 24: {
             LogStep(24, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7608,6 +7755,7 @@ private:
         }
         case 26: {
             LogStep(26, "Move down color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
             value.rate                    = 20U;
@@ -7622,6 +7770,7 @@ private:
         }
         case 27: {
             LogStep(27, "Stop Color Temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate                    = 10U;
@@ -7636,6 +7785,7 @@ private:
         }
         case 28: {
             LogStep(28, "Wait 140ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 140UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7647,6 +7797,7 @@ private:
         }
         case 30: {
             LogStep(30, "Wait 145ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 145UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7658,6 +7809,7 @@ private:
         }
         case 32: {
             LogStep(32, "Wait 150ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 150UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7669,6 +7821,7 @@ private:
         }
         case 34: {
             LogStep(34, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -7862,12 +8015,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -7884,6 +8039,7 @@ private:
         }
         case 4: {
             LogStep(4, "Step up color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type value;
             value.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
             value.stepSize                = 5U;
@@ -7899,6 +8055,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7910,6 +8067,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7921,6 +8079,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7932,6 +8091,7 @@ private:
         }
         case 11: {
             LogStep(11, "Step down color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type value;
             value.stepMode                = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(3);
             value.stepSize                = 5U;
@@ -7947,6 +8107,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7958,6 +8119,7 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7969,6 +8131,7 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -7980,6 +8143,7 @@ private:
         }
         case 18: {
             LogStep(18, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -8266,12 +8430,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -8283,6 +8449,7 @@ private:
         }
         case 3: {
             LogStep(3, "Enhanced Move To Hue command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1025U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
@@ -8301,6 +8468,7 @@ private:
         }
         case 5: {
             LogStep(5, "Enhanced Move To Hue command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1100U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
@@ -8314,6 +8482,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8325,6 +8494,7 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8336,6 +8506,7 @@ private:
         }
         case 10: {
             LogStep(10, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8347,6 +8518,7 @@ private:
         }
         case 12: {
             LogStep(12, "Enhanced Move To Hue command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1150U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(1);
@@ -8360,6 +8532,7 @@ private:
         }
         case 13: {
             LogStep(13, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8371,6 +8544,7 @@ private:
         }
         case 15: {
             LogStep(15, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8382,6 +8556,7 @@ private:
         }
         case 17: {
             LogStep(17, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8393,6 +8568,7 @@ private:
         }
         case 19: {
             LogStep(19, "Enhanced Move To Hue command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1200U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(2);
@@ -8406,6 +8582,7 @@ private:
         }
         case 20: {
             LogStep(20, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8417,6 +8594,7 @@ private:
         }
         case 22: {
             LogStep(22, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8428,6 +8606,7 @@ private:
         }
         case 24: {
             LogStep(24, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8439,6 +8618,7 @@ private:
         }
         case 26: {
             LogStep(26, "Enhanced Move To Hue command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 1300U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(3);
@@ -8452,6 +8632,7 @@ private:
         }
         case 27: {
             LogStep(27, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8463,6 +8644,7 @@ private:
         }
         case 29: {
             LogStep(29, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8474,6 +8656,7 @@ private:
         }
         case 31: {
             LogStep(31, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8485,6 +8668,7 @@ private:
         }
         case 33: {
             LogStep(33, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -8704,12 +8888,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -8726,6 +8912,7 @@ private:
         }
         case 4: {
             LogStep(4, "Enhanced Move Hue Up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate            = 50U;
@@ -8738,6 +8925,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 290ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 290UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8749,6 +8937,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 295ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 295UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8760,6 +8949,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 300ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 300UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8771,6 +8961,7 @@ private:
         }
         case 11: {
             LogStep(11, "Enhanced Move Hue Stop command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate            = 0U;
@@ -8788,6 +8979,7 @@ private:
         }
         case 13: {
             LogStep(13, "Enhanced Move Hue Down command ");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(3);
             value.rate            = 5U;
@@ -8800,6 +8992,7 @@ private:
         }
         case 14: {
             LogStep(14, "Wait 40ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 40UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8811,6 +9004,7 @@ private:
         }
         case 16: {
             LogStep(16, "Wait 45ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 45UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8822,6 +9016,7 @@ private:
         }
         case 18: {
             LogStep(18, "Wait 50ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 50UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -8833,6 +9028,7 @@ private:
         }
         case 20: {
             LogStep(20, "Enhanced Move Hue Stop command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(0);
             value.rate            = 0U;
@@ -8850,6 +9046,7 @@ private:
         }
         case 22: {
             LogStep(22, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -8987,12 +9184,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -9009,6 +9208,7 @@ private:
         }
         case 4: {
             LogStep(4, "Enhanced Step Hue Up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(0);
             value.stepSize        = 50U;
@@ -9022,6 +9222,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9033,6 +9234,7 @@ private:
         }
         case 7: {
             LogStep(7, "Enhanced Step Hue Down command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type value;
             value.stepMode        = static_cast<chip::app::Clusters::ColorControl::HueStepMode>(1);
             value.stepSize        = 75U;
@@ -9046,6 +9248,7 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9057,6 +9260,7 @@ private:
         }
         case 10: {
             LogStep(10, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -9177,12 +9381,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -9199,6 +9405,7 @@ private:
         }
         case 4: {
             LogStep(4, "Enhanced move to hue and saturation command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type value;
             value.enhancedHue     = 1200U;
             value.saturation      = 90;
@@ -9212,6 +9419,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 10ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9223,6 +9431,7 @@ private:
         }
         case 7: {
             LogStep(7, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -9546,12 +9755,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -9563,6 +9774,7 @@ private:
         }
         case 3: {
             LogStep(3, "Move hue up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate            = 50;
@@ -9580,6 +9792,7 @@ private:
         }
         case 5: {
             LogStep(5, "Stop Move Step command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
             value.optionsOverride = 0;
@@ -9595,6 +9808,7 @@ private:
         }
         case 7: {
             LogStep(7, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9606,6 +9820,7 @@ private:
         }
         case 9: {
             LogStep(9, "Move saturation up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
             value.rate            = 5;
@@ -9623,6 +9838,7 @@ private:
         }
         case 11: {
             LogStep(11, "Stop Move Step command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
             value.optionsOverride = 0;
@@ -9638,6 +9854,7 @@ private:
         }
         case 13: {
             LogStep(13, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9649,6 +9866,7 @@ private:
         }
         case 15: {
             LogStep(15, "Move Color command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColor::Type value;
             value.rateX           = 15;
             value.rateY           = 20;
@@ -9671,6 +9889,7 @@ private:
         }
         case 18: {
             LogStep(18, "Stop Move Step command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
             value.optionsOverride = 0;
@@ -9691,6 +9910,7 @@ private:
         }
         case 21: {
             LogStep(21, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9707,6 +9927,7 @@ private:
         }
         case 24: {
             LogStep(24, "Move up color temperature command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type value;
             value.moveMode                = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate                    = 10U;
@@ -9726,6 +9947,7 @@ private:
         }
         case 26: {
             LogStep(26, "Stop Move Step command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
             value.optionsOverride = 0;
@@ -9741,6 +9963,7 @@ private:
         }
         case 28: {
             LogStep(28, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9752,6 +9975,7 @@ private:
         }
         case 30: {
             LogStep(30, "Enhanced Move Hue Up command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type value;
             value.moveMode        = static_cast<chip::app::Clusters::ColorControl::HueMoveMode>(1);
             value.rate            = 50U;
@@ -9769,6 +9993,7 @@ private:
         }
         case 32: {
             LogStep(32, "Stop Move Step command");
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type value;
             value.optionsMask     = 0;
             value.optionsOverride = 0;
@@ -9784,6 +10009,7 @@ private:
         }
         case 34: {
             LogStep(34, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -9795,6 +10021,7 @@ private:
         }
         case 36: {
             LogStep(36, "Turn off light that we turned on");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -10213,12 +10440,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition : Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -10231,6 +10460,7 @@ private:
         case 3: {
             LogStep(3, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10253,6 +10483,7 @@ private:
         case 5: {
             LogStep(5, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10275,6 +10506,7 @@ private:
         case 7: {
             LogStep(7, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10297,6 +10529,7 @@ private:
         case 9: {
             LogStep(9, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(8);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10319,6 +10552,7 @@ private:
         case 11: {
             LogStep(11, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
@@ -10353,6 +10587,7 @@ private:
         case 15: {
             LogStep(15, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10387,6 +10622,7 @@ private:
         case 19: {
             LogStep(19, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10409,6 +10645,7 @@ private:
         case 21: {
             LogStep(21, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
@@ -10443,6 +10680,7 @@ private:
         case 25: {
             LogStep(25, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10477,6 +10715,7 @@ private:
         case 29: {
             LogStep(29, "Enhanced Move To Hue command");
             VerifyOrdo(!ShouldSkip("CR_ENHANCEDMOVETOHUE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type value;
             value.enhancedHue     = 40960U;
             value.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
@@ -10490,6 +10729,7 @@ private:
         }
         case 30: {
             LogStep(30, "Wait 2000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -10503,6 +10743,7 @@ private:
         case 32: {
             LogStep(32, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10525,6 +10766,7 @@ private:
         case 34: {
             LogStep(34, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
@@ -10559,6 +10801,7 @@ private:
         case 38: {
             LogStep(38, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10593,6 +10836,7 @@ private:
         case 42: {
             LogStep(42, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10615,6 +10859,7 @@ private:
         case 44: {
             LogStep(44, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(2);
@@ -10649,6 +10894,7 @@ private:
         case 48: {
             LogStep(48, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10682,6 +10928,7 @@ private:
         }
         case 52: {
             LogStep(52, "Turn Off light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -10880,12 +11127,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition: Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -10898,6 +11147,7 @@ private:
         case 3: {
             LogStep(3, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10944,6 +11194,7 @@ private:
         case 9: {
             LogStep(9, "Color Loop Set Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
@@ -10972,6 +11223,7 @@ private:
         case 12: {
             LogStep(12, "Color Loop Set Command - Start Color Loop");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -10994,6 +11246,7 @@ private:
         case 14: {
             LogStep(14, "Color Loop Set Command - Start Color Loop");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -11027,6 +11280,7 @@ private:
         }
         case 18: {
             LogStep(18, "Turn off light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -11225,12 +11479,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition: Turn on light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -11243,6 +11499,7 @@ private:
         case 3: {
             LogStep(3, "Sends ColorLoopSet Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(15);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -11283,6 +11540,7 @@ private:
         case 8: {
             LogStep(8, "Color Loop Set Command - Set all Attributes");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(1);
@@ -11317,6 +11575,7 @@ private:
         case 12: {
             LogStep(12, "Color Loop Set Command - Start Color Loop");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(4);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -11339,6 +11598,7 @@ private:
         case 14: {
             LogStep(14, "Color Loop Set Command - Start Color Loop");
             VerifyOrdo(!ShouldSkip("CR_COLORLOOPSET"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type value;
             value.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(1);
             value.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
@@ -11372,6 +11632,7 @@ private:
         }
         case 18: {
             LogStep(18, "Turn off light for color control tests");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -11646,6 +11907,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -11834,6 +12096,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -11952,6 +12215,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -12073,6 +12337,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -12089,6 +12354,7 @@ private:
         }
         case 3: {
             LogStep(3, "write the default values to mandatory global attribute: ClusterRevision");
+            ListFreer listFreer;
             uint16_t value;
             value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ElectricalMeasurement::Id,
@@ -12242,6 +12508,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -12397,6 +12664,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -12404,6 +12672,7 @@ private:
         case 1: {
             LogStep(1, "Sends ResetCounts command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                EthernetNetworkDiagnostics::Commands::ResetCounts::Id, value, chip::NullOptional
@@ -12551,6 +12820,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -12569,6 +12839,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -12590,6 +12861,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -12756,6 +13028,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -12777,6 +13050,7 @@ private:
         }
         case 4: {
             LogStep(4, "write the default value to optional attribute: MeasuredValue");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 0U;
@@ -12785,6 +13059,7 @@ private:
         }
         case 5: {
             LogStep(5, "write the default value to optional attribute: MinMeasuredValue");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 0U;
@@ -12793,6 +13068,7 @@ private:
         }
         case 6: {
             LogStep(6, "write the default value to optional attribute: MaxMeasuredValue");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 0U;
@@ -12826,6 +13102,7 @@ private:
         }
         case 12: {
             LogStep(12, "write the default value to optional attribute: Tolerance");
+            ListFreer listFreer;
             uint16_t value;
             value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FlowMeasurement::Id, FlowMeasurement::Attributes::Tolerance::Id,
@@ -12914,6 +13191,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -13073,6 +13351,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -13085,6 +13364,7 @@ private:
         case 2: {
             LogStep(2, "Read the global attribute: FeatureMap");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -13101,6 +13381,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -13227,6 +13508,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -13238,6 +13520,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH1 writes the BreadCrumb attribute as 1 to the DUT");
+            ListFreer listFreer;
             uint64_t value;
             value = 1ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
@@ -13406,6 +13689,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -13439,6 +13723,7 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -13450,6 +13735,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -13536,6 +13822,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -13682,6 +13969,7 @@ private:
         {
         case 0: {
             LogStep(0, "1.Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -13690,6 +13978,7 @@ private:
             LogStep(1,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(0);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13700,6 +13989,7 @@ private:
         }
         case 2: {
             LogStep(2, "Manually check DUT executes a blink effect");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes a blink effectgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -13708,6 +13998,7 @@ private:
             LogStep(3,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(1);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13718,6 +14009,7 @@ private:
         }
         case 4: {
             LogStep(4, "check DUT executes a breathe effect");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
             return UserPrompt(kIdentityAlpha, value);
@@ -13726,6 +14018,7 @@ private:
             LogStep(5,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x02 okay and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(2);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13736,6 +14029,7 @@ private:
         }
         case 6: {
             LogStep(6, "check DUT executes an okay effect");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes an okay effectgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -13744,6 +14038,7 @@ private:
             LogStep(7,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x0b channel change and the "
                     "effect variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(11);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13754,6 +14049,7 @@ private:
         }
         case 8: {
             LogStep(8, "check DUT executes a channel change effect");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes a channel change effectgarbage: not in length on purpose", 36);
             return UserPrompt(kIdentityAlpha, value);
@@ -13762,6 +14058,7 @@ private:
             LogStep(9,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(1);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13772,6 +14069,7 @@ private:
         }
         case 10: {
             LogStep(10, "check DUT executes a breathe effect");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
             return UserPrompt(kIdentityAlpha, value);
@@ -13780,6 +14078,7 @@ private:
             LogStep(11,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0xfe finish effect and the "
                     "effect variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(254);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13790,6 +14089,7 @@ private:
         }
         case 12: {
             LogStep(12, "Manually check DUT stops the breathe effect after the current effect sequence");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "DUT stops the breathe effect after the current effect sequencegarbage: not in length on purpose", 62);
@@ -13799,6 +14099,7 @@ private:
             LogStep(13,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x01 breathe and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(1);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13809,6 +14110,7 @@ private:
         }
         case 14: {
             LogStep(14, "Manually check DUT executes a breathe effect");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes a breathe effectgarbage: not in length on purpose", 29);
             return UserPrompt(kIdentityAlpha, value);
@@ -13817,6 +14119,7 @@ private:
             LogStep(15,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(255);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13827,6 +14130,7 @@ private:
         }
         case 16: {
             LogStep(16, "Check DUT stops the breathe effect as soon as possible.");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("DUT stops the breathe effect as soon as possiblegarbage: not in length on purpose", 48);
@@ -13836,6 +14140,7 @@ private:
             LogStep(17,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0x00 blink and the effect "
                     "variant field set to 0x42 unknown");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(0);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(66);
@@ -13846,6 +14151,7 @@ private:
         }
         case 18: {
             LogStep(18, "Check DUT executes a blink effect.");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("DUT executes a blink effectgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -13854,6 +14160,7 @@ private:
             LogStep(19,
                     "TH sends TriggerEffect command to DUT with the effect identifier field set to 0xff stop effect and the effect "
                     "variant field set to 0x00 default");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::TriggerEffect::Type value;
             value.effectIdentifier = static_cast<chip::app::Clusters::Identify::IdentifyEffectIdentifier>(255);
             value.effectVariant    = static_cast<chip::app::Clusters::Identify::IdentifyEffectVariant>(0);
@@ -13864,6 +14171,7 @@ private:
         }
         case 20: {
             LogStep(20, "Check DUT stops any effect that may be still running as soon as possible");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "DUT stops any effect that may be still running as soon as possiblegarbage: not in length on purpose", 66);
@@ -14009,6 +14317,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -14032,6 +14341,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -14053,6 +14363,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates FeatureMap attribute has "
                     "the value 0");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -14159,6 +14470,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -14341,6 +14653,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -14365,6 +14678,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -14570,12 +14884,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Reset level to 254");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254;
             value.transitionTime = 0U;
@@ -14588,6 +14904,7 @@ private:
         }
         case 2: {
             LogStep(2, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -14855,6 +15172,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -14866,6 +15184,7 @@ private:
         }
         case 2: {
             LogStep(2, "writes the OnOffTransitionTime attribute on the DUT");
+            ListFreer listFreer;
             uint16_t value;
             value = 10U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id,
@@ -14878,6 +15197,7 @@ private:
         }
         case 4: {
             LogStep(4, "writes default value of OnOffTransitionTime attribute");
+            ListFreer listFreer;
             uint16_t value;
             value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id,
@@ -14890,6 +15210,7 @@ private:
         }
         case 6: {
             LogStep(6, "writes the OnLevel attribute on the DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 254;
@@ -14908,6 +15229,7 @@ private:
         }
         case 9: {
             LogStep(9, "Writes the OnTransitionTime attribute on the DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 100U;
@@ -14926,6 +15248,7 @@ private:
         }
         case 12: {
             LogStep(12, "Writes the OffTransitionTime attribute on the DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 100U;
@@ -14944,6 +15267,7 @@ private:
         }
         case 15: {
             LogStep(15, "Writes the DefaultMoveRate attribute on the DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 100;
@@ -14962,6 +15286,7 @@ private:
         }
         case 18: {
             LogStep(18, "writes the StartUpCurrentLevel attribute on the DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 254;
@@ -15119,6 +15444,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -15140,6 +15466,7 @@ private:
         }
         case 4: {
             LogStep(4, "sends a Move to level command");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 64;
             value.transitionTime = 65535U;
@@ -15152,6 +15479,7 @@ private:
         }
         case 5: {
             LogStep(5, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15163,6 +15491,7 @@ private:
         }
         case 7: {
             LogStep(7, "sends a Move to level command");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 100;
             value.transitionTime = 100U;
@@ -15175,6 +15504,7 @@ private:
         }
         case 8: {
             LogStep(8, "Wait 11000 second");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 11000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15191,6 +15521,7 @@ private:
         }
         case 11: {
             LogStep(11, "sends a Move to level command");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 128;
             value.transitionTime = 65535U;
@@ -15203,6 +15534,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 1000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15214,6 +15546,7 @@ private:
         }
         case 14: {
             LogStep(14, "Reset level to 254");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254;
             value.transitionTime = 0U;
@@ -15226,6 +15559,7 @@ private:
         }
         case 15: {
             LogStep(15, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15389,6 +15723,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -15400,6 +15735,7 @@ private:
         }
         case 2: {
             LogStep(2, "sends a Move up command");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
             value.rate           = 32;
@@ -15412,6 +15748,7 @@ private:
         }
         case 3: {
             LogStep(3, "user prompt message");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Physically verify that the DUT moves at a rate of 32 units per second or as close as possible to this rate and "
@@ -15421,6 +15758,7 @@ private:
         }
         case 4: {
             LogStep(4, "Wait 3000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15437,6 +15775,7 @@ private:
         }
         case 7: {
             LogStep(7, "sends a Move down command");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
             value.rate           = 64;
@@ -15449,6 +15788,7 @@ private:
         }
         case 8: {
             LogStep(8, "user prompt message");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Physically verify that the DUT moves at a rate of 64 units per second or as close as possible to this rate and "
@@ -15458,6 +15798,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 5000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 5000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15474,6 +15815,7 @@ private:
         }
         case 12: {
             LogStep(12, "sends a Move up command at default move rate");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
             value.rate           = 255;
@@ -15486,6 +15828,7 @@ private:
         }
         case 13: {
             LogStep(13, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15497,6 +15840,7 @@ private:
         }
         case 15: {
             LogStep(15, "user prompt message");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Physically verify that the device moves at the rate recorded in step 3a and "
                                                    "completes moving to its maximum level.garbage: not in length on purpose",
@@ -15505,6 +15849,7 @@ private:
         }
         case 16: {
             LogStep(16, "Reset level to 254");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254;
             value.transitionTime = 0U;
@@ -15517,6 +15862,7 @@ private:
         }
         case 17: {
             LogStep(17, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15644,12 +15990,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sending on command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -15657,6 +16005,7 @@ private:
         }
         case 2: {
             LogStep(2, "Precondition: DUT level is set to its lowest point");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
             value.stepSize       = 100;
@@ -15670,6 +16019,7 @@ private:
         }
         case 3: {
             LogStep(3, "Wait 3000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15681,6 +16031,7 @@ private:
         }
         case 5: {
             LogStep(5, "Sends step up command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
             value.stepSize       = 64;
@@ -15694,6 +16045,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 5000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 5000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15705,6 +16057,7 @@ private:
         }
         case 8: {
             LogStep(8, "Sends a Step down command");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
             value.stepSize       = 64;
@@ -15718,6 +16071,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 4000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 4000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15729,6 +16083,7 @@ private:
         }
         case 11: {
             LogStep(11, "Reset level to 254");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254;
             value.transitionTime = 0U;
@@ -15741,12 +16096,14 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Sending off command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -15864,12 +16221,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sending on command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -15877,6 +16236,7 @@ private:
         }
         case 2: {
             LogStep(2, "Precondition: set DUT to lowest point");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 0;
             value.transitionTime = 0U;
@@ -15889,6 +16249,7 @@ private:
         }
         case 3: {
             LogStep(3, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -15900,6 +16261,7 @@ private:
         }
         case 5: {
             LogStep(5, "Sends a move up command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Move::Type value;
             value.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
             value.rate           = 1;
@@ -15912,12 +16274,14 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 2000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Sends stop command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Stop::Type value;
             value.optionMask     = 0;
             value.optionOverride = 0;
@@ -15933,6 +16297,7 @@ private:
         }
         case 9: {
             LogStep(9, "Reset level to 254");
+            ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254;
             value.transitionTime = 0U;
@@ -15945,12 +16310,14 @@ private:
         }
         case 10: {
             LogStep(10, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Sending off command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -16081,6 +16448,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -16099,6 +16467,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16120,6 +16489,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT response indicates either value 0 or throws a "
                     "general error if the attribute is not supported");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16262,6 +16632,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -16286,6 +16657,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16306,6 +16678,7 @@ private:
         case 7: {
             LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16456,6 +16829,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -16480,6 +16854,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16503,6 +16878,7 @@ private:
                     "Read attribute Feature map and verify that DUT response indicates that the FeatureMap attribute has bit 0 set "
                     "to 1 if the DUT supports the Application Platform feature (PICS_AP_S is true).");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16653,6 +17029,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -16677,6 +17054,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16698,6 +17076,7 @@ private:
                     "Read attribute Feature map and Verify that the DUT response indicates that the FeatureMap attribute has bit 0 "
                     "set to 1 if the DUT supports the Name Updates feature PICS_NU_S is true");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16838,6 +17217,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -16862,6 +17242,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -16881,6 +17262,7 @@ private:
         case 7: {
             LogStep(7, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17017,6 +17399,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -17041,6 +17424,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17065,6 +17449,7 @@ private:
                     "Bit 0 - Set to 1 if the DUT supports Channel Lists (PICS_CL_S is true) Bit 1 - Set to 1 if the DUT supports "
                     "Lineup Info (PICS_LI_S is true)");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17237,6 +17622,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -17275,6 +17661,7 @@ private:
                     "Set to 1 if the DUT supports Advanced Seek (PICS_ADVANCEDSEEK is true) Bit 1 - Set to 1 if the DUT supports "
                     "Variable Speed (PICS_VARIABLESPEED is true)");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17421,6 +17808,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -17445,6 +17833,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17468,6 +17857,7 @@ private:
                     "Read FeatureMap attribute from the DUT and Verify that the DUT has bit 1 set to 1 if the device supports Name "
                     "Updates PICS_NAMEUPDATES is true");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17612,6 +18002,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -17636,6 +18027,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17658,6 +18050,7 @@ private:
                     "Read FeatureMap attribute from the DUT and verify response has the value 0 or throws a general error if the "
                     "attribute is not supported..");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17816,6 +18209,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -17840,6 +18234,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -17863,6 +18258,7 @@ private:
                     "Read FeatureMap attribute from the DUT and verify response has the value 0 or throws a general error if the "
                     "attribute is not supported..");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -18007,6 +18403,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -18031,6 +18428,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -18055,6 +18453,7 @@ private:
                     "supports Content Search (PICS_CONTENTSEARCH is true) Bit 1 - Set to 1 if the DUT supports URL Playback "
                     "(PICS_URLPLAYBACK is true)");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -18192,6 +18591,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -18210,6 +18610,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -18231,6 +18632,7 @@ private:
         case 6: {
             LogStep(6, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -18302,12 +18704,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Put the device into low power mode");
+            ListFreer listFreer;
             chip::app::Clusters::LowPower::Commands::Sleep::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
                                chip::NullOptional
@@ -18477,6 +18881,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -18484,6 +18889,7 @@ private:
         case 1: {
             LogStep(1, "Send Select");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(0);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18494,6 +18900,7 @@ private:
         case 2: {
             LogStep(2, "Send Up");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18504,6 +18911,7 @@ private:
         case 3: {
             LogStep(3, "Send Down");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(2);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18514,6 +18922,7 @@ private:
         case 4: {
             LogStep(4, "Send Left");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(3);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18524,6 +18933,7 @@ private:
         case 5: {
             LogStep(5, "Send Right");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(4);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18534,6 +18944,7 @@ private:
         case 6: {
             LogStep(6, "Send RightUp");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(5);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18544,6 +18955,7 @@ private:
         case 7: {
             LogStep(7, "Send RightDown");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(6);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18554,6 +18966,7 @@ private:
         case 8: {
             LogStep(8, "Send LeftUp");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(7);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18564,6 +18977,7 @@ private:
         case 9: {
             LogStep(9, "Send LeftDown");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18574,6 +18988,7 @@ private:
         case 10: {
             LogStep(10, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18584,6 +18999,7 @@ private:
         case 11: {
             LogStep(11, "Send SetupMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(10);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18594,6 +19010,7 @@ private:
         case 12: {
             LogStep(12, "Send ContentsMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(11);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18604,6 +19021,7 @@ private:
         case 13: {
             LogStep(13, "Send FavoriteMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(12);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18614,6 +19032,7 @@ private:
         case 14: {
             LogStep(14, "Send Exit");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(13);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18624,6 +19043,7 @@ private:
         case 15: {
             LogStep(15, "Send Invalid");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(255);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18707,6 +19127,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -18714,6 +19135,7 @@ private:
         case 1: {
             LogStep(1, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18724,6 +19146,7 @@ private:
         case 2: {
             LogStep(2, "Send SetupMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(10);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18856,6 +19279,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -18863,6 +19287,7 @@ private:
         case 1: {
             LogStep(1, "Send Numbers1");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(33);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18873,6 +19298,7 @@ private:
         case 2: {
             LogStep(2, "Send Numbers2");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(34);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18883,6 +19309,7 @@ private:
         case 3: {
             LogStep(3, "Send Numbers3");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(35);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18893,6 +19320,7 @@ private:
         case 4: {
             LogStep(4, "Send Numbers4");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(36);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18903,6 +19331,7 @@ private:
         case 5: {
             LogStep(5, "Send Numbers5");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(37);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18913,6 +19342,7 @@ private:
         case 6: {
             LogStep(6, "Send Numbers6");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(38);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18923,6 +19353,7 @@ private:
         case 7: {
             LogStep(7, "Send Numbers7");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(39);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18933,6 +19364,7 @@ private:
         case 8: {
             LogStep(8, "Send Numbers8");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(40);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -18943,6 +19375,7 @@ private:
         case 9: {
             LogStep(9, "Send Numbers9");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(41);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19082,6 +19515,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19089,6 +19523,7 @@ private:
         case 1: {
             LogStep(1, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19099,6 +19534,7 @@ private:
         case 2: {
             LogStep(2, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19109,6 +19545,7 @@ private:
         case 3: {
             LogStep(3, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19119,6 +19556,7 @@ private:
         case 4: {
             LogStep(4, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19129,6 +19567,7 @@ private:
         case 5: {
             LogStep(5, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19139,6 +19578,7 @@ private:
         case 6: {
             LogStep(6, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19149,6 +19589,7 @@ private:
         case 7: {
             LogStep(7, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19159,6 +19600,7 @@ private:
         case 8: {
             LogStep(8, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19169,6 +19611,7 @@ private:
         case 9: {
             LogStep(9, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19179,6 +19622,7 @@ private:
         case 10: {
             LogStep(10, "Send RootMenu");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -19256,6 +19700,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19337,6 +19782,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19442,6 +19888,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19449,6 +19896,7 @@ private:
         case 1: {
             LogStep(1, "Launch an app with the provided a application ID");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
             value.application.catalogVendorId = 1234U;
@@ -19464,6 +19912,7 @@ private:
         case 2: {
             LogStep(2, "TH sends a LaunchApp command to DUT to launch an app which is not available");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
             value.application.catalogVendorId = 1234U;
@@ -19479,6 +19928,7 @@ private:
         case 3: {
             LogStep(3, "Launch an app with the provided a application ID");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
             value.application.catalogVendorId = 1234U;
@@ -19572,6 +20022,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19579,6 +20030,7 @@ private:
         case 1: {
             LogStep(1, "Stop an app with the provided application ID");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type value;
 
             value.application.catalogVendorId = 1234U;
@@ -19672,6 +20124,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19679,6 +20132,7 @@ private:
         case 1: {
             LogStep(1, "TH sends HideApp command to DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type value;
 
             value.application.catalogVendorId = 1234U;
@@ -19765,6 +20219,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19855,6 +20310,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19867,6 +20323,7 @@ private:
         case 2: {
             LogStep(2, "Select Input Command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::SelectInput::Type value;
             value.index = 1;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::SelectInput::Id, value,
@@ -19948,6 +20405,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -19955,6 +20413,7 @@ private:
         case 1: {
             LogStep(1, "Hide Input Status Command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value,
                                chip::NullOptional
@@ -19964,6 +20423,7 @@ private:
         case 2: {
             LogStep(2, "Show Input Status Command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value,
                                chip::NullOptional
@@ -20054,6 +20514,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20066,6 +20527,7 @@ private:
         case 2: {
             LogStep(2, "Rename Input Command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("A1garbage: not in length on purpose", 2);
@@ -20077,6 +20539,7 @@ private:
         case 3: {
             LogStep(3, "Rename Input Command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("A2garbage: not in length on purpose", 2);
@@ -20160,6 +20623,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20258,6 +20722,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20270,6 +20735,7 @@ private:
         case 2: {
             LogStep(2, "TH sends a ChangeChannelByNumber command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type value;
             value.majorNumber = mMajornumber.HasValue() ? mMajornumber.Value() : 1U;
             value.minorNumber = mMinornumber.HasValue() ? mMinornumber.Value() : 2U;
@@ -20280,6 +20746,7 @@ private:
         }
         case 3: {
             LogStep(3, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("verify that the channel has changed on the device.garbage: not in length on purpose", 50);
@@ -20392,6 +20859,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20410,6 +20878,7 @@ private:
         case 3: {
             LogStep(3, "Sends a SkipChannel command to the DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::SkipChannel::Type value;
             value.count = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::SkipChannel::Id, value,
@@ -20419,6 +20888,7 @@ private:
         }
         case 4: {
             LogStep(4, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("verify that the channel has changed on the devicegarbage: not in length on purpose", 49);
@@ -20511,6 +20981,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20523,6 +20994,7 @@ private:
         case 2: {
             LogStep(2, "Sends a SelectAudioOutput command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
             value.index = 1;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
@@ -20616,6 +21088,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20628,6 +21101,7 @@ private:
         case 2: {
             LogStep(2, "Sends a RenameOutput command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("CertTestgarbage: not in length on purpose", 8);
@@ -20641,6 +21115,7 @@ private:
                     "Reads the OutputList attribute from the DUT Verify that the output at the index provided in step 2 has the "
                     "name CertTest");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -20725,6 +21200,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -20873,12 +21349,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Precondition");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message =
                 chip::Span<const char>("DUT has one or more Content Apps availablegarbage: not in length on purpose", 42);
@@ -21003,6 +21481,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -21147,6 +21626,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -21171,6 +21651,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -21345,11 +21826,13 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -21357,20 +21840,22 @@ private:
         }
         case 2: {
             LogStep(2, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -21382,6 +21867,7 @@ private:
         }
         case 4: {
             LogStep(4, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptestgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21394,6 +21880,7 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:0000000000I31506010", 22);
@@ -21401,6 +21888,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             return WaitForCommissionee(kIdentityBeta, value);
@@ -21417,6 +21905,7 @@ private:
         }
         case 10: {
             LogStep(10, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptest1garbage: not in length on purpose", 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21429,6 +21918,7 @@ private:
         }
         case 12: {
             LogStep(12, "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptest2garbage: not in length on purpose", 9);
             return WriteAttribute(kIdentityBeta, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21592,11 +22082,13 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -21604,12 +22096,14 @@ private:
         }
         case 2: {
             LogStep(2, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -21620,6 +22114,7 @@ private:
         }
         case 4: {
             LogStep(4, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptestgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21632,6 +22127,7 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -21639,6 +22135,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             return WaitForCommissionee(kIdentityBeta, value);
@@ -21655,6 +22152,7 @@ private:
         }
         case 10: {
             LogStep(10, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptestgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21667,6 +22165,7 @@ private:
         }
         case 12: {
             LogStep(12, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptestgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityBeta, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21806,25 +22305,28 @@ private:
         {
         case 0: {
             LogStep(0, "Reboot target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -21836,30 +22338,35 @@ private:
         }
         case 3: {
             LogStep(3, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 28000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -21867,14 +22374,15 @@ private:
         }
         case 8: {
             LogStep(8, "TH_CR1 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -21886,6 +22394,7 @@ private:
         }
         case 9: {
             LogStep(9, "TH_CR1 revokes the commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
@@ -21895,6 +22404,7 @@ private:
         }
         case 10: {
             LogStep(10, "TH_CR2 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -21902,6 +22412,7 @@ private:
         }
         case 11: {
             LogStep(11, "TH_CR1 revokes the commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
@@ -21911,6 +22422,7 @@ private:
         }
         case 12: {
             LogStep(12, "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptestgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -21923,14 +22435,15 @@ private:
         }
         case 14: {
             LogStep(14, "TH_CR1 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -21943,6 +22456,7 @@ private:
         case 15: {
             LogStep(15, "TH_CR2 starts a commissioning process with DUT_CE");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -21950,6 +22464,7 @@ private:
         }
         case 16: {
             LogStep(16, "TH_CR3 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22092,11 +22607,13 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -22104,12 +22621,14 @@ private:
         }
         case 2: {
             LogStep(2, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -22120,30 +22639,35 @@ private:
         }
         case 4: {
             LogStep(4, "Wait for PIXIT_COMM_WIN(180) + 10");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for PIXIT_COMM_WIN(180) + 10");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Wait for PIXIT_COMM_WIN(180) + 10");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Wait for PIXIT_COMM_WIN(180) + 10");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 28000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22151,6 +22675,7 @@ private:
         }
         case 9: {
             LogStep(9, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -22161,6 +22686,7 @@ private:
         }
         case 10: {
             LogStep(10, "TH_CR1 revokes the commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
@@ -22170,6 +22696,7 @@ private:
         }
         case 11: {
             LogStep(11, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22177,6 +22704,7 @@ private:
         }
         case 12: {
             LogStep(12, "TH_CR1 revokes the commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
@@ -22186,6 +22714,7 @@ private:
         }
         case 13: {
             LogStep(13, "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("chiptestgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -22198,6 +22727,7 @@ private:
         }
         case 15: {
             LogStep(15, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -22208,6 +22738,7 @@ private:
         }
         case 16: {
             LogStep(16, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22215,12 +22746,14 @@ private:
         }
         case 17: {
             LogStep(17, "TH_CR2 starts a commissioning process on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             return WaitForCommissionee(kIdentityBeta, value);
         }
         case 18: {
             LogStep(18, "TH_CR3 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22409,17 +22942,20 @@ private:
         {
         case 0: {
             LogStep(0, "Reboot target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH_CR1 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -22430,6 +22966,7 @@ private:
         }
         case 3: {
             LogStep(3, "Commission from gamma");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22437,12 +22974,14 @@ private:
         }
         case 4: {
             LogStep(4, "TH_CR3 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             return WaitForCommissionee(kIdentityGamma, value);
         }
         case 5: {
             LogStep(5, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -22453,6 +22992,7 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -22460,12 +23000,14 @@ private:
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             return WaitForCommissionee(kIdentityBeta, value);
         }
         case 8: {
             LogStep(8, "TH_CR1 opens a commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -22476,14 +23018,15 @@ private:
         }
         case 9: {
             LogStep(9, "TH_CR1 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22500,38 +23043,43 @@ private:
         }
         case 11: {
             LogStep(11, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 18000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "TH_CR1 re-opens new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22543,14 +23091,15 @@ private:
         }
         case 16: {
             LogStep(16, "TH_CR3 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22567,38 +23116,43 @@ private:
         }
         case 18: {
             LogStep(18, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 54000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "Wait for the expiration of PIXIT_COMM_WIN seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 18000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "TH_CR1 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22610,14 +23164,15 @@ private:
         }
         case 23: {
             LogStep(23, "TH_CR2 opens a new commissioning window on DUT_CE");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22744,6 +23299,7 @@ private:
         {
         case 0: {
             LogStep(0, "Create OTA image");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::CreateOtaImage::Type value;
             value.otaImageFilePath =
                 mOtaImageFilePath.HasValue() ? mOtaImageFilePath.Value() : chip::Span<const char>("/tmp/otaImage", 13);
@@ -22755,6 +23311,7 @@ private:
         }
         case 1: {
             LogStep(1, "Start the provider with an image");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("chip-ota-provider-appgarbage: not in length on purpose", 21);
@@ -22772,6 +23329,7 @@ private:
         }
         case 2: {
             LogStep(2, "Commission the provider from alpha");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId = mProviderNodeId.HasValue() ? mProviderNodeId.Value() : 12648430ULL;
             value.payload =
@@ -22780,6 +23338,7 @@ private:
         }
         case 3: {
             LogStep(3, "Wait for the commissioned provider to be retrieved for alpha");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mProviderNodeId.HasValue() ? mProviderNodeId.Value() : 12648430ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -22834,11 +23393,13 @@ private:
         }
         case 5: {
             LogStep(5, "Stop the requestor");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Start the requestor with an OTA download path");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.otaDownloadPath.Emplace();
             value.otaDownloadPath.Value() = mDownloadImageFilePath.HasValue() ? mDownloadImageFilePath.Value()
@@ -22847,12 +23408,14 @@ private:
         }
         case 7: {
             LogStep(7, "Wait for the commissioned requestor to be retrieved for alpha");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mRequestorNodeId.HasValue() ? mRequestorNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Send an announce OTA provider command to the requestor");
+            ListFreer listFreer;
             chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type value;
             value.providerNodeId     = mProviderNodeId.HasValue() ? mProviderNodeId.Value() : 12648430ULL;
             value.vendorId           = static_cast<chip::VendorId>(0);
@@ -22865,6 +23428,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait for transfer complete message");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMessage::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
@@ -22873,6 +23437,7 @@ private:
         }
         case 10: {
             LogStep(10, "Compare original file to downloaded file");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::CompareFiles::Type value;
             value.file1 = mRawImageFilePath.HasValue() ? mRawImageFilePath.Value() : chip::Span<const char>("/tmp/rawImage", 13);
             value.file2 = mDownloadImageFilePath.HasValue() ? mDownloadImageFilePath.Value()
@@ -23000,6 +23565,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -23016,6 +23582,7 @@ private:
         }
         case 3: {
             LogStep(3, "write the default values to mandatory global attribute: ClusterRevision");
+            ListFreer listFreer;
             uint16_t value;
             value = 3U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
@@ -23035,6 +23602,7 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -23054,6 +23622,7 @@ private:
         case 9: {
             LogStep(9, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -23185,6 +23754,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -23196,6 +23766,7 @@ private:
         }
         case 2: {
             LogStep(2, "Writes the respective default value to mandatory attribute: Occupancy");
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::Occupancy::Id,
@@ -23213,6 +23784,7 @@ private:
         }
         case 5: {
             LogStep(5, "Writes the respective default value to mandatory attribute: OccupancySensorType");
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
@@ -23231,6 +23803,7 @@ private:
         }
         case 8: {
             LogStep(8, "Writes the respective default value to mandatory attribute: OccupancySensorTypeBitmap");
+            ListFreer listFreer;
             uint8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id,
@@ -23384,6 +23957,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -23403,6 +23977,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -23544,6 +24119,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -23754,12 +24330,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Off Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -23771,6 +24349,7 @@ private:
         }
         case 3: {
             LogStep(3, "Send On Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -23782,6 +24361,7 @@ private:
         }
         case 5: {
             LogStep(5, "Send On Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -23793,6 +24373,7 @@ private:
         }
         case 7: {
             LogStep(7, "Send Off Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -23804,6 +24385,7 @@ private:
         }
         case 9: {
             LogStep(9, "Send Off Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -23815,6 +24397,7 @@ private:
         }
         case 11: {
             LogStep(11, "Send Toggle Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Toggle::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id, value, chip::NullOptional
 
@@ -23822,6 +24405,7 @@ private:
         }
         case 12: {
             LogStep(12, "Wait 1000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -23832,6 +24416,7 @@ private:
         }
         case 14: {
             LogStep(14, "Send Toggle Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Toggle::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id, value, chip::NullOptional
 
@@ -23839,6 +24424,7 @@ private:
         }
         case 15: {
             LogStep(15, "Wait 1000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -23849,6 +24435,7 @@ private:
         }
         case 17: {
             LogStep(17, "User prompt Set OnOff attribute manually to on");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Operate on device to set OnOff attribute manually to ongarbage: not in length on purpose", 55);
@@ -23861,6 +24448,7 @@ private:
         }
         case 19: {
             LogStep(19, "User prompt Set OnOff attribute manually to off");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Operate on device to set OnOff attribute manually to offgarbage: not in length on purpose", 56);
@@ -23873,6 +24461,7 @@ private:
         }
         case 21: {
             LogStep(21, "Reset Off Command");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -24250,6 +24839,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -24257,6 +24847,7 @@ private:
         case 1: {
             LogStep(1, "Send On Command");
             VerifyOrdo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24264,6 +24855,7 @@ private:
         }
         case 2: {
             LogStep(2, "Wait 1000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -24282,6 +24874,7 @@ private:
         case 5: {
             LogStep(5, "Send On Command");
             VerifyOrdo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24289,6 +24882,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 1000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -24307,6 +24901,7 @@ private:
         case 9: {
             LogStep(9, "Send On Command");
             VerifyOrdo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24314,6 +24909,7 @@ private:
         }
         case 10: {
             LogStep(10, "Wait 1000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -24344,6 +24940,7 @@ private:
         case 15: {
             LogStep(15, "Send On Command");
             VerifyOrdo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24369,6 +24966,7 @@ private:
         case 19: {
             LogStep(19, "Send Off Command");
             VerifyOrdo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -24405,6 +25003,7 @@ private:
         case 25: {
             LogStep(25, "Send On Command");
             VerifyOrdo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24425,6 +25024,7 @@ private:
         case 28: {
             LogStep(28, "Send Off Command");
             VerifyOrdo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -24455,6 +25055,7 @@ private:
         case 33: {
             LogStep(33, "Send On Command");
             VerifyOrdo(!ShouldSkip("CR_ON"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24480,6 +25081,7 @@ private:
         case 37: {
             LogStep(37, "Send Off Command");
             VerifyOrdo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -24533,6 +25135,7 @@ private:
         case 46: {
             LogStep(46, "Send Off Command");
             VerifyOrdo(!ShouldSkip("CR_OFF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -24723,12 +25326,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH sends On command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -24736,6 +25341,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH writes a value of 0 to StartUpOnOff attribute of DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::OnOff::OnOffStartUpOnOff>(0);
@@ -24749,11 +25355,13 @@ private:
         }
         case 4: {
             LogStep(4, "Power off DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -24764,6 +25372,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH writes a value of 1 to StartUpOnOff attribute of DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::OnOff::OnOffStartUpOnOff>(1);
@@ -24772,11 +25381,13 @@ private:
         }
         case 8: {
             LogStep(8, "Power off DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -24787,6 +25398,7 @@ private:
         }
         case 11: {
             LogStep(11, "TH writes a value of 2 to StartUpOnOff attribute of DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::OnOff::OnOffStartUpOnOff>(2);
@@ -24795,11 +25407,13 @@ private:
         }
         case 12: {
             LogStep(12, "Power off DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -24810,11 +25424,13 @@ private:
         }
         case 15: {
             LogStep(15, "Power off DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -24825,6 +25441,7 @@ private:
         }
         case 18: {
             LogStep(18, "TH writes NULL to StartUpOnOff attribute of DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::StartUpOnOff::Id, value,
@@ -24832,11 +25449,13 @@ private:
         }
         case 19: {
             LogStep(19, "Power off DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -24847,6 +25466,7 @@ private:
         }
         case 22: {
             LogStep(22, "TH sends Off command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -24854,11 +25474,13 @@ private:
         }
         case 23: {
             LogStep(23, "Power off DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 24: {
             LogStep(24, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -25015,6 +25637,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -25039,6 +25662,7 @@ private:
             LogStep(4,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -25158,6 +25782,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -25295,6 +25920,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -25311,6 +25937,7 @@ private:
         }
         case 3: {
             LogStep(3, "Write the default values to mandatory global attribute: ClusterRevision");
+            ListFreer listFreer;
             uint16_t value;
             value = 3U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
@@ -25331,6 +25958,7 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -25340,6 +25968,7 @@ private:
         case 7: {
             LogStep(7, "Read AcceptedCommandList attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -25349,6 +25978,7 @@ private:
         case 8: {
             LogStep(8, "Read GeneratedCommandList attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -25358,6 +25988,7 @@ private:
         case 9: {
             LogStep(9, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -25540,6 +26171,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -25735,6 +26367,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -25758,6 +26391,7 @@ private:
         case 4: {
             LogStep(4, "TH reads the EventList attribute from the DUT");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -26377,6 +27011,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -26533,6 +27168,7 @@ private:
         }
         case 31: {
             LogStep(31, "write to the optional attribute: LifetimeEnergyConsumed");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 0UL;
@@ -26725,6 +27361,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -26732,6 +27369,7 @@ private:
         case 1: {
             LogStep(1, "Write 1 to the OperationMode attribute to DUT: OperationMode");
             VerifyOrdo(!ShouldSkip("A_OPERATIONMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26747,6 +27385,7 @@ private:
         case 3: {
             LogStep(3, "Write 2 to the OperationMode attribute to DUT: OperationMode");
             VerifyOrdo(!ShouldSkip("A_OPERATIONMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26762,6 +27401,7 @@ private:
         case 5: {
             LogStep(5, "Write 3 to the OperationMode attribute to DUT: OperationMode");
             VerifyOrdo(!ShouldSkip("A_OPERATIONMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(3);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26913,6 +27553,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -26920,6 +27561,7 @@ private:
         case 1: {
             LogStep(1, "Write 0 to the OperationMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_OPERATIONMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26935,6 +27577,7 @@ private:
         case 3: {
             LogStep(3, "Write 0 to the ControlMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_CONTROLMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26950,6 +27593,7 @@ private:
         case 5: {
             LogStep(5, "Write 1 to the ControlMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_CONTROLMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26965,6 +27609,7 @@ private:
         case 7: {
             LogStep(7, "Write 2 to the ControlMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_CONTROLMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26980,6 +27625,7 @@ private:
         case 9: {
             LogStep(9, "Write 3 to the ControlMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_CONTROLMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(3);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -26995,6 +27641,7 @@ private:
         case 11: {
             LogStep(11, "Write 5 to the ControlMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_CONTROLMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(5);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -27010,6 +27657,7 @@ private:
         case 13: {
             LogStep(13, "Write 7 to the ControlMode attribute to DUT");
             VerifyOrdo(!ShouldSkip("A_CONTROLMODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
             value = static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(7);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), PumpConfigurationAndControl::Id,
@@ -27156,12 +27804,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write 1 to the LifetimeRunningHours attribute to DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 1UL;
@@ -27176,6 +27826,7 @@ private:
         }
         case 3: {
             LogStep(3, "Write 2 to the LifetimeRunningHours attribute to DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 2UL;
@@ -27190,6 +27841,7 @@ private:
         }
         case 5: {
             LogStep(5, "Write 3 to the LifetimeRunningHours attribute to DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 3UL;
@@ -27204,6 +27856,7 @@ private:
         }
         case 7: {
             LogStep(7, "Write 1 to the LifetimeEnergyConsumed attribute to DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 1UL;
@@ -27218,6 +27871,7 @@ private:
         }
         case 9: {
             LogStep(9, "Write 2 to the LifetimeEnergyConsumed attribute to DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 2UL;
@@ -27232,6 +27886,7 @@ private:
         }
         case 11: {
             LogStep(11, "Write 3 to the LifetimeEnergyConsumed attribute to DUT");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 3UL;
@@ -27368,6 +28023,7 @@ private:
         {
         case 0: {
             LogStep(0, "Commission DUT to TH");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -27380,6 +28036,7 @@ private:
         case 2: {
             LogStep(2, "TH reads the FeatureMap attribute from the DUT");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -27406,6 +28063,7 @@ private:
             LogStep(6,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -27528,6 +28186,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -27537,6 +28196,7 @@ private:
                     "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
                     "attribute has the value 3");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Enter the Valuegarbage: not in length on purpose", 15);
             value.expectedValue.Emplace();
@@ -27553,6 +28213,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -27572,6 +28233,7 @@ private:
         case 6: {
             LogStep(6, "Read FeatureMap attribute from the DUT and Verify that the DUT response");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter FeatureMap attribute valuegarbage: not in length on purpose", 39);
             value.expectedValue.Emplace();
@@ -27684,6 +28346,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -27799,6 +28462,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -28088,11 +28752,13 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -28100,6 +28766,7 @@ private:
         }
         case 2: {
             LogStep(2, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -28108,6 +28775,7 @@ private:
             LogStep(3,
                     "TH is put in Commissioning Mode using Open Basic Commissioning Window command and starts advertising "
                     "Commissionable Node Discovery service using DNS-SD");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -28118,17 +28786,20 @@ private:
         }
         case 4: {
             LogStep(4, "Check Instance Name");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Check Long Discriminator _L");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByLongDiscriminator(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Check Short Discriminator (_S)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByShortDiscriminator(kIdentityAlpha, value);
@@ -28136,80 +28807,94 @@ private:
         case 7: {
             LogStep(7, "Check Vendor ID (_V)");
             VerifyOrdo(!ShouldSkip("VENDOR_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type value;
             value.value = mVendorId.HasValue() ? mVendorId.Value() : 65521ULL;
             return FindCommissionableByVendorId(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Check Commissioning Mode (_CM)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type value;
             return FindCommissionableByCommissioningMode(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Optional TXT key for MRP Retry Interval Idle (CRI)");
             VerifyOrdo(!ShouldSkip("CRI_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "Optional TXT key for MRP Retry Interval Active (CRA)");
             VerifyOrdo(!ShouldSkip("CRA_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "TXT key for commissioning mode (CM)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Optional TXT key for device name (DN)");
             VerifyOrdo(!ShouldSkip("DN_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Optional TXT key for rotating device identifier (RI)");
             VerifyOrdo(!ShouldSkip("RI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "Optional TXT key for pairing hint (PH)");
             VerifyOrdo(!ShouldSkip("PH_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Optional TXT key for pairing instructions (PI)");
             VerifyOrdo(!ShouldSkip("PI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "Check IPs");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -28217,6 +28902,7 @@ private:
         }
         case 21: {
             LogStep(21, "Log commands");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>(
                 "TH adds an unknown key/value pair in the advertised datagarbage: not in length on purpose", 56);
@@ -28224,6 +28910,7 @@ private:
         }
         case 22: {
             LogStep(22, "Log commands");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message =
                 chip::Span<const char>("Scan for DNS-SD commissioner advertisements from THgarbage: not in length on purpose", 51);
@@ -28342,6 +29029,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -28594,12 +29282,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Set up subscription to SwitchLatched eventgarbage: not in length on purpose", 42);
@@ -28607,6 +29297,7 @@ private:
         }
         case 2: {
             LogStep(2, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator sets switch to first positiongarbage: not in length on purpose", 38);
             return UserPrompt(kIdentityAlpha, value);
@@ -28618,12 +29309,14 @@ private:
         }
         case 4: {
             LogStep(4, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator sets switch to second positiongarbage: not in length on purpose", 39);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Set up subscription to InitialPress eventgarbage: not in length on purpose", 41);
@@ -28631,6 +29324,7 @@ private:
         }
         case 6: {
             LogStep(6, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
             return UserPrompt(kIdentityAlpha, value);
@@ -28642,12 +29336,14 @@ private:
         }
         case 8: {
             LogStep(8, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator sets switch to second positiongarbage: not in length on purpose", 39);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Operator does not operate switch (release switch)garbage: not in length on purpose", 49);
@@ -28655,6 +29351,7 @@ private:
         }
         case 10: {
             LogStep(10, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Set up subscription to InitialPress and ShortRelease eventsgarbage: not in length on purpose", 59);
@@ -28662,42 +29359,49 @@ private:
         }
         case 11: {
             LogStep(11, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator operates switch for 5 secondsgarbage: not in length on purpose", 38);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Wait 3000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Set up subscription to InitialPress, LongPress, ShortRelease, LongRelease eventsgarbage: not in length on purpose",
@@ -28706,42 +29410,49 @@ private:
         }
         case 18: {
             LogStep(18, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator operates switch for 5 secondsgarbage: not in length on purpose", 38);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "Wait 3000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 23: {
             LogStep(23, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 24: {
             LogStep(24, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Set up subscription to InitialPress, ShortRelease, MultiPressOngoing, "
                                                    "MultiPressComplete eventsgarbage: not in length on purpose",
@@ -28750,36 +29461,42 @@ private:
         }
         case 25: {
             LogStep(25, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator does not operate switchgarbage: not in length on purpose", 32);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 26: {
             LogStep(26, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 27: {
             LogStep(27, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 28: {
             LogStep(28, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator operates switch (press briefly)garbage: not in length on purpose", 40);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 29: {
             LogStep(29, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 30: {
             LogStep(30, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
@@ -28787,12 +29504,14 @@ private:
         }
         case 31: {
             LogStep(31, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 32: {
             LogStep(32, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
@@ -28800,12 +29519,14 @@ private:
         }
         case 33: {
             LogStep(33, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 34: {
             LogStep(34, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
@@ -28813,12 +29534,14 @@ private:
         }
         case 35: {
             LogStep(35, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
         }
         case 36: {
             LogStep(36, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Operator operates switch again (press briefly)garbage: not in length on purpose", 46);
@@ -28826,6 +29549,7 @@ private:
         }
         case 37: {
             LogStep(37, "User interaction needed");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Operator releases switchgarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
@@ -28928,6 +29652,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -28937,6 +29662,7 @@ private:
                     "Read ClusterRevision attribute from the DUT and Verify that the DUT response indicates ClusterRevision "
                     "attribute has the value 4");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Please enter ClusterRevision attribute valuegarbage: not in length on purpose", 44);
@@ -28954,6 +29680,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -28965,6 +29692,7 @@ private:
                     "Read AcceptedCommandList attribute from the DUT and Verify that the DUT response provides a list of supported "
                     "commands,This list SHALL include all the mandatory commands.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -28976,6 +29704,7 @@ private:
                     "Read GeneratedCommandList attribute from the DUT and Verify that the DUT response provides a list of "
                     "supported commands.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -29086,6 +29815,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -29208,6 +29938,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -29354,6 +30085,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -29378,6 +30110,7 @@ private:
         case 4: {
             LogStep(4, "Read the global attribute: EventList");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -29387,6 +30120,7 @@ private:
         case 5: {
             LogStep(5, "Read the global attribute: AcceptedCommandList");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -29396,6 +30130,7 @@ private:
         case 6: {
             LogStep(6, "Read the global attribute: GeneratedCommandList");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -29664,6 +30399,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -30145,6 +30881,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -30158,6 +30895,7 @@ private:
         case 2: {
             LogStep(2, "Writes a value back that is different but valid for OccupiedCoolingSetpoint attribute");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30173,6 +30911,7 @@ private:
         case 4: {
             LogStep(4, "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint attribute");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30182,6 +30921,7 @@ private:
         case 5: {
             LogStep(5, "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30197,6 +30937,7 @@ private:
         case 7: {
             LogStep(7, "Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2100;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30212,6 +30953,7 @@ private:
         case 9: {
             LogStep(9, "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30221,6 +30963,7 @@ private:
         case 10: {
             LogStep(10, "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30236,6 +30979,7 @@ private:
         case 12: {
             LogStep(12, "Writes a value back that is different but valid for MinHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
@@ -30250,6 +30994,7 @@ private:
         case 14: {
             LogStep(14, "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
@@ -30258,6 +31003,7 @@ private:
         case 15: {
             LogStep(15, "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
@@ -30272,6 +31018,7 @@ private:
         case 17: {
             LogStep(17, "Writes a value back that is different but valid for MaxHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
@@ -30286,6 +31033,7 @@ private:
         case 19: {
             LogStep(19, "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
@@ -30294,6 +31042,7 @@ private:
         case 20: {
             LogStep(20, "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
@@ -30308,6 +31057,7 @@ private:
         case 22: {
             LogStep(22, "Writes a value back that is different but valid for MinCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
@@ -30322,6 +31072,7 @@ private:
         case 24: {
             LogStep(24, "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
@@ -30330,6 +31081,7 @@ private:
         case 25: {
             LogStep(25, "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
@@ -30344,6 +31096,7 @@ private:
         case 27: {
             LogStep(27, "Writes a value back that is different but valid for MaxCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
@@ -30358,6 +31111,7 @@ private:
         case 29: {
             LogStep(29, "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
@@ -30366,6 +31120,7 @@ private:
         case 30: {
             LogStep(30, "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
@@ -30374,6 +31129,7 @@ private:
         case 31: {
             LogStep(31, "Writes (sets back) the limit of MinHeatSetpointLimit to MinHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
@@ -30382,6 +31138,7 @@ private:
         case 32: {
             LogStep(32, "Writes (sets back) the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
@@ -30390,6 +31147,7 @@ private:
         case 33: {
             LogStep(33, "Writes (sets back) the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
@@ -30398,6 +31156,7 @@ private:
         case 34: {
             LogStep(34, "Writes (sets back) the limit of MaxHeatSetpointLimit to MaxHeatSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
@@ -30406,6 +31165,7 @@ private:
         case 35: {
             LogStep(35, "Writes (sets back) the limit of MinCoolSetpointLimit to MinCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
@@ -30414,6 +31174,7 @@ private:
         case 36: {
             LogStep(36, "Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
@@ -30422,6 +31183,7 @@ private:
         case 37: {
             LogStep(37, "Writes (sets back) the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
@@ -30430,6 +31192,7 @@ private:
         case 38: {
             LogStep(38, "Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute");
             VerifyOrdo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
@@ -30444,6 +31207,7 @@ private:
         case 40: {
             LogStep(40, "Write Attribute command for ControlSequenceOfOperation with a new valid value");
             VerifyOrdo(!ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::Thermostat::ThermostatControlSequence value;
             value = static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30459,6 +31223,7 @@ private:
         case 42: {
             LogStep(42, "Sets OccupiedHeatingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30468,6 +31233,7 @@ private:
         case 43: {
             LogStep(43, "Sets OccupiedHeatingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30477,6 +31243,7 @@ private:
         case 44: {
             LogStep(44, "Sets OccupiedCoolingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30486,6 +31253,7 @@ private:
         case 45: {
             LogStep(45, "Sets OccupiedCoolingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30495,6 +31263,7 @@ private:
         case 46: {
             LogStep(46, "Sets OccupiedCoolingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30504,6 +31273,7 @@ private:
         case 47: {
             LogStep(47, "Sets OccupiedHeatingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30513,6 +31283,7 @@ private:
         case 48: {
             LogStep(48, "Sets OccupiedCoolingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30522,6 +31293,7 @@ private:
         case 49: {
             LogStep(49, "Sets OccupiedHeatingSetpoint to default value");
             VerifyOrdo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
@@ -30645,6 +31417,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -30664,6 +31437,7 @@ private:
             LogStep(3,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -30798,6 +31572,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -30977,6 +31752,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -30984,6 +31760,7 @@ private:
         case 1: {
             LogStep(1, "Writes a value of 0 to TemperatureDisplayMode attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -30992,6 +31769,7 @@ private:
         }
         case 2: {
             LogStep(2, "Verify device temperature displayed in °C");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify device temperature displayed in °Cgarbage: not in length on purpose", 42);
@@ -31000,6 +31778,7 @@ private:
         case 3: {
             LogStep(3, "Writes a value of 1 to TemperatureDisplayMode attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31008,6 +31787,7 @@ private:
         }
         case 4: {
             LogStep(4, "Verify device temperature displayed in °F");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify device temperature displayed in °Fgarbage: not in length on purpose", 42);
@@ -31016,6 +31796,7 @@ private:
         case 5: {
             LogStep(5, "Writes a value of greater than 1 to TemperatureDisplayMode attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 2;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31025,6 +31806,7 @@ private:
         case 6: {
             LogStep(6, "Writes a value of 0 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31033,6 +31815,7 @@ private:
         }
         case 7: {
             LogStep(7, "Verify all device functionality available to the user");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify all device functionality available to the usergarbage: not in length on purpose", 53);
@@ -31041,6 +31824,7 @@ private:
         case 8: {
             LogStep(8, "Writes a value of 1 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31049,6 +31833,7 @@ private:
         }
         case 9: {
             LogStep(9, "Verify device operates at Level 1 reduced functionality");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify device operates at Level 1 reduced functionalitygarbage: not in length on purpose", 55);
@@ -31057,6 +31842,7 @@ private:
         case 10: {
             LogStep(10, "Writes a value of 2 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 2;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31065,6 +31851,7 @@ private:
         }
         case 11: {
             LogStep(11, "Verify device operates at Level 2 reduced functionality");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify device operates at Level 2 reduced functionalitygarbage: not in length on purpose", 55);
@@ -31073,6 +31860,7 @@ private:
         case 12: {
             LogStep(12, "Writes a value of 3 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 3;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31081,6 +31869,7 @@ private:
         }
         case 13: {
             LogStep(13, "Verify device operates at Level 3 reduced functionality");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify device operates at Level 3 reduced functionalitygarbage: not in length on purpose", 55);
@@ -31089,6 +31878,7 @@ private:
         case 14: {
             LogStep(14, "Writes a value of 4 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 4;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31097,6 +31887,7 @@ private:
         }
         case 15: {
             LogStep(15, "Verify device operates at Level 4 reduced functionality");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify device operates at Level 4 reduced functionalitygarbage: not in length on purpose", 55);
@@ -31105,6 +31896,7 @@ private:
         case 16: {
             LogStep(16, "Writes a value of 5 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 5;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31113,6 +31905,7 @@ private:
         }
         case 17: {
             LogStep(17, "Verify device operates at least functionality level");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify device operates at least functionality levelgarbage: not in length on purpose", 51);
@@ -31121,6 +31914,7 @@ private:
         case 18: {
             LogStep(18, "Writes a value of greater than 5 to KeypadLockout attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_KEYPAD_LOCKOUT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 6;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31130,6 +31924,7 @@ private:
         case 19: {
             LogStep(19, "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31138,6 +31933,7 @@ private:
         }
         case 20: {
             LogStep(20, "Verify local schedule programming functionality is enabled at the thermostat");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify local schedule programming functionality is enabled at the thermostatgarbage: not in length on purpose",
@@ -31147,6 +31943,7 @@ private:
         case 21: {
             LogStep(21, "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31155,6 +31952,7 @@ private:
         }
         case 22: {
             LogStep(22, "Verify local schedule programming functionality is disabled at the thermostat");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify local schedule programming functionality is disabled at the thermostatgarbage: not in length on purpose",
@@ -31164,6 +31962,7 @@ private:
         case 23: {
             LogStep(23, "Writes a value of greater than 1 to ScheduleProgrammingVisibility attribute of DUT");
             VerifyOrdo(!ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             uint8_t value;
             value = 2;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ThermostatUserInterfaceConfiguration::Id,
@@ -31244,12 +32043,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sends ResetCounts command");
+            ListFreer listFreer;
             chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                ThreadNetworkDiagnostics::Commands::ResetCounts::Id, value, chip::NullOptional
@@ -31811,6 +32612,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -31835,6 +32637,7 @@ private:
                     "read NetworkName attribute from DUT and verify response value, If value is NULL then verify that RoutingRole "
                     "is set to 1");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -31851,6 +32654,7 @@ private:
                     "read PanId attribute from DUT and verify response value, If value is NULL then verify that RoutingRole is set "
                     "to 1");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -31867,6 +32671,7 @@ private:
                     "read ExtendedPanId attribute from DUT and verify response value, If value is NULL then verify that "
                     "RoutingRole is set to 1");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -31878,6 +32683,7 @@ private:
                     "read MeshLocalPrefix attribute from DUT and verify response value, If value is NULL then verify that "
                     "RoutingRole is set to 1");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -31894,6 +32700,7 @@ private:
                 11,
                 "read OverrunCount attribute from DUT and verify response value, If the Overruncount is greater than zero or not");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -31905,6 +32712,7 @@ private:
                     "read NeighborTableList attribute from DUT and Verify that the NeighborTable List size is Zero or greater and "
                     "verify each node types");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -31916,6 +32724,7 @@ private:
                     "read RouteTableList attribute from DUT and Verify that the RouteTableList List size is Zero or greater and "
                     "verify each node types");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -32166,6 +32975,7 @@ private:
         case 62: {
             LogStep(62, "read SecurityPolicy struct attribute from DUT and Verify the each field");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -32180,6 +32990,7 @@ private:
         case 64: {
             LogStep(64, "read OperationalDatasetComponents struct attribute from DUT and Verify the each field");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -32391,6 +33202,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -32675,6 +33487,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -32747,6 +33560,7 @@ private:
         case 14: {
             LogStep(14, "TH reads RxErrInvalidScrAddrCount attribute value from DUT and verify data type");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -32837,6 +33651,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -32963,6 +33778,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -33111,6 +33927,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -33118,6 +33935,7 @@ private:
         case 1: {
             LogStep(1, "TH sends ResetCounts command to DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                WiFiNetworkDiagnostics::Commands::ResetCounts::Id, value, chip::NullOptional
@@ -33311,6 +34129,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -33334,6 +34153,7 @@ private:
         case 4: {
             LogStep(4, "TH reads from the DUT the (0xFFFA) EventList attribute");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -33814,6 +34634,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -33825,6 +34646,7 @@ private:
         }
         case 2: {
             LogStep(2, "3a: write a value into the RO mandatory attribute: Type");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Type value;
             value = static_cast<chip::app::Clusters::WindowCovering::Type>(250);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Type::Id, value,
@@ -33842,6 +34664,7 @@ private:
         }
         case 5: {
             LogStep(5, "3a: write a value into the RO mandatory attribute: ConfigStatus");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::ConfigStatus>>(128);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id,
@@ -33859,6 +34682,7 @@ private:
         }
         case 8: {
             LogStep(8, "3a: write a value into the RO mandatory attribute: OperationalStatus");
+            ListFreer listFreer;
             uint8_t value;
             value = 128;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
@@ -33876,6 +34700,7 @@ private:
         }
         case 11: {
             LogStep(11, "3a: write a value into the RO mandatory attribute: EndProductType");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::EndProductType value;
             value = static_cast<chip::app::Clusters::WindowCovering::EndProductType>(250);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
@@ -33893,6 +34718,7 @@ private:
         }
         case 14: {
             LogStep(14, "3a: write a value into the RW mandatory attribute:: Mode");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -33910,6 +34736,7 @@ private:
         }
         case 17: {
             LogStep(17, "3a: write a value into the RO optional attribute: TargetPositionLiftPercent100ths");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::Percent100ths> value;
             value.SetNonNull();
             value.Value() = 20000U;
@@ -33929,6 +34756,7 @@ private:
         }
         case 20: {
             LogStep(20, "3a: write a value into the RO optional attribute: TargetPositionTiltPercent100ths");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::Percent100ths> value;
             value.SetNonNull();
             value.Value() = 20000U;
@@ -33948,6 +34776,7 @@ private:
         }
         case 23: {
             LogStep(23, "3a: write a value into the RO optional attribute: CurrentPositionLiftPercent100ths");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::Percent100ths> value;
             value.SetNonNull();
             value.Value() = 20000U;
@@ -33967,6 +34796,7 @@ private:
         }
         case 26: {
             LogStep(26, "3a: write a value into the RO optional attribute: CurrentPositionTiltPercent100ths");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::Percent100ths> value;
             value.SetNonNull();
             value.Value() = 20000U;
@@ -33986,6 +34816,7 @@ private:
         }
         case 29: {
             LogStep(29, "3a: write a value into the RO optional attribute: InstalledOpenLimitLift");
+            ListFreer listFreer;
             uint16_t value;
             value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
@@ -34004,6 +34835,7 @@ private:
         }
         case 32: {
             LogStep(32, "3a: write a value into the RO optional attribute: InstalledClosedLimitLift");
+            ListFreer listFreer;
             uint16_t value;
             value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
@@ -34022,6 +34854,7 @@ private:
         }
         case 35: {
             LogStep(35, "3a: write a value into the RO optional attribute: InstalledOpenLimitTilt");
+            ListFreer listFreer;
             uint16_t value;
             value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
@@ -34040,6 +34873,7 @@ private:
         }
         case 38: {
             LogStep(38, "3a: write a value into the RO optional attribute: InstalledClosedLimitTilt");
+            ListFreer listFreer;
             uint16_t value;
             value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
@@ -34058,6 +34892,7 @@ private:
         }
         case 41: {
             LogStep(41, "5a: write a value into the RO mandatory attribute: SafetyStatus");
+            ListFreer listFreer;
             uint16_t value;
             value = 4096U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::SafetyStatus::Id,
@@ -34075,6 +34910,7 @@ private:
         }
         case 44: {
             LogStep(44, "5a: write a value into the RO optional attribute: CurrentPositionLift");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 255U;
@@ -34094,6 +34930,7 @@ private:
         }
         case 47: {
             LogStep(47, "5a: write a value into the RO optional attribute: CurrentPositionTilt");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 255U;
@@ -34113,6 +34950,7 @@ private:
         }
         case 50: {
             LogStep(50, "5a: write a value into the RO optional attribute: CurrentPositionLiftPercentage");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::Percent> value;
             value.SetNonNull();
             value.Value() = 200;
@@ -34132,6 +34970,7 @@ private:
         }
         case 53: {
             LogStep(53, "5a: write a value into the RO optional attribute: CurrentPositionTiltPercentage");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::Percent> value;
             value.SetNonNull();
             value.Value() = 200;
@@ -34214,6 +35053,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -34223,6 +35063,7 @@ private:
                     "Reads ConfigStatus attribute from DUT, if (PA & LF) value of bit 3 must be 1b else 0b & if (PA & TL) value of "
                     "bit 4 must be 1b else 0b");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -34232,6 +35073,7 @@ private:
         case 2: {
             LogStep(2, "Reads ConfigStatus attribute from DUT, value of bit 0 must be 1b operational");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -34407,6 +35249,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -34414,6 +35257,7 @@ private:
         case 1: {
             LogStep(1, "1a: TH set the Mode Attribute bit0 of the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_REVERSAL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -34428,6 +35272,7 @@ private:
         case 3: {
             LogStep(3, "1c: TH clear the Mode Attribute bit0 of the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_REVERSAL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -34442,6 +35287,7 @@ private:
         case 5: {
             LogStep(5, "2a: TH set the Mode Attribute bit1 of the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -34456,6 +35302,7 @@ private:
         case 7: {
             LogStep(7, "2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -34465,6 +35312,7 @@ private:
         case 8: {
             LogStep(8, "2d: TH clear the Mode Attribute bit1 of the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -34485,6 +35333,7 @@ private:
         case 11: {
             LogStep(11, "2g: TH send DownOrClose command to the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_CALIBRATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -34494,6 +35343,7 @@ private:
         case 12: {
             LogStep(12, "3a: TH set the Mode Attribute bit2 of the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(4);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -34508,6 +35358,7 @@ private:
         case 14: {
             LogStep(14, "3c: TH send DownOrClose command to the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -34517,6 +35368,7 @@ private:
         case 15: {
             LogStep(15, "3d: TH clear the Mode Attribute bit2 of the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::WindowCovering::Mode> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::WindowCovering::Mode>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::Mode::Id, value,
@@ -34537,6 +35389,7 @@ private:
         case 18: {
             LogStep(18, "3g: TH send DownOrClose command to the DUT");
             VerifyOrdo(!ShouldSkip("WNCV_MAINTENANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -34623,6 +35476,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -34719,6 +35573,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -34975,12 +35830,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -34989,6 +35846,7 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 10 seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35027,6 +35885,7 @@ private:
         }
         case 8: {
             LogStep(8, "2a: TH sends UpOrOpen command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
@@ -35035,6 +35894,7 @@ private:
         }
         case 9: {
             LogStep(9, "2b: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35053,6 +35913,7 @@ private:
         }
         case 12: {
             LogStep(12, "2e: TH leave the device moving for 2 seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35063,6 +35924,7 @@ private:
         }
         case 14: {
             LogStep(14, "3a2: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35095,6 +35957,7 @@ private:
         }
         case 19: {
             LogStep(19, "4a: TH sends a StopMotion command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::StopMotion::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
@@ -35103,6 +35966,7 @@ private:
         }
         case 20: {
             LogStep(20, "4b: TH waits for 3 seconds the end of inertial movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35114,6 +35978,7 @@ private:
         }
         case 22: {
             LogStep(22, "5a: TH waits for x seconds attributes update on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35370,12 +36235,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
@@ -35384,6 +36251,7 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 10 seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35422,6 +36290,7 @@ private:
         }
         case 8: {
             LogStep(8, "2a: TH sends DownOrClose command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -35430,6 +36299,7 @@ private:
         }
         case 9: {
             LogStep(9, "2b: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35448,6 +36318,7 @@ private:
         }
         case 12: {
             LogStep(12, "2e: TH leave the device moving for 2 seconds");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35458,6 +36329,7 @@ private:
         }
         case 14: {
             LogStep(14, "3a2: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35490,6 +36362,7 @@ private:
         }
         case 19: {
             LogStep(19, "4a: TH sends a StopMotion command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::StopMotion::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
@@ -35498,6 +36371,7 @@ private:
         }
         case 20: {
             LogStep(20, "4b: TH waits for 3 seconds the end of inertial movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35509,6 +36383,7 @@ private:
         }
         case 22: {
             LogStep(22, "5a: TH waits for x seconds attributes update on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35694,12 +36569,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -35708,12 +36585,14 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 6-8 seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 6000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "1c: TH sends UpOrOpen command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
@@ -35722,6 +36601,7 @@ private:
         }
         case 4: {
             LogStep(4, "1d: TH Waits for 2 seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35734,6 +36614,7 @@ private:
         }
         case 6: {
             LogStep(6, "2a: TH sends a StopMotion command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::StopMotion::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
@@ -35742,6 +36623,7 @@ private:
         }
         case 7: {
             LogStep(7, "2b: TH waits for 3 seconds the end of inertial movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35752,6 +36634,7 @@ private:
         }
         case 9: {
             LogStep(9, "2d: TH waits for 100ms - 3s attributes update on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 2000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -35905,12 +36788,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -35919,12 +36804,14 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for fastMotionDuration seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "2a: TH sends UpOrOpen command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
@@ -35933,6 +36820,7 @@ private:
         }
         case 4: {
             LogStep(4, "2b: TH Waits for fullMotionDuration seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36079,12 +36967,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends UpOrOpen command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
@@ -36093,12 +36983,14 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH Waits for fastMotionDuration seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFastMotionDuration.HasValue() ? mFastMotionDuration.Value() : 3000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "2a: TH sends DownOrClose command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -36107,6 +36999,7 @@ private:
         }
         case 4: {
             LogStep(4, "2b: TH Waits for fullMotionDuration seconds movement(s) on the device");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36308,12 +37201,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -36322,6 +37217,7 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH waits for x seconds movement(s) on the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36335,6 +37231,7 @@ private:
         case 4: {
             LogStep(4, "2a: TH sends GoToLiftPercentage command with 25 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && CR_GOTOLIFTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
             value.liftPercent100thsValue = 2500U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
@@ -36344,6 +37241,7 @@ private:
         }
         case 5: {
             LogStep(5, "2b: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36356,6 +37254,7 @@ private:
         }
         case 7: {
             LogStep(7, "3a: TH set a timeout of X minutes for failure");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36381,6 +37280,7 @@ private:
         case 11: {
             LogStep(11, "4a: TH sends GoToLiftPercentage command with 75.20 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && CR_GOTOLIFTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
             value.liftPercent100thsValue = 7520U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
@@ -36390,6 +37290,7 @@ private:
         }
         case 12: {
             LogStep(12, "4b: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36402,6 +37303,7 @@ private:
         }
         case 14: {
             LogStep(14, "5a: TH waits for x seconds movement(s) on the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36595,12 +37497,14 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "1a: TH sends DownOrClose command to preposition the DUT in the opposite direction");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
@@ -36609,6 +37513,7 @@ private:
         }
         case 2: {
             LogStep(2, "1b: TH waits for x seconds movement(s) on the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36622,6 +37527,7 @@ private:
         case 4: {
             LogStep(4, "2a: TH sends GoToTiltPercentage command with 30 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && CR_GOTOTILTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
             value.tiltPercent100thsValue = 3000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
@@ -36631,6 +37537,7 @@ private:
         }
         case 5: {
             LogStep(5, "2b: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36643,6 +37550,7 @@ private:
         }
         case 7: {
             LogStep(7, "3a: TH set a timeout of X minutes for failure");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36668,6 +37576,7 @@ private:
         case 11: {
             LogStep(11, "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && CR_GOTOTILTPERCENTAGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
             value.tiltPercent100thsValue = 6005U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
@@ -36677,6 +37586,7 @@ private:
         }
         case 12: {
             LogStep(12, "4b: DUT updates its attributes");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36689,6 +37599,7 @@ private:
         }
         case 14: {
             LogStep(14, "5a: TH waits for x seconds movement(s) on the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mFullMotionDuration.HasValue() ? mFullMotionDuration.Value() : 6000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -36794,6 +37705,7 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -36808,6 +37720,7 @@ private:
             LogStep(2, "2b: TH sends GoToLiftPercentage command with BadParam to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
             value.liftPercent100thsValue = 12288U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
@@ -36819,6 +37732,7 @@ private:
             LogStep(3, "3a: TH sends GoToLiftPercentage command with 10001 to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
             value.liftPercent100thsValue = 10001U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
@@ -36830,6 +37744,7 @@ private:
             LogStep(4, "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
             value.liftPercent100thsValue = 65535U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
@@ -36931,6 +37846,7 @@ private:
         {
         case 0: {
             LogStep(0, "0: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -36952,6 +37868,7 @@ private:
             LogStep(3, "2b: TH sends GoToTiltPercentage command with BadParam to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
             value.tiltPercent100thsValue = 12288U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
@@ -36963,6 +37880,7 @@ private:
             LogStep(4, "3a: TH sends GoToTiltPercentage command with 10001 to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
             value.tiltPercent100thsValue = 10001U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
@@ -36974,6 +37892,7 @@ private:
             LogStep(5, "4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
             value.tiltPercent100thsValue = 65535U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
@@ -37139,12 +38058,14 @@ private:
         {
         case 0: {
             LogStep(0, "0a: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "0b: TH sends UpOrOpen command to preposition the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
@@ -37154,6 +38075,7 @@ private:
         case 2: {
             LogStep(2, "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_LF && WNCV_PA_LF"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type value;
             value.liftPercent100thsValue = 9000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
@@ -37163,12 +38085,14 @@ private:
         }
         case 3: {
             LogStep(3, "1b: TH Waits for 100ms-1s");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 500UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "1c: TH sends StopMotion command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::StopMotion::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
@@ -37177,6 +38101,7 @@ private:
         }
         case 5: {
             LogStep(5, "1d: TH Waits for 100ms-1s");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 500UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -37184,6 +38109,7 @@ private:
         case 6: {
             LogStep(6, "2a: If (PA_TL & TL) TH sends GoToTiltPercentage command with 90%% to DUT");
             VerifyOrdo(!ShouldSkip("WNCV_TL && WNCV_PA_TL"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type value;
             value.tiltPercent100thsValue = 9000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
@@ -37193,12 +38119,14 @@ private:
         }
         case 7: {
             LogStep(7, "2b: TH Waits for 100ms-1s");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 500UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "2c: TH sends StopMotion command to DUT");
+            ListFreer listFreer;
             chip::app::Clusters::WindowCovering::Commands::StopMotion::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
@@ -37207,6 +38135,7 @@ private:
         }
         case 9: {
             LogStep(9, "2d: TH Waits for 100ms-1s");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 500UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -37225,11 +38154,13 @@ private:
         }
         case 12: {
             LogStep(12, "3c: reboot/restart the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "3d: Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -37347,6 +38278,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -37363,6 +38295,7 @@ private:
         }
         case 3: {
             LogStep(3, "Navigate Target Request Command");
+            ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
             value.target = 1;
             value.data.Emplace();
@@ -37496,6 +38429,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -37512,6 +38446,7 @@ private:
         }
         case 3: {
             LogStep(3, "Select Output Command");
+            ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
             value.index = 1;
             return SendCommand(kIdentityAlpha, GetEndpoint(2), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
@@ -37521,6 +38456,7 @@ private:
         }
         case 4: {
             LogStep(4, "Rename Output Command");
+            ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
@@ -37651,6 +38587,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -37667,6 +38604,7 @@ private:
         }
         case 3: {
             LogStep(3, "Launch App Command");
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
             value.application.catalogVendorId = 123U;
@@ -37681,6 +38619,7 @@ private:
         }
         case 4: {
             LogStep(4, "Stop App Command");
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type value;
 
             value.application.catalogVendorId = 123U;
@@ -37693,6 +38632,7 @@ private:
         }
         case 5: {
             LogStep(5, "Hide App Command");
+            ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type value;
 
             value.application.catalogVendorId = 123U;
@@ -37774,12 +38714,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Key Command");
+            ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(3);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
@@ -37864,12 +38806,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Get Setup PIN Command");
+            ListFreer listFreer;
             chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type value;
             value.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
             return SendCommand(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Commands::GetSetupPIN::Id, value,
@@ -37879,6 +38823,7 @@ private:
         }
         case 2: {
             LogStep(2, "Login Command");
+            ListFreer listFreer;
             chip::app::Clusters::AccountLogin::Commands::Login::Type value;
             value.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
             value.setupPIN              = chip::Span<const char>("tempPin123garbage: not in length on purpose", 10);
@@ -37889,6 +38834,7 @@ private:
         }
         case 3: {
             LogStep(3, "Logout Command");
+            ListFreer listFreer;
             chip::app::Clusters::AccountLogin::Commands::Logout::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Commands::Logout::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
@@ -37966,6 +38912,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -38111,6 +39058,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -38435,6 +39383,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -38476,6 +39425,7 @@ private:
         }
         case 8: {
             LogStep(8, "Media Playback Play Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
@@ -38484,6 +39434,7 @@ private:
         }
         case 9: {
             LogStep(9, "Media Playback Pause Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
@@ -38492,6 +39443,7 @@ private:
         }
         case 10: {
             LogStep(10, "Media Playback Stop Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::StopPlayback::Id, value,
                                chip::NullOptional
@@ -38500,6 +39452,7 @@ private:
         }
         case 11: {
             LogStep(11, "Media Playback Start Over Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StartOver::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::StartOver::Id, value,
                                chip::NullOptional
@@ -38508,6 +39461,7 @@ private:
         }
         case 12: {
             LogStep(12, "Media Playback Previous Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Previous::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Previous::Id, value,
                                chip::NullOptional
@@ -38516,6 +39470,7 @@ private:
         }
         case 13: {
             LogStep(13, "Media Playback Next Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Next::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Next::Id, value,
                                chip::NullOptional
@@ -38524,6 +39479,7 @@ private:
         }
         case 14: {
             LogStep(14, "Media Playback Rewind Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
@@ -38532,6 +39488,7 @@ private:
         }
         case 15: {
             LogStep(15, "Media Playback Fast Forward Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
@@ -38540,6 +39497,7 @@ private:
         }
         case 16: {
             LogStep(16, "Media Playback Skip Forward Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type value;
             value.deltaPositionMilliseconds = 500ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::SkipForward::Id, value,
@@ -38554,6 +39512,7 @@ private:
         }
         case 18: {
             LogStep(18, "Media Playback Skip Backward Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type value;
             value.deltaPositionMilliseconds = 100ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::SkipBackward::Id, value,
@@ -38568,6 +39527,7 @@ private:
         }
         case 20: {
             LogStep(20, "Media Playback Seek Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = 1000ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Seek::Id, value,
@@ -38754,6 +39714,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -38775,6 +39736,7 @@ private:
         }
         case 4: {
             LogStep(4, "Change Channel Command");
+            ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::ChangeChannel::Type value;
             value.match = chip::Span<const char>("PBSgarbage: not in length on purpose", 3);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::ChangeChannel::Id, value,
@@ -38784,6 +39746,7 @@ private:
         }
         case 5: {
             LogStep(5, "Change Channel By Number Command");
+            ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type value;
             value.majorNumber = 6U;
             value.minorNumber = 0U;
@@ -38794,6 +39757,7 @@ private:
         }
         case 6: {
             LogStep(6, "Skip Channel Command");
+            ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::SkipChannel::Type value;
             value.count = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::SkipChannel::Id, value,
@@ -38866,12 +39830,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Sleep Input Status Command");
+            ListFreer listFreer;
             chip::app::Clusters::LowPower::Commands::Sleep::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
                                chip::NullOptional
@@ -38986,6 +39952,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -39040,6 +40007,7 @@ private:
         }
         case 4: {
             LogStep(4, "Launch URL Command");
+            ListFreer listFreer;
             chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type value;
             value.contentURL = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
             value.displayString.Emplace();
@@ -39257,6 +40225,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -39273,6 +40242,7 @@ private:
         }
         case 3: {
             LogStep(3, "Select Input Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::SelectInput::Type value;
             value.index = 1;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::SelectInput::Id, value,
@@ -39282,6 +40252,7 @@ private:
         }
         case 4: {
             LogStep(4, "Hide Input Status Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value,
                                chip::NullOptional
@@ -39290,6 +40261,7 @@ private:
         }
         case 5: {
             LogStep(5, "Show Input Status Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value,
                                chip::NullOptional
@@ -39298,6 +40270,7 @@ private:
         }
         case 6: {
             LogStep(6, "Rename Input Command");
+            ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1;
             value.name  = chip::Span<const char>("HDMI Testgarbage: not in length on purpose", 9);
@@ -42670,12 +43643,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::Test::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::NullOptional
@@ -42684,6 +43659,7 @@ private:
         }
         case 2: {
             LogStep(2, "Send Test Not Handled Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestNotHandled::Id, value,
                                chip::NullOptional
@@ -42692,6 +43668,7 @@ private:
         }
         case 3: {
             LogStep(3, "Send Test Specific Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestSpecific::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestSpecific::Id, value,
                                chip::NullOptional
@@ -42700,6 +43677,7 @@ private:
         }
         case 4: {
             LogStep(4, "Send Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = 3;
             value.arg2 = 17;
@@ -42710,6 +43688,7 @@ private:
         }
         case 5: {
             LogStep(5, "Send failing Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = 250;
             value.arg2 = 6;
@@ -42725,6 +43704,7 @@ private:
         }
         case 7: {
             LogStep(7, "Write attribute BOOLEAN True");
+            ListFreer listFreer;
             bool value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Boolean::Id, value,
@@ -42737,6 +43717,7 @@ private:
         }
         case 9: {
             LogStep(9, "Write attribute BOOLEAN False");
+            ListFreer listFreer;
             bool value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Boolean::Id, value,
@@ -42754,6 +43735,7 @@ private:
         }
         case 12: {
             LogStep(12, "Write attribute BITMAP8 Max Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
@@ -42766,6 +43748,7 @@ private:
         }
         case 14: {
             LogStep(14, "Write attribute BITMAP8 Min Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
@@ -42783,6 +43766,7 @@ private:
         }
         case 17: {
             LogStep(17, "Write attribute BITMAP16 Max Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
@@ -42795,6 +43779,7 @@ private:
         }
         case 19: {
             LogStep(19, "Write attribute BITMAP16 Min Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(0U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
@@ -42812,6 +43797,7 @@ private:
         }
         case 22: {
             LogStep(22, "Write attribute BITMAP32 Max Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
@@ -42824,6 +43810,7 @@ private:
         }
         case 24: {
             LogStep(24, "Write attribute BITMAP32 Min Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(0UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
@@ -42841,6 +43828,7 @@ private:
         }
         case 27: {
             LogStep(27, "Write attribute BITMAP64 Max Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
@@ -42853,6 +43841,7 @@ private:
         }
         case 29: {
             LogStep(29, "Write attribute BITMAP64 Min Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(0ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
@@ -42870,6 +43859,7 @@ private:
         }
         case 32: {
             LogStep(32, "Write attribute INT8U Max Value");
+            ListFreer listFreer;
             uint8_t value;
             value = 255;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
@@ -42882,6 +43872,7 @@ private:
         }
         case 34: {
             LogStep(34, "Write attribute INT8U Min Value");
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
@@ -42899,6 +43890,7 @@ private:
         }
         case 37: {
             LogStep(37, "Write attribute INT16U Max Value");
+            ListFreer listFreer;
             uint16_t value;
             value = 65535U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16u::Id, value,
@@ -42911,6 +43903,7 @@ private:
         }
         case 39: {
             LogStep(39, "Write attribute INT16U Min Value");
+            ListFreer listFreer;
             uint16_t value;
             value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16u::Id, value,
@@ -42928,6 +43921,7 @@ private:
         }
         case 42: {
             LogStep(42, "Write attribute INT32U Max Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 4294967295UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
@@ -42940,6 +43934,7 @@ private:
         }
         case 44: {
             LogStep(44, "Write attribute INT32U Min Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 0UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
@@ -42957,6 +43952,7 @@ private:
         }
         case 47: {
             LogStep(47, "Write attribute INT64U Max Value");
+            ListFreer listFreer;
             uint64_t value;
             value = 18446744073709551615ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64u::Id, value,
@@ -42969,6 +43965,7 @@ private:
         }
         case 49: {
             LogStep(49, "Write attribute INT64U Min Value");
+            ListFreer listFreer;
             uint64_t value;
             value = 0ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64u::Id, value,
@@ -42986,6 +43983,7 @@ private:
         }
         case 52: {
             LogStep(52, "Write attribute INT8S Max Value");
+            ListFreer listFreer;
             int8_t value;
             value = 127;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8s::Id, value,
@@ -42998,6 +43996,7 @@ private:
         }
         case 54: {
             LogStep(54, "Write attribute INT8S Min Value");
+            ListFreer listFreer;
             int8_t value;
             value = -128;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8s::Id, value,
@@ -43010,6 +44009,7 @@ private:
         }
         case 56: {
             LogStep(56, "Write attribute INT8S Default Value");
+            ListFreer listFreer;
             int8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8s::Id, value,
@@ -43027,6 +44027,7 @@ private:
         }
         case 59: {
             LogStep(59, "Write attribute INT16S Max Value");
+            ListFreer listFreer;
             int16_t value;
             value = 32767;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16s::Id, value,
@@ -43039,6 +44040,7 @@ private:
         }
         case 61: {
             LogStep(61, "Write attribute INT16S Min Value");
+            ListFreer listFreer;
             int16_t value;
             value = -32768;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16s::Id, value,
@@ -43051,6 +44053,7 @@ private:
         }
         case 63: {
             LogStep(63, "Write attribute INT16S Default Value");
+            ListFreer listFreer;
             int16_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16s::Id, value,
@@ -43068,6 +44071,7 @@ private:
         }
         case 66: {
             LogStep(66, "Write attribute INT32S Max Value");
+            ListFreer listFreer;
             int32_t value;
             value = 2147483647L;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32s::Id, value,
@@ -43080,6 +44084,7 @@ private:
         }
         case 68: {
             LogStep(68, "Write attribute INT32S Min Value");
+            ListFreer listFreer;
             int32_t value;
             value = -2147483648L;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32s::Id, value,
@@ -43092,6 +44097,7 @@ private:
         }
         case 70: {
             LogStep(70, "Write attribute INT32S Default Value");
+            ListFreer listFreer;
             int32_t value;
             value = 0L;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32s::Id, value,
@@ -43109,6 +44115,7 @@ private:
         }
         case 73: {
             LogStep(73, "Write attribute INT64S Max Value");
+            ListFreer listFreer;
             int64_t value;
             value = 9223372036854775807LL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64s::Id, value,
@@ -43121,6 +44128,7 @@ private:
         }
         case 75: {
             LogStep(75, "Write attribute INT64S Min Value");
+            ListFreer listFreer;
             int64_t value;
             value = -9223372036854775807LL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64s::Id, value,
@@ -43133,6 +44141,7 @@ private:
         }
         case 77: {
             LogStep(77, "Write attribute INT64S Default Value");
+            ListFreer listFreer;
             int64_t value;
             value = 0LL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64s::Id, value,
@@ -43150,6 +44159,7 @@ private:
         }
         case 80: {
             LogStep(80, "Write attribute SINGLE medium Value");
+            ListFreer listFreer;
             float value;
             value = 0.1f;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatSingle::Id, value,
@@ -43162,6 +44172,7 @@ private:
         }
         case 82: {
             LogStep(82, "Write attribute SINGLE large Value");
+            ListFreer listFreer;
             float value;
             value = 17000000000.0f;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatSingle::Id, value,
@@ -43174,6 +44185,7 @@ private:
         }
         case 84: {
             LogStep(84, "Write attribute SINGLE small Value");
+            ListFreer listFreer;
             float value;
             value = 1.7e-10f;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatSingle::Id, value,
@@ -43186,6 +44198,7 @@ private:
         }
         case 86: {
             LogStep(86, "Write attribute SINGLE Default Value");
+            ListFreer listFreer;
             float value;
             value = 0.0f;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatSingle::Id, value,
@@ -43203,6 +44216,7 @@ private:
         }
         case 89: {
             LogStep(89, "Write attribute DOUBLE medium Value");
+            ListFreer listFreer;
             double value;
             value = 0.1234567890123;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatDouble::Id, value,
@@ -43215,6 +44229,7 @@ private:
         }
         case 91: {
             LogStep(91, "Write attribute DOUBLE large Value");
+            ListFreer listFreer;
             double value;
             value = 1.7e+200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatDouble::Id, value,
@@ -43227,6 +44242,7 @@ private:
         }
         case 93: {
             LogStep(93, "Write attribute DOUBLE small Value");
+            ListFreer listFreer;
             double value;
             value = 1.7e-200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatDouble::Id, value,
@@ -43239,6 +44255,7 @@ private:
         }
         case 95: {
             LogStep(95, "Write attribute DOUBLE Default Value");
+            ListFreer listFreer;
             double value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::FloatDouble::Id, value,
@@ -43256,6 +44273,7 @@ private:
         }
         case 98: {
             LogStep(98, "Write attribute ENUM8 Max Value");
+            ListFreer listFreer;
             uint8_t value;
             value = 255;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
@@ -43268,6 +44286,7 @@ private:
         }
         case 100: {
             LogStep(100, "Write attribute ENUM8 Min Value");
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
@@ -43285,6 +44304,7 @@ private:
         }
         case 103: {
             LogStep(103, "Write attribute ENUM16 Max Value");
+            ListFreer listFreer;
             uint16_t value;
             value = 65535U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value,
@@ -43297,6 +44317,7 @@ private:
         }
         case 105: {
             LogStep(105, "Write attribute ENUM16 Min Value");
+            ListFreer listFreer;
             uint16_t value;
             value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value,
@@ -43314,6 +44335,7 @@ private:
         }
         case 108: {
             LogStep(108, "Write attribute OCTET_STRING with embedded null");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("Tes\000ti\000nggarbage: not in length on purpose"), 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -43326,6 +44348,7 @@ private:
         }
         case 110: {
             LogStep(110, "Write attribute OCTET_STRING with weird chars");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("\015\012\377\042\240garbage: not in length on purpose"), 5);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -43338,6 +44361,7 @@ private:
         }
         case 112: {
             LogStep(112, "Write attribute OCTET_STRING");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -43350,6 +44374,7 @@ private:
         }
         case 114: {
             LogStep(114, "Write attribute OCTET_STRING");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("TestValueLongerThan10garbage: not in length on purpose"), 21);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -43362,6 +44387,7 @@ private:
         }
         case 116: {
             LogStep(116, "Write attribute OCTET_STRING");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -43374,6 +44400,7 @@ private:
         }
         case 118: {
             LogStep(118, "Write attribute LONG_OCTET_STRING");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(
                 chip::Uint8::from_const_char("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -43391,6 +44418,7 @@ private:
         }
         case 120: {
             LogStep(120, "Write attribute LONG_OCTET_STRING");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::LongOctetString::Id,
@@ -43403,6 +44431,7 @@ private:
         }
         case 122: {
             LogStep(122, "Write attribute CHAR_STRING");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -43415,6 +44444,7 @@ private:
         }
         case 124: {
             LogStep(124, "Write attribute CHAR_STRING - Value too long");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("☉TestValueLongerThan10☉garbage: not in length on purpose", 27);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -43427,6 +44457,7 @@ private:
         }
         case 126: {
             LogStep(126, "Write attribute CHAR_STRING - Empty");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("garbage: not in length on purpose", 0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -43439,6 +44470,7 @@ private:
         }
         case 128: {
             LogStep(128, "Write attribute LONG_CHAR_STRING");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>(
                 "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
@@ -43455,6 +44487,7 @@ private:
         }
         case 130: {
             LogStep(130, "Write attribute LONG_CHAR_STRING");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("garbage: not in length on purpose", 0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::LongCharString::Id,
@@ -43535,6 +44568,7 @@ private:
         }
         case 135: {
             LogStep(135, "Write attribute EPOCH_US Max Value");
+            ListFreer listFreer;
             uint64_t value;
             value = 18446744073709551615ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochUs::Id, value,
@@ -43547,6 +44581,7 @@ private:
         }
         case 137: {
             LogStep(137, "Write attribute EPOCH_US Min Value");
+            ListFreer listFreer;
             uint64_t value;
             value = 0ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochUs::Id, value,
@@ -43564,6 +44599,7 @@ private:
         }
         case 140: {
             LogStep(140, "Write attribute EPOCH_S Max Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 4294967295UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochS::Id, value,
@@ -43576,6 +44612,7 @@ private:
         }
         case 142: {
             LogStep(142, "Write attribute EPOCH_S Min Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 0UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochS::Id, value,
@@ -43593,6 +44630,7 @@ private:
         }
         case 145: {
             LogStep(145, "Writeattribute UNSUPPORTED");
+            ListFreer listFreer;
             bool value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Unsupported::Id, value,
@@ -43600,6 +44638,7 @@ private:
         }
         case 146: {
             LogStep(146, "Send Test Command to unsupported endpoint");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::Test::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(200), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::NullOptional
@@ -43608,6 +44647,7 @@ private:
         }
         case 147: {
             LogStep(147, "Send Test Command to unsupported cluster");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::Test::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::NullOptional
@@ -43621,6 +44661,7 @@ private:
         }
         case 149: {
             LogStep(149, "Write attribute vendor_id");
+            ListFreer listFreer;
             chip::VendorId value;
             value = static_cast<chip::VendorId>(17);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::VendorId::Id, value,
@@ -43633,6 +44674,7 @@ private:
         }
         case 151: {
             LogStep(151, "Restore attribute vendor_id");
+            ListFreer listFreer;
             chip::VendorId value;
             value = static_cast<chip::VendorId>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::VendorId::Id, value,
@@ -43640,6 +44682,7 @@ private:
         }
         case 152: {
             LogStep(152, "Send a command with a vendor_id and enum");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type value;
             value.arg1 = static_cast<chip::VendorId>(20003);
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
@@ -43650,6 +44693,7 @@ private:
         }
         case 153: {
             LogStep(153, "Send Test Command With Struct Argument and arg1.b is true");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type value;
 
             value.arg1.a = 0;
@@ -43668,6 +44712,7 @@ private:
         }
         case 154: {
             LogStep(154, "Send Test Command With Struct Argument and arg1.b is false");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type value;
 
             value.arg1.a = 0;
@@ -43686,6 +44731,7 @@ private:
         }
         case 155: {
             LogStep(155, "Send Test Command With Nested Struct Argument and arg1.c.b is true");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type value;
 
             value.arg1.a = 0;
@@ -43707,6 +44753,7 @@ private:
         }
         case 156: {
             LogStep(156, "Send Test Command With Nested Struct Argument arg1.c.b is false");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type value;
 
             value.arg1.a = 0;
@@ -43886,6 +44933,7 @@ private:
         }
         case 159: {
             LogStep(159, "Send Test Command With Struct Argument and see what we get back");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type value;
 
             value.arg1.a = 17;
@@ -44320,6 +45368,7 @@ private:
         }
         case 174: {
             LogStep(174, "Send Test Command with optional arg set.");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type value;
             value.arg1.Emplace();
             value.arg1.Value().SetNonNull();
@@ -44331,6 +45380,7 @@ private:
         }
         case 175: {
             LogStep(175, "Send Test Command without its optional arg.");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNullableOptionalRequest::Id, value, chip::NullOptional
@@ -44380,6 +45430,7 @@ private:
         }
         case 179: {
             LogStep(179, "Write attribute NULLABLE_BOOLEAN null");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<bool> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
@@ -44392,6 +45443,7 @@ private:
         }
         case 181: {
             LogStep(181, "Write attribute NULLABLE_BOOLEAN True");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<bool> value;
             value.SetNonNull();
             value.Value() = true;
@@ -44410,6 +45462,7 @@ private:
         }
         case 184: {
             LogStep(184, "Write attribute NULLABLE_BITMAP8 Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(254);
@@ -44423,6 +45476,7 @@ private:
         }
         case 186: {
             LogStep(186, "Write attribute NULLABLE_BITMAP8 Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(255);
@@ -44436,6 +45490,7 @@ private:
         }
         case 188: {
             LogStep(188, "Write attribute NULLABLE_BITMAP8 null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
@@ -44453,6 +45508,7 @@ private:
         }
         case 191: {
             LogStep(191, "Write attribute NULLABLE_BITMAP16 Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65534U);
@@ -44466,6 +45522,7 @@ private:
         }
         case 193: {
             LogStep(193, "Write attribute NULLABLE_BITMAP16 Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(65535U);
@@ -44479,6 +45536,7 @@ private:
         }
         case 195: {
             LogStep(195, "Write attribute NULLABLE_BITMAP16 null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
@@ -44491,6 +45549,7 @@ private:
         }
         case 197: {
             LogStep(197, "Write attribute NULLABLE_BITMAP32 Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967294UL);
@@ -44504,6 +45563,7 @@ private:
         }
         case 199: {
             LogStep(199, "Write attribute NULLABLE_BITMAP32 Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(4294967295UL);
@@ -44517,6 +45577,7 @@ private:
         }
         case 201: {
             LogStep(201, "Write attribute NULLABLE_BITMAP32 null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
@@ -44529,6 +45590,7 @@ private:
         }
         case 203: {
             LogStep(203, "Write attribute NULLABLE_BITMAP64 Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551614ULL);
@@ -44542,6 +45604,7 @@ private:
         }
         case 205: {
             LogStep(205, "Write attribute NULLABLE_BITMAP64 Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(18446744073709551615ULL);
@@ -44555,6 +45618,7 @@ private:
         }
         case 207: {
             LogStep(207, "Write attribute NULLABLE_BITMAP64 null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
@@ -44567,6 +45631,7 @@ private:
         }
         case 209: {
             LogStep(209, "Write attribute NULLABLE_INT8U Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 0;
@@ -44580,6 +45645,7 @@ private:
         }
         case 211: {
             LogStep(211, "Write attribute NULLABLE_INT8U Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 254;
@@ -44593,6 +45659,7 @@ private:
         }
         case 213: {
             LogStep(213, "Write attribute NULLABLE_INT8U Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 255;
@@ -44611,6 +45678,7 @@ private:
         }
         case 216: {
             LogStep(216, "Write attribute NULLABLE_INT8U null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
@@ -44633,6 +45701,7 @@ private:
         }
         case 220: {
             LogStep(220, "Write attribute NULLABLE_INT8U Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 128;
@@ -44651,6 +45720,7 @@ private:
         }
         case 223: {
             LogStep(223, "Write attribute NULLABLE_INT16U Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 0U;
@@ -44664,6 +45734,7 @@ private:
         }
         case 225: {
             LogStep(225, "Write attribute NULLABLE_INT16U Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 65534U;
@@ -44677,6 +45748,7 @@ private:
         }
         case 227: {
             LogStep(227, "Write attribute NULLABLE_INT16U Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 65535U;
@@ -44690,6 +45762,7 @@ private:
         }
         case 229: {
             LogStep(229, "Write attribute NULLABLE_INT16U null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id,
@@ -44712,6 +45785,7 @@ private:
         }
         case 233: {
             LogStep(233, "Write attribute NULLABLE_INT16U Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 32000U;
@@ -44730,6 +45804,7 @@ private:
         }
         case 236: {
             LogStep(236, "Write attribute NULLABLE_INT32U Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 0UL;
@@ -44743,6 +45818,7 @@ private:
         }
         case 238: {
             LogStep(238, "Write attribute NULLABLE_INT32U Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 4294967294UL;
@@ -44756,6 +45832,7 @@ private:
         }
         case 240: {
             LogStep(240, "Write attribute NULLABLE_INT32U Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 4294967295UL;
@@ -44769,6 +45846,7 @@ private:
         }
         case 242: {
             LogStep(242, "Write attribute NULLABLE_INT32U null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id,
@@ -44791,6 +45869,7 @@ private:
         }
         case 246: {
             LogStep(246, "Write attribute NULLABLE_INT32U Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
             value.Value() = 2147483647UL;
@@ -44809,6 +45888,7 @@ private:
         }
         case 249: {
             LogStep(249, "Write attribute NULLABLE_INT64U Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
             value.Value() = 0ULL;
@@ -44822,6 +45902,7 @@ private:
         }
         case 251: {
             LogStep(251, "Write attribute NULLABLE_INT64U Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
             value.Value() = 18446744073709551614ULL;
@@ -44835,6 +45916,7 @@ private:
         }
         case 253: {
             LogStep(253, "Write attribute NULLABLE_INT64U Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
             value.Value() = 18446744073709551615ULL;
@@ -44848,6 +45930,7 @@ private:
         }
         case 255: {
             LogStep(255, "Write attribute NULLABLE_INT64U null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id,
@@ -44870,6 +45953,7 @@ private:
         }
         case 259: {
             LogStep(259, "Write attribute NULLABLE_INT64U Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
             value.Value() = 18000000000000000000ULL;
@@ -44888,6 +45972,7 @@ private:
         }
         case 262: {
             LogStep(262, "Write attribute NULLABLE_INT8S Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = -127;
@@ -44901,6 +45986,7 @@ private:
         }
         case 264: {
             LogStep(264, "Write attribute NULLABLE_INT8S Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = -128;
@@ -44914,6 +46000,7 @@ private:
         }
         case 266: {
             LogStep(266, "Write attribute NULLABLE_INT8S null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id,
@@ -44936,6 +46023,7 @@ private:
         }
         case 270: {
             LogStep(270, "Write attribute NULLABLE_INT8S Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = -127;
@@ -44954,6 +46042,7 @@ private:
         }
         case 273: {
             LogStep(273, "Write attribute NULLABLE_INT16S Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = -32767;
@@ -44967,6 +46056,7 @@ private:
         }
         case 275: {
             LogStep(275, "Write attribute NULLABLE_INT16S Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = -32768;
@@ -44980,6 +46070,7 @@ private:
         }
         case 277: {
             LogStep(277, "Write attribute NULLABLE_INT16S null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id,
@@ -45002,6 +46093,7 @@ private:
         }
         case 281: {
             LogStep(281, "Write attribute NULLABLE_INT16S Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = -32767;
@@ -45020,6 +46112,7 @@ private:
         }
         case 284: {
             LogStep(284, "Write attribute NULLABLE_INT32S Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNonNull();
             value.Value() = -2147483647L;
@@ -45033,6 +46126,7 @@ private:
         }
         case 286: {
             LogStep(286, "Write attribute NULLABLE_INT32S Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNonNull();
             value.Value() = -2147483648L;
@@ -45046,6 +46140,7 @@ private:
         }
         case 288: {
             LogStep(288, "Write attribute NULLABLE_INT32S null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id,
@@ -45068,6 +46163,7 @@ private:
         }
         case 292: {
             LogStep(292, "Write attribute NULLABLE_INT32S Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNonNull();
             value.Value() = -2147483647L;
@@ -45086,6 +46182,7 @@ private:
         }
         case 295: {
             LogStep(295, "Write attribute NULLABLE_INT64S Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
             value.Value() = -9223372036854775807LL;
@@ -45099,6 +46196,7 @@ private:
         }
         case 297: {
             LogStep(297, "Write attribute NULLABLE_INT64S Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
             value.Value() = static_cast<int64_t>(-9223372036854775807LL - 1);
@@ -45112,6 +46210,7 @@ private:
         }
         case 299: {
             LogStep(299, "Write attribute NULLABLE_INT64S null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id,
@@ -45134,6 +46233,7 @@ private:
         }
         case 303: {
             LogStep(303, "Write attribute NULLABLE_INT64S Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
             value.Value() = -9223372036854775807LL;
@@ -45152,6 +46252,7 @@ private:
         }
         case 306: {
             LogStep(306, "Write attribute NULLABLE_SINGLE medium Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
             value.Value() = 0.1f;
@@ -45165,6 +46266,7 @@ private:
         }
         case 308: {
             LogStep(308, "Write attribute NULLABLE_SINGLE largest Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
             value.Value() = INFINITY;
@@ -45178,6 +46280,7 @@ private:
         }
         case 310: {
             LogStep(310, "Write attribute NULLABLE_SINGLE smallest Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
             value.Value() = -INFINITY;
@@ -45191,6 +46294,7 @@ private:
         }
         case 312: {
             LogStep(312, "Write attribute NULLABLE_SINGLE null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
@@ -45203,6 +46307,7 @@ private:
         }
         case 314: {
             LogStep(314, "Write attribute NULLABLE_SINGLE 0 Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
             value.Value() = 0.0f;
@@ -45216,6 +46321,7 @@ private:
         }
         case 316: {
             LogStep(316, "Write attribute NULLABLE_DOUBLE medium Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
             value.Value() = 0.1234567890123;
@@ -45229,6 +46335,7 @@ private:
         }
         case 318: {
             LogStep(318, "Write attribute NULLABLE_DOUBLE largest Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
             value.Value() = INFINITY;
@@ -45242,6 +46349,7 @@ private:
         }
         case 320: {
             LogStep(320, "Write attribute NULLABLE_DOUBLE smallest Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
             value.Value() = -INFINITY;
@@ -45255,6 +46363,7 @@ private:
         }
         case 322: {
             LogStep(322, "Write attribute NULLABLE_DOUBLE null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
@@ -45267,6 +46376,7 @@ private:
         }
         case 324: {
             LogStep(324, "Write attribute NULLABLE_DOUBLE 0 Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
             value.Value() = 0;
@@ -45280,6 +46390,7 @@ private:
         }
         case 326: {
             LogStep(326, "Write attribute NULLABLE_ENUM8 Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 0;
@@ -45293,6 +46404,7 @@ private:
         }
         case 328: {
             LogStep(328, "Write attribute NULLABLE_ENUM8 Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 254;
@@ -45306,6 +46418,7 @@ private:
         }
         case 330: {
             LogStep(330, "Write attribute NULLABLE_ENUM8 Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 255;
@@ -45319,6 +46432,7 @@ private:
         }
         case 332: {
             LogStep(332, "Write attribute NULLABLE_ENUM8 null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
@@ -45331,6 +46445,7 @@ private:
         }
         case 334: {
             LogStep(334, "Write attribute NULLABLE_ENUM16 Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 0U;
@@ -45344,6 +46459,7 @@ private:
         }
         case 336: {
             LogStep(336, "Write attribute NULLABLE_ENUM16 Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 65534U;
@@ -45357,6 +46473,7 @@ private:
         }
         case 338: {
             LogStep(338, "Write attribute NULLABLE_ENUM16 Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 65535U;
@@ -45370,6 +46487,7 @@ private:
         }
         case 340: {
             LogStep(340, "Write attribute NULLABLE_ENUM16 null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
@@ -45382,6 +46500,7 @@ private:
         }
         case 342: {
             LogStep(342, "Write attribute NULLABLE_SIMPLE_ENUM Min Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(0);
@@ -45395,6 +46514,7 @@ private:
         }
         case 344: {
             LogStep(344, "Write attribute NULLABLE_SIMPLE_ENUM Max Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(254);
@@ -45408,6 +46528,7 @@ private:
         }
         case 346: {
             LogStep(346, "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(255);
@@ -45421,6 +46542,7 @@ private:
         }
         case 348: {
             LogStep(348, "Write attribute NULLABLE_SIMPLE_ENUM null Value");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
@@ -45443,6 +46565,7 @@ private:
         }
         case 352: {
             LogStep(352, "Write attribute NULLABLE_OCTET_STRING");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             value.SetNonNull();
             value.Value() = chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
@@ -45456,6 +46579,7 @@ private:
         }
         case 354: {
             LogStep(354, "Write attribute NULLABLE_OCTET_STRING");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
@@ -45468,6 +46592,7 @@ private:
         }
         case 356: {
             LogStep(356, "Write attribute NULLABLE_OCTET_STRING");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             value.SetNonNull();
             value.Value() = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
@@ -45491,6 +46616,7 @@ private:
         }
         case 360: {
             LogStep(360, "Write attribute NULLABLE_CHAR_STRING");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             value.SetNonNull();
             value.Value() = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
@@ -45509,6 +46635,7 @@ private:
         }
         case 363: {
             LogStep(363, "Write attribute NULLABLE_CHAR_STRING - Value too long");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
@@ -45521,6 +46648,7 @@ private:
         }
         case 365: {
             LogStep(365, "Write attribute NULLABLE_CHAR_STRING - Empty");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             value.SetNonNull();
             value.Value() = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -45549,6 +46677,7 @@ private:
         }
         case 370: {
             LogStep(370, "Send a command that takes an optional parameter but do not set it.");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestSimpleOptionalArgumentRequest::Id, value, chip::NullOptional
@@ -45557,6 +46686,7 @@ private:
         }
         case 371: {
             LogStep(371, "Send a command that takes an optional parameter but do not set it.");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type value;
             value.arg1.Emplace();
             value.arg1.Value() = 1;
@@ -45598,6 +46728,7 @@ private:
         }
         case 376: {
             LogStep(376, "Write min value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45605,6 +46736,7 @@ private:
         }
         case 377: {
             LogStep(377, "Write just-below-range value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 19;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45612,6 +46744,7 @@ private:
         }
         case 378: {
             LogStep(378, "Write just-above-range value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 101;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45619,6 +46752,7 @@ private:
         }
         case 379: {
             LogStep(379, "Write max value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 255;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45631,6 +46765,7 @@ private:
         }
         case 381: {
             LogStep(381, "Write min valid value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 20;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45643,6 +46778,7 @@ private:
         }
         case 383: {
             LogStep(383, "Write max valid value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 100;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45655,6 +46791,7 @@ private:
         }
         case 385: {
             LogStep(385, "Write middle valid value to a range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             uint8_t value;
             value = 50;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45672,6 +46809,7 @@ private:
         }
         case 388: {
             LogStep(388, "Write min value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45680,6 +46818,7 @@ private:
         }
         case 389: {
             LogStep(389, "Write just-below-range value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 99U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45688,6 +46827,7 @@ private:
         }
         case 390: {
             LogStep(390, "Write just-above-range value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 1001U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45696,6 +46836,7 @@ private:
         }
         case 391: {
             LogStep(391, "Write max value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 65535U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45709,6 +46850,7 @@ private:
         }
         case 393: {
             LogStep(393, "Write min valid value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 100U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45722,6 +46864,7 @@ private:
         }
         case 395: {
             LogStep(395, "Write max valid value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 1000U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45735,6 +46878,7 @@ private:
         }
         case 397: {
             LogStep(397, "Write middle valid value to a range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             uint16_t value;
             value = 500U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45753,6 +46897,7 @@ private:
         }
         case 400: {
             LogStep(400, "Write min value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = -128;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45760,6 +46905,7 @@ private:
         }
         case 401: {
             LogStep(401, "Write just-below-range value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = -41;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45767,6 +46913,7 @@ private:
         }
         case 402: {
             LogStep(402, "Write just-above-range value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = 51;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45774,6 +46921,7 @@ private:
         }
         case 403: {
             LogStep(403, "Write max value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = 127;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45786,6 +46934,7 @@ private:
         }
         case 405: {
             LogStep(405, "Write min valid value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = -40;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45798,6 +46947,7 @@ private:
         }
         case 407: {
             LogStep(407, "Write max valid value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = 50;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45810,6 +46960,7 @@ private:
         }
         case 409: {
             LogStep(409, "Write middle valid value to a range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             int8_t value;
             value = 6;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45827,6 +46978,7 @@ private:
         }
         case 412: {
             LogStep(412, "Write min value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = -32768;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45835,6 +46987,7 @@ private:
         }
         case 413: {
             LogStep(413, "Write just-below-range value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = -151;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45843,6 +46996,7 @@ private:
         }
         case 414: {
             LogStep(414, "Write just-above-range value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = 201;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45851,6 +47005,7 @@ private:
         }
         case 415: {
             LogStep(415, "Write max value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = 32767;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45864,6 +47019,7 @@ private:
         }
         case 417: {
             LogStep(417, "Write min valid value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = -150;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45877,6 +47033,7 @@ private:
         }
         case 419: {
             LogStep(419, "Write max valid value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = 200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45890,6 +47047,7 @@ private:
         }
         case 421: {
             LogStep(421, "Write middle valid value to a range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             int16_t value;
             value = 7;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45908,6 +47066,7 @@ private:
         }
         case 424: {
             LogStep(424, "Write min value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 0;
@@ -45917,6 +47076,7 @@ private:
         }
         case 425: {
             LogStep(425, "Write just-below-range value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 19;
@@ -45926,6 +47086,7 @@ private:
         }
         case 426: {
             LogStep(426, "Write just-above-range value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 101;
@@ -45935,6 +47096,7 @@ private:
         }
         case 427: {
             LogStep(427, "Write max value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 254;
@@ -45949,6 +47111,7 @@ private:
         }
         case 429: {
             LogStep(429, "Write min valid value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 20;
@@ -45963,6 +47126,7 @@ private:
         }
         case 431: {
             LogStep(431, "Write max valid value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 100;
@@ -45977,6 +47141,7 @@ private:
         }
         case 433: {
             LogStep(433, "Write middle valid value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 50;
@@ -45991,6 +47156,7 @@ private:
         }
         case 435: {
             LogStep(435, "Write null value to a nullable range-restricted unsigned 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -46009,6 +47175,7 @@ private:
         }
         case 438: {
             LogStep(438, "Write min value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 0U;
@@ -46018,6 +47185,7 @@ private:
         }
         case 439: {
             LogStep(439, "Write just-below-range value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 99U;
@@ -46027,6 +47195,7 @@ private:
         }
         case 440: {
             LogStep(440, "Write just-above-range value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 1001U;
@@ -46036,6 +47205,7 @@ private:
         }
         case 441: {
             LogStep(441, "Write max value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 65534U;
@@ -46050,6 +47220,7 @@ private:
         }
         case 443: {
             LogStep(443, "Write min valid value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 100U;
@@ -46064,6 +47235,7 @@ private:
         }
         case 445: {
             LogStep(445, "Write max valid value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 1000U;
@@ -46078,6 +47250,7 @@ private:
         }
         case 447: {
             LogStep(447, "Write middle valid value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
             value.Value() = 500U;
@@ -46092,6 +47265,7 @@ private:
         }
         case 449: {
             LogStep(449, "Write null value to a nullable range-restricted unsigned 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -46110,6 +47284,7 @@ private:
         }
         case 452: {
             LogStep(452, "Write min value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = -127;
@@ -46119,6 +47294,7 @@ private:
         }
         case 453: {
             LogStep(453, "Write just-below-range value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = -41;
@@ -46128,6 +47304,7 @@ private:
         }
         case 454: {
             LogStep(454, "Write just-above-range value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = 51;
@@ -46137,6 +47314,7 @@ private:
         }
         case 455: {
             LogStep(455, "Write max value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = 127;
@@ -46151,6 +47329,7 @@ private:
         }
         case 457: {
             LogStep(457, "Write min valid value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = -40;
@@ -46165,6 +47344,7 @@ private:
         }
         case 459: {
             LogStep(459, "Write max valid value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = 50;
@@ -46179,6 +47359,7 @@ private:
         }
         case 461: {
             LogStep(461, "Write middle valid value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
             value.Value() = 6;
@@ -46193,6 +47374,7 @@ private:
         }
         case 463: {
             LogStep(463, "Write null value to a nullable range-restricted signed 8-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -46211,6 +47393,7 @@ private:
         }
         case 466: {
             LogStep(466, "Write min value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = -32767;
@@ -46220,6 +47403,7 @@ private:
         }
         case 467: {
             LogStep(467, "Write just-below-range value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = -151;
@@ -46229,6 +47413,7 @@ private:
         }
         case 468: {
             LogStep(468, "Write just-above-range value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = 201;
@@ -46238,6 +47423,7 @@ private:
         }
         case 469: {
             LogStep(469, "Write max value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = 32767;
@@ -46252,6 +47438,7 @@ private:
         }
         case 471: {
             LogStep(471, "Write min valid value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = -150;
@@ -46266,6 +47453,7 @@ private:
         }
         case 473: {
             LogStep(473, "Write max valid value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = 200;
@@ -46280,6 +47468,7 @@ private:
         }
         case 475: {
             LogStep(475, "Write middle valid value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
             value.Value() = 7;
@@ -46294,6 +47483,7 @@ private:
         }
         case 477: {
             LogStep(477, "Write null value to a nullable range-restricted signed 16-bit integer");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -46307,6 +47497,7 @@ private:
         }
         case 479: {
             LogStep(479, "Write attribute that returns general status on write");
+            ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::GeneralErrorBoolean::Id,
@@ -46314,6 +47505,7 @@ private:
         }
         case 480: {
             LogStep(480, "Write attribute that returns cluster-specific status on write");
+            ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ClusterErrorBoolean::Id,
@@ -46341,6 +47533,7 @@ private:
         }
         case 485: {
             LogStep(485, "Write struct-typed attribute");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type value;
 
             value.a = 5;
@@ -46529,12 +47722,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Command with optional arg set to null.");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type value;
             value.arg1.Emplace();
             value.arg1.Value().SetNull();
@@ -46545,6 +47740,7 @@ private:
         }
         case 2: {
             LogStep(2, "Send command that needs timed invoke without a timeout value");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TimedInvokeRequest::Id,
                                value, chip::NullOptional, chip::NullOptional
@@ -46553,6 +47749,7 @@ private:
         }
         case 3: {
             LogStep(3, "Send command that needs timed invoke with a long timeout value");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TimedInvokeRequest::Id,
                                value, chip::Optional<uint16_t>(10000), chip::NullOptional
@@ -46561,6 +47758,7 @@ private:
         }
         case 4: {
             LogStep(4, "Send command that needs timed invoke with a too-short timeout value");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type value;
             ReturnErrorOnFailure(SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                              TestCluster::Commands::TimedInvokeRequest::Id, value, chip::Optional<uint16_t>(1),
@@ -46573,6 +47771,7 @@ private:
         }
         case 5: {
             LogStep(5, "Send command that does not need timed invoke with a long timeout value");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::Test::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
@@ -46581,6 +47780,7 @@ private:
         }
         case 6: {
             LogStep(6, "Send command that does not need timed invoke with a too-short timeout value");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::Test::Type value;
             ReturnErrorOnFailure(SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::Test::Id,
                                              value, chip::Optional<uint16_t>(1), chip::NullOptional
@@ -46597,6 +47797,7 @@ private:
         }
         case 8: {
             LogStep(8, "Write attribute that needs timed write without a timeout value");
+            ListFreer listFreer;
             bool value;
             value = true;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::TimedWriteBoolean::Id,
@@ -46609,6 +47810,7 @@ private:
         }
         case 10: {
             LogStep(10, "Write attribute that needs timed write with a too-short timeout value");
+            ListFreer listFreer;
             bool value;
             value = true;
             ReturnErrorOnFailure(WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -46625,6 +47827,7 @@ private:
         }
         case 12: {
             LogStep(12, "Write attribute that needs timed write with a long timeout value");
+            ListFreer listFreer;
             bool value;
             value = true;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::TimedWriteBoolean::Id,
@@ -46637,6 +47840,7 @@ private:
         }
         case 14: {
             LogStep(14, "Write attribute that needs timed write reset to default");
+            ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::TimedWriteBoolean::Id,
@@ -46649,6 +47853,7 @@ private:
         }
         case 16: {
             LogStep(16, "Write attribute that does not need timed write with a too-short timeout value");
+            ListFreer listFreer;
             bool value;
             value = true;
             ReturnErrorOnFailure(WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -46665,6 +47870,7 @@ private:
         }
         case 18: {
             LogStep(18, "Write attribute that does not need timed write with a long timeout value");
+            ListFreer listFreer;
             bool value;
             value = true;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Boolean::Id, value,
@@ -46677,6 +47883,7 @@ private:
         }
         case 20: {
             LogStep(20, "Write attribute that does not need timed write reset to default");
+            ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Boolean::Id, value,
@@ -46870,12 +48077,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write attribute INT32U Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 5UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
@@ -46898,6 +48107,7 @@ private:
         }
         case 5: {
             LogStep(5, "Write attribute INT32U Value Back to Default Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 0UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
@@ -46905,6 +48115,7 @@ private:
         }
         case 6: {
             LogStep(6, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("** Test **garbage: not in length on purpose", 10);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -46932,6 +48143,7 @@ private:
         }
         case 11: {
             LogStep(11, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("lowercasegarbage: not in length on purpose", 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -46944,6 +48156,7 @@ private:
         }
         case 13: {
             LogStep(13, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("UPPERCASEgarbage: not in length on purpose", 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -46956,6 +48169,7 @@ private:
         }
         case 15: {
             LogStep(15, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("lowUPPERgarbage: not in length on purpose", 8);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -46968,6 +48182,7 @@ private:
         }
         case 17: {
             LogStep(17, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("ABCDEF012Vgarbage: not in length on purpose", 10);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -46980,6 +48195,7 @@ private:
         }
         case 19: {
             LogStep(19, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("ABCDEF0123garbage: not in length on purpose", 10);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -46992,6 +48208,7 @@ private:
         }
         case 21: {
             LogStep(21, "Write attribute CHAR_STRING Value Back to Default Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("garbage: not in length on purpose", 0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -47063,12 +48280,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 100UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -47304,6 +48523,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -47322,6 +48542,7 @@ private:
         }
         case 3: {
             LogStep(3, "Generate an event on the accessory");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
             value.arg1 = 1;
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(2);
@@ -47351,6 +48572,7 @@ private:
         }
         case 7: {
             LogStep(7, "Generate a second event on the accessory");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
             value.arg1 = 3;
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(4);
@@ -47374,6 +48596,7 @@ private:
         }
         case 10: {
             LogStep(10, "Generate a third event on the accessory");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
             value.arg1 = 4;
             value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(5);
@@ -47686,11 +48909,13 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -47698,12 +48923,14 @@ private:
         }
         case 2: {
             LogStep(2, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Open Commissioning Window with too-short timeout");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 120U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -47714,6 +48941,7 @@ private:
         }
         case 4: {
             LogStep(4, "Open Commissioning Window with too-long timeout");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 1000U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -47724,6 +48952,7 @@ private:
         }
         case 5: {
             LogStep(5, "Open Commissioning Window");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -47734,103 +48963,121 @@ private:
         }
         case 6: {
             LogStep(6, "Check Instance Name");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Check Long Discriminator _L");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByLongDiscriminator(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Check Short Discriminator (_S)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByShortDiscriminator(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Check Commissioning Mode (_CM)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type value;
             return FindCommissionableByCommissioningMode(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "Check Vendor ID (_V)");
             VerifyOrdo(!ShouldSkip("VENDOR_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type value;
             value.value = mVendorId.HasValue() ? mVendorId.Value() : 65521ULL;
             return FindCommissionableByVendorId(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "TXT key for discriminator (D)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 12: {
             LogStep(12, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "TXT key for Vendor ID and Product ID (VP)");
             VerifyOrdo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Optional TXT key for MRP Retry Interval Idle (CRI)");
             VerifyOrdo(!ShouldSkip("CRI_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Optional TXT key for MRP Retry Interval Active (CRA)");
             VerifyOrdo(!ShouldSkip("CRA_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 16: {
             LogStep(16, "TXT key for commissioning mode (CM)");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Optional TXT key for device name (DN)");
             VerifyOrdo(!ShouldSkip("DN_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 18: {
             LogStep(18, "Optional TXT key for rotating device identifier (RI)");
             VerifyOrdo(!ShouldSkip("RI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Optional TXT key for pairing hint (PH)");
             VerifyOrdo(!ShouldSkip("PH_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Optional TXT key for pairing instructions (PI)");
             VerifyOrdo(!ShouldSkip("PI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 21: {
             LogStep(21, "Check IPs");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
         case 22: {
             LogStep(22, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 23: {
             LogStep(23, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -47838,12 +49085,14 @@ private:
         }
         case 24: {
             LogStep(24, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 25: {
             LogStep(25, "Open Commissioning Window");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -47854,6 +49103,7 @@ private:
         }
         case 26: {
             LogStep(26, "Check Instance Name");
+            ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
@@ -47927,18 +49177,21 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Log a simple message");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("This is a simple messagegarbage: not in length on purpose", 24);
             return Log(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Do a simple user prompt message");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("This is a simple messagegarbage: not in length on purpose", 24);
             return UserPrompt(kIdentityAlpha, value);
@@ -48794,12 +50047,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = 3;
             value.arg2 = 17;
@@ -48810,6 +50065,7 @@ private:
         }
         case 2: {
             LogStep(2, "Send Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = 3;
             value.arg2 = 17;
@@ -48820,6 +50076,7 @@ private:
         }
         case 3: {
             LogStep(3, "Send Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = 3;
             value.arg2 = TestAddArgumentDefaultValue;
@@ -48835,6 +50092,7 @@ private:
         }
         case 5: {
             LogStep(5, "Write attribute BOOLEAN Not Default Value");
+            ListFreer listFreer;
             bool value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Boolean::Id, value,
@@ -48847,6 +50105,7 @@ private:
         }
         case 7: {
             LogStep(7, "Write attribute BOOLEAN DefaultValue");
+            ListFreer listFreer;
             bool value;
             value = readAttributeBooleanDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Boolean::Id, value,
@@ -48864,6 +50123,7 @@ private:
         }
         case 10: {
             LogStep(10, "Write attribute BITMAP8 Not Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
@@ -48876,6 +50136,7 @@ private:
         }
         case 12: {
             LogStep(12, "Write attribute BITMAP8 Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value;
             value = readAttributeBitmap8DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap8::Id, value,
@@ -48893,6 +50154,7 @@ private:
         }
         case 15: {
             LogStep(15, "Write attribute BITMAP16 Not Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>(1U);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
@@ -48905,6 +50167,7 @@ private:
         }
         case 17: {
             LogStep(17, "Write attribute BITMAP16 Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value;
             value = readAttributeBitmap16DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap16::Id, value,
@@ -48922,6 +50185,7 @@ private:
         }
         case 20: {
             LogStep(20, "Write attribute BITMAP32 Not Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(1UL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
@@ -48934,6 +50198,7 @@ private:
         }
         case 22: {
             LogStep(22, "Write attribute BITMAP32 Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
             value = readAttributeBitmap32DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
@@ -48951,6 +50216,7 @@ private:
         }
         case 25: {
             LogStep(25, "Write attribute BITMAP64 Not Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             value = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>(1ULL);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
@@ -48963,6 +50229,7 @@ private:
         }
         case 27: {
             LogStep(27, "Write attribute BITMAP64 Default Value");
+            ListFreer listFreer;
             chip::BitFlags<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value;
             value = readAttributeBitmap64DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap64::Id, value,
@@ -48980,6 +50247,7 @@ private:
         }
         case 30: {
             LogStep(30, "Write attribute INT8U Not Default Value");
+            ListFreer listFreer;
             uint8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
@@ -48992,6 +50260,7 @@ private:
         }
         case 32: {
             LogStep(32, "Write attribute INT8U Default Value");
+            ListFreer listFreer;
             uint8_t value;
             value = readAttributeInt8uDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8u::Id, value,
@@ -49009,6 +50278,7 @@ private:
         }
         case 35: {
             LogStep(35, "Write attribute INT16U Not Default Value");
+            ListFreer listFreer;
             uint16_t value;
             value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16u::Id, value,
@@ -49021,6 +50291,7 @@ private:
         }
         case 37: {
             LogStep(37, "Write attribute INT16U Default Value");
+            ListFreer listFreer;
             uint16_t value;
             value = readAttributeInt16uDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16u::Id, value,
@@ -49038,6 +50309,7 @@ private:
         }
         case 40: {
             LogStep(40, "Write attribute INT32U Not Default Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 1UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
@@ -49050,6 +50322,7 @@ private:
         }
         case 42: {
             LogStep(42, "Write attribute INT32U Default Value");
+            ListFreer listFreer;
             uint32_t value;
             value = readAttributeInt32uDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
@@ -49067,6 +50340,7 @@ private:
         }
         case 45: {
             LogStep(45, "Write attribute INT64U Not Default Value");
+            ListFreer listFreer;
             uint64_t value;
             value = 1ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64u::Id, value,
@@ -49079,6 +50353,7 @@ private:
         }
         case 47: {
             LogStep(47, "Write attribute INT64U Default Value");
+            ListFreer listFreer;
             uint64_t value;
             value = readAttributeInt64uDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64u::Id, value,
@@ -49096,6 +50371,7 @@ private:
         }
         case 50: {
             LogStep(50, "Write attribute INT8S Not Default Value");
+            ListFreer listFreer;
             int8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8s::Id, value,
@@ -49108,6 +50384,7 @@ private:
         }
         case 52: {
             LogStep(52, "Write attribute INT8S Default Value");
+            ListFreer listFreer;
             int8_t value;
             value = readAttributeInt8sDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int8s::Id, value,
@@ -49125,6 +50402,7 @@ private:
         }
         case 55: {
             LogStep(55, "Write attribute INT16S Not Default Value");
+            ListFreer listFreer;
             int16_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16s::Id, value,
@@ -49137,6 +50415,7 @@ private:
         }
         case 57: {
             LogStep(57, "Write attribute INT16S Default Value");
+            ListFreer listFreer;
             int16_t value;
             value = readAttributeInt16sDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int16s::Id, value,
@@ -49154,6 +50433,7 @@ private:
         }
         case 60: {
             LogStep(60, "Write attribute INT32S Not Default Value");
+            ListFreer listFreer;
             int32_t value;
             value = 1L;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32s::Id, value,
@@ -49166,6 +50446,7 @@ private:
         }
         case 62: {
             LogStep(62, "Write attribute INT32S Default Value");
+            ListFreer listFreer;
             int32_t value;
             value = readAttributeInt32sDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32s::Id, value,
@@ -49183,6 +50464,7 @@ private:
         }
         case 65: {
             LogStep(65, "Write attribute INTS Not Default Value");
+            ListFreer listFreer;
             int64_t value;
             value = 1LL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64s::Id, value,
@@ -49195,6 +50477,7 @@ private:
         }
         case 67: {
             LogStep(67, "Write attribute INT64S Default Value");
+            ListFreer listFreer;
             int64_t value;
             value = readAttributeInt64sDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int64s::Id, value,
@@ -49212,6 +50495,7 @@ private:
         }
         case 70: {
             LogStep(70, "Write attribute ENUM8 Not Default Value");
+            ListFreer listFreer;
             uint8_t value;
             value = 1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
@@ -49224,6 +50508,7 @@ private:
         }
         case 72: {
             LogStep(72, "Write attribute ENUM8 Default Value");
+            ListFreer listFreer;
             uint8_t value;
             value = readAttributeEnum8DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum8::Id, value,
@@ -49241,6 +50526,7 @@ private:
         }
         case 75: {
             LogStep(75, "Write attribute ENUM16 Not Default Value");
+            ListFreer listFreer;
             uint16_t value;
             value = 1U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value,
@@ -49253,6 +50539,7 @@ private:
         }
         case 77: {
             LogStep(77, "Write attribute ENUM16 Default Value");
+            ListFreer listFreer;
             uint16_t value;
             value = readAttributeEnum16DefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Enum16::Id, value,
@@ -49270,6 +50557,7 @@ private:
         }
         case 80: {
             LogStep(80, "Write attribute EPOCH_US Not Default Value");
+            ListFreer listFreer;
             uint64_t value;
             value = 1ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochUs::Id, value,
@@ -49282,6 +50570,7 @@ private:
         }
         case 82: {
             LogStep(82, "Write attribute EPOCH_US Default Value");
+            ListFreer listFreer;
             uint64_t value;
             value = readAttributeEpochUSDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochUs::Id, value,
@@ -49299,6 +50588,7 @@ private:
         }
         case 85: {
             LogStep(85, "Write attribute EPOCH_S Not Default Value");
+            ListFreer listFreer;
             uint32_t value;
             value = 1UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochS::Id, value,
@@ -49311,6 +50601,7 @@ private:
         }
         case 87: {
             LogStep(87, "Write attribute EPOCH_S Default Value");
+            ListFreer listFreer;
             uint32_t value;
             value = readAttributeEpochSDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::EpochS::Id, value,
@@ -49328,6 +50619,7 @@ private:
         }
         case 90: {
             LogStep(90, "Write attribute vendor_id Not Default Value");
+            ListFreer listFreer;
             chip::VendorId value;
             value = static_cast<chip::VendorId>(1);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::VendorId::Id, value,
@@ -49340,6 +50632,7 @@ private:
         }
         case 92: {
             LogStep(92, "Write attribute vendor_id Default Value");
+            ListFreer listFreer;
             chip::VendorId value;
             value = readAttributeVendorIdDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::VendorId::Id, value,
@@ -49362,6 +50655,7 @@ private:
         }
         case 96: {
             LogStep(96, "Write attribute char_string Not Default Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("NotDefaultgarbage: not in length on purpose", 10);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -49379,6 +50673,7 @@ private:
         }
         case 99: {
             LogStep(99, "Write attribute char_string Not Default Value from saved value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = readAttributeCharStringNotDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -49391,6 +50686,7 @@ private:
         }
         case 101: {
             LogStep(101, "Write attribute char_string Default Value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = readAttributeCharStringDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
@@ -49408,6 +50704,7 @@ private:
         }
         case 104: {
             LogStep(104, "Write attribute octet_string Not Default Value");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(chip::Uint8::from_const_char("NotDefaultgarbage: not in length on purpose"), 10);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -49425,6 +50722,7 @@ private:
         }
         case 107: {
             LogStep(107, "Write attribute octet_string Not Default Value from saved value");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = readAttributeOctetStringNotDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -49437,6 +50735,7 @@ private:
         }
         case 109: {
             LogStep(109, "Write attribute octet_string Default Value");
+            ListFreer listFreer;
             chip::ByteSpan value;
             value = readAttributeOctetStringDefaultValue;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::OctetString::Id, value,
@@ -49530,12 +50829,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = 3;
             value.arg2 = 17;
@@ -49546,6 +50847,7 @@ private:
         }
         case 2: {
             LogStep(2, "Send Test Add Arguments Command");
+            ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type value;
             value.arg1 = mArg1.HasValue() ? mArg1.Value() : 5;
             value.arg2 = TestAddArgumentDefaultValue;
@@ -49722,6 +51024,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -49958,6 +51261,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -49969,6 +51273,7 @@ private:
         }
         case 2: {
             LogStep(2, "Write location");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("USgarbage: not in length on purpose", 2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Location::Id, value,
@@ -49981,6 +51286,7 @@ private:
         }
         case 4: {
             LogStep(4, "Restore initial location value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("XXgarbage: not in length on purpose", 2);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Location::Id, value,
@@ -49998,6 +51304,7 @@ private:
         }
         case 7: {
             LogStep(7, "Write NodeLabel");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("My nodegarbage: not in length on purpose", 7);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -50015,6 +51322,7 @@ private:
         }
         case 10: {
             LogStep(10, "Write LocalConfigDisabled");
+            ListFreer listFreer;
             bool value;
             value = true;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id, value,
@@ -50027,11 +51335,13 @@ private:
         }
         case 12: {
             LogStep(12, "Reboot the device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Connect to the device again");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -50043,6 +51353,7 @@ private:
         }
         case 15: {
             LogStep(15, "Restore initial NodeLabel value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("garbage: not in length on purpose", 0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -50055,6 +51366,7 @@ private:
         }
         case 17: {
             LogStep(17, "Restore initial LocalConfigDisabled value");
+            ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id, value,
@@ -50326,12 +51638,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write Breadcrumb (1/2)");
+            ListFreer listFreer;
             uint64_t value;
             value = 137438953472ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
@@ -50344,6 +51658,7 @@ private:
         }
         case 3: {
             LogStep(3, "Write Breadcrumb (2/2)");
+            ListFreer listFreer;
             uint64_t value;
             value = 81ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
@@ -50356,11 +51671,13 @@ private:
         }
         case 5: {
             LogStep(5, "Reboot to reset Breadcrumb");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Connect to the device again");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -50372,6 +51689,7 @@ private:
         }
         case 8: {
             LogStep(8, "Set Breadcrumb to nonzero value");
+            ListFreer listFreer;
             uint64_t value;
             value = 1ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
@@ -50384,6 +51702,7 @@ private:
         }
         case 10: {
             LogStep(10, "Send CommissioningComplete without armed fail-safe");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::CommissioningComplete::Id, value, chip::NullOptional
@@ -50397,6 +51716,7 @@ private:
         }
         case 12: {
             LogStep(12, "Open Commissioning Window from alpha");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -50407,6 +51727,7 @@ private:
         }
         case 13: {
             LogStep(13, "Try to arm fail-safe");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
             value.expiryLengthSeconds = 10U;
             value.breadcrumb          = 5000ULL;
@@ -50422,6 +51743,7 @@ private:
         }
         case 15: {
             LogStep(15, "Reset Breadcrumb to 0 so we can commission");
+            ListFreer listFreer;
             uint64_t value;
             value = 0ULL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
@@ -50429,6 +51751,7 @@ private:
         }
         case 16: {
             LogStep(16, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = 74565ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -50436,12 +51759,14 @@ private:
         }
         case 17: {
             LogStep(17, "Wait for the commissioned device to be retrieved for beta");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = 74565ULL;
             return WaitForCommissionee(kIdentityBeta, value);
         }
         case 18: {
             LogStep(18, "Arm fail-safe");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
             value.expiryLengthSeconds = 500U;
             value.breadcrumb          = 2ULL;
@@ -50457,6 +51782,7 @@ private:
         }
         case 20: {
             LogStep(20, "Try to arm fail-safe from wrong fabric");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
             value.expiryLengthSeconds = 10U;
             value.breadcrumb          = 5000ULL;
@@ -50472,6 +51798,7 @@ private:
         }
         case 22: {
             LogStep(22, "Send CommissioningComplete from wrong fabric");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type value;
             return SendCommand(kIdentityBeta, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::CommissioningComplete::Id, value, chip::NullOptional
@@ -50485,6 +51812,7 @@ private:
         }
         case 24: {
             LogStep(24, "Close out the fail-safe gracefully");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::CommissioningComplete::Id, value, chip::NullOptional
@@ -50498,6 +51826,7 @@ private:
         }
         case 26: {
             LogStep(26, "Arm fail-safe again");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
             value.expiryLengthSeconds = 500U;
             value.breadcrumb          = 3ULL;
@@ -50513,6 +51842,7 @@ private:
         }
         case 28: {
             LogStep(28, "Force-expire the fail-safe");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
             value.expiryLengthSeconds = 0U;
             value.breadcrumb          = 4ULL;
@@ -50597,12 +51927,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Send Identify command and expect success response");
+            ListFreer listFreer;
             chip::app::Clusters::Identify::Commands::Identify::Type value;
             value.identifyTime = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), Identify::Id, Identify::Commands::Identify::Id, value,
@@ -50754,6 +52086,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -50775,6 +52108,7 @@ private:
         }
         case 4: {
             LogStep(4, "Remove nonexistent fabric");
+            ListFreer listFreer;
             chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type value;
             value.fabricIndex = 243;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
@@ -50789,6 +52123,7 @@ private:
         }
         case 6: {
             LogStep(6, "Set the fabric label");
+            ListFreer listFreer;
             chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type value;
             value.label = chip::Span<const char>("Batcavegarbage: not in length on purpose", 7);
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
@@ -51056,6 +52391,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -51092,6 +52428,7 @@ private:
         }
         case 7: {
             LogStep(7, "Change to Supported Mode");
+            ListFreer listFreer;
             chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type value;
             value.newMode = 4;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
@@ -51106,6 +52443,7 @@ private:
         }
         case 9: {
             LogStep(9, "Change to Unsupported Mode");
+            ListFreer listFreer;
             chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type value;
             value.newMode = 2;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
@@ -51115,6 +52453,7 @@ private:
         }
         case 10: {
             LogStep(10, "Toggle OnOff");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -51122,6 +52461,7 @@ private:
         }
         case 11: {
             LogStep(11, "Toggle OnOff");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -51134,6 +52474,7 @@ private:
         }
         case 13: {
             LogStep(13, "Change to Unsupported OnMode");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 2;
@@ -51142,6 +52483,7 @@ private:
         }
         case 14: {
             LogStep(14, "Change OnMode");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 7;
@@ -51155,6 +52497,7 @@ private:
         }
         case 16: {
             LogStep(16, "Toggle OnOff");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -51162,6 +52505,7 @@ private:
         }
         case 17: {
             LogStep(17, "Toggle OnOff");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -51174,6 +52518,7 @@ private:
         }
         case 19: {
             LogStep(19, "Change to Unsupported StartUp Mode");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 2;
@@ -51182,6 +52527,7 @@ private:
         }
         case 20: {
             LogStep(20, "Change to Supported StartUp Mode");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 7;
@@ -51195,6 +52541,7 @@ private:
         }
         case 22: {
             LogStep(22, "Change CurrentMode to another value");
+            ListFreer listFreer;
             chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type value;
             value.newMode = 0;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
@@ -51204,6 +52551,7 @@ private:
         }
         case 23: {
             LogStep(23, "Change On Mode");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 4;
@@ -51212,6 +52560,7 @@ private:
         }
         case 24: {
             LogStep(24, "Set StartUpOnOff");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
             value.SetNonNull();
             value.Value() = static_cast<chip::app::Clusters::OnOff::OnOffStartUpOnOff>(1);
@@ -51220,11 +52569,13 @@ private:
         }
         case 25: {
             LogStep(25, "Reboot target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 26: {
             LogStep(26, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -51236,6 +52587,7 @@ private:
         }
         case 28: {
             LogStep(28, "Change On Mode to Null");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::OnMode::Id, value,
@@ -51243,11 +52595,13 @@ private:
         }
         case 29: {
             LogStep(29, "Reboot target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 30: {
             LogStep(30, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -51348,6 +52702,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -51364,6 +52719,7 @@ private:
         }
         case 3: {
             LogStep(3, "Remove single own fabric");
+            ListFreer listFreer;
             chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type value;
             value.fabricIndex = ourFabricIndex;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
@@ -51519,22 +52875,26 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Stop the default accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 2: {
             LogStep(2, "Start the default accessory with no command line options");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             return Start(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Stop the default accessory by key");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
@@ -51542,6 +52902,7 @@ private:
         }
         case 4: {
             LogStep(4, "Start the default accessory with discriminator command line option");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = 1111U;
@@ -51549,11 +52910,13 @@ private:
         }
         case 5: {
             LogStep(5, "Stop the default accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Start the default accessory with discriminator and port command line options");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = 1111U;
@@ -51563,11 +52926,13 @@ private:
         }
         case 7: {
             LogStep(7, "Stop the default accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 8: {
             LogStep(8, "Start the default accessory with minCommissioningTimeout only");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.minCommissioningTimeout.Emplace();
             value.minCommissioningTimeout.Value() = 10U;
@@ -51575,11 +52940,13 @@ private:
         }
         case 9: {
             LogStep(9, "Stop the default accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 10: {
             LogStep(10, "Start the default accessory by key with all command line options");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
@@ -51595,6 +52962,7 @@ private:
         }
         case 11: {
             LogStep(11, "Start a second accessory with all command line options");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
@@ -51608,6 +52976,7 @@ private:
         }
         case 12: {
             LogStep(12, "Commission second accessory from alpha");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = 3735928559ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0IX4122-.548G00", 22);
@@ -51615,12 +52984,14 @@ private:
         }
         case 13: {
             LogStep(13, "Wait for the second commissioned device to be retrieved for alpha");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = 3735928559ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 14: {
             LogStep(14, "Stop the second accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
@@ -51628,6 +52999,7 @@ private:
         }
         case 15: {
             LogStep(15, "Start a second accessory with different KVS");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
@@ -51641,11 +53013,13 @@ private:
         }
         case 16: {
             LogStep(16, "Reboot the default accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Reboot the default accessory by key");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
@@ -51653,6 +53027,7 @@ private:
         }
         case 18: {
             LogStep(18, "Reboot the second accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
@@ -51660,11 +53035,13 @@ private:
         }
         case 19: {
             LogStep(19, "Factory Reset the default accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
             return FactoryReset(kIdentityAlpha, value);
         }
         case 20: {
             LogStep(20, "Factory Reset the default accessory by key");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("defaultgarbage: not in length on purpose", 7);
@@ -51672,6 +53049,7 @@ private:
         }
         case 21: {
             LogStep(21, "Factory Reset the second accessory");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
             value.registerKey.Emplace();
             value.registerKey.Value() = chip::Span<const char>("chip-lock-appgarbage: not in length on purpose", 13);
@@ -51837,6 +53215,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -52065,6 +53444,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -52112,11 +53492,13 @@ private:
         }
         case 4: {
             LogStep(4, "Reboot target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -52222,11 +53604,13 @@ private:
         {
         case 0: {
             LogStep(0, "Reboot target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
             return Reboot(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Wait for the alpha device to be retrieved ");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -52238,6 +53622,7 @@ private:
         }
         case 3: {
             LogStep(3, "ArmFailSafe on target device with timeout 0");
+            ListFreer listFreer;
             chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type value;
             value.expiryLengthSeconds = 0U;
             value.breadcrumb          = 0ULL;
@@ -52473,12 +53858,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Write fan mode");
+            ListFreer listFreer;
             chip::app::Clusters::FanControl::FanModeType value;
             value = static_cast<chip::app::Clusters::FanControl::FanModeType>(3);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id, value,
@@ -52491,6 +53878,7 @@ private:
         }
         case 3: {
             LogStep(3, "Write fan mode sequence");
+            ListFreer listFreer;
             chip::app::Clusters::FanControl::FanModeSequenceType value;
             value = static_cast<chip::app::Clusters::FanControl::FanModeSequenceType>(5);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanModeSequence::Id,
@@ -52503,6 +53891,7 @@ private:
         }
         case 5: {
             LogStep(5, "Write percent setting");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 84;
@@ -52526,6 +53915,7 @@ private:
         }
         case 9: {
             LogStep(9, "Write percent setting");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::PercentSetting::Id, value,
@@ -52538,6 +53928,7 @@ private:
         }
         case 11: {
             LogStep(11, "Write speed setting");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
             value.Value() = 73;
@@ -52561,6 +53952,7 @@ private:
         }
         case 15: {
             LogStep(15, "Write speed setting");
+            ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::SpeedSetting::Id, value,
@@ -52573,6 +53965,7 @@ private:
         }
         case 17: {
             LogStep(17, "Write fan mode");
+            ListFreer listFreer;
             chip::app::Clusters::FanControl::FanModeType value;
             value = static_cast<chip::app::Clusters::FanControl::FanModeType>(0);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id, value,
@@ -52600,6 +53993,7 @@ private:
         }
         case 22: {
             LogStep(22, "Write fan mode");
+            ListFreer listFreer;
             chip::app::Clusters::FanControl::FanModeType value;
             value = static_cast<chip::app::Clusters::FanControl::FanModeType>(5);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), FanControl::Id, FanControl::Attributes::FanMode::Id, value,
@@ -52785,11 +54179,13 @@ private:
         {
         case 0: {
             LogStep(0, "Stop target device");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
+            ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
@@ -52797,12 +54193,14 @@ private:
         }
         case 2: {
             LogStep(2, "Wait for the commissioned device to be retrieved for alpha");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Commission from alpha when the commissioning window is not opened");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -52810,6 +54208,7 @@ private:
         }
         case 4: {
             LogStep(4, "Open Commissioning Window from alpha");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -52820,6 +54219,7 @@ private:
         }
         case 5: {
             LogStep(5, "Commission from alpha again");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -52832,6 +54232,7 @@ private:
         }
         case 7: {
             LogStep(7, "Close Commissioning Window after failed commissioning");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
@@ -52841,6 +54242,7 @@ private:
         }
         case 8: {
             LogStep(8, "Open Commissioning Window from alpha again");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -52851,6 +54253,7 @@ private:
         }
         case 9: {
             LogStep(9, "Commission from beta");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -52858,12 +54261,14 @@ private:
         }
         case 10: {
             LogStep(10, "Wait for the commissioned device to be retrieved for beta");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             return WaitForCommissionee(kIdentityBeta, value);
         }
         case 11: {
             LogStep(11, "Open Commissioning Window from beta");
+            ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             return SendCommand(kIdentityBeta, GetEndpoint(0), AdministratorCommissioning::Id,
@@ -52874,6 +54279,7 @@ private:
         }
         case 12: {
             LogStep(12, "Commission from gamma");
+            ListFreer listFreer;
             chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
@@ -52881,6 +54287,7 @@ private:
         }
         case 13: {
             LogStep(13, "Wait for the commissioned device to be retrieved for gamma");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             return WaitForCommissionee(kIdentityGamma, value);
@@ -52892,6 +54299,7 @@ private:
         }
         case 15: {
             LogStep(15, "write the mandatory attribute NodeLabel from beta");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("written from betagarbage: not in length on purpose", 17);
             return WriteAttribute(kIdentityBeta, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -52904,6 +54312,7 @@ private:
         }
         case 17: {
             LogStep(17, "write the mandatory attribute NodeLabel back to default");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = readFromAlpha;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id, value,
@@ -53016,6 +54425,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -53108,6 +54518,7 @@ private:
                     "Reads a list of SoftwareFault struct from DUT and data type in each field of the struct must match the value "
                     "listed in spec");
             VerifyOrdo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter '0' for successgarbage: not in length on purpose", 28);
             value.expectedValue.Emplace();
@@ -53212,6 +54623,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -53219,6 +54631,7 @@ private:
         case 1: {
             LogStep(1, "Sends ResetWatermarks to DUT");
             VerifyOrdo(!ShouldSkip("CR_RESETWATERMARKS"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                SoftwareDiagnostics::Commands::ResetWatermarks::Id, value, chip::NullOptional
@@ -53341,12 +54754,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Set OnOff Attribute to false");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -53359,6 +54774,7 @@ private:
         }
         case 3: {
             LogStep(3, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
@@ -53370,6 +54786,7 @@ private:
         }
         case 5: {
             LogStep(5, "Turn Off the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
@@ -55190,12 +56607,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Read available user slot and verify response fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55210,6 +56629,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read fails for user with index 0");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55219,6 +56639,7 @@ private:
         }
         case 4: {
             LogStep(4, "Read fails for user with index greater than Number Of Users Supported");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55228,6 +56649,7 @@ private:
         }
         case 5: {
             LogStep(5, "Create new user with default parameters");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = 1U;
@@ -55243,6 +56665,7 @@ private:
         }
         case 6: {
             LogStep(6, "Read the user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55252,6 +56675,7 @@ private:
         }
         case 7: {
             LogStep(7, "Set user at the occupied index fails with appropriate response");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = 1U;
@@ -55267,6 +56691,7 @@ private:
         }
         case 8: {
             LogStep(8, "Modify userName for existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
             value.userIndex     = 1U;
@@ -55283,6 +56708,7 @@ private:
         }
         case 9: {
             LogStep(9, "Read the modified user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55292,6 +56718,7 @@ private:
         }
         case 10: {
             LogStep(10, "Modify userUniqueId for existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
             value.userIndex     = 1U;
@@ -55308,6 +56735,7 @@ private:
         }
         case 11: {
             LogStep(11, "Read the modified user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55317,6 +56745,7 @@ private:
         }
         case 12: {
             LogStep(12, "Modify userStatus for existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
             value.userIndex     = 1U;
@@ -55333,6 +56762,7 @@ private:
         }
         case 13: {
             LogStep(13, "Read the modified user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55342,6 +56772,7 @@ private:
         }
         case 14: {
             LogStep(14, "Modify userType for existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
             value.userIndex     = 1U;
@@ -55358,6 +56789,7 @@ private:
         }
         case 15: {
             LogStep(15, "Read the modified user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55367,6 +56799,7 @@ private:
         }
         case 16: {
             LogStep(16, "Modify credentialRule for existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
             value.userIndex     = 1U;
@@ -55383,6 +56816,7 @@ private:
         }
         case 17: {
             LogStep(17, "Read the modified user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55392,6 +56826,7 @@ private:
         }
         case 18: {
             LogStep(18, "Modify all fields for existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
             value.userIndex     = 1U;
@@ -55412,6 +56847,7 @@ private:
         }
         case 19: {
             LogStep(19, "Read the modified user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55421,6 +56857,7 @@ private:
         }
         case 20: {
             LogStep(20, "Add another user with non-default fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = 2U;
@@ -55441,6 +56878,7 @@ private:
         }
         case 21: {
             LogStep(21, "Read the new user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55450,6 +56888,7 @@ private:
         }
         case 22: {
             LogStep(22, "Create user in the last slot");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = NumberOfTotalUsersSupported;
@@ -55466,6 +56905,7 @@ private:
         }
         case 23: {
             LogStep(23, "Read the last user back and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = NumberOfTotalUsersSupported;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55475,6 +56915,7 @@ private:
         }
         case 24: {
             LogStep(24, "User creation in the 0 slot fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = 0U;
@@ -55490,6 +56931,7 @@ private:
         }
         case 25: {
             LogStep(25, "User creation in the out-of-bounds slot fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -55505,6 +56947,7 @@ private:
         }
         case 26: {
             LogStep(26, "Clear first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
@@ -55514,6 +56957,7 @@ private:
         }
         case 27: {
             LogStep(27, "Read cleared user and verify it is available");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55523,6 +56967,7 @@ private:
         }
         case 28: {
             LogStep(28, "Create new user in the cleared slot");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = 1U;
@@ -55538,6 +56983,7 @@ private:
         }
         case 29: {
             LogStep(29, "Read the user in the previously cleared slot and verify its fields");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55547,6 +56993,7 @@ private:
         }
         case 30: {
             LogStep(30, "Clear user with index 0 fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
@@ -55556,6 +57003,7 @@ private:
         }
         case 31: {
             LogStep(31, "Clear user with out-of-bounds index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
@@ -55565,6 +57013,7 @@ private:
         }
         case 32: {
             LogStep(32, "Clear all users");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = 65534U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
@@ -55574,6 +57023,7 @@ private:
         }
         case 33: {
             LogStep(33, "Read first cleared user and verify it is available");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55583,6 +57033,7 @@ private:
         }
         case 34: {
             LogStep(34, "Read last cleared user and verify it is available");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = NumberOfTotalUsersSupported;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55597,6 +57048,7 @@ private:
         }
         case 36: {
             LogStep(36, "Check that PIN credential does not exist");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -55609,6 +57061,7 @@ private:
         }
         case 37: {
             LogStep(37, "Reading PIN credential with index 0 fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -55621,6 +57074,7 @@ private:
         }
         case 38: {
             LogStep(38, "Reading PIN credential with out-of-bounds index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -55633,6 +57087,7 @@ private:
         }
         case 39: {
             LogStep(39, "Create new PIN credential and user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55650,6 +57105,7 @@ private:
         }
         case 40: {
             LogStep(40, "Verify created user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55659,6 +57115,7 @@ private:
         }
         case 41: {
             LogStep(41, "Verify created PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -55671,6 +57128,7 @@ private:
         }
         case 42: {
             LogStep(42, "Create new PIN credential and user with index 0 fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55688,6 +57146,7 @@ private:
         }
         case 43: {
             LogStep(43, "Create new PIN credential and user with out-of-bounds index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55710,6 +57169,7 @@ private:
         }
         case 45: {
             LogStep(45, "Reading RFID credential with index 0 fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -55722,6 +57182,7 @@ private:
         }
         case 46: {
             LogStep(46, "Reading RFID credential with out-of-bounds index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -55734,6 +57195,7 @@ private:
         }
         case 47: {
             LogStep(47, "Check that RFID credential does not exist");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -55746,6 +57208,7 @@ private:
         }
         case 48: {
             LogStep(48, "Create new RFID credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55765,6 +57228,7 @@ private:
         }
         case 49: {
             LogStep(49, "Verify modified user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -55774,6 +57238,7 @@ private:
         }
         case 50: {
             LogStep(50, "Verify created credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -55786,6 +57251,7 @@ private:
         }
         case 51: {
             LogStep(51, "Create new RFID credential and user with index 0 fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55804,6 +57270,7 @@ private:
         }
         case 52: {
             LogStep(52, "Create new RFID credential and user with out-of-bounds index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55822,6 +57289,7 @@ private:
         }
         case 53: {
             LogStep(53, "Create new credential and try to add it to 0 user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55840,6 +57308,7 @@ private:
         }
         case 54: {
             LogStep(54, "Create new credential and try to add it to out-of-bounds user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55858,6 +57327,7 @@ private:
         }
         case 55: {
             LogStep(55, "Create new PIN with too short data");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55876,6 +57346,7 @@ private:
         }
         case 56: {
             LogStep(56, "Create new PIN with too long data");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55894,6 +57365,7 @@ private:
         }
         case 57: {
             LogStep(57, "Create new RFID with too short data");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55912,6 +57384,7 @@ private:
         }
         case 58: {
             LogStep(58, "Create new PIN with Programming user type fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55931,6 +57404,7 @@ private:
         }
         case 59: {
             LogStep(59, "Create new RFID with too short data");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55950,6 +57424,7 @@ private:
         }
         case 60: {
             LogStep(60, "Create new PIN credential with data the would cause duplicate");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55967,6 +57442,7 @@ private:
         }
         case 61: {
             LogStep(61, "Create new RFID credential with data the would cause duplicate");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -55985,6 +57461,7 @@ private:
         }
         case 62: {
             LogStep(62, "Modify credentialData of existing PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
 
@@ -56003,6 +57480,7 @@ private:
         }
         case 63: {
             LogStep(63, "Verify that credential was changed by creating new credential with old data");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56020,6 +57498,7 @@ private:
         }
         case 64: {
             LogStep(64, "Verify that credential was changed by creating new credential with new data");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56037,6 +57516,7 @@ private:
         }
         case 65: {
             LogStep(65, "Create new RFID credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56056,6 +57536,7 @@ private:
         }
         case 66: {
             LogStep(66, "Verify modified user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56065,6 +57546,7 @@ private:
         }
         case 67: {
             LogStep(67, "Create new RFID credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56083,6 +57565,7 @@ private:
         }
         case 68: {
             LogStep(68, "Verify modified user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56092,6 +57575,7 @@ private:
         }
         case 69: {
             LogStep(69, "Clear first PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56105,6 +57589,7 @@ private:
         }
         case 70: {
             LogStep(70, "Read back the credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -56117,6 +57602,7 @@ private:
         }
         case 71: {
             LogStep(71, "Read the user back and make sure PIN credential is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56126,6 +57612,7 @@ private:
         }
         case 72: {
             LogStep(72, "Clear the second PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56139,6 +57626,7 @@ private:
         }
         case 73: {
             LogStep(73, "Read back the credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -56151,6 +57639,7 @@ private:
         }
         case 74: {
             LogStep(74, "Read the user back and make sure related user is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56160,6 +57649,7 @@ private:
         }
         case 75: {
             LogStep(75, "Create new RFID credential with user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56178,6 +57668,7 @@ private:
         }
         case 76: {
             LogStep(76, "Clear all the RFID credentials");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56191,6 +57682,7 @@ private:
         }
         case 77: {
             LogStep(77, "Read back the fist RFID credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -56203,6 +57695,7 @@ private:
         }
         case 78: {
             LogStep(78, "Read back the second RFID credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -56215,6 +57708,7 @@ private:
         }
         case 79: {
             LogStep(79, "Read back the third RFID credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -56227,6 +57721,7 @@ private:
         }
         case 80: {
             LogStep(80, "Read the user related with first RFID back and make sure it has only PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56236,6 +57731,7 @@ private:
         }
         case 81: {
             LogStep(81, "Read the user related with second RFID back and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56245,6 +57741,7 @@ private:
         }
         case 82: {
             LogStep(82, "Create new PIN credential with user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56262,6 +57759,7 @@ private:
         }
         case 83: {
             LogStep(83, "Create new RFID credential with user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56280,6 +57778,7 @@ private:
         }
         case 84: {
             LogStep(84, "Create another RFID credential with user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56298,6 +57797,7 @@ private:
         }
         case 85: {
             LogStep(85, "Clear all the credentials");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNull();
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
@@ -56307,6 +57807,7 @@ private:
         }
         case 86: {
             LogStep(86, "Read back the first PIN credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -56319,6 +57820,7 @@ private:
         }
         case 87: {
             LogStep(87, "Read back the first RFID credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(2);
@@ -56331,6 +57833,7 @@ private:
         }
         case 88: {
             LogStep(88, "Read back the second PIN credential and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
@@ -56343,6 +57846,7 @@ private:
         }
         case 89: {
             LogStep(89, "Read the user related with first PIN back and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56352,6 +57856,7 @@ private:
         }
         case 90: {
             LogStep(90, "Read the user related with first RFID back and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 2U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56361,6 +57866,7 @@ private:
         }
         case 91: {
             LogStep(91, "Read the user related with second PIN back and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 3U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56370,6 +57876,7 @@ private:
         }
         case 92: {
             LogStep(92, "Read the user related with last RFID back and make sure it is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 4U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56379,6 +57886,7 @@ private:
         }
         case 93: {
             LogStep(93, "Create new Programming PIN credential with invalid index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56396,6 +57904,7 @@ private:
         }
         case 94: {
             LogStep(94, "Create new Programming PIN credential with valid index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56413,6 +57922,7 @@ private:
         }
         case 95: {
             LogStep(95, "Verify created user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56422,6 +57932,7 @@ private:
         }
         case 96: {
             LogStep(96, "Verify created programming PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
@@ -56434,6 +57945,7 @@ private:
         }
         case 97: {
             LogStep(97, "Modify the Programming PIN credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(2);
 
@@ -56451,6 +57963,7 @@ private:
         }
         case 98: {
             LogStep(98, "Clearing Programming PIN fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56464,6 +57977,7 @@ private:
         }
         case 99: {
             LogStep(99, "Clearing Programming PIN with invalid index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56477,6 +57991,7 @@ private:
         }
         case 100: {
             LogStep(100, "Clearing PIN credential with zero index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56490,6 +58005,7 @@ private:
         }
         case 101: {
             LogStep(101, "Clearing PIN credential with out-of-bound index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56503,6 +58019,7 @@ private:
         }
         case 102: {
             LogStep(102, "Clearing RFID credential with zero index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56516,6 +58033,7 @@ private:
         }
         case 103: {
             LogStep(103, "Clearing RFID credential with out-of-bound index fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -56529,6 +58047,7 @@ private:
         }
         case 104: {
             LogStep(104, "Clear the Programming PIN user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
@@ -56538,6 +58057,7 @@ private:
         }
         case 105: {
             LogStep(105, "Make sure Programming PIN user is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
             value.userIndex = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
@@ -56547,6 +58067,7 @@ private:
         }
         case 106: {
             LogStep(106, "Make sure programming PIN credential is deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(0);
@@ -56559,6 +58080,7 @@ private:
         }
         case 107: {
             LogStep(107, "Create new PIN credential and user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56576,6 +58098,7 @@ private:
         }
         case 108: {
             LogStep(108, "Create second PIN credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56594,6 +58117,7 @@ private:
         }
         case 109: {
             LogStep(109, "Create third PIN credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56612,6 +58136,7 @@ private:
         }
         case 110: {
             LogStep(110, "Create fourth PIN credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56630,6 +58155,7 @@ private:
         }
         case 111: {
             LogStep(111, "Create fifth PIN credential and add it to existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56648,6 +58174,7 @@ private:
         }
         case 112: {
             LogStep(112, "Try to create sixth PIN credential and make sure it fails");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56791,12 +58318,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and lock/unlock user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -56814,6 +58343,7 @@ private:
         }
         case 2: {
             LogStep(2, "Try to unlock the door with invalid PIN");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
@@ -56829,6 +58359,7 @@ private:
         }
         case 4: {
             LogStep(4, "Try to unlock the door with valid PIN");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -56844,6 +58375,7 @@ private:
         }
         case 6: {
             LogStep(6, "Try to lock the door with invalid PIN");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("000000garbage: not in length on purpose"), 6);
@@ -56859,6 +58391,7 @@ private:
         }
         case 8: {
             LogStep(8, "Try to unlock the door with valid PIN");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -56874,6 +58407,7 @@ private:
         }
         case 10: {
             LogStep(10, "Clean the created credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -57663,12 +59197,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and schedule user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -57701,6 +59237,7 @@ private:
         }
         case 5: {
             LogStep(5, "Create Week Day schedule with 0 index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
             value.userIndex    = 1U;
@@ -57716,6 +59253,7 @@ private:
         }
         case 6: {
             LogStep(6, "Create Week Day schedule with out-of-bounds index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
@@ -57731,6 +59269,7 @@ private:
         }
         case 7: {
             LogStep(7, "Create Week Day schedule with 0 user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 0U;
@@ -57746,6 +59285,7 @@ private:
         }
         case 8: {
             LogStep(8, "Create Week Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -57761,6 +59301,7 @@ private:
         }
         case 9: {
             LogStep(9, "Create Week Day schedule for non-existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 2U;
@@ -57776,6 +59317,7 @@ private:
         }
         case 10: {
             LogStep(10, "Create Week Day schedule with 0 days mask");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57791,6 +59333,7 @@ private:
         }
         case 11: {
             LogStep(11, "Create Week Day schedule for Sunday and Monday");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57806,6 +59349,7 @@ private:
         }
         case 12: {
             LogStep(12, "Create Week Day schedule for Sunday Wednesday and Saturday");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57821,6 +59365,7 @@ private:
         }
         case 13: {
             LogStep(13, "Create Week Day schedule with invalid start hour");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57836,6 +59381,7 @@ private:
         }
         case 14: {
             LogStep(14, "Create Week Day schedule with invalid start minute");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57851,6 +59397,7 @@ private:
         }
         case 15: {
             LogStep(15, "Create Week Day schedule with invalid end hour");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57866,6 +59413,7 @@ private:
         }
         case 16: {
             LogStep(16, "Create Week Day schedule with invalid end minute");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57881,6 +59429,7 @@ private:
         }
         case 17: {
             LogStep(17, "Create Week Day schedule with start hour later that end hour");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57896,6 +59445,7 @@ private:
         }
         case 18: {
             LogStep(18, "Create Week Day schedule with start minute later that end minute when hours are equal");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57911,6 +59461,7 @@ private:
         }
         case 19: {
             LogStep(19, "Make sure that previous operations did not create a schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -57921,6 +59472,7 @@ private:
         }
         case 20: {
             LogStep(20, "Get Week Day schedule with 0 index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
             value.userIndex    = 1U;
@@ -57931,6 +59483,7 @@ private:
         }
         case 21: {
             LogStep(21, "Get Week Day schedule with out-of-bounds index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
@@ -57941,6 +59494,7 @@ private:
         }
         case 22: {
             LogStep(22, "Get Week Day schedule with 0 user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 0U;
@@ -57951,6 +59505,7 @@ private:
         }
         case 23: {
             LogStep(23, "Get Week Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -57961,6 +59516,7 @@ private:
         }
         case 24: {
             LogStep(24, "Get Week Day schedule with non-existing user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 2U;
@@ -57971,6 +59527,7 @@ private:
         }
         case 25: {
             LogStep(25, "Create Year Day schedule with 0 index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 0;
             value.userIndex      = 1U;
@@ -57983,6 +59540,7 @@ private:
         }
         case 26: {
             LogStep(26, "Create Year Day schedule with out-of-bounds index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
             value.userIndex      = 1U;
@@ -57995,6 +59553,7 @@ private:
         }
         case 27: {
             LogStep(27, "Create Year Day schedule with 0 user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
             value.userIndex      = 0U;
@@ -58007,6 +59566,7 @@ private:
         }
         case 28: {
             LogStep(28, "Create Year Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
             value.userIndex      = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -58019,6 +59579,7 @@ private:
         }
         case 29: {
             LogStep(29, "Create Year Day schedule for non-existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
             value.userIndex      = 2U;
@@ -58031,6 +59592,7 @@ private:
         }
         case 30: {
             LogStep(30, "Create Year Day schedule with start hour later that end hour");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
             value.userIndex      = 1U;
@@ -58043,6 +59605,7 @@ private:
         }
         case 31: {
             LogStep(31, "Make sure that previous operations did not create a schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58053,6 +59616,7 @@ private:
         }
         case 32: {
             LogStep(32, "Get Year Day schedule with 0 index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 0;
             value.userIndex    = 1U;
@@ -58063,6 +59627,7 @@ private:
         }
         case 33: {
             LogStep(33, "Get Year Day schedule with out-of-bounds index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
@@ -58073,6 +59638,7 @@ private:
         }
         case 34: {
             LogStep(34, "Get Year Day schedule with 0 user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 0U;
@@ -58083,6 +59649,7 @@ private:
         }
         case 35: {
             LogStep(35, "Get Year Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -58093,6 +59660,7 @@ private:
         }
         case 36: {
             LogStep(36, "Get Year Day schedule with non-existing user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 2U;
@@ -58103,6 +59671,7 @@ private:
         }
         case 37: {
             LogStep(37, "Create Week Day schedule with valid parameters");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58118,6 +59687,7 @@ private:
         }
         case 38: {
             LogStep(38, "Verify created schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58128,6 +59698,7 @@ private:
         }
         case 39: {
             LogStep(39, "Create Year Day schedule with valid parameters");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
             value.userIndex      = 1U;
@@ -58140,6 +59711,7 @@ private:
         }
         case 40: {
             LogStep(40, "Verify created schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58150,6 +59722,7 @@ private:
         }
         case 41: {
             LogStep(41, "Clear Week Day schedule with 0 index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 0;
             value.userIndex    = 1U;
@@ -58160,6 +59733,7 @@ private:
         }
         case 42: {
             LogStep(42, "Clear Week Day schedule with out-of-bounds index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = static_cast<uint8_t>(NumberOfWeekDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
@@ -58170,6 +59744,7 @@ private:
         }
         case 43: {
             LogStep(43, "Clear Week Day schedule with 0 user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 0U;
@@ -58180,6 +59755,7 @@ private:
         }
         case 44: {
             LogStep(44, "Clear Week Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -58190,6 +59766,7 @@ private:
         }
         case 45: {
             LogStep(45, "Clear Week Day schedule with non-existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 2U;
@@ -58200,6 +59777,7 @@ private:
         }
         case 46: {
             LogStep(46, "Clear Year Day schedule with 0 index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 0;
             value.userIndex    = 1U;
@@ -58210,6 +59788,7 @@ private:
         }
         case 47: {
             LogStep(47, "Clear Year Day schedule with out-of-bounds index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = static_cast<uint8_t>(NumberOfYearDaySchedulesSupportedPerUser + 1);
             value.userIndex    = 1U;
@@ -58220,6 +59799,7 @@ private:
         }
         case 48: {
             LogStep(48, "Clear Year Day schedule with 0 user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 0U;
@@ -58230,6 +59810,7 @@ private:
         }
         case 49: {
             LogStep(49, "Clear Year Day schedule with out-of-bounds user index");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = static_cast<uint16_t>(NumberOfTotalUsersSupported + 1);
@@ -58240,6 +59821,7 @@ private:
         }
         case 50: {
             LogStep(50, "Clear Year Day schedule with non-existing user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 2U;
@@ -58250,6 +59832,7 @@ private:
         }
         case 51: {
             LogStep(51, "Make sure that week day schedule was not deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58260,6 +59843,7 @@ private:
         }
         case 52: {
             LogStep(52, "Make sure that year day schedule was not deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58270,6 +59854,7 @@ private:
         }
         case 53: {
             LogStep(53, "Create another Week Day schedule with valid parameters");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
             value.userIndex    = 1U;
@@ -58285,6 +59870,7 @@ private:
         }
         case 54: {
             LogStep(54, "Verify created week day schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
             value.userIndex    = 1U;
@@ -58295,6 +59881,7 @@ private:
         }
         case 55: {
             LogStep(55, "Create another Year Day schedule with valid parameters");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 2;
             value.userIndex      = 1U;
@@ -58307,6 +59894,7 @@ private:
         }
         case 56: {
             LogStep(56, "Verify created year day schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 2;
             value.userIndex    = 1U;
@@ -58317,6 +59905,7 @@ private:
         }
         case 57: {
             LogStep(57, "Clear a single week day schedule for the first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58327,6 +59916,7 @@ private:
         }
         case 58: {
             LogStep(58, "Verify cleared week day schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58337,6 +59927,7 @@ private:
         }
         case 59: {
             LogStep(59, "Clear all remaining week day schedules for the first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 254;
             value.userIndex    = 1U;
@@ -58347,6 +59938,7 @@ private:
         }
         case 60: {
             LogStep(60, "Verify cleared week schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 2;
             value.userIndex    = 1U;
@@ -58357,6 +59949,7 @@ private:
         }
         case 61: {
             LogStep(61, "Make sure that first year day schedule was not deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58367,6 +59960,7 @@ private:
         }
         case 62: {
             LogStep(62, "Make sure that second year day schedule was not deleted");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 2;
             value.userIndex    = 1U;
@@ -58377,6 +59971,7 @@ private:
         }
         case 63: {
             LogStep(63, "Create another Week Day schedule with valid parameters");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58392,6 +59987,7 @@ private:
         }
         case 64: {
             LogStep(64, "Clear a single year day schedule for the first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58402,6 +59998,7 @@ private:
         }
         case 65: {
             LogStep(65, "Verify cleared year day schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58412,6 +60009,7 @@ private:
         }
         case 66: {
             LogStep(66, "Clear all remaining year schedules for the first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
             value.yearDayIndex = 254;
             value.userIndex    = 1U;
@@ -58422,6 +60020,7 @@ private:
         }
         case 67: {
             LogStep(67, "Verify that second year day schedule was cleared");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 2;
             value.userIndex    = 1U;
@@ -58432,6 +60031,7 @@ private:
         }
         case 68: {
             LogStep(68, "Verify created week day schedule");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58442,6 +60042,7 @@ private:
         }
         case 69: {
             LogStep(69, "Clear all remaining week day schedules for the first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
             value.weekDayIndex = 254;
             value.userIndex    = 1U;
@@ -58452,6 +60053,7 @@ private:
         }
         case 70: {
             LogStep(70, "Create new user without credential so we can add more schedules to it");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
             value.userIndex     = 2U;
@@ -58467,6 +60069,7 @@ private:
         }
         case 71: {
             LogStep(71, "Create Week Day schedule with valid parameters for first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58482,6 +60085,7 @@ private:
         }
         case 72: {
             LogStep(72, "Verify created week day schedule for first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58492,6 +60096,7 @@ private:
         }
         case 73: {
             LogStep(73, "Create Year Day schedule for first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 4;
             value.userIndex      = 1U;
@@ -58504,6 +60109,7 @@ private:
         }
         case 74: {
             LogStep(74, "Verify created year day schedule for first");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 4;
             value.userIndex    = 1U;
@@ -58514,6 +60120,7 @@ private:
         }
         case 75: {
             LogStep(75, "Create Week Day schedule with valid parameters for second user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
             value.userIndex    = 2U;
@@ -58529,6 +60136,7 @@ private:
         }
         case 76: {
             LogStep(76, "Verify created week day schedule for first user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
             value.userIndex    = 2U;
@@ -58539,6 +60147,7 @@ private:
         }
         case 77: {
             LogStep(77, "Create Year Day schedule for second user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1;
             value.userIndex      = 1U;
@@ -58551,6 +60160,7 @@ private:
         }
         case 78: {
             LogStep(78, "Verify created year day schedule for first");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 1U;
@@ -58561,6 +60171,7 @@ private:
         }
         case 79: {
             LogStep(79, "Cleanup");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
             value.userIndex = 65534U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
@@ -58570,6 +60181,7 @@ private:
         }
         case 80: {
             LogStep(80, "Make sure clearing first user also cleared week day schedules");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 1;
             value.userIndex    = 1U;
@@ -58580,6 +60192,7 @@ private:
         }
         case 81: {
             LogStep(81, "Make sure clearing first user also cleared year day schedules");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 4;
             value.userIndex    = 1U;
@@ -58590,6 +60203,7 @@ private:
         }
         case 82: {
             LogStep(82, "Make sure clearing second user also cleared week day schedules");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type value;
             value.weekDayIndex = 4;
             value.userIndex    = 2U;
@@ -58600,6 +60214,7 @@ private:
         }
         case 83: {
             LogStep(83, "Make sure clearing second user also cleared year day schedules");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 1;
             value.userIndex    = 2U;
@@ -58731,12 +60346,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "TH writes the RequirePINforRemoteOperation attribute value as False on the DUT");
+            ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
@@ -58745,6 +60362,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH sends Lock Door Command to the DUT without PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
@@ -58755,6 +60373,7 @@ private:
         }
         case 3: {
             LogStep(3, "TH writes the RequirePINforRemoteOperation attribute value as True on the DUT");
+            ListFreer listFreer;
             bool value;
             value = true;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
@@ -58763,6 +60382,7 @@ private:
         }
         case 4: {
             LogStep(4, "Create new PIN credential and lock/unlock user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -58780,6 +60400,7 @@ private:
         }
         case 5: {
             LogStep(5, "TH sends Lock Door Command to the DUT with valid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -58790,6 +60411,7 @@ private:
         }
         case 6: {
             LogStep(6, "TH sends Lock Door Command to the DUT without any argument PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
@@ -58800,6 +60422,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT");
+            ListFreer listFreer;
             uint8_t value;
             value = 3;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::WrongCodeEntryLimit::Id,
@@ -58807,6 +60430,7 @@ private:
         }
         case 8: {
             LogStep(8, "TH writes UserCodeTemporaryDisableTime attribute value as 5 seconds on the DUT");
+            ListFreer listFreer;
             uint8_t value;
             value = 5;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
@@ -58815,6 +60439,7 @@ private:
         }
         case 9: {
             LogStep(9, "TH sends Lock Door Command to the DUT with invalid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("12345garbage: not in length on purpose"), 5);
@@ -58825,6 +60450,7 @@ private:
         }
         case 10: {
             LogStep(10, "TH sends Lock Door Command to the DUT with invalid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("54321garbage: not in length on purpose"), 5);
@@ -58835,6 +60461,7 @@ private:
         }
         case 11: {
             LogStep(11, "TH sends Lock Door Command to the DUT with invalid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("987623garbage: not in length on purpose"), 6);
@@ -58845,6 +60472,7 @@ private:
         }
         case 12: {
             LogStep(12, "TH sends Lock Door Command to the DUT with invalid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("67890garbage: not in length on purpose"), 5);
@@ -58860,6 +60488,7 @@ private:
         }
         case 14: {
             LogStep(14, "TH sends Lock Door Command to the DUT with valid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -58870,6 +60499,7 @@ private:
         }
         case 15: {
             LogStep(15, "Clean the created credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -58990,12 +60620,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and lock/unlock user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -59013,6 +60645,7 @@ private:
         }
         case 2: {
             LogStep(2, "Precondition: Door is in locked state");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -59023,6 +60656,7 @@ private:
         }
         case 3: {
             LogStep(3, "TH writes AutoRelockTime attribute value as 10 seconds on the DUT");
+            ListFreer listFreer;
             uint32_t value;
             value = 10UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::AutoRelockTime::Id, value,
@@ -59030,6 +60664,7 @@ private:
         }
         case 4: {
             LogStep(4, "TH sends the unlock Door command to the DUT with valid PINCode");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -59045,6 +60680,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 10000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -59056,6 +60692,7 @@ private:
         }
         case 8: {
             LogStep(8, "Clean the created credential");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
             value.credential.SetNonNull();
 
@@ -59173,12 +60810,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Create new PIN credential and lock/unlock user");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
@@ -59196,6 +60835,7 @@ private:
         }
         case 2: {
             LogStep(2, "Precondition: Door is in locked state");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             value.pinCode.Emplace();
             value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
@@ -59206,6 +60846,7 @@ private:
         }
         case 3: {
             LogStep(3, "TH writes AutoRelockTime attribute value as 10 seconds on the DUT");
+            ListFreer listFreer;
             uint32_t value;
             value = 10UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::AutoRelockTime::Id, value,
@@ -59213,6 +60854,7 @@ private:
         }
         case 4: {
             LogStep(4, "TH sends the unlock with Timeout command to the DUT ");
+            ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type value;
             value.timeout = 5U;
             value.pinCode.Emplace();
@@ -59229,6 +60871,7 @@ private:
         }
         case 6: {
             LogStep(6, "Wait 5000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 5000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -59376,12 +61019,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Add Group 1 (endpoint 1)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 257U;
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
@@ -59391,6 +61036,7 @@ private:
         }
         case 2: {
             LogStep(2, "Add Group 2 (endpoint 0)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 258U;
             value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
@@ -59400,6 +61046,7 @@ private:
         }
         case 3: {
             LogStep(3, "KeySet Write 1");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
             value.groupKeySet.groupKeySetID = 417U;
@@ -59434,6 +61081,7 @@ private:
         }
         case 4: {
             LogStep(4, "KeySet Write 2");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
             value.groupKeySet.groupKeySetID = 418U;
@@ -59523,6 +61171,7 @@ private:
         }
         case 8: {
             LogStep(8, "Group Write Attribute");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("xyzzygarbage: not in length on purpose", 5);
             return WriteGroupAttribute(kIdentityAlpha, 258, Basic::Id, Basic::Attributes::NodeLabel::Id, value, chip::NullOptional);
@@ -59534,6 +61183,7 @@ private:
         }
         case 10: {
             LogStep(10, "Restore initial Attribute value");
+            ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("garbage: not in length on purpose", 0);
             return WriteGroupAttribute(kIdentityAlpha, 258, Basic::Id, Basic::Attributes::NodeLabel::Id, value, chip::NullOptional);
@@ -59545,6 +61195,7 @@ private:
         }
         case 12: {
             LogStep(12, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::On::Id, value);
         }
@@ -59827,12 +61478,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "View Group 0 (invalid)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59842,6 +61495,7 @@ private:
         }
         case 2: {
             LogStep(2, "View Group 1 (not found)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59851,6 +61505,7 @@ private:
         }
         case 3: {
             LogStep(3, "Add Group 1 (new)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 1U;
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
@@ -59860,6 +61515,7 @@ private:
         }
         case 4: {
             LogStep(4, "View Group 1 (new)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59869,6 +61525,7 @@ private:
         }
         case 5: {
             LogStep(5, "View Group 2 (not found)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59889,6 +61546,7 @@ private:
         }
         case 7: {
             LogStep(7, "View Group 3 (not found)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 32767U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59898,6 +61556,7 @@ private:
         }
         case 8: {
             LogStep(8, "View Group 1 (existing)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59907,6 +61566,7 @@ private:
         }
         case 9: {
             LogStep(9, "Remove Group 0 (invalid)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
             value.groupId = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
@@ -59916,6 +61576,7 @@ private:
         }
         case 10: {
             LogStep(10, "Remove Group 4 (not found)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
             value.groupId = 4U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
@@ -59925,6 +61586,7 @@ private:
         }
         case 11: {
             LogStep(11, "View Group 1 (not removed)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59934,6 +61596,7 @@ private:
         }
         case 12: {
             LogStep(12, "View Group 2 (removed)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59962,6 +61625,7 @@ private:
         }
         case 14: {
             LogStep(14, "Remove All");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveAllGroups::Id, value,
                                chip::NullOptional
@@ -59970,6 +61634,7 @@ private:
         }
         case 15: {
             LogStep(15, "View Group 1 (removed)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59979,6 +61644,7 @@ private:
         }
         case 16: {
             LogStep(16, "View Group 2 (still removed)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 4369U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -59988,6 +61654,7 @@ private:
         }
         case 17: {
             LogStep(17, "View Group 3 (removed)");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 32767U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
@@ -60229,6 +61896,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -60245,6 +61913,7 @@ private:
         }
         case 3: {
             LogStep(3, "Add Group 1");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 257U;
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
@@ -60254,6 +61923,7 @@ private:
         }
         case 4: {
             LogStep(4, "Add Group 2");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 258U;
             value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
@@ -60263,6 +61933,7 @@ private:
         }
         case 5: {
             LogStep(5, "KeySet Write 1");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
             value.groupKeySet.groupKeySetID = 417U;
@@ -60297,6 +61968,7 @@ private:
         }
         case 6: {
             LogStep(6, "KeySet Write 2");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
             value.groupKeySet.groupKeySetID = 418U;
@@ -60331,6 +62003,7 @@ private:
         }
         case 7: {
             LogStep(7, "KeySet Read");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type value;
             value.groupKeySetID = 417U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
@@ -60392,6 +62065,7 @@ private:
         }
         case 12: {
             LogStep(12, "KeySet Remove 1");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type value;
             value.groupKeySetID = 417U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
@@ -60401,6 +62075,7 @@ private:
         }
         case 13: {
             LogStep(13, "KeySet Read (removed)");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type value;
             value.groupKeySetID = 417U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
@@ -60410,6 +62085,7 @@ private:
         }
         case 14: {
             LogStep(14, "KeySet Read (not removed)");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type value;
             value.groupKeySetID = 418U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
@@ -60419,6 +62095,7 @@ private:
         }
         case 15: {
             LogStep(15, "Remove All");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveAllGroups::Id, value,
                                chip::NullOptional
@@ -60427,6 +62104,7 @@ private:
         }
         case 16: {
             LogStep(16, "KeySet Remove 2");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type value;
             value.groupKeySetID = 418U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
@@ -60436,6 +62114,7 @@ private:
         }
         case 17: {
             LogStep(17, "KeySet Read (also removed)");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type value;
             value.groupKeySetID = 418U;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
@@ -60505,6 +62184,7 @@ private:
         {
         case 0: {
             LogStep(0, "Step 1");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC Forum "
@@ -60582,6 +62262,7 @@ private:
         {
         case 0: {
             LogStep(0, "Step 1");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message =
                 chip::Span<const char>("Scan the DUTs QR code using a QR code readergarbage: not in length on purpose", 44);
@@ -60589,6 +62270,7 @@ private:
         }
         case 1: {
             LogStep(1, "Step 1 verification");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message =
                 chip::Span<const char>("Verify the QR code gets scanned successfully and the QR code must be of sufficient size "
@@ -60599,6 +62281,7 @@ private:
         }
         case 2: {
             LogStep(2, "Step 2 verificaiton");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Verify QR code version is 1 or highergarbage: not in length on purpose", 37);
             return Log(kIdentityAlpha, value);
@@ -60669,6 +62352,7 @@ private:
         {
         case 0: {
             LogStep(0, "Precondition");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Verify manual pairing code is printed on the device or in additional provided "
                                                    "materialsgarbage: not in length on purpose",
@@ -60677,6 +62361,7 @@ private:
         }
         case 1: {
             LogStep(1, "Step 1");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message =
                 chip::Span<const char>("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 "
@@ -60750,12 +62435,14 @@ private:
         {
         case 0: {
             LogStep(0, "Step 1");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Scan the device QR code using DUTgarbage: not in length on purpose", 33);
             return Log(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Step 1 verification");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Verify the DUT is able to scan and parse the QR code successfully to onboard "
                                                    "the device onto the CHIP networkgarbage: not in length on purpose",
@@ -60832,6 +62519,7 @@ private:
         {
         case 0: {
             LogStep(0, "Precondition");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Verify that the manual pairing code is printed on the device or in additional "
                                                    "provided materialsgarbage: not in length on purpose",
@@ -60840,6 +62528,7 @@ private:
         }
         case 1: {
             LogStep(1, "Step 1");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Provide the 11 digit or 21 digit pairing code from the Device in text speech "
                                                    "or any format supported by DUTgarbage: not in length on purpose",
@@ -60848,6 +62537,7 @@ private:
         }
         case 2: {
             LogStep(2, "Step 1 verification");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("Verify that the manual pairing code can be provided to DUT and parsed to "
                                                    "onboard the device onto the CHIP networkgarbage: not in length on purpose",
@@ -62107,116 +63797,137 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::On::Id, value);
         }
         case 2: {
             LogStep(2, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Turn Off the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::Off::Id, value);
         }
         case 4: {
             LogStep(4, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
             LogStep(5, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::On::Id, value);
         }
         case 6: {
             LogStep(6, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Turn Off the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::Off::Id, value);
         }
         case 8: {
             LogStep(8, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 9: {
             LogStep(9, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::On::Id, value);
         }
         case 10: {
             LogStep(10, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 11: {
             LogStep(11, "Turn Off the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::Off::Id, value);
         }
         case 12: {
             LogStep(12, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::On::Id, value);
         }
         case 14: {
             LogStep(14, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 15: {
             LogStep(15, "Turn Off the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::Off::Id, value);
         }
         case 16: {
             LogStep(16, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 17: {
             LogStep(17, "Turn On the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::On::Id, value);
         }
         case 18: {
             LogStep(18, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 19: {
             LogStep(19, "Turn Off the light to see attribute change");
+            ListFreer listFreer;
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendGroupCommand(kIdentityAlpha, 257, OnOff::Id, OnOff::Commands::Off::Id, value);
         }
         case 20: {
             LogStep(20, "Wait 100ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
@@ -62303,12 +64014,14 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Add Group 1 - endpoint 1");
+            ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
             value.groupId   = 257U;
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
@@ -62318,6 +64031,7 @@ private:
         }
         case 2: {
             LogStep(2, "KeySet Write 1");
+            ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
             value.groupKeySet.groupKeySetID = 417U;
@@ -66916,6 +68630,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -66923,6 +68638,7 @@ private:
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
@@ -66931,6 +68647,7 @@ private:
         }
         case 2: {
             LogStep(2, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -66944,6 +68661,7 @@ private:
         case 4: {
             LogStep(4, "sends a Play command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
@@ -66952,6 +68670,7 @@ private:
         }
         case 5: {
             LogStep(5, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Physically verify that the media is playinggarbage: not in length on purpose", 43);
@@ -66965,6 +68684,7 @@ private:
         case 7: {
             LogStep(7, "sends a Pause command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
@@ -66973,6 +68693,7 @@ private:
         }
         case 8: {
             LogStep(8, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Physically verify that the media is pausedgarbage: not in length on purpose", 42);
@@ -66987,6 +68708,7 @@ private:
         case 10: {
             LogStep(10, "sends a Stop command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StopPlayback::Id, value,
                                chip::NullOptional
@@ -66995,6 +68717,7 @@ private:
         }
         case 11: {
             LogStep(11, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Physically verify that the media is stopedgarbage: not in length on purpose", 42);
@@ -67177,6 +68900,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -67184,6 +68908,7 @@ private:
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
@@ -67192,6 +68917,7 @@ private:
         }
         case 2: {
             LogStep(2, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -67205,6 +68931,7 @@ private:
         case 4: {
             LogStep(4, "Sends a Play command to the DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
@@ -67213,6 +68940,7 @@ private:
         }
         case 5: {
             LogStep(5, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Physically verify that the media is playinggarbage: not in length on purpose", 43);
@@ -67226,6 +68954,7 @@ private:
         case 7: {
             LogStep(7, "Sends a StartOver command to the DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StartOver::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StartOver::Id, value,
                                chip::NullOptional
@@ -67234,6 +68963,7 @@ private:
         }
         case 8: {
             LogStep(8, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Physically verify that the media is started overgarbage: not in length on purpose", 48);
@@ -67241,6 +68971,7 @@ private:
         }
         case 9: {
             LogStep(9, "Sends a Next command to the DUT");
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Next::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Next::Id, value,
                                chip::NullOptional
@@ -67249,6 +68980,7 @@ private:
         }
         case 10: {
             LogStep(10, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the next media item in the queue has been loadedgarbage: not in length on purpose", 60);
@@ -67257,6 +68989,7 @@ private:
         case 11: {
             LogStep(11, "Sends a Previous command to the DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Previous::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Previous::Id, value,
                                chip::NullOptional
@@ -67265,6 +68998,7 @@ private:
         }
         case 12: {
             LogStep(12, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the previous media item in the queue has been loadedgarbage: not in length on purpose", 64);
@@ -67273,6 +69007,7 @@ private:
         case 13: {
             LogStep(13, "Sends a SkipForward command to the DUT ");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type value;
             value.deltaPositionMilliseconds = 10000ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::SkipForward::Id, value,
@@ -67282,6 +69017,7 @@ private:
         }
         case 14: {
             LogStep(14, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify that the media has skipped forward 10 secondsgarbage: not in length on purpose", 52);
@@ -67296,6 +69032,7 @@ private:
         case 16: {
             LogStep(16, "Sends a SkipBackward command to the DUT ");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type value;
             value.deltaPositionMilliseconds = 10000ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::SkipBackward::Id, value,
@@ -67305,6 +69042,7 @@ private:
         }
         case 17: {
             LogStep(17, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the media has skipped backward 10 secondsgarbage: not in length on purpose", 53);
@@ -67422,6 +69160,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -67429,6 +69168,7 @@ private:
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
@@ -67437,6 +69177,7 @@ private:
         }
         case 2: {
             LogStep(2, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -67444,6 +69185,7 @@ private:
         case 3: {
             LogStep(3, "Sends a Seek command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = 10000ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Seek::Id, value,
@@ -67453,6 +69195,7 @@ private:
         }
         case 4: {
             LogStep(4, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the media has moved to 10 seconds from the starting point.garbage: not in length on purpose", 70);
@@ -67466,6 +69209,7 @@ private:
         }
         case 6: {
             LogStep(6, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "User prompt needed to enter the value beyond the furthest valid positiongarbage: not in length on purpose", 72);
@@ -67474,6 +69218,7 @@ private:
         case 7: {
             LogStep(7, "Sends a Seek command Position value beyond the furthest valid position");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = 10000ULL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Seek::Id, value,
@@ -67677,6 +69422,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -67684,6 +69430,7 @@ private:
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
@@ -67692,6 +69439,7 @@ private:
         }
         case 2: {
             LogStep(2, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Verify that media is pausedgarbage: not in length on purpose", 27);
             return UserPrompt(kIdentityAlpha, value);
@@ -67710,6 +69458,7 @@ private:
         case 5: {
             LogStep(5, "Sends a FastForward command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
@@ -67718,6 +69467,7 @@ private:
         }
         case 6: {
             LogStep(6, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Verify that the media is playinggarbage: not in length on purpose", 32);
             return UserPrompt(kIdentityAlpha, value);
@@ -67736,6 +69486,7 @@ private:
         case 9: {
             LogStep(9, "Sends a FastForward command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
@@ -67744,6 +69495,7 @@ private:
         }
         case 10: {
             LogStep(10, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify that the media play speed has increasedgarbage: not in length on purpose", 46);
@@ -67758,6 +69510,7 @@ private:
         case 12: {
             LogStep(12, "Sends a Rewind command to the DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
@@ -67766,6 +69519,7 @@ private:
         }
         case 13: {
             LogStep(13, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify that the media play has reversed directiongarbage: not in length on purpose", 49);
@@ -67779,6 +69533,7 @@ private:
         case 15: {
             LogStep(15, "Sends a Rewind command to the DUT");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
@@ -67787,6 +69542,7 @@ private:
         }
         case 16: {
             LogStep(16, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Verify that the media play has reversed directiongarbage: not in length on purpose", 49);
@@ -67795,6 +69551,7 @@ private:
         case 17: {
             LogStep(17, "Sends a Play command");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
@@ -67803,6 +69560,7 @@ private:
         }
         case 18: {
             LogStep(18, "log a command");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
                 "Verify that the media is has resumed playing forward at the default speedgarbage: not in length on purpose", 73);
@@ -67817,6 +69575,7 @@ private:
         case 20: {
             LogStep(20, "Sends consecutive FastForward commands");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
@@ -67826,6 +69585,7 @@ private:
         case 21: {
             LogStep(21, "Sends consecutive Rewind commands");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
@@ -71839,6 +73599,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
@@ -71852,6 +73613,7 @@ private:
         case 2: {
             LogStep(2, "Operate on DUT to change the occupancy status");
             VerifyOrdo(!ShouldSkip("MANUAL_OCCUPANCY_CHANGE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
                 chip::Span<const char>("Operate on DUT to change the occupancy statusgarbage: not in length on purpose", 45);
