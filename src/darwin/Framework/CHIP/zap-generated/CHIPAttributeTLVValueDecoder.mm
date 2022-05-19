@@ -14988,8 +14988,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::RoutingRole::Id: {
@@ -14999,8 +15003,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::NetworkName::Id: {
@@ -15010,8 +15018,14 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSString * _Nonnull value;
-            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            NSString * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [[NSString alloc] initWithBytes:cppValue.Value().data()
+                                                 length:cppValue.Value().size()
+                                               encoding:NSUTF8StringEncoding];
+            }
             return value;
         }
         case Attributes::PanId::Id: {
@@ -15021,8 +15035,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::ExtendedPanId::Id: {
@@ -15032,8 +15050,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedLongLong:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::MeshLocalPrefix::Id: {
@@ -15043,8 +15065,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSData * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSData dataWithBytes:cppValue.Value().data() length:cppValue.Value().size()];
+            }
             return value;
         }
         case Attributes::OverrunCount::Id: {
@@ -15079,8 +15105,16 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
                     newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
                     newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-                    newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
-                    newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
+                    if (entry_0.averageRssi.IsNull()) {
+                        newElement_0.averageRssi = nil;
+                    } else {
+                        newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi.Value()];
+                    }
+                    if (entry_0.lastRssi.IsNull()) {
+                        newElement_0.lastRssi = nil;
+                    } else {
+                        newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi.Value()];
+                    }
                     newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
                     newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
                     newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];

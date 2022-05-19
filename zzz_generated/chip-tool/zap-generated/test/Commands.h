@@ -31310,7 +31310,7 @@ private:
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
@@ -31318,7 +31318,7 @@ private:
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "RoutingRole"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0));
@@ -31328,10 +31328,10 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::CharSpan value;
+                chip::app::DataModel::Nullable<chip::CharSpan> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "string"));
-                VerifyOrReturn(CheckConstraintMaxLength("value", value.size(), 16));
+                VerifyOrReturn(CheckValueNonNull("networkName", value));
+                VerifyOrReturn(CheckValueAsString("networkName.Value()", value.Value(), chip::CharSpan("", 0)));
             }
             break;
         case 4:
@@ -31341,7 +31341,7 @@ private:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
@@ -31353,7 +31353,7 @@ private:
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint64_t value;
+                chip::app::DataModel::Nullable<uint64_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint64"));
             }
