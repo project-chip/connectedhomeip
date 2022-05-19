@@ -38,6 +38,9 @@ function getManualTests() {
     'Test_TC_DD_1_10',
     'Test_TC_DD_1_11',
     'Test_TC_DD_1_12',
+    'Test_TC_DD_1_13',
+    'Test_TC_DD_1_14',
+    'Test_TC_DD_1_15',
     'Test_TC_DD_2_1',
     'Test_TC_DD_2_2',
     'Test_TC_DD_3_1',
@@ -54,12 +57,22 @@ function getManualTests() {
     'Test_TC_DD_3_12',
     'Test_TC_DD_3_13',
     'Test_TC_DD_3_14',
-    'Test_TC_DD_4_1',
+    'Test_TC_DD_3_15',
+    'Test_TC_DD_3_16',
+    'Test_TC_DD_3_17',
+    'Test_TC_DD_3_18',
+    'Test_TC_DD_3_19',
+    'Test_TC_DD_3_20',
   ];
 
   const Groups = [
     'TestGroupDemoCommand',
     'TestGroupDemoConfig',
+    'Test_TC_GR_1_1',
+    'Test_TC_GR_2_1',
+    'Test_TC_GR_2_2',
+    'Test_TC_GR_3_1',
+    'Test_TC_GR_3_2',
   ];
 
   const BulkDataExchangeProtocol = [
@@ -346,27 +359,6 @@ function getManualTests() {
     'Test_TC_LVL_2_3',
   ];
 
-  const NetworkCommissioning = [
-    'Test_TC_NC_1_1',
-    'Test_TC_NC_1_2',
-    'Test_TC_NC_1_3',
-    'Test_TC_NC_1_4',
-    'Test_TC_NC_1_5',
-    'Test_TC_NC_1_6',
-    'Test_TC_NC_1_7',
-    'Test_TC_NC_1_8',
-    'Test_TC_NC_1_9',
-    'Test_TC_NC_1_10',
-    'Test_TC_NC_1_11',
-    'Test_TC_NC_1_12',
-    'Test_TC_NC_1_13',
-    'Test_TC_NC_1_14',
-    'Test_TC_NC_1_15',
-    'Test_TC_NC_1_16',
-    'Test_TC_NC_1_17',
-    'Test_TC_NC_1_18',
-  ];
-
   const OnOff = [
     'Test_TC_OO_3_1',
     'Test_TC_OO_3_2',
@@ -401,6 +393,26 @@ function getManualTests() {
     'Test_TC_DIAG_TH_NW_2_9',
   ];
 
+  const Actions = [
+    'Test_TC_ACT_1_1',
+    'Test_TC_ACT_2_1',
+    'Test_TC_ACT_2_2',
+    'Test_TC_ACT_3_1',
+  ];
+
+  const TimeFormatLocalization = [
+    'Test_TC_TFL_1_1',
+    'Test_TC_TFL_1_2',
+    'Test_TC_TFL_2_1',
+    'Test_TC_TFL_2_2',
+  ];
+
+  const UnitLocalization = [
+    'Test_TC_UL_1_1',
+    'Test_TC_UL_1_2',
+    'Test_TC_UL_2_1',
+    'Test_TC_UL_2_2',
+  ];
 
   const tests = [
     DeviceDiscovery,
@@ -437,7 +449,6 @@ function getManualTests() {
     UserLabel,
     LocalizationConfiguration,
     LevelControl,
-    NetworkCommissioning,
     OnOff,
     RelativeHumidityMeasurement,
     Switch,
@@ -445,6 +456,9 @@ function getManualTests() {
     Thermostat,
     ThermostatUserConfiguration,
     ThreadNetworkDiagnostics,
+    Actions,
+    TimeFormatLocalization,
+    UnitLocalization,
   ].flat(1);
 
   tests.disable = disable.bind(tests);
