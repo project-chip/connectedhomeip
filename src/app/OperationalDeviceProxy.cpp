@@ -74,7 +74,7 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
         return false;
 
     ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
-        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+                    ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
     mDeviceAddress = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     if (!mSecureSession.Grab(sessionHandle.Value()))
         return false;
