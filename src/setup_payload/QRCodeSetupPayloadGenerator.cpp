@@ -196,6 +196,8 @@ static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, 
         MutableCharSpan subSpan = outBuffer.SubSpan(prefixLen, outBuffer.size() - prefixLen);
         memcpy(outBuffer.data(), kQRCodePrefix, prefixLen);
         err = base38Encode(bits, subSpan);
+        // Reduce output span size to be the size of written data
+        outBuffer.reduce_size(subSpan.size() + prefixLen);
     }
 
     return err;
