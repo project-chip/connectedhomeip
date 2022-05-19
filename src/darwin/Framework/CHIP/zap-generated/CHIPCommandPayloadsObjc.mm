@@ -372,9 +372,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupId = @(0);
 
-        _sceneCount = @(0);
-
-        _sceneList = [NSArray array];
+        _sceneList = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;

@@ -1367,15 +1367,39 @@ public class ChipStructs {
     }
   }
 
+  public static class ScenesClusterAttributeValuePair {
+    public Optional<Long> attributeId;
+    public ArrayList<Object> attributeValue;
+
+    public ScenesClusterAttributeValuePair(
+        Optional<Long> attributeId, ArrayList<Object> attributeValue) {
+      this.attributeId = attributeId;
+      this.attributeValue = attributeValue;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ScenesClusterAttributeValuePair {\n");
+      output.append("\tattributeId: ");
+      output.append(attributeId);
+      output.append("\n");
+      output.append("\tattributeValue: ");
+      output.append(attributeValue);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class ScenesClusterSceneExtensionFieldSet {
     public Long clusterId;
-    public Integer length;
-    public Integer value;
+    public ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList;
 
-    public ScenesClusterSceneExtensionFieldSet(Long clusterId, Integer length, Integer value) {
+    public ScenesClusterSceneExtensionFieldSet(
+        Long clusterId, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
       this.clusterId = clusterId;
-      this.length = length;
-      this.value = value;
+      this.attributeValueList = attributeValueList;
     }
 
     @Override
@@ -1385,11 +1409,8 @@ public class ChipStructs {
       output.append("\tclusterId: ");
       output.append(clusterId);
       output.append("\n");
-      output.append("\tlength: ");
-      output.append(length);
-      output.append("\n");
-      output.append("\tvalue: ");
-      output.append(value);
+      output.append("\tattributeValueList: ");
+      output.append(attributeValueList);
       output.append("\n");
       output.append("}\n");
       return output.toString();

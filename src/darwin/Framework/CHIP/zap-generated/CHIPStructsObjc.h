@@ -24,10 +24,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface CHIPScenesClusterAttributeValuePair : NSObject
+@property (strong, nonatomic) NSNumber * _Nullable attributeId;
+@property (strong, nonatomic) NSArray * _Nonnull attributeValue;
+- (instancetype)init;
+@end
+
 @interface CHIPScenesClusterSceneExtensionFieldSet : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
-@property (strong, nonatomic) NSNumber * _Nonnull length;
-@property (strong, nonatomic) NSNumber * _Nonnull value;
+@property (strong, nonatomic) NSArray * _Nonnull attributeValueList;
 - (instancetype)init;
 @end
 

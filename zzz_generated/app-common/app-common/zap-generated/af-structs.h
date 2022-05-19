@@ -64,6 +64,20 @@ typedef struct _Dimension
     uint8_t metric;
 } Dimension;
 
+// Struct for AttributeValuePair
+typedef struct _AttributeValuePair
+{
+    chip::AttributeId attributeId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * attributeValue;
+} AttributeValuePair;
+
+// Struct for SceneExtensionFieldSet
+typedef struct _SceneExtensionFieldSet
+{
+    chip::ClusterId clusterId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * attributeValueList;
+} SceneExtensionFieldSet;
+
 // Struct for AdditionalInfo
 typedef struct _AdditionalInfo
 {
@@ -486,21 +500,6 @@ typedef struct _RouteTable
     bool Allocated;
     bool LinkEstablished;
 } RouteTable;
-
-// Struct for SceneExtensionAttributeInfo
-typedef struct _SceneExtensionAttributeInfo
-{
-    uint8_t attributeType;
-    uint8_t * attributeLocation;
-} SceneExtensionAttributeInfo;
-
-// Struct for SceneExtensionFieldSet
-typedef struct _SceneExtensionFieldSet
-{
-    chip::ClusterId clusterId;
-    uint8_t length;
-    uint8_t value;
-} SceneExtensionFieldSet;
 
 // Struct for ScheduledPhase
 typedef struct _ScheduledPhase

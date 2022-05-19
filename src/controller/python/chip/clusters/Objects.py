@@ -1959,7 +1959,7 @@ class Scenes(Cluster):
                 ClusterObjectFieldDescriptor(Label="currentGroup", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="sceneValid", Tag=0x00000003, Type=bool),
                 ClusterObjectFieldDescriptor(Label="nameSupport", Tag=0x00000004, Type=uint),
-                ClusterObjectFieldDescriptor(Label="lastConfiguredBy", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="lastConfiguredBy", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -1972,7 +1972,7 @@ class Scenes(Cluster):
     currentGroup: 'uint' = None
     sceneValid: 'bool' = None
     nameSupport: 'uint' = None
-    lastConfiguredBy: 'typing.Optional[uint]' = None
+    lastConfiguredBy: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -1982,19 +1982,30 @@ class Scenes(Cluster):
 
     class Structs:
         @dataclass
+        class AttributeValuePair(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="attributeId", Tag=0, Type=typing.Optional[uint]),
+                            ClusterObjectFieldDescriptor(Label="attributeValue", Tag=1, Type=typing.List[uint]),
+                    ])
+
+            attributeId: 'typing.Optional[uint]' = None
+            attributeValue: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
         class SceneExtensionFieldSet(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="clusterId", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="length", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="value", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="attributeValueList", Tag=1, Type=typing.List[Scenes.Structs.AttributeValuePair]),
                     ])
 
             clusterId: 'uint' = 0
-            length: 'uint' = 0
-            value: 'uint' = 0
+            attributeValueList: 'typing.List[Scenes.Structs.AttributeValuePair]' = field(default_factory=lambda: [])
 
 
 
@@ -2234,15 +2245,13 @@ class Scenes(Cluster):
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="capacity", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupId", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="sceneCount", Tag=3, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="sceneList", Tag=4, Type=typing.List[uint]),
+                            ClusterObjectFieldDescriptor(Label="sceneList", Tag=3, Type=typing.Optional[typing.List[uint]]),
                     ])
 
             status: 'uint' = 0
             capacity: 'uint' = 0
             groupId: 'uint' = 0
-            sceneCount: 'uint' = 0
-            sceneList: 'typing.List[uint]' = field(default_factory=lambda: [])
+            sceneList: 'typing.Optional[typing.List[uint]]' = None
 
         @dataclass
         class EnhancedAddScene(ClusterCommand):
@@ -2464,9 +2473,9 @@ class Scenes(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

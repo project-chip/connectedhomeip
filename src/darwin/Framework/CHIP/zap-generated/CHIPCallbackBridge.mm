@@ -12600,8 +12600,43 @@ void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
                 CHIPScenesClusterSceneExtensionFieldSet * newElement_0;
                 newElement_0 = [CHIPScenesClusterSceneExtensionFieldSet new];
                 newElement_0.clusterId = [NSNumber numberWithUnsignedInt:entry_0.clusterId];
-                newElement_0.length = [NSNumber numberWithUnsignedChar:entry_0.length];
-                newElement_0.value = [NSNumber numberWithUnsignedChar:entry_0.value];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.attributeValueList.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        CHIPScenesClusterAttributeValuePair * newElement_2;
+                        newElement_2 = [CHIPScenesClusterAttributeValuePair new];
+                        if (entry_2.attributeId.HasValue()) {
+                            newElement_2.attributeId = [NSNumber numberWithUnsignedInt:entry_2.attributeId.Value()];
+                        } else {
+                            newElement_2.attributeId = nil;
+                        }
+                        { // Scope for our temporary variables
+                            auto * array_4 = [NSMutableArray new];
+                            auto iter_4 = entry_2.attributeValue.begin();
+                            while (iter_4.Next()) {
+                                auto & entry_4 = iter_4.GetValue();
+                                NSNumber * newElement_4;
+                                newElement_4 = [NSNumber numberWithUnsignedChar:entry_4];
+                                [array_4 addObject:newElement_4];
+                            }
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                OnFailureFn(context, err);
+                                return;
+                            }
+                            newElement_2.attributeValue = array_4;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.attributeValueList = array_2;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -12674,24 +12709,25 @@ void CHIPScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
         response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        response.sceneCount = [NSNumber numberWithUnsignedChar:data.sceneCount];
-    }
-    {
-        { // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.sceneList.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
-                [array_0 addObject:newElement_0];
+        if (data.sceneList.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = data.sceneList.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    NSNumber * newElement_1;
+                    newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, err);
+                    return;
+                }
+                response.sceneList = array_1;
             }
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            response.sceneList = array_0;
+        } else {
+            response.sceneList = nil;
         }
     }
     DispatchSuccess(context, response);
@@ -12743,8 +12779,43 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
                 CHIPScenesClusterSceneExtensionFieldSet * newElement_0;
                 newElement_0 = [CHIPScenesClusterSceneExtensionFieldSet new];
                 newElement_0.clusterId = [NSNumber numberWithUnsignedInt:entry_0.clusterId];
-                newElement_0.length = [NSNumber numberWithUnsignedChar:entry_0.length];
-                newElement_0.value = [NSNumber numberWithUnsignedChar:entry_0.value];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.attributeValueList.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        CHIPScenesClusterAttributeValuePair * newElement_2;
+                        newElement_2 = [CHIPScenesClusterAttributeValuePair new];
+                        if (entry_2.attributeId.HasValue()) {
+                            newElement_2.attributeId = [NSNumber numberWithUnsignedInt:entry_2.attributeId.Value()];
+                        } else {
+                            newElement_2.attributeId = nil;
+                        }
+                        { // Scope for our temporary variables
+                            auto * array_4 = [NSMutableArray new];
+                            auto iter_4 = entry_2.attributeValue.begin();
+                            while (iter_4.Next()) {
+                                auto & entry_4 = iter_4.GetValue();
+                                NSNumber * newElement_4;
+                                newElement_4 = [NSNumber numberWithUnsignedChar:entry_4];
+                                [array_4 addObject:newElement_4];
+                            }
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                OnFailureFn(context, err);
+                                return;
+                            }
+                            newElement_2.attributeValue = array_4;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.attributeValueList = array_2;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -12827,178 +12898,183 @@ void CHIPTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucc
     void * context, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
     auto * response = [CHIPTestClusterClusterTestStructArrayArgumentResponseParams new];
-    { { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-    auto iter_0 = data.arg1.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        CHIPTestClusterClusterNestedStructList * newElement_0;
-        newElement_0 = [CHIPTestClusterClusterNestedStructList new];
-        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [CHIPTestClusterClusterSimpleStruct new];
-        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
-        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
-                                                    length:entry_0.c.e.size()
-                                                  encoding:NSUTF8StringEncoding];
-        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.d.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                CHIPTestClusterClusterSimpleStruct * newElement_2;
-                newElement_2 = [CHIPTestClusterClusterSimpleStruct new];
-                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
-                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
-                                                          length:entry_2.e.size()
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg1.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPTestClusterClusterNestedStructList * newElement_0;
+                newElement_0 = [CHIPTestClusterClusterNestedStructList new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [CHIPTestClusterClusterSimpleStruct new];
+                newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
+                newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
+                newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
+                newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
+                newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
+                                                            length:entry_0.c.e.size()
+                                                          encoding:NSUTF8StringEncoding];
+                newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
+                newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
+                newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.d.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        CHIPTestClusterClusterSimpleStruct * newElement_2;
+                        newElement_2 = [CHIPTestClusterClusterSimpleStruct new];
+                        newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
+                        newElement_2.b = [NSNumber numberWithBool:entry_2.b];
+                        newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
+                        newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
+                        newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
+                                                                  length:entry_2.e.size()
+                                                                encoding:NSUTF8StringEncoding];
+                        newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
+                        newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
+                        newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.d = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.e.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.e = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.f.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSData * newElement_2;
+                        newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.f = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.g.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, err);
+                        return;
+                    }
+                    newElement_0.g = array_2;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.arg1 = array_0;
+        }
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg2.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPTestClusterClusterSimpleStruct * newElement_0;
+                newElement_0 = [CHIPTestClusterClusterSimpleStruct new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+                newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
+                newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
+                                                          length:entry_0.e.size()
                                                         encoding:NSUTF8StringEncoding];
-                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                [array_2 addObject:newElement_2];
+                newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+                newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+                newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 OnFailureFn(context, err);
                 return;
             }
-            newElement_0.d = array_2;
+            response.arg2 = array_0;
         }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.e.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.e = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.f.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSData * newElement_2;
-                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.f = array_2;
-        }
-        { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.g.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                [array_2 addObject:newElement_2];
-            }
-            CHIP_ERROR err = iter_2.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, err);
-                return;
-            }
-            newElement_0.g = array_2;
-        }
-        [array_0 addObject:newElement_0];
     }
-    CHIP_ERROR err = iter_0.GetStatus();
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg3.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.arg3 = array_0;
+        }
     }
-    response.arg1 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg2.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    CHIPTestClusterClusterSimpleStruct * newElement_0;
-    newElement_0 = [CHIPTestClusterClusterSimpleStruct new];
-    newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-    newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-    newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data() length:entry_0.e.size() encoding:NSUTF8StringEncoding];
-    newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-    newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-    newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg2 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg3.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg3 = array_0;
-}
-}
-{ { // Scope for our temporary variables
-    auto * array_0 = [NSMutableArray new];
-auto iter_0 = data.arg4.begin();
-while (iter_0.Next()) {
-    auto & entry_0 = iter_0.GetValue();
-    NSNumber * newElement_0;
-    newElement_0 = [NSNumber numberWithBool:entry_0];
-    [array_0 addObject:newElement_0];
-}
-CHIP_ERROR err = iter_0.GetStatus();
-if (err != CHIP_NO_ERROR) {
-    OnFailureFn(context, err);
-    return;
-}
-response.arg4 = array_0;
-}
-}
-{
-    response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
-}
-{
-    response.arg6 = [NSNumber numberWithBool:data.arg6];
-}
-DispatchSuccess(context, response);
-}
-;
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = data.arg4.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithBool:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            response.arg4 = array_0;
+        }
+    }
+    {
+        response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
+    }
+    {
+        response.arg6 = [NSNumber numberWithBool:data.arg6];
+    }
+    DispatchSuccess(context, response);
+};
 
 void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data)

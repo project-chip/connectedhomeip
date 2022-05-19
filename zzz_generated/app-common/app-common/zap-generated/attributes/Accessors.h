@@ -456,8 +456,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace CurrentScene
 
 namespace CurrentGroup {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::GroupId * value); // group_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::GroupId value);
 } // namespace CurrentGroup
 
 namespace SceneValid {
@@ -471,8 +471,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace NameSupport
 
 namespace LastConfiguredBy {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * value); // node_id
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::NodeId> & value); // node_id
 EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value);
 } // namespace LastConfiguredBy
 
 namespace FeatureMap {

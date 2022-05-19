@@ -864,19 +864,23 @@ server cluster Scenes = 5 {
 
   struct SceneExtensionFieldSet {
     cluster_id clusterId = 0;
-    int8u length = 1;
-    int8u value = 2;
+    AttributeValuePair attributeValueList[] = 1;
+  }
+
+  struct AttributeValuePair {
+    optional attrib_id attributeId = 0;
+    int8u attributeValue[] = 1;
   }
 
   readonly attribute int8u sceneCount = 0;
   readonly attribute int8u currentScene = 1;
-  readonly attribute int16u currentGroup = 2;
+  readonly attribute group_id currentGroup = 2;
   readonly attribute boolean sceneValid = 3;
   readonly attribute bitmap8 nameSupport = 4;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
@@ -884,43 +888,43 @@ server cluster Scenes = 5 {
   }
 
   request struct ViewSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RemoveSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RemoveAllScenesRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   request struct StoreSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
   }
 
   request struct RecallSceneRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
     INT8U sceneId = 1;
     INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
-    INT16U groupId = 0;
+    group_id groupId = 0;
   }
 
   response struct AddSceneResponse = 0 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct ViewSceneResponse = 1 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
     INT16U transitionTime = 3;
     CHAR_STRING sceneName = 4;
@@ -929,27 +933,26 @@ server cluster Scenes = 5 {
 
   response struct RemoveSceneResponse = 2 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
   }
 
   response struct StoreSceneResponse = 4 {
     ENUM8 status = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT8U sceneId = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
     INT8U capacity = 1;
-    INT16U groupId = 2;
-    INT8U sceneCount = 3;
-    INT8U sceneList[] = 4;
+    group_id groupId = 2;
+    optional INT8U sceneList[] = 3;
   }
 
   command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
