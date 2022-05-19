@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    7.1.10. [TC-DD-1.10] NFC Onboarding Payload Verification [DUT -
+    3.1.10. [TC-DD-1.10] NFC Onboarding Payload Verification [DUT -
     Commissioner]
 
 config:
@@ -23,10 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Power up the Device and put the Device in pairing mode"
+    - label: "Power up the TH Device and put the TH Device in pairing mode"
       verification: |
           sudo ./chip-all-clusters-app
-
 
           [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
           [1646286638.375960][11651:11651] CHIP:DL:   Serial Number: TEST_SN
@@ -44,7 +43,7 @@ tests:
           [1646286638.378089][11651:11651] CHIP:SVR: Long manual pairing code: [749701123365521327694]
       disabled: true
 
-    - label: "Bring the DUT close to the NFC code on the Device"
+    - label: "Bring the DUT close to the NFC tag for the TH Device"
       verification: |
           Vendor specific field testcase
       disabled: true

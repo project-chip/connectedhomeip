@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.1.7. [TC-DD-1.7] Setup Code Format and Label
+name: 3.1.7. [TC-DD-1.7] Setup Code Format and Label [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -21,23 +21,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify manual pairing code is printed on the device or in
-                    additional provided materials"
-
-    - label: "Step 1"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify that the Manual Pairing Code should be printed using
-                    a minimum font size of 6 points typically producing a
-                    typeface height of 2.1 mm"
+    - label: "Verify using instruments"
+      verification: |
+          Vendor specific field testcase
+      disabled: true
