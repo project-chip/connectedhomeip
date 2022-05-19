@@ -545,7 +545,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) || (mbedtls_mpi_size(&s) <= kP256_FE_Length),
+    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) && (mbedtls_mpi_size(&s) <= kP256_FE_Length),
                  error = CHIP_ERROR_INTERNAL);
 
     // Concatenate r and s to output. Sizes were checked above.
