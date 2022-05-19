@@ -1,22 +1,13 @@
-# CHIP MW320 Lighting Example Application
-
-The Matter MW320 Lighting Example demonstrates how to remotely control a light
-bulb. The light bulb is simulated using one of the MW320 platform LED. It uses
-buttons to test turn on/turn off of the light bulb. You can use this example as
-a reference for creating your own application.
+# MW320 All Clusters Example Application
 
 The example is based on
-[Matter](https://github.com/project-chip/connectedhomeip) and the NXP MW320 SDK,
-and supports remote access and control of a light bulb over a low-power, WiFi
+[Matter](https://github.com/project-chip/connectedhomeip) and the NXP MW320 SDK
+to demonstrates device commissioning and cluster control over a low-power, WiFi
 802.11n network.
-
-The example behaves as a Project CHIP accessory, that is a device that can be
-used bypass paired into an existing Matter network and can be controlled by this
-network.
 
 <hr>
 
--   [CHIP MW320 Lighting Example Application](#chip-mw320-lighting-example-application) -
+-   [MW320 All Clusters Example Application](#mw320-all-clusters-example-application)
 -   [Introduction](#introduction)
 -   [Building](#building)
 -   [Flashing and debugging](#flashdebug)
@@ -28,33 +19,32 @@ network.
 
 ## Introduction
 
-![MW320](../../platform/mw320/doc/images/mw320.jpg)
-
-The MW320 lighting example application provides a working demonstration of a
-light led device, built using the Matter code base and the NXP MW320 SDK. The
-example supports remote access (e.g.: using Matter chip Tool from a Ubuntu
-laptop) and control of a led light over a low-power, WiFi 802.11n network. It is
-capable of being paired into an existing Matter network along with other
-Matter-enabled devices.
+![MW320](../../../platform/nxp/mw320/doc/images/mw320.jpg)
 
 The example targets the
 [NXP MW320 WiFi Micro controller Soc](https://www.nxp.com/products/wireless/wi-fi-plus-bluetooth/88mw32x-802-11n-wi-fi-microcontroller-soc:88MW32X)
 development kit.
 
-The Matter device that runs the lighting application is controlled by the CHIP
-controller device over the WiFi 802.11 protocol. By default, the CHIP device has
-Soft-AP enable with SSID:matter_mw320 WPA2:12345678, and it should be connect
-over WiFi network and bypass pairing from other chip tool base on Project CHIP
-test_event_6 code base. The actions required before establishing full
-communication are described below.
-
-The example also comes with a test mode, which allows to start WiFi Soft-AP with
-the default settings. However, this mode does not guarantee that the device will
-be able to communicate with the Matter controller and other devices.
-
 <a name="building"></a>
 
 ## Building
+
+Building the example application is quite straightforward. It can be done via
+following commands:
+```
+git submodule update --init
+source third_party/connectedhomeip/scripts/activate.sh
+gn gen out/debug
+ninja -v -C out/debug
+```
+Example application binary file "all-cluster-mw320.bin" will be generated under
+directory "out/debug".
+
+Note:
+1. "git submodule update --init" only needs to be issued for the first time in order
+   to download MW320 SDK for Matter.
+3. "source third_party/connectedhomeip/scripts/activate.sh" can be omitted if your
+   environment is already setup without issues.
 
 <a name="flashdebug"></a>
 
@@ -66,4 +56,4 @@ program at second USB interface. ex. /dev/ttyUSB1.
 
 ## Testing the example
 
-![MW320 LED ON](../../platform/mw320/doc/images/mw320_on.jpg)
+![MW320 LED ON](../../../platform/nxp/mw320/doc/images/mw320_on.jpg)
