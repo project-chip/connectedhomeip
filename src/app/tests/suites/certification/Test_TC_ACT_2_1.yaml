@@ -1,0 +1,177 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.1. [TC-ACT-2.1] Attributes with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Use manufacturer provided means (e.g. app) to define groups of
+          endpoints that can be exposed using the Actions server cluster (NOTE
+          if this is not provided, it is assumed the DUT automagically creates
+          these)"
+      verification: |
+          no Matter messages, result will be used in steps 4a and beyond
+      disabled: true
+
+    - label:
+          "Use manufacturer provided means (e.g. app) to define available
+          actions that can be exposed using the Actions server cluster (NOTE if
+          this is not provided, it is assumed the DUT automagically creates
+          these)"
+      verification: |
+          no Matter messages, result will be used in steps 5a and beyond
+      disabled: true
+
+    - label:
+          "Read PartsList attribute of Descriptor cluster on all endpoints of
+          the DUT"
+      verification: |
+          Read PartsList attribute of Descriptor cluster on all endpoints of the DUT (start with EP 0 and recursively handle all the EP found in the PartsList)
+      disabled: true
+
+    - label: "Compile a list of all endpoints on the server"
+      verification: |
+          internal TH: create list of all EP on this server
+      disabled: true
+
+    - label:
+          "Read EndpointLists attribute of Actions server and validate the
+          EndpointListStructs using the following steps"
+      verification: |
+          Read EndpointLists attribute
+      disabled: true
+
+    - label:
+          "For each EndpointListStruct, verify that the endpoints in the
+          Endpoints field are in the list of endpoints of the DUT"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label: "For each EndpointListStruct, verify that the Name is present"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "For each EndpointListStruct, verify that the Type is present and
+          valid"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "Verify that the EndPointListIDs of all EndpointListStruct are unique
+          (no duplicates)"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "For each EndpointListStruct, verify Name and Type against the
+          name/type of each group of endpoints provided by the manufacturers
+          means"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "Read ActionList attribute of Actions server and validate the
+          ActionStructs using the following steps"
+      verification: |
+          Read ActionList attribute
+      disabled: true
+
+    - label: "For each ActionStruct, verify the Name is present"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label: "For each ActionStruct, verify the Type is present and valid"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "For each ActionStruct, verify the EndpointListID is present in one of
+          the EndpointListStructs (see step 4a)"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "For each ActionStruct, verify the SupportedCommands field is present
+          and valid (at least one bit is set)"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "For each ActionStruct, verify the State field is present and valid"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "Verify that the ActionIDs of all ActionStructs are unique (no
+          duplicates)"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "For each ActionStruct, verify Name, Type and State against the
+          name/type/state info for the action provided by the manufacturers
+          means"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label: "Read SetupURL attribute"
+      verification: |
+          Read SetupURL attribute
+      disabled: true
+
+    - label:
+          "Verify that its syntax follows the syntax as specified in RFC 3986,
+          max. 512 ASCII characters"
+      verification: |
+          no Matter messages, but TH internal checking
+      disabled: true
+
+    - label:
+          "Verify SetupURL points to a site providing information about the
+          actions"
+      verification: |
+          no Matter messages, but TH internal checking + accessing the URL on the internet
+      disabled: true
+
+    - label:
+          'Verify SetupURL appended by "?/a=" and the decimal numeric value of
+          one of the exposed ActionIDs (see step 5a) points to a site providing
+          information about the action'
+      verification: |
+          no Matter messages, but TH internal checking + accessing the URL on the internet
+      disabled: true

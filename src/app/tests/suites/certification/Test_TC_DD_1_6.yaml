@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.1.6. [TC-DD-1.6] QR Code Format and Label
+name: 3.1.6. [TC-DD-1.6] QR Code Format and Label [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -21,30 +21,12 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Step 1"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value: "Scan the DUTs QR code using a QR code reader"
+    - label: "Scan the DUTs QR code using the TH QR code reader"
+      verification: |
+          Vendor specific field testcase
+      disabled: true
 
-    - label: "Step 1 verification"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Verify the QR code gets scanned successfully and the QR
-                    code must be of sufficient size and contrast respective to
-                    surface material as to be readable with standard readers
-                    such as smartphones in normal lighting conditions"
-
-    - label: "Step 2 verificaiton"
-      cluster: "LogCommands"
-      command: "Log"
-      arguments:
-          values:
-              - name: "message"
-                value: "Verify QR code version is 1 or higher"
+    - label: "Verify QR code version"
+      verification: |
+          Vendor specific field verification
+      disabled: true
