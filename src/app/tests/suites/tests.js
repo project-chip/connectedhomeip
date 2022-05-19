@@ -321,9 +321,7 @@ function getManualTests()
     'Test_TC_DL_2_5',
     'Test_TC_DL_2_6',
     'Test_TC_DL_2_7',
-    'Test_TC_DL_2_8',
     'Test_TC_DL_2_10',
-    'Test_TC_DL_2_11',
     'Test_TC_DL_2_13',
     'Test_TC_DL_2_14',
     'Test_TC_DL_2_15',
@@ -758,6 +756,8 @@ function getTests()
     'Test_TC_DL_2_2',
     'Test_TC_DL_2_3',
     'Test_TC_DL_2_4',
+    'Test_TC_DL_2_8',
+    'Test_TC_DL_2_11',
   ];
 
   const Groups = [

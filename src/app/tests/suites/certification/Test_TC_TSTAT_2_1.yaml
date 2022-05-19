@@ -28,8 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #issue  #11524 below disabled steps are for attributes not supported in YAML framework
-
     - label:
           "Reads constraints of mandatory attributes from DUT: LocalTemperature"
       command: "readAttribute"
@@ -84,27 +82,100 @@ tests:
               minValue: 1600
               maxValue: 3200
 
+    #issue #18319
     - label:
-          "Reads constraints of mandatory attributes from DUT: PICoolingDemand"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PICoolingDemand"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 100
+          "Read PICoolingDemand attribute from the DUT Verify that the DUT
+          responds with a uint8 value.The value has to be in the range of 0 to
+          100"
+      verification: |
+          ./apps/chip-tool thermostat read pi-cooling-demand 54321 1
+
+          [1651147835.214624][10638:10643] CHIP:DMG: ReportDataMessage =
+          [1651147835.214675][10638:10643] CHIP:DMG: {
+          [1651147835.214714][10638:10643] CHIP:DMG:         AttributeReportIBs =
+          [1651147835.214772][10638:10643] CHIP:DMG:         [
+          [1651147835.214816][10638:10643] CHIP:DMG:                 AttributeReportIB =
+          [1651147835.214881][10638:10643] CHIP:DMG:                 {
+          [1651147835.214928][10638:10643] CHIP:DMG:                         AttributeStatusIB =
+          [1651147835.214985][10638:10643] CHIP:DMG:                         {
+          [1651147835.215039][10638:10643] CHIP:DMG:                                 AttributePathIB =
+          [1651147835.215100][10638:10643] CHIP:DMG:                                 {    
+          [1651147835.215162][10638:10643] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147835.215228][10638:10643] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147835.215293][10638:10643] CHIP:DMG:                                         Attribute = 0x0000_0007,
+          [1651147835.215351][10638:10643] CHIP:DMG:                                 }
+          [1651147835.215416][10638:10643] CHIP:DMG:                                         
+          [1651147835.215469][10638:10643] CHIP:DMG:                                 StatusIB =
+          [1651147835.215535][10638:10643] CHIP:DMG:                                 {
+          [1651147835.215597][10638:10643] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147835.215657][10638:10643] CHIP:DMG:                                 },
+          [1651147835.215717][10638:10643] CHIP:DMG:                                 
+          [1651147835.215772][10638:10643] CHIP:DMG:                         },
+          [1651147835.215833][10638:10643] CHIP:DMG:                         
+          [1651147835.215879][10638:10643] CHIP:DMG:                 },
+          [1651147835.215935][10638:10643] CHIP:DMG:                 
+          [1651147835.215978][10638:10643] CHIP:DMG:         ],
+          [1651147835.216033][10638:10643] CHIP:DMG:         
+          [1651147835.216078][10638:10643] CHIP:DMG:         SuppressResponse = true, 
+          [1651147835.216124][10638:10643] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147835.216167][10638:10643] CHIP:DMG: }
+          [1651147835.216348][10638:10643] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of mandatory attributes from DUT: PIHeatingDemand"
-      disabled: true
-      command: "readAttribute"
-      attribute: "PIHeatingDemand"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 100
+          "Read PIHeatingDemand attribute from the DUT and Verify that the DUT
+          responds with a uint8 value.The value has to be in the range of 0 to
+          100"
+      verification: |
+          ./apps/chip-tool thermostat read pi-heating-demand 54321 1
+
+          [1651147869.659064][10648:10653] CHIP:DMG: ReportDataMessage =
+          [1651147869.659093][10648:10653] CHIP:DMG: {
+          [1651147869.659116][10648:10653] CHIP:DMG:         AttributeReportIBs =
+          [1651147869.659149][10648:10653] CHIP:DMG:         [
+          [1651147869.659174][10648:10653] CHIP:DMG:                 AttributeReportIB =
+          [1651147869.659215][10648:10653] CHIP:DMG:                 {
+          [1651147869.659244][10648:10653] CHIP:DMG:                         AttributeStatusIB =
+          [1651147869.659277][10648:10653] CHIP:DMG:                         {
+          [1651147869.659308][10648:10653] CHIP:DMG:                                 AttributePathIB =
+          [1651147869.659373][10648:10653] CHIP:DMG:                                 {
+          [1651147869.659411][10648:10653] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147869.659469][10648:10653] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147869.659511][10648:10653] CHIP:DMG:                                         Attribute = 0x0000_0008,
+          [1651147869.659567][10648:10653] CHIP:DMG:                                 }
+          [1651147869.659629][10648:10653] CHIP:DMG:                                         
+          [1651147869.659688][10648:10653] CHIP:DMG:                                 StatusIB =
+          [1651147869.659729][10648:10653] CHIP:DMG:                                 {
+          [1651147869.659794][10648:10653] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147869.659852][10648:10653] CHIP:DMG:                                 },
+          [1651147869.659916][10648:10653] CHIP:DMG:                                 
+          [1651147869.659948][10648:10653] CHIP:DMG:                         },
+          [1651147869.660004][10648:10653] CHIP:DMG:                         
+          [1651147869.660062][10648:10653] CHIP:DMG:                 },
+          [1651147869.660098][10648:10653] CHIP:DMG:                 
+          [1651147869.660123][10648:10653] CHIP:DMG:         ],
+          [1651147869.660178][10648:10653] CHIP:DMG:         
+          [1651147869.660230][10648:10653] CHIP:DMG:         SuppressResponse = true, 
+          [1651147869.660277][10648:10653] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147869.660304][10648:10653] CHIP:DMG: }
+          [1651147869.660459][10648:10653] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads constraints of optional attributes from DUT:
@@ -130,28 +201,92 @@ tests:
               maxValue: 2600
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
-          UnoccupiedCoolingSetpoint"
-      disabled: true
-      command: "readAttribute"
-      attribute: "UnoccupiedCoolingSetpoint"
-      response:
-          constraints:
-              type: int16
-              minValue: 1600
-              maxValue: 2600
+          "Read UnoccupiedCoolingSetpoint attribute from the DUT and Verify that
+          the DUT responds with an int16 value"
+      verification: |
+          ./apps/chip-tool thermostat read unoccupied-cooling-setpoint 54321 1
+          [1651148145.862809][10702:10707] CHIP:DMG: ReportDataMessage =
+          [1651148145.862848][10702:10707] CHIP:DMG: {
+          [1651148145.862880][10702:10707] CHIP:DMG:         AttributeReportIBs =
+          [1651148145.862930][10702:10707] CHIP:DMG:         [
+          [1651148145.862966][10702:10707] CHIP:DMG:                 AttributeReportIB =
+          [1651148145.863018][10702:10707] CHIP:DMG:                 {
+          [1651148145.863057][10702:10707] CHIP:DMG:                         AttributeStatusIB =
+          [1651148145.863109][10702:10707] CHIP:DMG:                         {
+          [1651148145.863156][10702:10707] CHIP:DMG:                                 AttributePathIB =
+          [1651148145.863205][10702:10707] CHIP:DMG:                                 {
+          [1651148145.863250][10702:10707] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651148145.863307][10702:10707] CHIP:DMG:                                         Cluster = 0x201,
+          [1651148145.863360][10702:10707] CHIP:DMG:                                         Attribute = 0x0000_0013,
+          [1651148145.863408][10702:10707] CHIP:DMG:                                 }
+          [1651148145.863466][10702:10707] CHIP:DMG:                                         
+          [1651148145.863513][10702:10707] CHIP:DMG:                                 StatusIB =
+          [1651148145.863562][10702:10707] CHIP:DMG:                                 {
+          [1651148145.863609][10702:10707] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651148145.863658][10702:10707] CHIP:DMG:                                 },
+          [1651148145.863707][10702:10707] CHIP:DMG:                                 
+          [1651148145.863750][10702:10707] CHIP:DMG:                         },
+          [1651148145.863799][10702:10707] CHIP:DMG:                         
+          [1651148145.863836][10702:10707] CHIP:DMG:                 },
+          [1651148145.863883][10702:10707] CHIP:DMG:                 
+          [1651148145.863920][10702:10707] CHIP:DMG:         ],
+          [1651148145.863965][10702:10707] CHIP:DMG:         
+          [1651148145.864000][10702:10707] CHIP:DMG:         SuppressResponse = true, 
+          [1651148145.864037][10702:10707] CHIP:DMG:         InteractionModelRevision = 1
+          [1651148145.864072][10702:10707] CHIP:DMG: }
+          [1651148145.864219][10702:10707] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of mandatory attributes from DUT:
-          UnoccupiedHeatingSetpoint"
-      disabled: true
-      command: "readAttribute"
-      attribute: "UnoccupiedHeatingSetpoint"
-      response:
-          constraints:
-              type: int16
-              minValue: 700
-              maxValue: 2000
+          "Read UnoccupiedHeatingSetpoint attribute from the DUT and Verify that
+          the DUT responds with an int16 value"
+      verification: |
+          ./apps/chip-tool thermostat read occupied-heating-setpoint 54321 1
+          [1651148114.140452][10694:10699] CHIP:DMG: ReportDataMessage =
+          [1651148114.140501][10694:10699] CHIP:DMG: {
+          [1651148114.140541][10694:10699] CHIP:DMG:         AttributeReportIBs =
+          [1651148114.140597][10694:10699] CHIP:DMG:         [
+          [1651148114.140643][10694:10699] CHIP:DMG:                 AttributeReportIB =
+          [1651148114.140798][10694:10699] CHIP:DMG:                 {
+          [1651148114.140855][10694:10699] CHIP:DMG:                         AttributeDataIB =
+          [1651148114.140914][10694:10699] CHIP:DMG:                         {
+          [1651148114.141054][10694:10699] CHIP:DMG:                                 DataVersion = 0xeb3241b,
+          [1651148114.141118][10694:10699] CHIP:DMG:                                 AttributePathIB =
+          [1651148114.141179][10694:10699] CHIP:DMG:                                 {
+          [1651148114.141285][10694:10699] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651148114.141396][10694:10699] CHIP:DMG:                                         Cluster = 0x201,
+          [1651148114.141474][10694:10699] CHIP:DMG:                                         Attribute = 0x0000_0012,
+          [1651148114.141667][10694:10699] CHIP:DMG:                                 }
+          [1651148114.141780][10694:10699] CHIP:DMG:                                         
+          [1651148114.141945][10694:10699] CHIP:DMG:                                         Data = 2000, 
+          [1651148114.142024][10694:10699] CHIP:DMG:                         },
+          [1651148114.142136][10694:10699] CHIP:DMG:                         
+          [1651148114.142195][10694:10699] CHIP:DMG:                 },
+          [1651148114.142263][10694:10699] CHIP:DMG:                 
+          [1651148114.142399][10694:10699] CHIP:DMG:         ],
+          [1651148114.142466][10694:10699] CHIP:DMG:         
+          [1651148114.142517][10694:10699] CHIP:DMG:         SuppressResponse = true, 
+          [1651148114.142569][10694:10699] CHIP:DMG:         InteractionModelRevision = 1
+          [1651148114.142698][10694:10699] CHIP:DMG: }
+          [1651148114.143048][10694:10699] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0012 DataVersion: 246621211
+          [1651148114.143195][10694:10699] CHIP:TOO:   occupied heating setpoint: 2000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads constraints of mandatory attributes from DUT:
@@ -220,47 +355,190 @@ tests:
               maxValue: 9
 
     - label:
-          "Reads constraints of optional attributes from DUT: OutdoorTemperature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "OutdoorTemperature"
-      response:
-          constraints:
-              type: int16
+          "Read OutdoorTemperature attribute from the DUT and Verify the
+          datatype"
+      verification: |
+          ./apps/chip-tool thermostat read outdoor-temperature 54321 1
 
-    - label: "Reads constraints of optional attributes from DUT: Occupancy"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Occupancy"
-      response:
-          constraints:
-              type: map8
-              minValue: 0
-              maxValue: 1
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          HVACSystemTypeConfiguration"
-      disabled: true
-      command: "readAttribute"
-      attribute: "HVACSystemTypeConfiguration"
-      response:
-          constraints:
-              type: map8
-              minValue: 0
-              maxValue: 63
+          "Read Occupancy attribute from the DUT and Verify the datatype and
+          response value"
+      verification: |
+          ./apps/chip-tool thermostat read occupancy 54321 1
+
+          [1651147633.547776][10591:10596] CHIP:DMG: ReportDataMessage =
+          [1651147633.547816][10591:10596] CHIP:DMG: {
+          [1651147633.547848][10591:10596] CHIP:DMG:         AttributeReportIBs =
+          [1651147633.547893][10591:10596] CHIP:DMG:         [
+          [1651147633.547929][10591:10596] CHIP:DMG:                 AttributeReportIB =
+          [1651147633.547988][10591:10596] CHIP:DMG:                 {
+          [1651147633.548028][10591:10596] CHIP:DMG:                         AttributeStatusIB =
+          [1651147633.548075][10591:10596] CHIP:DMG:                         {
+          [1651147633.548114][10591:10596] CHIP:DMG:                                 AttributePathIB =
+          [1651147633.548168][10591:10596] CHIP:DMG:                                 {
+          [1651147633.548222][10591:10596] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147633.548278][10591:10596] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147633.548330][10591:10596] CHIP:DMG:                                         Attribute = 0x0000_0002,
+          [1651147633.548383][10591:10596] CHIP:DMG:                                 }
+          [1651147633.548446][10591:10596] CHIP:DMG:                                         
+          [1651147633.548491][10591:10596] CHIP:DMG:                                 StatusIB =
+          [1651147633.548538][10591:10596] CHIP:DMG:                                 {
+          [1651147633.548585][10591:10596] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147633.548633][10591:10596] CHIP:DMG:                                 },
+          [1651147633.548679][10591:10596] CHIP:DMG:                                 
+          [1651147633.548722][10591:10596] CHIP:DMG:                         },
+          [1651147633.548773][10591:10596] CHIP:DMG:                         
+          [1651147633.548813][10591:10596] CHIP:DMG:                 },
+          [1651147633.548860][10591:10596] CHIP:DMG:                 
+          [1651147633.548898][10591:10596] CHIP:DMG:         ],
+          [1651147633.548942][10591:10596] CHIP:DMG:         
+          [1651147633.548978][10591:10596] CHIP:DMG:         SuppressResponse = true, 
+          [1651147633.549016][10591:10596] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147633.549050][10591:10596] CHIP:DMG: }
+          [1651147633.549200][10591:10596] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          LocalTemperatureCalibration"
-      disabled: true
-      command: "readAttribute"
-      attribute: "LocalTemperatureCalibration"
-      response:
-          constraints:
-              type: int8
-              minValue: -25
-              maxValue: 25
+          "Read HVACSystemTypeConfiguration attribute from the DUT and Verify
+          that the DUT responds with a map8 value. The value has to be in the
+          range of 0x00 to 0x3f"
+      verification: |
+          ./apps/chip-tool thermostat read hvac-system-type-configuration 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0009,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Read LocalTemperatureCalibration attribute from the DUT and Verify
+          that the DUT responds with an int8 value.The value has to be in the
+          range of -25 to 25"
+      verification: |
+          ./apps/chip-tool thermostat read local-temperature-calibration 54321 1
+
+          [1651147993.335400][10670:10675] CHIP:DMG: ReportDataMessage =
+          [1651147993.335427][10670:10675] CHIP:DMG: {
+          [1651147993.335448][10670:10675] CHIP:DMG:         AttributeReportIBs =
+          [1651147993.335480][10670:10675] CHIP:DMG:         [
+          [1651147993.335504][10670:10675] CHIP:DMG:                 AttributeReportIB =
+          [1651147993.335539][10670:10675] CHIP:DMG:                 {
+          [1651147993.335567][10670:10675] CHIP:DMG:                         AttributeStatusIB =
+          [1651147993.335599][10670:10675] CHIP:DMG:                         {
+          [1651147993.335626][10670:10675] CHIP:DMG:                                 AttributePathIB =
+          [1651147993.335659][10670:10675] CHIP:DMG:                                 {
+          [1651147993.335695][10670:10675] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147993.335727][10670:10675] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147993.335763][10670:10675] CHIP:DMG:                                         Attribute = 0x0000_0010,
+          [1651147993.335797][10670:10675] CHIP:DMG:                                 }
+          [1651147993.335833][10670:10675] CHIP:DMG:                                         
+          [1651147993.335868][10670:10675] CHIP:DMG:                                 StatusIB =
+          [1651147993.335902][10670:10675] CHIP:DMG:                                 {
+          [1651147993.335933][10670:10675] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147993.335968][10670:10675] CHIP:DMG:                                 },
+          [1651147993.336002][10670:10675] CHIP:DMG:                                 
+          [1651147993.336029][10670:10675] CHIP:DMG:                         },
+          [1651147993.336063][10670:10675] CHIP:DMG:                         
+          [1651147993.336089][10670:10675] CHIP:DMG:                 },
+          [1651147993.336122][10670:10675] CHIP:DMG:                 
+          [1651147993.336143][10670:10675] CHIP:DMG:         ],
+          [1651147993.336174][10670:10675] CHIP:DMG:         
+          [1651147993.336198][10670:10675] CHIP:DMG:         SuppressResponse = true, 
+          [1651147993.336224][10670:10675] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147993.336245][10670:10675] CHIP:DMG: }
+          [1651147993.336348][10670:10675] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads constraints of optional attributes from DUT:
@@ -274,37 +552,145 @@ tests:
               minValue: 0
               maxValue: 25
 
-    - label: "Reads constraints of optional attributes from DUT: RemoteSensing"
-      disabled: true
-      command: "readAttribute"
-      attribute: "RemoteSensing"
-      response:
-          constraints:
-              type: map8
-              minValue: 0
-              maxValue: 7
+    - label:
+          "Read RemoteSensing attribute from the DUT and Verify that the DUT
+          responds with a map8 value. The value has to be in the range of 0x00
+          to 0x07"
+      verification: |
+          ./apps/chip-tool thermostat read remote-sensing 54321 1
 
-    - label: "Reads constraints of optional attributes from DUT: AlarmMask"
-      disabled: true
-      command: "readAttribute"
-      attribute: "AlarmMask"
-      response:
-          constraints:
-              type: map8
-              minValue: 0
-              maxValue: 2
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_001A,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          ThermostatRunningMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ThermostatRunningMode"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 9
+          "Read AlarmMask attribute from the DUT and Verify that the DUT
+          responds with a map8 value.The value has to be in the range of 0x00 to
+          0x07."
+      verification: |
+          ./apps/chip-tool thermostat read alarm-mask 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_001D,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Read ThermostatRunningMode attribute from the DUT and Verify that the
+          DUT responds with an enum8 value.The value has to be 0, 3 or 4"
+      verification: |
+          ./apps/chip-tool thermostat read thermostat-running-mode 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_001E,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads constraints of optional attributes from DUT: StartOfWeek"
       optional: true
@@ -337,242 +723,774 @@ tests:
               type: uint8
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          TemperatureSetpointHold"
-      disabled: true
-      command: "readAttribute"
-      attribute: "TemperatureSetpointHold"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 1
+          "Read TemperatureSetpointHold attribute from the DUT and Verify that
+          the DUT responds with an enum8 value.The value has to 0 or 1"
+      verification: |
+          ./apps/chip-tool thermostat read temperature-setpoint-hold 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0023,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          TemperatureSetpointHoldDuration"
-      disabled: true
-      command: "readAttribute"
-      attribute: "TemperatureSetpointHoldDuration"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 1440
+          "Read TemperatureSetpointHoldDuration attribute from the DUT and
+          Verify that the DUT responds with a uint16 value or NULL.The value has
+          to be in the range of 0 to 1440"
+      verification: |
+          ./apps/chip-tool thermostat read temperature-setpoint-hold-duration 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0024,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          ThermostatProgrammingOperationMode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ThermostatProgrammingOperationMode"
-      response:
-          constraints:
-              type: map8
-              minValue: 0
-              maxValue: 2
+          "Read ThermostatProgrammingOperationMode attribute from the DUT and
+          Verify that the DUT responds with a map8 value.The value has to be in
+          the range of 0x00 to 0x07"
+      verification: |
+          ./apps/chip-tool thermostat read thermostat-programming-operation-mode 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0025,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          ThermostatRunningState"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ThermostatRunningState"
-      response:
-          constraints:
-              type: map16
-              minValue: 0
-              maxValue: 6
+          "Read ThermostatRunningState attribute from the DUT and Verify that
+          the DUT responds with a map16 value.The value has to be in the range
+          of 0x00 to 0x7F"
+      verification: |
+          ./apps/chip-tool thermostat read thermostat-running-mode 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute =  0x0000_001E,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          SetpointChangeSource"
-      disabled: true
-      command: "readAttribute"
-      attribute: "SetpointChangeSource"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 2
+          "Read SetpointChangeSource attribute from the DUT and Verify that the
+          DUT responds with an enum8 value. The value has to be in the range of
+          0 to 2"
+      verification: |
+          ./apps/chip-tool thermostat read setpoint-change-source 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0030,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          SetpointChangeAmount"
-      disabled: true
-      command: "readAttribute"
-      attribute: "SetpointChangeAmount"
-      response:
-          constraints:
-              type: int16
+          "Read SetpointChangeAmount attribute from the DUT and Verify that the
+          DUT responds with an int16 value or NULL"
+      verification: |
+          ./apps/chip-tool thermostat read setpoint-change-amount 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0031,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          SetpointChangeSourceTimestamp"
-      disabled: true
-      command: "readAttribute"
-      attribute: "SetpointChangeSourceTimestamp"
-      response:
-          constraints:
-              type: utc
+          "Read SetpointChangeSourceTimestamp attribute from the DUT and Verify
+          that the DUT responds with a utc value"
+      verification: |
+          ./apps/chip-tool thermostat read setpoint-change-source-timestamp 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0001,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: OccupiedSetback"
-      disabled: true
-      command: "readAttribute"
-      attribute: "OccupiedSetback"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "Read OccupiedSetback attribute from the DUT and Verify that the DUT
+          responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: OccupiedSetbackMin"
-      disabled: true
-      command: "readAttribute"
-      attribute: "OccupiedSetbackMin"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "Read OccupiedSetbackMin attribute from the DUT and Verify that the
+          DUT responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: OccupiedSetbackMax"
-      disabled: true
-      command: "readAttribute"
-      attribute: "OccupiedSetbackMax"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "Read OccupiedSetbackMax attribute from the DUT and Verify that the
+          DUT responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: UnoccupiedSetback"
-      disabled: true
-      command: "readAttribute"
-      attribute: "UnoccupiedSetback"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "Read UnoccupiedSetback attribute from the DUT and Verify that the DUT
+          responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          UnoccupiedSetbackMin"
-      disabled: true
-      command: "readAttribute"
-      attribute: "UnoccupiedSetbackMin"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "Read UnoccupiedSetbackMin attribute from the DUT and Verify that the
+          DUT responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT:
-          UnoccupiedSetbackMax"
-      disabled: true
-      command: "readAttribute"
-      attribute: "UnoccupiedSetbackMax"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 254
+          "Read UnoccupiedSetbackMax attribute from the DUT and Verify that the
+          DUT responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: EmergencyHeatDelta"
-      disabled: true
-      command: "readAttribute"
-      attribute: "EmergencyHeatDelta"
-      response:
-          constraints:
-              type: uint8
-
-    - label: "Reads constraints of optional attributes from DUT: ACType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACType"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 4
-
-    - label: "Reads constraints of optional attributes from DUT: ACCapacity"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACCapacity"
-      response:
-          constraints:
-              type: uint16
+          "Read EmergencyHeatDelta attribute from the DUT and Verify that the
+          DUT responds with a uint8 value or NULL"
+      verification: |
+          Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: ACRefrigerantType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACRefrigerantType"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 3
+          "Read ACType attribute from the DUT and Verify that the DUT responds
+          with an enum8 value. The value has to be in the range of 0 to 4"
+      verification: |
+          ./apps/chip-tool thermostat read ac-type 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0040,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: ACCompressorType"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACCompressorType"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 3
+          "Read ACCapacity attribute from the DUT and Verify that the DUT
+          responds with a uint16 value"
+      verification: |
+          ./apps/chip-tool thermostat read ac-capacity 54321 1
 
-    - label: "Reads constraints of optional attributes from DUT: ACErrorCode"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACErrorCode"
-      response:
-          constraints:
-              type: map32
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0041,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: ACLouverPosition"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACLouverPosition"
-      response:
-          constraints:
-              type: enum8
-              minValue: 1
-              maxValue: 5
+          "Read ACRefrigerantType attribute from the DUT and VVerify that the
+          DUT responds with an enum8 value.The value has to be in the range of 0
+          to 3"
+      verification: |
+          ./apps/chip-tool thermostat read ac-refrigerant-type 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0042,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: ACCoilTemperature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACCoilTemperature"
-      response:
-          constraints:
-              type: int16
+          "Read ACCompressorType attribute from the DUT and Verify that the DUT
+          responds with an enum8 value.The value has to be in the range of 0 to
+          3"
+      verification: |
+          ./apps/chip-tool thermostat read ac-compressor 54321 1
 
-    - label: "Reads optional attributes from DUT: ACCapacityFormat"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACCapacityFormat"
-      response:
-          value: 0
+           Attribute Not implemented in the SDK
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Reads constraints of optional attributes from DUT: ACCapacityFormat"
-      disabled: true
-      command: "readAttribute"
-      attribute: "ACCapacityFormat"
-      response:
-          constraints:
-              type: enum8
+          "Read ACErrorCode attribute from the DUT and Verify that the DUT
+          responds with a map32 value"
+      verification: |
+          ./apps/chip-tool thermostat read ac-error-code 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0044,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Read ACLouverPosition attribute from the DUT and Verify that the DUT
+          responds with an enum8 value.The value has to be in the range of 1 to
+          5"
+      verification: |
+          ./apps/chip-tool thermostat read ac-louver-position 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0045,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Read ACCoilTemperature attribute from the DUT and Verify that the DUT
+          responds with an int16 value or NULL"
+      verification: |
+          ./apps/chip-tool thermostat read ac-coil-temperature 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0046,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Read ACCapacityFormat attribute from the DUT and Verify that the DUT
+          responds with an enum8 value.The value has to be 0."
+      verification: |
+          ./apps/chip-tool thermostat read ac-capacity-format 54321 1
+
+          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
+          [1651147597.962928][10583:10588] CHIP:DMG: {
+          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
+          [1651147597.963014][10583:10588] CHIP:DMG:         [
+          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
+          [1651147597.963103][10583:10588] CHIP:DMG:                 {
+          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
+          [1651147597.963177][10583:10588] CHIP:DMG:                         {
+          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
+          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
+          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_0047,
+          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
+          [1651147597.963641][10583:10588] CHIP:DMG:                                         
+          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
+          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
+          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
+          [1651147597.963892][10583:10588] CHIP:DMG:                                 
+          [1651147597.963945][10583:10588] CHIP:DMG:                         },
+          [1651147597.963991][10583:10588] CHIP:DMG:                         
+          [1651147597.964040][10583:10588] CHIP:DMG:                 },
+          [1651147597.964092][10583:10588] CHIP:DMG:                 
+          [1651147597.964125][10583:10588] CHIP:DMG:         ],
+          [1651147597.964180][10583:10588] CHIP:DMG:         
+          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true, 
+          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
+          [1651147597.964290][10583:10588] CHIP:DMG: }
+          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

@@ -11,65 +11,191 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    100.2.8. [TC-DL-2.8] Verification for the following Commands - Set Week Day
+    108.2.8. [TC-DL-2.8] Verification for the following Commands - Set Week Day
     Schedule, Get Week Day Schedule , Get Week Day Schedule Response, Clear Week
     Day Schedule [DUT-Server]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Door Lock"
+    endpoint: 1
 
 tests:
-    - label:
-          "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute and saves
-          for future use."
-      verification: |
-          https://github.com/project-chip/connectedhomeip/issues/15776
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Get Max number of Week Day schedules for user"
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          value: 10
+
+    - label: "Get number of supported users"
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: NumberOfTotalUsersSupported
+          value: 10
+
+    - label: "Send Set Week Day Schedule Command to DUT"
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 2
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                value: 16
+              - name: "endMinute"
+                value: 55
+
+    #issue #18591
+    - label: "send GetWeekDay Schedule Command "
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                constraints:
+                    minValue: 1
+                    maxValue: NumberOfWeekDaySchedulesSupportedPerUser
+              - name: "userIndex"
+                constraints:
+                    minValue: 1
+                    maxValue: NumberOfTotalUsersSupported
+              - name: "status"
+                value: 0x0
+              - name: "daysMask"
+                constraints:
+                    minValue: 0
+                    maxValue: 6
+              - name: "startHour"
+                constraints:
+                    minValue: 0
+                    maxValue: 23
+              - name: "startMinute"
+                constraints:
+                    minValue: 0
+                    maxValue: 59
+              - name: "endHour"
+                constraints:
+                    minValue: 0
+                    maxValue: 23
+              - name: "endMinute"
+                constraints:
+                    minValue: 0
+                    maxValue: 59
 
     - label:
-          "TH reads NumberOfTotalUsersSupported attribute and saves for future
-          use."
-      verification: |
-
-      disabled: true
+          "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND
+          response"
+      command: "SetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "daysMask"
+                value: 7
+              - name: "startHour"
+                value: 15
+              - name: "startMinute"
+                value: 45
+              - name: "endHour"
+                value: 16
+              - name: "endMinute"
+                value: 55
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "TH send Set Week Day Schedule Command to DUT with the following
-          values: WeekDayIndex as 2 NumberOfTotalUsersSupported as 2 DaysMaskMap
-          as 2 StartHour as 15 StartMinute as 45 EndHour as 16 EndMinute as 55"
-      verification: |
+          "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND
+          response"
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x85
 
-      disabled: true
+    - label: "Clear all week day schedules for the first user"
+      command: "ClearWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 0xFE
+              - name: "userIndex"
+                value: 1
 
-    - label: "TH send Get Week Day Schedule Command to DUT"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH send Set Week Day Schedule Command to DUT with the following
-          values: WeekDayIndex as 0 NumberOfTotalUsersSupported as 2 DaysMaskMap
-          as 7 StartHour as 15 StartMinute as 45 EndHour as 16 EndMinute as 55"
-      verification: |
-
-      disabled: true
-
-    - label: "TH send Get Week Day Schedule Command to DUT"
-      verification: |
-
-      disabled: true
-
-    - label: "TH sends Clear Week Day Schedule Command to DUT"
-      verification: |
-
-      disabled: true
-
-    - label: "TH sends Get Week Day Schedule Command to DUT"
-      verification: |
-
-      disabled: true
+    - label: "send GetWeekDay Schedule Command "
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "weekDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "weekDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 1
+              - name: "status"
+                value: 0x8B
