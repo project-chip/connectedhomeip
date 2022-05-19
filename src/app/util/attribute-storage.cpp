@@ -953,8 +953,19 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             }
         }
 
-        // TODO: Once endpoints are in parts lists other than that of endpoint
-        // 0, something more complicated might need to happen here.
+        EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
+        while (parentEndpointId != kInvalidEndpointId)
+        {
+            MatterReportingAttributeChangeCallback(parentEndpointId, app::Clusters::Descriptor::Id,
+                                                   app::Clusters::Descriptor::Attributes::PartsList::Id);
+            uint16_t parentIndex = emberAfIndexFromEndpoint(parentEndpointId);
+            if (parentIndex == kEmberInvalidEndpointIndex)
+            {
+                // Something has gone wrong.
+                break;
+            }
+            parentEndpointId = emberAfParentEndpointFromIndex(parentIndex);
+        }
 
         MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
                                                app::Clusters::Descriptor::Attributes::PartsList::Id);
