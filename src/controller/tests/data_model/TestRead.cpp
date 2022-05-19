@@ -188,6 +188,9 @@ public:
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TwoParallelReads(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TooManyPaths(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext);
 
 private:
     static constexpr uint16_t kTestMinInterval = 33;
@@ -1823,6 +1826,168 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
+void TestReadInteraction::TestReadHandler_TwoParallelReads(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace chip::app;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    chip::Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = app::InteractionModelEngine::GetInstance();
+    engine->SetForceHandlerQuota(true);
+
+    app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    // Read full wildcard paths, repeat twice to ensure chunking.
+    chip::app::AttributePathParams attributePathParams[2];
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+
+    {
+        MockInteractionModelApp delegate1;
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+        app::ReadClient readClient1(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate1,
+                                    ReadClient::InteractionType::Read);
+
+        MockInteractionModelApp delegate2;
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate2.mReadError);
+        ReadClient readClient2(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate2,
+                               ReadClient::InteractionType::Read);
+
+        CHIP_ERROR err = readClient1.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readClient2.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse != 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, delegate2.mReadError);
+
+        StatusIB status(delegate2.mError);
+        NL_TEST_ASSERT(apSuite, status.mStatus == Protocols::InteractionModel::Status::Busy);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    engine->SetForceHandlerQuota(false);
+}
+
+// Needs to be larger than our plausible path pool.
+constexpr size_t sTooLargePathCount = 200;
+
+void TestReadInteraction::TestReadHandler_TooManyPaths(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace chip::app;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    chip::Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = InteractionModelEngine::GetInstance();
+    engine->SetForceHandlerQuota(true);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    // Needs to be larger than our plausible path pool.
+    chip::app::AttributePathParams attributePathParams[sTooLargePathCount];
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+
+    {
+        MockInteractionModelApp delegate;
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Read);
+
+        CHIP_ERROR err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, delegate.mReadError);
+
+        StatusIB status(delegate.mError);
+        NL_TEST_ASSERT(apSuite, status.mStatus == Protocols::InteractionModel::Status::PathsExhausted);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    engine->SetForceHandlerQuota(false);
+}
+
+void TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace chip::app;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    chip::Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = InteractionModelEngine::GetInstance();
+    engine->SetForceHandlerQuota(true);
+
+    {
+        MockInteractionModelApp delegate1;
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+        ReadClient readClient1(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate1,
+                               ReadClient::InteractionType::Read);
+
+        MockInteractionModelApp delegate2;
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate2.mReadError);
+        ReadClient readClient2(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate2,
+                               ReadClient::InteractionType::Read);
+
+        ReadPrepareParams readPrepareParams1(ctx.GetSessionBobToAlice());
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        chip::app::AttributePathParams attributePathParams1[2];
+        readPrepareParams1.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams1.mAttributePathParamsListSize = ArraySize(attributePathParams1);
+
+        CHIP_ERROR err = readClient1.SendRequest(readPrepareParams1);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ReadPrepareParams readPrepareParams2(ctx.GetSessionBobToAlice());
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        chip::app::AttributePathParams attributePathParams2[sTooLargePathCount];
+        readPrepareParams2.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams2.mAttributePathParamsListSize = ArraySize(attributePathParams2);
+
+        err = readClient2.SendRequest(readPrepareParams2);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse != 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, delegate2.mReadError);
+
+        StatusIB status(delegate2.mError);
+        NL_TEST_ASSERT(apSuite, status.mStatus == Protocols::InteractionModel::Status::PathsExhausted);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    engine->SetForceHandlerQuota(false);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -1845,6 +2010,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
     NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
     NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),
+    NL_TEST_DEF("TestReadHandler_TwoParallelReads", TestReadInteraction::TestReadHandler_TwoParallelReads),
+    NL_TEST_DEF("TestReadHandler_TooManyPaths", TestReadInteraction::TestReadHandler_TooManyPaths),
+    NL_TEST_DEF("TestReadHandler_TwoParallelReadsSecondTooManyPaths", TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths),
     NL_TEST_SENTINEL()
 };
 // clang-format on
