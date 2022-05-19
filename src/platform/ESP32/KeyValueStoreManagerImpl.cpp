@@ -29,8 +29,8 @@
 
 #include "nvs.h"
 #include "nvs_flash.h"
-#include <lib/support/CodeUtils.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,7 +47,7 @@ CHIP_ERROR HashIfLongKey(const char * key, char * keyHash)
     VerifyOrReturnError(strlen(key) > (NVS_KEY_NAME_MAX_SIZE - 1), CHIP_ERROR_INCORRECT_STATE);
 
     uint8_t hashBuffer[chip::Crypto::kSHA1_Hash_Length];
-    ReturnErrorOnFailure(chip::Crypto::Hash_SHA1((const uint8_t *)key, strlen(key), hashBuffer));
+    ReturnErrorOnFailure(chip::Crypto::Hash_SHA1((const uint8_t *) key, strlen(key), hashBuffer));
 
     int i = 0, j = 0;
     while (i < NVS_KEY_NAME_MAX_SIZE)
