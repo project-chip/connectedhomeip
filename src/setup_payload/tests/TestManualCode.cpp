@@ -38,10 +38,11 @@ using namespace chip;
 
 namespace {
 
-bool CheckGenerator(const PayloadContents & payload, std::string expectedResult)
+bool CheckGenerator(const PayloadContents & payload, std::string expectedResult, bool allowInvalidPayload = false)
 {
     std::string result;
     ManualSetupPayloadGenerator generator(payload);
+    generator.SetAllowInvalidPayload(allowInvalidPayload);
     generator.payloadDecimalStringRepresentation(result);
 
     if (!expectedResult.empty())
@@ -62,7 +63,7 @@ bool CheckGenerator(const PayloadContents & payload, std::string expectedResult)
 PayloadContents GetDefaultPayload()
 {
     PayloadContents payload;
-    payload.setUpPINCode  = 123456780;
+    payload.setUpPINCode  = 12345679;
     payload.discriminator = 2560;
 
     return payload;
@@ -72,7 +73,7 @@ void TestDecimalRepresentation_PartialPayload(nlTestSuite * inSuite, void * inCo
 {
     PayloadContents payload = GetDefaultPayload();
 
-    std::string expectedResult = "2361087535";
+    std::string expectedResult = "2412950753";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -82,7 +83,7 @@ void TestDecimalRepresentation_PartialPayload_RequiresCustomFlow(nlTestSuite * i
     PayloadContents payload   = GetDefaultPayload();
     payload.commissioningFlow = CommissioningFlow::kCustom;
 
-    std::string expectedResult = "63610875350000000000";
+    std::string expectedResult = "64129507530000000000";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -94,7 +95,7 @@ void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void 
     payload.vendorID          = 1;
     payload.productID         = 1;
 
-    std::string expectedResult = "63610875350000100001";
+    std::string expectedResult = "64129507530000100001";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -106,7 +107,7 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, vo
     payload.vendorID          = 45367;
     payload.productID         = 14526;
 
-    std::string expectedResult = "63610875354536714526";
+    std::string expectedResult = "64129507534536714526";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -117,7 +118,7 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
     payload.vendorID        = 45367;
     payload.productID       = 14526;
 
-    std::string expectedResult = "2361087535";
+    std::string expectedResult = "2412950753";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
@@ -144,7 +145,7 @@ void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
 
     std::string expectedResult = "76553581916553565535";
 
-    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
+    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult, /*allowInvalidPayload*/ true));
 }
 
 void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inContext)

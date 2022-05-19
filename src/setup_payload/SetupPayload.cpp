@@ -27,6 +27,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <utility>
 
@@ -49,12 +50,24 @@ bool SetupPayload::IsVendorTag(uint8_t tag)
 // `vendor_id` and `product_id` are allowed all of uint16_t
 bool PayloadContents::isValidQRCodePayload() const
 {
+    // 3-bit value specifying the QR code payload version.
     if (version >= 1 << kVersionFieldLengthInBits)
     {
         return false;
     }
 
     if (static_cast<uint8_t>(commissioningFlow) > static_cast<uint8_t>((1 << kCommissioningFlowFieldLengthInBits) - 1))
+    {
+        return false;
+    }
+
+    // Device Commissioning Flow
+    // 0: Standard commissioning flow: such a device, when uncommissioned, always enters commissioning mode upon power-up, subject
+    // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user action required to enter
+    // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified means is needed before commissioning.
+    // 3: Reserved
+    if (commissioningFlow != CommissioningFlow::kStandard && commissioningFlow != CommissioningFlow::kUserActionRequired &&
+        commissioningFlow != CommissioningFlow::kCustom)
     {
         return false;
     }
@@ -76,12 +89,7 @@ bool PayloadContents::isValidQRCodePayload() const
         return false;
     }
 
-    if (version == 0 && !rendezvousInformation.HasAny(allvalid) && discriminator == 0 && setUpPINCode == 0)
-    {
-        return false;
-    }
-
-    return true;
+    return CheckPayloadCommonConstraints();
 }
 
 bool PayloadContents::isValidManualCode() const
@@ -100,7 +108,37 @@ bool PayloadContents::isValidManualCode() const
         return false;
     }
 
-    if (setUpPINCode == 0)
+    return CheckPayloadCommonConstraints();
+}
+
+bool PayloadContents::CheckPayloadCommonConstraints() const
+{
+    // A version not equal to 0 would be invalid for v1 and would indicate new format (e.g. version 2)
+    if (version != 0)
+    {
+        return false;
+    }
+
+    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal), excluding the invalid Passcode
+    // values.
+    if (setUpPINCode < 0x0000001 || setUpPINCode > 0x5F5E0FE || setUpPINCode == 11111111 || setUpPINCode == 22222222 ||
+        setUpPINCode == 33333333 || setUpPINCode == 44444444 || setUpPINCode == 55555555 || setUpPINCode == 66666666 ||
+        setUpPINCode == 77777777 || setUpPINCode == 88888888 || setUpPINCode == 12345678 || setUpPINCode == 87654321)
+    {
+        return false;
+    }
+
+    // VendorID after TestVendor4 are reserved.
+    if (vendorID > VendorId::TestVendor4)
+    {
+        return false;
+    }
+
+    // A value of 0x0000 SHALL NOT be assigned to a product since Product ID = 0x0000 is used for these specific cases:
+    //  * To announce an anonymized Product ID as part of device discovery
+    //  * To indicate an OTA software update file applies to multiple Product IDs equally.
+    //  * To avoid confusion when presenting the Onboarding Payload for ECM with multiple nodes
+    if (productID == 0 && vendorID != 0)
     {
         return false;
     }

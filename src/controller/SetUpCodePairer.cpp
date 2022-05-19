@@ -44,8 +44,16 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
     mConnectionType = commission;
 
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
-    ReturnErrorOnFailure(isQRCode ? QRCodeSetupPayloadParser(setUpCode).populatePayload(payload)
-                                  : ManualSetupPayloadParser(setUpCode).populatePayload(payload));
+    if (isQRCode)
+    {
+        ReturnErrorOnFailure(QRCodeSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadParser(setUpCode).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     mRemoteId     = remoteId;
     mSetUpPINCode = payload.setUpPINCode;
