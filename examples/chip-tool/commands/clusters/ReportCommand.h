@@ -310,10 +310,10 @@ public:
         ReportCommand("subscribe-event", credsIssuerConfig),
         mClusterIds(1, clusterId), mEventIds(1, eventId)
     {
-        AddArgument("event-name", eventName, 0, "Event name.");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval, 0,
+        AddArgument("event-name", eventName, "Event name.");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval,
                     "The requested minimum interval between reports. Sets MinIntervalFloor in the Subscribe Request.");
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval, 0,
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval,
                     "The requested maximum interval between reports. Sets MaxIntervalCeiling in the Subscribe Request.");
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions,
                     "false - Terminate existing subscriptions from initiator.\n  true - Leave existing subscriptions in place.");

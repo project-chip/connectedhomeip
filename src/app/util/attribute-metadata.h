@@ -100,19 +100,20 @@ typedef struct
 union EmberAfDefaultOrMinMaxAttributeValue
 {
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
-    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(val) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint32_t val) : defaultValue(val) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}
 
     /**
-     * Points to data if size is more than 2 bytes.
-     * If size is more than 2 bytes, and this value is NULL,
+     * Points to data if the attribute type is a string or the size of the data is more than 4 bytes.
+     * If the attribute type is a string or the data size is more than 4 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     const uint8_t * ptrToDefaultValue;
     /**
-     * Actual default value if the attribute size is 2 bytes or less.
+     * Actual default value if the attribute is non string and size
+     * is 4 bytes or less.
      */
-    uint16_t defaultValue;
+    uint32_t defaultValue;
     /**
      * Points to the min max attribute value structure, if min/max is
      * supported for this attribute.

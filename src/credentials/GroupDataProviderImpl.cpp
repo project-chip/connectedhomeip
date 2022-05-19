@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     uint16_t group_count           = 0;
     uint16_t first_map             = 0;
     uint16_t map_count             = 0;
-    chip::KeysetId first_keyset    = 0xffff;
+    chip::KeysetId first_keyset    = kInvalidKeysetId;
     uint16_t keyset_count          = 0;
     chip::FabricIndex next         = kUndefinedFabricIndex;
 
@@ -191,7 +191,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key.FabricGroups(fabric_index);
         return CHIP_NO_ERROR;
     }
@@ -200,7 +200,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     {
         first_group  = kUndefinedGroupId;
         group_count  = 0;
-        first_keyset = 0xffff;
+        first_keyset = kInvalidKeysetId;
         keyset_count = 0;
         next         = kUndefinedFabricIndex;
     }
@@ -389,7 +389,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key.FabricGroup(fabric_index, group_id);
         return CHIP_NO_ERROR;
     }
@@ -512,7 +512,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key.FabricGroupKey(fabric_index, id);
         return CHIP_NO_ERROR;
     }
@@ -632,7 +632,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
+        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key.FabricGroupEndpoint(fabric_index, group_id, endpoint_id);
         return CHIP_NO_ERROR;
     }
@@ -718,8 +718,8 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
     static constexpr TLV::Tag TagNext() { return TLV::ContextTag(7); }
 
     chip::FabricIndex fabric_index = kUndefinedFabricIndex;
-    chip::KeysetId next            = 0xffff;
-    chip::KeysetId prev            = 0xffff;
+    chip::KeysetId next            = kInvalidKeysetId;
+    chip::KeysetId prev            = kInvalidKeysetId;
     bool first                     = true;
 
     uint16_t keyset_id                       = 0;
@@ -735,8 +735,8 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR UpdateKey(DefaultStorageKeyAllocator & key) override
     {
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_ID);
-        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_KEY_ID);
+        VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        VerifyOrReturnError(kInvalidKeysetId != keyset_id, CHIP_ERROR_INVALID_KEY_ID);
         key.FabricKeyset(fabric_index, keyset_id);
         return CHIP_NO_ERROR;
     }
@@ -746,7 +746,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         policy     = GroupDataProvider::SecurityPolicy::kCacheAndSync;
         keys_count = 0;
         memset(operational_keys, 0x00, sizeof(operational_keys));
-        next = 0xffff;
+        next = kInvalidKeysetId;
     }
 
     OperationalKey * GetCurrentKey()
@@ -1397,7 +1397,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     FabricData fabric(fabric_index);
     GroupData group;
 
-    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_KEY_NOT_FOUND);
 
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
@@ -1523,7 +1523,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
-    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     size_t count = 0;
     KeyMapData map(fabric_index, fabric.first_map);

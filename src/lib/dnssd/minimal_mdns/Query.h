@@ -53,6 +53,8 @@ public:
         return *this;
     }
 
+    const FullQName & GetName() const { return mQName; }
+
     /// Append the query to the specified buffer
     ///
     /// @param hdr will be updated with a query count

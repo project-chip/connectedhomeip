@@ -87,7 +87,18 @@ class cc13x2x7_26x2x7Builder(GnBuilder):
 
     def build_outputs(self):
         items = {}
-        for extension in [".out", ".bin", ".out.map", "-bim.hex"]:
+        if (self.app == cc13x2x7_26x2x7App.LOCK
+                or self.app == cc13x2x7_26x2x7App.PUMP
+                or self.app == cc13x2x7_26x2x7App.PUMP_CONTROLLER):
+            extensions = [".out", ".bin", ".out.map", "-bim.hex"]
+
+        elif self.app == cc13x2x7_26x2x7App.ALL_CLUSTERS or self.app == cc13x2x7_26x2x7App.SHELL:
+            extensions = [".out", ".out.map"]
+
+        else:
+            raise Exception('Unknown app type: %r' % self.app)
+
+        for extension in extensions:
             name = '%s%s' % (self.app.AppNamePrefix(), extension)
             items[name] = os.path.join(self.output_dir, name)
 
