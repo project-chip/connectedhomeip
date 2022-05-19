@@ -20523,10 +20523,10 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:0000000000I31506010", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
@@ -20753,10 +20753,10 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
@@ -20975,10 +20975,10 @@ private:
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 8: {
             LogStep(8, "TH_CR1 opens a new commissioning window on DUT_CE");
@@ -21006,10 +21006,10 @@ private:
         }
         case 10: {
             LogStep(10, "TH_CR2 starts a commissioning process with DUT_CE");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 11: {
             LogStep(11, "TH_CR1 revokes the commissioning window on DUT_CE");
@@ -21048,17 +21048,17 @@ private:
         case 15: {
             LogStep(15, "TH_CR2 starts a commissioning process with DUT_CE");
             VerifyOrdo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 16: {
             LogStep(16, "TH_CR3 starts a commissioning process with DUT_CE");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityGamma, value);
+            return PairWithCode(kIdentityGamma, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -21247,10 +21247,10 @@ private:
         }
         case 8: {
             LogStep(8, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 9: {
             LogStep(9, "TH_CR1 opens a commissioning window on DUT_CE");
@@ -21269,10 +21269,10 @@ private:
         }
         case 11: {
             LogStep(11, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 12: {
             LogStep(12, "TH_CR1 revokes the commissioning window on DUT_CE");
@@ -21301,10 +21301,10 @@ private:
         }
         case 16: {
             LogStep(16, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 17: {
             LogStep(17, "TH_CR2 starts a commissioning process on DUT_CE");
@@ -21314,10 +21314,10 @@ private:
         }
         case 18: {
             LogStep(18, "TH_CR3 starts a commissioning process with DUT_CE");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityGamma, value);
+            return PairWithCode(kIdentityGamma, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -21521,10 +21521,10 @@ private:
         }
         case 3: {
             LogStep(3, "Commission from gamma");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityGamma, value);
+            return PairWithCode(kIdentityGamma, value);
         }
         case 4: {
             LogStep(4, "TH_CR3 starts a commissioning process with DUT_CE");
@@ -21542,10 +21542,10 @@ private:
         }
         case 6: {
             LogStep(6, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 7: {
             LogStep(7, "TH_CR2 starts a commissioning process with DUT_CE");
@@ -21849,11 +21849,11 @@ private:
         }
         case 2: {
             LogStep(2, "Commission the provider from alpha");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId = mProviderNodeId.HasValue() ? mProviderNodeId.Value() : 12648430ULL;
             value.payload =
                 mProviderPayload.HasValue() ? mProviderPayload.Value() : chip::Span<const char>("MT:-24J0IX4122-.548G00", 22);
-            return PairWithQRCode(kIdentityAlpha, value);
+            return PairWithCode(kIdentityAlpha, value);
         }
         case 3: {
             LogStep(3, "Wait for the commissioned provider to be retrieved for alpha");
@@ -48442,10 +48442,10 @@ private:
         }
         case 16: {
             LogStep(16, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = 74565ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 17: {
             LogStep(17, "Wait for the commissioned device to be retrieved for beta");
@@ -49563,10 +49563,10 @@ private:
         }
         case 12: {
             LogStep(12, "Commission second accessory from alpha");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = 3735928559ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0IX4122-.548G00", 22);
-            return PairWithQRCode(kIdentityAlpha, value);
+            return PairWithCode(kIdentityAlpha, value);
         }
         case 13: {
             LogStep(13, "Wait for the second commissioned device to be retrieved for alpha");
@@ -50722,10 +50722,10 @@ private:
         }
         case 3: {
             LogStep(3, "Commission from alpha when the commissioning window is not opened");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityAlpha, value);
+            return PairWithCode(kIdentityAlpha, value);
         }
         case 4: {
             LogStep(4, "Open Commissioning Window from alpha");
@@ -50737,10 +50737,10 @@ private:
         }
         case 5: {
             LogStep(5, "Commission from alpha again");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeIdForDuplicateCommissioning.HasValue() ? mNodeIdForDuplicateCommissioning.Value() : 17ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityAlpha, value);
+            return PairWithCode(kIdentityAlpha, value);
         }
         case 6: {
             LogStep(6, "Check that we just have the one fabric and did not add a new one");
@@ -50764,10 +50764,10 @@ private:
         }
         case 9: {
             LogStep(9, "Commission from beta");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId2.HasValue() ? mNodeId2.Value() : 51966ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityBeta, value);
+            return PairWithCode(kIdentityBeta, value);
         }
         case 10: {
             LogStep(10, "Wait for the commissioned device to be retrieved for beta");
@@ -50785,10 +50785,10 @@ private:
         }
         case 12: {
             LogStep(12, "Commission from gamma");
-            chip::app::Clusters::CommissionerCommands::Commands::PairWithQRCode::Type value;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
             value.nodeId  = mNodeId3.HasValue() ? mNodeId3.Value() : 12586990ULL;
             value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
-            return PairWithQRCode(kIdentityGamma, value);
+            return PairWithCode(kIdentityGamma, value);
         }
         case 13: {
             LogStep(13, "Wait for the commissioned device to be retrieved for gamma");

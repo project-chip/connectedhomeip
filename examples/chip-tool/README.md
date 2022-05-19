@@ -111,7 +111,7 @@ The command below will discover devices based on the given QR code (which
 devices log when they start up) and try to pair with the first one it discovers.
 
     ```
-    $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
+    $ chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:#######
     ```
 
 In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`

@@ -20,16 +20,10 @@
 
 #include "PairingCommandBridge.h"
 
-class PairQRCode : public PairingCommandBridge
+class PairCode : public PairingCommandBridge
 {
 public:
-    PairQRCode() : PairingCommandBridge("qrcode", PairingMode::QRCode, PairingNetworkType::None) {}
-};
-
-class PairManualCode : public PairingCommandBridge
-{
-public:
-    PairManualCode() : PairingCommandBridge("manualcode", PairingMode::ManualCode, PairingNetworkType::None) {}
+    PairCode() : PairingCommandBridge("code", PairingMode::Code, PairingNetworkType::None) {}
 };
 
 class PairWithIPAddress : public PairingCommandBridge
@@ -61,8 +55,8 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<PairQRCode>(),  make_unique<PairManualCode>(), make_unique<PairWithIPAddress>(),
-        make_unique<PairBleWiFi>(), make_unique<PairBleThread>(),  make_unique<Unpair>(),
+        make_unique<PairCode>(), make_unique<PairWithIPAddress>(), make_unique<PairBleWiFi>(), make_unique<PairBleThread>(),
+        make_unique<Unpair>(),
     };
 
     commands.Register(clusterName, clusterCommands);

@@ -79,7 +79,7 @@ tests:
     - label: "Commission the provider from alpha"
       identity: "alpha"
       cluster: "CommissionerCommands"
-      command: "PairWithQRCode"
+      command: "PairWithCode"
       arguments:
           values:
               - name: "nodeId"
