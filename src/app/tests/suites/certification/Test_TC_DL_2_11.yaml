@@ -11,75 +11,237 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    100.2.11. [TC-DL-2.11] Verification for the following Commands - Set Year
+    108.2.11. [TC-DL-2.11] Verification for the following Commands - Set Year
     Schedule, Get Year Schedule, Get Year Day Schedule Response and Clear Year
     Day Schedule[DUT-Server]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Door Lock"
+    endpoint: 1
 
 tests:
-    - label:
-          "TH reads RFID Users Supported attribute and saves as usersupported
-          for future use."
-      verification: |
-          https://github.com/project-chip/connectedhomeip/issues/15776
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Create new PIN credential and lock/unlock for second user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 2 }
+              - name: "credentialData"
+                value: "123457"
+              - name: "userIndex"
+                value: null
+              - name: "userStatus"
+                value: null
+              - name: "userType"
+                value: null
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: 2
+              - name: "nextCredentialIndex"
+                value: 3
+
+    - label: "Get Max number of year Day schedules for user"
+      command: "readAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfYearDaySchedulesSupportedPerUser
+          value: 10
+
+    - label: "Get number of supported users"
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: NumberOfTotalUsersSupported
+          value: 10
+
+    - label: "Send Set Year Day Schedule Command to DUT"
+      command: "SetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+              - name: "LocalStartTime"
+                value: 10
+              - name: "LocalEndTime"
+                value: 20
+
+    #issue #18591 and #18590
+    - label: "send Get Year Day Schedule Command"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 1
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "YearDayIndex"
+                constraints:
+                    minValue: 1
+                    maxValue: NumberOfYearDaySchedulesSupportedPerUser
+              - name: "userIndex"
+                constraints:
+                    minValue: 1
+                    maxValue: NumberOfTotalUsersSupported
+              - name: "status"
+                value: 0x0
+              - name: "LocalStartTime"
+                constraints:
+                    type: epoch-s
+              - name: "LocalEndTime"
+                constraints:
+                    type: epoch-s
 
     - label:
-          "TH sends Set RFID Code Command to DUT with the following values: User
-          ID as 1 User Status as 0 User Type as 0 RFID Code as 785"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends Set RFID Code Command to DUT with the following values: User
-          ID as usersupported+1 User Status as 0 User Type as 0 RFID Code as 824"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends Set RFID Code Command to DUT with the following values: User
-          ID as 2 User Status as 0 User Type as 0 RFID Code as 824"
-      verification: |
-
-      disabled: true
-
-    - label: "TH sends Get RFID Code Command to DUT"
-      verification: |
-
-      disabled: true
+          "Send Set Year Day Schedule Command to DUT and verify INVALID_COMMAND
+          response"
+      command: "SetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 0
+              - name: "userIndex"
+                value: 10
+              - name: "LocalStartTime"
+                value: 30
+              - name: "LocalEndTime"
+                value: 10
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "TH sends Get RFID Code Command to the DUT with User ID value as
-          usersupported +1"
-      verification: |
+          "send Get Year Day Schedule Command to DUT and Verify INVALID_FIELD
+          response"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 21
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 21
+              - name: "status"
+                value: 0x85
 
-      disabled: true
+    - label:
+          "send Get Year Day Schedule Command to DUT and verify NOT_FOUND
+          response"
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 10
+              - name: "userIndex"
+                value: 5
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 10
+              - name: "userIndex"
+                value: 5
+              - name: "status"
+                value: 0x8B
 
-    - label: "TH sends Clear RFID Code Command to DUT with the User ID as 2"
-      verification: |
+    - label:
+          "send Get Year Day Schedule Command  to DUT and verify NOT_FOUND
+          response "
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 2
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 2
+              - name: "status"
+                value: 0x8B
 
-      disabled: true
+    - label: "Send Set Year Day Schedule Command to DUT"
+      command: "SetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 2
+              - name: "LocalStartTime"
+                value: 10
+              - name: "LocalEndTime"
+                value: 20
 
-    - label: "TH sends Get RFID Code Command to DUT for User ID as 2"
-      verification: |
-
-      disabled: true
-
-    - label: "TH sends Clear All RFID Codes Command to DUT"
-      verification: |
-
-      disabled: true
-
-    - label: "TH sends Get RFID Code Command to DUT"
-      verification: |
-
-      disabled: true
+    - label: "send Get Year Day Schedule Command "
+      command: "GetYearDaySchedule"
+      arguments:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 2
+      response:
+          values:
+              - name: "YearDayIndex"
+                value: 2
+              - name: "userIndex"
+                value: 2
+              - name: "status"
+                value: 0x0
+              - name: "LocalStartTime"
+                value: 10
+              - name: "LocalEndTime"
+                value: 20
