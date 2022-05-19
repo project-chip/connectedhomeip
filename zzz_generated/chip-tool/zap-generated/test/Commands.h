@@ -249,6 +249,9 @@ public:
         printf("Test_TC_DD_1_10\n");
         printf("Test_TC_DD_1_11\n");
         printf("Test_TC_DD_1_12\n");
+        printf("Test_TC_DD_1_13\n");
+        printf("Test_TC_DD_1_14\n");
+        printf("Test_TC_DD_1_15\n");
         printf("Test_TC_DD_2_1\n");
         printf("Test_TC_DD_2_2\n");
         printf("Test_TC_DD_3_1\n");
@@ -265,9 +268,19 @@ public:
         printf("Test_TC_DD_3_12\n");
         printf("Test_TC_DD_3_13\n");
         printf("Test_TC_DD_3_14\n");
-        printf("Test_TC_DD_4_1\n");
+        printf("Test_TC_DD_3_15\n");
+        printf("Test_TC_DD_3_16\n");
+        printf("Test_TC_DD_3_17\n");
+        printf("Test_TC_DD_3_18\n");
+        printf("Test_TC_DD_3_19\n");
+        printf("Test_TC_DD_3_20\n");
         printf("TestGroupDemoCommand\n");
         printf("TestGroupDemoConfig\n");
+        printf("Test_TC_GR_1_1\n");
+        printf("Test_TC_GR_2_1\n");
+        printf("Test_TC_GR_2_2\n");
+        printf("Test_TC_GR_3_1\n");
+        printf("Test_TC_GR_3_2\n");
         printf("Test_TC_BDX_1_1\n");
         printf("Test_TC_BDX_1_2\n");
         printf("Test_TC_BDX_1_3\n");
@@ -457,24 +470,6 @@ public:
         printf("Test_TC_LC_2_5\n");
         printf("Test_TC_LO_1_1\n");
         printf("Test_TC_LVL_2_3\n");
-        printf("Test_TC_NC_1_1\n");
-        printf("Test_TC_NC_1_2\n");
-        printf("Test_TC_NC_1_3\n");
-        printf("Test_TC_NC_1_4\n");
-        printf("Test_TC_NC_1_5\n");
-        printf("Test_TC_NC_1_6\n");
-        printf("Test_TC_NC_1_7\n");
-        printf("Test_TC_NC_1_8\n");
-        printf("Test_TC_NC_1_9\n");
-        printf("Test_TC_NC_1_10\n");
-        printf("Test_TC_NC_1_11\n");
-        printf("Test_TC_NC_1_12\n");
-        printf("Test_TC_NC_1_13\n");
-        printf("Test_TC_NC_1_14\n");
-        printf("Test_TC_NC_1_15\n");
-        printf("Test_TC_NC_1_16\n");
-        printf("Test_TC_NC_1_17\n");
-        printf("Test_TC_NC_1_18\n");
         printf("Test_TC_OO_3_1\n");
         printf("Test_TC_OO_3_2\n");
         printf("Test_TC_RH_3_1\n");
@@ -488,6 +483,18 @@ public:
         printf("Test_TC_DIAG_TH_NW_2_7\n");
         printf("Test_TC_DIAG_TH_NW_2_8\n");
         printf("Test_TC_DIAG_TH_NW_2_9\n");
+        printf("Test_TC_ACT_1_1\n");
+        printf("Test_TC_ACT_2_1\n");
+        printf("Test_TC_ACT_2_2\n");
+        printf("Test_TC_ACT_3_1\n");
+        printf("Test_TC_TFL_1_1\n");
+        printf("Test_TC_TFL_1_2\n");
+        printf("Test_TC_TFL_2_1\n");
+        printf("Test_TC_TFL_2_2\n");
+        printf("Test_TC_UL_1_1\n");
+        printf("Test_TC_UL_1_2\n");
+        printf("Test_TC_UL_2_1\n");
+        printf("Test_TC_UL_2_2\n");
 
         return CHIP_NO_ERROR;
     }
@@ -21851,11 +21858,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22322,11 +22329,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22378,11 +22385,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -22439,11 +22446,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23022,11 +23029,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23075,11 +23082,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23095,11 +23102,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23148,11 +23155,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -23168,11 +23175,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                        chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                        97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -62148,7 +62155,7 @@ private:
 class Test_TC_DD_1_5Suite : public TestCommand
 {
 public:
-    Test_TC_DD_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", 1, credsIssuerConfig)
+    Test_TC_DD_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_5", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -62181,10 +62188,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -62199,18 +62202,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Step 1");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>(
-                "Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC Forum "
-                "in URI Record Type Definition RTD URIgarbage: not in length on purpose",
-                151);
-            return Log(kIdentityAlpha, value);
-        }
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62218,7 +62210,7 @@ private:
 class Test_TC_DD_1_6Suite : public TestCommand
 {
 public:
-    Test_TC_DD_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", 3, credsIssuerConfig)
+    Test_TC_DD_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_6", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -62251,18 +62243,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -62277,34 +62257,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Step 1");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message =
-                chip::Span<const char>("Scan the DUTs QR code using a QR code readergarbage: not in length on purpose", 44);
-            return Log(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Step 1 verification");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message =
-                chip::Span<const char>("Verify the QR code gets scanned successfully and the QR code must be of sufficient size "
-                                       "and contrast respective to surface material as to be readable with standard readers such "
-                                       "as smartphones in normal lighting conditionsgarbage: not in length on purpose",
-                                       221);
-            return Log(kIdentityAlpha, value);
-        }
-        case 2: {
-            LogStep(2, "Step 2 verificaiton");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Verify QR code version is 1 or highergarbage: not in length on purpose", 37);
-            return Log(kIdentityAlpha, value);
-        }
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62312,7 +62265,7 @@ private:
 class Test_TC_DD_1_7Suite : public TestCommand
 {
 public:
-    Test_TC_DD_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", 2, credsIssuerConfig)
+    Test_TC_DD_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_7", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -62345,14 +62298,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -62367,27 +62312,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Precondition");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Verify manual pairing code is printed on the device or in additional provided "
-                                                   "materialsgarbage: not in length on purpose",
-                                                   87);
-            return Log(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Step 1");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message =
-                chip::Span<const char>("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 "
-                                       "points typically producing a typeface height of 2.1 mmgarbage: not in length on purpose",
-                                       139);
-            return Log(kIdentityAlpha, value);
-        }
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62395,7 +62320,7 @@ private:
 class Test_TC_DD_1_8Suite : public TestCommand
 {
 public:
-    Test_TC_DD_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", 2, credsIssuerConfig)
+    Test_TC_DD_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_8", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -62428,14 +62353,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -62450,24 +62367,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Step 1");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Scan the device QR code using DUTgarbage: not in length on purpose", 33);
-            return Log(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Step 1 verification");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Verify the DUT is able to scan and parse the QR code successfully to onboard "
-                                                   "the device onto the CHIP networkgarbage: not in length on purpose",
-                                                   109);
-            return Log(kIdentityAlpha, value);
-        }
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62475,7 +62375,7 @@ private:
 class Test_TC_DD_1_9Suite : public TestCommand
 {
 public:
-    Test_TC_DD_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", 3, credsIssuerConfig)
+    Test_TC_DD_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_9", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -62508,18 +62408,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -62534,35 +62422,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Precondition");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Verify that the manual pairing code is printed on the device or in additional "
-                                                   "provided materialsgarbage: not in length on purpose",
-                                                   96);
-            return Log(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Step 1");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Provide the 11 digit or 21 digit pairing code from the Device in text speech "
-                                                   "or any format supported by DUTgarbage: not in length on purpose",
-                                                   107);
-            return Log(kIdentityAlpha, value);
-        }
-        case 2: {
-            LogStep(2, "Step 1 verification");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("Verify that the manual pairing code can be provided to DUT and parsed to "
-                                                   "onboard the device onto the CHIP networkgarbage: not in length on purpose",
-                                                   113);
-            return Log(kIdentityAlpha, value);
-        }
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62617,8 +62477,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62673,8 +62532,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62729,8 +62587,172 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_1_13Suite : public TestCommand
+{
+public:
+    Test_TC_DD_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_13", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_1_13Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
         {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_1_14Suite : public TestCommand
+{
+public:
+    Test_TC_DD_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_14", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_1_14Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_1_15Suite : public TestCommand
+{
+public:
+    Test_TC_DD_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_1_15", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_1_15Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62785,8 +62807,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62841,8 +62862,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62897,8 +62917,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -62953,8 +62972,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63009,8 +63027,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63065,8 +63082,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63121,8 +63137,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63177,8 +63192,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63233,8 +63247,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63289,8 +63302,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63345,8 +63357,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63401,8 +63412,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63457,8 +63467,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63513,8 +63522,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63569,8 +63577,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -63625,16 +63632,15 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
 
-class Test_TC_DD_4_1Suite : public TestCommand
+class Test_TC_DD_3_15Suite : public TestCommand
 {
 public:
-    Test_TC_DD_4_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_4_1", 0, credsIssuerConfig)
+    Test_TC_DD_3_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_15", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -63642,7 +63648,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DD_4_1Suite() {}
+    ~Test_TC_DD_3_15Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -63681,8 +63687,282 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_16Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_16Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_16", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_16Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
         {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_17Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_17Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_17", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_17Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_18Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_18Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_18", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_18Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_19Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_19Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_19", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_19Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DD_3_20Suite : public TestCommand
+{
+public:
+    Test_TC_DD_3_20Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DD_3_20", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DD_3_20Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64140,6 +64420,281 @@ private:
     }
 };
 
+class Test_TC_GR_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_GR_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GR_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_GR_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_GR_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GR_2_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_GR_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_GR_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GR_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_GR_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_GR_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GR_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_GR_3_2Suite : public TestCommand
+{
+public:
+    Test_TC_GR_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_GR_3_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_GR_3_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_BDX_1_1Suite : public TestCommand
 {
 public:
@@ -64190,8 +64745,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64246,8 +64800,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64302,8 +64855,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64358,8 +64910,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64414,8 +64965,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64470,8 +65020,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64526,8 +65075,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64582,8 +65130,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64638,8 +65185,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64694,8 +65240,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64750,8 +65295,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64806,8 +65350,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64862,8 +65405,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64918,8 +65460,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -64974,8 +65515,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65030,8 +65570,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65086,8 +65625,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65142,8 +65680,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65198,8 +65735,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65254,8 +65790,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65310,8 +65845,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65366,8 +65900,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65422,8 +65955,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65478,8 +66010,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65534,8 +66065,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65590,8 +66120,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65646,8 +66175,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65702,8 +66230,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65758,8 +66285,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65814,8 +66340,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65870,8 +66395,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65926,8 +66450,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -65982,8 +66505,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66038,8 +66560,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66094,8 +66615,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66150,8 +66670,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66206,8 +66725,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66262,8 +66780,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66318,8 +66835,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66374,8 +66890,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66430,8 +66945,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66486,8 +67000,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66542,8 +67055,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66598,8 +67110,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66654,8 +67165,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66711,8 +67221,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66768,8 +67277,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66825,8 +67333,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66881,8 +67388,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66938,8 +67444,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -66994,8 +67499,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67050,8 +67554,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67106,8 +67609,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67163,8 +67665,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67220,8 +67721,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67277,8 +67777,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67333,8 +67832,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67389,8 +67887,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67445,8 +67942,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67501,8 +67997,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67557,8 +68052,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67613,8 +68107,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67669,8 +68162,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67725,8 +68217,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67781,8 +68272,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67837,8 +68327,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67893,8 +68382,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -67949,8 +68437,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68005,8 +68492,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68061,8 +68547,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68117,8 +68602,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68173,8 +68657,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68229,8 +68712,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68285,8 +68767,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68341,8 +68822,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68397,8 +68877,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68453,8 +68932,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -68509,8 +68987,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69665,8 +70142,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69721,8 +70197,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69777,8 +70252,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69833,8 +70307,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69889,8 +70362,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -69945,8 +70417,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70001,8 +70472,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70057,8 +70527,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70113,8 +70582,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70169,8 +70637,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70225,8 +70692,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70281,8 +70747,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70337,8 +70802,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70393,8 +70857,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70449,8 +70912,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70505,8 +70967,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70561,8 +71022,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70617,8 +71077,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70673,8 +71132,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70729,8 +71187,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70785,8 +71242,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70841,8 +71297,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70897,8 +71352,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -70953,8 +71407,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71009,8 +71462,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71065,8 +71517,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71121,8 +71572,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71177,8 +71627,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71233,8 +71682,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71289,8 +71737,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71345,8 +71792,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71401,8 +71847,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71457,8 +71902,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71513,8 +71957,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71569,8 +72012,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71625,8 +72067,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71681,8 +72122,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71737,8 +72177,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71793,8 +72232,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71849,8 +72287,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71905,8 +72342,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -71961,8 +72397,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72017,8 +72452,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72073,8 +72507,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72129,8 +72562,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72185,8 +72617,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72241,8 +72672,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72297,8 +72727,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72353,8 +72782,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72409,8 +72837,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72465,8 +72892,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72521,8 +72947,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72577,8 +73002,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72633,8 +73057,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72689,8 +73112,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72745,8 +73167,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72801,8 +73222,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72857,8 +73277,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72913,8 +73332,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -72969,8 +73387,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73025,8 +73442,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73081,8 +73497,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73137,8 +73552,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73193,8 +73607,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73249,8 +73662,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73306,8 +73718,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73363,8 +73774,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73419,8 +73829,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73475,8 +73884,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73531,8 +73939,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73698,8 +74105,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73754,8 +74160,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73810,8 +74215,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73866,8 +74270,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73922,8 +74325,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -73978,8 +74380,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74034,8 +74435,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74090,8 +74490,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74146,8 +74545,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74202,8 +74600,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74258,8 +74655,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74314,8 +74710,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74370,8 +74765,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74426,8 +74820,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74482,8 +74875,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74538,8 +74930,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74594,8 +74985,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74650,8 +75040,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74706,8 +75095,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74762,8 +75150,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74818,8 +75205,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74874,8 +75260,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74930,8 +75315,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -74986,8 +75370,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75042,8 +75425,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75098,8 +75480,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75154,8 +75535,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75210,8 +75590,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75266,8 +75645,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75322,8 +75700,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75378,8 +75755,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75434,8 +75810,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75490,8 +75865,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75546,8 +75920,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75602,8 +75975,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -75658,1016 +76030,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_1Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_1", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_1Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_2Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_2", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_2Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_3Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_3", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_3Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_4Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_4", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_4Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_5Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_5", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_5Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_6Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_6", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_6Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_7Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_7", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_7Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_8Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_8", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_8Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_9Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_9", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_9Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_10Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_10", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_10Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_11Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_11", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_11Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_12Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_12", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_12Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_13Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_13", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_13Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_14Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_14", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_14Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_15Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_15", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_15Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_16Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_16Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_16", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_16Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_17Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_17Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_17", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_17Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_NC_1_18Suite : public TestCommand
-{
-public:
-    Test_TC_NC_1_18Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_NC_1_18", 0, credsIssuerConfig)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_NC_1_18Suite() {}
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
-    }
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76722,8 +76085,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76778,8 +76140,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76834,8 +76195,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76890,8 +76250,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -76946,8 +76305,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77002,8 +76360,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77058,8 +76415,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77114,8 +76470,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77170,8 +76525,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77227,8 +76581,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77284,8 +76637,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77341,8 +76693,7 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
-        {
-        }
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77398,8 +76749,667 @@ private:
     {
         using namespace chip::app::Clusters;
         switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACT_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACT_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACT_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
         {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACT_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACT_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACT_2_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACT_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_ACT_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACT_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACT_3_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACT_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_3_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACT_3_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TFL_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_TFL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TFL_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TFL_1_2Suite : public TestCommand
+{
+public:
+    Test_TC_TFL_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_1_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TFL_1_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TFL_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_TFL_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TFL_2_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_TFL_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_TFL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_TFL_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_UL_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_UL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_UL_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_UL_1_2Suite : public TestCommand
+{
+public:
+    Test_TC_UL_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_1_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_UL_1_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_UL_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_UL_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_UL_2_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_UL_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_UL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_UL_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {}
         return CHIP_NO_ERROR;
     }
 };
@@ -77618,6 +77628,9 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DD_1_10Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_11Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_1_12Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_13Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_14Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_1_15Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_1Suite>(credsIssuerConfig),
@@ -77634,9 +77647,19 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DD_3_12Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_13Suite>(credsIssuerConfig),
         make_unique<Test_TC_DD_3_14Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DD_4_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_15Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_16Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_17Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_18Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_19Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DD_3_20Suite>(credsIssuerConfig),
         make_unique<TestGroupDemoCommandSuite>(credsIssuerConfig),
         make_unique<TestGroupDemoConfigSuite>(credsIssuerConfig),
+        make_unique<Test_TC_GR_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_GR_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_GR_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_GR_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_GR_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_BDX_1_3Suite>(credsIssuerConfig),
@@ -77826,24 +77849,6 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_LC_2_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_LO_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_LVL_2_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_4Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_6Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_7Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_8Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_9Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_10Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_11Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_12Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_13Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_14Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_15Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_16Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_17Suite>(credsIssuerConfig),
-        make_unique<Test_TC_NC_1_18Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OO_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_RH_3_1Suite>(credsIssuerConfig),
@@ -77857,6 +77862,18 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_DIAG_TH_NW_2_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_DIAG_TH_NW_2_8Suite>(credsIssuerConfig),
         make_unique<Test_TC_DIAG_TH_NW_2_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACT_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACT_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACT_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACT_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TFL_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TFL_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TFL_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TFL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_UL_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_UL_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_UL_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_UL_2_2Suite>(credsIssuerConfig),
 #endif // CONFIG_ENABLE_YAML_TESTS
     };
 
