@@ -192,10 +192,7 @@ public:
     T * Release()
     {
         T * buffer = ScopedMemoryBuffer<T>::Release();
-        if (buffer == nullptr)
-        {
-            mSize = 0;
-        }
+        mSize = 0;
         return buffer;
     }
 
