@@ -96,6 +96,21 @@ typedef struct _NestedStruct
     SimpleStruct c;
 } NestedStruct;
 
+// Struct for SemanticTag
+typedef struct _SemanticTag
+{
+    uint16_t MfgCode;
+    uint16_t Value;
+} SemanticTag;
+
+// Struct for ModeOptionStruct
+typedef struct _ModeOptionStruct
+{
+    chip::CharSpan Label;
+    uint8_t Mode;
+    /* TYPE WARNING: array array defaults to */ uint8_t * SemanticTags;
+} ModeOptionStruct;
+
 // Struct for NestedStructList
 typedef struct _NestedStructList
 {
@@ -337,14 +352,6 @@ typedef struct _LineupInfo
     uint8_t lineupInfoType;
 } LineupInfo;
 
-// Struct for ModeOptionStruct
-typedef struct _ModeOptionStruct
-{
-    chip::CharSpan Label;
-    uint8_t Mode;
-    uint32_t SemanticTag;
-} ModeOptionStruct;
-
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
@@ -508,13 +515,6 @@ typedef struct _SecurityPolicy
     uint16_t RotationTime;
     uint16_t Flags;
 } SecurityPolicy;
-
-// Struct for SemanticTag
-typedef struct _SemanticTag
-{
-    uint16_t MfgCode;
-    uint16_t Value;
-} SemanticTag;
 
 // Struct for SoftwareFaultStruct
 typedef struct _SoftwareFaultStruct

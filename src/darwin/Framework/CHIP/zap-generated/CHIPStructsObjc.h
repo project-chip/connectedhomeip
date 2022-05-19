@@ -462,16 +462,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull stateValue;
 @end
 
-@interface CHIPModeSelectClusterModeOptionStruct : NSObject
-@property (strong, nonatomic) NSString * _Nonnull label;
-@property (strong, nonatomic) NSNumber * _Nonnull mode;
-@property (strong, nonatomic) NSNumber * _Nonnull semanticTag;
-- (instancetype)init;
-@end
-
 @interface CHIPModeSelectClusterSemanticTag : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull mfgCode;
 @property (strong, nonatomic) NSNumber * _Nonnull value;
+- (instancetype)init;
+@end
+
+@interface CHIPModeSelectClusterModeOptionStruct : NSObject
+@property (strong, nonatomic) NSString * _Nonnull label;
+@property (strong, nonatomic) NSNumber * _Nonnull mode;
+@property (strong, nonatomic) NSArray * _Nonnull semanticTags;
 - (instancetype)init;
 @end
 

@@ -551,32 +551,32 @@ private:
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
                     {
-                        auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                        auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                            "acl[0].targets.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_3.GetValue().cluster));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 0U));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 0U));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                            "acl[0].targets.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 1UL));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 1UL));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                            "acl[0].targets.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                            CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 2UL));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 3U));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()",
-                                                                                                         iter_NaN, 3));
+                            CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 3U));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_3.GetValue().deviceType));
+                        VerifyOrReturn(
+                            CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_3, 3));
                     }
                     VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 1));
@@ -584,50 +584,50 @@ private:
                     VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
                     VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
                     {
-                        auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                        auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 4ULL));
+                            "acl[1].subjects.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_3.GetValue(), 4ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 5ULL));
+                            "acl[1].subjects.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_3.GetValue(), 5ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_NaN.GetValue(), 6ULL));
+                            "acl[1].subjects.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_3.GetValue(), 6ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 3));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_NaN.GetValue(), 7ULL));
+                            "acl[1].subjects.Value()", iter_3, 3));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_3.GetValue(), 7ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()",
-                                                                                                          iter_NaN, 4));
+                                                                                                          iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
                     {
-                        auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                        auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                            "acl[1].targets.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_3.GetValue().cluster));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 8U));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 8U));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                            "acl[1].targets.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 9UL));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 9UL));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                            "acl[1].targets.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 10UL));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                            CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 10UL));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 11U));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()",
-                                                                                                         iter_NaN, 3));
+                            CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 11U));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[2].deviceType", iter_3.GetValue().deviceType));
+                        VerifyOrReturn(
+                            CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_3, 3));
                     }
                     VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 2));
@@ -635,50 +635,50 @@ private:
                     VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3));
                     VerifyOrReturn(CheckValueNonNull("acl[2].subjects", iter_0.GetValue().subjects));
                     {
-                        auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                        auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_NaN.GetValue(), 12ULL));
+                            "acl[2].subjects.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_3.GetValue(), 12ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_NaN.GetValue(), 13ULL));
+                            "acl[2].subjects.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_3.GetValue(), 13ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_NaN.GetValue(), 14ULL));
+                            "acl[2].subjects.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_3.GetValue(), 14ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 3));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_NaN.GetValue(), 15ULL));
+                            "acl[2].subjects.Value()", iter_3, 3));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_3.GetValue(), 15ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()",
-                                                                                                          iter_NaN, 4));
+                                                                                                          iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[2].targets", iter_0.GetValue().targets));
                     {
-                        auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                        auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                            "acl[2].targets.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_3.GetValue().cluster));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 16U));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 16U));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                            "acl[2].targets.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 17UL));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 17UL));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                            "acl[2].targets.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 18UL));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                            CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 18UL));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 19U));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()",
-                                                                                                         iter_NaN, 3));
+                            CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 19U));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[2].deviceType", iter_3.GetValue().deviceType));
+                        VerifyOrReturn(
+                            CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_3, 3));
                     }
                     VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 3));
@@ -855,32 +855,32 @@ private:
                     VerifyOrReturn(CheckValueNull("acl[0].subjects", iter_0.GetValue().subjects));
                     VerifyOrReturn(CheckValueNonNull("acl[0].targets", iter_0.GetValue().targets));
                     {
-                        auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                        auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                            "acl[0].targets.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_3.GetValue().cluster));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 0U));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 0U));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                            "acl[0].targets.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 1UL));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 1UL));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                            "acl[0].targets.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 2UL));
-                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                            CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 2UL));
+                        VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 3U));
-                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()",
-                                                                                                         iter_NaN, 3));
+                            CheckValue("acl[0].targets.Value()[2].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 3U));
+                        VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[2].deviceType", iter_3.GetValue().deviceType));
+                        VerifyOrReturn(
+                            CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[0].targets.Value()", iter_3, 3));
                     }
                     VerifyOrReturn(CheckValue("acl[0].fabricIndex", iter_0.GetValue().fabricIndex, 1));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 1));
@@ -888,50 +888,50 @@ private:
                     VerifyOrReturn(CheckValue("acl[1].authMode", iter_0.GetValue().authMode, 2));
                     VerifyOrReturn(CheckValueNonNull("acl[1].subjects", iter_0.GetValue().subjects));
                     {
-                        auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                        auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_NaN.GetValue(), 4ULL));
+                            "acl[1].subjects.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_3.GetValue(), 4ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_NaN.GetValue(), 5ULL));
+                            "acl[1].subjects.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_3.GetValue(), 5ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_NaN.GetValue(), 6ULL));
+                            "acl[1].subjects.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_3.GetValue(), 6ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_NaN, 3));
-                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_NaN.GetValue(), 7ULL));
+                            "acl[1].subjects.Value()", iter_3, 3));
+                        VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_3.GetValue(), 7ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()",
-                                                                                                          iter_NaN, 4));
+                                                                                                          iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
                     {
-                        auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                        auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                            "acl[1].targets.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_3.GetValue().cluster));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 8U));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 8U));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                            "acl[1].targets.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 9UL));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 9UL));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                            "acl[1].targets.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 10UL));
-                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                            CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 10UL));
+                        VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 11U));
-                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()",
-                                                                                                         iter_NaN, 3));
+                            CheckValue("acl[1].targets.Value()[2].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 11U));
+                        VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[2].deviceType", iter_3.GetValue().deviceType));
+                        VerifyOrReturn(
+                            CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[1].targets.Value()", iter_3, 3));
                     }
                     VerifyOrReturn(CheckValue("acl[1].fabricIndex", iter_0.GetValue().fabricIndex, 1));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("acl", iter_0, 2));
@@ -939,50 +939,50 @@ private:
                     VerifyOrReturn(CheckValue("acl[2].authMode", iter_0.GetValue().authMode, 3));
                     VerifyOrReturn(CheckValueNonNull("acl[2].subjects", iter_0.GetValue().subjects));
                     {
-                        auto iter_NaN = iter_0.GetValue().subjects.Value().begin();
+                        auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_NaN.GetValue(), 12ULL));
+                            "acl[2].subjects.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_3.GetValue(), 12ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_NaN.GetValue(), 13ULL));
+                            "acl[2].subjects.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_3.GetValue(), 13ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_NaN.GetValue(), 14ULL));
+                            "acl[2].subjects.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_3.GetValue(), 14ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_NaN, 3));
-                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_NaN.GetValue(), 15ULL));
+                            "acl[2].subjects.Value()", iter_3, 3));
+                        VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_3.GetValue(), 15ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()",
-                                                                                                          iter_NaN, 4));
+                                                                                                          iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[2].targets", iter_0.GetValue().targets));
                     {
-                        auto iter_NaN = iter_0.GetValue().targets.Value().begin();
+                        auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_NaN, 0));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_NaN.GetValue().cluster));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_NaN.GetValue().endpoint));
+                            "acl[2].targets.Value()", iter_3, 0));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_3.GetValue().cluster));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 16U));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 16U));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_NaN, 1));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_NaN.GetValue().cluster));
+                            "acl[2].targets.Value()", iter_3, 1));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 17UL));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_NaN.GetValue().endpoint));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_NaN.GetValue().deviceType));
+                            CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 17UL));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_NaN, 2));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_NaN.GetValue().cluster));
+                            "acl[2].targets.Value()", iter_3, 2));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_NaN.GetValue().cluster.Value(), 18UL));
-                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].endpoint", iter_NaN.GetValue().endpoint));
+                            CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 18UL));
+                        VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
-                            CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_NaN.GetValue().endpoint.Value(), 19U));
-                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[2].deviceType", iter_NaN.GetValue().deviceType));
-                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()",
-                                                                                                         iter_NaN, 3));
+                            CheckValue("acl[2].targets.Value()[2].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 19U));
+                        VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[2].deviceType", iter_3.GetValue().deviceType));
+                        VerifyOrReturn(
+                            CheckNoMoreListItems<decltype(iter_0.GetValue().targets.Value())>("acl[2].targets.Value()", iter_3, 3));
                     }
                     VerifyOrReturn(CheckValue("acl[2].fabricIndex", iter_0.GetValue().fabricIndex, 1));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acl", iter_0, 3));
@@ -40688,17 +40688,17 @@ private:
                     VerifyOrReturn(
                         CheckValueNonNull("listNullablesAndOptionalsStruct[0].nullableList", iter_0.GetValue().nullableList));
                     {
-                        auto iter_NaN = iter_0.GetValue().nullableList.Value().begin();
+                        auto iter_3 = iter_0.GetValue().nullableList.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().nullableList.Value())>(
-                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_NaN, 0));
+                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 0));
                         VerifyOrReturn(
-                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[0]", iter_NaN.GetValue(), 1));
+                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[0]", iter_3.GetValue(), 1));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().nullableList.Value())>(
-                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_NaN, 1));
+                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 1));
                         VerifyOrReturn(
-                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[1]", iter_NaN.GetValue(), 2));
+                            CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[1]", iter_3.GetValue(), 2));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().nullableList.Value())>(
-                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_NaN, 2));
+                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 2));
                     }
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listNullablesAndOptionalsStruct", iter_0, 1));
                 }
@@ -50879,17 +50879,35 @@ private:
                     VerifyOrReturn(
                         CheckValueAsString("supportedModes[0].label", iter_0.GetValue().label, chip::CharSpan("Black", 5)));
                     VerifyOrReturn(CheckValue("supportedModes[0].mode", iter_0.GetValue().mode, 0));
-                    VerifyOrReturn(CheckValue("supportedModes[0].semanticTag", iter_0.GetValue().semanticTag, 0UL));
+                    {
+                        auto iter_2 = iter_0.GetValue().semanticTags.begin();
+                        VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
+                            "supportedModes[0].semanticTags", iter_2, 0));
+                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().semanticTags)>(
+                            "supportedModes[0].semanticTags", iter_2, 1));
+                    }
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 1));
                     VerifyOrReturn(
                         CheckValueAsString("supportedModes[1].label", iter_0.GetValue().label, chip::CharSpan("Cappuccino", 10)));
                     VerifyOrReturn(CheckValue("supportedModes[1].mode", iter_0.GetValue().mode, 4));
-                    VerifyOrReturn(CheckValue("supportedModes[1].semanticTag", iter_0.GetValue().semanticTag, 0UL));
+                    {
+                        auto iter_2 = iter_0.GetValue().semanticTags.begin();
+                        VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
+                            "supportedModes[1].semanticTags", iter_2, 0));
+                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().semanticTags)>(
+                            "supportedModes[1].semanticTags", iter_2, 1));
+                    }
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 2));
                     VerifyOrReturn(
                         CheckValueAsString("supportedModes[2].label", iter_0.GetValue().label, chip::CharSpan("Espresso", 8)));
                     VerifyOrReturn(CheckValue("supportedModes[2].mode", iter_0.GetValue().mode, 7));
-                    VerifyOrReturn(CheckValue("supportedModes[2].semanticTag", iter_0.GetValue().semanticTag, 0UL));
+                    {
+                        auto iter_2 = iter_0.GetValue().semanticTags.begin();
+                        VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
+                            "supportedModes[2].semanticTags", iter_2, 0));
+                        VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().semanticTags)>(
+                            "supportedModes[2].semanticTags", iter_2, 1));
+                    }
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("supportedModes", iter_0, 3));
                 }
             }

@@ -45,9 +45,17 @@ tests:
       response:
           value:
               [
-                  { Label: "Black", Mode: 0, SemanticTag: 0 },
-                  { Label: "Cappuccino", Mode: 4, SemanticTag: 0 },
-                  { Label: "Espresso", Mode: 7, SemanticTag: 0 },
+                  { Label: "Black", Mode: 0, SemanticTags: [{ "value": 0 }] },
+                  {
+                      Label: "Cappuccino",
+                      Mode: 4,
+                      SemanticTags: [{ "value": 0 }],
+                  },
+                  {
+                      Label: "Espresso",
+                      Mode: 7,
+                      SemanticTags: [{ "value": 0 }],
+                  },
               ]
           constraints:
               - type: list
