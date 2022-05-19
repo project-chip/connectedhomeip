@@ -890,7 +890,7 @@ static CHIP_ERROR GenerateCertificationRequestInformation(ASN1Writer & writer, c
      */
     ASN1_START_SEQUENCE
     {
-        ASN1_ENCODE_INTEGER(0);  // version INTEGER { v1(0) }
+        ASN1_ENCODE_INTEGER(0); // version INTEGER { v1(0) }
 
         // subject Name
         ASN1_START_SEQUENCE
@@ -927,7 +927,8 @@ static CHIP_ERROR GenerateCertificationRequestInformation(ASN1Writer & writer, c
         ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0)
         {
             // Using a plain empty attributes request
-            ASN1_START_SEQUENCE {
+            ASN1_START_SEQUENCE
+            {
                 ASN1_ENCODE_OBJECT_ID(kOID_Extension_CSRRequest);
                 ASN1_START_SET
                 {
@@ -941,8 +942,8 @@ static CHIP_ERROR GenerateCertificationRequestInformation(ASN1Writer & writer, c
         ASN1_END_CONSTRUCTED;
     }
     ASN1_END_SEQUENCE;
-  exit:
-      return err;
+exit:
+    return err;
 }
 
 CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span)
@@ -966,7 +967,7 @@ CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, Mutabl
         CHIP_ERROR err = GenerateCertificationRequestInformation(toBeSignedWriter, keypair->Pubkey());
         ReturnErrorOnFailure(err);
 
-        size_t encodedLen = (uint16_t)toBeSignedWriter.GetLengthWritten();
+        size_t encodedLen = (uint16_t) toBeSignedWriter.GetLengthWritten();
         // This should not/will not happen
         if (encodedLen > csr_span.size())
         {
@@ -1025,20 +1026,20 @@ CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, Mutabl
                 {
                     MutableByteSpan derIntSpan(derInt, sizeof(derInt));
                     ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data()), derIntSpan));
-                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(),
-                                                          static_cast<uint16_t>(derIntSpan.size())));
+                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                                         derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
                 }
 
                 // s INTEGER
                 {
                     MutableByteSpan derIntSpan(derInt, sizeof(derInt));
-                    ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derIntSpan));
-                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(),
-                                                          static_cast<uint16_t>(derIntSpan.size())));
+                    ReturnErrorOnFailure(
+                        ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derIntSpan));
+                    ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false,
+                                                         derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
                 }
             }
             ASN1_END_SEQUENCE;
-
         }
         ASN1_END_ENCAPSULATED;
     }

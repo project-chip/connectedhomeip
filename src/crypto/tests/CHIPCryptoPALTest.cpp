@@ -68,10 +68,10 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPTLV.h>
 
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 using namespace chip;
@@ -1297,7 +1297,6 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
 }
 
-
 void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t csrBuf[kMAX_CSR_Length];
@@ -1330,7 +1329,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        size_t length = csrSpan.size();
+        size_t length      = csrSpan.size();
         csrBuf[length - 2] = (uint8_t)(csrBuf[length - 2] + 1);
         csrBuf[length - 1] = (uint8_t)(csrBuf[length - 1] + 1);
 
