@@ -235,7 +235,6 @@ CHIP_ERROR AppTask::Init()
     chip::EndpointId endpointId{ 1 };
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     uint8_t maxCredentialsPerUser = 0;
     if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
@@ -246,6 +245,7 @@ CHIP_ERROR AppTask::Init()
                      endpointId);
         maxCredentialsPerUser = 5;
     }
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     err = LockMgr().Init(state, maxCredentialsPerUser);
     if (err != CHIP_NO_ERROR)
