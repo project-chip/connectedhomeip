@@ -63,7 +63,7 @@ public:
                     "directory.");
         AddArgument(
             "commissioner-name", &mCommissionerName,
-            "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or eequal to 4.");
+            "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to 4.");
         AddArgument("commissioner-nodeid", 0, UINT64_MAX, &mCommissionerNodeId,
                     "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.");
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
