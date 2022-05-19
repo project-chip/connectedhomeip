@@ -462,6 +462,27 @@ CHIP_ERROR ClusterStateCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs
         }
     }
 
+    for (auto & attribute1 : aAttributePaths)
+    {
+        if (attribute1.HasWildcardAttributeId())
+        {
+            continue;
+        }
+
+        auto attribute2 = std::begin(mRequestPathSet);
+        while (attribute2 != std::end(mRequestPathSet))
+        {
+            if (attribute1.IsAttributePathOverlapped(*attribute2))
+            {
+                attribute2 = mRequestPathSet.erase(attribute2);
+            }
+            else
+            {
+                ++attribute2;
+            }
+        }
+    }
+
     std::vector<std::pair<DataVersionFilter, size_t>> filterVector;
     GetSortedFilters(filterVector);
 
