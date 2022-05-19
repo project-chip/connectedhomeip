@@ -105,10 +105,15 @@ void OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onC
         isConnected = AttachToExistingSecureSession();
         if (!isConnected)
         {
+            // LookupPeerAddress could perhaps call back with a result
+            // synchronously, so do our state update first.
+            MoveToState(State::ResolvingAddress);
             err = LookupPeerAddress();
-            if (err == CHIP_NO_ERROR)
+            if (err != CHIP_NO_ERROR)
             {
-                MoveToState(State::ResolvingAddress);
+                // Roll back the state change, since we are presumably not in
+                // the middle of a lookup.
+                MoveToState(State::NeedsAddress);
             }
         }
 
