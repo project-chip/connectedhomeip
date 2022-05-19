@@ -89,7 +89,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     {
         // If the code has been compiled with a default WiFi station provision, configure that now.
 #if !defined(CONFIG_DEFAULT_WIFI_SSID)
-        printf("%s %d pls define CONFIG_DEFAULT_WIFI_SSID\r\n", __func__, __LINE__);
+        ChipLogProgress(DeviceLayer, "Please define CONFIG_DEFAULT_WIFI_SSID");
 #else
         if (CONFIG_DEFAULT_WIFI_SSID[0] != 0)
         {
@@ -145,8 +145,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
-        DriveStationState();
         DHCPProcess();
+        DriveStationState();
     }
     if (event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent)
     {
@@ -674,16 +674,9 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 // address (2000::/3) that is in the valid state.  If such an address is found...
                 for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
                 {
-                    if (ip6_addr_isglobal(netif_ip6_addr(netif, i)) && ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
+                    if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
                     {
-                        // Determine if there is a default IPv6 router that is currently reachable
-                        // via the station interface.  If so, presume for now that the device has
-                        // IPv6 connectivity.
-                        struct netif * found_if = nd6_find_route(IP6_ADDR_ANY6);
-                        if (found_if && netif->num == found_if->num)
-                        {
-                            haveIPv6Conn = true;
-                        }
+                        haveIPv6Conn = true;
                     }
                 }
             }

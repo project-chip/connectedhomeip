@@ -33,27 +33,14 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
-#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
-#include <platform/Ameba/AmebaOTAImageProcessor.h>
-
 void * __dso_handle = 0;
 
-using chip::AmebaOTAImageProcessor;
-using chip::BDXDownloader;
 using chip::ByteSpan;
-using chip::DefaultOTARequestor;
 using chip::EndpointId;
 using chip::FabricIndex;
-using chip::GetRequestorInstance;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
-using chip::OTADownloader;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
@@ -87,51 +74,6 @@ void NetWorkCommissioningInstInit()
 
 static DeviceCallbacks EchoCallbacks;
 
-DefaultOTARequestor gRequestorCore;
-DefaultOTARequestorStorage gRequestorStorage;
-ExtendedOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-AmebaOTAImageProcessor gImageProcessor;
-chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
-static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentState::kGranted;
-
-extern "C" void amebaQueryImageCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
-}
-
-extern "C" void amebaApplyUpdateCmdHandler()
-{
-    ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
-}
-
-static void InitOTARequestor(void)
-{
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-
-    // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
-
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
-    {
-        gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
-}
-
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
@@ -142,8 +84,6 @@ static void InitServer(intptr_t context)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     NetWorkCommissioningInstInit();
-
-    InitOTARequestor();
 }
 
 extern "C" void ChipTest(void)
