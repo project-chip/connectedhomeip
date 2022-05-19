@@ -21,6 +21,8 @@
 
 #include "TestCommand.h"
 
+#include <lib/support/CHIPListUtils.h>
+
 class Test_TC_DM_1_3_SimulatedSuite : public TestCommand
 {
 public:
@@ -77,11 +79,13 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
             return WaitForCommissioning(kIdentityAlpha, value);
         }
         case 1: {
             LogStep(1, "Log OnOff Test Startup");
+            ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::Log::Type value;
             value.message = chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
             return Log(kIdentityAlpha, value);
@@ -219,6 +223,7 @@ private:
         {
         case 0: {
             LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
             return WaitForCommissioning(kIdentityAlpha, value);
         }
@@ -344,6 +349,7 @@ private:
         }
         case 9: {
             LogStep(9, "Wait 3000ms");
+            ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 3000UL;
             return WaitForMs(kIdentityAlpha, value);
