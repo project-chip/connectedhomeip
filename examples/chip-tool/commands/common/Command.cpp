@@ -520,7 +520,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     return isValidArgument;
 }
 
-size_t Command::AddArgument(const char * name, const char * value, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, const char * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Attribute;
@@ -532,7 +532,7 @@ size_t Command::AddArgument(const char * name, const char * value, uint8_t flags
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, char ** value, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, char ** value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::String;
@@ -544,7 +544,7 @@ size_t Command::AddArgument(const char * name, char ** value, uint8_t flags, con
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, chip::CharSpan * value, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, chip::CharSpan * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::CharString;
@@ -556,7 +556,7 @@ size_t Command::AddArgument(const char * name, chip::CharSpan * value, uint8_t f
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, chip::ByteSpan * value, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, chip::ByteSpan * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::OctetString;
@@ -568,7 +568,7 @@ size_t Command::AddArgument(const char * name, chip::ByteSpan * value, uint8_t f
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, AddressWithInterface * out, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, AddressWithInterface * out, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Address;
@@ -647,7 +647,7 @@ size_t Command::AddArgument(const char * name, CustomArgument * value, const cha
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, float min, float max, float * out, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, float min, float max, float * out, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Float;
@@ -660,7 +660,7 @@ size_t Command::AddArgument(const char * name, float min, float max, float * out
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, double min, double max, double * out, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, double min, double max, double * out, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Double;
@@ -673,8 +673,8 @@ size_t Command::AddArgument(const char * name, double min, double max, double * 
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, uint8_t flags,
-                            const char * desc)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, const char * desc,
+                            uint8_t flags)
 {
     Argument arg;
     arg.type  = type;
@@ -688,7 +688,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, uint8_t flags, const char * desc)
+size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Number_uint8;
