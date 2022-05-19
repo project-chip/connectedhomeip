@@ -1396,10 +1396,10 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 43L) {
-      if (attributeId == 1L) {
+      if (attributeId == 0L) {
         return "ActiveLocale";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "SupportedLocales";
       }
       if (attributeId == 65528L) {

@@ -105,6 +105,7 @@ public:
     // Unique ID is identifier utilized for the rotating device ID calculation purpose as an input key. It is separate identifier
     // from the Basic cluster unique ID.
     virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) = 0;
+    virtual CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan)  = 0;
 #endif
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;

@@ -16,7 +16,6 @@
  */
 
 #include "AppTask.h"
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -28,12 +27,8 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/Server.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
-
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include <cmath>
 #include <cstdio>
@@ -48,29 +43,15 @@
 #endif
 
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
 
 static const char * TAG = "lock-app";
 
-static DeviceCallbacks EchoCallbacks;
-
-namespace {
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-} // namespace
+static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    sWiFiNetworkCommissioningInstance.Init();
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     CHIP_ERROR error = GetAppTask().StartAppTask();

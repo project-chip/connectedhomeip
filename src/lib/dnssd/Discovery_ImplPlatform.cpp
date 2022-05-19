@@ -351,6 +351,7 @@ void DiscoveryImplPlatform::Shutdown()
     VerifyOrReturn(mDnssdInitialized);
     mResolverProxy.Shutdown();
     ChipDnssdShutdown();
+    mDnssdInitialized = false;
 }
 
 void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError)

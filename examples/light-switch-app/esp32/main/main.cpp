@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include "AppTask.h"
 #include "BindingHandler.h"
@@ -28,52 +29,23 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
 
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/ESP32/NetworkCommissioningDriver.h>
 
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
 
 static const char * TAG = "light-switch-app";
 
-static DeviceCallbacks EchoCallbacks;
-namespace {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
-#endif
-} // namespace
+static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    sWiFiNetworkCommissioningInstance.Init();
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
-        (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
-    {
-        ESP_LOGI(TAG, "Thread has been provisioned, publish the dns service now");
-        chip::app::DnssdServer::Instance().StartServer();
-    }
-#endif
     InitBindingHandler();
 }
 

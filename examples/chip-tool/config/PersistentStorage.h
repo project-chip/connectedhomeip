@@ -48,6 +48,9 @@ public:
     // Store local CATs.
     CHIP_ERROR SetCommissionerCATs(const chip::CATValues & cats);
 
+    // Clear all of the persistent storage for running session.
+    CHIP_ERROR SyncClearAll();
+
 private:
     CHIP_ERROR CommitConfig(const char * name);
     inipp::Ini<char> mConfig;

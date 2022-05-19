@@ -67,7 +67,8 @@ void PairingSession::Finish()
     CHIP_ERROR err = ActivateSecureSession(address);
     if (err == CHIP_NO_ERROR)
     {
-        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get());
+        VerifyOrDie(mSecureSessionHolder);
+        mDelegate->OnSessionEstablished(mSecureSessionHolder.Get().Value());
     }
     else
     {
@@ -155,14 +156,14 @@ void PairingSession::Clear()
 
     if (mSecureSessionHolder)
     {
-        SessionHandle session = mSecureSessionHolder.Get();
+        auto session = mSecureSessionHolder.Get();
         // Call Release before ExpirePairing because we don't want to receive OnSessionReleased() event here
         mSecureSessionHolder.Release();
-        if (!session->AsSecureSession()->IsActiveSession() && mSessionManager != nullptr)
+        if (!session.Value()->AsSecureSession()->IsActiveSession() && mSessionManager != nullptr)
         {
             // Make sure to clean up our pending session, since we're the only
             // ones who have access to it do do so.
-            mSessionManager->ExpirePairing(session);
+            mSessionManager->ExpirePairing(session.Value());
         }
     }
 

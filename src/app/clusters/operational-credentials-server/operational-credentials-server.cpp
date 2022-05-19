@@ -81,10 +81,16 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::Subje
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kAdminister));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-    ReturnErrorOnFailure(Access::GetAccessControl().CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry));
+    CHIP_ERROR err = Access::GetAccessControl().CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: ACL entry created for Fabric %X CASE Admin NodeId 0x" ChipLogFormatX64,
-                   fabricIndex, ChipLogValueX64(subject));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "OpCreds: Failed to add administrative node ACL entry: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    ChipLogProgress(Zcl, "OpCreds: ACL entry created for Fabric index 0x%x CASE Admin Subject 0x" ChipLogFormatX64,
+                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(subject));
 
     return CHIP_NO_ERROR;
 }
@@ -262,7 +268,7 @@ CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
 FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 {
     FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
+    ChipLogDetail(Zcl, "OpCreds: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
@@ -285,7 +291,7 @@ void CleanupFabricContext(SessionManager & sessionMgr, FabricIndex fabricIndex)
 
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to FailSafeCleanup");
+    ChipLogError(Zcl, "OpCreds: Proceeding to FailSafeCleanup on fail-safe expiry!");
 
     FabricIndex fabricIndex = event->FailSafeTimerExpired.PeerFabricIndex;
 
@@ -339,8 +345,6 @@ constexpr size_t kMaxRspLen = 900;
 
 void fabricListChanged()
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to fabricListChanged");
-
     // Currently, we only manage FabricsList attribute in endpoint 0, OperationalCredentials cluster is always required to be on
     // EP0.
     MatterReportingAttributeChangeCallback(0, OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
@@ -360,8 +364,7 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
     // Gets called when a fabric is deleted from KVS store
     void OnFabricDeletedFromStorage(FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric index 0x%x was deleted from fabric storage.",
-                       static_cast<unsigned>(fabricIndex));
+        ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was deleted from fabric storage.", static_cast<unsigned>(fabricIndex));
         fabricListChanged();
 
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
@@ -405,11 +408,11 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         // Safety check, but should not happen by the code paths involved
         VerifyOrReturn(fabric != nullptr);
 
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
-                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
-                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
+        ChipLogProgress(Zcl,
+                        "OpCreds: Fabric index 0x%x was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04X",
+                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
+                        ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 
@@ -420,11 +423,11 @@ class OpCredsFabricTableDelegate : public chip::FabricTable::Delegate
         // Safety check, but should not happen by the code paths involved
         VerifyOrReturn(fabric != nullptr);
 
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
-                       ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
-                       static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
-                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
+        ChipLogProgress(Zcl,
+                        "OpCreds: Fabric  index 0x%x was persisted to storage. FabricId " ChipLogFormatX64
+                        ", NodeId " ChipLogFormatX64 ", VendorId 0x%04X",
+                        static_cast<unsigned>(fabric->GetFabricIndex()), ChipLogValueX64(fabric->GetFabricId()),
+                        ChipLogValueX64(fabric->GetNodeId()), fabric->GetVendorId());
         fabricListChanged();
     }
 };
@@ -433,8 +436,6 @@ OpCredsFabricTableDelegate gFabricDelegate;
 
 void MatterOperationalCredentialsPluginServerInitCallback(void)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
-
     registerAttributeAccessOverride(&gAttrAccess);
 
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
@@ -471,7 +472,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     MATTER_TRACE_EVENT_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
+    ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command");
 
     CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
@@ -525,7 +526,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
     auto & Label        = commandData.label;
     auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
+    ChipLogProgress(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
     for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
     {
@@ -541,7 +542,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
 
     // Fetch current fabric
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_ID);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Set Label on fabric
     err = fabric->SetFabricLabel(Label);
@@ -592,7 +593,7 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidPublicKey;
     }
-    if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
+    if (err == CHIP_ERROR_INVALID_FABRIC_INDEX || err == CHIP_ERROR_WRONG_NODE_ID)
     {
         return OperationalCertStatus::kInvalidNodeOpId;
     }
@@ -640,7 +641,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
     MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Received AddNOC command");
+    ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
     if (nullptr == groupDataProvider)
     {
@@ -734,12 +735,12 @@ exit:
 
     if (nocResponse != OperationalCertStatus::kSuccess)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddNOC request. Status %d", to_underlying(nocResponse));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request (err=%" CHIP_ERROR_FORMAT "). Status %d", err.Format(),
+                     to_underlying(nocResponse));
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: successfully created fabric index %u via AddNOC",
-                       static_cast<unsigned>(fabricIndex));
+        ChipLogProgress(Zcl, "OpCreds: successfully created fabric index 0x%x via AddNOC", static_cast<unsigned>(fabricIndex));
     }
 
     return true;
@@ -758,7 +759,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator requested an update to the NOC");
+    ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
@@ -776,7 +777,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     // Fetch current fabric
     FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_ID));
+    VerifyOrExit(fabric != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INVALID_FABRIC_INDEX));
 
     // Flag on the fail-safe context that the UpdateNOC command was invoked.
     err = failSafeContext.SetUpdateNocCommandInvoked();
@@ -801,11 +802,12 @@ exit:
 
     if (nocResponse != OperationalCertStatus::kSuccess)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed UpdateNOC request. Status %d", to_underlying(nocResponse));
+        ChipLogError(Zcl, "OpCreds: Failed UpdateNOC request (err=%" CHIP_ERROR_FORMAT "). Sending Status %d", err.Format(),
+                     to_underlying(nocResponse));
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateNOC successful.");
+        ChipLogProgress(Zcl, "OpCreds: UpdateNOC successful.");
     }
 
     return true;
@@ -831,18 +833,17 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 
     if (certificateType == kDACCertificate)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for DAC");
+        ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
         SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
     }
     else if (certificateType == kPAICertificate)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for PAI");
+        ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
         SuccessOrExit(err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan));
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Certificate Chain request received for unknown type: %d",
-                       static_cast<int>(certificateType));
+        ChipLogError(Zcl, "OpCreds: Certificate Chain request received for unknown type: %d", static_cast<int>(certificateType));
         SuccessOrExit(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -852,7 +853,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CertificateChainRequest: %s", ErrorStr(err));
+        ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -875,7 +876,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     MutableByteSpan certDeclSpan(certDeclBuf);
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: received an AttestationRequest");
+    ChipLogProgress(Zcl, "OpCreds: Received an AttestationRequest command");
 
     // TODO: retrieve vendor information to populate the fields below.
     uint32_t timestamp = 0;
@@ -913,7 +914,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AttestationRequest: %s", ErrorStr(err));
+        ChipLogError(Zcl, "OpCreds: Failed AttestationRequest: %" CHIP_ERROR_FORMAT, err.Format());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -925,7 +926,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                             const Commands::CSRRequest::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("CSRRequest", "OperationalCredentials");
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested a CSR");
+    ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::ScopedMemoryBuffer<uint8_t> csr;
@@ -973,8 +974,13 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
         VerifyOrExit(csr.Alloc(csrLength), err = CHIP_ERROR_NO_MEMORY);
 
         err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %" CHIP_ERROR_FORMAT, err.Format());
-        SuccessOrExit(err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "OpCreds: NewCertificateSigningRequest returned %" CHIP_ERROR_FORMAT, err.Format());
+            SuccessOrExit(err);
+        }
+        ChipLogProgress(Zcl, "OpCreds: NewCertificateSigningRequest succeeded");
+
         VerifyOrExit(csrLength <= Crypto::kMAX_CSR_Length, err = CHIP_ERROR_INTERNAL);
 
         // Encode the NOCSR elements with the CSR and Nonce
@@ -1011,7 +1017,7 @@ exit:
     {
         // TODO: Replace this error handling with fail-safe since it's not transactional against root certs
         gFabricBeingCommissioned.Reset();
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CSRRequest: %s", ErrorStr(err));
+        ChipLogError(Zcl, "OpCreds: Failed CSRRequest: %" CHIP_ERROR_FORMAT, err.Format());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -1027,7 +1033,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+    ChipLogProgress(Zcl, "OpCreds: Received an AddTrustedRootCertificate command");
 
     FailSafeContext & failSafeContext = DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
 
@@ -1046,7 +1052,7 @@ exit:
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         gFabricBeingCommissioned.Reset();
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
+        ChipLogProgress(Zcl, "OpCreds: Failed AddTrustedRootCertificate request");
     }
     else
     {

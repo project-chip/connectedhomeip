@@ -32,11 +32,12 @@ tests:
     - label: "Precondition: Connect media content available for playback"
       disabled: true
 
+    #Issue 18109
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      disabled: true
-      command: "MediaPause"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "Pause"
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -47,8 +48,8 @@ tests:
                 value: "Verify that media is paused"
 
     - label: "Sends a Seek command"
-      disabled: true
-      command: "MediaSeek"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "Seek"
       arguments:
           values:
               - name: "Position"
@@ -65,7 +66,7 @@ tests:
                     starting point."
 
     - label: "Reads the SampledPosition attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
@@ -81,22 +82,21 @@ tests:
                 value:
                     "User prompt needed to enter the value beyond the furthest
                     valid position"
-                saveAs: positionValue
 
     # todo : Need a user input
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      disabled: true
-      command: "MediaSeek"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "Seek"
       arguments:
           values:
               - name: "position"
-                value: positionValue
+                value: 10000
 
     # response: SEEK_OUT_OF_RANGE
     - label: "Reads the SampledPosition attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:

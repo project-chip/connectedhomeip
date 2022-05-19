@@ -1788,7 +1788,7 @@
           "attributes": [
             {
               "name": "ActiveLocale",
-              "code": 1,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "char_string",
@@ -1804,7 +1804,7 @@
             },
             {
               "name": "SupportedLocales",
-              "code": 2,
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -2285,7 +2285,7 @@
               "side": "server",
               "type": "RegulatoryLocationType",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -2301,7 +2301,7 @@
               "side": "server",
               "type": "RegulatoryLocationType",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -4881,7 +4881,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -4897,7 +4897,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -7970,6 +7970,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 10
     }
-  ],
-  "log": []
+  ]
 }
