@@ -119,6 +119,9 @@ struct PayloadContents
     bool isValidManualCode() const;
     bool isShortDiscriminator = false;
     bool operator==(PayloadContents & input) const;
+
+private:
+    bool CheckPayloadCommonConstraints() const;
 };
 
 enum optionalQRCodeInfoType
