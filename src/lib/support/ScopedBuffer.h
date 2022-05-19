@@ -62,7 +62,7 @@ public:
         return *this;
     }
 
-    virtual ~ScopedMemoryBufferBase() { Free(); }
+    ~ScopedMemoryBufferBase() { Free(); }
 
     /** Check if a buffer is valid */
     explicit operator bool() const { return mBuffer != nullptr; }
@@ -184,27 +184,38 @@ public:
         return *this;
     }
 
-    virtual ~ScopedMemoryBufferWithSize() { mSize = 0; }
+    ~ScopedMemoryBufferWithSize() { mSize = 0; }
 
-    inline size_t GetSize() const { return mSize; }
+    // return the size in bytes
+    inline size_t BufferByteSize() const { return mSize; }
 
     T * Release()
     {
-        mSize = 0;
-        return ScopedMemoryBuffer<T>::Release();
+        T * buffer = ScopedMemoryBuffer<T>::Release();
+        if (buffer == nullptr)
+        {
+            mSize = 0;
+        }
+        return buffer;
     }
 
     ScopedMemoryBufferWithSize & Calloc(size_t elementCount)
     {
-        mSize = elementCount * sizeof(T);
         ScopedMemoryBuffer<T>::Calloc(elementCount);
+        if (ScopedMemoryBuffer<T>::Get() != nullptr)
+        {
+            mSize = elementCount * sizeof(T);
+        }
         return *this;
     }
 
     ScopedMemoryBufferWithSize & Alloc(size_t size)
     {
-        mSize = size * sizeof(T);
         ScopedMemoryBuffer<T>::Alloc(size);
+        if (ScopedMemoryBuffer<T>::Get() != nullptr)
+        {
+            mSize = size * sizeof(T);
+        }
         return *this;
     }
 

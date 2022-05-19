@@ -840,17 +840,17 @@ public:
     uint32_t GetRemainingLength() const { return mMaxLen - mLenRead; }
 
     /**
+     * Return the total number of bytes for the TLV data
+     * @return the total number of bytes for the TLV data
+     */
+    uint32_t GetTotalLength() const { return mMaxLen; }
+
+    /**
      * Returns the stored backing store.
      *
      * @return the stored backing store.
      */
     TLVBackingStore * GetBackingStore() { return mBackingStore; }
-
-    /**
-     * Return the total number of bytes for the TLV data
-     * @return the total number of bytes for the TLV data
-     */
-    uint32_t GetTotalLength() const { return mMaxLen; }
 
     /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.
@@ -969,17 +969,14 @@ public:
     /*
      * Construct and initialize the reader by taking ownership of the provided scoped buffer.
      */
-    ScopedBufferTLVReader(Platform::ScopedMemoryBufferWithSize<uint8_t> && buffer, size_t dataLen)
-    {
-        Init(std::move(buffer), dataLen);
-    }
+    ScopedBufferTLVReader(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen) { Init(std::move(buffer), dataLen); }
 
     ScopedBufferTLVReader() {}
 
     /*
      * Initialize the reader by taking ownership of a passed in scoped buffer.
      */
-    void Init(Platform::ScopedMemoryBufferWithSize<uint8_t> && buffer, size_t dataLen)
+    void Init(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen)
     {
         mBuffer = std::move(buffer);
         TLVReader::Init(mBuffer.Get(), dataLen);
@@ -990,14 +987,14 @@ public:
      * the provided buffer reference. This also re-initializes the reader with
      * a null buffer to prevent further use of the reader.
      */
-    void TakeBuffer(Platform::ScopedMemoryBufferWithSize<uint8_t> & buffer)
+    void TakeBuffer(Platform::ScopedMemoryBuffer<uint8_t> & buffer)
     {
         buffer = std::move(mBuffer);
         TLVReader::Init(nullptr, 0);
     }
 
 private:
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
 /**
@@ -2259,7 +2256,7 @@ public:
     /*
      * Construct and initialize the writer by taking ownership of the provided scoped buffer.
      */
-    ScopedBufferTLVWriter(Platform::ScopedMemoryBufferWithSize<uint8_t> && buffer, size_t dataLen)
+    ScopedBufferTLVWriter(Platform::ScopedMemoryBuffer<uint8_t> && buffer, size_t dataLen)
     {
         mBuffer = std::move(buffer);
         Init(mBuffer.Get(), dataLen);
@@ -2270,7 +2267,7 @@ public:
      * ownership to the provided buffer reference. This also re-initializes the writer with
      * a null buffer to prevent further inadvertent use of the writer.
      */
-    CHIP_ERROR Finalize(Platform::ScopedMemoryBufferWithSize<uint8_t> & buffer)
+    CHIP_ERROR Finalize(Platform::ScopedMemoryBuffer<uint8_t> & buffer)
     {
         ReturnErrorOnFailure(TLVWriter::Finalize());
         buffer = std::move(mBuffer);
@@ -2279,7 +2276,7 @@ public:
     }
 
 private:
-    Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
+    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
 };
 
 /**

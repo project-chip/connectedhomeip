@@ -48,7 +48,7 @@ void BufferedReadCallback::OnReportEnd()
 CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aReader)
 {
     TLV::TLVType outerType;
-    Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
 
     //
     // To generate the final reconstituted list, we need to allocate a contiguous

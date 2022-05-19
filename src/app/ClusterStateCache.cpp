@@ -36,7 +36,6 @@ CHIP_ERROR ClusterStateCache::GetElementTLVSize(TLV::TLVReader * apData, size_t 
     ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), reader));
     aSize = writer.GetLengthWritten();
     ReturnErrorOnFailure(writer.Finalize(backingBuffer));
-    backingBuffer.Release();
     return CHIP_NO_ERROR;
 }
 
@@ -221,7 +220,7 @@ CHIP_ERROR ClusterStateCache::Get(const ConcreteAttributePath & path, TLV::TLVRe
     }
 
     reader.Init(attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
-                attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().GetSize());
+                attributeState->Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().BufferByteSize());
     return reader.Next();
 }
 
@@ -423,7 +422,7 @@ void ClusterStateCache::GetSortedFilters(std::vector<std::pair<DataVersionFilter
                 {
                     TLV::TLVReader bufReader;
                     bufReader.Init(attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().Get(),
-                                   attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().GetSize());
+                                   attributeIter.second.Get<Platform::ScopedMemoryBufferWithSize<uint8_t>>().BufferByteSize());
                     ReturnOnFailure(bufReader.Next());
                     // Skip to the end of the element.
                     ReturnOnFailure(bufReader.Skip());
