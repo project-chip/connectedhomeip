@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <linux/types.h> /* for "caddr_t" et al      */
@@ -44,6 +45,8 @@ public:
     static uint8_t MapFrequencyToChannel(const uint16_t frequency);
     static app::Clusters::GeneralDiagnostics::InterfaceType GetInterfaceConnectionType(const char * ifname);
     static CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
+    static CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
+    static CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
     static CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize);
     static CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber);
     static CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi);
