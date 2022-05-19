@@ -192,17 +192,14 @@ public:
     T * Release()
     {
         T * buffer = ScopedMemoryBuffer<T>::Release();
-        if (buffer == nullptr)
-        {
-            mSize = 0;
-        }
+        mSize      = 0;
         return buffer;
     }
 
     ScopedMemoryBufferWithSize & Calloc(size_t elementCount)
     {
         ScopedMemoryBuffer<T>::Calloc(elementCount);
-        if (ScopedMemoryBuffer<T>::Get() != nullptr)
+        if (this->Get() != nullptr)
         {
             mSize = elementCount * sizeof(T);
         }
@@ -212,7 +209,7 @@ public:
     ScopedMemoryBufferWithSize & Alloc(size_t size)
     {
         ScopedMemoryBuffer<T>::Alloc(size);
-        if (ScopedMemoryBuffer<T>::Get() != nullptr)
+        if (this->Get() != nullptr)
         {
             mSize = size * sizeof(T);
         }
