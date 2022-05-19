@@ -39,6 +39,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <pthread.h>
+#include <sys/ioctl.h>
+
 #include "CommissionableInit.h"
 #include "Device.h"
 #include <app/server/Server.h>
@@ -149,8 +152,19 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
+//DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
+//DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
+
+DeviceOnOff Light1("Light 1", "Office");
+DeviceOnOff Light2("Light 2", "Office");
+//DeviceOnOff Light3("Light 3", "Office");
+//DeviceOnOff Light4("Light 4", "Den");
+
+DeviceSwitch Switch1("Switch 1", "Office", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
+DeviceSwitch Switch2("Switch 2", "Office",
+                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
+                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
+                     EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
 
 // ---------------------------------------------------------------------------
 //
@@ -661,6 +675,72 @@ const EmberAfDeviceType gComposedSwitchDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF
 
 const EmberAfDeviceType gComposedPowerSourceDeviceTypes[] = { { DEVICE_TYPE_POWER_SOURCE, DEVICE_VERSION_DEFAULT } };
 
+
+#define POLL_INTERVAL_MS (100)
+uint8_t poll_prescale = 0;
+
+bool kbhit()
+{
+    int byteswaiting;
+    ioctl(0, FIONREAD, &byteswaiting);
+    return byteswaiting > 0;
+}
+
+void * bridge_polling_thread(void * context)
+{
+    bool light1_added = true;
+    bool light2_added = false;
+    while (1)
+    {
+        if (kbhit())
+        {
+            int ch = getchar();
+            if (ch == '2' && light2_added == false)
+            {
+                std::cout << "Adding light2." << std::endl;    
+                AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                  Span<DataVersion>(gLight2DataVersions));
+                light2_added = true;
+            }
+            else if (ch == '4' && light1_added == true)
+            {
+                std::cout << "Removing light1." << std::endl;
+                RemoveDeviceEndpoint(&Light1);
+                light1_added = false;
+            }
+            if (ch == '5' && light1_added == false)
+            {
+                std::cout << "Adding light1." << std::endl;    
+                AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+                                  Span<DataVersion>(gLight1DataVersions));
+                light1_added = true;
+            }
+            if (ch == 'b')
+            {
+                Light1.SetName("Light 1b");
+            }
+            if (ch == 'c')
+            {
+                if (light1_added)
+                {
+                    Light1.Toggle();
+                }
+                if (light2_added)
+                {
+                    Light2.Toggle();
+                }
+            }
+            continue;            
+        }
+
+        // Sleep to avoid tight loop reading commands        
+        usleep(POLL_INTERVAL_MS * 1000);
+    }
+
+    return NULL;
+}
+
+
 int main(int argc, char * argv[])
 {
     // Clear out the device database
@@ -669,27 +749,27 @@ int main(int argc, char * argv[])
     // Create Mock Devices
 
     // Define 4 lights
-    DeviceOnOff Light1("Light 1", "Office");
-    DeviceOnOff Light2("Light 2", "Office");
-    DeviceOnOff Light3("Light 3", "Office");
-    DeviceOnOff Light4("Light 4", "Den");
+    // DeviceOnOff Light1("Light 1", "Office");
+    // DeviceOnOff Light2("Light 2", "Office");
+    // DeviceOnOff Light3("Light 3", "Office");
+    // DeviceOnOff Light4("Light 4", "Den");
 
     Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
     Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    Light3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    Light4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    //Light3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    //Light4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
     Light1.SetReachable(true);
     Light2.SetReachable(true);
-    Light3.SetReachable(true);
-    Light4.SetReachable(true);
+    //Light3.SetReachable(true);
+    //Light4.SetReachable(true);
 
     // Define 2 switches
-    DeviceSwitch Switch1("Switch 1", "Office", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
-    DeviceSwitch Switch2("Switch 2", "Office",
-                         EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
-                             EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
-                             EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
+    // DeviceSwitch Switch1("Switch 1", "Office", EMBER_AF_SWITCH_FEATURE_LATCHING_SWITCH);
+    // DeviceSwitch Switch2("Switch 2", "Office",
+    //                      EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH | EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_RELEASE |
+    //                          EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_LONG_PRESS |
+    //                          EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
 
     Switch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
     Switch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
@@ -755,21 +835,21 @@ int main(int argc, char * argv[])
     // Add lights 1..3 --> will be mapped to ZCL endpoints 2, 3, 4
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight1DataVersions));
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions));
-    AddDeviceEndpoint(&Light3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions));
+    // AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+    //                   Span<DataVersion>(gLight2DataVersions));
+    // AddDeviceEndpoint(&Light3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+    //                   Span<DataVersion>(gLight3DataVersions));
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 2 & 4
-    RemoveDeviceEndpoint(&Light2);
+    // RemoveDeviceEndpoint(&Light2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 5
-    AddDeviceEndpoint(&Light4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions));
+    // AddDeviceEndpoint(&Light4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+    //                  Span<DataVersion>(gLight4DataVersions));
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 6
-    AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions));
+    // AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
+    //                   Span<DataVersion>(gLight2DataVersions));
 
     // Add switch 1..2 --> will be mapped to ZCL endpoints 7,8
     AddDeviceEndpoint(&Switch1, &bridgedSwitchEndpoint, Span<const EmberAfDeviceType>(gBridgedSwitchDeviceTypes),
@@ -787,6 +867,16 @@ int main(int argc, char * argv[])
     AddDeviceEndpoint(&ComposedPowerSource, &bridgedPowerSourceEndpoint,
                       Span<const EmberAfDeviceType>(gComposedPowerSourceDeviceTypes),
                       Span<DataVersion>(gComposedPowerSourceDataVersions), ComposedDevice.GetEndpointId());
+
+    {
+        pthread_t poll_thread;
+        int res = pthread_create(&poll_thread, NULL, bridge_polling_thread, NULL);
+        if (res)
+        {
+            printf("Error creating polling thread: %d\n", res);
+            exit(1);
+        }
+    }
 
     // Run CHIP
 

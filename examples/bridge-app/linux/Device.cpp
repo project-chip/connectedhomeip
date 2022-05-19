@@ -110,6 +110,12 @@ void DeviceOnOff::SetOnOff(bool aOn)
     }
 }
 
+void DeviceOnOff::Toggle()
+{
+    bool aOn = !IsOn();
+    SetOnOff(aOn);
+}
+
 void DeviceOnOff::SetChangeCallback(DeviceCallback_fn aChanged_CB)
 {
     mChanged_CB = aChanged_CB;
