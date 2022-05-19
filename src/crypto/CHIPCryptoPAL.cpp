@@ -902,7 +902,7 @@ static CHIP_ERROR GenerateCertificationRequestInformation(ASN1Writer & writer, c
                     // Any subject, placeholder is good, since this
                     // is going to usually be ignored
                     ASN1_ENCODE_OBJECT_ID(kOID_AttributeType_OrganizationalUnitName);
-                    ASN1_ENCODE_STRING(kASN1UniversalTag_UTF8String, "CSA", strlen("CSA"));
+                    ASN1_ENCODE_STRING(kASN1UniversalTag_UTF8String, "CSA", static_cast<uint16_t>(strlen("CSA")));
                 }
                 ASN1_END_SEQUENCE;
             }
