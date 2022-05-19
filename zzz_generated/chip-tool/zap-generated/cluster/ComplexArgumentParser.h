@@ -42,6 +42,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLaun
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Scenes::Structs::AttributeValuePair::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::Type & request,
                         Json::Value & value);

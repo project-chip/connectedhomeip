@@ -633,9 +633,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 
-@property (strong, nonatomic) NSNumber * _Nonnull sceneCount;
-
-@property (strong, nonatomic) NSArray * _Nonnull sceneList;
+@property (strong, nonatomic) NSArray * _Nullable sceneList;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

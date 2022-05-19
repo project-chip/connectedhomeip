@@ -4846,8 +4846,7 @@ class ChipClusters:
                         "transitionTime": "int",
                         "sceneName": "str",
                         "clusterId": "int",
-                        "length": "int",
-                        "value": "int",
+                        "attributeValueList": "",
                     },
                 },
             0x00000006: {

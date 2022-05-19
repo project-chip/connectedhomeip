@@ -5439,11 +5439,7 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        Integer status,
-        Integer capacity,
-        Integer groupId,
-        Integer sceneCount,
-        ArrayList<Integer> sceneList) {
+        Integer status, Integer capacity, Integer groupId, Optional<ArrayList<Integer>> sceneList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
@@ -5451,9 +5447,6 @@ public class ClusterInfoMapping {
       responseValues.put(capacityResponseValue, capacity);
       CommandResponseInfo groupIdResponseValue = new CommandResponseInfo("groupId", "Integer");
       responseValues.put(groupIdResponseValue, groupId);
-      CommandResponseInfo sceneCountResponseValue =
-          new CommandResponseInfo("sceneCount", "Integer");
-      responseValues.put(sceneCountResponseValue, sceneCount);
       // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);

@@ -3109,8 +3109,8 @@ void CHIPScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr);
 
     err = JniReferences::GetInstance().FindMethod(
-        env, javaCallbackRef, "onSuccess",
-        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;)V", &javaMethod);
+        env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject status;
@@ -3128,27 +3128,31 @@ void CHIPScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
     std::string groupIdCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
                                                                    dataResponse.groupId, groupId);
-    jobject sceneCount;
-    std::string sceneCountClassName     = "java/lang/Integer";
-    std::string sceneCountCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(sceneCountClassName.c_str(), sceneCountCtorSignature.c_str(),
-                                                                  dataResponse.sceneCount, sceneCount);
     jobject sceneList;
-    chip::JniReferences::GetInstance().CreateArrayList(sceneList);
-
-    auto iter_sceneList_0 = dataResponse.sceneList.begin();
-    while (iter_sceneList_0.Next())
+    if (!dataResponse.sceneList.HasValue())
     {
-        auto & entry_0 = iter_sceneList_0.GetValue();
-        jobject newElement_0;
-        std::string newElement_0ClassName     = "java/lang/Integer";
-        std::string newElement_0CtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0ClassName.c_str(),
-                                                                      newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToList(sceneList, newElement_0);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, sceneList);
+    }
+    else
+    {
+        jobject sceneListInsideOptional;
+        chip::JniReferences::GetInstance().CreateArrayList(sceneListInsideOptional);
+
+        auto iter_sceneListInsideOptional_1 = dataResponse.sceneList.Value().begin();
+        while (iter_sceneListInsideOptional_1.Next())
+        {
+            auto & entry_1 = iter_sceneListInsideOptional_1.GetValue();
+            jobject newElement_1;
+            std::string newElement_1ClassName     = "java/lang/Integer";
+            std::string newElement_1CtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1ClassName.c_str(),
+                                                                          newElement_1CtorSignature.c_str(), entry_1, newElement_1);
+            chip::JniReferences::GetInstance().AddToList(sceneListInsideOptional, newElement_1);
+        }
+        chip::JniReferences::GetInstance().CreateOptional(sceneListInsideOptional, sceneList);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, capacity, groupId, sceneCount, sceneList);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status, capacity, groupId, sceneList);
 }
 CHIPScenesClusterRemoveAllScenesResponseCallback::CHIPScenesClusterRemoveAllScenesResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPScenesClusterRemoveAllScenesResponseCallbackType>(CallbackFn, this)
@@ -3445,16 +3449,66 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
         chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_clusterIdClassName.c_str(),
                                                                        newElement_0_clusterIdCtorSignature.c_str(),
                                                                        entry_0.clusterId, newElement_0_clusterId);
-        jobject newElement_0_length;
-        std::string newElement_0_lengthClassName     = "java/lang/Integer";
-        std::string newElement_0_lengthCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-            newElement_0_lengthClassName.c_str(), newElement_0_lengthCtorSignature.c_str(), entry_0.length, newElement_0_length);
-        jobject newElement_0_value;
-        std::string newElement_0_valueClassName     = "java/lang/Integer";
-        std::string newElement_0_valueCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-            newElement_0_valueClassName.c_str(), newElement_0_valueCtorSignature.c_str(), entry_0.value, newElement_0_value);
+        jobject newElement_0_attributeValueList;
+        chip::JniReferences::GetInstance().CreateArrayList(newElement_0_attributeValueList);
+
+        auto iter_newElement_0_attributeValueList_NaN = entry_0.attributeValueList.begin();
+        while (iter_newElement_0_attributeValueList_NaN.Next())
+        {
+            auto & entry_NaN = iter_newElement_0_attributeValueList_NaN.GetValue();
+            jobject newElement_NaN;
+            jobject newElement_NaN_attributeId;
+            if (!entry_NaN.attributeId.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_NaN_attributeId);
+            }
+            else
+            {
+                jobject newElement_NaN_attributeIdInsideOptional;
+                std::string newElement_NaN_attributeIdInsideOptionalClassName     = "java/lang/Long";
+                std::string newElement_NaN_attributeIdInsideOptionalCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                    newElement_NaN_attributeIdInsideOptionalClassName.c_str(),
+                    newElement_NaN_attributeIdInsideOptionalCtorSignature.c_str(), entry_NaN.attributeId.Value(),
+                    newElement_NaN_attributeIdInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(newElement_NaN_attributeIdInsideOptional,
+                                                                  newElement_NaN_attributeId);
+            }
+            jobject newElement_NaN_attributeValue;
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_NaN_attributeValue);
+
+            auto iter_newElement_NaN_attributeValue_NaN = entry_NaN.attributeValue.begin();
+            while (iter_newElement_NaN_attributeValue_NaN.Next())
+            {
+                auto & entry_NaN = iter_newElement_NaN_attributeValue_NaN.GetValue();
+                jobject newElement_NaN;
+                std::string newElement_NaNClassName     = "java/lang/Integer";
+                std::string newElement_NaNCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
+                chip::JniReferences::GetInstance().AddToList(newElement_NaN_attributeValue, newElement_NaN);
+            }
+
+            jclass attributeValuePairStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$ScenesClusterAttributeValuePair", attributeValuePairStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$ScenesClusterAttributeValuePair");
+                return;
+            }
+            jmethodID attributeValuePairStructCtor =
+                env->GetMethodID(attributeValuePairStructClass, "<init>", "(Ljava/util/Optional;Ljava/util/ArrayList;)V");
+            if (attributeValuePairStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");
+                return;
+            }
+
+            newElement_NaN = env->NewObject(attributeValuePairStructClass, attributeValuePairStructCtor, newElement_NaN_attributeId,
+                                            newElement_NaN_attributeValue);
+            chip::JniReferences::GetInstance().AddToList(newElement_0_attributeValueList, newElement_NaN);
+        }
 
         jclass sceneExtensionFieldSetStructClass;
         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -3464,8 +3518,8 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ScenesClusterSceneExtensionFieldSet");
             return;
         }
-        jmethodID sceneExtensionFieldSetStructCtor = env->GetMethodID(sceneExtensionFieldSetStructClass, "<init>",
-                                                                      "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        jmethodID sceneExtensionFieldSetStructCtor =
+            env->GetMethodID(sceneExtensionFieldSetStructClass, "<init>", "(Ljava/lang/Long;Ljava/util/ArrayList;)V");
         if (sceneExtensionFieldSetStructCtor == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterSceneExtensionFieldSet constructor");
@@ -3473,7 +3527,7 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
         }
 
         newElement_0 = env->NewObject(sceneExtensionFieldSetStructClass, sceneExtensionFieldSetStructCtor, newElement_0_clusterId,
-                                      newElement_0_length, newElement_0_value);
+                                      newElement_0_attributeValueList);
         chip::JniReferences::GetInstance().AddToList(extensionFieldSets, newElement_0);
     }
 

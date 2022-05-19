@@ -15770,8 +15770,7 @@ public class ChipClusters {
           Integer status,
           Integer capacity,
           Integer groupId,
-          Integer sceneCount,
-          ArrayList<Integer> sceneList);
+          Optional<ArrayList<Integer>> sceneList);
 
       void onError(Exception error);
     }
@@ -15804,6 +15803,14 @@ public class ChipClusters {
           ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets);
 
       void onError(Exception error);
+    }
+
+    public interface CurrentGroupAttributeCallback {
+      void onSuccess(Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -15848,12 +15855,12 @@ public class ChipClusters {
       subscribeCurrentSceneAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readCurrentGroupAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentGroupAttribute(CurrentGroupAttributeCallback callback) {
       readCurrentGroupAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeCurrentGroupAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        CurrentGroupAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCurrentGroupAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -15924,10 +15931,13 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readCurrentGroupAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentGroupAttributeCallback callback);
 
     private native void subscribeCurrentGroupAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        CurrentGroupAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readSceneValidAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
