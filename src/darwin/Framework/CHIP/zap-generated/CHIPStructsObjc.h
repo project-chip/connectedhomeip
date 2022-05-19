@@ -294,8 +294,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull linkFrameCounter;
 @property (strong, nonatomic) NSNumber * _Nonnull mleFrameCounter;
 @property (strong, nonatomic) NSNumber * _Nonnull lqi;
-@property (strong, nonatomic) NSNumber * _Nonnull averageRssi;
-@property (strong, nonatomic) NSNumber * _Nonnull lastRssi;
+@property (strong, nonatomic) NSNumber * _Nullable averageRssi;
+@property (strong, nonatomic) NSNumber * _Nullable lastRssi;
 @property (strong, nonatomic) NSNumber * _Nonnull frameErrorRate;
 @property (strong, nonatomic) NSNumber * _Nonnull messageErrorRate;
 @property (strong, nonatomic) NSNumber * _Nonnull rxOnWhenIdle;

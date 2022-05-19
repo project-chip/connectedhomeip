@@ -10910,12 +10910,12 @@ class ThreadNetworkDiagnostics(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="channel", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=str),
-                ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=uint),
-                ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=uint),
-                ClusterObjectFieldDescriptor(Label="meshLocalPrefix", Tag=0x00000005, Type=bytes),
+                ClusterObjectFieldDescriptor(Label="channel", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=typing.Union[Nullable, str]),
+                ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="meshLocalPrefix", Tag=0x00000005, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="neighborTableList", Tag=0x00000007, Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]),
                 ClusterObjectFieldDescriptor(Label="routeTableList", Tag=0x00000008, Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]),
@@ -10980,12 +10980,12 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    channel: 'uint' = None
-    routingRole: 'uint' = None
-    networkName: 'str' = None
-    panId: 'uint' = None
-    extendedPanId: 'uint' = None
-    meshLocalPrefix: 'bytes' = None
+    channel: 'typing.Union[Nullable, uint]' = None
+    routingRole: 'typing.Union[Nullable, uint]' = None
+    networkName: 'typing.Union[Nullable, str]' = None
+    panId: 'typing.Union[Nullable, uint]' = None
+    extendedPanId: 'typing.Union[Nullable, uint]' = None
+    meshLocalPrefix: 'typing.Union[Nullable, bytes]' = None
     overrunCount: 'typing.Optional[uint]' = None
     neighborTableList: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = None
     routeTableList: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = None
@@ -11083,8 +11083,8 @@ class ThreadNetworkDiagnostics(Cluster):
                             ClusterObjectFieldDescriptor(Label="linkFrameCounter", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="mleFrameCounter", Tag=4, Type=uint),
                             ClusterObjectFieldDescriptor(Label="lqi", Tag=5, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="averageRssi", Tag=6, Type=int),
-                            ClusterObjectFieldDescriptor(Label="lastRssi", Tag=7, Type=int),
+                            ClusterObjectFieldDescriptor(Label="averageRssi", Tag=6, Type=typing.Union[Nullable, int]),
+                            ClusterObjectFieldDescriptor(Label="lastRssi", Tag=7, Type=typing.Union[Nullable, int]),
                             ClusterObjectFieldDescriptor(Label="frameErrorRate", Tag=8, Type=uint),
                             ClusterObjectFieldDescriptor(Label="messageErrorRate", Tag=9, Type=uint),
                             ClusterObjectFieldDescriptor(Label="rxOnWhenIdle", Tag=10, Type=bool),
@@ -11099,8 +11099,8 @@ class ThreadNetworkDiagnostics(Cluster):
             linkFrameCounter: 'uint' = 0
             mleFrameCounter: 'uint' = 0
             lqi: 'uint' = 0
-            averageRssi: 'int' = 0
-            lastRssi: 'int' = 0
+            averageRssi: 'typing.Union[Nullable, int]' = NullValue
+            lastRssi: 'typing.Union[Nullable, int]' = NullValue
             frameErrorRate: 'uint' = 0
             messageErrorRate: 'uint' = 0
             rxOnWhenIdle: 'bool' = False
@@ -11213,9 +11213,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class RoutingRole(ClusterAttributeDescriptor):
@@ -11229,9 +11229,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NetworkName(ClusterAttributeDescriptor):
@@ -11245,9 +11245,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=str)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, str])
 
-            value: 'str' = ""
+            value: 'typing.Union[Nullable, str]' = NullValue
 
         @dataclass
         class PanId(ClusterAttributeDescriptor):
@@ -11261,9 +11261,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class ExtendedPanId(ClusterAttributeDescriptor):
@@ -11277,9 +11277,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class MeshLocalPrefix(ClusterAttributeDescriptor):
@@ -11293,9 +11293,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bytes)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bytes])
 
-            value: 'bytes' = b""
+            value: 'typing.Union[Nullable, bytes]' = NullValue
 
         @dataclass
         class OverrunCount(ClusterAttributeDescriptor):

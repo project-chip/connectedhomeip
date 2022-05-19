@@ -1827,8 +1827,8 @@ public class ChipStructs {
     public Long linkFrameCounter;
     public Long mleFrameCounter;
     public Integer lqi;
-    public Integer averageRssi;
-    public Integer lastRssi;
+    public @Nullable Integer averageRssi;
+    public @Nullable Integer lastRssi;
     public Integer frameErrorRate;
     public Integer messageErrorRate;
     public Boolean rxOnWhenIdle;
@@ -1843,8 +1843,8 @@ public class ChipStructs {
         Long linkFrameCounter,
         Long mleFrameCounter,
         Integer lqi,
-        Integer averageRssi,
-        Integer lastRssi,
+        @Nullable Integer averageRssi,
+        @Nullable Integer lastRssi,
         Integer frameErrorRate,
         Integer messageErrorRate,
         Boolean rxOnWhenIdle,

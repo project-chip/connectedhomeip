@@ -635,9 +635,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _lqi = @(0);
 
-        _averageRssi = @(0);
+        _averageRssi = nil;
 
-        _lastRssi = @(0);
+        _lastRssi = nil;
 
         _frameErrorRate = @(0);
 

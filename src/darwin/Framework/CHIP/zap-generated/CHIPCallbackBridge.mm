@@ -10379,8 +10379,16 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
             newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
             newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
             newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-            newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
-            newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
+            if (entry_0.averageRssi.IsNull()) {
+                newElement_0.averageRssi = nil;
+            } else {
+                newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi.Value()];
+            }
+            if (entry_0.lastRssi.IsNull()) {
+                newElement_0.lastRssi = nil;
+            } else {
+                newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi.Value()];
+            }
             newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
             newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
             newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];
