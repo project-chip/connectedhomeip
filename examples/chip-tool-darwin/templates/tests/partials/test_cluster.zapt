@@ -127,7 +127,6 @@ class {{filename}}: public TestCommandBridge
     CHIP_ERROR {{>testCommand}}()
     {
         {{#if (isTestOnlyCluster cluster)}}
-        {{#if (chip_tests_item_has_list)}}ListFreer listFreer;{{/if~}}
         {{asEncodableType}} value;
         {{#chip_tests_item_parameters}}
           {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
