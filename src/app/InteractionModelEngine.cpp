@@ -1199,5 +1199,18 @@ uint16_t InteractionModelEngine::GetMinSubscriptionsPerFabric() const
     return static_cast<uint16_t>(perFabricSubscriptionCapacity);
 }
 
+size_t InteractionModelEngine::GetNumDirtySubscriptions() const
+{
+    size_t numDirtySubscriptions = 0;
+    mReadHandlers.ForEachActiveObject([&](const auto readHandler) {
+        if (readHandler->IsType(ReadHandler::InteractionType::Subscribe) && readHandler->IsDirty())
+        {
+            numDirtySubscriptions++;
+        }
+        return Loop::Continue;
+    });
+    return numDirtySubscriptions;
+}
+
 } // namespace app
 } // namespace chip

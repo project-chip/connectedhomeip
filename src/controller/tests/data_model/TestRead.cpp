@@ -1521,10 +1521,10 @@ public:
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
 };
 
-class TestInfinityListReadCallback : public app::ReadClient::Callback
+class TestPerpetualListReadCallback : public app::ReadClient::Callback
 {
 public:
-    TestInfinityListReadCallback() {}
+    TestPerpetualListReadCallback() {}
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
@@ -1588,7 +1588,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // We don't care about the data read, we only care about the existence of such read transactions.
     TestReadCallback readCallback;
     TestReadCallback readCallbackFabric2;
-    TestInfinityListReadCallback infinityReadCallback;
+    TestPerpetualListReadCallback infinityReadCallback;
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionAliceToBob(), 1, 1,
@@ -1607,10 +1607,16 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
 
     // Intentially establish subscriptions using exceeded resources.
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    // We established kExpectedParallelSubs + 1 subsctions, with (kExpectedParallelSubs + 1) * kMinSupportedPathsPerSubscription + 1
+    // interested paths. This exceeds the limit we set below, and the subscription with kMinSupportedPathsPerSubscription + 1
+    // interested path will be evicted firstly.
+    // We intentially use exceeded resource here to make testing "used exactly all resources" easier.
+    // Subscription A
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), 1,
                                  app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
                                  app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
                                  app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+    // Subscription B
     EstablishReadOrSubscriptions(apSuite, ctx.GetSessionBobToAlice(), kExpectedParallelSubs,
                                  app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
                                  app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
@@ -1632,11 +1638,15 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1);
 
     // We have set up the environment for testing the evicting logic.
+    // We now have a full stable of subscriptions setup AND we've artificially limited the capacity, creation of further
+    // subscriptions will require the eviction of existing subscriptions, OR potential rejection of the subscription if it exceeds
+    // minimas.
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
     app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
 
-    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    // Part 1: Test per subscription minimas.
+    // Rejection of the subscription that exceeds minimas.
     {
         TestReadCallback callback;
         std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
@@ -1645,14 +1655,15 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
             app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback.mOnError == 5; });
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback.mOnError == 1; });
 
         // Over-sized request after used all paths will receive Paths Exhausted status code.
         NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_IM_GLOBAL_STATUS(PathsExhausted));
     }
 
-    // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
+    // This next test validates that a compliant subscription request will kick out an existing subscription (arguably, the one that
+    // was previously established with more paths than the limit per fabric)
     {
         EstablishReadOrSubscriptions(
             apSuite, ctx.GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
@@ -1660,16 +1671,22 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
             app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
         readCallback.ClearCounters();
+        // Run until the new subscription got setup fully as viewed by the client.
         ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
             return readCallback.mOnSubscriptionEstablishedCount == 1 &&
                 readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
         });
 
-        // This read handler should evict some existing subscriptions for enough space
+        // This read handler should evict some existing subscriptions for enough space.
+        // Validate that the new subscription got setup fully as viewed by the client. And we will validate we handled this
+        // subscription by evicting the correct subscriptions later.
         NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == 1);
         NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
     }
 
+    // Validate we evicted the right subscription for handling the new subscription above.
+    // We should used **exactly** all resources for subscriptions if we have evicted the correct subscription, and we validate the
+    // number of used paths by mark all subscriptions as dirty, and count the number of received reports.
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
@@ -1679,18 +1696,20 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     }
     readCallback.ClearCounters();
 
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return readCallback.mAttributeCount == kExpectedParallelPaths &&
-            app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Subscribe) ==
-            static_cast<uint32_t>(kExpectedParallelSubs);
-    });
+    // Run until all subscriptions are clean.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                    [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
-    // We should evict the subscriptions with excess resources, so we should use exactly all resources.
+    // Before the above subscription, we have one subscription with kMinSupportedPathsPerSubscription + 1 paths, we should evict
+    // that subscription before evicting any other subscriptions, which will result we used exactly kExpectedParallelPaths and have
+    // exactly kExpectedParallelSubs.
     NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == kExpectedParallelPaths);
     NL_TEST_ASSERT(apSuite,
                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
                        app::ReadHandler::InteractionType::Subscribe) == static_cast<uint32_t>(kExpectedParallelSubs));
 
+    // Part 2: Testing per fabric minimas.
+    // Validate we have more than kMinSupportedSubscriptionsPerFabric subscriptions for testing per fabric minimas.
     NL_TEST_ASSERT(apSuite,
                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
                        app::ReadHandler::InteractionType::Subscribe, ctx.GetAliceFabricIndex()) >
@@ -1704,6 +1723,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
             app::AttributePathParams(kTestEndpointId, TestCluster::Id, TestCluster::Attributes::Int16u::Id),
             app::ReadClient::InteractionType::Subscribe, &readCallbackFabric2, readClients);
 
+        // Run until we have established the subscriptions.
         ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
             return readCallbackFabric2.mOnSubscriptionEstablishedCount ==
                 app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric &&
@@ -1712,7 +1732,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
                     app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric;
         });
 
-        // This read handler should evict some existing subscriptions for enough space
+        // Verify the subscriptions are established successfully. We will check if we evicted the expected subscriptions later.
         NL_TEST_ASSERT(apSuite,
                        readCallbackFabric2.mOnSubscriptionEstablishedCount ==
                            app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
@@ -1722,6 +1742,7 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
                                app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
     }
 
+    // Validate the subscriptions are handled by evicting one or more subscriptions from Fabric A.
     {
         app::AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
@@ -1732,15 +1753,9 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     readCallback.ClearCounters();
     readCallbackFabric2.ClearCounters();
 
-    // Run until the global dirtyset is cleared.
-    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return readCallback.mAttributeCount ==
-            app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric &&
-            readCallbackFabric2.mAttributeCount ==
-            app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric;
-    });
+    // Run until all subscriptions are clean.
+    ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
+                                    [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
     // Some subscriptions on fabric 1 should be evicted since fabric 1 is using more resources than the limits.
     NL_TEST_ASSERT(apSuite,
