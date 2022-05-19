@@ -257,7 +257,9 @@ function setDefaultResponse(test, useSynthesizeWaitForReport)
     return;
   }
 
-  const defaultResponse = {};
+  test.expectMultipleResponses = test.isEvent;
+
+  const defaultResponse = test.expectMultipleResponses ? [] : {};
   setDefault(test, kResponseName, defaultResponse);
 
   // There is different syntax for expressing the expected response, but in the
@@ -363,8 +365,6 @@ function setDefaultResponse(test, useSynthesizeWaitForReport)
 
       setDefault(expectedValue, 'name', defaultName);
     });
-
-    test.expectMultipleResponses = test[kResponseName].length > 1;
 
     setDefault(response, kCommandName, test.command);
     setDefault(response, responseType, test[responseType]);
