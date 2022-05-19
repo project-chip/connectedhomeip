@@ -302,6 +302,15 @@ void CommissioningWindowManager::CloseCommissioningWindow()
 {
     if (mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
+#if CONFIG_NETWORK_LAYER_BLE
+        if (mListeningForPASE)
+        {
+            // We never established PASE, so never armed a fail-safe and hence
+            // can't rely on it expiring to close our BLE connection.  Do that
+            // manually here.
+            mServer->GetBleLayerObject()->CloseAllBleConnections();
+        }
+#endif
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
     }

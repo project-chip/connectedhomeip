@@ -16,6 +16,10 @@ public class CastingContext {
     return fragmentActivity.getApplicationContext();
   }
 
+  public FragmentActivity getFragmentActivity() {
+    return fragmentActivity;
+  }
+
   public NsdManager getNsdManager() {
     return (NsdManager)
         fragmentActivity.getApplicationContext().getSystemService(Context.NSD_SERVICE);

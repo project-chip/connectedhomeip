@@ -41,7 +41,7 @@ jobs:
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -89,6 +89,9 @@ jobs:
                         --target darwin-x64-chip-tool-darwin-${BUILD_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
                         --target darwin-x64-lock-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
+                        --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -98,11 +101,14 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/darwin-x64-chip-tool-darwin-${BUILD_VARIANT}/chip-tool-darwin \
-                     --target-skip-glob '{TestGroupMessaging,TV_*}' \
+                     --target-skip-glob '{TestGroupMessaging}' \
                      run \
                      --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2

@@ -34,10 +34,10 @@ id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
     return nil;
 }
 
-void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
+BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
 {
     CFPreferencesSetAppValue((CFStringRef) key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef) domain);
-    CFPreferencesAppSynchronize((CFStringRef) domain);
+    return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
 }
 
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
@@ -87,9 +87,8 @@ CHIPDeviceController * InitializeCHIP(void)
             return;
         }
 
-        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys ipk:keys.ipk];
-        params.vendorId = kTestVendorId;
-        params.fabricId = 1;
+        __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
+        params.vendorId = @(kTestVendorId);
 
         // We're not sure whether we have a fabric configured already; try as if
         // we did, and if not fall back to creating a new one.
@@ -114,9 +113,7 @@ CHIPDeviceController * CHIPRestartController(CHIPDeviceController * controller)
     [controller shutdown];
 
     NSLog(@"Starting up the stack");
-    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithKeypair:keys ipk:keys.ipk];
-    params.vendorId = kTestVendorId;
-    params.fabricId = 1;
+    __auto_type * params = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:keys fabricId:1 ipk:keys.ipk];
 
     sController = [[MatterControllerFactory sharedInstance] startControllerOnExistingFabric:params];
 
@@ -212,21 +209,25 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 
 // MARK: CHIPPersistentStorageDelegate
 
-- (NSString *)CHIPGetKeyValue:(NSString *)key
+- (nullable NSData *)storageDataForKey:(NSString *)key
 {
-    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    NSData * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
-    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    return CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
 }
 
-- (void)CHIPDeleteKeyValue:(NSString *)key
+- (BOOL)removeStorageDataForKey:(NSString *)key
 {
+    if (CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key) == nil) {
+        return NO;
+    }
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    return YES;
 }
 
 @end

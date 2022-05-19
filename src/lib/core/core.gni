@@ -64,6 +64,9 @@ declare_args() {
   # of tracking information for operational advertisement.
   chip_config_minmdns_dynamic_operational_responder_list =
       current_os == "linux" || current_os == "android" || current_os == "darwin"
+
+  # When using minmdns, set the number of parallel resolves
+  chip_config_minmdns_max_parallel_resolves = 2
 }
 
 if (chip_target_style == "") {

@@ -51,10 +51,16 @@ public:
     void Release();
 
     operator bool() const { return mSession.HasValue(); }
-    SessionHandle Get() const { return SessionHandle{ mSession.Value().Get() }; }
-    Optional<SessionHandle> ToOptional() const
+    Optional<SessionHandle> Get() const
     {
-        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(Get()) : chip::Optional<SessionHandle>::Missing();
+        //
+        // We cannot return mSession directly even if Optional<SessionHandle> is internally composed of the same bits,
+        // since they are not actually equivalent type-wise, and SessionHandle does not permit copy-construction.
+        //
+        // So, construct a new Optional<SessionHandle> from the underlying Transport::Session reference.
+        //
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
+                                   : chip::Optional<SessionHandle>::Missing();
     }
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }

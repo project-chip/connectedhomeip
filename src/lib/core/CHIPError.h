@@ -1448,13 +1448,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR               CHIP_CORE_ERROR(0x70)
 
 /**
- *  @def CHIP_ERROR_INVALID_FABRIC_ID
+ *  @def CHIP_ERROR_INVALID_FABRIC_INDEX
  *
  *  @brief
- *    A fabric id is invalid.
+ *    A fabric index is invalid.
  *
  */
-#define CHIP_ERROR_INVALID_FABRIC_ID                           CHIP_CORE_ERROR(0x71)
+#define CHIP_ERROR_INVALID_FABRIC_INDEX                        CHIP_CORE_ERROR(0x71)
 
 /**
  *  @def CHIP_ERROR_TOO_MANY_CONNECTIONS
@@ -1500,7 +1500,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_TAG_NOT_FOUND                           CHIP_CORE_ERROR(0x76)
 
-// unused CHIP_CORE_ERROR(0x77)
+/**
+ * @def CHIP_ERROR_MISSING_SECURE_SESSION
+ *
+ * @brief
+ *
+ *  A secure session is needed to do work, but is missing/is not present.
+ */
+#define CHIP_ERROR_MISSING_SECURE_SESSION                      CHIP_CORE_ERROR(0x77)
 
 // unused CHIP_CORE_ERROR(0x78)
 
@@ -2387,10 +2394,6 @@ using CHIP_ERROR = ::chip::ChipError;
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_STATUS_RESPONSE_MESSAGE      CHIP_CORE_ERROR(0xe1)
-
-/**
- *  @}
- */
 
 // clang-format on
 

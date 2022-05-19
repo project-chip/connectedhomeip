@@ -52,7 +52,6 @@ static_library("chip-tool-utils") {
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
     "commands/common/Command.cpp",
-    "commands/common/CommandInvoker.h",
     "commands/common/Commands.cpp",
     "commands/common/CredentialIssuerCommands.h",
     "commands/discover/DiscoverCommand.cpp",
@@ -69,6 +68,7 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
+    "commands/storage/StorageManagementCommand.cpp",
     "config/PersistentStorage.cpp",
   ]
 

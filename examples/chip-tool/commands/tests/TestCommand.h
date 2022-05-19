@@ -29,7 +29,6 @@
 #include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
-#include <zap-generated/tests/simulated-cluster-objects.h>
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
@@ -93,7 +92,7 @@ protected:
 
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<uint16_t> mTimeout;
-    std::map<std::string, ChipDevice *> mDevices;
+    std::map<std::string, chip::DeviceProxy *> mDevices;
 
     // When set to false, prevents interaction model events from affecting the current test status.
     // This flag exists because if an error happens while processing a response the allocated

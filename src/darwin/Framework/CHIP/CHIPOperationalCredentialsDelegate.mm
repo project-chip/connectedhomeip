@@ -24,6 +24,8 @@
 #include <Security/SecKey.h>
 
 #import "CHIPLogging.h"
+#import "MTRCertificates.h"
+#import "NSDataSpanConversion.h"
 
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -33,17 +35,15 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/TimeUtils.h>
 
-constexpr const char kOperationalCredentialsRootCertificateStorage[] = "MatterCARootCert";
-
 using namespace chip;
 using namespace TLV;
 using namespace Credentials;
 using namespace Crypto;
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
-    CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner, NSData * ipk)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::Init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner,
+    NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
 {
-    if (storage == nil || nocSigner == nullptr || ipk == nil) {
+    if (storage == nil || ipk == nil || rootCert == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -57,15 +57,38 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(
     }
     memcpy(mIPK.Bytes(), [ipk bytes], [ipk length]);
 
+    // Make copies of the certificates, just in case the API consumer
+    // has them as MutableData.
+    mRootCert = [NSData dataWithData:rootCert];
+    if (mRootCert == nil) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (icaCert != nil) {
+        mIntermediateCert = [NSData dataWithData:icaCert];
+        if (mIntermediateCert == nil) {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
-    const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac,
-    MutableByteSpan & noc)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(
+    NodeId nodeId, FabricId fabricId, const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & noc)
+{
+    if (!mIssuerKey) {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return GenerateNOC(
+        *mIssuerKey, (mIntermediateCert != nil) ? mIntermediateCert : mRootCert, nodeId, fabricId, cats, pubkey, noc);
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(P256Keypair & signingKeypair, NSData * signingCertificate, NodeId nodeId,
+    FabricId fabricId, const CATValues & cats, const P256PublicKey & pubkey, MutableByteSpan & noc)
 {
     uint32_t validityStart, validityEnd;
-    bool haveRootCert = false;
 
     if (!ToChipEpochTime(0, validityStart)) {
         NSLog(@"Failed in computing certificate validity start date");
@@ -77,38 +100,16 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         return CHIP_ERROR_INTERNAL;
     }
 
-    ChipDN rcac_dn;
-    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-        haveRootCert = (mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen) == CHIP_NO_ERROR));
-    if (haveRootCert) {
-        uint64_t rcacId;
-        rcac.reduce_size(rcacBufLen);
-        ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
-        ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
-        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
-    } else {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabricId));
-
-        NSLog(@"Generating RCAC");
-        X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
-        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, *mIssuerKey, rcac));
-
-        VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-            ReturnErrorOnFailure(mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size()))));
-    }
-
-    icac.reduce_size(0);
+    ChipDN signerSubject;
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(AsByteSpan(signingCertificate), signerSubject));
 
     ChipDN noc_dn;
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterNodeId(nodeId));
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
-    X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, rcac_dn };
-    return NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc);
+    X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, signerSubject };
+    return NewNodeOperationalX509Cert(noc_request, pubkey, signingKeypair, noc);
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
@@ -149,16 +150,23 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
     NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
     MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
 
-    NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
-    MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+    ReturnErrorOnFailure(GenerateNOC(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, noc));
 
-    MutableByteSpan icac;
-
-    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, chip::kUndefinedCATs, pubkey, rcac, icac, noc));
-
-    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac, MakeOptional(GetIPK()), Optional<NodeId>());
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, IntermediateCertSpan(), RootCertSpan(), MakeOptional(GetIPK()),
+        Optional<NodeId>());
 
     return CHIP_NO_ERROR;
+}
+
+ByteSpan CHIPOperationalCredentialsDelegate::RootCertSpan() const { return AsByteSpan(mRootCert); }
+
+ByteSpan CHIPOperationalCredentialsDelegate::IntermediateCertSpan() const
+{
+    if (mIntermediateCert == nil) {
+        return ByteSpan();
+    }
+
+    return AsByteSpan(mIntermediateCert);
 }
 
 bool CHIPOperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32_t & epoch)
@@ -176,4 +184,147 @@ bool CHIPOperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32
     uint8_t minute = static_cast<uint8_t>([components minute]);
     uint8_t second = static_cast<uint8_t>([components second]);
     return chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, epoch);
+}
+
+namespace {
+uint64_t GetIssuerId(NSNumber * _Nullable providedIssuerId)
+{
+    if (providedIssuerId != nil) {
+        return [providedIssuerId unsignedLongLongValue];
+    }
+
+    return (uint64_t(arc4random()) << 32) | arc4random();
+}
+} // anonymous namespace
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertificate(id<CHIPKeypair> keypair, NSNumber * _Nullable issuerId,
+    NSNumber * _Nullable fabricId, NSData * _Nullable __autoreleasing * _Nonnull rootCert)
+{
+    *rootCert = nil;
+    CHIPP256KeypairBridge keypairBridge;
+    ReturnErrorOnFailure(keypairBridge.Init(keypair));
+    CHIPP256KeypairNativeBridge nativeKeypair(keypairBridge);
+
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(GetIssuerId(issuerId)));
+
+    if (fabricId != nil) {
+        FabricId fabric = [fabricId unsignedLongLongValue];
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabric));
+    }
+
+    uint32_t validityStart, validityEnd;
+
+    if (!ToChipEpochTime(0, validityStart)) {
+        NSLog(@"Failed in computing certificate validity start date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (!ToChipEpochTime(kCertificateValiditySecs, validityEnd)) {
+        NSLog(@"Failed in computing certificate validity end date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint8_t rcacBuffer[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan rcac(rcacBuffer);
+    X509CertRequestParams rcac_request = { 0, validityStart, validityEnd, rcac_dn, rcac_dn };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, nativeKeypair, rcac));
+    *rootCert = AsData(rcac);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(id<CHIPKeypair> rootKeypair,
+    NSData * rootCertificate, SecKeyRef intermediatePublicKey, NSNumber * _Nullable issuerId, NSNumber * _Nullable fabricId,
+    NSData * _Nullable __autoreleasing * _Nonnull intermediateCert)
+{
+    *intermediateCert = nil;
+
+    // Verify that the provided root certificate public key matches the root keypair.
+    if ([MTRCertificates keypair:rootKeypair matchesCertificate:rootCertificate] == NO) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIPP256KeypairBridge keypairBridge;
+    ReturnErrorOnFailure(keypairBridge.Init(rootKeypair));
+    CHIPP256KeypairNativeBridge nativeRootKeypair(keypairBridge);
+
+    ByteSpan rcac = AsByteSpan(rootCertificate);
+
+    P256PublicKey pubKey;
+    ReturnErrorOnFailure(CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(intermediatePublicKey, &pubKey));
+
+    ChipDN rcac_dn;
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
+
+    ChipDN icac_dn;
+    ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(GetIssuerId(issuerId)));
+    if (fabricId != nil) {
+        FabricId fabric = [fabricId unsignedLongLongValue];
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId(fabric));
+    }
+
+    uint32_t validityStart, validityEnd;
+
+    if (!ToChipEpochTime(0, validityStart)) {
+        NSLog(@"Failed in computing certificate validity start date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (!ToChipEpochTime(kCertificateValiditySecs, validityEnd)) {
+        NSLog(@"Failed in computing certificate validity end date");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint8_t icacBuffer[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan icac(icacBuffer);
+    X509CertRequestParams icac_request = { 0, validityStart, validityEnd, icac_dn, rcac_dn };
+    ReturnErrorOnFailure(NewICAX509Cert(icac_request, pubKey, nativeRootKeypair, icac));
+    *intermediateCert = AsData(icac);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateOperationalCertificate(id<CHIPKeypair> signingKeypair,
+    NSData * signingCertificate, SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
+    NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert)
+{
+    *operationalCert = nil;
+
+    // Verify that the provided signing certificate public key matches the signing keypair.
+    if ([MTRCertificates keypair:signingKeypair matchesCertificate:signingCertificate] == NO) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if ([caseAuthenticatedTags count] > kMaxSubjectCATAttributeCount) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    FabricId fabric = [fabricId unsignedLongLongValue];
+    VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+
+    NodeId node = [nodeId unsignedLongLongValue];
+    VerifyOrReturnError(IsOperationalNodeId(node), CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIPP256KeypairBridge keypairBridge;
+    ReturnErrorOnFailure(keypairBridge.Init(signingKeypair));
+    CHIPP256KeypairNativeBridge nativeSigningKeypair(keypairBridge);
+
+    P256PublicKey pubKey;
+    ReturnErrorOnFailure(CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(operationalPublicKey, &pubKey));
+
+    CATValues cats;
+    if (caseAuthenticatedTags != nil) {
+        size_t idx = 0;
+        for (NSNumber * cat in caseAuthenticatedTags) {
+            cats.values[idx++] = [cat unsignedIntValue];
+        }
+    }
+
+    uint8_t nocBuffer[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan noc(nocBuffer);
+    ReturnErrorOnFailure(GenerateNOC(nativeSigningKeypair, signingCertificate, node, fabric, cats, pubKey, noc));
+
+    *operationalCert = AsData(noc);
+    return CHIP_NO_ERROR;
 }

@@ -226,6 +226,7 @@ int TestSetup(void * inContext)
 
 int TestTeardown(void * inContext)
 {
+    DiscoveryImplPlatform::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

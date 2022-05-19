@@ -30,11 +30,12 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.IsValid())
+        if (!discoveredNode.resolutionData.IsValid())
         {
             continue;
         }
-        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0 && discoveredNode.port == nodeData.port)
+        if (strcmp(discoveredNode.resolutionData.hostName, nodeData.resolutionData.hostName) == 0 &&
+            discoveredNode.resolutionData.port == nodeData.resolutionData.port)
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -47,7 +48,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
     // Node not yet in the list
     for (auto & discoveredNode : discoveredNodes)
     {
-        if (!discoveredNode.IsValid())
+        if (!discoveredNode.resolutionData.IsValid())
         {
             discoveredNode = nodeData;
             if (mDeviceDiscoveryDelegate != nullptr)
@@ -57,7 +58,7 @@ void AbstractDnssdDiscoveryController::OnNodeDiscovered(const chip::Dnssd::Disco
             return;
         }
     }
-    ChipLogError(Discovery, "Failed to add discovered node with hostname %s- Insufficient space", nodeData.hostName);
+    ChipLogError(Discovery, "Failed to add discovered node with hostname %s- Insufficient space", nodeData.resolutionData.hostName);
 }
 
 CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
@@ -74,7 +75,7 @@ const Dnssd::DiscoveredNodeData * AbstractDnssdDiscoveryController::GetDiscovere
 {
     // TODO(cecille): Add assertion about main loop.
     auto discoveredNodes = GetDiscoveredNodes();
-    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].IsValid())
+    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].resolutionData.IsValid())
     {
         return discoveredNodes.data() + idx;
     }

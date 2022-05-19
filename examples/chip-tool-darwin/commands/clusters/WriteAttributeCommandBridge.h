@@ -47,6 +47,7 @@ public:
     WriteAttribute(const char * _Nonnull attributeName)
         : ModelCommand("write")
     {
+        AddArgument("data-version", 0, UINT32_MAX, &mDataVersion);
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
@@ -88,22 +89,22 @@ public:
                            : nil
                              clientQueue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  CHIP_ERROR chipError = [CHIPError errorToCHIPErrorCode:error];
-                                  if (chipError != CHIP_NO_ERROR) {
-                                      ChipLogError(chipTool, "Error: %s", chip::ErrorStr(chipError));
+                                  if (error != nil) {
+                                      LogNSError("Error writing attribute", error);
                                   }
                                   if (values) {
                                       for (id item in values) {
                                           NSLog(@"Response Item: %@", [item description]);
                                       }
                                   }
-                                  SetCommandExitStatus(chipError);
+                                  SetCommandExitStatus(error);
                               }];
         return CHIP_NO_ERROR;
     }
 
 protected:
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<uint32_t> mDataVersion;
 
 private:
     chip::ClusterId mClusterId;

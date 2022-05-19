@@ -31,12 +31,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.64
+            image: connectedhomeip/chip-build:0.5.73
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -66,7 +66,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-all-clusters-no-ble-libfuzzer-test-group \
+                        --target linux-x64-all-clusters-no-ble-libfuzzer \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -86,7 +86,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.11
+            - uses: Wandalen/wretry.action@v1.0.15
               name: Checkout
               with:
                   action: actions/checkout@v3

@@ -428,6 +428,7 @@ dropdown
 dryrun
 DS
 duplicative
+DUT
 DV
 dynload
 eabi
@@ -985,6 +986,7 @@ PlatformManagerImpl
 plt
 png
 PollControl
+pollInterval
 polymorphism
 POSIX
 PosixConfig
@@ -1271,6 +1273,7 @@ timedInteractionTimeoutMs
 TimeFormatLocalization
 timeoutMs
 TimeSynchronization
+Tizen
 TKIP
 tlsr
 TLV
@@ -1287,6 +1290,7 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
+TPK
 trackAlloc
 trackFree
 TransferSession

@@ -1,1 +1,1 @@
-0.5.72 Version bump reason: [Ameba] Migrate mbedtls cmake file to Matter SDK
+0.5.75 Version bump reason: Update curl version from 7.68.0-1ubuntu2.10 to 7.68.0-1ubuntu2.11

@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol CHIPPersistentStorageDelegate;
 @protocol CHIPKeypair;
 @class CHIPDeviceController;
+@class CHIPDeviceControllerStartupParams;
 
 @interface MatterControllerFactoryParams : NSObject
 /*
@@ -59,34 +60,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithStorage:(id<CHIPPersistentStorageDelegate>)storageDelegate;
-@end
-
-@interface CHIPDeviceControllerStartupParams : NSObject
-/*
- * Vendor ID (allocated by the Connectivity Standards Alliance) for
- * this controller.  Must be set by consumer.
- */
-@property (nonatomic) uint16_t vendorId;
-/*
- * Root CA keypair that scopes (via its public key) the fabric id.  To use
- * startControllerOnExistingFabric successfully, both the public key of
- * rootCAKeypair and the fabricId must match an existing fabric.
- */
-@property (strong, nonatomic) id<CHIPKeypair> rootCAKeypair;
-/*
- * Fabric id for the controller.  Must be set to a nonzero value.
- */
-@property (nonatomic) uint64_t fabricId;
-/*
- * IPK to use for the controller's fabric.  Allowed to change from the last time
- * a controller was started on this fabric if a new IPK has been distributed to
- * all the devices the controller wants to interact with.
- */
-@property (strong, nonatomic) NSData * ipk;
-
-- (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithKeypair:(id<CHIPKeypair>)rootCAKeypair ipk:(NSData *)ipk;
-
 @end
 
 @interface MatterControllerFactory : NSObject

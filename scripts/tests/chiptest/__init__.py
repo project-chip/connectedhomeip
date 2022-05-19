@@ -34,6 +34,8 @@ def AllTests(chip_tool: str):
             target = TestTarget.TV
         elif name.startswith('DL_'):
             target = TestTarget.LOCK
+        elif name.startswith('OTA_'):
+            target = TestTarget.OTA
         else:
             target = TestTarget.ALL_CLUSTERS
 

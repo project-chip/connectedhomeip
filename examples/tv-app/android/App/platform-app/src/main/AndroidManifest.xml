@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.matter.tv.server">
+
+    <!-- Permission to bind to Matter Agent service from Matter content apps-->
+    <permission android:name="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION"
+        android:protectionLevel="normal" />
 
     <!-- Permission for Matter Agent to send Matter commands -->
     <permission
-        android:name="com.matter.app_agent_api.permission.SEND_DATA"
+        android:name="com.matter.tv.app.api.permission.SEND_DATA"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.matter.app_agent_api.permission.SEND_DATA" />
+    <uses-permission android:name="com.matter.tv.app.api.permission.SEND_DATA" />
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -18,6 +23,8 @@
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:allowBackup="true"
@@ -39,17 +46,16 @@
         </activity>
 
         <service android:name="com.matter.tv.server.service.MatterServantService" />
-
-        <receiver
-            android:name="com.matter.tv.server.receivers.ContentAppDiscoveryService"
+        <service
+            android:name="com.matter.tv.server.service.ContentAppAgentService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION">
+
             <intent-filter>
-                <data android:scheme="package" />
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <action android:name="com.matter.tv.app.api.action.MatterAppAgent" />
             </intent-filter>
-        </receiver>
+        </service>
 
     </application>
 

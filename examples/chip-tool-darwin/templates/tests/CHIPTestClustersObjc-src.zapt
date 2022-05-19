@@ -1,14 +1,11 @@
-{{#if (chip_has_client_clusters)}}
 {{> header}}
 #import <Foundation/Foundation.h>
-#import <CHIP/CHIPError_Internal.h>
 
-#import "CHIPCallbackBridge_internal.h"
-#import "CHIPCluster_internal.h"
-#import "CHIPDevice.h"
-#import "CHIPDevice_Internal.h"
+#import "CHIP/CHIP.h"
 
-#import "zap-generated/tests/CHIPClustersTest.h"
+#import "CHIPCallbackBridge_internal.h" // For CHIPDefaultSuccessCallbackBridge, etc
+#import "CHIPCluster_internal.h" // For self.callbackQueue
+
 #import "zap-generated/cluster/CHIPTestClustersObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -18,10 +15,10 @@ using chip::Callback::Callback;
 using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 
-{{#chip_client_clusters}}
+{{#chip_client_clusters includeAll=true}}
 
 @interface CHIPTest{{asUpperCamelCase name}} ()
-@property (readonly) chip::Controller::{{asUpperCamelCase name}}ClusterTest cppCluster;
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
 @implementation CHIPTest{{asUpperCamelCase name}}
@@ -61,4 +58,3 @@ using namespace chip::app::Clusters;
 @end
 
 {{/chip_client_clusters}}
-{{/if}}

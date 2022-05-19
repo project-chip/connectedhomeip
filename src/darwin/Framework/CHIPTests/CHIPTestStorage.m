@@ -17,22 +17,25 @@
 #import "CHIPTestStorage.h"
 
 @interface CHIPTestStorage ()
-@property (strong, nonatomic) NSMutableDictionary<NSString *, NSString *> * values;
+@property (strong, nonatomic) NSMutableDictionary<NSString *, NSData *> * values;
 @end
 
 @implementation CHIPTestStorage
 
-- (NSString *)CHIPGetKeyValue:(NSString *)key
+- (nullable NSData *)storageDataForKey:(NSString *)key
 {
     return _values[key];
 }
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
+- (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
     _values[key] = value;
+    return YES;
 }
-- (void)CHIPDeleteKeyValue:(NSString *)key
+- (BOOL)removeStorageDataForKey:(NSString *)key
 {
+    BOOL present = (_values[key] != nil);
     [_values removeObjectForKey:key];
+    return present;
 }
 
 - (instancetype)init

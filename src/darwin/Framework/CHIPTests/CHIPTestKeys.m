@@ -65,11 +65,11 @@
     return self;
 }
 
-- (NSData *)ECDSA_sign_hash:(NSData *)hash
+- (NSData *)ECDSA_sign_message_DER:(NSData *)message
 {
     CFErrorRef error = NULL;
     CFDataRef outData
-        = SecKeyCreateSignature(_privateKey, kSecKeyAlgorithmECDSASignatureRFC4754, (__bridge CFDataRef) hash, &error);
+        = SecKeyCreateSignature(_privateKey, kSecKeyAlgorithmECDSASignatureMessageX962SHA256, (__bridge CFDataRef) message, &error);
 
     if (error != noErr) {
         NSLog(@"Failed to sign cert: %@", (__bridge NSError *) error);

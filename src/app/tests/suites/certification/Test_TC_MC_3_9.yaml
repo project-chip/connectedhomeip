@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 21.5.2. [TC-MC-3.9] Select Input Verification
+name: 18.4.5. [TC-MC-3.9] Hide Application Verification
 
 config:
     nodeId: 0x12344321
-    cluster: "Media Input"
+    cluster: "Application Launcher"
     endpoint: 1
 
 tests:
@@ -28,18 +28,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # Remove disable flag when SDK supports command.
-    - label: "Select Input Command"
-      disabled: true
-      command: "SelectInput"
+    #Issue 17968
+    - label: "TH sends HideApp command to DUT"
+      PICS: PICS_SKIP_SAMPLE_APP
+      command: "HideApp"
       arguments:
           values:
-              - name: "index"
-                value: 1
-    # Remove disable flag when SDK supports attribute.
-    - label: "Read current input list"
-      disabled: true
+              - name: "application"
+                value: { catalogVendorId: 1234, applicationId: "HelloWorldApp" }
+
+    - label: "Reads the Status attribute"
+      PICS: PICS_SKIP_SAMPLE_APP
+      cluster: "Application Basic"
       command: "readAttribute"
-      attribute: "CurrentInput"
+      attribute: "Status"
       response:
-          value: 1
+          value: 0

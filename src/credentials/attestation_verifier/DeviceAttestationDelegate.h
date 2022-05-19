@@ -39,7 +39,7 @@ public:
 
     /**
      * @brief
-     *   If valid, value to set for the fail-safe timer before the delegate's OnDeviceAttestionFailed is invoked.
+     *   If valid, value to set for the fail-safe timer before the delegate's OnDeviceAttestationFailed is invoked.
      *
      * @return Optional value for the fail-safe timer in seconds.
      */

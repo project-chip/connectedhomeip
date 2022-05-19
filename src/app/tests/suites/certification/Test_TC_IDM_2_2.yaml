@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 19.2.2. [TC-IDM-2.2] Report Data Action from DUT to TH [DUT - Controller]
+name: 19.2.2. [TC-IDM-2.2] Report Data Action from DUT to TH
 
 config:
     nodeId: 0x12344321
@@ -27,9 +27,42 @@ tests:
           CommandDataIB, which has the specific Endpoint, Specific Cluster and
           Specific Attribute. On receipt of this message, DUT should send a
           report data action with the attribute value to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool identify read identify-time 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+          '' ./chip-tool identify read identify-time 1 1
+
+
+
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
+
+          [1650358005665] [85455:1222335] CHIP: [DMG] ReportDataMessage =
+          [1650358005665] [85455:1222335] CHIP: [DMG] {
+          [1650358005665] [85455:1222335] CHIP: [DMG]         AttributeReportIBs =
+          [1650358005665] [85455:1222335] CHIP: [DMG]         [
+          [1650358005665] [85455:1222335] CHIP: [DMG]                 AttributeReportIB =
+          [1650358005665] [85455:1222335] CHIP: [DMG]                 {
+          [1650358005665] [85455:1222335] CHIP: [DMG]                         AttributeDataIB =
+          [1650358005665] [85455:1222335] CHIP: [DMG]                         {
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                 DataVersion = 0x1f79ca06,
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                 AttributePathIB =
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                 {
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                         Cluster = 0x3,
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                         Attribute = 0x0000_0000,
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                 }
+          [1650358005665] [85455:1222335] CHIP: [DMG]
+          [1650358005665] [85455:1222335] CHIP: [DMG]                                         Data = 0,
+          [1650358005665] [85455:1222335] CHIP: [DMG]                         },
+          [1650358005665] [85455:1222335] CHIP: [DMG]
+          [1650358005665] [85455:1222335] CHIP: [DMG]                 },
+          [1650358005665] [85455:1222335] CHIP: [DMG]
+          [1650358005665] [85455:1222335] CHIP: [DMG]         ],
+          [1650358005665] [85455:1222335] CHIP: [DMG]
+          [1650358005665] [85455:1222335] CHIP: [DMG]         SuppressResponse = true,
+          [1650358005665] [85455:1222335] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650358005665] [85455:1222335] CHIP: [DMG] }
+          [1650358005665] [85455:1222335] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 528075270
+          [1650358005665] [85455:1222335] CHIP: [TOO]   identify time: 0
       disabled: true
 
     - label:
@@ -38,9 +71,35 @@ tests:
           [[Endpoint = Endpoint1, Cluster = ClusterID]] On receipt of this
           message, DUT should send a report data action with the attribute value
           to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
+
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
+
+          [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3061827023
+          [1650358167494] [85475:1223021] CHIP: [TOO]   identify time: 0
+          [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3061827023
+          [1650358167494] [85475:1223021] CHIP: [TOO]   identify type: 2
+          [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3061827023
+          [1650358167494] [85475:1223021] CHIP: [TOO]   ClusterRevision: 4
+          [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3061827023
+          [1650358167494] [85475:1223021] CHIP: [TOO]   GeneratedCommandList: 1 entries
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [1]: 0
+          [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3061827023
+          [1650358167494] [85475:1223021] CHIP: [TOO]   AcceptedCommandList: 3 entries
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [1]: 0
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [2]: 1
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [3]: 64
+          [1650358167494] [85475:1223021] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3061827023
+          [1650358167494] [85475:1223021] CHIP: [TOO]   AttributeList: 6 entries
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [1]: 0
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [2]: 1
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [3]: 65528
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [4]: 65529
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [5]: 65531
+          [1650358167494] [85475:1223021] CHIP: [TOO]     [6]: 65533
       disabled: true
 
     - label:
@@ -49,9 +108,12 @@ tests:
           = ClusterID, Attribute = AttributeID]] On receipt of this message, DUT
           should send a report data action with the attribute value from all the
           Endpoints to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use ./chip-tool
-          any read-by-id 0x03 1 1 0xffff"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          ./chip-tool any read-by-id 0x03 1 1 0xffff
+
+          TH side---Verify we are getting all supported right attribute value on TH when we sent  above command
       disabled: true
 
     - label:
@@ -60,9 +122,12 @@ tests:
           [[Endpoint = Endpoint1, Attribute = AttributeID]] On receipt of this
           message, DUT should send a report data action with the attribute value
           from all the clusters to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0xFFFFFFFF 0 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+           '' ./chip-tool any read-by-id 0xFFFFFFFF 0 1 1
+
+          TH side---Verify we are getting all supported right attribute value on TH when we sent  above command
       disabled: true
 
     - label:
@@ -70,155 +135,602 @@ tests:
           all attributes from all clusters AttributePath = [[]] On receipt of
           this message, DUT should send a report data action with the attribute
           value from all the clusters to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+
+          TH side---Verify we are getting all supported right attribute value on TH when we sent  above command
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type bool. DUT responds with the report data action
           with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool onoff read on-off 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool onoff read on-off 1 1
+
+          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.
+
+          [1650360287270] [85704:1230840] CHIP: [DMG] ReportDataMessage =
+          [1650360287270] [85704:1230840] CHIP: [DMG] {
+          [1650360287270] [85704:1230840] CHIP: [DMG]         AttributeReportIBs =
+          [1650360287270] [85704:1230840] CHIP: [DMG]         [
+          [1650360287270] [85704:1230840] CHIP: [DMG]                 AttributeReportIB =
+          [1650360287270] [85704:1230840] CHIP: [DMG]                 {
+          [1650360287270] [85704:1230840] CHIP: [DMG]                         AttributeDataIB =
+          [1650360287270] [85704:1230840] CHIP: [DMG]                         {
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                 DataVersion = 0xdc20dc44,
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                 AttributePathIB =
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                 {
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                         Cluster = 0x6,
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                         Attribute = 0x0000_0000,
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                 }
+          [1650360287270] [85704:1230840] CHIP: [DMG]
+          [1650360287270] [85704:1230840] CHIP: [DMG]                                         Data = false,
+          [1650360287270] [85704:1230840] CHIP: [DMG]                         },
+          [1650360287270] [85704:1230840] CHIP: [DMG]
+          [1650360287270] [85704:1230840] CHIP: [DMG]                 },
+          [1650360287270] [85704:1230840] CHIP: [DMG]
+          [1650360287270] [85704:1230840] CHIP: [DMG]         ],
+          [1650360287270] [85704:1230840] CHIP: [DMG]
+          [1650360287270] [85704:1230840] CHIP: [DMG]         SuppressResponse = true,
+          [1650360287270] [85704:1230840] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650360287270] [85704:1230840] CHIP: [DMG] }
+          [1650360287270] [85704:1230840] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3693141060
+          [1650360287270] [85704:1230840] CHIP: [TOO]   OnOff: FALSE
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type string. DUT responds with the report data
           action with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool modeselect read description 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool modeselect read description  1 1
+
+          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.
+
+          [1650360466457] [85724:1231451] CHIP: [DMG] ReportDataMessage =
+          [1650360466457] [85724:1231451] CHIP: [DMG] {
+          [1650360466457] [85724:1231451] CHIP: [DMG]         AttributeReportIBs =
+          [1650360466457] [85724:1231451] CHIP: [DMG]         [
+          [1650360466457] [85724:1231451] CHIP: [DMG]                 AttributeReportIB =
+          [1650360466457] [85724:1231451] CHIP: [DMG]                 {
+          [1650360466457] [85724:1231451] CHIP: [DMG]                         AttributeDataIB =
+          [1650360466457] [85724:1231451] CHIP: [DMG]                         {
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                 DataVersion = 0xfc73c079,
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                 AttributePathIB =
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                 {
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                         Cluster = 0x50,
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                         Attribute = 0x0000_0000,
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                 }
+          [1650360466457] [85724:1231451] CHIP: [DMG]
+          [1650360466457] [85724:1231451] CHIP: [DMG]                                         Data = "Coffee",
+          [1650360466457] [85724:1231451] CHIP: [DMG]                         },
+          [1650360466457] [85724:1231451] CHIP: [DMG]
+          [1650360466457] [85724:1231451] CHIP: [DMG]                 },
+          [1650360466457] [85724:1231451] CHIP: [DMG]
+          [1650360466457] [85724:1231451] CHIP: [DMG]         ],
+          [1650360466457] [85724:1231451] CHIP: [DMG]
+          [1650360466457] [85724:1231451] CHIP: [DMG]         SuppressResponse = true,
+          [1650360466457] [85724:1231451] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650360466457] [85724:1231451] CHIP: [DMG] }
+          [1650360466457] [85724:1231451] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4235444345
+          [1650360466457] [85724:1231451] CHIP: [TOO]   Description: Coffee
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type unsigned integer. DUT responds with the report
           data action with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0x3 0x1 1 0"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any read-by-id 0x3 0x1 1 0
+
+          TH side---Verify we are getting ReportData message path(EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command.
+
+          [1650360573160] [85736:1231972] CHIP: [DMG] ReportDataMessage =
+          [1650360573160] [85736:1231972] CHIP: [DMG] {
+          [1650360573160] [85736:1231972] CHIP: [DMG]         AttributeReportIBs =
+          [1650360573160] [85736:1231972] CHIP: [DMG]         [
+          [1650360573160] [85736:1231972] CHIP: [DMG]                 AttributeReportIB =
+          [1650360573160] [85736:1231972] CHIP: [DMG]                 {
+          [1650360573160] [85736:1231972] CHIP: [DMG]                         AttributeDataIB =
+          [1650360573160] [85736:1231972] CHIP: [DMG]                         {
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                 DataVersion = 0xb67fc5cf,
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                 AttributePathIB =
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                 {
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                         Cluster = 0x3,
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                         Attribute = 0x0000_0001,
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                 }
+          [1650360573160] [85736:1231972] CHIP: [DMG]
+          [1650360573160] [85736:1231972] CHIP: [DMG]                                         Data = 2,
+          [1650360573160] [85736:1231972] CHIP: [DMG]                         },
+          [1650360573160] [85736:1231972] CHIP: [DMG]
+          [1650360573160] [85736:1231972] CHIP: [DMG]                 },
+          [1650360573160] [85736:1231972] CHIP: [DMG]
+          [1650360573160] [85736:1231972] CHIP: [DMG]         ],
+          [1650360573160] [85736:1231972] CHIP: [DMG]
+          [1650360573160] [85736:1231972] CHIP: [DMG]         SuppressResponse = true,
+          [1650360573160] [85736:1231972] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650360573160] [85736:1231972] CHIP: [DMG] }
+          [1650360573160] [85736:1231972] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3061827023
+          [1650360573160] [85736:1231972] CHIP: [TOO]   identify type: 2
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type signed integer. DUT responds with the report
           data action with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool pressuremeasurement read measured-value 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool pressuremeasurement read measured-value 1 1
+
+          Verify we are getting right attribute value on TH when we sent  above command
+
+          [1650360637967] [85753:1232470] CHIP: [DMG] ReportDataMessage =
+          [1650360637967] [85753:1232470] CHIP: [DMG] {
+          [1650360637967] [85753:1232470] CHIP: [DMG]         AttributeReportIBs =
+          [1650360637967] [85753:1232470] CHIP: [DMG]         [
+          [1650360637967] [85753:1232470] CHIP: [DMG]                 AttributeReportIB =
+          [1650360637967] [85753:1232470] CHIP: [DMG]                 {
+          [1650360637967] [85753:1232470] CHIP: [DMG]                         AttributeDataIB =
+          [1650360637967] [85753:1232470] CHIP: [DMG]                         {
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                 DataVersion = 0x560e9d91,
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                 AttributePathIB =
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                 {
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                         Cluster = 0x403,
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                         Attribute = 0x0000_0000,
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                 }
+          [1650360637967] [85753:1232470] CHIP: [DMG]
+          [1650360637967] [85753:1232470] CHIP: [DMG]                                         Data = 0,
+          [1650360637967] [85753:1232470] CHIP: [DMG]                         },
+          [1650360637967] [85753:1232470] CHIP: [DMG]
+          [1650360637967] [85753:1232470] CHIP: [DMG]                 },
+          [1650360637967] [85753:1232470] CHIP: [DMG]
+          [1650360637967] [85753:1232470] CHIP: [DMG]         ],
+          [1650360637967] [85753:1232470] CHIP: [DMG]
+          [1650360637967] [85753:1232470] CHIP: [DMG]         SuppressResponse = true,
+          [1650360637967] [85753:1232470] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650360637967] [85753:1232470] CHIP: [DMG] }
+          [1650360637967] [85753:1232470] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 1443798417
+          [1650360637967] [85753:1232470] CHIP: [TOO]   MeasuredValue: 0
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type floating point. DUT responds with the report
           data action with the right attribute value."
-      verification: "Currently the Spec is not supporting for this data type."
+      verification: |
+          DUT implementation required to verify read an attribute of data type floating point
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type Octet String. DUT responds with the report data
           action with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool operationalcredentials read trusted-root-certificates 1 0"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+
+          TH side--Verify we are getting right attribute value on TH when we sent  above command
+
+          [1650360694433] [85761:1232769] CHIP: [DMG] ReportDataMessage =
+          [1650360694433] [85761:1232769] CHIP: [DMG] {
+          [1650360694433] [85761:1232769] CHIP: [DMG]         AttributeReportIBs =
+          [1650360694433] [85761:1232769] CHIP: [DMG]         [
+          [1650360694433] [85761:1232769] CHIP: [DMG]                 AttributeReportIB =
+          [1650360694433] [85761:1232769] CHIP: [DMG]                 {
+          [1650360694433] [85761:1232769] CHIP: [DMG]                         AttributeDataIB =
+          [1650360694433] [85761:1232769] CHIP: [DMG]                         {
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                 DataVersion = 0xb318d380,
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                 AttributePathIB =
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                 {
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                         Cluster = 0x3e,
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                         Attribute = 0x0000_0004,
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                 }
+          [1650360694433] [85761:1232769] CHIP: [DMG]
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                         Data = [
+          [1650360694433] [85761:1232769] CHIP: [DMG]
+          [1650360694433] [85761:1232769] CHIP: [DMG]                                         ],
+          [1650360694433] [85761:1232769] CHIP: [DMG]                         },
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]                 },
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]                 AttributeReportIB =
+          [1650360694434] [85761:1232769] CHIP: [DMG]                 {
+          [1650360694434] [85761:1232769] CHIP: [DMG]                         AttributeDataIB =
+          [1650360694434] [85761:1232769] CHIP: [DMG]                         {
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                 DataVersion = 0xb318d380,
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                 AttributePathIB =
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                 {
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                         Cluster = 0x3e,
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                         Attribute = 0x0000_0004,
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                         ListIndex = Null,
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                 }
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                         Data = [
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                                 0x15, 0x30, 0x1, 0x1, 0x0, 0x24, 0x2, 0x1, 0x37, 0x3, 0x24, 0x14, 0x0, 0x18, 0x26, 0x4, 0x80, 0x22, 0x81, 0x27, 0x26, 0x5, 0x80, 0x25, 0x4d, 0x3a, 0x37, 0x6, 0x24, 0x14, 0x0, 0x18, 0x24, 0x7, 0x1, 0x24, 0x
+          [1650360694434] [85761:1232769] CHIP: [DMG]                                         ]
+          [1650360694434] [85761:1232769] CHIP: [DMG]                         },
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]                 },
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]         ],
+          [1650360694434] [85761:1232769] CHIP: [DMG]
+          [1650360694434] [85761:1232769] CHIP: [DMG]         SuppressResponse = true,
+          [1650360694434] [85761:1232769] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650360694434] [85761:1232769] CHIP: [DMG] }
+          [1650360694435] [85761:1232769] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 3004748672
+          [1650360694435] [85761:1232769] CHIP: [TOO]   TrustedRootCertificates: 1 entries
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type Struct. DUT responds with the report data
           action with the right attribute value."
-      verification: "Currently the Spec is not supporting for this data type."
+      verification: |
+          DUT implementation required to verify read an attribute of data type struct.
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type List. DUT responds with the report data action
           with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool modeselect read supported-modes 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool modeselect read  supported-modes 1 1
+
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
+
+          [1650362184885] [85960:1238675] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 4235444345
+          [1650362184885] [85960:1238675] CHIP: [TOO]   SupportedModes: 3 entries
+          [1650362184885] [85960:1238675] CHIP: [TOO]     [1]: {
+          [1650362184885] [85960:1238675] CHIP: [TOO]       Label: Black
+          [1650362184885] [85960:1238675] CHIP: [TOO]       Mode: 0
+          [1650362184885] [85960:1238675] CHIP: [TOO]       SemanticTag: 0
+          [1650362184885] [85960:1238675] CHIP: [TOO]      }
+          [1650362184885] [85960:1238675] CHIP: [TOO]     [2]: {
+          [1650362184885] [85960:1238675] CHIP: [TOO]       Label: Cappuccino
+          [1650362184885] [85960:1238675] CHIP: [TOO]       Mode: 4
+          [1650362184885] [85960:1238675] CHIP: [TOO]       SemanticTag: 0
+          [1650362184885] [85960:1238675] CHIP: [TOO]      }
+          [1650362184885] [85960:1238675] CHIP: [TOO]     [3]: {
+          [1650362184885] [85960:1238675] CHIP: [TOO]       Label: Espresso
+          [1650362184885] [85960:1238675] CHIP: [TOO]       Mode: 7
+          [1650362184885] [85960:1238675] CHIP: [TOO]       SemanticTag: 0
+          [1650362184885] [85960:1238675] CHIP: [TOO]      }
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type enum. DUT responds with the report data action
           with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool occupancysensing read occupancy-sensor-type 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
+
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
+
+
+          [1650362650962] [86020:1240713] CHIP: [DMG] ReportDataMessage =
+          [1650362650963] [86020:1240713] CHIP: [DMG] {
+          [1650362650963] [86020:1240713] CHIP: [DMG]         AttributeReportIBs =
+          [1650362650963] [86020:1240713] CHIP: [DMG]         [
+          [1650362650963] [86020:1240713] CHIP: [DMG]                 AttributeReportIB =
+          [1650362650963] [86020:1240713] CHIP: [DMG]                 {
+          [1650362650963] [86020:1240713] CHIP: [DMG]                         AttributeDataIB =
+          [1650362650963] [86020:1240713] CHIP: [DMG]                         {
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                 DataVersion = 0xa301ff86,
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                 AttributePathIB =
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                 {
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                         Cluster = 0x406,
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                         Attribute = 0x0000_0001,
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                 }
+          [1650362650963] [86020:1240713] CHIP: [DMG]
+          [1650362650963] [86020:1240713] CHIP: [DMG]                                         Data = 0,
+          [1650362650963] [86020:1240713] CHIP: [DMG]                         },
+          [1650362650963] [86020:1240713] CHIP: [DMG]
+          [1650362650963] [86020:1240713] CHIP: [DMG]                 },
+          [1650362650963] [86020:1240713] CHIP: [DMG]
+          [1650362650963] [86020:1240713] CHIP: [DMG]         ],
+          [1650362650963] [86020:1240713] CHIP: [DMG]
+          [1650362650963] [86020:1240713] CHIP: [DMG]         SuppressResponse = true,
+          [1650362650963] [86020:1240713] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650362650963] [86020:1240713] CHIP: [DMG] }
+          [1650362650963] [86020:1240713] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 2734817158
+          [1650362650963] [86020:1240713] CHIP: [TOO]   occupancy sensor type: 0
       disabled: true
 
     - label:
           "[Optional] TH sends the Read Request Message to the DUT to read an
           attribute of data type bitmap. DUT responds with the report data
           action with the right attribute value."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool levelcontrol read options 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool levelcontrol read options 1 1
+
+          TH side---Verify we are getting right attribute value on TH when we sent  above command
+
+          [1650362616022] [86014:1240558] CHIP: [DMG] ReportDataMessage =
+          [1650362616022] [86014:1240558] CHIP: [DMG] {
+          [1650362616022] [86014:1240558] CHIP: [DMG]         AttributeReportIBs =
+          [1650362616022] [86014:1240558] CHIP: [DMG]         [
+          [1650362616022] [86014:1240558] CHIP: [DMG]                 AttributeReportIB =
+          [1650362616022] [86014:1240558] CHIP: [DMG]                 {
+          [1650362616022] [86014:1240558] CHIP: [DMG]                         AttributeDataIB =
+          [1650362616022] [86014:1240558] CHIP: [DMG]                         {
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                 DataVersion = 0x3355c36c,
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                 AttributePathIB =
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                 {
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                         Cluster = 0x8,
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                         Attribute = 0x0000_000F,
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                 }
+          [1650362616022] [86014:1240558] CHIP: [DMG]
+          [1650362616022] [86014:1240558] CHIP: [DMG]                                         Data = 0,
+          [1650362616022] [86014:1240558] CHIP: [DMG]                         },
+          [1650362616022] [86014:1240558] CHIP: [DMG]
+          [1650362616022] [86014:1240558] CHIP: [DMG]                 },
+          [1650362616022] [86014:1240558] CHIP: [DMG]
+          [1650362616022] [86014:1240558] CHIP: [DMG]         ],
+          [1650362616022] [86014:1240558] CHIP: [DMG]
+          [1650362616022] [86014:1240558] CHIP: [DMG]         SuppressResponse = true,
+          [1650362616022] [86014:1240558] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650362616022] [86014:1240558] CHIP: [DMG] }
+          [1650362616022] [86014:1240558] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_000F DataVersion: 861258604
+          [1650362616022] [86014:1240558] CHIP: [TOO]   options: 0
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read any attribute to
           an unsupported node. DUT responds with the report data action."
-      verification:
-          "Unsupported for TE8 -
-          https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/4999"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/17500
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read any attribute to
           an unsupported Endpoint. DUT responds with the report data action."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool levelcontrol read-by-id 0 1 4"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool levelcontrol read-by-id 0 1 4
+
+          TH side---Verify we are getting "status = 0x7f (UNSUPPORTED_ENDPOINT)" for above command.
+
+
+          [1650361252618] [85838:1235112] CHIP: [DMG] ReportDataMessage =
+          [1650361252618] [85838:1235112] CHIP: [DMG] {
+          [1650361252618] [85838:1235112] CHIP: [DMG]         AttributeReportIBs =
+          [1650361252618] [85838:1235112] CHIP: [DMG]         [
+          [1650361252618] [85838:1235112] CHIP: [DMG]                 AttributeReportIB =
+          [1650361252618] [85838:1235112] CHIP: [DMG]                 {
+          [1650361252618] [85838:1235112] CHIP: [DMG]                         AttributeStatusIB =
+          [1650361252618] [85838:1235112] CHIP: [DMG]                         {
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                 AttributePathIB =
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                 {
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                         Endpoint = 0x4,
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                         Cluster = 0x8,
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                         Attribute = 0x0000_0000,
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                 }
+          [1650361252618] [85838:1235112] CHIP: [DMG]
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                 StatusIB =
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                 {
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                         status = 0x7f (UNSUPPORTED_ENDPOINT),
+          [1650361252618] [85838:1235112] CHIP: [DMG]                                 },
+          [1650361252618] [85838:1235112] CHIP: [DMG]
+          [1650361252618] [85838:1235112] CHIP: [DMG]                         },
+          [1650361252618] [85838:1235112] CHIP: [DMG]
+          [1650361252618] [85838:1235112] CHIP: [DMG]                 },
+          [1650361252618] [85838:1235112] CHIP: [DMG]
+          [1650361252618] [85838:1235112] CHIP: [DMG]         ],
+          [1650361252618] [85838:1235112] CHIP: [DMG]
+          [1650361252618] [85838:1235112] CHIP: [DMG]         SuppressResponse = true,
+          [1650361252618] [85838:1235112] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650361252618] [85838:1235112] CHIP: [DMG] }
+          [1650361252618] [85838:1235112] CHIP: [TOO] Response Failure: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read any attribute to
           an unsupported cluster. DUT responds with the report data action."
-      verification:
-          "In case of chip tool, here is an example command to use ./chip-tool
-          any command-by-id 0x0003 0 1 1 2"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          ./chip-tool any command-by-id 0x0003 0 1 1 2
+
+          TH side---Verify we are getting "  status = 0xc3 (UNSUPPORTED_CLUSTER)"  for above command.
+
+          [1650361310127] [85846:1235360] CHIP: [DMG] InvokeResponseMessage =
+          [1650361310127] [85846:1235360] CHIP: [DMG] {
+          [1650361310127] [85846:1235360] CHIP: [DMG]         suppressResponse = false,
+          [1650361310127] [85846:1235360] CHIP: [DMG]         InvokeResponseIBs =
+          [1650361310127] [85846:1235360] CHIP: [DMG]         [
+          [1650361310127] [85846:1235360] CHIP: [DMG]                 InvokeResponseIB =
+          [1650361310127] [85846:1235360] CHIP: [DMG]                 {
+          [1650361310127] [85846:1235360] CHIP: [DMG]                         CommandStatusIB =
+          [1650361310127] [85846:1235360] CHIP: [DMG]                         {
+          [1650361310127] [85846:1235360] CHIP: [DMG]                                 CommandPathIB =
+          [1650361310127] [85846:1235360] CHIP: [DMG]                                 {
+          [1650361310127] [85846:1235360] CHIP: [DMG]                                         EndpointId = 0x2,
+          [1650361310127] [85846:1235360] CHIP: [DMG]                                         ClusterId = 0x3,
+          [1650361310128] [85846:1235360] CHIP: [DMG]                                         CommandId = 0x0,
+          [1650361310128] [85846:1235360] CHIP: [DMG]                                 },
+          [1650361310128] [85846:1235360] CHIP: [DMG]
+          [1650361310128] [85846:1235360] CHIP: [DMG]                                 StatusIB =
+          [1650361310128] [85846:1235360] CHIP: [DMG]                                 {
+          [1650361310128] [85846:1235360] CHIP: [DMG]                                         status = 0xc3 (UNSUPPORTED_CLUSTER),
+          [1650361310128] [85846:1235360] CHIP: [DMG]                                 },
+          [1650361310128] [85846:1235360] CHIP: [DMG]
+          [1650361310128] [85846:1235360] CHIP: [DMG]                         },
+          [1650361310128] [85846:1235360] CHIP: [DMG]
+          [1650361310128] [85846:1235360] CHIP: [DMG]                 },
+          [1650361310128] [85846:1235360] CHIP: [DMG]
+          [1650361310128] [85846:1235360] CHIP: [DMG]         ],
+          [1650361310128] [85846:1235360] CHIP: [DMG]
+          [1650361310128] [85846:1235360] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650361310128] [85846:1235360] CHIP: [DMG] },
+          [1650361310128] [85846:1235360] CHIP: [DMG] Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
+          [1650361310128] [85846:1235360] CHIP: [TOO] Error: IM Error 0x000005C3: General error: 0xc3 (UNSUPPORTED_CLUSTER)
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read an unsupported
           attribute DUT responds with the report data action."
-      verification: "Check for optional one that is not implemented"
+      verification: |
+          '' ./chip-tool thermostat read outdoor-temperature 1 1
+
+          TH side---Verify we are getting "status = 0x86 (UNSUPPORTED_ATTRIBUTE)"  for above command.
+
+          [1650361351617] [85853:1235541] CHIP: [DMG] ReportDataMessage =
+          [1650361351617] [85853:1235541] CHIP: [DMG] {
+          [1650361351617] [85853:1235541] CHIP: [DMG]         AttributeReportIBs =
+          [1650361351617] [85853:1235541] CHIP: [DMG]         [
+          [1650361351617] [85853:1235541] CHIP: [DMG]                 AttributeReportIB =
+          [1650361351617] [85853:1235541] CHIP: [DMG]                 {
+          [1650361351617] [85853:1235541] CHIP: [DMG]                         AttributeStatusIB =
+          [1650361351617] [85853:1235541] CHIP: [DMG]                         {
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                 AttributePathIB =
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                 {
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                         Cluster = 0x201,
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                         Attribute = 0x0000_0001,
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                 }
+          [1650361351617] [85853:1235541] CHIP: [DMG]
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                 StatusIB =
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                 {
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1650361351617] [85853:1235541] CHIP: [DMG]                                 },
+          [1650361351617] [85853:1235541] CHIP: [DMG]
+          [1650361351617] [85853:1235541] CHIP: [DMG]                         },
+          [1650361351617] [85853:1235541] CHIP: [DMG]
+          [1650361351617] [85853:1235541] CHIP: [DMG]                 },
+          [1650361351617] [85853:1235541] CHIP: [DMG]
+          [1650361351617] [85853:1235541] CHIP: [DMG]         ],
+          [1650361351617] [85853:1235541] CHIP: [DMG]
+          [1650361351617] [85853:1235541] CHIP: [DMG]         SuppressResponse = true,
+          [1650361351617] [85853:1235541] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650361351617] [85853:1235541] CHIP: [DMG] }
+          [1650361351617] [85853:1235541] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+
+          or
+
+          '' ./chip-tool applicationlauncher  read feature-map 1 1
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read an attribute
           which is not readable. DUT responds with the report data action."
-      verification: "Need to find more info"
+      verification: |
+          DUT implementation required to verify read an attribute which is nor readable
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read an attribute in
           the path that requires a privilege that is not granted for the cluster
           in the path. DUT responds with the report data action."
-      verification: "Unsupported in TE8 - Out of scope"
+      verification: |
+          '' ./chip-tool basic read vendor-name  2 0 --commissioner-nodeid 332211
+
+          TH side---Verify we are getting "status = 0x7e (UNSUPPORTED_ACCESS)"  for above command.
+
+          [1650361510244] [85874:1236133] CHIP: [DMG] ReportDataMessage =
+          [1650361510244] [85874:1236133] CHIP: [DMG] {
+          [1650361510244] [85874:1236133] CHIP: [DMG]         AttributeReportIBs =
+          [1650361510244] [85874:1236133] CHIP: [DMG]         [
+          [1650361510244] [85874:1236133] CHIP: [DMG]                 AttributeReportIB =
+          [1650361510244] [85874:1236133] CHIP: [DMG]                 {
+          [1650361510244] [85874:1236133] CHIP: [DMG]                         AttributeStatusIB =
+          [1650361510244] [85874:1236133] CHIP: [DMG]                         {
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                 AttributePathIB =
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                 {
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                         Endpoint = 0x0,
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                         Cluster = 0x28,
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                         Attribute = 0x0000_0001,
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                 }
+          [1650361510244] [85874:1236133] CHIP: [DMG]
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                 StatusIB =
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                 {
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                         status = 0x7e (UNSUPPORTED_ACCESS),
+          [1650361510244] [85874:1236133] CHIP: [DMG]                                 },
+          [1650361510244] [85874:1236133] CHIP: [DMG]
+          [1650361510244] [85874:1236133] CHIP: [DMG]                         },
+          [1650361510244] [85874:1236133] CHIP: [DMG]
+          [1650361510244] [85874:1236133] CHIP: [DMG]                 },
+          [1650361510244] [85874:1236133] CHIP: [DMG]
+          [1650361510244] [85874:1236133] CHIP: [DMG]         ],
+          [1650361510244] [85874:1236133] CHIP: [DMG]
+          [1650361510244] [85874:1236133] CHIP: [DMG]         SuppressResponse = true,
+          [1650361510244] [85874:1236133] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650361510244] [85874:1236133] CHIP: [DMG] }
+          [1650361510244] [85874:1236133] CHIP: [TOO] Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read an attribute in
           the path that is fabric scoped, and the associated fabric does not
           match the accessing fabric. DUT responds with the Report Data action"
-      verification: "Unsupported in TE8 - Out of scope"
+      verification: |
+          https://github.com/project-chip/connectedhomeip/issues/16569
       disabled: true
 
     - label:
           "TH sends the Read Request Message to the DUT to read an attribute
           Repeat the above steps 3 times."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool occupancysensing read occupancy 1 1 sudo ./chip-tool
-          occupancysensing read occupancy 1 1 sudo ./chip-tool occupancysensing
-          read occupancy 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool  occupancysensing read occupancy    1 1 (send same command 3 times)
+
+          TH side---Verify we are getting ReportData message path and value (EndpointID, AttributeID, ClusterID ) same as provided data sent in the above command
+          (verify the values we are getting same when we send same command 3 times)
+
+          [1650362704154] [86027:1240909] CHIP: [DMG] ReportDataMessage =
+          [1650362704154] [86027:1240909] CHIP: [DMG] {
+          [1650362704154] [86027:1240909] CHIP: [DMG]         AttributeReportIBs =
+          [1650362704154] [86027:1240909] CHIP: [DMG]         [
+          [1650362704154] [86027:1240909] CHIP: [DMG]                 AttributeReportIB =
+          [1650362704154] [86027:1240909] CHIP: [DMG]                 {
+          [1650362704154] [86027:1240909] CHIP: [DMG]                         AttributeDataIB =
+          [1650362704154] [86027:1240909] CHIP: [DMG]                         {
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                 DataVersion = 0xa301ff86,
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                 AttributePathIB =
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                 {
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                         Cluster = 0x406,
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                         Attribute = 0x0000_0000,
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                 }
+          [1650362704154] [86027:1240909] CHIP: [DMG]
+          [1650362704154] [86027:1240909] CHIP: [DMG]                                         Data = 0,
+          [1650362704154] [86027:1240909] CHIP: [DMG]                         },
+          [1650362704154] [86027:1240909] CHIP: [DMG]
+          [1650362704154] [86027:1240909] CHIP: [DMG]                 },
+          [1650362704154] [86027:1240909] CHIP: [DMG]
+          [1650362704154] [86027:1240909] CHIP: [DMG]         ],
+          [1650362704154] [86027:1240909] CHIP: [DMG]
+          [1650362704154] [86027:1240909] CHIP: [DMG]         SuppressResponse = true,
+          [1650362704154] [86027:1240909] CHIP: [DMG]         InteractionModelRevision = 1
+          [1650362704154] [86027:1240909] CHIP: [DMG] }
+          [1650362704154] [86027:1240909] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 2734817158
+          [1650362704154] [86027:1240909] CHIP: [TOO]   occupancy: 0
       disabled: true
 
     - label:
@@ -227,9 +739,12 @@ tests:
           attribute AttributePath = [[ Attribute = AttributeID]] On receipt of
           this message, DUT should send a report data action with the attribute
           value from all the clusters and endpoints to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0xFFFFFFFF 0 1 0xFFFF"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any read-by-id 0xFFFFFFFF 0 1 0xFFFF
+
+          TH side---Verify we are getting all supported right attribute value on TH when we sent  above command
       disabled: true
 
     - label:
@@ -238,9 +753,12 @@ tests:
           AttributePath = [[ Endpoint = EndpointID]] On receipt of this message,
           DUT should send a report data action with all the attribute values
           from all the clusters from that particular endpointID to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
+
+          TH side---Verify we are getting all supported right attribute value on TH when we sent  above command
       disabled: true
 
     - label:
@@ -249,9 +767,12 @@ tests:
           AttributePath = [[ Cluster = ClusterID]] On receipt of this message,
           DUT should send a report data action with all the attribute values
           from all the endpoints from that particular ClusterID to the DUT."
-      verification:
-          "In case of chip tool, here is an example command to use sudo
-          ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0xFFFF"
+      verification: |
+          In case of chip tool, here is an example command to use
+
+          '' ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0xFFFF
+
+          TH side---Verify we are getting all supported right attribute value on TH when we sent  above command
       disabled: true
 
     - label:
@@ -260,9 +781,45 @@ tests:
           attribute value with the DataVersion of the cluster. TH sends a second
           read request to the same cluster with the DataVersionFilter Field set
           with the dataversion value received before."
-      verification:
-          "Unsupported in TE8 - Out of scope - Need to file ticket (No
-          DataVersionFilter available)"
+      verification: |
+          ./chip-tool identify read identify-time 1 1
+
+          [1650615356.464413][2439:2444] CHIP:DMG: ReportDataMessage =
+          [1650615356.464525][2439:2444] CHIP:DMG: {
+          [1650615356.464597][2439:2444] CHIP:DMG:         AttributeReportIBs =
+          [1650615356.464651][2439:2444] CHIP:DMG:         [
+          [1650615356.464690][2439:2444] CHIP:DMG:                 AttributeReportIB =
+          [1650615356.464743][2439:2444] CHIP:DMG:                 {
+          [1650615356.464785][2439:2444] CHIP:DMG:                         AttributeDataIB =
+          [1650615356.464926][2439:2444] CHIP:DMG:                         {
+          [1650615356.464975][2439:2444] CHIP:DMG:                                 DataVersion = 0x9125b20e,
+          [1650615356.465027][2439:2444] CHIP:DMG:                                 AttributePathIB =
+          [1650615356.465076][2439:2444] CHIP:DMG:                                 {
+          [1650615356.465129][2439:2444] CHIP:DMG:                                         Endpoint = 0x1,
+          [1650615356.465308][2439:2444] CHIP:DMG:                                         Cluster = 0x3,
+          [1650615356.465364][2439:2444] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1650615356.465415][2439:2444] CHIP:DMG:                                 }
+          [1650615356.465471][2439:2444] CHIP:DMG:
+          [1650615356.465523][2439:2444] CHIP:DMG:                                         Data = 0,
+          [1650615356.465576][2439:2444] CHIP:DMG:                         },
+          [1650615356.465661][2439:2444] CHIP:DMG:
+          [1650615356.465703][2439:2444] CHIP:DMG:                 },
+          [1650615356.465750][2439:2444] CHIP:DMG:
+          [1650615356.465787][2439:2444] CHIP:DMG:         ],
+          [1650615356.465887][2439:2444] CHIP:DMG:
+          [1650615356.465928][2439:2444] CHIP:DMG:         SuppressResponse = true,
+          [1650615356.465968][2439:2444] CHIP:DMG:         InteractionModelRevision = 1
+          [1650615356.466007][2439:2444] CHIP:DMG: }
+          [1650615356.470192][2439:2444] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2435166734
+          [1650615356.472574][2439:2444] CHIP:TOO:   identify time: 0
+
+
+          '' ./chip-tool identify read  identify-time  1 1 --data-version   0x9125b20e
+          [1650615415.501037][2459:2464] CHIP:DMG: ReportDataMessage =
+          [1650615415.501075][2459:2464] CHIP:DMG: {
+          [1650615415.501109][2459:2464] CHIP:DMG: 	SuppressResponse = true,
+          [1650615415.501172][2459:2464] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650615415.501208][2459:2464] CHIP:DMG: }
       disabled: true
 
     - label:
@@ -273,7 +830,94 @@ tests:
           second read request to read an attribute from the same cluster with
           the DataVersionFilter Field set with the dataversion value received
           before."
-      verification: "Unsupported in TE8 - Out of scope"
+      verification: |
+          ./chip-tool levelcontrol read  on-level 1 1
+          [1650615572.769784][2475:2480] CHIP:DMG: ReportDataMessage =
+          [1650615572.769821][2475:2480] CHIP:DMG: {
+          [1650615572.769849][2475:2480] CHIP:DMG:         AttributeReportIBs =
+          [1650615572.769887][2475:2480] CHIP:DMG:         [
+          [1650615572.769918][2475:2480] CHIP:DMG:                 AttributeReportIB =
+          [1650615572.769959][2475:2480] CHIP:DMG:                 {
+          [1650615572.769991][2475:2480] CHIP:DMG:                         AttributeDataIB =
+          [1650615572.770031][2475:2480] CHIP:DMG:                         {
+          [1650615572.770069][2475:2480] CHIP:DMG:                                 DataVersion = 0x5709863,
+          [1650615572.770113][2475:2480] CHIP:DMG:                                 AttributePathIB =
+          [1650615572.770163][2475:2480] CHIP:DMG:                                 {
+          [1650615572.770210][2475:2480] CHIP:DMG:                                         Endpoint = 0x1,
+          [1650615572.770247][2475:2480] CHIP:DMG:                                         Cluster = 0x8,
+          [1650615572.770296][2475:2480] CHIP:DMG:                                         Attribute = 0x0000_0011,
+          [1650615572.770337][2475:2480] CHIP:DMG:                                 }
+          [1650615572.770376][2475:2480] CHIP:DMG:
+          [1650615572.770417][2475:2480] CHIP:DMG:                                         Data = NULL
+          [1650615572.770458][2475:2480] CHIP:DMG:                         },
+          [1650615572.770496][2475:2480] CHIP:DMG:
+          [1650615572.770528][2475:2480] CHIP:DMG:                 },
+          [1650615572.770566][2475:2480] CHIP:DMG:
+          [1650615572.770595][2475:2480] CHIP:DMG:         ],
+          [1650615572.770633][2475:2480] CHIP:DMG:
+          [1650615572.770664][2475:2480] CHIP:DMG:         SuppressResponse = true,
+          [1650615572.770695][2475:2480] CHIP:DMG:         InteractionModelRevision = 1
+          [1650615572.770724][2475:2480] CHIP:DMG: }
+          [1650615572.770895][2475:2480] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 91265123
+          [1650615572.770989][2475:2480] CHIP:TOO:   on level: null
+
+           ./chip-tool levelcontrol write  on-level 1 1 1
+          [1650615622.935047][2483:2488] CHIP:DMG: WriteResponseMessage =
+          [1650615622.935078][2483:2488] CHIP:DMG: {
+          [1650615622.935119][2483:2488] CHIP:DMG:         AttributeStatusIBs =
+          [1650615622.935160][2483:2488] CHIP:DMG:         [
+          [1650615622.935212][2483:2488] CHIP:DMG:                 AttributeStatusIB =
+          [1650615622.935252][2483:2488] CHIP:DMG:                 {
+          [1650615622.935298][2483:2488] CHIP:DMG:                         AttributePathIB =
+          [1650615622.935367][2483:2488] CHIP:DMG:                         {
+          [1650615622.935410][2483:2488] CHIP:DMG:                                 Endpoint = 0x1,
+          [1650615622.935469][2483:2488] CHIP:DMG:                                 Cluster = 0x8,
+          [1650615622.935516][2483:2488] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1650615622.935562][2483:2488] CHIP:DMG:                         }
+          [1650615622.935616][2483:2488] CHIP:DMG:
+          [1650615622.935674][2483:2488] CHIP:DMG:                         StatusIB =
+          [1650615622.935728][2483:2488] CHIP:DMG:                         {
+          [1650615622.935804][2483:2488] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1650615622.935853][2483:2488] CHIP:DMG:                         },
+          [1650615622.935915][2483:2488] CHIP:DMG:
+          [1650615622.935973][2483:2488] CHIP:DMG:                 },
+          [1650615622.936028][2483:2488] CHIP:DMG:
+          [1650615622.936081][2483:2488] CHIP:DMG:         ],
+          [1650615622.936132][2483:2488] CHIP:DMG:
+          [1650615622.936185][2483:2488] CHIP:DMG:         InteractionModelRevision = 1
+          [1650615622.936224][2483:2488] CHIP:DMG: }
+
+
+          ./chip-tool levelcontrol read  on-level 1 1   --data-version   0xa8215230
+
+          [1650615673.320008][2497:2502] CHIP:DMG: ReportDataMessage =
+          [1650615673.320039][2497:2502] CHIP:DMG: {
+          [1650615673.320098][2497:2502] CHIP:DMG: 	AttributeReportIBs =
+          [1650615673.320140][2497:2502] CHIP:DMG: 	[
+          [1650615673.320168][2497:2502] CHIP:DMG: 		AttributeReportIB =
+          [1650615673.320205][2497:2502] CHIP:DMG: 		{
+          [1650615673.320238][2497:2502] CHIP:DMG: 			AttributeDataIB =
+          [1650615673.320280][2497:2502] CHIP:DMG: 			{
+          [1650615673.320522][2497:2502] CHIP:DMG: 				DataVersion = 0x5709864,
+          [1650615673.320625][2497:2502] CHIP:DMG: 				AttributePathIB =
+          [1650615673.320674][2497:2502] CHIP:DMG: 				{
+          [1650615673.320807][2497:2502] CHIP:DMG: 					Endpoint = 0x1,
+          [1650615673.320877][2497:2502] CHIP:DMG: 					Cluster = 0x8,
+          [1650615673.320946][2497:2502] CHIP:DMG: 					Attribute = 0x0000_0011,
+          [1650615673.321005][2497:2502] CHIP:DMG: 				}
+          [1650615673.321062][2497:2502] CHIP:DMG:
+          [1650615673.321187][2497:2502] CHIP:DMG: 					Data = 1,
+          [1650615673.321249][2497:2502] CHIP:DMG: 			},
+          [1650615673.321306][2497:2502] CHIP:DMG:
+          [1650615673.321351][2497:2502] CHIP:DMG: 		},
+          [1650615673.321405][2497:2502] CHIP:DMG:
+          [1650615673.321444][2497:2502] CHIP:DMG: 	],
+          [1650615673.321559][2497:2502] CHIP:DMG:
+          [1650615673.321605][2497:2502] CHIP:DMG: 	SuppressResponse = true,
+          [1650615673.321647][2497:2502] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650615673.321685][2497:2502] CHIP:DMG: }
+          [1650615673.321895][2497:2502] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 91265124
+          [1650615673.322012][2497:2502] CHIP:TOO:   on level: 1
       disabled: true
 
     - label:
@@ -284,7 +928,36 @@ tests:
           sends a second read request to read all the attributes from the same
           cluster with the DataVersionFilter Field set with the dataversion
           value received before."
-      verification:
-          "Unsupported in TE8
-          https://github.com/project-chip/connectedhomeip/issues/15812"
+      verification: |
+          /chip-tool levelcontrol read-by-id 0xFFFFFFFF 1 1
+
+
+          ./chip-tool levelcontrol write  on-level 2 1 1
+          [1650615802.966713][2527:2532] CHIP:DMG: WriteResponseMessage =
+          [1650615802.966754][2527:2532] CHIP:DMG: {
+          [1650615802.966791][2527:2532] CHIP:DMG: 	AttributeStatusIBs =
+          [1650615802.966828][2527:2532] CHIP:DMG: 	[
+          [1650615802.966863][2527:2532] CHIP:DMG: 		AttributeStatusIB =
+          [1650615802.966909][2527:2532] CHIP:DMG: 		{
+          [1650615802.966936][2527:2532] CHIP:DMG: 			AttributePathIB =
+          [1650615802.966995][2527:2532] CHIP:DMG: 			{
+          [1650615802.967038][2527:2532] CHIP:DMG: 				Endpoint = 0x1,
+          [1650615802.967081][2527:2532] CHIP:DMG: 				Cluster = 0x8,
+          [1650615802.967133][2527:2532] CHIP:DMG: 				Attribute = 0x0000_0011,
+          [1650615802.967169][2527:2532] CHIP:DMG: 			}
+          [1650615802.967221][2527:2532] CHIP:DMG:
+          [1650615802.967259][2527:2532] CHIP:DMG: 			StatusIB =
+          [1650615802.967304][2527:2532] CHIP:DMG: 			{
+          [1650615802.967340][2527:2532] CHIP:DMG: 				status = 0x00 (SUCCESS),
+          [1650615802.967378][2527:2532] CHIP:DMG: 			},
+          [1650615802.967424][2527:2532] CHIP:DMG:
+          [1650615802.967456][2527:2532] CHIP:DMG: 		},
+          [1650615802.967502][2527:2532] CHIP:DMG:
+          [1650615802.967530][2527:2532] CHIP:DMG: 	],
+          [1650615802.967576][2527:2532] CHIP:DMG:
+          [1650615802.967613][2527:2532] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650615802.967640][2527:2532] CHIP:DMG: }
+
+
+          ./chip-tool levelcontrol read-by-id 0xFFFFFFFF 1 1 --data-version 0xa8215232
       disabled: true

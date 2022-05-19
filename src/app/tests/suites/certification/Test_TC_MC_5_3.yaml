@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
+    majornumber:
+        type: INT16U
+        defaultValue: 1
+    minornumber:
+        type: INT16U
+        defaultValue: 2
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -28,27 +34,25 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Disabled due to issue- #13029
     - label: "Reads the ChannelList attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "ChannelList"
       response:
-          saveAs: tvchannellistvalues
           constraints:
               type: list
 
-    #Disabled due to issue- #13029
+    #Issue 18094
     - label: "Reads the CurrentChannel attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: channellistvalues
+          saveAs: currentChannelvalue
+          value: [majorNumber: majornumber, minorNumber: minornumber]
 
-    #Disabled due to issue - #13084
+    #Issue 13084 and 18098
     - label: "Sends a SkipChannel command to the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SkipChannel"
       arguments:
           values:
@@ -63,10 +67,11 @@ tests:
               - name: "message"
                 value: "verify that the channel has changed on the device"
 
-    #Disabled due to issue- #13029
+    #Issue 18094 and 13029
     - label: "Reads the CurrentChannel attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: channellistvalues
+          constraints:
+              type: list

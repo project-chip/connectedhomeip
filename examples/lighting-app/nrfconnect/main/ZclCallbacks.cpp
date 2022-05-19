@@ -42,7 +42,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
         ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-        GetAppTask().GetLightingDevice().InitiateAction(PWMDevice::LEVEL_ACTION, AppEvent::kEventType_Lighting, value);
+        if (GetAppTask().GetLightingDevice().IsTurnedOn())
+        {
+            GetAppTask().GetLightingDevice().InitiateAction(PWMDevice::LEVEL_ACTION, AppEvent::kEventType_Lighting, value);
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "LED is off. Try to use move-to-level-with-on-off instead of move-to-level");
+        }
     }
 }
 

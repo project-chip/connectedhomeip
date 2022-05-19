@@ -422,8 +422,9 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess",
+        "(Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject credentialExists;
@@ -443,6 +444,32 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallback::CallbackFn(
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(userIndexClassName.c_str(), userIndexCtorSignature.c_str(),
                                                                        dataResponse.userIndex.Value(), userIndex);
     }
+    jobject creatorFabricIndex;
+    if (dataResponse.creatorFabricIndex.IsNull())
+    {
+        creatorFabricIndex = nullptr;
+    }
+    else
+    {
+        std::string creatorFabricIndexClassName     = "java/lang/Integer";
+        std::string creatorFabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(creatorFabricIndexClassName.c_str(),
+                                                                      creatorFabricIndexCtorSignature.c_str(),
+                                                                      dataResponse.creatorFabricIndex.Value(), creatorFabricIndex);
+    }
+    jobject lastModifiedFabricIndex;
+    if (dataResponse.lastModifiedFabricIndex.IsNull())
+    {
+        lastModifiedFabricIndex = nullptr;
+    }
+    else
+    {
+        std::string lastModifiedFabricIndexClassName     = "java/lang/Integer";
+        std::string lastModifiedFabricIndexCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            lastModifiedFabricIndexClassName.c_str(), lastModifiedFabricIndexCtorSignature.c_str(),
+            dataResponse.lastModifiedFabricIndex.Value(), lastModifiedFabricIndex);
+    }
     jobject nextCredentialIndex;
     if (dataResponse.nextCredentialIndex.IsNull())
     {
@@ -457,7 +484,8 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallback::CallbackFn(
             dataResponse.nextCredentialIndex.Value(), nextCredentialIndex);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, credentialExists, userIndex, nextCredentialIndex);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, credentialExists, userIndex, creatorFabricIndex, lastModifiedFabricIndex,
+                        nextCredentialIndex);
 }
 CHIPDoorLockClusterGetHolidayScheduleResponseCallback::CHIPDoorLockClusterGetHolidayScheduleResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(CallbackFn, this)

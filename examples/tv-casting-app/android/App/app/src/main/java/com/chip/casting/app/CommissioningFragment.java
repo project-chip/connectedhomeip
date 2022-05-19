@@ -9,29 +9,35 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.TvCastingApp;
-import com.chip.casting.dnssd.CommissionerDiscoveryListener;
+import com.chip.casting.dnssd.DiscoveredNodeData;
+import com.chip.casting.platform.MatterCallbackHandler;
 import com.chip.casting.util.GlobalCastingConstants;
 
 /** A {@link Fragment} to get the TV Casting App commissioned. */
 public class CommissioningFragment extends Fragment {
-  private static final String TAG = CommissionerDiscoveryListener.class.getSimpleName();
+  private static final String TAG = CommissioningFragment.class.getSimpleName();
 
   private final TvCastingApp tvCastingApp;
+  private final DiscoveredNodeData selectedCommissioner;
 
-  public CommissioningFragment(TvCastingApp tvCastingApp) {
+  private boolean initServerSuccess;
+  private boolean openCommissioningWindowSuccess;
+  private boolean sendUdcSuccess;
+
+  public CommissioningFragment(TvCastingApp tvCastingApp, DiscoveredNodeData selectedCommissioner) {
     this.tvCastingApp = tvCastingApp;
+    this.selectedCommissioner = selectedCommissioner;
   }
 
   /**
    * Use this factory method to create a new instance of this fragment using the provided
    * parameters.
    *
-   * @param tvCastingApp TV Casting App (JNI)
    * @return A new instance of fragment CommissioningFragment.
    */
-  // TODO: Rename and change types and number of parameters
-  public static CommissioningFragment newInstance(TvCastingApp tvCastingApp) {
-    return new CommissioningFragment(tvCastingApp);
+  public static CommissioningFragment newInstance(
+      TvCastingApp tvCastingApp, DiscoveredNodeData selectedCommissioner) {
+    return new CommissioningFragment(tvCastingApp, selectedCommissioner);
   }
 
   @Override
@@ -42,27 +48,68 @@ public class CommissioningFragment extends Fragment {
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    // Inflate the layout for this fragment
+    Callback callback = (CommissioningFragment.Callback) this.getActivity();
+    this.initServerSuccess =
+        tvCastingApp.initServer(
+            new MatterCallbackHandler() {
+              @Override
+              public boolean handle(boolean success) {
+                Log.d(
+                    TAG, "handle() called on CommissioningComplete event with success " + success);
+                if (success) {
+                  callback.handleCommissioningComplete();
+                }
+                return true;
+              }
+            });
+
+    if (this.initServerSuccess) {
+      this.openCommissioningWindowSuccess =
+          tvCastingApp.openBasicCommissioningWindow(
+              GlobalCastingConstants.CommissioningWindowDurationSecs);
+      if (this.openCommissioningWindowSuccess) {
+        if (selectedCommissioner != null && selectedCommissioner.getNumIPs() > 0) {
+          String ipAddress = selectedCommissioner.getIpAddresses().get(0).getHostAddress();
+          Log.d(
+              TAG,
+              "CommissioningFragment calling tvCastingApp.sendUserDirectedCommissioningRequest with IP: "
+                  + ipAddress
+                  + " port: "
+                  + selectedCommissioner.getPort());
+
+          this.sendUdcSuccess =
+              tvCastingApp.sendUserDirectedCommissioningRequest(
+                  ipAddress, selectedCommissioner.getPort());
+        }
+      }
+    }
     return inflater.inflate(R.layout.fragment_commissioning, container, false);
   }
 
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    boolean status =
-        tvCastingApp.openBasicCommissioningWindow(
-            GlobalCastingConstants.CommissioningWindowDurationSecs);
-    Log.d(
-        TAG,
-        "CommissioningFragment.onViewCreated tvCastingApp.openBasicCommissioningWindow returned "
-            + status);
-    TextView commissioningWindowStatusView = getView().findViewById(R.id.commissioningWindowStatus);
-    TextView onboardingPayloadView = getView().findViewById(R.id.onboardingPayload);
-    if (status == true) {
-      commissioningWindowStatusView.setText("Commissioning window opened!");
-      onboardingPayloadView.setText("Onboarding Pin: " + GlobalCastingConstants.SetupPasscode);
-    } else {
-      commissioningWindowStatusView.setText("Commissioning window could not be opened!");
+    String commissioningWindowStatus = "Failed to open commissioning window";
+    if (this.initServerSuccess) {
+      if (this.openCommissioningWindowSuccess) {
+        commissioningWindowStatus = "Commissioning window has been opened. Commission manually.";
+        if (this.sendUdcSuccess) {
+          commissioningWindowStatus =
+              "Commissioning window has been opened. Commissioning requested from "
+                  + selectedCommissioner.getDeviceName();
+        }
+        TextView onboardingPayloadView = getView().findViewById(R.id.onboardingPayload);
+        onboardingPayloadView.setText("Onboarding PIN: " + GlobalCastingConstants.SetupPasscode);
+      }
     }
+
+    TextView commissioningWindowStatusView = getView().findViewById(R.id.commissioningWindowStatus);
+    commissioningWindowStatusView.setText(commissioningWindowStatus);
+  }
+
+  /** Interface for notifying the host. */
+  public interface Callback {
+    /** Notifies listener to trigger transition on completion of commissioning */
+    void handleCommissioningComplete();
   }
 }

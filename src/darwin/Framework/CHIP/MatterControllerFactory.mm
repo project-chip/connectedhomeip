@@ -20,12 +20,17 @@
 #import "CHIPAttestationTrustStoreBridge.h"
 #import "CHIPControllerAccessControl.h"
 #import "CHIPDeviceController.h"
+#import "CHIPDeviceControllerStartupParams.h"
+#import "CHIPDeviceControllerStartupParams_Internal.h"
 #import "CHIPDeviceController_Internal.h"
 #import "CHIPLogging.h"
 #import "CHIPP256KeypairBridge.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
+#import "MTRCertificates.h"
+#import "NSDataSpanConversion.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -57,6 +62,9 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
 @property (readonly) chip::Credentials::GroupDataProviderImpl * groupDataProvider;
 @property (readonly) NSMutableArray<CHIPDeviceController *> * controllers;
 
+- (BOOL)findMatchingFabric:(FabricTable &)fabricTable
+                    params:(CHIPDeviceControllerStartupParams *)params
+                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric;
 @end
 
 @implementation MatterControllerFactory
@@ -255,28 +263,24 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
+    // Create the controller, so we start the event loop, since we plan to do
+    // our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
         return nil;
     }
 
-    __block BOOL okToStart = NO;
+    __block CHIPDeviceControllerStartupParamsInternal * params = nil;
     dispatch_sync(_chipWorkQueue, ^{
         FabricTable fabricTable;
-        if (fabricTable.Init(_persistentStorageDelegateBridge) != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't start on existing fabric: fabric table init failed");
+        FabricInfo * fabric = nullptr;
+        BOOL ok = [self findMatchingFabric:fabricTable params:startupParams fabric:&fabric];
+        if (!ok) {
+            CHIP_LOG_ERROR("Can't start on existing fabric: fabric matching failed");
             return;
         }
 
-        CHIPP256KeypairBridge keypairBridge;
-        if (keypairBridge.Init(startupParams.rootCAKeypair) != CHIP_NO_ERROR) {
-            return;
-        }
-        auto * fabric
-            = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
-
-        if (!fabric) {
+        if (fabric == nullptr) {
             CHIP_LOG_ERROR("Can't start on existing fabric: fabric not found");
             return;
         }
@@ -294,16 +298,15 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
             }
         }
 
-        okToStart = YES;
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabric params:startupParams];
     });
 
-    if (okToStart == NO) {
+    if (params == nil) {
         [self controllerShuttingDown:controller];
         return nil;
     }
 
-    // TODO: Pass in the existing NOC and whatnot, as needed.
-    BOOL ok = [controller startup:startupParams];
+    BOOL ok = [controller startup:params];
     if (ok == NO) {
         return nil;
     }
@@ -318,41 +321,47 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
         return nil;
     }
 
-    // Create the controller, so we start the event loop, since we plan to do our fabric table operations there.
+    if (startupParams.vendorId == nil) {
+        CHIP_LOG_ERROR("Must provide vendor id when starting controller on new fabric");
+        return nil;
+    }
+
+    if (startupParams.intermediateCertificate != nil && startupParams.rootCertificate == nil) {
+        CHIP_LOG_ERROR("Must provide a root certificate when using an intermediate certificate");
+        return nil;
+    }
+
+    // Create the controller, so we start the event loop, since we plan to do
+    // our fabric table operations there.
     auto * controller = [self createController];
     if (controller == nil) {
         return nil;
     }
 
-    __block BOOL okToStart = NO;
+    __block CHIPDeviceControllerStartupParamsInternal * params = nil;
     dispatch_sync(_chipWorkQueue, ^{
         FabricTable fabricTable;
-        if (fabricTable.Init(_persistentStorageDelegateBridge) != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't start on new fabric: storage can't read fabric table");
+        FabricInfo * fabric = nullptr;
+        BOOL ok = [self findMatchingFabric:fabricTable params:startupParams fabric:&fabric];
+        if (!ok) {
+            CHIP_LOG_ERROR("Can't start on new fabric: fabric matching failed");
             return;
         }
 
-        CHIPP256KeypairBridge keypairBridge;
-        if (keypairBridge.Init(startupParams.rootCAKeypair) != CHIP_NO_ERROR) {
-            CHIP_LOG_ERROR("Can't start controller without a usable public key");
-            return;
-        }
-        auto * fabric
-            = fabricTable.FindFabric(Credentials::P256PublicKeySpan(keypairBridge.Pubkey().ConstBytes()), startupParams.fabricId);
-        if (fabric) {
+        if (fabric != nullptr) {
             CHIP_LOG_ERROR("Can't start on new fabric that matches existing fabric");
             return;
         }
 
-        okToStart = YES;
+        params = [[CHIPDeviceControllerStartupParamsInternal alloc] initForNewFabric:startupParams];
     });
 
-    if (okToStart == NO) {
+    if (params == nil) {
         [self controllerShuttingDown:controller];
         return nil;
     }
 
-    BOOL ok = [controller startup:startupParams];
+    BOOL ok = [controller startup:params];
     if (ok == NO) {
         return nil;
     }
@@ -379,6 +388,45 @@ static NSString * const kErrorControllerFactoryInit = @"Init failure while initi
     [_controllers addObject:controller];
 
     return controller;
+}
+
+// Finds a fabric that matches the given params, if one exists.
+//
+// Returns NO on failure, YES on success.  If YES is returned, the
+// outparam will be written to, but possibly with a null value.
+//
+// fabricTable should be an un-initialized fabric table.  It needs to
+// outlive the consumer's use of the FabricInfo we return, which is
+// why it's provided by the caller.
+- (BOOL)findMatchingFabric:(FabricTable &)fabricTable
+                    params:(CHIPDeviceControllerStartupParams *)params
+                    fabric:(FabricInfo * _Nullable * _Nonnull)fabric
+{
+    CHIP_ERROR err = fabricTable.Init(_persistentStorageDelegateBridge);
+    if (err != CHIP_NO_ERROR) {
+        CHIP_LOG_ERROR("Can't initialize fabric table: %s", ErrorStr(err));
+        return NO;
+    }
+
+    Crypto::P256PublicKey pubKey;
+    if (params.rootCertificate != nil) {
+        err = ExtractPubkeyFromX509Cert(AsByteSpan(params.rootCertificate), pubKey);
+        if (err != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't extract public key from root certificate: %s", ErrorStr(err));
+            return NO;
+        }
+    } else {
+        // No root certificate means the nocSigner is using the root keys, because
+        // consumers must provide a root certificate whenever an ICA is used.
+        err = CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(params.nocSigner.pubkey, &pubKey);
+        if (err != CHIP_NO_ERROR) {
+            CHIP_LOG_ERROR("Can't extract public key from CHIPKeypair: %s", ErrorStr(err));
+            return NO;
+        }
+    }
+
+    *fabric = fabricTable.FindFabric(Credentials::P256PublicKeySpan(pubKey.ConstBytes()), params.fabricId);
+    return YES;
 }
 
 @end

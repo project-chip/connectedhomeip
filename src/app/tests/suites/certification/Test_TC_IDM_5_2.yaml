@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 19.7.2. [TC-IDM-5.2] Timed Request Action TH to DUT
+name: 3.7.2. [TC-IDM-5.2] Timed Request Action TH to DUT
 
 config:
     nodeId: 0x12344321
@@ -24,21 +24,43 @@ tests:
     - label:
           "TH sends a Timed Request Message with the timeout value set. (Example
           - 200 milliseconds)."
-      verification:
-          "./chip-tool basic mfg-specific-ping 1 0 --commissioner-name alpha
-          --timedInteractionTimeoutMs -200 TimedRequestMessage =
-          [1641535747.977210][3603:3603] CHIP:DMG: {
-          [1641535747.977247][3603:3603] CHIP:DMG: TimeoutMs = 0xff38,
-          [1641535747.977294][3603:3603] CHIP:DMG: }
-          [1641535747.977334][3603:3603] CHIP:DMG: Got Timed Request with
-          timeout 65336: handler 0xaaaae9085698 exchange 25353r"
+      verification: |
+          for below example command is verified by using write interaction
+          ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
       disabled: true
 
     - label:
           "TH sends a Timed Request Message with the timeout value set. (Example
           - 200 milliseconds). Wait for the status response message to be
-          received. Wait for 5 seconds and then send a Write Request Message to
-          the DUT."
-      verification:
-          "Chip-tool yet to implement timed interaction for write request"
+          received. Wait for 5 seconds(Timer has expired) and then send a Write
+          Request Message to the DUT."
+      verification: |
+          here is the example command you can use
+
+          '' ./chip-tool onoff on 1 1 --repeat-delay-ms 5000  --timedInteractionTimeoutMs 200
+
+          Verify we are getting status response and UNSUPPORTED_ACCESS from TH to DUT for above command
+
+          [1649686333.696111][3252:3257] CHIP:DMG: StatusResponseMessage =
+          [1649686333.696178][3252:3257] CHIP:DMG: {
+          [1649686333.696236][3252:3257] CHIP:DMG:         Status = 0x0,
+          [1649686333.696311][3252:3257] CHIP:DMG:         InteractionModelRevision = 1
+          [1649686333.696375][3252:3257] CHIP:DMG: }
+          [1649686333.696434][3252:3257] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+          [1649686333.696513][3252:3257] CHIP:EM: Piggybacking Ack for MessageCounter:3570360 on exchange: 28108i
+          [1649686333.696626][3252:3257] CHIP:IN: Prepared secure message 0xaaaae019e098 to 0x0000000000000001 (1)  of type 0x8 and protocolId (0, 1) on exchange 28108i with MessageCounter:6840786.
+          [1649686333.696711][3252:3257] CHIP:IN: Sending encrypted msg 0xaaaae019e098 with MessageCounter:6840786 to 0x0000000000000001 (1) at monotonic time: 0000000000CE3312 msec
+          [1649686333.696989][3252:3257] CHIP:DMG: ICR moving to [CommandSen]
+          [1649686333.698938][3252:3257] CHIP:EM: Received message of type 0x1 with protocolId (0, 1) and MessageCounter:3570361 on exchange 28108i
+          [1649686333.699013][3252:3257] CHIP:EM: Found matching exchange: 28108i, Delegate: 0xffff68005c30
+          [1649686333.699089][3252:3257] CHIP:EM: Rxd Ack; Removing MessageCounter:6840786 from Retrans Table on exchange 28108i
+          [1649686333.699147][3252:3257] CHIP:EM: Removed CHIP MessageCounter:6840786 from RetransTable on exchange 28108i
+          [1649686333.699215][3252:3257] CHIP:DMG: ICR moving to [ResponseRe]
+          [1649686333.699294][3252:3257] CHIP:DMG: StatusResponseMessage =
+          [1649686333.699354][3252:3257] CHIP:DMG: {
+          [1649686333.699410][3252:3257] CHIP:DMG:         Status = 0x7e,
+          [1649686333.699471][3252:3257] CHIP:DMG:         InteractionModelRevision = 1
+          [1649686333.699528][3252:3257] CHIP:DMG: }
+          [1649686333.699585][3252:3257] CHIP:IM: Received status response, status is 0x7e (UNSUPPORTED_ACCESS)
+          [1649686333.699661][3252:3257] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
       disabled: true

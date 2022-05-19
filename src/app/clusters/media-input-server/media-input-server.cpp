@@ -247,15 +247,20 @@ bool emberAfMediaInputClusterRenameInputCallback(app::CommandHandler * command, 
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (HasFeature(endpoint, MediaInputFeature::kNameUpdates) && err == CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfMediaInputClusterRenameInputCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        bool success = delegate->HandleRenameInput(index, name);
+        Protocols::InteractionModel::Status status =
+            success ? Protocols::InteractionModel::Status::Success : Protocols::InteractionModel::Status::Failure;
+        command->AddStatus(commandPath, status);
+    }
+    else
+    {
+        err != CHIP_NO_ERROR ? ChipLogError(Zcl, "emberAfMediaInputClusterRenameInputCallback error: %s", err.AsString())
+                             : ChipLogError(Zcl, "MediaInput no name updates feature");
+        command->AddStatus(commandPath, Protocols::InteractionModel::Status::Failure);
     }
 
-    bool success         = delegate->HandleRenameInput(index, name);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 

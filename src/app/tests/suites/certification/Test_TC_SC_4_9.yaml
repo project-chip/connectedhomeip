@@ -22,39 +22,38 @@ config:
 
 tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      verification:
-          "provision the DUT using chip-tool. Ref to provisioning instructions"
+      verification: |
+          provision the DUT using chip-tool. Ref to provisioning instructions
       disabled: true
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT_COMM_WIN seconds using ECM"
-      verification:
-          "Refer to Multi-admin tests (either TC-MF-1.3 OR TC-MF-1.4) on the
-          steps to add 2nd admin on the node Open Commissioning window on DUT
-          using BCM sudo ./out/debug/chip-tool administratorcommissioning
-          open-basic-commissioning-window 10 99998888 0"
+      verification: |
+          Refer to Multi-admin tests (either TC-MF-1.3 OR TC-MF-1.4) on the steps to add 2nd admin on the node
+          Open Commissioning window on DUT using BCM or ECM
+
+            ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      verification:
-          "Refer to Multi-admin tests on the steps to add 2nd admin on the node.
-          Get another chip-tool instance on a machine connected behind the
-          border router. Make sure IPV4 interface are disabled on the border
-          router. We need to make sure chip-tool on IPV6 network talk to the
-          Wifi device with LWIP stack on the wifi network."
+      verification: |
+          Refer to Multi-admin tests on the steps to add 2nd admin on the node. Get another chip-tool instance on a machine connected behind the border router. Make sure IPV4 interface are disabled on the border router. We need to make sure chip-tool on IPV6 network talk to the Wifi device with LWIP stack on the wifi network.
+          ./chip-tool pairing manualcode 1 36177160937
       disabled: true
 
     - label:
           "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
           mandatory attribute of DUT_CE"
-      verification: "Read/Write attributes frm the 1st controller"
+      verification: |
+          ./chip-tool basic write node-label te8 1 0
+          ./chip-tool basic read node-label  1 0
       disabled: true
 
     - label:
           "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
           mandatory attribute of DUT_CE"
-      verification:
-          "Read/Write attributes frm the 2nd controller that is on thread
-          network."
+      verification: |
+          ./chip-tool basic write node-label te8 2 0
+          ./chip-tool basic read node-label  2 0
       disabled: true

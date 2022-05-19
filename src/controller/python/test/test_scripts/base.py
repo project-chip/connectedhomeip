@@ -381,6 +381,8 @@ class BaseTestHelper:
         ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
         chip.FabricAdmin.FabricAdmin.ShutdownAll()
 
+        self.logger.info("Shutdown completed, starting new controllers...")
+
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
@@ -389,6 +391,8 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
         self.devCtrl2 = fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
+
+        self.logger.info("Waiting for attribute reads...")
 
         data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
@@ -414,6 +418,7 @@ class BaseTestHelper:
                 "Got back fabric indices that match for two different fabrics!")
             return False
 
+        self.logger.info("Attribute reads completed...")
         return True
 
     async def TestFabricSensitive(self, nodeid: int):

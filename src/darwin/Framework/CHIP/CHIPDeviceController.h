@@ -36,6 +36,12 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 @property (readonly, nonatomic) BOOL isRunning;
 
 /**
+ * Return the Node Id assigned to the controller.  Will return nil if the
+ * controller is not running (and hence does not know its node id).
+ */
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId;
+
+/**
  * Start pairing for a device with the given ID, using the provided setup PIN
  * to establish a PASE connection.
  *
@@ -88,7 +94,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
                               error:(NSError * __autoreleasing *)error;
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
-- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
 - (nullable CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
@@ -113,11 +118,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-
-/**
- * Return the Node Id assigned to the controller.
- */
-- (NSNumber *)getControllerNodeId;
 
 /**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered

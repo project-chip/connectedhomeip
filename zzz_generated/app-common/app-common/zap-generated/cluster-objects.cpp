@@ -14467,6 +14467,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCredentialExists)), credentialExists));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserIndex)), userIndex));
     ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCreatorFabricIndex)), creatorFabricIndex));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLastModifiedFabricIndex)), lastModifiedFabricIndex));
+    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNextCredentialIndex)), nextCredentialIndex));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -14491,6 +14495,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kUserIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            break;
+        case to_underlying(Fields::kCreatorFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, creatorFabricIndex));
+            break;
+        case to_underlying(Fields::kLastModifiedFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, lastModifiedFabricIndex));
             break;
         case to_underlying(Fields::kNextCredentialIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, nextCredentialIndex));
@@ -14605,6 +14615,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         break;
     case Attributes::CredentialRulesSupport::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, credentialRulesSupport));
+        break;
+    case Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, numberOfCredentialsSupportedPerUser));
         break;
     case Attributes::EnableLogging::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, enableLogging));
@@ -15109,8 +15122,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLiftPercentageValue)), liftPercentageValue));
-    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLiftPercent100thsValue)), liftPercent100thsValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -15130,9 +15141,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kLiftPercentageValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, liftPercentageValue));
-            break;
         case to_underlying(Fields::kLiftPercent100thsValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, liftPercent100thsValue));
             break;
@@ -15189,8 +15197,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTiltPercentageValue)), tiltPercentageValue));
-    ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTiltPercent100thsValue)), tiltPercent100thsValue));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -15210,9 +15216,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kTiltPercentageValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercentageValue));
-            break;
         case to_underlying(Fields::kTiltPercent100thsValue):
             ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercent100thsValue));
             break;
