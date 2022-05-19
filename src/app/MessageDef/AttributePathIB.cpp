@@ -228,6 +228,63 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
     return err;
 }
 
+CHIP_ERROR AttributePathIB::Parser::ParsePath(AttributePathParams & params) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = GetEndpoint(&(params.mEndpointId));
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!params.HasWildcardEndpointId(), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetCluster(&params.mClusterId);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(IsValidClusterId(params.mClusterId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetAttribute(&params.mAttributeId);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(IsValidAttributeId(params.mAttributeId), CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    // A wildcard cluster requires that the attribute path either be
+    // wildcard or a global attribute.
+    VerifyOrReturnError(!params.HasWildcardClusterId() || params.HasWildcardAttributeId() || IsGlobalAttribute(params.mAttributeId),
+                        CHIP_IM_GLOBAL_STATUS(InvalidAction));
+
+    err = GetListIndex(&params.mListIndex);
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(!params.HasWildcardAttributeId() && !params.HasWildcardListIndex(),
+                            CHIP_IM_GLOBAL_STATUS(InvalidAction));
+    }
+    else if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    return CHIP_NO_ERROR;
+}
+
 AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const bool aEnableTagCompression)
 {
     // skip if error has already been set

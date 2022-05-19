@@ -405,72 +405,19 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
+
     aAttributePathListParser.GetReader(&reader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag() == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        AttributePathParams attribute;
+        VerifyOrReturnError(TLV::AnonymousTag() == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        AttributePathParams params;
         AttributePathIB::Parser path;
-        err = path.Init(reader);
-        SuccessOrExit(err);
 
-        err = path.GetEndpoint(&(attribute.mEndpointId));
-        if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(!attribute.HasWildcardEndpointId(), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        }
-        else if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
-
-        ClusterId clusterId = kInvalidClusterId;
-        err                 = path.GetCluster(&clusterId);
-        if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(IsValidClusterId(clusterId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-            attribute.mClusterId = clusterId;
-        }
-        else if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
-
-        AttributeId attributeId = kInvalidAttributeId;
-        err                     = path.GetAttribute(&attributeId);
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else if (err == CHIP_NO_ERROR)
-        {
-            VerifyOrExit(IsValidAttributeId(attributeId), err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-            attribute.mAttributeId = attributeId;
-        }
-        SuccessOrExit(err);
-
-        // A wildcard cluster requires that the attribute path either be
-        // wildcard or a global attribute.
-        VerifyOrExit(!attribute.HasWildcardClusterId() || attribute.HasWildcardAttributeId() ||
-                         IsGlobalAttribute(attribute.mAttributeId),
-                     err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-
-        err = path.GetListIndex(&(attribute.mListIndex));
-        if (CHIP_NO_ERROR == err)
-        {
-            VerifyOrExit(!attribute.HasWildcardAttributeId() && !attribute.HasWildcardListIndex(),
-                         err = CHIP_IM_GLOBAL_STATUS(InvalidAction));
-        }
-        else if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        SuccessOrExit(err);
-        err = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attribute);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(path.Init(reader));
+        ReturnErrorOnFailure(path.ParsePath(params));
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, params));
     }
+
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
@@ -479,8 +426,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAtt
         err                          = CHIP_NO_ERROR;
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parser & aDataVersionFilterListParser)

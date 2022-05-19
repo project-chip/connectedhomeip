@@ -26,6 +26,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <access/SubjectDescriptor.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
@@ -443,6 +444,22 @@ private:
      */
     bool EnsureResourceForSubscription(FabricIndex aFabricIndex, size_t aRequestedAttributePathCount,
                                        size_t aRequestedEventPathCount);
+
+    /**
+     * This parses the attribute path list to ensure it is well formed. If so, for each path in the list, it will expand to a list
+     * of concrete paths and walk each path to check if it has privileges to read that attribute.
+     *
+     * If there is AT LEAST one concrete path that has sufficient privilege, hasValidPath will be set to true. Otherwise, it will be
+     * set to false.
+     *
+     * requestedAttributePathCount will be updated to reflect the number of attribute paths in the request.
+     *
+     * @retval CHIP_NO_ERROR if no error is encountered.
+     *
+     */
+    CHIP_ERROR ParseAttributePaths(Access::SubjectDescriptor & subjectDescriptor,
+                                   AttributePathIBs::Parser & attributePathListParser, bool & hasValidPath,
+                                   size_t & requestedAttributePathCount);
 
     template <typename T, size_t N>
     void ReleasePool(ObjectList<T> *& aObjectList, ObjectPool<ObjectList<T>, N> & aObjectPool);
