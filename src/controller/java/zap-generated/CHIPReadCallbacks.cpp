@@ -753,16 +753,16 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
         {
             chip::JniReferences::GetInstance().CreateArrayList(newElement_0_subjects);
 
-            auto iter_newElement_0_subjects_NaN = entry_0.subjects.Value().begin();
-            while (iter_newElement_0_subjects_NaN.Next())
+            auto iter_newElement_0_subjects_3 = entry_0.subjects.Value().begin();
+            while (iter_newElement_0_subjects_3.Next())
             {
-                auto & entry_NaN = iter_newElement_0_subjects_NaN.GetValue();
-                jobject newElement_NaN;
-                std::string newElement_NaNClassName     = "java/lang/Long";
-                std::string newElement_NaNCtorSignature = "(J)V";
+                auto & entry_3 = iter_newElement_0_subjects_3.GetValue();
+                jobject newElement_3;
+                std::string newElement_3ClassName     = "java/lang/Long";
+                std::string newElement_3CtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
-                    newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-                chip::JniReferences::GetInstance().AddToList(newElement_0_subjects, newElement_NaN);
+                    newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), entry_3, newElement_3);
+                chip::JniReferences::GetInstance().AddToList(newElement_0_subjects, newElement_3);
             }
         }
         jobject newElement_0_targets;
@@ -774,49 +774,49 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
         {
             chip::JniReferences::GetInstance().CreateArrayList(newElement_0_targets);
 
-            auto iter_newElement_0_targets_NaN = entry_0.targets.Value().begin();
-            while (iter_newElement_0_targets_NaN.Next())
+            auto iter_newElement_0_targets_3 = entry_0.targets.Value().begin();
+            while (iter_newElement_0_targets_3.Next())
             {
-                auto & entry_NaN = iter_newElement_0_targets_NaN.GetValue();
-                jobject newElement_NaN;
-                jobject newElement_NaN_cluster;
-                if (entry_NaN.cluster.IsNull())
+                auto & entry_3 = iter_newElement_0_targets_3.GetValue();
+                jobject newElement_3;
+                jobject newElement_3_cluster;
+                if (entry_3.cluster.IsNull())
                 {
-                    newElement_NaN_cluster = nullptr;
+                    newElement_3_cluster = nullptr;
                 }
                 else
                 {
-                    std::string newElement_NaN_clusterClassName     = "java/lang/Long";
-                    std::string newElement_NaN_clusterCtorSignature = "(J)V";
+                    std::string newElement_3_clusterClassName     = "java/lang/Long";
+                    std::string newElement_3_clusterCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_clusterClassName.c_str(),
+                                                                                   newElement_3_clusterCtorSignature.c_str(),
+                                                                                   entry_3.cluster.Value(), newElement_3_cluster);
+                }
+                jobject newElement_3_endpoint;
+                if (entry_3.endpoint.IsNull())
+                {
+                    newElement_3_endpoint = nullptr;
+                }
+                else
+                {
+                    std::string newElement_3_endpointClassName     = "java/lang/Integer";
+                    std::string newElement_3_endpointCtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_3_endpointClassName.c_str(),
+                                                                                   newElement_3_endpointCtorSignature.c_str(),
+                                                                                   entry_3.endpoint.Value(), newElement_3_endpoint);
+                }
+                jobject newElement_3_deviceType;
+                if (entry_3.deviceType.IsNull())
+                {
+                    newElement_3_deviceType = nullptr;
+                }
+                else
+                {
+                    std::string newElement_3_deviceTypeClassName     = "java/lang/Long";
+                    std::string newElement_3_deviceTypeCtorSignature = "(J)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-                        newElement_NaN_clusterClassName.c_str(), newElement_NaN_clusterCtorSignature.c_str(),
-                        entry_NaN.cluster.Value(), newElement_NaN_cluster);
-                }
-                jobject newElement_NaN_endpoint;
-                if (entry_NaN.endpoint.IsNull())
-                {
-                    newElement_NaN_endpoint = nullptr;
-                }
-                else
-                {
-                    std::string newElement_NaN_endpointClassName     = "java/lang/Integer";
-                    std::string newElement_NaN_endpointCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_NaN_endpointClassName.c_str(), newElement_NaN_endpointCtorSignature.c_str(),
-                        entry_NaN.endpoint.Value(), newElement_NaN_endpoint);
-                }
-                jobject newElement_NaN_deviceType;
-                if (entry_NaN.deviceType.IsNull())
-                {
-                    newElement_NaN_deviceType = nullptr;
-                }
-                else
-                {
-                    std::string newElement_NaN_deviceTypeClassName     = "java/lang/Long";
-                    std::string newElement_NaN_deviceTypeCtorSignature = "(J)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-                        newElement_NaN_deviceTypeClassName.c_str(), newElement_NaN_deviceTypeCtorSignature.c_str(),
-                        entry_NaN.deviceType.Value(), newElement_NaN_deviceType);
+                        newElement_3_deviceTypeClassName.c_str(), newElement_3_deviceTypeCtorSignature.c_str(),
+                        entry_3.deviceType.Value(), newElement_3_deviceType);
                 }
 
                 jclass targetStructClass;
@@ -835,9 +835,9 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
                     return;
                 }
 
-                newElement_NaN = env->NewObject(targetStructClass, targetStructCtor, newElement_NaN_cluster,
-                                                newElement_NaN_endpoint, newElement_NaN_deviceType);
-                chip::JniReferences::GetInstance().AddToList(newElement_0_targets, newElement_NaN);
+                newElement_3 = env->NewObject(targetStructClass, targetStructCtor, newElement_3_cluster, newElement_3_endpoint,
+                                              newElement_3_deviceType);
+                chip::JniReferences::GetInstance().AddToList(newElement_0_targets, newElement_3);
             }
         }
         jobject newElement_0_fabricIndex;
@@ -4011,16 +4011,16 @@ void CHIPBridgedActionsEndpointListAttributeCallback::CallbackFn(
         jobject newElement_0_endpoints;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
 
-        auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
-        while (iter_newElement_0_endpoints_NaN.Next())
+        auto iter_newElement_0_endpoints_2 = entry_0.endpoints.begin();
+        while (iter_newElement_0_endpoints_2.Next())
         {
-            auto & entry_NaN = iter_newElement_0_endpoints_NaN.GetValue();
-            jobject newElement_NaN;
-            std::string newElement_NaNClassName     = "java/lang/Integer";
-            std::string newElement_NaNCtorSignature = "(I)V";
+            auto & entry_2 = iter_newElement_0_endpoints_2.GetValue();
+            jobject newElement_2;
+            std::string newElement_2ClassName     = "java/lang/Integer";
+            std::string newElement_2CtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-            chip::JniReferences::GetInstance().AddToList(newElement_0_endpoints, newElement_NaN);
+                newElement_2ClassName.c_str(), newElement_2CtorSignature.c_str(), entry_2, newElement_2);
+            chip::JniReferences::GetInstance().AddToList(newElement_0_endpoints, newElement_2);
         }
 
         jclass endpointListStructStructClass;
@@ -8443,30 +8443,30 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
         jobject newElement_0_IPv4Addresses;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv4Addresses);
 
-        auto iter_newElement_0_IPv4Addresses_NaN = entry_0.IPv4Addresses.begin();
-        while (iter_newElement_0_IPv4Addresses_NaN.Next())
+        auto iter_newElement_0_IPv4Addresses_2 = entry_0.IPv4Addresses.begin();
+        while (iter_newElement_0_IPv4Addresses_2.Next())
         {
-            auto & entry_NaN = iter_newElement_0_IPv4Addresses_NaN.GetValue();
-            jobject newElement_NaN;
-            jbyteArray newElement_NaNByteArray = env->NewByteArray(static_cast<jsize>(entry_NaN.size()));
-            env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
-                                    reinterpret_cast<const jbyte *>(entry_NaN.data()));
-            newElement_NaN = newElement_NaNByteArray;
-            chip::JniReferences::GetInstance().AddToList(newElement_0_IPv4Addresses, newElement_NaN);
+            auto & entry_2 = iter_newElement_0_IPv4Addresses_2.GetValue();
+            jobject newElement_2;
+            jbyteArray newElement_2ByteArray = env->NewByteArray(static_cast<jsize>(entry_2.size()));
+            env->SetByteArrayRegion(newElement_2ByteArray, 0, static_cast<jsize>(entry_2.size()),
+                                    reinterpret_cast<const jbyte *>(entry_2.data()));
+            newElement_2 = newElement_2ByteArray;
+            chip::JniReferences::GetInstance().AddToList(newElement_0_IPv4Addresses, newElement_2);
         }
         jobject newElement_0_IPv6Addresses;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_IPv6Addresses);
 
-        auto iter_newElement_0_IPv6Addresses_NaN = entry_0.IPv6Addresses.begin();
-        while (iter_newElement_0_IPv6Addresses_NaN.Next())
+        auto iter_newElement_0_IPv6Addresses_2 = entry_0.IPv6Addresses.begin();
+        while (iter_newElement_0_IPv6Addresses_2.Next())
         {
-            auto & entry_NaN = iter_newElement_0_IPv6Addresses_NaN.GetValue();
-            jobject newElement_NaN;
-            jbyteArray newElement_NaNByteArray = env->NewByteArray(static_cast<jsize>(entry_NaN.size()));
-            env->SetByteArrayRegion(newElement_NaNByteArray, 0, static_cast<jsize>(entry_NaN.size()),
-                                    reinterpret_cast<const jbyte *>(entry_NaN.data()));
-            newElement_NaN = newElement_NaNByteArray;
-            chip::JniReferences::GetInstance().AddToList(newElement_0_IPv6Addresses, newElement_NaN);
+            auto & entry_2 = iter_newElement_0_IPv6Addresses_2.GetValue();
+            jobject newElement_2;
+            jbyteArray newElement_2ByteArray = env->NewByteArray(static_cast<jsize>(entry_2.size()));
+            env->SetByteArrayRegion(newElement_2ByteArray, 0, static_cast<jsize>(entry_2.size()),
+                                    reinterpret_cast<const jbyte *>(entry_2.data()));
+            newElement_2 = newElement_2ByteArray;
+            chip::JniReferences::GetInstance().AddToList(newElement_0_IPv6Addresses, newElement_2);
         }
         jobject newElement_0_type;
         std::string newElement_0_typeClassName     = "java/lang/Integer";
@@ -9108,16 +9108,16 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
         jobject newElement_0_endpoints;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_endpoints);
 
-        auto iter_newElement_0_endpoints_NaN = entry_0.endpoints.begin();
-        while (iter_newElement_0_endpoints_NaN.Next())
+        auto iter_newElement_0_endpoints_2 = entry_0.endpoints.begin();
+        while (iter_newElement_0_endpoints_2.Next())
         {
-            auto & entry_NaN = iter_newElement_0_endpoints_NaN.GetValue();
-            jobject newElement_NaN;
-            std::string newElement_NaNClassName     = "java/lang/Integer";
-            std::string newElement_NaNCtorSignature = "(I)V";
+            auto & entry_2 = iter_newElement_0_endpoints_2.GetValue();
+            jobject newElement_2;
+            std::string newElement_2ClassName     = "java/lang/Integer";
+            std::string newElement_2CtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-            chip::JniReferences::GetInstance().AddToList(newElement_0_endpoints, newElement_NaN);
+                newElement_2ClassName.c_str(), newElement_2CtorSignature.c_str(), entry_2, newElement_2);
+            chip::JniReferences::GetInstance().AddToList(newElement_0_endpoints, newElement_2);
         }
         jobject newElement_0_groupName;
         if (!entry_0.groupName.HasValue())
@@ -19923,17 +19923,16 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
         {
             chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableList);
 
-            auto iter_newElement_0_nullableList_NaN = entry_0.nullableList.Value().begin();
-            while (iter_newElement_0_nullableList_NaN.Next())
+            auto iter_newElement_0_nullableList_3 = entry_0.nullableList.Value().begin();
+            while (iter_newElement_0_nullableList_3.Next())
             {
-                auto & entry_NaN = iter_newElement_0_nullableList_NaN.GetValue();
-                jobject newElement_NaN;
-                std::string newElement_NaNClassName     = "java/lang/Integer";
-                std::string newElement_NaNCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
-                                                                              newElement_NaNCtorSignature.c_str(),
-                                                                              static_cast<uint8_t>(entry_NaN), newElement_NaN);
-                chip::JniReferences::GetInstance().AddToList(newElement_0_nullableList, newElement_NaN);
+                auto & entry_3 = iter_newElement_0_nullableList_3.GetValue();
+                jobject newElement_3;
+                std::string newElement_3ClassName     = "java/lang/Integer";
+                std::string newElement_3CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), static_cast<uint8_t>(entry_3), newElement_3);
+                chip::JniReferences::GetInstance().AddToList(newElement_0_nullableList, newElement_3);
             }
         }
         jobject newElement_0_optionalList;
@@ -19946,17 +19945,16 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
             jobject newElement_0_optionalListInsideOptional;
             chip::JniReferences::GetInstance().CreateArrayList(newElement_0_optionalListInsideOptional);
 
-            auto iter_newElement_0_optionalListInsideOptional_NaN = entry_0.optionalList.Value().begin();
-            while (iter_newElement_0_optionalListInsideOptional_NaN.Next())
+            auto iter_newElement_0_optionalListInsideOptional_3 = entry_0.optionalList.Value().begin();
+            while (iter_newElement_0_optionalListInsideOptional_3.Next())
             {
-                auto & entry_NaN = iter_newElement_0_optionalListInsideOptional_NaN.GetValue();
-                jobject newElement_NaN;
-                std::string newElement_NaNClassName     = "java/lang/Integer";
-                std::string newElement_NaNCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
-                                                                              newElement_NaNCtorSignature.c_str(),
-                                                                              static_cast<uint8_t>(entry_NaN), newElement_NaN);
-                chip::JniReferences::GetInstance().AddToList(newElement_0_optionalListInsideOptional, newElement_NaN);
+                auto & entry_3 = iter_newElement_0_optionalListInsideOptional_3.GetValue();
+                jobject newElement_3;
+                std::string newElement_3ClassName     = "java/lang/Integer";
+                std::string newElement_3CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_3ClassName.c_str(), newElement_3CtorSignature.c_str(), static_cast<uint8_t>(entry_3), newElement_3);
+                chip::JniReferences::GetInstance().AddToList(newElement_0_optionalListInsideOptional, newElement_3);
             }
             chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalListInsideOptional, newElement_0_optionalList);
         }
@@ -19976,18 +19974,17 @@ void CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::CallbackFn
             {
                 chip::JniReferences::GetInstance().CreateArrayList(newElement_0_nullableOptionalListInsideOptional);
 
-                auto iter_newElement_0_nullableOptionalListInsideOptional_NaN =
-                    entry_0.nullableOptionalList.Value().Value().begin();
-                while (iter_newElement_0_nullableOptionalListInsideOptional_NaN.Next())
+                auto iter_newElement_0_nullableOptionalListInsideOptional_4 = entry_0.nullableOptionalList.Value().Value().begin();
+                while (iter_newElement_0_nullableOptionalListInsideOptional_4.Next())
                 {
-                    auto & entry_NaN = iter_newElement_0_nullableOptionalListInsideOptional_NaN.GetValue();
-                    jobject newElement_NaN;
-                    std::string newElement_NaNClassName     = "java/lang/Integer";
-                    std::string newElement_NaNCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_NaNClassName.c_str(),
-                                                                                  newElement_NaNCtorSignature.c_str(),
-                                                                                  static_cast<uint8_t>(entry_NaN), newElement_NaN);
-                    chip::JniReferences::GetInstance().AddToList(newElement_0_nullableOptionalListInsideOptional, newElement_NaN);
+                    auto & entry_4 = iter_newElement_0_nullableOptionalListInsideOptional_4.GetValue();
+                    jobject newElement_4;
+                    std::string newElement_4ClassName     = "java/lang/Integer";
+                    std::string newElement_4CtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_4ClassName.c_str(),
+                                                                                  newElement_4CtorSignature.c_str(),
+                                                                                  static_cast<uint8_t>(entry_4), newElement_4);
+                    chip::JniReferences::GetInstance().AddToList(newElement_0_nullableOptionalListInsideOptional, newElement_4);
                 }
             }
             chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalListInsideOptional,
@@ -20296,16 +20293,16 @@ void CHIPTestClusterListFabricScopedAttributeCallback::CallbackFn(
         jobject newElement_0_fabricSensitiveInt8uList;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_fabricSensitiveInt8uList);
 
-        auto iter_newElement_0_fabricSensitiveInt8uList_NaN = entry_0.fabricSensitiveInt8uList.begin();
-        while (iter_newElement_0_fabricSensitiveInt8uList_NaN.Next())
+        auto iter_newElement_0_fabricSensitiveInt8uList_2 = entry_0.fabricSensitiveInt8uList.begin();
+        while (iter_newElement_0_fabricSensitiveInt8uList_2.Next())
         {
-            auto & entry_NaN = iter_newElement_0_fabricSensitiveInt8uList_NaN.GetValue();
-            jobject newElement_NaN;
-            std::string newElement_NaNClassName     = "java/lang/Integer";
-            std::string newElement_NaNCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-            chip::JniReferences::GetInstance().AddToList(newElement_0_fabricSensitiveInt8uList, newElement_NaN);
+            auto & entry_2 = iter_newElement_0_fabricSensitiveInt8uList_2.GetValue();
+            jobject newElement_2;
+            std::string newElement_2ClassName     = "java/lang/Integer";
+            std::string newElement_2CtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_2ClassName.c_str(),
+                                                                          newElement_2CtorSignature.c_str(), entry_2, newElement_2);
+            chip::JniReferences::GetInstance().AddToList(newElement_0_fabricSensitiveInt8uList, newElement_2);
         }
         jobject newElement_0_fabricIndex;
         std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";

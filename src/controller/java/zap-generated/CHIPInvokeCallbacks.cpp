@@ -3452,41 +3452,40 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
         jobject newElement_0_attributeValueList;
         chip::JniReferences::GetInstance().CreateArrayList(newElement_0_attributeValueList);
 
-        auto iter_newElement_0_attributeValueList_NaN = entry_0.attributeValueList.begin();
-        while (iter_newElement_0_attributeValueList_NaN.Next())
+        auto iter_newElement_0_attributeValueList_2 = entry_0.attributeValueList.begin();
+        while (iter_newElement_0_attributeValueList_2.Next())
         {
-            auto & entry_NaN = iter_newElement_0_attributeValueList_NaN.GetValue();
-            jobject newElement_NaN;
-            jobject newElement_NaN_attributeId;
-            if (!entry_NaN.attributeId.HasValue())
+            auto & entry_2 = iter_newElement_0_attributeValueList_2.GetValue();
+            jobject newElement_2;
+            jobject newElement_2_attributeId;
+            if (!entry_2.attributeId.HasValue())
             {
-                chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_NaN_attributeId);
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_attributeId);
             }
             else
             {
-                jobject newElement_NaN_attributeIdInsideOptional;
-                std::string newElement_NaN_attributeIdInsideOptionalClassName     = "java/lang/Long";
-                std::string newElement_NaN_attributeIdInsideOptionalCtorSignature = "(J)V";
+                jobject newElement_2_attributeIdInsideOptional;
+                std::string newElement_2_attributeIdInsideOptionalClassName     = "java/lang/Long";
+                std::string newElement_2_attributeIdInsideOptionalCtorSignature = "(J)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-                    newElement_NaN_attributeIdInsideOptionalClassName.c_str(),
-                    newElement_NaN_attributeIdInsideOptionalCtorSignature.c_str(), entry_NaN.attributeId.Value(),
-                    newElement_NaN_attributeIdInsideOptional);
-                chip::JniReferences::GetInstance().CreateOptional(newElement_NaN_attributeIdInsideOptional,
-                                                                  newElement_NaN_attributeId);
+                    newElement_2_attributeIdInsideOptionalClassName.c_str(),
+                    newElement_2_attributeIdInsideOptionalCtorSignature.c_str(), entry_2.attributeId.Value(),
+                    newElement_2_attributeIdInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(newElement_2_attributeIdInsideOptional, newElement_2_attributeId);
             }
-            jobject newElement_NaN_attributeValue;
-            chip::JniReferences::GetInstance().CreateArrayList(newElement_NaN_attributeValue);
+            jobject newElement_2_attributeValue;
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_2_attributeValue);
 
-            auto iter_newElement_NaN_attributeValue_NaN = entry_NaN.attributeValue.begin();
-            while (iter_newElement_NaN_attributeValue_NaN.Next())
+            auto iter_newElement_2_attributeValue_4 = entry_2.attributeValue.begin();
+            while (iter_newElement_2_attributeValue_4.Next())
             {
-                auto & entry_NaN = iter_newElement_NaN_attributeValue_NaN.GetValue();
-                jobject newElement_NaN;
-                std::string newElement_NaNClassName     = "java/lang/Integer";
-                std::string newElement_NaNCtorSignature = "(I)V";
+                auto & entry_4 = iter_newElement_2_attributeValue_4.GetValue();
+                jobject newElement_4;
+                std::string newElement_4ClassName     = "java/lang/Integer";
+                std::string newElement_4CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_NaNClassName.c_str(), newElement_NaNCtorSignature.c_str(), entry_NaN, newElement_NaN);
-                chip::JniReferences::GetInstance().AddToList(newElement_NaN_attributeValue, newElement_NaN);
+                    newElement_4ClassName.c_str(), newElement_4CtorSignature.c_str(), entry_4, newElement_4);
+                chip::JniReferences::GetInstance().AddToList(newElement_2_attributeValue, newElement_4);
             }
 
             jclass attributeValuePairStructClass;
@@ -3505,9 +3504,9 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                 return;
             }
 
-            newElement_NaN = env->NewObject(attributeValuePairStructClass, attributeValuePairStructCtor, newElement_NaN_attributeId,
-                                            newElement_NaN_attributeValue);
-            chip::JniReferences::GetInstance().AddToList(newElement_0_attributeValueList, newElement_NaN);
+            newElement_2 = env->NewObject(attributeValuePairStructClass, attributeValuePairStructCtor, newElement_2_attributeId,
+                                          newElement_2_attributeValue);
+            chip::JniReferences::GetInstance().AddToList(newElement_0_attributeValueList, newElement_2);
         }
 
         jclass sceneExtensionFieldSetStructClass;
