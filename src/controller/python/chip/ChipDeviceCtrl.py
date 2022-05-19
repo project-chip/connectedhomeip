@@ -81,6 +81,7 @@ class DCState(enum.IntEnum):
     BLE_READY = 2
     RENDEZVOUS_ONGOING = 3
     RENDEZVOUS_CONNECTED = 4
+    COMMISSIONING = 5
 
 
 class ChipDeviceController():
@@ -116,8 +117,12 @@ class ChipDeviceController():
                     err)
             else:
                 print("Established CASE with Device")
-            self.state = DCState.IDLE
-            self._ChipStack.completeEvent.set()
+            if self.state != DCState.COMMISSIONING:
+                # During Commissioning, HandleKeyExchangeComplete will also be called,
+                # in this case the async operation should be marked as finished by
+                # HandleCommissioningComplete instead this function.
+                self.state = DCState.IDLE
+                self._ChipStack.completeEvent.set()
 
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
@@ -126,9 +131,9 @@ class ChipDeviceController():
                 print("Commissioning complete")
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
+            self._ChipStack.commissioningEventRes = err
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
-            self._ChipStack.commissioningEventRes = err
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandleKeyExchangeComplete)
@@ -212,14 +217,11 @@ class ChipDeviceController():
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
-        self.state = DCState.RENDEZVOUS_ONGOING
+        self.state = DCState.COMMISSIONING
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         )
-        # Wait up to 5 additional seconds for the commissioning complete event
-        if not self._ChipStack.commissioningCompleteEvent.isSet():
-            self._ChipStack.commissioningCompleteEvent.wait(5.0)
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
             return False
@@ -253,14 +255,12 @@ class ChipDeviceController():
     def Commission(self, nodeid):
         self.CheckIsActive()
         self._ChipStack.commissioningCompleteEvent.clear()
+        self.state = DCState.COMMISSIONING
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_Commission(
                 self.devCtrl, nodeid)
         )
-        # Wait up to 5 additional seconds for the commissioning complete event
-        if not self._ChipStack.commissioningCompleteEvent.isSet():
-            self._ChipStack.commissioningCompleteEvent.wait(5.0)
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
             return False
@@ -297,7 +297,7 @@ class ChipDeviceController():
 
         # IP connection will run through full commissioning, so we need to wait
         # for the commissioning complete event, not just any callback.
-        self.state = DCState.RENDEZVOUS_ONGOING
+        self.state = DCState.COMMISSIONING
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
@@ -315,7 +315,7 @@ class ChipDeviceController():
 
         # IP connection will run through full commissioning, so we need to wait
         # for the commissioning complete event, not just any callback.
-        self.state = DCState.RENDEZVOUS_ONGOING
+        self.state = DCState.COMMISSIONING
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
