@@ -21886,7 +21886,21 @@ private:
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
                 listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
                 listHolder_0->mList[1].subjects.SetNull();
-                listHolder_0->mList[1].targets.SetNull();
+                listHolder_0->mList[1].targets.SetNonNull();
+
+                {
+                    auto * listHolder_3 = new ListHolder<chip::app::Clusters::AccessControl::Structs::Target::Type>(1);
+                    listFreer.add(listHolder_3);
+
+                    listHolder_3->mList[0].cluster.SetNonNull();
+                    listHolder_3->mList[0].cluster.Value() = 41UL;
+                    listHolder_3->mList[0].endpoint.SetNull();
+                    listHolder_3->mList[0].deviceType.SetNull();
+
+                    listHolder_0->mList[1].targets.Value() =
+                        chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
+                                                                                                              1);
+                }
                 listHolder_0->mList[1].fabricIndex = 1;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
