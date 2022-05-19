@@ -400,7 +400,9 @@ void DefaultOTARequestor::DisconnectFromProvider()
         return;
     }
 
-    mCASESessionManager->ReleaseSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID));
+    PeerId peerID = fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID);
+    mCASESessionManager->FindExistingSession(peerID)->Disconnect();
+    mCASESessionManager->ReleaseSession(peerID);
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
