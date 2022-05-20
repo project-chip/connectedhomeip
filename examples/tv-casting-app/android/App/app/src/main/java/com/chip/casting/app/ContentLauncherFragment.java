@@ -6,9 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.TvCastingApp;
+import com.chip.casting.platform.MatterCallbackHandler;
 
 /** A {@link Fragment} to send Content Launcher commands from the TV Casting App. */
 public class ContentLauncherFragment extends Fragment {
@@ -49,7 +51,18 @@ public class ContentLauncherFragment extends Fragment {
             EditText contentDisplayString =
                 getView().findViewById(R.id.contentDisplayStringEditText);
             tvCastingApp.contentLauncherLaunchURL(
-                contentUrl.getText().toString(), contentDisplayString.getText().toString());
+                contentUrl.getText().toString(),
+                contentDisplayString.getText().toString(),
+                new MatterCallbackHandler() {
+                  @Override
+                  public boolean handle(boolean success) {
+                    Log.d(TAG, "handle() called on LaunchURLResponse with success " + success);
+                    TextView launchUrlStatus = getView().findViewById(R.id.launchUrlStatus);
+                    launchUrlStatus.setText(
+                        success ? "Launch URL succeeded!" : "Launch URL failed!");
+                    return true;
+                  }
+                });
           }
         };
 

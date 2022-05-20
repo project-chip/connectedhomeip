@@ -38,7 +38,9 @@ void PrepareForCommissioning(const chip::Dnssd::DiscoveredNodeData * selectedCom
 
 void InitCommissioningFlow(intptr_t commandArg);
 
-CHIP_ERROR HandleCommissioningCompleteCallback();
+CHIP_ERROR HandleCommissioningCompleteCallback(bool success);
+
+CHIP_ERROR LaunchURLResponseCallback(bool success);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 void HandleUDCSendExpiration(chip::System::Layer * aSystemLayer, void * context);

@@ -57,9 +57,9 @@ CHIP_ERROR RequestCommissioning(int index)
  */
 void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
-    CastingServer::GetInstance()->InitServer(HandleCommissioningCompleteCallback);
+    CastingServer::GetInstance()->Init();
 
-    CastingServer::GetInstance()->OpenBasicCommissioningWindow();
+    CastingServer::GetInstance()->OpenBasicCommissioningWindow(HandleCommissioningCompleteCallback);
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
@@ -109,10 +109,21 @@ void InitCommissioningFlow(intptr_t commandArg)
     }
 }
 
-CHIP_ERROR HandleCommissioningCompleteCallback()
+CHIP_ERROR LaunchURLResponseCallback(bool success)
 {
-    ChipLogProgress(AppServer, "HandleCommissioningCompleteCallback calling ContentLauncherLaunchURL");
-    return CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
+    ChipLogProgress(AppServer, "LaunchURLResponseCallback success status %d", success);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR HandleCommissioningCompleteCallback(bool success)
+{
+    ChipLogProgress(AppServer, "HandleCommissioningCompleteCallback called with %d", success);
+    if (success)
+    {
+        ChipLogProgress(AppServer, "HandleCommissioningCompleteCallback calling ContentLauncherLaunchURL");
+        return CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr, LaunchURLResponseCallback);
+    }
+    return CHIP_ERROR_NO_ENDPOINT;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

@@ -7,4 +7,5 @@
     <string name="default_content_display_string">Test video</string>
     <string name="content_url_prompt_text">URL</string>
     <string name="content_display_string_prompt_text">Display string</string>
+    <string name="discovery_message_text">Discovering commissioners on-network...</string>
 </resources>

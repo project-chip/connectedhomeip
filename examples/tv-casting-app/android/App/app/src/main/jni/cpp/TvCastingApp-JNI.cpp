@@ -17,7 +17,7 @@
  */
 
 #include "TvCastingApp-JNI.h"
-#include "CallbackHelper.h"
+#include "MatterCallbackHandler.h"
 #include "CastingServer.h"
 #include "JNIDACProvider.h"
 
@@ -97,16 +97,28 @@ JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
     }
 }
 
-JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv *, jobject, jint duration)
+MatterCallbackHandler gCommissioningCompleteHandler;
+CHIP_ERROR CommissioningCompleteHandler(bool success)
+{
+    return gCommissioningCompleteHandler.Handle(success);
+}
+
+JNI_METHOD(jboolean, openBasicCommissioningWindow)(JNIEnv * env, jobject, jint duration, jobject jCommissioningCompleteHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
     ChipLogProgress(AppServer, "JNI_METHOD openBasicCommissioningWindow called with duration %d", duration);
+    CHIP_ERROR err = gCommissioningCompleteHandler.SetUp(env, jCommissioningCompleteHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandler::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow();
+    err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(CommissioningCompleteHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
@@ -130,7 +142,7 @@ JNI_METHOD(jboolean, sendUserDirectedCommissioningRequest)(JNIEnv * env, jobject
     CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(peerAddress);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingServer::SendUserDirectedCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "TVCastingApp-JNI::sendUserDirectedCommissioningRequest failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
     return true;
@@ -142,35 +154,49 @@ JNI_METHOD(jboolean, discoverCommissioners)(JNIEnv *, jobject)
     CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "CastingServer::DiscoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(AppServer, "TVCastingApp-JNI::discoverCommissioners failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
     return true;
 }
 
-JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCompleteHandler)
+JNI_METHOD(void, init)(JNIEnv *, jobject)
 {
-    ChipLogProgress(AppServer, "JNI_METHOD initServer called");
-    CHIP_ERROR err = SetUpMatterCallbackHandler(env, jCommissioningCompleteHandler, gCommissioningCompleteHandler);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "initServer error: %s", err.AsString());
-        return false;
-    }
-
-    CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
-    return true;
+    ChipLogProgress(AppServer, "JNI_METHOD init called");
+    CastingServer::GetInstance()->Init();
 }
 
-JNI_METHOD(void, contentLauncherLaunchURL)(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr)
+MatterCallbackHandler gLaunchURLResponseHandler;
+CHIP_ERROR LaunchURLResponseHandler(bool success)
+{
+    return gLaunchURLResponseHandler.Handle(success);
+}
+
+JNI_METHOD(jboolean, contentLauncherLaunchURL)
+(JNIEnv * env, jobject, jstring contentUrl, jstring contentDisplayStr, jobject jLaunchURLResponseHandler)
 {
     ChipLogProgress(AppServer, "JNI_METHOD contentLauncherLaunchURL called");
     const char * nativeContentUrl        = env->GetStringUTFChars(contentUrl, 0);
     const char * nativeContentDisplayStr = env->GetStringUTFChars(contentDisplayStr, 0);
 
-    CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr);
+    CHIP_ERROR err = gLaunchURLResponseHandler.SetUp(env, jLaunchURLResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "MatterCallbackHandler::SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err =
+        CastingServer::GetInstance()->ContentLauncherLaunchURL(nativeContentUrl, nativeContentDisplayStr, LaunchURLResponseHandler);
+    VerifyOrExit(CHIP_NO_ERROR == err,
+                 ChipLogError(AppServer, "CastingServer::ContentLauncherLaunchURL failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     env->ReleaseStringUTFChars(contentUrl, nativeContentUrl);
     env->ReleaseStringUTFChars(contentDisplayStr, nativeContentDisplayStr);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    return true;
 }

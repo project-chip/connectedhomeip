@@ -21,15 +21,17 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 
-struct MatterCallbackHandler
+class MatterCallbackHandler
 {
-    jobject object   = nullptr;
-    jclass clazz     = nullptr;
-    jmethodID method = nullptr;
+public:
+    CHIP_ERROR SetUp(JNIEnv * env, jobject inHandler);
+
+    CHIP_ERROR Handle(bool success);
+
+private:
+    jobject mObject   = nullptr;
+    jclass mClazz     = nullptr;
+    jmethodID mMethod = nullptr;
 };
 
-extern struct MatterCallbackHandler gCommissioningCompleteHandler;
-
-CHIP_ERROR SetUpMatterCallbackHandler(JNIEnv * env, jobject inHandler, MatterCallbackHandler & callback);
-
-CHIP_ERROR CommissioningCompleteHandler();
+extern MatterCallbackHandler gCommissioningCompleteHandler;

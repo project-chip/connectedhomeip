@@ -39,15 +39,17 @@ public class TvCastingApp {
 
   public native void setDACProvider(DACProvider provider);
 
-  public native boolean openBasicCommissioningWindow(int duration);
+  public native boolean openBasicCommissioningWindow(
+      int duration, Object commissioningCompleteHandler);
 
   public native boolean sendUserDirectedCommissioningRequest(String address, int port);
 
   public native boolean discoverCommissioners();
 
-  public native boolean initServer(Object commissioningCompleteHandler);
+  public native void init();
 
-  public native void contentLauncherLaunchURL(String contentUrl, String contentDisplayStr);
+  public native boolean contentLauncherLaunchURL(
+      String contentUrl, String contentDisplayStr, Object launchURLHandler);
 
   static {
     System.loadLibrary("TvCastingApp");
