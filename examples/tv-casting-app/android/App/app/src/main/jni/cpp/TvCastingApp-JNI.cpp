@@ -153,7 +153,7 @@ JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCo
 {
     ChipLogProgress(AppServer, "JNI_METHOD initServer called");
     CHIP_ERROR err = SetUpMatterCallbackHandler(env, jCommissioningCompleteHandler, gCommissioningCompleteHandler);
-    if(err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "initServer error: %s", err.AsString());
         return false;

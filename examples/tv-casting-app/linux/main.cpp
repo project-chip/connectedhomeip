@@ -114,7 +114,6 @@ int main(int argc, char * argv[])
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
-
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
