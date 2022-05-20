@@ -29,6 +29,7 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <platform/Zephyr/DeviceInfoProviderImpl.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
 
@@ -108,6 +109,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
 #if !CONFIG_NORDIC_SECURITY_BACKEND
     // Add entropy source based on Zephyr entropy driver
