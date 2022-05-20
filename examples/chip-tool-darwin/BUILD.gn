@@ -48,6 +48,8 @@ executable("chip-tool-darwin") {
     "commands/pairing/Commands.h",
     "commands/pairing/PairingCommandBridge.mm",
     "commands/pairing/PairingDelegateBridge.mm",
+    "commands/storage/Commands.h",
+    "commands/storage/StorageManagementCommand.mm",
     "main.mm",
   ]
 

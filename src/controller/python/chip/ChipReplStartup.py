@@ -12,6 +12,7 @@ import chip.logging
 import argparse
 import builtins
 import chip.FabricAdmin
+import atexit
 
 _fabricAdmins = None
 
@@ -66,7 +67,7 @@ def CreateDefaultDeviceController():
     return _fabricAdmins[0].NewController()
 
 
-def ReplInit():
+def ReplInit(debug):
     #
     # Install the pretty printer that rich provides to replace the existing
     # printer.
@@ -92,8 +93,16 @@ def ReplInit():
     coloredlogs.install(level='DEBUG')
     chip.logging.RedirectToPythonLogging()
 
-    # logging.getLogger().setLevel(logging.DEBUG)
-    logging.getLogger().setLevel(logging.WARN)
+    if debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+    else:
+        logging.getLogger().setLevel(logging.WARN)
+
+
+def StackShutdown():
+    chip.FabricAdmin.FabricAdmin.ShutdownAll()
+    ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
+    builtins.chipStack.Shutdown()
 
 
 def matterhelp(classOrObj=None):
@@ -122,13 +131,18 @@ console = Console()
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default="/tmp/repl-storage.json")
+parser.add_argument(
+    "-d", "--debug", help="Set default logging level to debug.", action="store_true")
 args = parser.parse_args()
-ReplInit()
+
+ReplInit(args.debug)
 chipStack = ChipStack(persistentStoragePath=args.storagepath)
 fabricAdmins = LoadFabricAdmins()
 devCtrl = CreateDefaultDeviceController()
 
 builtins.devCtrl = devCtrl
+
+atexit.register(StackShutdown)
 
 console.print(
     '\n\n[blue]Default CHIP Device Controller has been initialized to manage [bold red]fabricAdmins[0][blue], and is available as [bold red]devCtrl')

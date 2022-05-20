@@ -104,7 +104,7 @@ public:
      * Notifies the BindingManager that a fabric is removed from the device
      *
      */
-    void FabricRemoved(CompressedFabricId compressedId, FabricIndex fabricIndex);
+    void FabricRemoved(FabricIndex fabricIndex);
 
     /*
      * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.
@@ -137,6 +137,9 @@ private:
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+
+    // Used to keep track of synchronous failures from FindOrEstablishSession.
+    CHIP_ERROR mLastSessionEstablishmentError;
 };
 
 } // namespace chip

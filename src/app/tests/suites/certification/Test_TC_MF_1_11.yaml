@@ -69,7 +69,7 @@ tests:
           1. On your DUT controller connect using wrong manual code. Repeat the step for 20 times.
 
           Below the example when using chip tool as controller
-          ./chip-tool pairing manualcode 1 36177160937  (With wrong passcode)
+          ./chip-tool pairing code 1 36177160937  (With wrong passcode)
       disabled: true
 
     - label: "DUT_CR1 starts a 21st commissioning process with a valid passcode"
@@ -78,5 +78,5 @@ tests:
 
           Below the example when using chip tool as controller
 
-          ./chip-tool pairing manualcode 1 35407541839 (correct passcode)
+          ./chip-tool pairing code 1 35407541839 (correct passcode)
       disabled: true

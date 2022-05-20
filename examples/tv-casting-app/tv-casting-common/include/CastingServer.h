@@ -20,6 +20,7 @@
 
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
+#include <functional>
 #include <zap-generated/CHIPClusters.h>
 
 #include "TargetEndpointInfo.h"
@@ -40,7 +41,7 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
-    void InitServer();
+    void InitServer(std::function<CHIP_ERROR()> commissioningCompleteCallback);
 
     CHIP_ERROR DiscoverCommissioners();
     const chip::Dnssd::DiscoveredNodeData * GetDiscoveredCommissioner(int index);
@@ -51,9 +52,11 @@ public:
 
     CHIP_ERROR InitBindingHandlers();
     TargetVideoPlayerInfo * GetTargetVideoPlayerInfo() { return &mTargetVideoPlayerInfo; }
-    CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex);
+    CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
+                                         std::function<CHIP_ERROR()> commissioningCompleteCallback);
     void ReadServerClusters(chip::EndpointId endpointId);
     void ReadServerClustersForNode(chip::NodeId nodeId);
+
     static void OnDescriptorReadSuccessResponse(void * context,
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
@@ -67,13 +70,14 @@ public:
     chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
     void PrintBindings();
     chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
-    void SetDefaultFabricIndex();
+    void SetDefaultFabricIndex(std::function<CHIP_ERROR()> commissioningCompleteCallback);
 
 private:
     static CastingServer * castingServer_;
-    CastingServer() {}
+    CastingServer();
 
     bool mInited = false;
     TargetVideoPlayerInfo mTargetVideoPlayerInfo;
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
+    std::function<CHIP_ERROR()> mCommissioningCompleteCallback;
 };

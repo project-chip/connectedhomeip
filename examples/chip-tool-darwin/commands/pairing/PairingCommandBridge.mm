@@ -16,15 +16,12 @@
  *
  */
 
-#import <CHIP/CHIPCommissioningParameters.h>
+#import <CHIP/CHIP.h>
 #import <CHIP/CHIPError_Internal.h>
-#import <setup_payload/ManualSetupPayloadGenerator.h>
-#import <setup_payload/SetupPayload.h>
 
 #include "../common/CHIPCommandBridge.h"
 #include "PairingCommandBridge.h"
 #include "PairingDelegateBridge.h"
-#include "platform/PlatformManager.h"
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
@@ -61,8 +58,10 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
 {
     NSError * error;
     switch (mPairingMode) {
-    case PairingMode::QRCode:
-    case PairingMode::ManualCode:
+    case PairingMode::None:
+        Unpair();
+        break;
+    case PairingMode::Code:
         PairWithPayload(&error);
         break;
     case PairingMode::Ethernet:
@@ -73,7 +72,10 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
         break;
     }
 
-    return [CHIPError errorToCHIPErrorCode:error];
+    if (error != nil) {
+        SetCommandExitStatus(error);
+    }
+    return CHIP_NO_ERROR;
 }
 
 void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
@@ -98,4 +100,52 @@ void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
                                  port:mRemotePort
                          setupPINCode:mSetupPINCode
                                 error:error];
+}
+
+void PairingCommandBridge::Unpair()
+{
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip-tool.command", DISPATCH_QUEUE_SERIAL);
+    [CurrentCommissioner()
+        getConnectedDevice:mNodeId
+                     queue:callbackQueue
+         completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
+             CHIP_ERROR err = CHIP_NO_ERROR;
+             if (error) {
+                 err = [CHIPError errorToCHIPErrorCode:error];
+                 LogNSError("Error: ", error);
+                 SetCommandExitStatus(err);
+             } else if (device == nil) {
+                 ChipLogError(chipTool, "Error: %s", chip::ErrorStr(CHIP_ERROR_INTERNAL));
+                 SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+             } else {
+                 ChipLogProgress(chipTool, "Attempting to unpair device %llu", mNodeId);
+                 CHIPOperationalCredentials * opCredsCluster = [[CHIPOperationalCredentials alloc] initWithDevice:device
+                                                                                                         endpoint:0
+                                                                                                            queue:callbackQueue];
+                 [opCredsCluster readAttributeCurrentFabricIndexWithCompletionHandler:^(
+                     NSNumber * _Nullable value, NSError * _Nullable readError) {
+                     if (readError) {
+                         CHIP_ERROR readErr = [CHIPError errorToCHIPErrorCode:readError];
+                         LogNSError("Failed to get current fabric: ", readError);
+                         SetCommandExitStatus(readErr);
+                         return;
+                     }
+                     CHIPOperationalCredentialsClusterRemoveFabricParams * params =
+                         [[CHIPOperationalCredentialsClusterRemoveFabricParams alloc] init];
+                     params.fabricIndex = value;
+                     [opCredsCluster removeFabricWithParams:params
+                                          completionHandler:^(CHIPOperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                              NSError * _Nullable removeError) {
+                                              CHIP_ERROR removeErr = CHIP_NO_ERROR;
+                                              if (removeError) {
+                                                  removeErr = [CHIPError errorToCHIPErrorCode:removeError];
+                                                  LogNSError("Failed to remove current fabric: ", removeError);
+                                              } else {
+                                                  ChipLogProgress(chipTool, "Successfully unpaired deviceId %llu", mNodeId);
+                                              }
+                                              SetCommandExitStatus(removeErr);
+                                          }];
+                 }];
+             }
+         }];
 }

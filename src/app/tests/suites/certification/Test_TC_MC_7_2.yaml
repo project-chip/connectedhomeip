@@ -28,31 +28,35 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Disabled due to issue- #13029
     - label: "Reads the OutputList attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "OutputList"
       response:
           saveAs: audioOutputListValues
           constraints:
-              type: list
+              type: OutPutInfo
 
-    #Disabled due to issue- #13029
+    #Issue 18102
     - label: "Sends a RenameOutput command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "RenameOutput"
       arguments:
           values:
               - name: "Index"
-                value: audioOutputListValues
+                value: 1
               - name: "name"
                 value: "CertTest"
 
     #Disabled due to issue- #13029
-    - label: "Reads the OutputList attribute from the DUT"
-      disabled: true
-      command: "readAttribute"
-      attribute: "OutputList"
-      response:
-          value: audioOutputListValues
+    - label:
+          "Reads the OutputList attribute from the DUT Verify that the output at
+          the index provided in step 2 has the name CertTest"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

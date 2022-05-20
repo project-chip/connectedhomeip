@@ -53,6 +53,7 @@ public:
         if (mTestSubStepIndex != mTestSubStepCount)
         {
             Exit(mTestName, CHIP_ERROR_INVALID_ARGUMENT);
+            return;
         }
         mTestSubStepIndex = 0;
         mTestSubStepCount = 0;

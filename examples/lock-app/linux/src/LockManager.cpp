@@ -59,6 +59,16 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
         numberOfSupportedCredentials = std::max(numberOfPINCredentialsSupported, numberOfRFIDCredentialsSupported);
     }
 
+    uint8_t numberOfCredentialsSupportedPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsSupportedPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        numberOfCredentialsSupportedPerUser = 5;
+    }
+
     uint8_t numberOfWeekDaySchedulesPerUser = 0;
     if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekDaySchedulesPerUser))
     {
@@ -79,14 +89,15 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
         numberOfYearDaySchedulesPerUser = 10;
     }
 
-    mEndpoints.push_back(LockEndpoint(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials,
-                                      numberOfWeekDaySchedulesPerUser, numberOfYearDaySchedulesPerUser));
+    mEndpoints.emplace_back(endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
+                            numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser);
 
-    ChipLogProgress(
-        Zcl,
-        "Initialized new lock door endpoint [id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d,yearDaySchedulesPerUser=%d]",
-        endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
-        numberOfYearDaySchedulesPerUser);
+    ChipLogProgress(Zcl,
+                    "Initialized new lock door endpoint "
+                    "[id=%d,users=%d,credentials=%d,weekDaySchedulesPerUser=%d,yearDaySchedulesPerUser=%d,"
+                    "numberOfCredentialsSupportedPerUser=%d]",
+                    endpointId, numberOfSupportedUsers, numberOfSupportedCredentials, numberOfWeekDaySchedulesPerUser,
+                    numberOfYearDaySchedulesPerUser, numberOfCredentialsSupportedPerUser);
 
     return true;
 }
@@ -150,8 +161,9 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     return lockEndpoint->GetCredential(credentialIndex, credentialType, credential);
 }
 
-bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                                DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
+                                chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
+                                const chip::ByteSpan & credentialData)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -159,7 +171,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
         ChipLogError(Zcl, "Unable to set the credential - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->SetCredential(credentialIndex, credentialStatus, credentialType, credentialData);
+    return lockEndpoint->SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType, credentialData);
 }
 
 DlStatus LockManager::GetSchedule(chip::EndpointId endpointId, uint8_t weekDayIndex, uint16_t userIndex,
@@ -217,11 +229,11 @@ DlStatus LockManager::SetSchedule(chip::EndpointId endpointId, uint8_t yearDayIn
 
 LockEndpoint * LockManager::getEndpoint(chip::EndpointId endpointId)
 {
-    for (auto it = mEndpoints.begin(); it != mEndpoints.end(); ++it)
+    for (auto & mEndpoint : mEndpoints)
     {
-        if (it->GetEndpointId() == endpointId)
+        if (mEndpoint.GetEndpointId() == endpointId)
         {
-            return &(*it);
+            return &mEndpoint;
         }
     }
     return nullptr;

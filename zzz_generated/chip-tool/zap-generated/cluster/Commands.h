@@ -5358,8 +5358,8 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * ActiveLocale                                                      | 0x0001 |
-| * SupportedLocales                                                  | 0x0002 |
+| * ActiveLocale                                                      | 0x0000 |
+| * SupportedLocales                                                  | 0x0001 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -5384,12 +5384,12 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002B, 0x00000001, mValue);
+        return WriteAttribute::SendCommand(device, endpointIds.at(0), 0x0000002B, 0x00000000, mValue);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002B, 0x00000001, mValue);
+        return WriteAttribute::SendGroupCommand(groupId, fabricIndex, 0x0000002B, 0x00000000, mValue);
     }
 
 private:
@@ -7409,6 +7409,7 @@ private:
 | * MaxRFIDCodeLength                                                 | 0x0019 |
 | * MinRFIDCodeLength                                                 | 0x001A |
 | * CredentialRulesSupport                                            | 0x001B |
+| * NumberOfCredentialsSupportedPerUser                               | 0x001C |
 | * EnableLogging                                                     | 0x0020 |
 | * Language                                                          | 0x0021 |
 | * LEDSettings                                                       | 0x0022 |
@@ -9322,7 +9323,6 @@ public:
     WindowCoveringGoToLiftPercentage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("go-to-lift-percentage", credsIssuerConfig)
     {
-        AddArgument("LiftPercentageValue", 0, UINT8_MAX, &mRequest.liftPercentageValue);
         AddArgument("LiftPercent100thsValue", 0, UINT16_MAX, &mRequest.liftPercent100thsValue);
         ClusterCommand::AddArguments();
     }
@@ -9385,7 +9385,6 @@ public:
     WindowCoveringGoToTiltPercentage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("go-to-tilt-percentage", credsIssuerConfig)
     {
-        AddArgument("TiltPercentageValue", 0, UINT8_MAX, &mRequest.tiltPercentageValue);
         AddArgument("TiltPercent100thsValue", 0, UINT16_MAX, &mRequest.tiltPercent100thsValue);
         ClusterCommand::AddArguments();
     }
@@ -10816,7 +10815,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteFanControlSpeedSetting : public WriteAttribute
@@ -10842,7 +10841,7 @@ public:
     }
 
 private:
-    uint8_t mValue;
+    chip::app::DataModel::Nullable<uint8_t> mValue;
 };
 
 class WriteFanControlRockSetting : public WriteAttribute
@@ -22097,12 +22096,14 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<ReadAttribute>(Id, "number-of-year-day-schedules-supported-per-user",
                                    Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "number-of-holiday-schedules-supported", Attributes::NumberOfHolidaySchedulesSupported::Id,
-                                   credsIssuerConfig),                                                                           //
-        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig),   //
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "max-pincode-length", Attributes::MaxPINCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "min-pincode-length", Attributes::MinPINCodeLength::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "number-of-credentials-supported-per-user",
+                                   Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),                                 //
         make_unique<ReadAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),                           //
@@ -22199,7 +22200,9 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<SubscribeAttribute>(Id, "max-rfidcode-length", Attributes::MaxRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "min-rfidcode-length", Attributes::MinRFIDCodeLength::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "credential-rules-support", Attributes::CredentialRulesSupport::Id,
-                                        credsIssuerConfig),                                                         //
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "number-of-credentials-supported-per-user",
+                                        Attributes::NumberOfCredentialsSupportedPerUser::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "enable-logging", Attributes::EnableLogging::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "language", Attributes::Language::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "ledsettings", Attributes::LEDSettings::Id, credsIssuerConfig),         //

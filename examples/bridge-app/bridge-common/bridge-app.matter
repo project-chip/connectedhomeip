@@ -526,8 +526,8 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -908,8 +908,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
     int32u linkFrameCounter = 3;
     int32u mleFrameCounter = 4;
     int8u lqi = 5;
-    int8s averageRssi = 6;
-    int8s lastRssi = 7;
+    nullable int8s averageRssi = 6;
+    nullable int8s lastRssi = 7;
     int8u frameErrorRate = 8;
     int8u messageErrorRate = 9;
     boolean rxOnWhenIdle = 10;
@@ -955,12 +955,12 @@ server cluster ThreadNetworkDiagnostics = 53 {
     ThreadConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute int16u channel = 0;
-  readonly attribute enum8 routingRole = 1;
-  readonly attribute char_string<16> networkName = 2;
-  readonly attribute int16u panId = 3;
-  readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string<17> meshLocalPrefix = 5;
+  readonly attribute nullable int16u channel = 0;
+  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable char_string<16> networkName = 2;
+  readonly attribute nullable int16u panId = 3;
+  readonly attribute nullable int64u extendedPanId = 4;
+  readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;

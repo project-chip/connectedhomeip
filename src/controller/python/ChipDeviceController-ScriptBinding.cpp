@@ -121,6 +121,8 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
                                                           uint32_t setupPINCode, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                          uint32_t setupPINCode, chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl,
+                                                               const char * onboardingPayload, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
 ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
@@ -152,7 +154,6 @@ ChipError::StorageType pychip_DeviceController_OpenCommissioningWindow(chip::Con
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
-ChipError::StorageType pychip_DeviceController_UpdateDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 // Pairing Delegate
 ChipError::StorageType
@@ -186,7 +187,7 @@ uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 // CHIP Stack objects
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 
-chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64_t subscriptionId);
+chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(SubscriptionId subscriptionId);
 
 //
 // Storage
@@ -329,6 +330,12 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     devCtrl->ReleaseOperationalDevice(nodeid);
 
     return devCtrl->PairDevice(nodeid, params, sCommissioningParameters).AsInteger();
+}
+
+ChipError::StorageType pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl,
+                                                               const char * onboardingPayload, chip::NodeId nodeid)
+{
+    return devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)
@@ -536,11 +543,6 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatus
 {
     sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
     return CHIP_NO_ERROR.AsInteger();
-}
-
-ChipError::StorageType pychip_DeviceController_UpdateDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
-{
-    return devCtrl->UpdateDevice(nodeid).AsInteger();
 }
 
 ChipError::StorageType pychip_Stack_Init()

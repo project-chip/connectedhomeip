@@ -1183,6 +1183,7 @@ client cluster DoorLock = 257 {
     kDuplicate = 2;
     kOccupied = 3;
     kInvalidField = 133;
+    kResourceExhausted = 137;
     kNotFound = 139;
   }
 
@@ -1460,6 +1461,7 @@ client cluster DoorLock = 257 {
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
   readonly attribute int8u minRFIDCodeLength = 26;
+  readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
   attribute access(write: manage) int8u soundVolume = 36;
@@ -1629,7 +1631,9 @@ client cluster DoorLock = 257 {
   response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
+    nullable fabric_idx creatorFabricIndex = 2;
+    nullable fabric_idx lastModifiedFabricIndex = 3;
+    nullable INT16U nextCredentialIndex = 4;
   }
 
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
@@ -1747,10 +1751,10 @@ client cluster FanControl = 514 {
 
   attribute FanModeType fanMode = 0;
   attribute FanModeSequenceType fanModeSequence = 1;
-  attribute int8u percentSetting = 2;
+  attribute nullable int8u percentSetting = 2;
   readonly attribute int8u percentCurrent = 3;
   readonly attribute int8u speedMax = 4;
-  attribute int8u speedSetting = 5;
+  attribute nullable int8u speedSetting = 5;
   readonly attribute int8u speedCurrent = 6;
   readonly attribute bitmap8 rockSupport = 7;
   attribute bitmap8 rockSetting = 8;
@@ -2337,8 +2341,8 @@ client cluster LevelControl = 8 {
 }
 
 client cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute int16u clusterRevision = 65533;
@@ -2474,7 +2478,12 @@ client cluster ModeSelect = 80 {
   struct ModeOptionStruct {
     char_string<32> label = 0;
     int8u mode = 1;
-    int32u semanticTag = 2;
+    SemanticTag semanticTags[] = 2;
+  }
+
+  struct SemanticTag {
+    enum16 mfgCode = 0;
+    enum16 value = 1;
   }
 
   readonly attribute char_string<32> description = 0;
@@ -3902,8 +3911,8 @@ client cluster ThreadNetworkDiagnostics = 53 {
     int32u linkFrameCounter = 3;
     int32u mleFrameCounter = 4;
     int8u lqi = 5;
-    int8s averageRssi = 6;
-    int8s lastRssi = 7;
+    nullable int8s averageRssi = 6;
+    nullable int8s lastRssi = 7;
     int8u frameErrorRate = 8;
     int8u messageErrorRate = 9;
     boolean rxOnWhenIdle = 10;
@@ -3949,12 +3958,12 @@ client cluster ThreadNetworkDiagnostics = 53 {
     ThreadConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute int16u channel = 0;
-  readonly attribute enum8 routingRole = 1;
-  readonly attribute char_string<16> networkName = 2;
-  readonly attribute int16u panId = 3;
-  readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string<17> meshLocalPrefix = 5;
+  readonly attribute nullable int16u channel = 0;
+  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable char_string<16> networkName = 2;
+  readonly attribute nullable int16u panId = 3;
+  readonly attribute nullable int64u extendedPanId = 4;
+  readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
@@ -4266,8 +4275,7 @@ client cluster WindowCovering = 258 {
   }
 
   request struct GoToLiftPercentageRequest {
-    Percent liftPercentageValue = 0;
-    optional Percent100ths liftPercent100thsValue = 1;
+    Percent100ths liftPercent100thsValue = 0;
   }
 
   request struct GoToTiltValueRequest {
@@ -4275,8 +4283,7 @@ client cluster WindowCovering = 258 {
   }
 
   request struct GoToTiltPercentageRequest {
-    Percent tiltPercentageValue = 0;
-    optional Percent100ths tiltPercent100thsValue = 1;
+    Percent100ths tiltPercent100thsValue = 0;
   }
 
   command UpOrOpen(): DefaultSuccess = 0;

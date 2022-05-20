@@ -24,52 +24,7 @@
 
 namespace chip {
 
-struct PairWithQRCodeCommand
-{
-    chip::NodeId nodeId;
-    chip::CharSpan payload;
-
-    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-    {
-        chip::TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), nodeId));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), payload));
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVType outer;
-        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
-            {
-            case 0:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, nodeId));
-                break;
-            case 1:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, payload));
-                break;
-            default:
-                break;
-            }
-        }
-
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-struct PairWithManualCodeCommand
+struct PairWithCodeCommand
 {
     chip::NodeId nodeId;
     chip::CharSpan payload;
@@ -269,13 +224,17 @@ struct WaitForCommissioneeCommand
     }
 };
 
-struct WaitForCommissionableAdvertisementCommand
+struct WaitForMessageCommand
 {
+    Optional<chip::CharSpan> registerKey;
+    chip::CharSpan message;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
         chip::TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), registerKey));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), message));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -292,41 +251,12 @@ struct WaitForCommissionableAdvertisementCommand
             VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
             switch (chip::TLV::TagNumFromTag(reader.GetTag()))
             {
-            default:
+            case 0:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, registerKey));
                 break;
-            }
-        }
-
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-struct WaitForOperationalAdvertisementCommand
-{
-
-    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
-    {
-        chip::TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::TLV::TLVType outer;
-        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-
-        while ((err = reader.Next()) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
-            {
+            case 1:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, message));
+                break;
             default:
                 break;
             }
@@ -936,21 +866,25 @@ struct UserPromptCommand
 
 struct StartCommand
 {
+    Optional<chip::CharSpan> registerKey;
     Optional<uint16_t> discriminator;
     Optional<uint16_t> port;
     Optional<chip::CharSpan> kvs;
     Optional<uint16_t> minCommissioningTimeout;
-    Optional<chip::CharSpan> registerKey;
+    Optional<chip::CharSpan> filepath;
+    Optional<chip::CharSpan> otaDownloadPath;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
         chip::TLV::TLVType outer;
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), discriminator));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), port));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), kvs));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(3), minCommissioningTimeout));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(4), registerKey));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), registerKey));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), discriminator));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), port));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(3), kvs));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(4), minCommissioningTimeout));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(5), filepath));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(6), otaDownloadPath));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -968,19 +902,25 @@ struct StartCommand
             switch (chip::TLV::TagNumFromTag(reader.GetTag()))
             {
             case 0:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, discriminator));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, registerKey));
                 break;
             case 1:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, port));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, discriminator));
                 break;
             case 2:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, kvs));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, port));
                 break;
             case 3:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, minCommissioningTimeout));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, kvs));
                 break;
             case 4:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, registerKey));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, minCommissioningTimeout));
+                break;
+            case 5:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, filepath));
+                break;
+            case 6:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, otaDownloadPath));
                 break;
             default:
                 break;
@@ -1114,16 +1054,108 @@ struct FactoryResetCommand
     }
 };
 
+struct CreateOtaImageCommand
+{
+    chip::CharSpan otaImageFilePath;
+    chip::CharSpan rawImageFilePath;
+    chip::CharSpan rawImageContent;
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), otaImageFilePath));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), rawImageFilePath));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), rawImageContent));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            case 0:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, otaImageFilePath));
+                break;
+            case 1:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, rawImageFilePath));
+                break;
+            case 2:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, rawImageContent));
+                break;
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+struct CompareFilesCommand
+{
+    chip::CharSpan file1;
+    chip::CharSpan file2;
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), file1));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), file2));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            case 0:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, file1));
+                break;
+            case 1:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, file2));
+                break;
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 namespace app {
 namespace Clusters {
 
 namespace CommissionerCommands {
 namespace Commands {
-namespace PairWithQRCode {
-using Type = struct PairWithQRCodeCommand;
-}
-namespace PairWithManualCode {
-using Type = struct PairWithManualCodeCommand;
+namespace PairWithCode {
+using Type = struct PairWithCodeCommand;
 }
 namespace Unpair {
 using Type = struct UnpairCommand;
@@ -1142,11 +1174,8 @@ using Type = struct WaitForCommissioningCommand;
 namespace WaitForCommissionee {
 using Type = struct WaitForCommissioneeCommand;
 }
-namespace WaitForCommissionableAdvertisement {
-using Type = struct WaitForCommissionableAdvertisementCommand;
-}
-namespace WaitForOperationalAdvertisement {
-using Type = struct WaitForOperationalAdvertisementCommand;
+namespace WaitForMessage {
+using Type = struct WaitForMessageCommand;
 }
 } // namespace Commands
 } // namespace DelayCommands
@@ -1213,6 +1242,12 @@ using Type = struct RebootCommand;
 }
 namespace FactoryReset {
 using Type = struct FactoryResetCommand;
+}
+namespace CreateOtaImage {
+using Type = struct CreateOtaImageCommand;
+}
+namespace CompareFiles {
+using Type = struct CompareFilesCommand;
 }
 } // namespace Commands
 } // namespace SystemCommands

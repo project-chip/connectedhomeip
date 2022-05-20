@@ -48,6 +48,11 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
     return mResolver->FindCommissioners(discoveryFilter);
 }
 
+CommissionableNodeController::~CommissionableNodeController()
+{
+    mDNSResolver.SetCommissioningDelegate(nullptr);
+}
+
 const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)
 {
     return GetDiscoveredNode(idx);

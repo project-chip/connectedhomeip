@@ -235,6 +235,8 @@ def HostTargets():
     app_targets.append(
         target_native.Extend('tv-app', app=HostApp.TV_APP))
     app_targets.append(
+        target_native.Extend('tv-casting-app', app=HostApp.TV_CASTING_APP))
+    app_targets.append(
         target_native.Extend('nl-test-runner', app=HostApp.NL_TEST_RUNNER))
 
     for target in targets:
@@ -246,6 +248,7 @@ def HostTargets():
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
+        app_targets.append(target.Extend('light', app=HostApp.LIGHT))
         app_targets.append(target.Extend('lock', app=HostApp.LOCK))
         app_targets.append(target.Extend('shell', app=HostApp.SHELL))
         app_targets.append(target.Extend(
@@ -492,6 +495,7 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
     yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
+    yield target.Extend('shell', app=cc13x2x7_26x2x7App.SHELL)
 
 
 def Cyw30739Targets():
@@ -580,6 +584,8 @@ for generator in target_generators:
 # Simple targets added one by one
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
+ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.SWITCH))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

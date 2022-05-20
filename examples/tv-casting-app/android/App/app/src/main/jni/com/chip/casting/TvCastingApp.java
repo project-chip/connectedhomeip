@@ -45,7 +45,9 @@ public class TvCastingApp {
 
   public native boolean discoverCommissioners();
 
-  public native void initServer();
+  public native boolean initServer(Object commissioningCompleteHandler);
+
+  public native void contentLauncherLaunchURL(String contentUrl, String contentDisplayStr);
 
   static {
     System.loadLibrary("TvCastingApp");

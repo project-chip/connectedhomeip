@@ -48,11 +48,16 @@ static_library("dnssd") {
       "ActiveResolveAttempts.cpp",
       "ActiveResolveAttempts.h",
       "Advertiser_ImplMinimalMdns.cpp",
+      "IncrementalResolve.cpp",
+      "IncrementalResolve.h",
       "MinimalMdnsServer.cpp",
       "MinimalMdnsServer.h",
       "Resolver_ImplMinimalMdns.cpp",
     ]
-    public_deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns" ]
+    public_deps += [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/trace",
+    ]
   } else if (chip_mdns == "platform") {
     sources += [
       "Discovery_ImplPlatform.cpp",

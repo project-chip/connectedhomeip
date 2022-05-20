@@ -70,7 +70,6 @@ constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
-TestContext sContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -503,6 +502,8 @@ static int Finalize(void * aContext)
 
 int TestTCP()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

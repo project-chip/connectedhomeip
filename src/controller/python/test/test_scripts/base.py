@@ -258,13 +258,22 @@ class BaseTestHelper:
         self.devCtrl.Commission(nodeid)
         return self.devCtrl.CheckTestCommissionerCallbacks() and self.devCtrl.CheckTestCommissionerPaseConnection(nodeid)
 
-    def TestKeyExchange(self, ip: str, setuppin: int, nodeid: int):
-        self.logger.info("Conducting key exchange with device {}".format(ip))
+    def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
+        self.logger.info("Commissioning device {}".format(ip))
         if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
-                "Failed to finish key exchange with device {}".format(ip))
+                "Failed to finish commissioning device {}".format(ip))
             return False
-        self.logger.info("Device finished key exchange.")
+        self.logger.info("Commissioning finished.")
+        return True
+
+    def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int):
+        self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
+        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid):
+            self.logger.info(
+                "Failed to finish commissioning device {}".format(setupPayload))
+            return False
+        self.logger.info("Commissioning finished.")
         return True
 
     def TestUsedTestCommissioner(self):
@@ -381,6 +390,8 @@ class BaseTestHelper:
         ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
         chip.FabricAdmin.FabricAdmin.ShutdownAll()
 
+        self.logger.info("Shutdown completed, starting new controllers...")
+
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
             fabricId=1, fabricIndex=1)
         fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
@@ -389,6 +400,8 @@ class BaseTestHelper:
             self.controllerNodeId, self.paaTrustStorePath)
         self.devCtrl2 = fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
+
+        self.logger.info("Waiting for attribute reads...")
 
         data1 = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
         data2 = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False)
@@ -414,6 +427,7 @@ class BaseTestHelper:
                 "Got back fabric indices that match for two different fabrics!")
             return False
 
+        self.logger.info("Attribute reads completed...")
         return True
 
     async def TestFabricSensitive(self, nodeid: int):

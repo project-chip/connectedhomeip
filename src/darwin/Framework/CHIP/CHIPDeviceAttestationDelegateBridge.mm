@@ -22,7 +22,7 @@ void CHIPDeviceAttestationDelegateBridge::OnDeviceAttestationFailed(chip::Contro
     chip::DeviceProxy * device, chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
-        NSLog(@"CHIPDeviceAttestationDelegateBridge::OnDeviceAttestionFailed failed with result: %hu", attestationResult);
+        NSLog(@"CHIPDeviceAttestationDelegateBridge::OnDeviceAttestationFailed failed with result: %hu", attestationResult);
 
         mResult = attestationResult;
 

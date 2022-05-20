@@ -56,8 +56,6 @@ enum : uint8_t
     kMsgType_TEST2 = 2,
 };
 
-TestContext sContext;
-
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
 public:
@@ -262,6 +260,8 @@ nlTestSuite sSuite =
  */
 int TestExchangeMgr()
 {
+    TestContext sContext;
+
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 

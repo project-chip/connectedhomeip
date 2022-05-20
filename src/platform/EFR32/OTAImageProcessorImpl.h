@@ -36,8 +36,8 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
-    bool IsFirstImageRun() override { return false; }
-    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override;
+    CHIP_ERROR ConfirmCurrentImage() override;
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
     void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
@@ -46,7 +46,7 @@ private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
-    static void HandleApply(intptr_t context);
+    static void HandleApply(chip::System::Layer * systemLayer, void *);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
     CHIP_ERROR ProcessHeader(ByteSpan & block);

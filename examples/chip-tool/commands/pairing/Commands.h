@@ -34,67 +34,35 @@ public:
     {}
 };
 
-class PairQRCode : public PairingCommand
+class PairCode : public PairingCommand
 {
 public:
-    PairQRCode(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode", PairingMode::QRCode, PairingNetworkType::None, credsIssuerConfig)
+    PairCode(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code", PairingMode::Code, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
-class PairQRCodePase : public PairingCommand
+class PairCodePase : public PairingCommand
 {
 public:
-    PairQRCodePase(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode-paseonly", PairingMode::QRCodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
+    PairCodePase(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-paseonly", PairingMode::CodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
-class PairQRCodeWifi : public PairingCommand
+class PairCodeWifi : public PairingCommand
 {
 public:
-    PairQRCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode-wifi", PairingMode::QRCode, PairingNetworkType::WiFi, credsIssuerConfig)
+    PairCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-wifi", PairingMode::Code, PairingNetworkType::WiFi, credsIssuerConfig)
     {}
 };
 
-class PairQRCodeThread : public PairingCommand
+class PairCodeThread : public PairingCommand
 {
 public:
-    PairQRCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode-thread", PairingMode::QRCode, PairingNetworkType::Thread, credsIssuerConfig)
-    {}
-};
-
-class PairManualCode : public PairingCommand
-{
-public:
-    PairManualCode(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None, credsIssuerConfig)
-    {}
-};
-
-class PairManualCodePase : public PairingCommand
-{
-public:
-    PairManualCodePase(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode-paseonly", PairingMode::ManualCodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
-    {}
-};
-
-class PairManualCodeWifi : public PairingCommand
-{
-public:
-    PairManualCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode-wifi", PairingMode::ManualCode, PairingNetworkType::WiFi, credsIssuerConfig)
-    {}
-};
-
-class PairManualCodeThread : public PairingCommand
-{
-public:
-    PairManualCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode-thread", PairingMode::ManualCode, PairingNetworkType::Thread, credsIssuerConfig)
+    PairCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-thread", PairingMode::Code, PairingNetworkType::Thread, credsIssuerConfig)
     {}
 };
 
@@ -229,14 +197,10 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
 
     commands_list clusterCommands = {
         make_unique<Unpair>(credsIssuerConfig),
-        make_unique<PairQRCode>(credsIssuerConfig),
-        make_unique<PairQRCodePase>(credsIssuerConfig),
-        make_unique<PairQRCodeWifi>(credsIssuerConfig),
-        make_unique<PairQRCodeThread>(credsIssuerConfig),
-        make_unique<PairManualCode>(credsIssuerConfig),
-        make_unique<PairManualCodePase>(credsIssuerConfig),
-        make_unique<PairManualCodeWifi>(credsIssuerConfig),
-        make_unique<PairManualCodeThread>(credsIssuerConfig),
+        make_unique<PairCode>(credsIssuerConfig),
+        make_unique<PairCodePase>(credsIssuerConfig),
+        make_unique<PairCodeWifi>(credsIssuerConfig),
+        make_unique<PairCodeThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),

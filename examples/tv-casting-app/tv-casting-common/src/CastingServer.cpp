@@ -25,9 +25,20 @@ using namespace chip::app::Clusters::ContentLauncher::Commands;
 
 CastingServer * CastingServer::castingServer_ = nullptr;
 
-// TODO: Accept these values over CLI
-const char * kContentUrl        = "https://www.test.com/videoid";
-const char * kContentDisplayStr = "Test video";
+CastingServer::CastingServer()
+{
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    // generate and set a random uniqueId for generating rotatingId
+    uint8_t rotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
+    for (size_t i = 0; i < sizeof(rotatingDeviceIdUniqueId); i++)
+    {
+        rotatingDeviceIdUniqueId[i] = chip::Crypto::GetRandU8();
+    }
+
+    ByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+    chip::DeviceLayer::ConfigurationMgr().SetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+}
 
 CastingServer * CastingServer::GetInstance()
 {
@@ -38,12 +49,14 @@ CastingServer * CastingServer::GetInstance()
     return castingServer_;
 }
 
-void CastingServer::InitServer()
+void CastingServer::InitServer(std::function<CHIP_ERROR()> commissioningCompleteCallback)
 {
     if (mInited)
     {
         return;
     }
+
+    mCommissioningCompleteCallback = commissioningCompleteCallback;
 
     // Enter commissioning mode, open commissioning window
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -67,9 +80,10 @@ CHIP_ERROR CastingServer::InitBindingHandlers()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex)
+CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex fabricIndex,
+                                                    std::function<CHIP_ERROR()> commissioningCompleteCallback)
 {
-    InitServer();
+    InitServer(mCommissioningCompleteCallback);
     return mTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex);
 }
 
@@ -227,7 +241,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
         ReturnOnFailure(CastingServer::GetInstance()->GetTargetVideoPlayerInfo()->Initialize(
             event->CommissioningComplete.PeerNodeId, event->CommissioningComplete.PeerFabricIndex));
 
-        CastingServer::GetInstance()->ContentLauncherLaunchURL(kContentUrl, kContentDisplayStr);
+        CastingServer::GetInstance()->mCommissioningCompleteCallback();
     }
 }
 
@@ -287,9 +301,9 @@ void CastingServer::PrintBindings()
     return;
 }
 
-void CastingServer::SetDefaultFabricIndex()
+void CastingServer::SetDefaultFabricIndex(std::function<CHIP_ERROR()> commissioningCompleteCallback)
 {
-    InitServer();
+    InitServer(commissioningCompleteCallback);
 
     // set fabric to be the first in the list
     for (const auto & fb : chip::Server::GetInstance().GetFabricTable())

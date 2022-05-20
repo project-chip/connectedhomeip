@@ -1104,12 +1104,13 @@ enum class DlOperationSource : uint8_t
 // Enum for DlStatus
 enum class DlStatus : uint8_t
 {
-    kSuccess      = 0x00,
-    kFailure      = 0x01,
-    kDuplicate    = 0x02,
-    kOccupied     = 0x03,
-    kInvalidField = 0x85,
-    kNotFound     = 0x8B,
+    kSuccess           = 0x00,
+    kFailure           = 0x01,
+    kDuplicate         = 0x02,
+    kOccupied          = 0x03,
+    kInvalidField      = 0x85,
+    kResourceExhausted = 0x89,
+    kNotFound          = 0x8B,
 };
 
 // Enum for DlUserStatus

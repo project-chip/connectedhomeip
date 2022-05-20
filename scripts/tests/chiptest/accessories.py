@@ -64,7 +64,7 @@ class AppsRegister:
     def start(self, name, args):
         accessory = self.__accessories[name]
         if accessory:
-            # The args param comes directly from the sys.argv[1:] of Start.py and should contain a list of strings in
+            # The args param comes directly from the sys.argv[2:] of Start.py and should contain a list of strings in
             # key-value pair, e.g. [option1, value1, option2, value2, ...]
             options = self.__createCommandLineOptions(args)
             return accessory.start(options)
@@ -92,16 +92,12 @@ class AppsRegister:
             return accessory.factoryReset()
         return False
 
-    def waitForCommissionableAdvertisement(self, name):
+    def waitForMessage(self, name, message):
         accessory = self.__accessories[name]
         if accessory:
-            return accessory.waitForCommissionableAdvertisement()
-        return False
-
-    def waitForOperationalAdvertisement(self, name):
-        accessory = self.__accessories[name]
-        if accessory:
-            return accessory.waitForOperationalAdvertisement()
+            # The message param comes directly from the sys.argv[2:] of WaitForMessage.py and should contain a list of strings that
+            # comprise the entire message to wait for
+            return accessory.waitForMessage(' '.join(message))
         return False
 
     def __startXMLRPCServer(self):
@@ -111,12 +107,7 @@ class AppsRegister:
         self.server.register_function(self.stop, 'stop')
         self.server.register_function(self.reboot, 'reboot')
         self.server.register_function(self.factoryReset, 'factoryReset')
-        self.server.register_function(
-            self.waitForCommissionableAdvertisement,
-            'waitForCommissionableAdvertisement')
-        self.server.register_function(
-            self.waitForOperationalAdvertisement,
-            'waitForOperationalAdvertisement')
+        self.server.register_function(self.waitForMessage, 'waitForMessage')
 
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()

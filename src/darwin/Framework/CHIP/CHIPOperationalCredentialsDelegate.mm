@@ -43,7 +43,7 @@ using namespace Crypto;
 CHIP_ERROR CHIPOperationalCredentialsDelegate::Init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner,
     NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert)
 {
-    if (storage == nil || nocSigner == nullptr || ipk == nil || rootCert == nil) {
+    if (storage == nil || ipk == nil || rootCert == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -77,6 +77,17 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::Init(CHIPPersistentStorageDelegat
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(
     NodeId nodeId, FabricId fabricId, const chip::CATValues & cats, const Crypto::P256PublicKey & pubkey, MutableByteSpan & noc)
 {
+    if (!mIssuerKey) {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return GenerateNOC(
+        *mIssuerKey, (mIntermediateCert != nil) ? mIntermediateCert : mRootCert, nodeId, fabricId, cats, pubkey, noc);
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(P256Keypair & signingKeypair, NSData * signingCertificate, NodeId nodeId,
+    FabricId fabricId, const CATValues & cats, const P256PublicKey & pubkey, MutableByteSpan & noc)
+{
     uint32_t validityStart, validityEnd;
 
     if (!ToChipEpochTime(0, validityStart)) {
@@ -90,8 +101,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(
     }
 
     ChipDN signerSubject;
-    NSData * signer = (mIntermediateCert != nil) ? mIntermediateCert : mRootCert;
-    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(AsByteSpan(signer), signerSubject));
+    ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(AsByteSpan(signingCertificate), signerSubject));
 
     ChipDN noc_dn;
     ReturnErrorOnFailure(noc_dn.AddAttribute_MatterFabricId(fabricId));
@@ -99,7 +109,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOC(
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     X509CertRequestParams noc_request = { 1, validityStart, validityEnd, noc_dn, signerSubject };
-    return NewNodeOperationalX509Cert(noc_request, pubkey, *mIssuerKey, noc);
+    return NewNodeOperationalX509Cert(noc_request, pubkey, signingKeypair, noc);
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
@@ -199,7 +209,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateRootCertificate(id<CHIPKe
     ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(GetIssuerId(issuerId)));
 
     if (fabricId != nil) {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId([fabricId unsignedLongLongValue]));
+        FabricId fabric = [fabricId unsignedLongLongValue];
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterFabricId(fabric));
     }
 
     uint32_t validityStart, validityEnd;
@@ -228,7 +240,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
 {
     *intermediateCert = nil;
 
-    // Verify that the provided certificate public key matches the root keypair.
+    // Verify that the provided root certificate public key matches the root keypair.
     if ([MTRCertificates keypair:rootKeypair matchesCertificate:rootCertificate] == NO) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -248,7 +260,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     ChipDN icac_dn;
     ReturnErrorOnFailure(icac_dn.AddAttribute_MatterICACId(GetIssuerId(issuerId)));
     if (fabricId != nil) {
-        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId([fabricId unsignedLongLongValue]));
+        FabricId fabric = [fabricId unsignedLongLongValue];
+        VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(icac_dn.AddAttribute_MatterFabricId(fabric));
     }
 
     uint32_t validityStart, validityEnd;
@@ -268,5 +282,49 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateIntermediateCertificate(i
     X509CertRequestParams icac_request = { 0, validityStart, validityEnd, icac_dn, rcac_dn };
     ReturnErrorOnFailure(NewICAX509Cert(icac_request, pubKey, nativeRootKeypair, icac));
     *intermediateCert = AsData(icac);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateOperationalCertificate(id<CHIPKeypair> signingKeypair,
+    NSData * signingCertificate, SecKeyRef operationalPublicKey, NSNumber * fabricId, NSNumber * nodeId,
+    NSArray<NSNumber *> * _Nullable caseAuthenticatedTags, NSData * _Nullable __autoreleasing * _Nonnull operationalCert)
+{
+    *operationalCert = nil;
+
+    // Verify that the provided signing certificate public key matches the signing keypair.
+    if ([MTRCertificates keypair:signingKeypair matchesCertificate:signingCertificate] == NO) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if ([caseAuthenticatedTags count] > kMaxSubjectCATAttributeCount) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    FabricId fabric = [fabricId unsignedLongLongValue];
+    VerifyOrReturnError(IsValidFabricId(fabric), CHIP_ERROR_INVALID_ARGUMENT);
+
+    NodeId node = [nodeId unsignedLongLongValue];
+    VerifyOrReturnError(IsOperationalNodeId(node), CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIPP256KeypairBridge keypairBridge;
+    ReturnErrorOnFailure(keypairBridge.Init(signingKeypair));
+    CHIPP256KeypairNativeBridge nativeSigningKeypair(keypairBridge);
+
+    P256PublicKey pubKey;
+    ReturnErrorOnFailure(CHIPP256KeypairBridge::MatterPubKeyFromSecKeyRef(operationalPublicKey, &pubKey));
+
+    CATValues cats;
+    if (caseAuthenticatedTags != nil) {
+        size_t idx = 0;
+        for (NSNumber * cat in caseAuthenticatedTags) {
+            cats.values[idx++] = [cat unsignedIntValue];
+        }
+    }
+
+    uint8_t nocBuffer[Controller::kMaxCHIPDERCertLength];
+    MutableByteSpan noc(nocBuffer);
+    ReturnErrorOnFailure(GenerateNOC(nativeSigningKeypair, signingCertificate, node, fabric, cats, pubKey, noc));
+
+    *operationalCert = AsData(noc);
     return CHIP_NO_ERROR;
 }

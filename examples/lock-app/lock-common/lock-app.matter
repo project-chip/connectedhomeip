@@ -308,6 +308,7 @@ server cluster DoorLock = 257 {
     kDuplicate = 2;
     kOccupied = 3;
     kInvalidField = 133;
+    kResourceExhausted = 137;
     kNotFound = 139;
   }
 
@@ -585,6 +586,7 @@ server cluster DoorLock = 257 {
   readonly attribute int8u maxRFIDCodeLength = 25;
   readonly attribute int8u minRFIDCodeLength = 26;
   readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
+  readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
   attribute access(write: manage) int8u soundVolume = 36;
@@ -724,7 +726,9 @@ server cluster DoorLock = 257 {
   response struct GetCredentialStatusResponse = 37 {
     boolean credentialExists = 0;
     nullable INT16U userIndex = 1;
-    nullable INT16U nextCredentialIndex = 2;
+    nullable fabric_idx creatorFabricIndex = 2;
+    nullable fabric_idx lastModifiedFabricIndex = 3;
+    nullable INT16U nextCredentialIndex = 4;
   }
 
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
@@ -1021,8 +1025,8 @@ server cluster Identify = 3 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute char_string<35> activeLocale = 1;
-  readonly attribute CHAR_STRING supportedLocales[] = 2;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -1589,8 +1593,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
     int32u linkFrameCounter = 3;
     int32u mleFrameCounter = 4;
     int8u lqi = 5;
-    int8s averageRssi = 6;
-    int8s lastRssi = 7;
+    nullable int8s averageRssi = 6;
+    nullable int8s lastRssi = 7;
     int8u frameErrorRate = 8;
     int8u messageErrorRate = 9;
     boolean rxOnWhenIdle = 10;
@@ -1636,12 +1640,12 @@ server cluster ThreadNetworkDiagnostics = 53 {
     ThreadConnectionStatus connectionStatus = 0;
   }
 
-  readonly attribute int16u channel = 0;
-  readonly attribute enum8 routingRole = 1;
-  readonly attribute char_string<16> networkName = 2;
-  readonly attribute int16u panId = 3;
-  readonly attribute int64u extendedPanId = 4;
-  readonly attribute octet_string<17> meshLocalPrefix = 5;
+  readonly attribute nullable int16u channel = 0;
+  readonly attribute nullable enum8 routingRole = 1;
+  readonly attribute nullable char_string<16> networkName = 2;
+  readonly attribute nullable int16u panId = 3;
+  readonly attribute nullable int64u extendedPanId = 4;
+  readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
   readonly attribute NeighborTable neighborTableList[] = 7;
   readonly attribute RouteTable routeTableList[] = 8;
@@ -2113,6 +2117,7 @@ endpoint 1 {
     ram      attribute maxRFIDCodeLength default = 20;
     ram      attribute minRFIDCodeLength default = 10;
     ram      attribute credentialRulesSupport default = 1;
+    ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute language default = "en";
     ram      attribute autoRelockTime default = 60;
     ram      attribute soundVolume;

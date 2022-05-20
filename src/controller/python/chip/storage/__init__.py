@@ -108,8 +108,9 @@ class PersistentStorage:
                 self._file = open(self._path, 'w')
             except Exception as ex:
                 logging.warn(
-                    f"Could not open {path} for writing configuration. Error:")
+                    f"Could not open {self._path} for writing configuration. Error:")
                 logging.warn(ex)
+                return
 
         self._file.seek(0)
         json.dump(self.jsonData, self._file, ensure_ascii=True, indent=4)

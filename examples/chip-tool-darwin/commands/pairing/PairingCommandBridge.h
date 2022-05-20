@@ -18,13 +18,12 @@
 
 #pragma once
 #include "../common/CHIPCommandBridge.h"
-#import <CHIP/CHIPClustersObjc.h>
-#import <CHIP/CHIPDevicePairingDelegate.h>
+#import <CHIP/CHIP.h>
 
 enum class PairingMode
 {
-    QRCode,
-    ManualCode,
+    None,
+    Code,
     Ethernet,
     Ble,
 };
@@ -60,10 +59,9 @@ public:
 
         switch (mode)
         {
-        case PairingMode::QRCode:
-            AddArgument("payload", &mOnboardingPayload);
+        case PairingMode::None:
             break;
-        case PairingMode::ManualCode:
+        case PairingMode::Code:
             AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ethernet:
@@ -87,6 +85,7 @@ private:
     void PairWithCode(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
     void PairWithIPAddress(NSError * __autoreleasing * error);
+    void Unpair();
     void SetUpPairingDelegate();
 
     const PairingMode mPairingMode;

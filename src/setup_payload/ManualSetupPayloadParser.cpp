@@ -131,6 +131,12 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         return result;
     }
 
+    // First digit of '8' or '9' would be invalid for v1 and would indicate new format (e.g. version 2)
+    if (chunk1 == 8 || chunk1 == 9)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     bool isLongCode = ((chunk1 >> kManualSetupChunk1VidPidPresentBitPos) & 1) == 1;
     result          = CheckCodeLengthValidity(representationWithoutCheckDigit, isLongCode);
     if (result != CHIP_NO_ERROR)

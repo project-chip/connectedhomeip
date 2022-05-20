@@ -294,8 +294,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull linkFrameCounter;
 @property (strong, nonatomic) NSNumber * _Nonnull mleFrameCounter;
 @property (strong, nonatomic) NSNumber * _Nonnull lqi;
-@property (strong, nonatomic) NSNumber * _Nonnull averageRssi;
-@property (strong, nonatomic) NSNumber * _Nonnull lastRssi;
+@property (strong, nonatomic) NSNumber * _Nullable averageRssi;
+@property (strong, nonatomic) NSNumber * _Nullable lastRssi;
 @property (strong, nonatomic) NSNumber * _Nonnull frameErrorRate;
 @property (strong, nonatomic) NSNumber * _Nonnull messageErrorRate;
 @property (strong, nonatomic) NSNumber * _Nonnull rxOnWhenIdle;
@@ -462,16 +462,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull stateValue;
 @end
 
-@interface CHIPModeSelectClusterModeOptionStruct : NSObject
-@property (strong, nonatomic) NSString * _Nonnull label;
-@property (strong, nonatomic) NSNumber * _Nonnull mode;
-@property (strong, nonatomic) NSNumber * _Nonnull semanticTag;
-- (instancetype)init;
-@end
-
 @interface CHIPModeSelectClusterSemanticTag : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull mfgCode;
 @property (strong, nonatomic) NSNumber * _Nonnull value;
+- (instancetype)init;
+@end
+
+@interface CHIPModeSelectClusterModeOptionStruct : NSObject
+@property (strong, nonatomic) NSString * _Nonnull label;
+@property (strong, nonatomic) NSNumber * _Nonnull mode;
+@property (strong, nonatomic) NSArray * _Nonnull semanticTags;
 - (instancetype)init;
 @end
 

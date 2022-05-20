@@ -23,7 +23,9 @@
 #include "LEDWidget.h"
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
+#ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/af-structs.h>
@@ -233,9 +235,19 @@ CHIP_ERROR AppTask::Init()
     chip::EndpointId endpointId{ 1 };
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
+
+    uint8_t maxCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        maxCredentialsPerUser = 5;
+    }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    err = LockMgr().Init(state);
+    err = LockMgr().Init(state, maxCredentialsPerUser);
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("LockMgr().Init() failed");
@@ -264,11 +276,13 @@ CHIP_ERROR AppTask::Init()
 
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    std::string QRCode;
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
 
     if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
     {
-        LCDWriteQRCode((uint8_t *) QRCode.c_str());
+        LCDWriteQRCode((uint8_t *) QRCode.data());
     }
     else
     {
