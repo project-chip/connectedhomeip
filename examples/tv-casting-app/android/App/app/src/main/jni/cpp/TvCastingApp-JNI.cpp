@@ -158,7 +158,7 @@ JNI_METHOD(jboolean, initServer)(JNIEnv * env, jobject, jobject jCommissioningCo
         ChipLogError(AppServer, "initServer error: %s", err.AsString());
         return false;
     }
-    
+
     CastingServer::GetInstance()->InitServer(CommissioningCompleteHandler);
     return true;
 }
