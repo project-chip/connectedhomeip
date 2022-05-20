@@ -109,10 +109,6 @@ int main(int argc, char * argv[])
 {
     VerifyOrDie(CHIP_NO_ERROR == chip::Platform::MemoryInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::DeviceLayer::PlatformMgr().InitChipStack());
-    // Enter commissioning mode, open commissioning window
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
@@ -138,6 +134,11 @@ int main(int argc, char * argv[])
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
+
+    // Enter commissioning mode, open commissioning window
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
     // Send discover commissioners request
     SuccessOrExit(err = CastingServer::GetInstance()->DiscoverCommissioners());
