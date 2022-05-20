@@ -43,7 +43,7 @@ DeviceInfoProviderImpl & DeviceInfoProviderImpl::GetDefaultInstance()
 
 DeviceInfoProvider::FixedLabelIterator * DeviceInfoProviderImpl::IterateFixedLabel(EndpointId endpoint)
 {
-    return new FixedLabelIteratorImpl(endpoint);
+    return chip::Platform::New<FixedLabelIteratorImpl>(endpoint);
 }
 
 DeviceInfoProviderImpl::FixedLabelIteratorImpl::FixedLabelIteratorImpl(EndpointId endpoint) : mEndpoint(endpoint)
@@ -151,7 +151,7 @@ CHIP_ERROR DeviceInfoProviderImpl::SetUserLabelAt(EndpointId endpoint, size_t in
 
 DeviceInfoProvider::UserLabelIterator * DeviceInfoProviderImpl::IterateUserLabel(EndpointId endpoint)
 {
-    return new UserLabelIteratorImpl(*this, endpoint);
+    return chip::Platform::New<UserLabelIteratorImpl>(*this, endpoint);
 }
 
 DeviceInfoProviderImpl::UserLabelIteratorImpl::UserLabelIteratorImpl(DeviceInfoProviderImpl & provider, EndpointId endpoint) :
@@ -210,7 +210,7 @@ bool DeviceInfoProviderImpl::UserLabelIteratorImpl::Next(UserLabelType & output)
 
 DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSupportedLocales()
 {
-    return new SupportedLocalesIteratorImpl();
+    return chip::Platform::New<SupportedLocalesIteratorImpl>();
 }
 
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
@@ -285,7 +285,7 @@ bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & outpu
 
 DeviceInfoProvider::SupportedCalendarTypesIterator * DeviceInfoProviderImpl::IterateSupportedCalendarTypes()
 {
-    return new SupportedCalendarTypesIteratorImpl();
+    return chip::Platform::New<SupportedCalendarTypesIteratorImpl>();
 }
 
 size_t DeviceInfoProviderImpl::SupportedCalendarTypesIteratorImpl::Count()
