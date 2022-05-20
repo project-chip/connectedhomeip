@@ -1392,11 +1392,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ScenesClusterSceneExtensionFieldSet {
+  public static class ScenesClusterExtensionFieldSet {
     public Long clusterId;
     public ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList;
 
-    public ScenesClusterSceneExtensionFieldSet(
+    public ScenesClusterExtensionFieldSet(
         Long clusterId, ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList) {
       this.clusterId = clusterId;
       this.attributeValueList = attributeValueList;
@@ -1405,7 +1405,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ScenesClusterSceneExtensionFieldSet {\n");
+      output.append("ScenesClusterExtensionFieldSet {\n");
       output.append("\tclusterId: ");
       output.append(clusterId);
       output.append("\n");

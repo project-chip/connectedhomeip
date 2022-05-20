@@ -245,11 +245,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneId = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
-        _sceneName = @"";
+        _sceneName = nil;
 
-        _extensionFieldSets = [NSArray array];
+        _extensionFieldSets = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -344,7 +344,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneId = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -368,7 +368,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _capacity = @(0);
+        _capacity = nil;
 
         _groupId = @(0);
 
@@ -436,11 +436,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneId = @(0);
 
-        _transitionTime = @(0);
+        _transitionTime = nil;
 
-        _sceneName = @"";
+        _sceneName = nil;
 
-        _extensionFieldSets = [NSArray array];
+        _extensionFieldSets = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
