@@ -408,7 +408,7 @@ EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl & app) {
 
 /**
  * @brief Code for testing the message flow path.
- * 
+ *
  */
 class TestCommandHandlerCallback : public app::CommandHandler::Callback {
         void OnDone(app::CommandHandler & apCommandObj){}
@@ -421,7 +421,7 @@ class TestCommandHandlerCallback : public app::CommandHandler::Callback {
 
 /**
  * @brief Code for testing the message flow path.
- * 
+ *
  */
 void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * message){
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage called with message %s & endpointId %d", message, epId);

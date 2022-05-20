@@ -12,5 +12,5 @@ public class ContentAppEndpointManagerStub implements ContentAppEndpointManager{
     public String sendCommand(int endpointId, String commandPayload) {
         return delegate.sendCommand(endpointId, commandPayload);
     }
-    
+
 }
