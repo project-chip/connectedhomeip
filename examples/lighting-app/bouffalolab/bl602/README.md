@@ -2,7 +2,8 @@ CHIP BL602 Lighting Example
 
 ## Supported Devices
 
-The CHIP demo application is intended to work on BL602.See [Demo board](https://dev.bouffalolab.com/product)
+The CHIP demo application is intended to work on BL602.See
+[Demo board](https://dev.bouffalolab.com/product)
 
 ## Build
 
@@ -54,8 +55,8 @@ Building the example:
 
         $ ./scripts/examples/gn_build_example.sh examples/chip-tool BUILD_PATH
 
-
-In this command, BUILD_PATH specifies where the target binaries are to be placed.
+In this command, BUILD_PATH specifies where the target binaries are to be
+placed.
 
 ### Commission a device using chip-tool
 
