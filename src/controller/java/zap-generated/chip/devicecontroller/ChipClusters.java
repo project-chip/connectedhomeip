@@ -15608,7 +15608,7 @@ public class ChipClusters {
         Integer sceneId,
         Integer transitionTime,
         String sceneName,
-        ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets) {
+        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets) {
       addScene(
           chipClusterPtr,
           callback,
@@ -15626,7 +15626,7 @@ public class ChipClusters {
         Integer sceneId,
         Integer transitionTime,
         String sceneName,
-        ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets,
+        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
         int timedInvokeTimeoutMs) {
       addScene(
           chipClusterPtr,
@@ -15649,7 +15649,10 @@ public class ChipClusters {
     }
 
     public void recallScene(
-        DefaultClusterCallback callback, Integer groupId, Integer sceneId, Integer transitionTime) {
+        DefaultClusterCallback callback,
+        Integer groupId,
+        Integer sceneId,
+        @Nullable Optional<Integer> transitionTime) {
       recallScene(chipClusterPtr, callback, groupId, sceneId, transitionTime, null);
     }
 
@@ -15657,7 +15660,7 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Integer groupId,
         Integer sceneId,
-        Integer transitionTime,
+        @Nullable Optional<Integer> transitionTime,
         int timedInvokeTimeoutMs) {
       recallScene(chipClusterPtr, callback, groupId, sceneId, transitionTime, timedInvokeTimeoutMs);
     }
@@ -15715,7 +15718,7 @@ public class ChipClusters {
         Integer sceneId,
         Integer transitionTime,
         String sceneName,
-        ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets,
+        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getSceneMembership(
@@ -15729,7 +15732,7 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Integer groupId,
         Integer sceneId,
-        Integer transitionTime,
+        @Nullable Optional<Integer> transitionTime,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeAllScenes(
@@ -15768,7 +15771,7 @@ public class ChipClusters {
     public interface GetSceneMembershipResponseCallback {
       void onSuccess(
           Integer status,
-          Integer capacity,
+          @Nullable Integer capacity,
           Integer groupId,
           Optional<ArrayList<Integer>> sceneList);
 
@@ -15798,9 +15801,9 @@ public class ChipClusters {
           Integer status,
           Integer groupId,
           Integer sceneId,
-          Integer transitionTime,
-          String sceneName,
-          ArrayList<ChipStructs.ScenesClusterSceneExtensionFieldSet> extensionFieldSets);
+          Optional<Integer> transitionTime,
+          Optional<String> sceneName,
+          Optional<ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>> extensionFieldSets);
 
       void onError(Exception error);
     }

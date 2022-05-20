@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPScenesClusterSceneExtensionFieldSet
+@implementation CHIPScenesClusterExtensionFieldSet
 - (instancetype)init
 {
     if (self = [super init]) {

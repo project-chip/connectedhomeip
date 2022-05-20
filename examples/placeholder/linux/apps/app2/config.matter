@@ -1951,7 +1951,7 @@ server cluster Scenes = 5 {
     kCopyAllScenes = 0x1;
   }
 
-  struct SceneExtensionFieldSet {
+  struct ExtensionFieldSet {
     cluster_id clusterId = 0;
     AttributeValuePair attributeValueList[] = 1;
   }
@@ -1973,7 +1973,7 @@ server cluster Scenes = 5 {
     INT8U sceneId = 1;
     INT16U transitionTime = 2;
     CHAR_STRING sceneName = 3;
-    SceneExtensionFieldSet extensionFieldSets[] = 4;
+    ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct ViewSceneRequest {
@@ -1998,7 +1998,7 @@ server cluster Scenes = 5 {
   request struct RecallSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    INT16U transitionTime = 2;
+    optional nullable INT16U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
@@ -2015,9 +2015,9 @@ server cluster Scenes = 5 {
     ENUM8 status = 0;
     group_id groupId = 1;
     INT8U sceneId = 2;
-    INT16U transitionTime = 3;
-    CHAR_STRING sceneName = 4;
-    SceneExtensionFieldSet extensionFieldSets[] = 5;
+    optional INT16U transitionTime = 3;
+    optional CHAR_STRING sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
 
   response struct RemoveSceneResponse = 2 {
@@ -2039,7 +2039,7 @@ server cluster Scenes = 5 {
 
   response struct GetSceneMembershipResponse = 6 {
     ENUM8 status = 0;
-    INT8U capacity = 1;
+    nullable INT8U capacity = 1;
     group_id groupId = 2;
     optional INT8U sceneList[] = 3;
   }

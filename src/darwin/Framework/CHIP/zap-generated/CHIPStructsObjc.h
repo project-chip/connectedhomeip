@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPScenesClusterSceneExtensionFieldSet : NSObject
+@interface CHIPScenesClusterExtensionFieldSet : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull clusterId;
 @property (strong, nonatomic) NSArray * _Nonnull attributeValueList;
 - (instancetype)init;
