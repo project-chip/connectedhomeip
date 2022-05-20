@@ -3,7 +3,7 @@ FROM connectedhomeip/chip-build:${VERSION}
 
 # Setup Ameba
 ARG AMEBA_DIR=/opt/ameba
-ARG TAG_NAME=ameba_update_2022_05_10
+ARG TAG_NAME=ameba_update_2022_05_20
 RUN set -x \
     && apt-get update \
     && mkdir ${AMEBA_DIR} \
