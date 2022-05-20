@@ -192,4 +192,15 @@
     XCTAssertNil(operationalCert);
 }
 
+- (void)testGenerateCSR
+{
+    __auto_type * testKeys = [[CHIPTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * csr = [MTRCertificates generateCertificateSigningRequest:testKeys error:nil];
+    XCTAssertNotNil(csr);
+
+    // Wish there was something we could test here about the CSR.
+}
+
 @end
