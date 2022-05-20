@@ -17,25 +17,13 @@
  */
 package chip.appserver;
 
-/** Controller to interact with the CHIP device. */
-public class ChipAppServer {
-  private static final String TAG = ChipAppServer.class.getSimpleName();
+import java.util.List;
 
-  private volatile ChipFabricProvider mChipFabricProvider;
+/** read fabric count and list */
+public class ChipFabricProvider {
+  public native int getFabricCount();
 
-  public ChipFabricProvider getFabricProvider() {
+  public native List<Fabric> getFabricList();
 
-    if (mChipFabricProvider == null) {
-      synchronized (this) {
-        if (mChipFabricProvider == null)
-          mChipFabricProvider = new ChipFabricProvider();
-      }
-    }
-
-    return mChipFabricProvider;
-  }
-
-  public native boolean startApp();
-
-  public native boolean stopApp();
+  // todo support to remove fabric
 }

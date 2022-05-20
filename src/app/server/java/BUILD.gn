@@ -26,6 +26,8 @@ static_library("jni") {
   sources = [
     "AndroidAppServerWrapper.cpp",
     "AndroidAppServerWrapper.h",
+    "ChipFabricProvider-JNI.cpp",
+    "ChipFabricProvider-JNI.h",
     "CHIPAppServer-JNI.cpp",
     "ChipThreadWork.cpp",
     "ChipThreadWork.h",
@@ -58,7 +60,9 @@ android_library("java") {
 
   sources = [
     "src/chip/appserver/ChipAppServer.java",
+    "src/chip/appserver/ChipFabricProvider.java",
     "src/chip/appserver/ChipAppServerException.java",
+    "src/chip/appserver/Fabric.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
