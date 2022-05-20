@@ -73,13 +73,15 @@ mirror your environment to a reasonable degree. For this, at a minimum the
 platforms on which everything is running is needed.
 
 Try to provide as much information as seems relevant. At a minimum this could
-look like `Failed to commission nrf board using chip-tool running on linux`.
+look like `Failed to commission nrf board using chip-tool running on linux. Used
+build on SHA abcde...`.
 This provides basic information (use nrf board, use chip-tool on linux, default
 build) that can get started. Beyond that, you can refine if more items seem
 relevant:
 
--   `Tested on TE9` or `Tested on master as of SHA abcd` gives a build reference
-    point. Important when branches/tags are used instead of master branch
+-   `Tested on TE9` or `Tested on interop branch xyz` gives a build reference
+    point. Useful when branches/tags are used instead of master branch as development
+    happens on master branch.
 
 -   `Thread devices fail, tested with qpg and efr32` shows that this seems to be
     a general thread issue and developer can investigate on multiple of them
