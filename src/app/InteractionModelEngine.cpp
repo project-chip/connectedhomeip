@@ -792,14 +792,14 @@ void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
 
     while (pCurListItem != apReadClient)
     {
+        //
+        // Item must exist in this tracker list. If not, there's a bug somewhere.
+        //
+        VerifyOrDie(pCurListItem != nullptr);
+
         pPrevListItem = pCurListItem;
         pCurListItem  = pCurListItem->GetNextClient();
     }
-
-    //
-    // Item must exist in this tracker list. If not, there's a bug somewhere.
-    //
-    VerifyOrDie(pCurListItem != nullptr);
 
     if (pPrevListItem)
     {
