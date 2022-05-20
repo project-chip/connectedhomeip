@@ -460,9 +460,9 @@ CHIP_ERROR ClusterStateCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs
     // wildcard), (wildcard, C1, A1)
     for (auto & attribute1 : aAttributePaths)
     {
-        bool intersected = false;
         if (attribute1.HasWildcardAttributeId())
         {
+            bool intersected = false;
             for (auto & attribute2 : aAttributePaths)
             {
                 if (attribute2.HasWildcardAttributeId())
