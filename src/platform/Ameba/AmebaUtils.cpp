@@ -100,6 +100,9 @@ CHIP_ERROR AmebaUtils::GetWiFiConfig(rtw_wifi_config_t *config)
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, config->password, sizeof(config->password), &credentialsLen);
     SuccessOrExit(err);
 
+    config->ssid_len = ssidLen;
+    config->password_len = credentialsLen;
+
 exit:
     return err;
 }
