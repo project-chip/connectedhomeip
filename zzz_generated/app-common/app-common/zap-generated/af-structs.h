@@ -64,20 +64,6 @@ typedef struct _Dimension
     uint8_t metric;
 } Dimension;
 
-// Struct for AttributeValuePair
-typedef struct _AttributeValuePair
-{
-    chip::AttributeId attributeId;
-    /* TYPE WARNING: array array defaults to */ uint8_t * attributeValue;
-} AttributeValuePair;
-
-// Struct for SceneExtensionFieldSet
-typedef struct _SceneExtensionFieldSet
-{
-    chip::ClusterId clusterId;
-    /* TYPE WARNING: array array defaults to */ uint8_t * attributeValueList;
-} SceneExtensionFieldSet;
-
 // Struct for AdditionalInfo
 typedef struct _AdditionalInfo
 {
@@ -124,6 +110,20 @@ typedef struct _ModeOptionStruct
     uint8_t Mode;
     /* TYPE WARNING: array array defaults to */ uint8_t * SemanticTags;
 } ModeOptionStruct;
+
+// Struct for AttributeValuePair
+typedef struct _AttributeValuePair
+{
+    chip::AttributeId AttributeId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * AttributeValue;
+} AttributeValuePair;
+
+// Struct for ExtensionFieldSet
+typedef struct _ExtensionFieldSet
+{
+    chip::ClusterId ClusterId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * AttributeValueList;
+} ExtensionFieldSet;
 
 // Struct for NestedStructList
 typedef struct _NestedStructList
