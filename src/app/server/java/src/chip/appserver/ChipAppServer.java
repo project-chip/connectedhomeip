@@ -27,8 +27,7 @@ public class ChipAppServer {
 
     if (mChipFabricProvider == null) {
       synchronized (this) {
-        if (mChipFabricProvider == null)
-          mChipFabricProvider = new ChipFabricProvider();
+        if (mChipFabricProvider == null) mChipFabricProvider = new ChipFabricProvider();
       }
     }
 
