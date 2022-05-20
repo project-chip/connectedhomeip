@@ -15,7 +15,7 @@
 {{~#*inline "maybePrepareArguments"}}
 {{#unless isWait}}
 {{#if hasSpecificArguments}}
-    {{#if (chip_tests_item_has_list)}}ListFreer listFreer;{{/if~}}
+    ListFreer listFreer;
     {{asEncodableType}} value;
     {{#chip_tests_item_parameters}}
         {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
