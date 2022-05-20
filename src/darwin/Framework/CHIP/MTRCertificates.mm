@@ -176,7 +176,8 @@ struct AutoPlatformMemory {
     return subject1.IsEqual(subject2);
 }
 
-+ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair error:(NSError * __autoreleasing _Nullable * _Nullable)error
++ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair
+                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
     AutoPlatformMemory platformMemory;
 

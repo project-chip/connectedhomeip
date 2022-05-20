@@ -124,7 +124,8 @@ NS_ASSUME_NONNULL_BEGIN
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
-+ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair error:(NSError * __autoreleasing _Nullable * _Nullable)error;
++ (nullable NSData *)generateCertificateSigningRequest:(id<CHIPKeypair>)keypair
+                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error;
 
 @end
 
