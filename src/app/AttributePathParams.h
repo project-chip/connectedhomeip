@@ -96,7 +96,7 @@ struct AttributePathParams
         return true;
     }
 
-    bool IsAttributePathOverlapped(const AttributePathParams & other) const
+    bool Intersects(const AttributePathParams & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || other.HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || other.HasWildcardClusterId() || mClusterId == other.mClusterId, false);

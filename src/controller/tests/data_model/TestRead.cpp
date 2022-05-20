@@ -431,7 +431,8 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         delegate.mNumAttributeResponse = 0;
     }
