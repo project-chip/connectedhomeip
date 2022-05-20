@@ -52,7 +52,7 @@ tests:
           CommissioningCustomFlowUrl field of the DCL. Verify that the
           CommissioningCustomFlow field is set to a value = 2"
       verification: |
-          1. Verify CommissioningCustomFlow=1 
+          1. Verify CommissioningCustomFlow=1
           2. Verify CommissioningModeInitialStepsHint contains a valid, non-zero integer
       disabled: true
 
@@ -62,7 +62,7 @@ tests:
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
 
-          2. Verify DUT is advertising in commissioning mode. On DUT, 
+          2. Verify DUT is advertising in commissioning mode. On DUT,
 
           $  ./out/chip-tool/chip-tool discover commissionables
           [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32

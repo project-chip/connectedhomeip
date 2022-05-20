@@ -64,7 +64,7 @@ tests:
           for triggering the DUT Commissioner for commissioning, and for
           completing the commissioning process using BLE."
       verification: |
-          TH all-clusters-app: 
+          TH all-clusters-app:
           [1651104141.533461][26507:26507] CHIP:SVR: Commissioning completed successfully
           [1651104141.533498][26507:26507] CHIP:DIS: Updating services using commissioning mode 0
 
