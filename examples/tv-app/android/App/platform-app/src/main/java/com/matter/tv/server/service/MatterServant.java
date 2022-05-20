@@ -27,6 +27,9 @@ import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+
+import com.matter.tv.server.handlers.ContentAppEndpointManagerImpl;
+import com.matter.tv.server.model.ContentApp;
 import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.Clusters;
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
@@ -61,7 +64,12 @@ public class MatterServant {
     return SingletonHolder.instance;
   }
 
+  private Context context;
+
   public void init(@NonNull Context context) {
+
+    this.context = context;
+
     // The order is important, must
     // first new TvApp to load dynamic library
     // then chipPlatform to prepare platform
@@ -138,5 +146,13 @@ public class MatterServant {
 
   public void updateLevel(int value) {
     mTvApp.setCurrentLevel(mLevelEndpoint, value);
+  }
+
+  public int addContentApp(ContentApp app) {
+    return mTvApp.addContentApp(app.getVendorName(), app.getVendorId(), app.getAppName(), app.getProductId(), "1.0", new ContentAppEndpointManagerImpl(context));
+  }
+
+  public void sendTestMessage(int endpoint, String message) {
+    mTvApp.sendTestMessage(endpoint, message);
   }
 }

@@ -1,13 +1,16 @@
 {
   "clusters": [
     {
-      "identifier": "0x050a",
-      "features": "CS"
+      "identifier": 1289,
+      "features": ["NV", "LK", "NK"]
     },
     {
-      "identifier": "0x0506",
-      "features": "AS",
-      "optionalCommands" : [4, 5]
+      "identifier": 1290,
+      "features": ["CS"],
+    },
+    {
+      "identifier": 1286,
+      "features": ["AS"],
     }
   ]
 }

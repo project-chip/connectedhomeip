@@ -29,12 +29,15 @@
 #include <functional>
 #include <stdbool.h>
 #include <stdint.h>
+#include <jni.h>
+#include <lib/support/JniReferences.h>
 
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/application-launcher/ApplicationLauncherManager.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
+#include "ContentAppCommandDelegate.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
 #include "KeypadInputManager.h"
@@ -50,6 +53,9 @@
 
 CHIP_ERROR InitVideoPlayerPlatform();
 CHIP_ERROR PreServerInit();
+EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                   const char * szApplicationVersion, jobject manager);
+void SendTestMessage(EndpointId epID, const char * message);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -65,6 +71,7 @@ using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
 using SupportedStreamingProtocol  = app::Clusters::ContentLauncher::SupportedStreamingProtocol;
+using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
 
 static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
 
@@ -75,12 +82,13 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, const char * setupPIN) :
+                   const char * szApplicationVersion, const char * setupPIN, jobject manager) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate({ "image/*", "video/*" },
-                                                                  to_underlying(SupportedStreamingProtocol::kDash) |
-                                                                      to_underlying(SupportedStreamingProtocol::kHls)),
+        mAccountLoginDelegate(setupPIN), 
+        mContentLauncherDelegate(ContentAppCommandDelegate(manager), { "image/*", "video/*" },
+                                            to_underlying(SupportedStreamingProtocol::kDash) |
+                                            to_underlying(SupportedStreamingProtocol::kHls)),        
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
@@ -88,12 +96,14 @@ public:
     ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
     ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
     ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
-    ContentLauncherDelegate * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
+    ContentLauncherDelegate * GetContentLauncherDelegate() override { mContentLauncherDelegate.SetEndpointId(GetEndpointId()); return &mContentLauncherDelegate; };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
+
 protected:
+
     ApplicationBasicManager mApplicationBasicDelegate;
     AccountLoginManager mAccountLoginDelegate;
     ApplicationLauncherManager mApplicationLauncherDelegate;
@@ -102,6 +112,7 @@ protected:
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;
+
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
@@ -119,6 +130,10 @@ public:
     // Lookup ContentApp for this catalog id / app id and load it
     ContentApp * LoadContentApp(const CatalogVendorApp & vendorApp) override;
 
+    EndpointId AddContentApp(ContentAppImpl & app);
+
+    void SendTestMessage(EndpointId epID, const char * message);
+
     // Gets the catalog vendor ID used by this platform
     uint16_t GetPlatformCatalogVendorId() override;
 
@@ -127,11 +142,11 @@ public:
     CHIP_ERROR ConvertToPlatformCatalogVendorApp(const CatalogVendorApp & sourceApp, CatalogVendorApp * destinationApp) override;
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = {
-        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890"),
-        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021"),
-        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
-        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021")
+    std::vector<ContentAppImpl> mContentApps{
+        ContentAppImpl("Vendor1", 1, "exampleid", 11, "Version1", "34567890", nullptr),
+        ContentAppImpl("Vendor2", 65521, "exampleString", 32768, "Version2", "20202021", nullptr),
+        ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021", nullptr),
+        ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2", "20202021", nullptr)
     };
 };
 

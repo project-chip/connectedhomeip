@@ -9,17 +9,10 @@
         android:layout_height="wrap_content"
         android:text="TextView" />
 
-    <TextView
-        android:id="@+id/appDetailsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_toEndOf="@id/appNameTextView" />
-
     <Button
         android:id="@+id/sendMessageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Button"
-        android:layout_toEndOf="@id/appDetailsTextView" />
+        android:layout_toEndOf="@id/appNameTextView" />
 </RelativeLayout>
