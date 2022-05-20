@@ -125,7 +125,7 @@ restylers:
       interpreters: []
     - name: clang-format
       enabled: true
-      image: restyled/restyler-clang-format:v9.0.0
+      image: restyled/restyler-clang-format:v13.0.1
       command:
           - clang-format
           - "-i"
