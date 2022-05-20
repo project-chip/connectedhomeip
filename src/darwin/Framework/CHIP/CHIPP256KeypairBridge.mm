@@ -31,6 +31,7 @@ CHIP_ERROR CHIPP256KeypairBridge::Init(id<CHIPKeypair> keypair)
     if (![keypair respondsToSelector:@selector(ECDSA_sign_message_DER:)]
         && ![keypair respondsToSelector:@selector(ECDSA_sign_message_raw:)]) {
         // Not a valid CHIPKeypair implementation.
+        NSLog(@"Keypair does not support message signing");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
