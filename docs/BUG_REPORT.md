@@ -92,3 +92,23 @@ relevant:
 - `Passes with chip-tool-darwin and repl but fails with chip-tool` helps the
   developer in narrowing down the problem
 
+### Additional information
+
+Providing additional information that can be helpful is encouraged. Each bug
+report is different here. Some examples:
+
+- `This worked last week (around Jan 5) but started failing in recent master
+  builds`
+
+- `Specification changed this attribute from optional to mandatory so this
+  may be the cause of the issue`
+
+- `This issue may be related to #1234 as the same error is seen, however the
+  reproduction steps seemed distinct enough that I openend a new issue`
+
+- `While running this, I observed 100% CPU before the operation finally timed
+  out`
+
+- `While running this test, I observed device under test rebooting, logs attached.`
+
+- `This only happens intermitently - I see it about 30% of the time`
