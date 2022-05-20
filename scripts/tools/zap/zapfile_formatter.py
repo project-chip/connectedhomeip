@@ -62,7 +62,7 @@ class Mutator:
         pass
 
 
-class ValidateManditoryServerClusterAttributes(Mutator):
+class ValidateMandatoryServerClusterAttributes(Mutator):
     def __init__(self, attribute_entry, add_if_missing, forces_include, replace_if_storage_nvm):
         self._attribute_entry = attribute_entry
         self._add_if_missing = add_if_missing
@@ -93,7 +93,7 @@ class ValidateManditoryServerClusterAttributes(Mutator):
         if not isinstance(candidate, dict):
             return
 
-        # We only care about adding manditory attributes.
+        # We only care about adding mandatory attributes.
         if "attributes" not in candidate:
             return
 
@@ -164,12 +164,12 @@ def setupArgumentsParser():
     parser = argparse.ArgumentParser(description='Mutate ZAP files')
     parser.add_argument('zap_filenames', metavar='zap-filename', type=str, nargs='+',
                         help='zapfiles that need mutating')
-    parser.add_argument('--manditory-attributes-add-missing', default=False, action='store_true',
-                        help="Add missing manditory attributes to server clusters (default: False)")
-    parser.add_argument('--manditory-attributes-force-included', default=False, action='store_true',
-                        help="If manditory attribute is not included, include it (default: False)")
-    parser.add_argument('--manditory-attributes-replace-if-storage-nvm', default=False, action='store_true',
-                        help="Enforce manditory attribute use default storage type (default: False)")
+    parser.add_argument('--mandatory-attributes-add-missing', default=False, action='store_true',
+                        help="Add missing mandatory attributes to server clusters (default: False)")
+    parser.add_argument('--mandatory-attributes-force-included', default=False, action='store_true',
+                        help="If mandatory attribute is not included, include it (default: False)")
+    parser.add_argument('--mandatory-attributes-replace-if-storage-nvm', default=False, action='store_true',
+                        help="Enforce mandatory attribute use default storage type (default: False)")
     return parser.parse_args()
 
 
@@ -177,12 +177,12 @@ def main():
     args = setupArgumentsParser()
 
     mutators = []
-    add_missing_cluster_revision = ValidateManditoryServerClusterAttributes(
-        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.manditory_attributes_add_missing,
-        args.manditory_attributes_force_included, args.manditory_attributes_replace_if_storage_nvm)
-    add_missing_feature_map = ValidateManditoryServerClusterAttributes(
-        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.manditory_attributes_add_missing,
-        args.manditory_attributes_force_included, args.manditory_attributes_replace_if_storage_nvm)
+    add_missing_cluster_revision = ValidateMandatoryServerClusterAttributes(
+        _DEFAULT_CLUSTER_REVISION_ATTRIBUTE, args.mandatory_attributes_add_missing,
+        args.mandatory_attributes_force_included, args.mandatory_attributes_replace_if_storage_nvm)
+    add_missing_feature_map = ValidateMandatoryServerClusterAttributes(
+        _DEFAULT_FEATURE_MAP_ATTRIBUTE, args.mandatory_attributes_add_missing,
+        args.mandatory_attributes_force_included, args.mandatory_attributes_replace_if_storage_nvm)
 
     mutators.extend([add_missing_cluster_revision, add_missing_feature_map])
 
