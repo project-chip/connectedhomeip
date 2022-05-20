@@ -199,7 +199,7 @@
 // Scenes FeatureMap Attribute Toggle Scenes Name feature
 // App cluster specs 1.4.4
 #define MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK 0x0001
-#define MATTER_CLUSTER_SCENE_NAME_SUPPORT (0x0000 | MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK)
+#define MATTER_CLUSTER_SCENE_NAME_SUPPORT (0x0000 & MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK)
 
 // Use this macro to check if the server side of the Software Diagnostics cluster is included
 #define ZCL_USING_SOFTWARE_DIAGNOSTICS_CLUSTER_SERVER
