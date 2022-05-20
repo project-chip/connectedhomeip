@@ -74,7 +74,7 @@ public:
 
 private:
     static CastingServer * castingServer_;
-    CastingServer() {}
+    CastingServer();
 
     bool mInited = false;
     TargetVideoPlayerInfo mTargetVideoPlayerInfo;

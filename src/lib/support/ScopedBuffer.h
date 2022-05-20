@@ -160,5 +160,65 @@ public:
     }
 };
 
+/**
+ * Represents a memory buffer with buffer size allocated using chip::Platform::Memory*Alloc
+ * methods.
+ *
+ * Use for RAII to auto-free after use.
+ */
+template <typename T>
+class ScopedMemoryBufferWithSize : public ScopedMemoryBuffer<T>
+{
+public:
+    ScopedMemoryBufferWithSize() {}
+    ScopedMemoryBufferWithSize(ScopedMemoryBufferWithSize && other) { *this = std::move(other); }
+
+    ScopedMemoryBufferWithSize & operator=(ScopedMemoryBufferWithSize && other)
+    {
+        if (this != &other)
+        {
+            mSize       = other.mSize;
+            other.mSize = 0;
+        }
+        ScopedMemoryBuffer<T>::operator=(std::move(other));
+        return *this;
+    }
+
+    ~ScopedMemoryBufferWithSize() { mSize = 0; }
+
+    // return the size in bytes
+    inline size_t BufferByteSize() const { return mSize; }
+
+    T * Release()
+    {
+        T * buffer = ScopedMemoryBuffer<T>::Release();
+        mSize      = 0;
+        return buffer;
+    }
+
+    ScopedMemoryBufferWithSize & Calloc(size_t elementCount)
+    {
+        ScopedMemoryBuffer<T>::Calloc(elementCount);
+        if (this->Get() != nullptr)
+        {
+            mSize = elementCount * sizeof(T);
+        }
+        return *this;
+    }
+
+    ScopedMemoryBufferWithSize & Alloc(size_t size)
+    {
+        ScopedMemoryBuffer<T>::Alloc(size);
+        if (this->Get() != nullptr)
+        {
+            mSize = size * sizeof(T);
+        }
+        return *this;
+    }
+
+private:
+    size_t mSize = 0;
+};
+
 } // namespace Platform
 } // namespace chip

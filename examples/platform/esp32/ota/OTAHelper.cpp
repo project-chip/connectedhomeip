@@ -22,29 +22,31 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
+#include <system/SystemEvent.h>
 
 using namespace chip::DeviceLayer;
 using namespace chip;
 
 namespace {
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
-#endif
 } // namespace
-void OTAHelpers::InitOTARequestor()
-{
 
-#if CONFIG_ENABLE_OTA_REQUESTOR
+static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+{
     SetRequestorInstance(&gRequestorCore);
     gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
+}
+
+void OTAHelpers::InitOTARequestor()
+{
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
+                                                nullptr);
 }

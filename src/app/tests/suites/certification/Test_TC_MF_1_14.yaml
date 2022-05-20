@@ -52,7 +52,7 @@ tests:
 
           On 2nd controller using chip tool connect using manual code
 
-          ./chip-tool pairing manualcode 1 35484132896
+          ./chip-tool pairing code 1 35484132896
       disabled: true
 
     - label:
@@ -79,7 +79,7 @@ tests:
 
           On 3rd controller using chip tool connect using manual code
 
-          ./chip-tool pairing manualcode 1 35484132896
+          ./chip-tool pairing code 1 35484132896
       disabled: true
 
     - label:

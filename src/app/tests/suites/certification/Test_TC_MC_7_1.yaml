@@ -28,31 +28,25 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Disabled due to issue- #13029
     - label: "Reads the OutputList attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "OutputList"
       response:
-          saveAs: outputListValues
           constraints:
-              type: list
+              type: OutPutInfo
 
-    #Disabled due to issue- #13029
+    #Issue 18100
     - label: "Sends a SelectAudioOutput command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SelectOutput"
       arguments:
           values:
               - name: "Index"
-                value: outputListValues
+                value: 1
 
-    #Disabled due to issue- #13029
     - label: "Reads the CurrentOutput attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
-      attribute: "OutputList"
+      attribute: "CurrentOutput"
       response:
-          value: outputListValues
-          constarints:
-              type: uint8
+          value: 1

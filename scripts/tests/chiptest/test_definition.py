@@ -79,16 +79,6 @@ class App:
     def waitForAnyAdvertisement(self):
         self.__waitFor("mDNS service published:", self.process, self.outpipe)
 
-    def waitForCommissionableAdvertisement(self):
-        self.__waitFor("mDNS service published: _matterc._udp",
-                       self.process, self.outpipe)
-        return True
-
-    def waitForOperationalAdvertisement(self):
-        self.__waitFor("mDNS service published: _matter._tcp",
-                       self.process, self.outpipe)
-        return True
-
     def waitForMessage(self, message):
         self.__waitFor(message, self.process, self.outpipe)
         return True
@@ -273,7 +263,7 @@ class TestDefinition:
             # Only start and pair the default app
             app = apps_register.get('default')
             app.start()
-            pairing_cmd = tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, app.setupCode]
+            pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
             if sys.platform != 'darwin':
                 pairing_cmd.append('--paa-trust-store-path')
                 pairing_cmd.append(DEVELOPMENT_PAA_LIST)

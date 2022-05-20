@@ -66,7 +66,7 @@ CHIP_ERROR CHIPP256KeypairBridge::Deserialize(P256SerializedKeypair & input)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length)
+CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -75,7 +75,7 @@ CHIP_ERROR CHIPP256KeypairBridge::NewCertificateSigningRequest(uint8_t * csr, si
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
     if (!HasKeypair()) {
         CHIP_LOG_ERROR("ECDSA sign msg failure: no keypair to sign with.");
@@ -121,7 +121,8 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
+CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(
+    const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;

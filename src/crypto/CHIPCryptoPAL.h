@@ -322,7 +322,7 @@ public:
      *CSR.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) = 0;
+    virtual CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const = 0;
 
     /**
      * @brief A function to sign a msg using ECDSA
@@ -332,7 +332,7 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) = 0;
+    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
 
     /**
      * @brief A function to sign a hash using ECDSA
@@ -342,7 +342,7 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) = 0;
+    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) const = 0;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -416,7 +416,7 @@ public:
      *CSR.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
+    CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
 
     /**
      * @brief A function to sign a msg using ECDSA
@@ -426,7 +426,7 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief A function to sign a hash using ECDSA
@@ -436,7 +436,7 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief A function to derive a shared secret using ECDH
@@ -462,7 +462,7 @@ public:
 
 private:
     P256PublicKey mPublicKey;
-    P256KeypairContext mKeypair;
+    mutable P256KeypairContext mKeypair;
     bool mInitialized = false;
 };
 
@@ -615,6 +615,27 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
                            const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
+
+/**
+ * @brief Generate a PKCS#10 CSR, usable for Matter, from a P256Keypair.
+ *
+ * This uses first principles ASN.1 encoding to avoid relying on the CHIPCryptoPAL backend
+ * itself, other than to provide an implementation of a P256Keypair * that supports
+ * at least `::Pubkey()` and `::ECDSA_sign_msg`. This allows using it with
+ * OS/Platform-bridged private key handling, without requiring a specific
+ * implementation of other bits like ASN.1.
+ *
+ * The CSR will have subject OU set to `CSA`. This is needed since omiting
+ * subject altogether often trips CSR parsing code. The profile at the CA can
+ * be configured to ignore CSR requested subject.
+ *
+ * @param keypair The key pair for which a CSR should be generated. Must not be null.
+ * @param csr_span Span to hold the resulting CSR. Must be at least kMAX_CSR_Length.  Otherwise returns CHIP_ERROR_BUFFER_TOO_SMALL.
+ *                 It will get resized to actual size needed on success.
+
+ * @return Returns a CHIP_ERROR from P256Keypair or ASN.1 backend on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, MutableByteSpan & csr_span);
 
 /**
  * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.

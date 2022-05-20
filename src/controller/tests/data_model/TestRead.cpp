@@ -41,6 +41,19 @@ namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
 constexpr DataVersion kDataVersion   = 5;
+bool expectedAttribute1              = true;
+int16_t expectedAttribute2           = 42;
+uint64_t expectedAttribute3          = 0xdeadbeef0000cafe;
+uint8_t expectedAttribute4[256]      = {
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+};
 
 enum ResponseDirective
 {
@@ -141,7 +154,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
+bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
 {
     if (aRequiredVersion == kDataVersion)
     {
@@ -188,6 +201,9 @@ public:
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TwoParallelReads(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TooManyPaths(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext);
 
 private:
     static constexpr uint16_t kTestMinInterval = 33;
@@ -235,8 +251,10 @@ public:
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
+            ChipLogProgress(DataManagement, "\t\t -- attribute  status sucess");
             mNumAttributeResponse++;
         }
+        ChipLogProgress(DataManagement, "\t\t -- OnAttributeData is called");
     }
 
     void OnError(CHIP_ERROR aError) override
@@ -412,11 +430,41 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -450,11 +498,37 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint1, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -483,11 +557,49 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -520,11 +632,40 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -552,11 +693,49 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -592,11 +771,40 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -629,11 +837,40 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 3);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version1.HasValue());
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -661,11 +898,49 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -698,11 +973,49 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 1));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint3, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint3, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse             = 0;
         readPrepareParams.mpEventPathParamsList    = nullptr;
         readPrepareParams.mEventPathParamsListSize = 0;
@@ -741,14 +1054,71 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 12);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 2));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint2, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version2.HasValue() && (version2.Value() == 2));
         Optional<DataVersion> version3;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint1, Test::MockClusterId(2), version3) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath3(Test::kMockEndpoint1, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath3, version3) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version3.HasValue() && (version3.Value() == 2));
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint1, Test::MockClusterId(2), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
         delegate.mNumAttributeResponse = 0;
     }
 
@@ -785,17 +1155,137 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 7);
         NL_TEST_ASSERT(apSuite, !delegate.mReadError);
         Optional<DataVersion> version1;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(3), version1) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath1(Test::kMockEndpoint2, Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 2));
         Optional<DataVersion> version2;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint2, Test::MockClusterId(2), version2) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath2(Test::kMockEndpoint2, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version2.HasValue() && (version2.Value() == 2));
         Optional<DataVersion> version3;
-        NL_TEST_ASSERT(apSuite, cache.GetVersion(Test::kMockEndpoint1, Test::MockClusterId(2), version3) == CHIP_NO_ERROR);
+        app::ConcreteClusterPath clusterPath3(Test::kMockEndpoint1, Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath3, version3) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, version3.HasValue() && (version3.Value() == 2));
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint1, Test::MockClusterId(2), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(3), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint2, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
         delegate.mNumAttributeResponse             = 0;
         readPrepareParams.mpEventPathParamsList    = nullptr;
         readPrepareParams.mEventPathParamsListSize = 0;
+    }
+
+    // Read of E3C2 which has a oversized list attribute, MockAttributeId (4). It would use none stored data versions in the cache
+    // since previous read does not cache any committed data version for E3C2, and expect to cache E3C2's version
+    {
+        testId++;
+        ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams1[1];
+        attributePathParams1[0].mEndpointId = Test::kMockEndpoint3;
+        attributePathParams1[0].mClusterId  = Test::MockClusterId(2);
+
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams.mAttributePathParamsListSize = 1;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        app::ConcreteClusterPath clusterPath(Test::kMockEndpoint3, Test::MockClusterId(2));
+
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath, version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(1));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            bool receivedAttribute1;
+            reader.Get(receivedAttribute1);
+            NL_TEST_ASSERT(apSuite, receivedAttribute1 == expectedAttribute1);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            int16_t receivedAttribute2;
+            reader.Get(receivedAttribute2);
+            NL_TEST_ASSERT(apSuite, receivedAttribute2 == expectedAttribute2);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint64_t receivedAttribute3;
+            reader.Get(receivedAttribute3);
+            NL_TEST_ASSERT(apSuite, receivedAttribute3 == expectedAttribute3);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) == CHIP_NO_ERROR);
+            uint8_t receivedAttribute4[256];
+            reader.GetBytes(receivedAttribute4, 256);
+            NL_TEST_ASSERT(apSuite, memcmp(receivedAttribute4, expectedAttribute4, 256));
+        }
+        delegate.mNumAttributeResponse = 0;
     }
 
     NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
@@ -1823,6 +2313,168 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
+void TestReadInteraction::TestReadHandler_TwoParallelReads(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace chip::app;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    chip::Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = app::InteractionModelEngine::GetInstance();
+    engine->SetForceHandlerQuota(true);
+
+    app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    // Read full wildcard paths, repeat twice to ensure chunking.
+    chip::app::AttributePathParams attributePathParams[2];
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+
+    {
+        MockInteractionModelApp delegate1;
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+        app::ReadClient readClient1(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate1,
+                                    ReadClient::InteractionType::Read);
+
+        MockInteractionModelApp delegate2;
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate2.mReadError);
+        ReadClient readClient2(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate2,
+                               ReadClient::InteractionType::Read);
+
+        CHIP_ERROR err = readClient1.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readClient2.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse != 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, delegate2.mReadError);
+
+        StatusIB status(delegate2.mError);
+        NL_TEST_ASSERT(apSuite, status.mStatus == Protocols::InteractionModel::Status::Busy);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    engine->SetForceHandlerQuota(false);
+}
+
+// Needs to be larger than our plausible path pool.
+constexpr size_t sTooLargePathCount = 200;
+
+void TestReadInteraction::TestReadHandler_TooManyPaths(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace chip::app;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    chip::Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = InteractionModelEngine::GetInstance();
+    engine->SetForceHandlerQuota(true);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    // Needs to be larger than our plausible path pool.
+    chip::app::AttributePathParams attributePathParams[sTooLargePathCount];
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+
+    {
+        MockInteractionModelApp delegate;
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                              ReadClient::InteractionType::Read);
+
+        CHIP_ERROR err = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, delegate.mReadError);
+
+        StatusIB status(delegate.mError);
+        NL_TEST_ASSERT(apSuite, status.mStatus == Protocols::InteractionModel::Status::PathsExhausted);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    engine->SetForceHandlerQuota(false);
+}
+
+void TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace chip::app;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    chip::Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    auto * engine = InteractionModelEngine::GetInstance();
+    engine->SetForceHandlerQuota(true);
+
+    {
+        MockInteractionModelApp delegate1;
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+        ReadClient readClient1(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate1,
+                               ReadClient::InteractionType::Read);
+
+        MockInteractionModelApp delegate2;
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, !delegate2.mReadError);
+        ReadClient readClient2(InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate2,
+                               ReadClient::InteractionType::Read);
+
+        ReadPrepareParams readPrepareParams1(ctx.GetSessionBobToAlice());
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        chip::app::AttributePathParams attributePathParams1[2];
+        readPrepareParams1.mpAttributePathParamsList    = attributePathParams1;
+        readPrepareParams1.mAttributePathParamsListSize = ArraySize(attributePathParams1);
+
+        CHIP_ERROR err = readClient1.SendRequest(readPrepareParams1);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ReadPrepareParams readPrepareParams2(ctx.GetSessionBobToAlice());
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        chip::app::AttributePathParams attributePathParams2[sTooLargePathCount];
+        readPrepareParams2.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams2.mAttributePathParamsListSize = ArraySize(attributePathParams2);
+
+        err = readClient2.SendRequest(readPrepareParams2);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate1.mNumAttributeResponse != 0);
+        NL_TEST_ASSERT(apSuite, !delegate1.mReadError);
+
+        NL_TEST_ASSERT(apSuite, delegate2.mNumAttributeResponse == 0);
+        NL_TEST_ASSERT(apSuite, delegate2.mReadError);
+
+        StatusIB status(delegate2.mError);
+        NL_TEST_ASSERT(apSuite, status.mStatus == Protocols::InteractionModel::Status::PathsExhausted);
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    engine->SetForceHandlerQuota(false);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -1845,6 +2497,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
     NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
     NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),
+    NL_TEST_DEF("TestReadHandler_TwoParallelReads", TestReadInteraction::TestReadHandler_TwoParallelReads),
+    NL_TEST_DEF("TestReadHandler_TooManyPaths", TestReadInteraction::TestReadHandler_TooManyPaths),
+    NL_TEST_DEF("TestReadHandler_TwoParallelReadsSecondTooManyPaths", TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths),
     NL_TEST_SENTINEL()
 };
 // clang-format on

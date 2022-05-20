@@ -56,13 +56,11 @@ tests:
       arguments:
           value: 0
 
-    #Disabled due to issue - #11670
+    #Issue 13414
     - label: "Reads the OnLevel attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "on level"
       response:
-          value: null
           constraints:
               type: uint8
 
@@ -80,13 +78,11 @@ tests:
           constraints:
               type: uint8
 
-    #Disabled due to issue - #11670
+    #Issue 13414
     - label: "Reads the OnTransitionTime attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "on transition time"
       response:
-          value: null
           constraints:
               type: uint16
 
@@ -104,13 +100,11 @@ tests:
           constraints:
               type: uint16
 
-    #Disabled due to issue - #11670
+    #Issue -13414
     - label: "Reads the OffTransitionTime attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "off transition time"
       response:
-          value: null
           constraints:
               type: uint16
 
@@ -150,13 +144,11 @@ tests:
           constraints:
               type: uint8
 
-    #Disabled due to issue - #11670
+    #issue -13414
     - label: "Reads the StartUpCurrentLevel attribute from the DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "start up current level"
       response:
-          value: null
           constraints:
               type: uint8
 

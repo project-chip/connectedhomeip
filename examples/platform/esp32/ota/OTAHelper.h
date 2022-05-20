@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <stdint.h>
 class OTAHelpers
 {
 public:
@@ -23,5 +23,6 @@ public:
         static OTAHelpers sInitOTA;
         return sInitOTA;
     }
+    static constexpr uint32_t kInitOTARequestorDelaySec = 3;
     void InitOTARequestor(void);
 };

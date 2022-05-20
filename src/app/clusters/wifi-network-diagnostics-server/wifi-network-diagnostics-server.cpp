@@ -293,35 +293,8 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler
                                                              const app::ConcreteCommandPath & commandPath,
                                                              const Commands::ResetCounts::DecodableType & commandData)
 {
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    VerifyOrExit(DeviceLayer::GetDiagnosticDataProvider().ResetWiFiNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
-
-    status = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconLostCount attribute"));
-
-    status = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconRxCount attribute"));
-
-    status = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketMulticastRxCount attribute"));
-
-    status = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketMulticastTxCount attribute"));
-
-    status = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketUnicastRxCount attribute"));
-
-    status = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketUnicastTxCount attribute"));
-
-    status = WiFiNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
-
-exit:
-    emberAfSendImmediateDefaultResponse(status);
+    DeviceLayer::GetDiagnosticDataProvider().ResetWiFiNetworkDiagnosticsCounts();
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
 
     return true;
 }

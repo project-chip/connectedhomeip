@@ -6639,7 +6639,24 @@ void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void *
                                                           length:entry_0.label.size()
                                                         encoding:NSUTF8StringEncoding];
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
-            newElement_0.semanticTag = [NSNumber numberWithUnsignedInt:entry_0.semanticTag];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = entry_0.semanticTags.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    CHIPModeSelectClusterSemanticTag * newElement_2;
+                    newElement_2 = [CHIPModeSelectClusterSemanticTag new];
+                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:entry_2.mfgCode];
+                    newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, err);
+                    return;
+                }
+                newElement_0.semanticTags = array_2;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -10379,8 +10396,16 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
             newElement_0.linkFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.linkFrameCounter];
             newElement_0.mleFrameCounter = [NSNumber numberWithUnsignedInt:entry_0.mleFrameCounter];
             newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-            newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi];
-            newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi];
+            if (entry_0.averageRssi.IsNull()) {
+                newElement_0.averageRssi = nil;
+            } else {
+                newElement_0.averageRssi = [NSNumber numberWithChar:entry_0.averageRssi.Value()];
+            }
+            if (entry_0.lastRssi.IsNull()) {
+                newElement_0.lastRssi = nil;
+            } else {
+                newElement_0.lastRssi = [NSNumber numberWithChar:entry_0.lastRssi.Value()];
+            }
             newElement_0.frameErrorRate = [NSNumber numberWithUnsignedChar:entry_0.frameErrorRate];
             newElement_0.messageErrorRate = [NSNumber numberWithUnsignedChar:entry_0.messageErrorRate];
             newElement_0.rxOnWhenIdle = [NSNumber numberWithBool:entry_0.rxOnWhenIdle];

@@ -35,7 +35,7 @@ tests:
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
 
     - label: "log a command"
@@ -49,15 +49,16 @@ tests:
     - label: "Precondition: At least 2 media items are queued"
       disabled: true
 
+    #Issue 18109
     - label: "Reads the CurrentState attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Sends a Play command to the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Play"
 
     - label: "log a command"
@@ -75,7 +76,7 @@ tests:
           value: 0
 
     - label: "Sends a StartOver command to the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "StartOver"
 
     - label: "log a command"
@@ -87,7 +88,6 @@ tests:
                 value: "Physically verify that the media is started over"
 
     - label: "Sends a Next command to the DUT"
-      disabled: true
       command: "Next"
 
     - label: "log a command"
@@ -101,7 +101,7 @@ tests:
                     loaded"
 
     - label: "Sends a Previous command to the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Previous"
 
     - label: "log a command"
@@ -115,7 +115,7 @@ tests:
                     loaded"
 
     - label: "Sends a SkipForward command to the DUT "
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SkipForward"
       arguments:
           values:
@@ -131,14 +131,14 @@ tests:
                 value: "Verify that the media has skipped forward 10 seconds"
 
     - label: "Reads the SampledPosition attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
           value: 10000
 
     - label: "Sends a SkipBackward command to the DUT "
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "SkipBackward"
       arguments:
           values:
@@ -154,7 +154,7 @@ tests:
                 value: "Verify that the media has skipped backward 10 seconds"
 
     - label: "Reads the SampledPosition attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "SampledPosition"
       response:

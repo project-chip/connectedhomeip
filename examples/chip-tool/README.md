@@ -111,7 +111,7 @@ The command below will discover devices based on the given QR code (which
 devices log when they start up) and try to pair with the first one it discovers.
 
     ```
-    $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
+    $ chip-tool pairing code ${NODE_ID_TO_ASSIGN} MT:#######
     ```
 
 In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
@@ -159,23 +159,25 @@ The client will send a single command packet and then exit.
 2. Add Group to device
 
     ```
+    $ chip-tool groups add-group GroupId GroupName node-id endpoint-id
     $ chip-tool groups add-group 0x4141 Light 1234 1
     ```
 
 3. Add group Keyset to device
 
     ```
+    $ chip-tool groupkeymanagement key-set-write GroupKeySet node-id endpoint-id
     $ chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
     "groupKeySecurityPolicy": 0, "epochKey0":
     "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
     "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, }' 1234 0
+    "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1234 0
     ```
 
 4. Bind Key to group
     ```
-    $ chip-tool groupkeymanagement write group-key-map
-    '[{"groupId": 16705, "groupKeySetID": 42, "fabricIndex": 0}]' 1234 0
+    $ chip-tool groupkeymanagement write group-key-map attr-value node-id endpoint-id
+    $ chip-tool groupkeymanagement write group-key-map '[{"groupId": 16705, "groupKeySetID": 42}]' 1234 0
     ```
 
 ## Configuring the client for Group Commands
@@ -195,13 +197,15 @@ encryption key must match the one configured on the end device.
 To add a group
 
     ```
-    $ chip-tool groupsettings add-group TestName 0x1010
+    $ chip-tool groupsettings add-group groupName groupId
+    $ chip-tool groupsettings add-group TestName 0x4141
     ```
 
 To add a keyset
 
     ```
-    $ chip-tool groupsettings add-keyset 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
+    $ chip-tool groupsettings add-keysets keysetId keyPolicy validityTime EpochKey
+    $ chip-tool groupsettings add-keysets 0xAAAA 0 0x000000000021dfe0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
     ```
 
 Take note that the epoch key must be in hex form with the 'hex:' prefix
@@ -209,7 +213,8 @@ Take note that the epoch key must be in hex form with the 'hex:' prefix
 Finally to bind the keyset to the group
 
     ```
-    $ chip-tool groupsettings bind-keyset 0x1010 0xAAAA
+    $ chip-tool groupsettings bind-keyset groupId keysetId
+    $ chip-tool groupsettings bind-keyset 0x4141 0xAAAA
     ```
 
 ## Using the Client to Send Group (Multicast) Matter Commands
@@ -219,10 +224,10 @@ the target cluster name, the target command name, the Group Id in Node Id form
 (`0xffffffffffffXXXX`) and an unused endpoint Id. Take note that Only commands
 and attributes write can be send with Group Id.
 
-E.G. sending to group Id 0x0025
+E.G. sending to group Id 0x4141
 
     ```
-    $ chip-tool onoff on 0xffffffffffff0025 1
+    $ chip-tool onoff on 0xffffffffffff4141 1
     ```
 
 The client will send a single multicast command packet and then exit.

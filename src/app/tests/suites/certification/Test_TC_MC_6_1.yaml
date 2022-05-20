@@ -32,10 +32,11 @@ tests:
     - label: "Precondition: Connect media content available for playback"
       disabled: true
 
+    #Issue 18109
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
 
     - label: "log a command"
@@ -47,14 +48,14 @@ tests:
                 value: "Verify that media is paused"
 
     - label: "Reads the CurrentState attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "sends a Play command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Play"
 
     - label: "log a command"
@@ -72,7 +73,7 @@ tests:
           value: 0
 
     - label: "sends a Pause command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
 
     - label: "log a command"
@@ -84,14 +85,14 @@ tests:
                 value: "Physically verify that the media is paused"
 
     - label: "Reads the playback state attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "sends a Stop command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "StopPlayback"
 
     - label: "log a command"
@@ -103,7 +104,7 @@ tests:
                 value: "Physically verify that the media is stoped"
 
     - label: "Reads the playback state attribute"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:

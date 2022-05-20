@@ -3307,16 +3307,16 @@ class ChipClusters:
             "commands": {
             },
             "attributes": {
-                0x00000001: {
+                0x00000000: {
                     "attributeName": "ActiveLocale",
-                    "attributeId": 0x00000001,
+                    "attributeId": 0x00000000,
                     "type": "str",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00000002: {
+                0x00000001: {
                     "attributeName": "SupportedLocales",
-                    "attributeId": 0x00000002,
+                    "attributeId": 0x00000001,
                     "type": "str",
                     "reportable": True,
                 },

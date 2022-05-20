@@ -990,35 +990,6 @@ public class ChipStructs {
     }
   }
 
-  public static class ModeSelectClusterModeOptionStruct {
-    public String label;
-    public Integer mode;
-    public Long semanticTag;
-
-    public ModeSelectClusterModeOptionStruct(String label, Integer mode, Long semanticTag) {
-      this.label = label;
-      this.mode = mode;
-      this.semanticTag = semanticTag;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterModeOptionStruct {\n");
-      output.append("\tlabel: ");
-      output.append(label);
-      output.append("\n");
-      output.append("\tmode: ");
-      output.append(mode);
-      output.append("\n");
-      output.append("\tsemanticTag: ");
-      output.append(semanticTag);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class ModeSelectClusterSemanticTag {
     public Integer mfgCode;
     public Integer value;
@@ -1037,6 +1008,38 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ModeSelectClusterModeOptionStruct {
+    public String label;
+    public Integer mode;
+    public ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags;
+
+    public ModeSelectClusterModeOptionStruct(
+        String label,
+        Integer mode,
+        ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags) {
+      this.label = label;
+      this.mode = mode;
+      this.semanticTags = semanticTags;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ModeSelectClusterModeOptionStruct {\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("\tmode: ");
+      output.append(mode);
+      output.append("\n");
+      output.append("\tsemanticTags: ");
+      output.append(semanticTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1827,8 +1830,8 @@ public class ChipStructs {
     public Long linkFrameCounter;
     public Long mleFrameCounter;
     public Integer lqi;
-    public Integer averageRssi;
-    public Integer lastRssi;
+    public @Nullable Integer averageRssi;
+    public @Nullable Integer lastRssi;
     public Integer frameErrorRate;
     public Integer messageErrorRate;
     public Boolean rxOnWhenIdle;
@@ -1843,8 +1846,8 @@ public class ChipStructs {
         Long linkFrameCounter,
         Long mleFrameCounter,
         Integer lqi,
-        Integer averageRssi,
-        Integer lastRssi,
+        @Nullable Integer averageRssi,
+        @Nullable Integer lastRssi,
         Integer frameErrorRate,
         Integer messageErrorRate,
         Boolean rxOnWhenIdle,

@@ -32,10 +32,11 @@ tests:
     - label: "Precondition: Connect media content available for playback"
       disabled: true
 
+    #Issue 18109
     - label:
           "Precondition: Media content in a paused state at the beginning of the
           content"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Pause"
 
     - label: "log a command"
@@ -47,7 +48,7 @@ tests:
                 value: "Verify that media is paused"
 
     - label: "Reads the CurrentState attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "CurrentState"
       response:
@@ -60,12 +61,8 @@ tests:
           value: 0
 
     - label: "Sends a FastForward command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "FastForward"
-      response:
-          values:
-              - name: "returnValue"
-                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -82,19 +79,15 @@ tests:
           value: 0
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 1
 
     - label: "Sends a FastForward command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "FastForward"
-      response:
-          values:
-              - name: "returnValue"
-                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -105,14 +98,14 @@ tests:
                 value: "Verify that the media play speed has increased"
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 2
 
     - label: "Sends a Rewind command to the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Rewind"
 
     - label: "log a command"
@@ -137,12 +130,8 @@ tests:
           value: -1
 
     - label: "Sends a Rewind command to the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Rewind"
-      response:
-          values:
-              - name: "returnValue"
-                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -160,12 +149,8 @@ tests:
           value: -2
 
     - label: "Sends a Play command"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Play"
-      response:
-          values:
-              - name: "returnValue"
-                value: 0
 
     - label: "log a command"
       cluster: "LogCommands"
@@ -178,20 +163,20 @@ tests:
                     default speed"
 
     - label: "Reads the PlaybackSpeed attribute from the DUT"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 1
 
     - label: "Sends consecutive FastForward commands"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "FastForward"
       response:
           error: 4
 
     - label: "Sends consecutive Rewind commands"
-      disabled: true
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "Rewind"
       response:
           error: 4

@@ -29,10 +29,8 @@
 enum class PairingMode
 {
     None,
-    QRCode,
-    ManualCode,
-    QRCodePaseOnly,
-    ManualCodePaseOnly,
+    Code,
+    CodePaseOnly,
     Ble,
     SoftAP,
     Ethernet,
@@ -79,10 +77,8 @@ public:
         {
         case PairingMode::None:
             break;
-        case PairingMode::QRCode:
-        case PairingMode::ManualCode:
-        case PairingMode::QRCodePaseOnly:
-        case PairingMode::ManualCodePaseOnly:
+        case PairingMode::Code:
+        case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ble:
@@ -132,11 +128,13 @@ public:
             AddArgument("name", &mDiscoveryFilterInstanceName);
             break;
         }
+
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(120); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(120)); }
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -161,6 +159,7 @@ private:
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
     NodeId mNodeId;
+    chip::Optional<uint16_t> mTimeout;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;

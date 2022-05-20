@@ -37,6 +37,7 @@ tests:
               type: list
 
     - label: "Rename Input Command"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "RenameInput"
       arguments:
           values:
@@ -46,6 +47,7 @@ tests:
                 value: "A1"
 
     - label: "Rename Input Command"
+      PICS: PICS_SKIP_SAMPLE_APP
       command: "RenameInput"
       arguments:
           values:
@@ -58,4 +60,5 @@ tests:
       command: "readAttribute"
       attribute: "InputList"
       response:
-          value: []
+          constraints:
+              type: list

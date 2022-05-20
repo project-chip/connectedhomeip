@@ -1203,7 +1203,12 @@ client cluster ModeSelect = 80 {
   struct ModeOptionStruct {
     char_string<32> label = 0;
     int8u mode = 1;
-    int32u semanticTag = 2;
+    SemanticTag semanticTags[] = 2;
+  }
+
+  struct SemanticTag {
+    enum16 mfgCode = 0;
+    enum16 value = 1;
   }
 
   readonly attribute char_string<32> description = 0;
@@ -1232,7 +1237,12 @@ server cluster ModeSelect = 80 {
   struct ModeOptionStruct {
     char_string<32> label = 0;
     int8u mode = 1;
-    int32u semanticTag = 2;
+    SemanticTag semanticTags[] = 2;
+  }
+
+  struct SemanticTag {
+    enum16 mfgCode = 0;
+    enum16 value = 1;
   }
 
   readonly attribute char_string<32> description = 0;
