@@ -41,7 +41,7 @@ tests:
 
     - label: "Check EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -52,13 +52,13 @@ tests:
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 290ms"
@@ -73,7 +73,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -92,7 +92,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -111,7 +111,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -122,20 +122,20 @@ tests:
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -146,13 +146,13 @@ tests:
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 3
-              - name: "rate"
+              - name: "Rate"
                 value: 5
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 40ms"
@@ -167,7 +167,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -186,7 +186,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -205,7 +205,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -216,20 +216,20 @@ tests:
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16

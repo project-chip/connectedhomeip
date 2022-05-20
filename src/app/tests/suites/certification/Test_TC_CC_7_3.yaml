@@ -41,7 +41,7 @@ tests:
 
     - label: "Reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -52,15 +52,15 @@ tests:
       command: "EnhancedStepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 0
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 50
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 1
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 10ms"
@@ -73,7 +73,7 @@ tests:
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -84,15 +84,15 @@ tests:
       command: "EnhancedStepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 1
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 75
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 1
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 10ms"
@@ -105,7 +105,7 @@ tests:
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16

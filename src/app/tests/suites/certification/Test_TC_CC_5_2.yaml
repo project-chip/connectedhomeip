@@ -41,7 +41,7 @@ tests:
 
     - label: "Check current x attribute value  matched before any change"
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentX"
       response:
           constraints:
               type: uint16
@@ -50,7 +50,7 @@ tests:
 
     - label: "Check current y attribute value matched before any change"
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentY"
       response:
           constraints:
               type: uint16
@@ -65,9 +65,9 @@ tests:
                 value: 15
               - name: "rateY"
                 value: 20
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 150ms"
@@ -82,7 +82,7 @@ tests:
           "Check current x attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentX"
       response:
           constraints:
               type: uint16
@@ -93,7 +93,7 @@ tests:
           "Check current y attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentY"
       response:
           constraints:
               type: uint16
@@ -104,16 +104,16 @@ tests:
       command: "StopMoveStep"
       arguments:
           values:
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label:
           "Check current x attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current x"
+      attribute: "CurrentX"
       response:
           constraints:
               type: uint16
@@ -124,7 +124,7 @@ tests:
           "Check current y attribute value matched the value sent by the last
           command"
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentY"
       response:
           constraints:
               type: uint16

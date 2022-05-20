@@ -43,7 +43,7 @@ tests:
 
     - label: "Reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16
@@ -54,15 +54,15 @@ tests:
       command: "EnhancedMoveToHueAndSaturation"
       arguments:
           values:
-              - name: "enhancedHue"
+              - name: "EnhancedHue"
                 value: 1200
-              - name: "saturation"
+              - name: "Saturation"
                 value: 90
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 10ms"
@@ -77,7 +77,7 @@ tests:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
           constraints:
               type: uint16

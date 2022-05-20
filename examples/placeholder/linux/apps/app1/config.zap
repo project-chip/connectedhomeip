@@ -1,5 +1,5 @@
 {
-  "featureLevel": 70,
+  "featureLevel": 71,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -8150,7 +8150,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "current hue",
+              "name": "CurrentHue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8166,7 +8166,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current saturation",
+              "name": "CurrentSaturation",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8182,7 +8182,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current x",
+              "name": "CurrentX",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -8198,7 +8198,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current y",
+              "name": "CurrentY",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -8214,7 +8214,7 @@
               "reportableChange": 0
             },
             {
-              "name": "color temperature",
+              "name": "ColorTemperature",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -8230,7 +8230,7 @@
               "reportableChange": 0
             },
             {
-              "name": "color control options",
+              "name": "Options",
               "code": 15,
               "mfgCode": null,
               "side": "server",
@@ -8246,7 +8246,7 @@
               "reportableChange": 0
             },
             {
-              "name": "couple color temp to level min-mireds",
+              "name": "CoupleColorTempToLevelMinMireds",
               "code": 16397,
               "mfgCode": null,
               "side": "server",
@@ -8262,7 +8262,7 @@
               "reportableChange": 0
             },
             {
-              "name": "start up color temperature mireds",
+              "name": "StartUpColorTemperatureMireds",
               "code": 16400,
               "mfgCode": null,
               "side": "server",
@@ -8333,5 +8333,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 258
     }
-  ]
+  ],
+  "log": []
 }

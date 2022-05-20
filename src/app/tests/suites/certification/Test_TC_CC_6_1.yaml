@@ -43,7 +43,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16
@@ -56,11 +56,11 @@ tests:
           values:
               - name: "colorTemperature"
                 value: 100
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
     - label: "Wait 10ms"
@@ -73,7 +73,7 @@ tests:
 
     - label: "Read current color temprature"
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           constraints:
               type: uint16

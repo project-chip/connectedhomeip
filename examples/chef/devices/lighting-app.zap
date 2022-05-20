@@ -6200,7 +6200,7 @@
               "reportableChange": 0
             },
             {
-              "name": "remaining time",
+              "name": "RemainingTime",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7187,7 +7187,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "current hue",
+              "name": "CurrentHue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7203,7 +7203,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current saturation",
+              "name": "CurrentSaturation",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7219,7 +7219,7 @@
               "reportableChange": 0
             },
             {
-              "name": "remaining time",
+              "name": "RemainingTime",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -7235,7 +7235,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current x",
+              "name": "currentX",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -7251,7 +7251,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current y",
+              "name": "currentY",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -7267,7 +7267,7 @@
               "reportableChange": 0
             },
             {
-              "name": "drift compensation",
+              "name": "DriftCompensation",
               "code": 5,
               "mfgCode": null,
               "side": "server",
