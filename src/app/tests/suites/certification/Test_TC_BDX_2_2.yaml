@@ -22,11 +22,19 @@ config:
 
 tests:
     - label:
+          "TH sends a SendInit message to DUT + DUT sends a SendAccept message
+          back to TH + TH sends a Block message to DUT + DUT sends a BlockAck
+          message back to TH"
+      verification: |
+          Out of scope for V1.0
+      disabled: true
+
+    - label:
           "IF (PICS_DT_Receiver_Driver) TH sends a SendInit message to DUT + DUT
           sends a SendAccept message back to TH + DUT sends a BlockQuery message
           to TH + TH sends a Block message back to DUT"
       verification: |
-          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT
+          1. Verify that the OTA Reference Provider App logs show BlockQuery message from DUT 
 
           [1636410922974] [59203:62969336] CHIP: [ATM] Handling received BDX Message
           [1636410922974] [59203:62969336] CHIP: [ATM] BlockQuery
@@ -49,10 +57,17 @@ tests:
       disabled: true
 
     - label:
+          "IF (PICS_DT_Receiver_Driver) DUT sends a BlockQueryWithSkip message
+          to TH + TH sends a Block message back to DUT"
+      verification: |
+          Out of scope for V1.0
+      disabled: true
+
+    - label:
           "TH sends a BlockEOF message to DUT + DUT sends a BlockAckEOF message
           back to TH"
       verification: |
-          1. Verify that the OTA Reference App logs show BlockAckEOF message from DUT
+          1. Verify that the OTA Reference App logs show BlockAckEOF message from DUT 
 
           [1636410936486] [59203:62969336] CHIP: [ATM] Handling received BDX Message
           [1636410936486] [59203:62969336] CHIP: [ATM] BlockAckEOF
