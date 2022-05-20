@@ -31,11 +31,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-namespace {
-constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
-constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
-} // namespace
-
 CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     CHIP_ERROR err;
@@ -45,20 +40,17 @@ CHIP_ERROR AmebaWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChan
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
-                                                   sizeof(mSavedNetwork.credentials), &credentialsLen);
+    rtw_wifi_config_t config = {0};
+    err = chip::DeviceLayer::Internal::AmebaUtils::GetWiFiConfig(&config);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
     }
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), &ssidLen);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_NO_ERROR;
-    }
-    mSavedNetwork.credentialsLen = credentialsLen;
-    mSavedNetwork.ssidLen        = ssidLen;
+    memcpy(mSavedNetwork.ssid, config.ssid, sizeof(config.ssid));
+    memcpy(mSavedNetwork.credentials, config.password, sizeof(config.password));
+    mSavedNetwork.ssidLen        = config.ssid_len;
+    mSavedNetwork.credentialsLen = config.password_len;
 
     mStagingNetwork = mSavedNetwork;
     return err;
@@ -72,9 +64,11 @@ CHIP_ERROR AmebaWiFiDriver::Shutdown()
 
 CHIP_ERROR AmebaWiFiDriver::CommitConfiguration()
 {
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kWiFiSSIDKeyName, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kWiFiCredentialsKeyName, mStagingNetwork.credentials,
-                                                                  mStagingNetwork.credentialsLen));
+    rtw_wifi_config_t config = {0};
+    memcpy(config.ssid, mStagingNetwork.ssid, mStagingNetwork.ssidLen);
+    memcpy(config.password, mStagingNetwork.credentials, mStagingNetwork.credentialsLen);
+    ReturnErrorOnFailure(chip::DeviceLayer::Internal::AmebaUtils::SetWiFiConfig(&config));
+
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;
 }
