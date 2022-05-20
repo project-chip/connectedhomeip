@@ -19,8 +19,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/Zephyr/DeviceInfoProviderImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <stdlib.h>
 #include <string.h>
