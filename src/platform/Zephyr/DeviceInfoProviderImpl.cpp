@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <cstring>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -67,7 +69,7 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
 
     VerifyOrReturnError(mIndex < 4, false);
 
-    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%ld at endpoint:%d", mIndex, mEndpoint);
+    ChipLogProgress(DeviceLayer, "Get the fixed label with index:%u at endpoint:%d", static_cast<unsigned>(mIndex), mEndpoint);
 
     switch (mIndex)
     {
