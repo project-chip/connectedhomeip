@@ -31,6 +31,7 @@
 #include <app/util/af.h>
 #include <cstdio>
 #include <inttypes.h>
+#include <jni.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/shell/Commands.h>
@@ -41,7 +42,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <jni.h>
 
 using namespace chip;
 using namespace chip::AppPlatform;
@@ -396,54 +396,63 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl & app) {
+EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl & app)
+{
     DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
     EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
-                                                            Span<const EmberAfDeviceType>(gContentAppDeviceType));
-    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId, app.GetEndpointId());
+                                                                      Span<const EmberAfDeviceType>(gContentAppDeviceType));
+    ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
+                    app.GetEndpointId());
     mContentApps.push_back(app);
     return epId;
 }
-
 
 /**
  * @brief Code for testing the message flow path.
  *
  */
-class TestCommandHandlerCallback : public app::CommandHandler::Callback {
-        void OnDone(app::CommandHandler & apCommandObj){}
+class TestCommandHandlerCallback : public app::CommandHandler::Callback
+{
+    void OnDone(app::CommandHandler & apCommandObj) {}
 
-        void DispatchCommand(app::CommandHandler & apCommandObj, const app::ConcreteCommandPath & aCommandPath,
-                                     TLV::TLVReader & apPayload){}
+    void DispatchCommand(app::CommandHandler & apCommandObj, const app::ConcreteCommandPath & aCommandPath,
+                         TLV::TLVReader & apPayload)
+    {}
 
-        Protocols::InteractionModel::Status CommandExists(const app::ConcreteCommandPath & aCommandPath){return Protocols::InteractionModel::Status::Success;}
+    Protocols::InteractionModel::Status CommandExists(const app::ConcreteCommandPath & aCommandPath)
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
 };
 
 /**
  * @brief Code for testing the message flow path.
  *
  */
-void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * message){
+void ContentAppFactoryImpl::SendTestMessage(EndpointId epId, const char * message)
+{
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage called with message %s & endpointId %d", message, epId);
     for (size_t i = 0; i < mContentApps.size(); ++i)
     {
         ContentAppImpl app = mContentApps.at(i);
         ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl checking app with endpointId %d", app.ContentApp::GetEndpointId());
-        if (app.GetEndpointId() == epId) {
+        if (app.GetEndpointId() == epId)
+        {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl SendTestMessage endpoint found");
-            app::ConcreteCommandPath commandPath(epId,app::Clusters::ContentLauncher::Id,app::Clusters::ContentLauncher::Commands::LaunchURL::Id);
+            app::ConcreteCommandPath commandPath(epId, app::Clusters::ContentLauncher::Id,
+                                                 app::Clusters::ContentLauncher::Commands::LaunchURL::Id);
             chip::AppPlatform::TestCommandHandlerCallback callback;
             app::CommandHandler commandHandler(&callback);
             CommandResponseHelper<LaunchResponseType> helper(&commandHandler, commandPath);
             chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type branding;
-            app.GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message), CharSpan::fromCharString("Temp Display"), branding);
+            app.GetContentLauncherDelegate()->HandleLaunchUrl(helper, CharSpan::fromCharString(message),
+                                                              CharSpan::fromCharString("Temp Display"), branding);
         }
     }
 }
 
 } // namespace AppPlatform
 } // namespace chip
-
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -485,11 +494,11 @@ CHIP_ERROR PreServerInit()
 }
 
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, jobject manager)
+                         const char * szApplicationVersion, jobject manager)
 {
-    ContentAppImpl app = ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "34567890", manager);
-    ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ",
-                    vendorId, szApplicationName);
+    ContentAppImpl app =
+        ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "34567890", manager);
+    ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
     return gFactory.AddContentApp(app);
 }
 

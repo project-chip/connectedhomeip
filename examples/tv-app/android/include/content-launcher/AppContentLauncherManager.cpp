@@ -16,17 +16,19 @@
  *    limitations under the License.
  */
 
-#include "../../java/ContentAppCommandDelegate.h"
 #include "AppContentLauncherManager.h"
+#include "../../java/ContentAppCommandDelegate.h"
 
 using namespace std;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
-using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
+using ContentAppCommandDelegate = chip::AppPlatform::ContentAppCommandDelegate;
 
-AppContentLauncherManager::AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols) : mCommandDelegate(commandDelegate)
+AppContentLauncherManager::AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, list<std::string> acceptHeaderList,
+                                                     uint32_t supportedStreamingProtocols) :
+    mCommandDelegate(commandDelegate)
 {
     mAcceptHeaderList            = acceptHeaderList;
     mSupportedStreamingProtocols = supportedStreamingProtocols;

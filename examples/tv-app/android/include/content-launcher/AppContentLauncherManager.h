@@ -25,16 +25,17 @@ using chip::CharSpan;
 using chip::EndpointId;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
-using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
-using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
-using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
-using ContentAppCommandDelegate   = chip::AppPlatform::ContentAppCommandDelegate;
+using ContentLauncherDelegate   = chip::app::Clusters::ContentLauncher::Delegate;
+using LaunchResponseType        = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
+using ParameterType             = chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType;
+using BrandingInformationType   = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type;
+using ContentAppCommandDelegate = chip::AppPlatform::ContentAppCommandDelegate;
 
 class AppContentLauncherManager : public ContentLauncherDelegate
 {
 public:
-    AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
+    AppContentLauncherManager(ContentAppCommandDelegate commandDelegate, std::list<std::string> acceptHeaderList,
+                              uint32_t supportedStreamingProtocols);
 
     void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                              const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
@@ -44,7 +45,7 @@ public:
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
-    void SetEndpointId(EndpointId epId) {mEndpointId = epId;};
+    void SetEndpointId(EndpointId epId) { mEndpointId = epId; };
 
 protected:
     std::list<std::string> mAcceptHeaderList;

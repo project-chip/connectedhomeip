@@ -27,19 +27,19 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
-#include <stdbool.h>
-#include <stdint.h>
 #include <jni.h>
 #include <lib/support/JniReferences.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/application-launcher/ApplicationLauncherManager.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
-#include "ContentAppCommandDelegate.h"
 #include "ChannelManager.h"
 #include "CommissionerMain.h"
+#include "ContentAppCommandDelegate.h"
 #include "KeypadInputManager.h"
 #include "MediaPlaybackManager.h"
 #include <app/clusters/account-login-server/account-login-delegate.h>
@@ -54,7 +54,7 @@
 CHIP_ERROR InitVideoPlayerPlatform();
 CHIP_ERROR PreServerInit();
 EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, jobject manager);
+                         const char * szApplicationVersion, jobject manager);
 void SendTestMessage(EndpointId epID, const char * message);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -85,10 +85,9 @@ public:
                    const char * szApplicationVersion, const char * setupPIN, jobject manager) :
         mApplicationBasicDelegate(kCatalogVendorId, BuildAppId(vendorId), szVendorName, vendorId, szApplicationName, productId,
                                   szApplicationVersion),
-        mAccountLoginDelegate(setupPIN),
-        mContentLauncherDelegate(ContentAppCommandDelegate(manager), { "image/*", "video/*" },
-                                            to_underlying(SupportedStreamingProtocol::kDash) |
-                                            to_underlying(SupportedStreamingProtocol::kHls)),
+        mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(ContentAppCommandDelegate(manager), { "image/*", "video/*" },
+                                                                  to_underlying(SupportedStreamingProtocol::kDash) |
+                                                                      to_underlying(SupportedStreamingProtocol::kHls)),
         mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
@@ -96,14 +95,16 @@ public:
     ApplicationBasicDelegate * GetApplicationBasicDelegate() override { return &mApplicationBasicDelegate; };
     ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
     ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
-    ContentLauncherDelegate * GetContentLauncherDelegate() override { mContentLauncherDelegate.SetEndpointId(GetEndpointId()); return &mContentLauncherDelegate; };
+    ContentLauncherDelegate * GetContentLauncherDelegate() override
+    {
+        mContentLauncherDelegate.SetEndpointId(GetEndpointId());
+        return &mContentLauncherDelegate;
+    };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
 
-
 protected:
-
     ApplicationBasicManager mApplicationBasicDelegate;
     AccountLoginManager mAccountLoginDelegate;
     ApplicationLauncherManager mApplicationLauncherDelegate;
@@ -112,7 +113,6 @@ protected:
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;
-
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory

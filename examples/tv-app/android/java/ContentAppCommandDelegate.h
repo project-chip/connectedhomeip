@@ -22,10 +22,9 @@
 
 #pragma once
 
-
 #include <jni.h>
-#include <lib/support/JniReferences.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/JniReferences.h>
 
 namespace chip {
 namespace AppPlatform {
@@ -33,31 +32,34 @@ namespace AppPlatform {
 class ContentAppCommandDelegate
 {
 public:
-    ContentAppCommandDelegate(jobject manager){
-            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-            VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
+    ContentAppCommandDelegate(jobject manager)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentAppEndpointManager"));
 
-            mContentAppEndpointManager = env->NewGlobalRef(manager);
-            VerifyOrReturn(mContentAppEndpointManager != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef ContentAppEndpointManager"));
+        mContentAppEndpointManager = env->NewGlobalRef(manager);
+        VerifyOrReturn(mContentAppEndpointManager != nullptr,
+                       ChipLogError(Zcl, "Failed to NewGlobalRef ContentAppEndpointManager"));
 
-            jclass ContentAppEndpointManagerClass = env->GetObjectClass(manager);
-            VerifyOrReturn(ContentAppEndpointManagerClass != nullptr, ChipLogError(Zcl, "Failed to get ContentAppEndpointManager Java class"));
+        jclass ContentAppEndpointManagerClass = env->GetObjectClass(manager);
+        VerifyOrReturn(ContentAppEndpointManagerClass != nullptr,
+                       ChipLogError(Zcl, "Failed to get ContentAppEndpointManager Java class"));
 
-            mSendCommandMethod = env->GetMethodID(ContentAppEndpointManagerClass, "sendCommand", "(ILjava/lang/String;)Ljava/lang/String;");
-            if (mSendCommandMethod == nullptr)
-            {
-                ChipLogError(Zcl, "Failed to access ContentAppEndpointManager 'sendCommand' method");
-                env->ExceptionClear();
-            }
-
+        mSendCommandMethod =
+            env->GetMethodID(ContentAppEndpointManagerClass, "sendCommand", "(ILjava/lang/String;)Ljava/lang/String;");
+        if (mSendCommandMethod == nullptr)
+        {
+            ChipLogError(Zcl, "Failed to access ContentAppEndpointManager 'sendCommand' method");
+            env->ExceptionClear();
+        }
     };
 
     const char * sendCommand(chip::EndpointId epID, std::string commandPayload);
 
 private:
-    jobject mContentAppEndpointManager          = nullptr;
-    jmethodID mSendCommandMethod                = nullptr;
+    jobject mContentAppEndpointManager = nullptr;
+    jmethodID mSendCommandMethod       = nullptr;
 };
 
-}
-}
+} // namespace AppPlatform
+} // namespace chip

@@ -23,18 +23,20 @@
 #include "ContentAppCommandDelegate.h"
 
 #include <jni.h>
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/CHIPJNIError.h>
 
 namespace chip {
 namespace AppPlatform {
 
-const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload) {
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::string commandPayload)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     UtfString jCommandPayload(env, commandPayload.c_str());
     ChipLogProgress(Zcl, "ContentAppCommandDelegate::sendCommand with payload %s", commandPayload.c_str());
-    jstring resp = (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(epID), jCommandPayload.jniValue());
+    jstring resp = (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(epID),
+                                                   jCommandPayload.jniValue());
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
@@ -42,9 +44,9 @@ const char * ContentAppCommandDelegate::sendCommand(chip::EndpointId epID, std::
         env->ExceptionClear();
         return "Failed";
     }
-    const char *ret = env->GetStringUTFChars(resp, 0);
+    const char * ret = env->GetStringUTFChars(resp, 0);
     return ret;
 }
 
-}
-}
+} // namespace AppPlatform
+} // namespace chip
