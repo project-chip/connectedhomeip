@@ -454,11 +454,33 @@ CHIP_ERROR ClusterStateCache::OnUpdateDataVersionFilterList(DataVersionFilterIBs
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter backup;
 
-    for (auto & attribute : aAttributePaths)
+    // Only put paths into mRequestPathSet if they cover clusters in their entirety and no other path in our path list
+    // points to a specific attribute from any of those clusters.
+    // this would help for data-out-of-sync issue when handling store data version for the particular case on two paths: (E1, C1,
+    // wildcard), (wildcard, C1, A1)
+    for (auto & attribute1 : aAttributePaths)
     {
-        if (attribute.HasWildcardAttributeId())
+        if (attribute1.HasWildcardAttributeId())
         {
-            mRequestPathSet.insert(attribute);
+            bool intersected = false;
+            for (auto & attribute2 : aAttributePaths)
+            {
+                if (attribute2.HasWildcardAttributeId())
+                {
+                    continue;
+                }
+
+                if (attribute1.Intersects(attribute2))
+                {
+                    intersected = true;
+                    break;
+                }
+            }
+
+            if (!intersected)
+            {
+                mRequestPathSet.insert(attribute1);
+            }
         }
     }
 
